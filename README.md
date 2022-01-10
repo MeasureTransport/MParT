@@ -3,7 +3,7 @@ A CPU/GPU performance-portable library for parameterizing and constructing monot
 
 ## Installation
 
-## Compiling from source
+### Compiling from source
 MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:
 ```
 mkdir build
