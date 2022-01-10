@@ -1,4 +1,4 @@
-# MParT: A Monotone Parameterization Toolbox
+# MParT: Monotone Parameterization Toolbox
 A CPU/GPU performance-portable library for parameterizing and constructing monotone functions in the context of measure transport and regression.
 
 ## Installation
