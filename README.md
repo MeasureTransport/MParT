@@ -1,4 +1,4 @@
-# MPart: A Monotone Parameterization Toolbox
+# MParT: A Monotone Parameterization Toolbox
 A core library for parameterizing and constructing monotone functions in the context of measure transport and regression.
 
 ## Installation
