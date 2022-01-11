@@ -29,23 +29,30 @@ author = 'The MParT development team.'
 # ones.
 extensions = [ 'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
-    'sphinx.ext.autosectionlabel',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
-    'sphinx.ext.mathjax',
-    'sphinx.ext.ifconfig',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.imgmath', 
+    'sphinx.ext.mathjax', 
     'breathe' ]
 
 breathe_default_project = "mpart"
 
+html_theme_options = {
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/MeasureTransport/MParT",
+            "icon": "fab fa-github-square",
+            "type": "fontawesome",
+        }
+   ]
+}
+html_sidebars = {
+    "**": ["search-field.html", "sidebar-nav-bs.html"]
+}
+
+
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
-
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-
-highlight_language = 'c++'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
