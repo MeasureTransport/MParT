@@ -1,0 +1,33 @@
+name: docs
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+jobs:
+  build-test-and-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          submodules: recursive
+
+      - name: Install doxygen and sphinx
+        run: sudo apt-get install -y doxygen python3-sphinx
+        
+      - name: Install sphinx extensions 
+        run: pip install breathe pydata-sphinx-theme
+
+      - name: Run CMake
+        run: |
+          cd ${{ github.workspace }}
+          mkdir build
+          cd build
+          cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON ../
+
+      - name: Build Docs
+        run: cd build; make sphinx
+

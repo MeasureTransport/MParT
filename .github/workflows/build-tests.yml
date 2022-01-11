@@ -1,4 +1,4 @@
-name: MParT CI
+name: tests
 
 on:
   push:
@@ -7,19 +7,13 @@ on:
   pull_request: {}
 
 jobs:
-  build-doc:
+  build-test-and-doc:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v1
         with:
           submodules: recursive
-
-      - name: Install doxygen and sphinx
-        run: sudo apt-get install -y doxygen python3-sphinx
-        
-      - name: Install sphinx extensions 
-        run: pip install breathe pydata-sphinx-theme
 
       - name: Run CMake
         run: |
@@ -33,9 +27,6 @@ jobs:
 
       - name: Run Tests
         run: cd build; ./RunTests --kokkos-cores=2 --reporter junit -o test-results.xml
-
-      - name: Build Docs
-        run: cd build; make sphinx
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
