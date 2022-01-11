@@ -15,8 +15,8 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install doxygen 
-        run: sudo apt-get install -y doxygen 
+      - name: Install doxygen and sphinx
+        run: sudo apt-get install -y doxygen python3-sphinx
 
       - name: Run CMake
         run: |
