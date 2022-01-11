@@ -22,11 +22,11 @@ jobs:
           cd build
           cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON ../
 
-    - name: Build
-      run: cd build; make
+      - name: Build
+        run: cd build; make
 
-    - name: Run Tests
-      run: cd build; ./RunTests --kokkos-cores=2
+      - name: Run Tests
+        run: cd build; ./RunTests --kokkos-cores=2
 
-    - name: Build Docs
-      run: cd build; make doc
+      - name: Build Docs
+        run: cd build; make doc
