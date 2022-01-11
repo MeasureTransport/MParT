@@ -3,8 +3,6 @@
 Installation
 ============
 
-
-
 Compiling from Source
 ---------------------
 MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:
@@ -27,3 +25,27 @@ Or, with the additional specification of the number of Kokkos threads to use:
 .. code-block::
 
    ./RunTests --kokkos-threads=4
+
+
+Building Documentation
+----------------------
+
+1. Make sure doxygen, sphinx, breathe, and the pydata-sphinx-theme are installed.  This is easily done with anaconda:
+
+.. code-block::
+
+   conda install -c conda-forge doxygen sphinx breathe pydata-sphinx-theme
+
+2. Build the :code:`sphinx` target:
+
+.. code-block::
+
+    cd build
+    cmake .. 
+    make sphinx 
+
+3. Open the sphinx output 
+
+.. code-block::
+
+    open docs/sphinx/index.html
