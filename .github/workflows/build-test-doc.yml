@@ -27,3 +27,6 @@ jobs:
 
     - name: Run Tests
       run: cd build; ./RunTests --kokkos-cores=2
+
+    - name: Build Docs
+      run: cd build; make doc
