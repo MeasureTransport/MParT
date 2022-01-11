@@ -75,3 +75,40 @@ add_executable(RunTests ${TEST_SOURCES})
 target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2)
 
 ##############################################################
+# Documentation
+find_package(Doxygen)
+
+# if(Doxygen_FOUND)
+
+#     message(STATUS "To build documentation, run 'make doc'")
+
+#     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/mpart.doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile @ONLY)
+#     add_custom_target(doc
+#         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile
+#         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#         COMMENT "Generating API documentation with Doxygen" VERBATIM
+#     )
+
+# endif()
+
+
+find_package(Sphinx)
+if(Sphinx_FOUND AND Doxygen_FOUND)
+
+    set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/docs)
+    set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
+
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/mpart.doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile @ONLY)
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs)
+
+    add_custom_target(doc
+                  COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile
+                  COMMAND ${SPHINX_EXECUTABLE} -b html
+                  # Tell Breathe where to find the Doxygen output
+                  -Dbreathe_projects.mpart=${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen/xml
+                  ${SPHINX_SOURCE} ${SPHINX_BUILD}
+                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                  COMMENT "Generating documentation with Sphinx")
+
+endif()
+##############################################################
