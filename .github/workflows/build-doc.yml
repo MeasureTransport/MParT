@@ -31,3 +31,9 @@ jobs:
       - name: Build Docs
         run: cd build; make sphinx
 
+      - name: Push to gh-pages 
+        uses: peaceiris/actions-gh-pages@v3.6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ github.workspace }}/build/docs/sphinx/
+
