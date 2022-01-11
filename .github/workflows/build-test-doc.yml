@@ -17,6 +17,8 @@ jobs:
 
       - name: Install doxygen and sphinx
         run: sudo apt-get install -y doxygen python3-sphinx
+        
+      - name: Install sphinx extensions 
         run: pip install breathe pydata-sphinx-theme
 
       - name: Run CMake
