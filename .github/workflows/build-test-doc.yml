@@ -32,9 +32,15 @@ jobs:
         run: cd build; make
 
       - name: Run Tests
-        run: cd build; ./RunTests --kokkos-cores=2
+        run: cd build; ./RunTests --kokkos-cores=2 --reporter junit -o test-results.xml
 
       - name: Build Docs
         run: cd build; make sphinx
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          files: build/test-results.xml
 
 
