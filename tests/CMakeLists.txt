@@ -1,4 +1,4 @@
 set (TEST_SOURCES 
      tests/RunTests.cpp
-     tests/TEST_MultiIndexSet.cpp
+     tests/Test_MultiIndexSet.cpp
 PARENT_SCOPE) 
