@@ -6,6 +6,7 @@
 #include <set>
 #include <map>
 #include <iostream>
+#include <functional>
 
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndex.h"

@@ -1,7 +1,7 @@
 #ifndef MPART_MULTIINDEXLIMITER_H_
 #define MPART_MULTIINDEXLIMITER_H_
 
-#include <memory>
+#include <functional>
 
 #include "MParT/MultiIndices/MultiIndex.h"
 
