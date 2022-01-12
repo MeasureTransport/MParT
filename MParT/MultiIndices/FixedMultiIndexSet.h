@@ -1,5 +1,5 @@
-#ifndef MPART_MULTIINDEXSET_H
-#define MPART_MULTIINDEXSET_H
+#ifndef MPART_FIXEDMULTIINDEXSET_H
+#define MPART_FIXEDMULTIINDEXSET_H
 
 #include <iostream>
 #include <vector>
@@ -8,15 +8,15 @@
 
 namespace mpart{
 
-class MultiIndexSet
+class FixedMultiIndexSet
 {
 public:
 
     /*
     Constructs a total order limited multiindex set
     */
-    MultiIndexSet(unsigned int _dim, 
-                  unsigned int _maxOrder);
+    FixedMultiIndexSet(unsigned int _dim, 
+                       unsigned int _maxOrder);
 
     // Returns the maximum order in the dimension dim
     std::vector<unsigned int> GetMaxOrders() const;

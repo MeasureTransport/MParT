@@ -1,9 +1,9 @@
-#include "MParT/MultiIndexSet.h"
+#include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
 using namespace mpart;
 
 
-MultiIndexSet::MultiIndexSet(unsigned int _dim, 
+FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim, 
                              unsigned int _maxOrder) : dim(_dim)
 {   
     // Figure out the number of terms in the total order
@@ -25,7 +25,7 @@ MultiIndexSet::MultiIndexSet(unsigned int _dim,
 
     
 
-std::vector<unsigned int> MultiIndexSet::GetMaxOrders() const
+std::vector<unsigned int> FixedMultiIndexSet::GetMaxOrders() const
 {   
     std::vector<unsigned int> maxOrders(dim, 0);
 
@@ -38,7 +38,7 @@ std::vector<unsigned int> MultiIndexSet::GetMaxOrders() const
 }
 
 
-std::vector<unsigned int> MultiIndexSet::IndexToMulti(unsigned int index) const
+std::vector<unsigned int> FixedMultiIndexSet::IndexToMulti(unsigned int index) const
 {   
     std::vector<unsigned int> output(dim,0);
     
@@ -48,7 +48,7 @@ std::vector<unsigned int> MultiIndexSet::IndexToMulti(unsigned int index) const
     return output;
 }
 
-int MultiIndexSet::MultiToIndex(std::vector<unsigned int> const& multi) const
+int FixedMultiIndexSet::MultiToIndex(std::vector<unsigned int> const& multi) const
 {   
     // Figure out how many nonzeros are in this multiindex
     unsigned int nnz = 0;
@@ -81,7 +81,7 @@ int MultiIndexSet::MultiToIndex(std::vector<unsigned int> const& multi) const
 }
 
 
-void MultiIndexSet::Print() const
+void FixedMultiIndexSet::Print() const
 {
     std::cout << "Starts:\n";
     for(int i=0; i<nzStarts.extent(0); ++i)
@@ -113,13 +113,13 @@ void MultiIndexSet::Print() const
 }
 
 
-unsigned int MultiIndexSet::NumTerms() const
+unsigned int FixedMultiIndexSet::NumTerms() const
 {
     return nzStarts.extent(0)-1;
 }   
 
 
-std::pair<unsigned int, unsigned int> MultiIndexSet::TotalOrderSize(unsigned int maxOrder, unsigned int currDim)
+std::pair<unsigned int, unsigned int> FixedMultiIndexSet::TotalOrderSize(unsigned int maxOrder, unsigned int currDim)
 {
     unsigned int numTerms=0;
     unsigned int numNz=0;
@@ -138,7 +138,7 @@ std::pair<unsigned int, unsigned int> MultiIndexSet::TotalOrderSize(unsigned int
     return std::make_pair(numTerms, numNz);
 }
 
-void MultiIndexSet::FillTotalOrder(unsigned int maxOrder,
+void FixedMultiIndexSet::FillTotalOrder(unsigned int maxOrder,
                     std::vector<unsigned int> &workspace, 
                     unsigned int currDim, 
                     unsigned int &currTerm,
