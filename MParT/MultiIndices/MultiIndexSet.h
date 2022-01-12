@@ -5,6 +5,7 @@
 #include <memory>
 #include <set>
 #include <map>
+#include <iostream>
 
 #include "MParT/MultiIndices/MultiIndex.h"
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
@@ -63,13 +64,24 @@ public:
   /**
    Factory method for constructing a total order limited multiindex set.
    @param[in] length The length of the multiindices stored in this set.
-   @param[in] maxOrder The maximum of multiindices to include.
+   @param[in] maxOrder The maximum order of multiindices to include.
    @param[in] limiter An optional additional limiter to attach to the set.  Only multiindices that satisfy this limiter will be included.
    @return MultiIndexSet An instance of the MultiIndexSet class containing all multiindices of order <= maxOrder AND satisfying the limiter.
   */
   static MultiIndexSet CreateTotalOrder(unsigned int length, 
                                         unsigned int maxOrder, 
                                         LimiterType const& limiter = MultiIndexLimiter::None());
+
+  /**
+   Factory method for constructing a full tensor product multiindex set.
+   @param[in] length The length of the multiindices stored in this set.
+   @param[in] maxDegree The maximum value allowed in any multiindex.
+   @param[in] limiter An optional additional limiter to attach to the set.  Only multiindices that satisfy this limiter will be included.
+   @return MultiIndexSet An instance of the MultiIndexSet class containing all multiindices with components a_i <= maxDegree AND satisfying the limiter.
+  */
+  static MultiIndexSet CreateTensorProduct(unsigned int length, 
+                                           unsigned int maxOrder, 
+                                           LimiterType const& limiter = MultiIndexLimiter::None());
 
 
   /**
@@ -293,6 +305,29 @@ MultiIndexSet set(length, limiter);
   /// Returns the number of forward neighbors (active or inactive)
   unsigned int NumForward(unsigned int activeInd) const;
 
+  /** Visualizes a two-dimensional MultiIndexSet as ASCII art.   The output for a total order limited set with max order 11 looks like 
+  @code
+12 | o  
+11 | x  o  
+10 | x  x  o  
+ 9 | x  x  x  o  
+ 8 | x  x  x  x  o  
+ 7 | x  x  x  x  x  o  
+ 6 | x  x  x  x  x  x  o  
+ 5 | x  x  x  x  x  x  x  o  
+ 4 | x  x  x  x  x  x  x  x  o  
+ 3 | x  x  x  x  x  x  x  x  x  o  
+ 2 | x  x  x  x  x  x  x  x  x  x  o  
+ 1 | x  x  x  x  x  x  x  x  x  x  x  o  
+ 0 | x  x  x  x  x  x  x  x  x  x  x  x  o  
+    ----------------------------------------
+     0  1  2  3  4  5  6  7  8  9  10 11 12 
+  @endcode 
+
+  @param[in,out] out The output stream where the visualization should be written.  Defaults to std::cout.  
+  */ 
+  void Visualize(std::ostream &out = std::cout) const;
+
 protected:
 
   // A vector of both active and admissable multiindices.  Global index.
@@ -337,7 +372,13 @@ private:
                                       std::vector<unsigned int> &denseMulti,
                                       LimiterType const& limiter);
 
-  std::map<const MultiIndex*, unsigned int, std::function<bool(const MultiIndex*, const MultiIndex*)>> multi2global; // map from a multiindex to an integer
+  static void RecursiveTensorFill(unsigned int   maxOrder, 
+                                      MultiIndexSet &mset,
+                                      unsigned int currDim,
+                                      std::vector<unsigned int> &denseMulti,
+                                      LimiterType const& limiter);
+
+  std::map<MultiIndex, unsigned int> multi2global; // map from a multiindex to an integer
 
 }; // class MultiIndexSet
 

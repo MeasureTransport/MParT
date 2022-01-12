@@ -22,6 +22,24 @@ MultiIndexSet MultiIndexSet::CreateTotalOrder(unsigned int length,
     return output;
 }
 
+
+MultiIndexSet MultiIndexSet::CreateTensorProduct(unsigned int length, 
+                                                 unsigned int maxDegree, 
+                                                 LimiterType const& limiter)
+{ 
+    assert(length>0);
+
+    // create an empy multiindex set
+    MultiIndexSet output(length, limiter);
+
+    // start with a vector of zeros
+    std::vector<unsigned int> base(length,0);
+
+    RecursiveTensorFill(maxDegree, output, 0, base, limiter);
+
+    return output;
+}
+
 void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder, 
                                             MultiIndexSet &output,
                                             unsigned int currDim,
@@ -57,12 +75,42 @@ void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder,
 }
 
 
+void MultiIndexSet::RecursiveTensorFill(unsigned int   maxDegree, 
+                                        MultiIndexSet &output,
+                                        unsigned int currDim,
+                                        std::vector<unsigned int> &base,
+                                        LimiterType const& limiter)
+{
+    const int length = base.size();
+
+    if(currDim==length-1)
+    {
+        for(int i=0; i<=maxDegree; ++i)
+        {
+            base.at(length-1) = i;
+            MultiIndex newTerm(base);
+            if(limiter(newTerm))
+                output.AddActive(newTerm);
+        }
+
+    }else{
+        for(int i=0; i<=maxDegree; ++i)
+        {
+            for(unsigned int k=currDim+1; k<length; ++k)
+                base.at(k) = 0;
+
+            base.at(currDim) = i;
+            RecursiveTensorFill(maxDegree,output,currDim+1,base,limiter);
+        }
+    }
+}
+
+
 
 MultiIndexSet::MultiIndexSet(const unsigned int lengthIn,
                              LimiterType const& limiterIn) : maxOrders(lengthIn,0),
                                                              length(lengthIn),
-                                                             limiter(limiterIn),
-                                                             multi2global([](const MultiIndex* a,const MultiIndex* b){return (*a) < (*b);})
+                                                             limiter(limiterIn)
 {
 };
 
@@ -95,7 +143,7 @@ void MultiIndexSet::SetLimiter(LimiterType const& newLimiter){
 
 int MultiIndexSet::MultiToIndex(MultiIndex const& input) const{
 
-  auto localIter = multi2global.find(&input);
+  auto localIter = multi2global.find(input);
 
   if(localIter!=multi2global.end()){
     return global2active[localIter->second];
@@ -110,7 +158,7 @@ int MultiIndexSet::AddMulti(MultiIndex const& newMulti)
   allMultis.push_back(newMulti);
   
   int globalInd = allMultis.size() - 1;
-  multi2global[&allMultis.back()] = globalInd;
+  multi2global[allMultis.back()] = globalInd;
 
   global2active.push_back(-1);
 
@@ -128,7 +176,7 @@ int MultiIndexSet::AddMulti(MultiIndex const& newMulti)
 int MultiIndexSet::AddActive(MultiIndex const& newNode)
 {
   int globalInd = AddInactive(newNode);
-
+  
   if(globalInd>=0){
 
     Activate(globalInd);
@@ -143,25 +191,22 @@ int MultiIndexSet::AddActive(MultiIndex const& newNode)
 
 int MultiIndexSet::AddInactive(MultiIndex const& newNode)
 {
-  auto iter = multi2global.find(&newNode);
+  auto iter = multi2global.find(newNode);
 
   if(iter!=multi2global.end()){
-
     return iter->second;
 
   }else if(limiter(newNode)){
-
     return AddMulti(newNode);
 
   }else{
-
     return -1;
   }
 }
 
 bool MultiIndexSet::IsActive(MultiIndex const& multiIndex) const
 {
-  auto iter = multi2global.find(&multiIndex);
+  auto iter = multi2global.find(multiIndex);
 
   if(iter!=multi2global.end()){
     return IsActive(iter->second);
@@ -201,7 +246,8 @@ bool MultiIndexSet::IsAdmissible(unsigned int globalIndex) const
 
 bool MultiIndexSet::IsAdmissible(MultiIndex const& multiIndex) const
 {
-  auto iter = multi2global.find(&multiIndex);
+  auto iter = multi2global.find(multiIndex);
+    
   if(iter==multi2global.end()){
     return false;
   }else{
@@ -248,7 +294,7 @@ void MultiIndexSet::Activate(int globalIndex)
 
 void MultiIndexSet::Activate(MultiIndex const& multiIndex)
 {
-  auto iter = multi2global.find(&multiIndex);
+  auto iter = multi2global.find(multiIndex);
 
   assert(iter!=multi2global.end());
   assert(IsAdmissible(iter->second));
@@ -258,7 +304,6 @@ void MultiIndexSet::Activate(MultiIndex const& multiIndex)
 
 void MultiIndexSet::AddForwardNeighbors(unsigned int globalIndex, bool addInactive)
 {
-
   std::vector<unsigned int> base = allMultis.at(globalIndex).Vector();
 
   for(unsigned int i=0; i<base.size(); ++i)
@@ -271,7 +316,7 @@ void MultiIndexSet::AddForwardNeighbors(unsigned int globalIndex, bool addInacti
     if(limiter(newNode)){
 
       // Check to see if we already have this multiindex...
-      auto iter = multi2global.find(&newNode);
+      auto iter = multi2global.find(newNode);
       if(iter!=multi2global.end()){
         inEdges.at(iter->second).insert(globalIndex);
         outEdges.at(globalIndex).insert(iter->second);
@@ -285,6 +330,54 @@ void MultiIndexSet::AddForwardNeighbors(unsigned int globalIndex, bool addInacti
     base[i]--;
   }
 }
+
+
+void MultiIndexSet::Visualize(std::ostream &out) const
+{
+
+  for(int i=maxOrders.at(1)+1; i>=0; --i){
+
+    if(i<10)
+      out << " ";
+    out << i << " | ";
+
+    for(unsigned int j=0; j<=maxOrders.at(0)+1; ++j){
+
+      bool found = false;
+      for(unsigned int k=0; k<active2global.size(); ++k){
+        if((allMultis.at(active2global.at(k)).Get(0)==j)&&(allMultis.at(active2global.at(k)).Get(1)==i)){
+          out << "x  ";
+          found = true;
+          break;
+        }
+      }
+
+      if(!found){
+        for(auto& multi : allMultis){
+          if((multi.Get(0)==j)&&(multi.Get(1)==i))
+            out << "o  ";
+        }
+      }
+    }
+    out << std::endl;
+  }
+
+  out << "    -";
+  for(unsigned int j=0; j<=maxOrders.at(0)+1; ++j)
+    out << "---";
+
+  out << "\n     ";
+  for(unsigned int j=0; j<=maxOrders.at(0)+1; ++j){
+    
+    if(j<10)
+      out << j << "  ";
+    else
+      out << j << " ";
+  }
+  out << std::endl; 
+
+}
+
 
 std::vector<MultiIndex>  MultiIndexSet::GetAdmissibleForwardNeighbors(unsigned int activeIndex)
 {
@@ -344,7 +437,7 @@ std::vector<unsigned int> MultiIndexSet::GetBackwardNeighbors(unsigned int activ
 
 std::vector<unsigned int> MultiIndexSet::GetBackwardNeighbors(MultiIndex const& multiIndex) const
 {
-  auto iter = multi2global.find(&multiIndex);
+  auto iter = multi2global.find(multiIndex);
 
   assert(iter!=multi2global.end());
 
@@ -391,7 +484,7 @@ void MultiIndexSet::AddBackwardNeighbors(unsigned int globalIndex, bool addInact
       if(limiter(newNode)){
 
         // Check to see if we already have this multiindex in the set
-        auto iter = multi2global.find(&newNode);
+        auto iter = multi2global.find(newNode);
         if(iter!=multi2global.end()){
           outEdges.at(iter->second).insert(globalIndex);
           inEdges.at(globalIndex).insert(iter->second);
@@ -470,7 +563,7 @@ std::vector<unsigned int> MultiIndexSet::ForciblyActivate(MultiIndex const& mult
 
   assert(limiter(multiIndex));
 
-  auto iter = multi2global.find(&multiIndex);
+  auto iter = multi2global.find(multiIndex);
   std::vector<unsigned int> newIndices;
 
   // if we found the multiindex and it is active, there is nothing to do
