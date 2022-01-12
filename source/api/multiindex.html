@@ -538,6 +538,34 @@
 <dd><p>Returns the number of forward neighbors (active or inactive) </p>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart13MultiIndexSet9VisualizeERNSt7ostreamE">
+<span id="_CPPv3NK5mpart13MultiIndexSet9VisualizeERNSt7ostreamE"></span><span id="_CPPv2NK5mpart13MultiIndexSet9VisualizeERNSt7ostreamE"></span><span id="mpart::MultiIndexSet::Visualize__osRC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a13d7d605b706c59ae01869dd46b1502a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Visualize</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">cout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet9VisualizeERNSt7ostreamE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Visualizes a two-dimensional <a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> as ASCII art. The output for a total order limited set with max order 11 looks like <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">12</span> <span class="o">|</span> <span class="n">o</span>  
+<span class="mi">11</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">o</span>  
+<span class="mi">10</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+ <span class="mi">9</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+ <span class="mi">8</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+ <span class="mi">7</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+ <span class="mi">6</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+ <span class="mi">5</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+ <span class="mi">4</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+ <span class="mi">3</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+ <span class="mi">2</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+ <span class="mi">1</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+ <span class="mi">0</span> <span class="o">|</span> <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">x</span>  <span class="n">o</span>  
+    <span class="o">----------------------------------------</span>
+     <span class="mi">0</span>  <span class="mi">1</span>  <span class="mi">2</span>  <span class="mi">3</span>  <span class="mi">4</span>  <span class="mi">5</span>  <span class="mi">6</span>  <span class="mi">7</span>  <span class="mi">8</span>  <span class="mi">9</span>  <span class="mi">10</span> <span class="mi">11</span> <span class="mi">12</span> 
+</pre></div>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>out</strong> – <strong>[inout]</strong> The output stream where the visualization should be written. Defaults to std::cout. </p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
@@ -549,12 +577,30 @@
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>length</strong> – <strong>[in]</strong> The length of the multiindices stored in this set. </p></li>
-<li><p><strong>maxOrder</strong> – <strong>[in]</strong> The maximum of multiindices to include. </p></li>
+<li><p><strong>maxOrder</strong> – <strong>[in]</strong> The maximum order of multiindices to include. </p></li>
 <li><p><strong>limiter</strong> – <strong>[in]</strong> An optional additional limiter to attach to the set. Only multiindices that satisfy this limiter will be included. </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> An instance of the <a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> class containing all multiindices of order &lt;= maxOrder AND satisfying the limiter. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart13MultiIndexSet19CreateTensorProductEjjRK11LimiterType">
+<span id="_CPPv3N5mpart13MultiIndexSet19CreateTensorProductEjjRK11LimiterType"></span><span id="_CPPv2N5mpart13MultiIndexSet19CreateTensorProductEjjRK11LimiterType"></span><span id="mpart::MultiIndexSet::CreateTensorProduct__unsigned-i.unsigned-i.LimiterTypeCR"></span><span class="target" id="classmpart_1_1_multi_index_set_1a62bd7b6b99f460a775a6b8bfdcbefbe1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart13MultiIndexSetE" title="mpart::MultiIndexSet"><span class="n"><span class="pre">MultiIndexSet</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CreateTensorProduct</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxOrder</span></span>, <a class="reference internal" href="#_CPPv4N5mpart13MultiIndexSet11LimiterTypeE" title="mpart::MultiIndexSet::LimiterType"><span class="n"><span class="pre">LimiterType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">limiter</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">MultiIndexLimiter</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">None</span></span><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet19CreateTensorProductEjjRK11LimiterType" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Factory method for constructing a full tensor product multiindex set. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>length</strong> – <strong>[in]</strong> The length of the multiindices stored in this set. </p></li>
+<li><p><strong>maxDegree</strong> – <strong>[in]</strong> The maximum value allowed in any multiindex. </p></li>
+<li><p><strong>limiter</strong> – <strong>[in]</strong> An optional additional limiter to attach to the set. Only multiindices that satisfy this limiter will be included. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> An instance of the <a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> class containing all multiindices with components a_i &lt;= maxDegree AND satisfying the limiter. </p>
 </dd>
 </dl>
 </dd></dl>
