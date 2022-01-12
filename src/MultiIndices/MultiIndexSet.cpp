@@ -114,6 +114,41 @@ MultiIndexSet::MultiIndexSet(const unsigned int lengthIn,
 {
 };
 
+
+FixedMultiIndexSet MultiIndexSet::Compress() const
+{
+  unsigned int numTerms = Size();
+  unsigned int totalNnz = 0; // total number of nonzero components in all multiindex
+  for(auto& activeInd : active2global)
+    totalNnz += allMultis.at(activeInd).NumNz();
+
+  
+  Kokkos::View<unsigned int*> nzStarts("Start of a Multiindex", numTerms+1);
+  Kokkos::View<unsigned int*> nzDims("Index of nz component", totalNnz);
+  Kokkos::View<unsigned int*> nzOrders("Power of nz component", totalNnz);
+  
+  unsigned int cumNz = 0;
+
+  for(unsigned int i=0; i<numTerms; ++i){
+
+    unsigned int activeInd = active2global.at(i);
+    MultiIndex const& multi = allMultis.at(activeInd);
+
+    nzStarts(i) = cumNz;
+    
+    for(unsigned int j=0; j<multi.nzInds.size(); ++j){
+      nzDims(cumNz + j) = multi.nzInds[j];
+      nzOrders(cumNz + j) = multi.nzVals[j];
+    }
+
+    cumNz += allMultis.at(activeInd).NumNz();
+  }
+  nzStarts(numTerms) = totalNnz;
+  
+  return FixedMultiIndexSet(length, nzStarts, nzDims, nzOrders);
+}
+
+
 void MultiIndexSet::SetLimiter(LimiterType const& newLimiter){
 
   // first, make sure no active terms in the set currently obey the new limiter.

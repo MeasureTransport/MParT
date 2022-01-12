@@ -66,12 +66,6 @@ public:
     */
     MultiIndex(std::initializer_list<unsigned int> const& indIn);
 
-    /** Create a deep copy of MultiIndex pointed to by the input.
-        @param[in] indIn A shared_ptr to a MultiIndex instance
-        @return A shared_ptr to a new MultiIndex instance containing the same information as the input.
-    */
-    static std::shared_ptr<MultiIndex> Copy(std::shared_ptr<MultiIndex> const& indIn){return std::make_shared<MultiIndex>(*indIn);};
-
     /** Get the dense representation of this multiindex.
         @return A std::vector of unsigned integers containing the multiindex.
     */

@@ -12,6 +12,10 @@ class FixedMultiIndexSet
 {
 public:
 
+    FixedMultiIndexSet(unsigned int                _dim,
+                       Kokkos::View<unsigned int*> _nzStarts,
+                       Kokkos::View<unsigned int*> _nzDims,
+                       Kokkos::View<unsigned int*> _nzOrders);
     /*
     Constructs a total order limited multiindex set
     */
@@ -29,7 +33,7 @@ public:
 
     void Print() const;
 
-    unsigned int NumTerms() const;
+    unsigned int Size() const;
 
     const unsigned int dim;
 

@@ -7,6 +7,7 @@
 #include <map>
 #include <iostream>
 
+#include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndex.h"
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
 
@@ -105,6 +106,16 @@ MultiIndexSet set(length, limiter);
   MultiIndexSet(const unsigned int lengthIn,
                 LimiterType const& limiterIn = MultiIndexLimiter::None() );
 
+  /**
+   @brief "Compresses" this multiindex set into the fixed representation provided by the "FixedMultiIndexSet" class.
+   @details The FixedMultiIndexSet cannot easily be adapted, but stores the multiindices in a contiguous block of memory 
+            in a Kokkos::View that can be more amenable to fast computation.   This function creates an instance of the 
+            FixedMultiIndexSet from the current state of *this.   Note that memory is deep copied and any subsequent updates 
+            to this class will not result in updates to the FixedMultiIndexSet.
+   @return An instance of the FixedMultiIndexSet class with a snapshot of the current state of this MultiIndexSet.
+   */
+  FixedMultiIndexSet Compress() const;
+
   /** Set the limiter of this MultiIndexSet.  This function will check to make
       sure that all currently active nodes are still feasible with the new limiter.
       If this is not the case, an assert will be thrown.
@@ -122,7 +133,7 @@ MultiIndexSet set(length, limiter);
       @param[in] activeIndex Linear index of interest.
       @return A constant reference to the MultiIndex.
   */
-  MultiIndex const& IndexToMulti(unsigned activeIndex) const{return allMultis.at(active2global.at(activeIndex));};
+  MultiIndex const& IndexToMulti(unsigned int activeIndex) const{return allMultis.at(active2global.at(activeIndex));};
 
   /** Given a multiindex, return the linear index where it is located.
       @param[in] input An instance of the MultiIndex class.

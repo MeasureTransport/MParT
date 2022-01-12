@@ -3,6 +3,16 @@
 using namespace mpart;
 
 
+FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
+                                       Kokkos::View<unsigned int*> _nzStarts,
+                                       Kokkos::View<unsigned int*> _nzDims,
+                                       Kokkos::View<unsigned int*> _nzOrders) : dim(_dim),
+                                                                                nzStarts(_nzStarts), 
+                                                                                nzDims(_nzDims),
+                                                                                nzOrders(_nzOrders)
+{
+}
+
 FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim, 
                              unsigned int _maxOrder) : dim(_dim)
 {   
@@ -113,7 +123,7 @@ void FixedMultiIndexSet::Print() const
 }
 
 
-unsigned int FixedMultiIndexSet::NumTerms() const
+unsigned int FixedMultiIndexSet::Size() const
 {
     return nzStarts.extent(0)-1;
 }   

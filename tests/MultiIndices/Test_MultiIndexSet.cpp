@@ -12,10 +12,28 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
 
     FixedMultiIndexSet mset(dim,maxOrder);
 
-    REQUIRE( mset.NumTerms()==((maxOrder+1)*(maxOrder+2)/2));
+    REQUIRE( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
 }
 
 
+TEST_CASE("Conversions between MultiIndexSet types", "[MultiIndexSet Conversions]" ) {
+
+    unsigned int dim = 10;
+    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, 3);
+
+    FixedMultiIndexSet fixedSet = mset.Compress();
+
+    REQUIRE(mset.Size() == fixedSet.Size() );
+
+    // Make sure the active multiindices are exactly the same
+    for(unsigned int i=0; i<mset.Size(); ++i){
+        std::vector<unsigned int> fixedVec = fixedSet.IndexToMulti(i);
+        std::vector<unsigned int> vec = mset.IndexToMulti(i).Vector();
+
+        for(unsigned int d=0; d<dim; ++d)
+            REQUIRE(fixedVec.at(d)==vec.at(d));
+    }
+}
 
 TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
