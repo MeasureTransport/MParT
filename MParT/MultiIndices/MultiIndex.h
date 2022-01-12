@@ -9,7 +9,6 @@ namespace mpart {
 
 class MultiIndexSet;
 
-///
 /**
 @class MultiIndex
 @ingroup MultiIndices

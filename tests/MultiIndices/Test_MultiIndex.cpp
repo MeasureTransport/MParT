@@ -114,6 +114,4 @@ TEST_CASE( "Testing MultiIndex ordering", "[MultiIndexOrder]" ) {
     REQUIRE( b>a );
     REQUIRE( b>=a );
     REQUIRE( a!=b );
-
-
 }

@@ -9,15 +9,10 @@
 #include "MParT/MultiIndices/MultiIndex.h"
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
 
+
 namespace mpart{
 
 class MultiIndexSet;
-
-std::shared_ptr<MultiIndexSet> operator+=( std::shared_ptr<MultiIndexSet> x,
-                                            std::shared_ptr<MultiIndexSet> y);
-
-std::shared_ptr<MultiIndexSet> operator+=( std::shared_ptr<MultiIndexSet> x,
-                                            std::shared_ptr<MultiIndex> y);
 
 /** @class MultiIndexSet
   @ingroup MultiIndices
@@ -63,55 +58,70 @@ class MultiIndexSet{
 
 public:
 
-  MultiIndexSet(const unsigned dimIn,
-                std::shared_ptr<MultiIndexLimiter> limiterIn = std::make_shared<NoLimiter>());
+  typedef std::function<bool(MultiIndex const&)> LimiterType;
 
-  /// NOTE: does not perform a deep copy of the multiindices themselves, only pointers to the multiindices
-  static std::shared_ptr<MultiIndexSet> CloneExisting(std::shared_ptr<MultiIndexSet> const& original);
+  /**
+   Factory method for constructing a total order limited multiindex set.
+   @param[in] length The length of the multiindices stored in this set.
+   @param[in] maxOrder The maximum of multiindices to include.
+   @param[in] limiter An optional additional limiter to attach to the set.  Only multiindices that satisfy this limiter will be included.
+   @return MultiIndexSet An instance of the MultiIndexSet class containing all multiindices of order <= maxOrder AND satisfying the limiter.
+  */
+  static MultiIndexSet CreateTotalOrder(unsigned int length, 
+                                        unsigned int maxOrder, 
+                                        LimiterType const& limiter = MultiIndexLimiter::None());
 
-  /** Default virtual destructor */
-  virtual ~MultiIndexSet() = default;
+
+  /**
+   @brief Construct a new MultiIndexSet object with a specific length.
+   @details Constructs an empty MultiIndexSet to store multi-indices of a specified length.  Also allows 
+            a functor to be be passed in as an additional limiter on the admissible set.  If no functor is 
+            provided, it is possible to include any multi-index in \f$\mathbb{N}^D\f$.  
+
+            For example, to construct a MultiIndexSet in 2 dimensions that only allows multi-indices with maximum 
+            degree less than 5, we could use a lambda function:
+@code{.cpp}
+unsigned int length =2;
+auto limiter = [](MultiIndex const& multi) {return multi.Max()<5;};
+MultiIndexSet set(length, limiter);
+@endcode
+            Multiple pre-defined limiter functors are defined in the mpart::MultiIndexLimiter namespace.
+
+   @param[in] lengthIn The length of each multi-index in the set.
+   @param[in] limiterIn An optional functor defining the possible admissible multi-indices.  Should accept a const& to MultiIndex and return a boolean.  True if the MultiIndex is allowed and false otherwise.
+  */
+  MultiIndexSet(const unsigned int lengthIn,
+                LimiterType const& limiterIn = MultiIndexLimiter::None() );
 
   /** Set the limiter of this MultiIndexSet.  This function will check to make
       sure that all currently active nodes are still feasible with the new limiter.
       If this is not the case, an assert will be thrown.
-      @param[in] limiterIn A shared pointer to the new limiter.
+      @param[in] limiterIn A functor that accepts a MultiIndex and returns a boolean if it is allowed in the set.
   */
-  virtual void SetLimiter(std::shared_ptr<MultiIndexLimiter> const& limiterIn);
+  void SetLimiter(LimiterType const& limiterIn);
 
   /** Returns the limiter used in this MultiIndexSet. */
-  virtual std::shared_ptr<MultiIndexLimiter> GetLimiter() const{return limiter;};
-
-  // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-  // * * * FIXED COMPONENTS
-  // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-
-  /** Get all the active multiindices in this set.
-      @return A vector with shared pointers to all the multi indices in the set.
-  */
-  virtual std::vector<std::shared_ptr<MultiIndex>> GetAllMultiIndices() const {return allMultis;};
-
+  LimiterType GetLimiter() const{return limiter;};
 
   /** Given an index into the set, return the corresponding multiindex as an
       instance of the MultiIndex set. If all the multiindices were stored in a
       vector called multiVec, the functionality of this method would be equivalent
       to multiVec[activeIndex].
       @param[in] activeIndex Linear index of interest.
-      @return A shared pointer to a constant instance of the MultiIndex class.
+      @return A constant reference to the MultiIndex.
   */
-  virtual std::shared_ptr<MultiIndex> const& IndexToMulti(unsigned activeIndex) const{return allMultis.at(active2global.at(activeIndex));};
-
+  MultiIndex const& IndexToMulti(unsigned activeIndex) const{return allMultis.at(active2global.at(activeIndex));};
 
   /** Given a multiindex, return the linear index where it is located.
-      @param[in] input A shared pointer to an instance of the MultiIndex class.
+      @param[in] input An instance of the MultiIndex class.
       @return If the multiindex was found in this set, a nonnegative value
       containing the linear index is returned.  However, if the set does not
       contain the multiindex, -1 is returned.
   */
-  virtual int MultiToIndex(std::shared_ptr<MultiIndex> const& input) const;
+  int MultiToIndex(MultiIndex const& input) const;
 
   /** Get the dimension of the multiindex, i.e. how many components does it have? */
-  virtual unsigned int GetMultiLength() const{return dim;};
+  unsigned int Length() const{return length;};
 
   /** Assume the \f$\mathbf{j}^{\mbox{th}}\f$ multiindex in this set is given by
       \f$\mathbf{j}=[j_1,j_2,\dots,j_D]\f$.  This function returns a vector
@@ -120,66 +130,65 @@ public:
       j_d\f$.
       @return The vector \f$\mathbf{m}\f$.
   */
-  virtual Eigen::VectorXi GetMaxOrders() const{return maxOrders;};
+  std::vector<unsigned int> const& MaxOrders() const{return maxOrders;};
 
   /**
     * This function provides access to each of the MultiIndices.
     @param[in] activeIndex The index of the active MultiIndex to return.
     @return A pointer to the MultiIndex at index outputIndex.
     */
-  virtual std::shared_ptr<MultiIndex> const& at(int activeIndex){return IndexToMulti(activeIndex);}
+  MultiIndex const& at(int activeIndex) const{return IndexToMulti(activeIndex);}
 
   /**
     * This function provides access to each of the MultiIndices without any bounds checking on the vector.
     @param[in] outputIndex The index of the active MultiIndex we want to return.
     @return A pointer to the MultiIndex at index outputIndex.
     */
-  virtual std::shared_ptr<MultiIndex> operator[](int activeIndex){return allMultis[active2global[activeIndex]]; };
+  MultiIndex const& operator[](int activeIndex) const{return allMultis[active2global[activeIndex]]; };
 
   /**
     * Get the number of active MultiIndices in this set.
     @return An unsigned integer with the number of active MultiIndices in the set.
     */
-  virtual unsigned int Size() const{return active2global.size();};
+  unsigned int Size() const{return active2global.size();};
 
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   // * * * ADAPTIVE COMPONENTS
   // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
   /** @brief Add another set of multiindices to this one.
-      @details Any basis functions in the rhs MultiIndexSet that are not equivalent
-                to basis functions in this instance are added.
+      @details Any multiindices the rhs MultiIndexSet not already in (*this) are added.  After calling this function, *this will contain the union or the two sets.
       @param[in] rhs Another MultiIndex set to add to this one
       @return A reference to this MultiIndex set, which now contains the union of
               this set and rhs.
   */
-  virtual MultiIndexSet& operator+=(const MultiIndexSet &rhs);
+  MultiIndexSet& operator+=(const MultiIndexSet &rhs);
 
   /** @brief Add a single MultiIndex to the set.
     @details This functions checks to see if the input basis function is
             already in the set and if the input function is unique, it is
             added to the set.
-    @param[in] rhs A shared_ptr to the MultiIndex we want to add to the set.
+    @param[in] rhs The MultiIndex we want to add to the set.
     @return A reference to this MultiIndex set, which may now contain the new
             MultiIndex in rhs.
     */
-  virtual MultiIndexSet& operator+=(std::shared_ptr<MultiIndex> const& rhs);
+  MultiIndexSet& operator+=(MultiIndex const& rhs);
 
   /** @brief Add all terms in rhs to this instance.
     @details This function adds all unique MultiIndices from the rhs into this MultiIndexSet.  In the event that a multiindex is active in one set, but not the other, the union will set that multiindex to be active.
     @param[in] rhs The MultiIndex set we want to add to this instance.
     @return The number of unique terms from rhs that were added to this set.
     */
-  virtual int Union(const MultiIndexSet &rhs);
+  unsigned int Union(const MultiIndexSet &rhs);
 
   /**
-      Make the multi-index active. Assumes that the multiIndex input is already
-      admissible, as checked by an assertion.  To be admissable (according to
-      this function), the multiIndex must already exist as an inactive member
-      of this set.  If that is not the case, use the AddActive function instead.
+      Make the multi-index active. If the multiIndex is not admissable, an exception 
+      will be thrown.  To be admissable (according to this function), the multiIndex
+      must already exist as an inactive member of this set.  If that is not the case,
+      use the AddActive function instead.
       @param[in] multiIndex A multiindex to make active. Note that an assert will fail if multiIndex is not admissable.
   */
-  virtual void Activate(std::shared_ptr<MultiIndex> const& multiIndex);
+  void Activate(MultiIndex const& multiIndex);
 
   /**
     * Add the given multiindex to the set and make it active.  The functionality
@@ -192,7 +201,7 @@ public:
     @param[in] newNode A multiindex we want to add as an active member of the set.
     @return An integer specifying the linear index of the now active multiindex.
     */
-  virtual int AddActive(std::shared_ptr<MultiIndex> const& newNode);
+  int AddActive(MultiIndex const& newNode);
 
   /**
       If possible, make the neighbors of this index active, and return any
@@ -200,9 +209,16 @@ public:
       of the family.
       @param activeIndex The linear index of the active multiindex to expand.
       @return A vector containing the linear index of any multiindices
-            activated because of the expansion.
+              activated because of the expansion.
     */
-  virtual std::vector<unsigned> Expand(unsigned int activeIndex);
+  std::vector<unsigned int> Expand(unsigned int activeIndex);
+
+   /**
+      Activate any inactive but admissible forward neighbors of MultiIndices on the frontier.
+      @return A vector containing the linear index of any multiindices
+              activated because of this expansion.
+    */
+   std::vector<unsigned int> Expand();
 
   /**
       Completely expands an index, whether or not it is currently expandable.
@@ -212,66 +228,83 @@ public:
       @return A vector containing the linear index of any multiindices
               activated because of the expansion.
     */
-  virtual std::vector<unsigned> ForciblyExpand(unsigned int const activeIndex);
+  std::vector<unsigned int> ForciblyExpand(unsigned int const activeIndex);
 
   /**
-    * Add the given multi-index to the active set regardless of whether it's currently admissible.
-    * To keep the whole set admissible, recursively add any backward neighbors necessary.
-    * Returns a list of indices of any newly added elements, including itself.
-    * @param multiIndex The MultiIndex to forcibly add, make active, and make admissable.
-    * @return A vector of linear indices indicating all the active MultiIndices
+      Add the given multi-index to the active set regardless of whether it's currently admissible.
+      To keep the whole set admissible, recursively add any backward neighbors necessary.
+      Returns a list of indices of any newly added elements, including itself.
+      @param multiIndex The MultiIndex to forcibly add, make active, and make admissable.
+      @return A vector of linear indices indicating all the active MultiIndices
               added to the set in order to make the given multiIndex admissable.
     */
-  virtual std::vector<unsigned> ForciblyActivate(std::shared_ptr<MultiIndex> const& multiIndex);
+  std::vector<unsigned int> ForciblyActivate(MultiIndex const& multiIndex);
 
   /** This function returns the admissable forward neighbors of an active multiindex.
     @param[in] activeIndex The linear index of the active multiIndex under consideration.
     @return A vector of admissible forward neighbors.
     */
-  virtual std::vector<std::shared_ptr<MultiIndex>>  GetAdmissibleForwardNeighbors(unsigned int activeIndex);
+  std::vector<MultiIndex> GetAdmissibleForwardNeighbors(unsigned int activeIndex);
 
   /** Here, we define a term on the "frontier" of the multiindex set as one
       that has at least one inactive admissable forward neighbors.  These terms are expandable.
-      @return A vector of active "frontier" indices.
+      @return A vector with linear indices for active multi-indices on the frontier.
   */
-  virtual std::vector<unsigned int> GetFrontier() const;
+  std::vector<unsigned int> GetFrontier() const;
 
   /** We define the strict frontier to be the collection of multiindices, whose
       forward neighbors are all inactive.
+      @return A vector with linear indices for active multi-indices on the strict frontier.
   */
-  virtual std::vector<unsigned int> GetStrictFrontier() const;
+  std::vector<unsigned int> GetStrictFrontier() const;
 
   /** Returns the indices for the backward neighbors of a currently active multiindex.
   @param[in] activeIndex The linear index of the MultiIndex of interest
   @return A std::vector containing the linear indices of the backward neighbors.
   */
-  virtual std::vector<unsigned int> GetBackwardNeighbors(unsigned int activeIndex) const;
+  std::vector<unsigned int> GetBackwardNeighbors(unsigned int activeIndex) const;
 
-  /** Returns indices for backward neighbors of an active or inactive multiindex. */
-  virtual std::vector<unsigned int> GetBackwardNeighbors(std::shared_ptr<MultiIndex> const& multiIndex) const;
+  /** Returns indices for backward neighbors of an active or inactive multiindex. 
+  @param[in] multiIndex The multiindex in question.
+  @return A vector with linear indices for the backward neighbors of this multiindex.
+  */
+  std::vector<unsigned int> GetBackwardNeighbors(MultiIndex const& multiIndex) const;
 
-  //*********************************************************
-  //Testing properties of an index/multiIndex
-  //*********************************************************
+  /**
+  Determines whether the input multiIndex is currently admissible.
+  @param[in] multiIndex The multiindex to consider.
+  @return true if the multiIndex is admissible.  false otherwise.
+  */
+  bool IsAdmissible(MultiIndex const& multiIndex) const;
 
-  ///Determines whether the input multiIndex is currently admissible.
-  virtual bool IsAdmissible(std::shared_ptr<MultiIndex> const& multiIndex) const;
-
-  ///Return true if one of the forward neighbors of index is admissible but not active.
-  virtual bool IsExpandable(unsigned int activeIndex) const;
+  /** 
+  Check to see if any forward neighbors of a multiIndex are admissible but not active.
+  @param[in] activeIndex The linear index of the multi-index in question.
+  @return true if this multiindex has at least one admissible but inactive forward neighbor.
+  */
+  bool IsExpandable(unsigned int activeIndex) const;
 
   ///Return true if the multiIndex is active
-  virtual bool IsActive(std::shared_ptr<MultiIndex> const& multiIndex) const;
+  bool IsActive(MultiIndex const& multiIndex) const;
 
   /// Returns the number of active forward neighbors
-  virtual unsigned int NumActiveForward(unsigned int activeInd) const;
+  unsigned int NumActiveForward(unsigned int activeInd) const;
 
   /// Returns the number of forward neighbors (active or inactive)
-  virtual unsigned int NumForward(unsigned int activeInd) const;
+  unsigned int NumForward(unsigned int activeInd) const;
 
 protected:
 
-  int AddInactive(std::shared_ptr<MultiIndex> const& newNode);
+  // A vector of both active and admissable multiindices.  Global index.
+  std::vector<MultiIndex> allMultis;
+
+  // store a MultiIndexLimiter that will tell us the feasible set (i.e. simplex, exp limited, etc...)
+  LimiterType limiter;
+
+  // the dimension (i.e., number of components) in each multi index
+  const unsigned int length;
+
+  int AddInactive(MultiIndex const& newNode);
 
   virtual bool IsAdmissible(unsigned int globalIndex) const;
   virtual bool IsActive(unsigned int globalIndex) const;
@@ -283,7 +316,7 @@ protected:
   void ForciblyActivate(int localIndex, std::vector<unsigned int> &newInds);
 
   // Maps the active index to an entry in allMultis
-  std::vector<unsigned> active2global;
+  std::vector<unsigned int> active2global;
 
   // Maps a global index to an active index.  Non-active values are -1
   std::vector<int> global2active;
@@ -292,24 +325,19 @@ protected:
   std::vector<std::set<int>> outEdges; // edges going out of each multi
   std::vector<std::set<int>> inEdges;  // edges coming in to each multi
 
-  Eigen::VectorXi maxOrders; // the maximum order in each dimension
-
-  // the dimension (i.e., number of components) in each multi index
-  unsigned int dim;
-
-  // A vector of both active and admissable multiindices.  Global index.
-  std::vector<std::shared_ptr<MultiIndex>> allMultis;
-
-  // store a MultiIndexLimiter that will tell us the feasible set (i.e. simplex, exp limited, etc...)
-  std::shared_ptr<MultiIndexLimiter> limiter;
+  std::vector<unsigned int> maxOrders; // the maximum order in each dimension
 
 private:
 
-  int AddMulti(std::shared_ptr<MultiIndex> const& newMulti);
+  int AddMulti(MultiIndex const& newMulti);
 
-  std::map<std::shared_ptr<MultiIndex>, unsigned int, MultiPtrComp> multi2global; // map from a multiindex to an integer
+  static void RecursiveTotalOrderFill(unsigned int   maxOrder, 
+                                      MultiIndexSet &mset,
+                                      unsigned int currDim,
+                                      std::vector<unsigned int> &denseMulti,
+                                      LimiterType const& limiter);
 
-  MultiIndexSet() = default;
+  std::map<const MultiIndex*, unsigned int, std::function<bool(const MultiIndex*, const MultiIndex*)>> multi2global; // map from a multiindex to an integer
 
 }; // class MultiIndexSet
 

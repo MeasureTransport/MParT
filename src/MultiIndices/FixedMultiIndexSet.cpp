@@ -139,10 +139,10 @@ std::pair<unsigned int, unsigned int> FixedMultiIndexSet::TotalOrderSize(unsigne
 }
 
 void FixedMultiIndexSet::FillTotalOrder(unsigned int maxOrder,
-                    std::vector<unsigned int> &workspace, 
-                    unsigned int currDim, 
-                    unsigned int &currTerm,
-                    unsigned int &currNz)
+                                        std::vector<unsigned int> &workspace, 
+                                        unsigned int currDim, 
+                                        unsigned int &currTerm,
+                                        unsigned int &currNz)
 {   
 
     if(currDim<dim-1) {
