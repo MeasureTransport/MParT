@@ -2,6 +2,9 @@
 MultiIndices
 ===================
 
+Background
+-------------------
+
 A multiindex is simply a length :math:`D` vector of nonnegative integers :math:`\mathbf{p}=[p_1,p_2,\dots,p_D]`.
 Multiindices are commonly employed for defining multivariate polynomial expansions and other function parameterizations.
 In these cases, sets of multiindices define the form of the expansion.   
@@ -59,6 +62,7 @@ C++ Objects
    multiindices/multiindexset
    multiindices/fixedmultiindexset
    multiindices/multiindexlimiter
+   multiindices/multiindexneighborhood
 
 
 Definitions
@@ -70,41 +74,62 @@ Definitions
     it is useful to only consider multiindices in some subset :math:`\mathcal{G}\subseteq \mathbb{N}^D`.   We call this subset 
     the limiting set or, more loosely, the "limiter".   In MParT, limiting sets are defined by functors that accept a 
     MultiIndex and return `true` if the multiindex is in :math:`\mathcal{G}` and `false` otherwise.  Some predefined limiting 
-    sets are defined in the MPart::MultiIndexLimiter namespace, but custom functors can also be employed.
+    sets are defined in the MultiIndexLimiter namespace, but custom functors can also be employed.
 
 .. topic:: Neighbors
 
-    Let :math:`\mathbf{j}=[j_1,j_2,\dots,j_D]` be a :math:`D`-dimensional multiindex in the set :math:`\mathcal{S}` 
-    of multiindices.  In 
+    In most parameterization applications, there is additional structure in the multiindex set that can be represented 
+    through edges on a graph.   Each multiindex can be treated as a node in directed graph.  Outgoing edges connect to 
+    other multiindices, which we call "forward neighbors", that represent higher order basis functions.   Incoming edges
+    come from multiindices, which we call "backward neighbors", that represent lower order basis functions.   
     
-    For polynomials, the of :math:`\mbox{j}` are the multiindices that only differ from :math:`\mbox{j}` in one component,
-    and in that component, the difference is -1. For example, \f$[j_1-1, j_2,\dots,j_D]\f$ and \f$[j_1, j_2-1,\dots,j_D]\f$ are
-    backwards neighbors of \f$\mbox{j}\f$, but \f$[j_1-1,
-    j_2-1,\dots,j_D]\f$ and \f$[j_1, j_2-2,\dots,j_D]\f$ are not.
+    In the multivariate polynomial example above, the backward neighbors of a multiindex :math:`\mathbf{j}` are the multiindices
+    that only differ from :math:`\mbox{j}` in one component, and in that component, the difference is -1.  More precisely, 
+    the set of backward neighbors is 
     
+    .. math::
+    
+        \mathcal{B}_{\mathbf{j}} = \{\mathbf{i} : \|\mathbf{i}-\mathbf{j}\|_1=1 \text{ and } \mathbf{i}_k \leq \mathbf{j}_k \text{ for all } k \}.
+    
+    The set of forward neighbors is similarly defined as 
+
+    .. math::
+
+        \mathcal{F}_{\mathbf{j}} = \{\mathbf{i} : \|\mathbf{i}-\mathbf{j}\|_1=1 \text{ and } \mathbf{i}_k \geq \mathbf{j}_k \text{ for all } k \}
+
+    The neighborhood structure of a multindex set is defined through a child of the abstract MultiIndexNeighborhood class.
+
 .. topic:: Downward Closed
 
-    A multiindex set \f$\mathcal{S}\f$ is downward closed if for any multiindex \f$\mathbf{j}\in\mathcal{S}\f$, all 
-    backward neighbors of \f$\mathbf{j}\f$ are also in \f$\mathcal{S}\f$.
+    A multiindex set :math:`\mathcal{S}` is downward closed if for any multiindex :math:`\mathbf{j}\in\mathcal{S}`, all 
+    backward neighbors of :math:`\mathbf{j}` are also in :math:`\mathcal{S}`.
 
 .. topic:: Margin
 
-    For a multindex set \f$\mathcal{S}\f\subseteq\mathcal{G}$ and limiting set \f$\mathcal{G}\f$, 
-    the margin of \f$\mathcal{S}\f$ is the set \f$\mathcal{M}\f\in \mathcal{G}\\ \mathcal{S}\f$ containing 
-    indices that have at least one backward neighbor in \f$\mathcal{S}\f$.
+    For a multindex set :math:`\mathcal{S}\subseteq\mathcal{G}`, the margin of :math:`\mathcal{S}` is the set
+    :math:`\mathcal{M} \in \mathcal{G}\\ \mathcal{S}` containing indices that have at least one backward neighbor
+    in :math:`\mathcal{S}`.
 
 .. topic:: Reduced Margin
-    The reduced margin \f$\mathcal{M}_r\subset\mathcal{M}\f$ is a subset of the margin \$\mathcal{M}\f$ containing
-    indices that could be added to the set \f$\mathcal{S}\f$ while preserving the downward closed property of \f$\mathcal{S}\f$.
+
+    The reduced margin :math:`\mathcal{M}_r\subset\mathcal{M}` is a subset of the margin :math:`\mathcal{M}` containing
+    indices that could be added to the set :math:`\mathcal{S}` while preserving the downward closed property of :math:`\mathcal{S}`.
     Multiindices in the reduced margin are often called admissible.
 
 .. topic:: Active/Inactive Indices
 
-    The MParT::MultiIndexSet class stores both the set \f$\mathcal{S}\f$ and the margin \f$\mathcal{M}\f$.   In MParT,
-    multiindices in \f$\mathcal{S}\f$ are sometimes called active, while multiindices in \f$\mathcal{M}\f$ are called inactive.
+    The MultiIndexSet class stores both the set :math:`\mathcal{S}` and the margin :math:`\mathcal{M}`.   In MParT,
+    multiindices in :math:`\mathcal{S}` are sometimes called active, while multiindices in :math:`\mathcal{M}` are called inactive.
     Only active indices are included in the linear indexing.  Inactive
     indices are hidden (i.e. not even considered) in all the public members
     of this class.  Inactive multiindices are used behind the scenes to check admissability, to define the margin, and 
-    are added to the \f$\mathcal{S}\f$ during adaptation.
+    are added to the :math:`\mathcal{S}` during adaptation.
+
+.. topic:: Frontier
+
+    The Frontier is similar but contains multiindices in :math:`\mathcal{S}` that have at least one forward neighbor in 
+    the margin :math:`\mathcal{M}`.   We use the term "strict frontier" to describe the set of multiindices in :math:`\mathcal{S}` that have all of their forward neighbors in the margin.   
+ 
+
 
 

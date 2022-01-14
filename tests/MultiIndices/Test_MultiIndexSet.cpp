@@ -79,13 +79,15 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
     SECTION("Visualize")
     {
-        // MultiIndexSet - the "square".
-        MultiIndexSet indexFamily = MultiIndexSet::CreateTotalOrder(2, 3);
+        auto limiter = [](MultiIndex const& multi){ return ( (multi.Get(0)==0)||(multi.Get(1)==0)||((multi.Get(0)<2)&&(multi.Get(1)<2)));};
+
+        MultiIndexSet set = MultiIndexSet::CreateTotalOrder(2, 3, limiter);
+        set.SetLimiter( MultiIndexLimiter::None() );
 
         std::stringstream truth, output;
-        truth << " 4 | o  \n 3 | x  o  \n 2 | x  x  o  \n 1 | x  x  x  o  \n 0 | x  x  x  x  o  \n    ----------------\n     0  1  2  3  4  \n";
+        truth << " 4 | r  \n 3 | a  m  \n 2 | a  r  \n 1 | a  a  r  m  \n 0 | a  a  a  a  r  \n    ----------------\n     0  1  2  3  4  \n";
 
-        indexFamily.Visualize(output);
+        set.Visualize(output);
 
         REQUIRE(output.str() == truth.str());
     }
@@ -348,7 +350,7 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         
         // Now remove the limiter, which should allow more multiindices in the 
         set.SetLimiter( MultiIndexLimiter::None() );
-
+        
         inds = set.Frontier();
         
         REQUIRE( inds.size() == 5);

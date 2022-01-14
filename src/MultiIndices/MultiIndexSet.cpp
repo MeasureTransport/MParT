@@ -403,7 +403,7 @@ void MultiIndexSet::Visualize(std::ostream &out) const
       bool found = false;
       for(unsigned int k=0; k<active2global.size(); ++k){
         if((allMultis.at(active2global.at(k)).Get(0)==j)&&(allMultis.at(active2global.at(k)).Get(1)==i)){
-          out << "x  ";
+          out << "a  ";
           found = true;
           break;
         }
@@ -411,8 +411,13 @@ void MultiIndexSet::Visualize(std::ostream &out) const
 
       if(!found){
         for(auto& multi : allMultis){
-          if((multi.Get(0)==j)&&(multi.Get(1)==i))
-            out << "o  ";
+          if((multi.Get(0)==j)&&(multi.Get(1)==i)){
+            if(IsAdmissible(multi)){
+              out << "r  ";
+            }else{
+              out << "m  ";
+            }
+          }
         }
       }
     }
@@ -461,6 +466,54 @@ std::vector<unsigned int> MultiIndexSet::Frontier() const {
 
   return frontierInds;
 }
+
+std::vector<MultiIndex> MultiIndexSet::Margin() const
+{
+  std::vector<MultiIndex> output;
+
+  for(unsigned int globalInd=0; globalInd<global2active.size(); ++globalInd){
+
+    // If this is an inactive multiindex
+    if(!IsActive(globalInd)){
+
+      // Check the backward neighbors
+      for(auto neighbor : inEdges[globalInd]){
+        if(IsActive(neighbor)>0){
+          output.push_back(allMultis.at(globalInd));
+          break;
+        }
+      }
+    }
+  }
+
+  return output;
+}
+
+
+std::vector<MultiIndex> MultiIndexSet::ReducedMargin() const
+{
+
+  std::vector<MultiIndex> output;
+
+  for(unsigned int globalInd=0; globalInd<global2active.size(); ++globalInd){
+
+    // If this is an inactive multiindex
+    if(!IsActive(globalInd)){
+
+      // Check the backward neighbors
+      bool allActive = true;
+      for(auto neighbor : inEdges[globalInd])
+        allActive = (allActive && IsActive(neighbor));
+
+      if(allActive)
+        output.push_back(allMultis.at(globalInd));
+
+    }
+  }
+
+  return output;
+}
+
 
 std::vector<unsigned int> MultiIndexSet::StrictFrontier() const
 {

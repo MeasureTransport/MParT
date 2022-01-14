@@ -248,6 +248,20 @@ MultiIndexSet set(length, limiter);
   */
   std::vector<unsigned int> Frontier() const;
 
+
+  /** Returns multiindices in the margin of the set.  The margin contains multiindices in the 
+      limiting set that also have at least one active backward neighbor.
+      @return A std::vector containing the multiindices in the margin 
+  */
+  std::vector<MultiIndex> Margin() const;
+
+  /** Returns multiindices in the reduced margin of the set.  A multiindex is in the reduced 
+      margin if it is in the limiting set and all of its backward neighbors are active.
+      @return A std::vector containing the multiindices in the reduced margin 
+  */
+  std::vector<MultiIndex> ReducedMargin() const;
+
+
   /** We define the strict frontier to be the collection of multiindices, where
       all admissible forward neighbors are inactive.
       @return A vector with linear indices for active multi-indices on the strict frontier.
@@ -289,44 +303,47 @@ MultiIndexSet set(length, limiter);
   /// Returns the number of forward neighbors (active or inactive)
   unsigned int NumForward(unsigned int activeInd) const;
 
-  /** Visualizes a two-dimensional MultiIndexSet as ASCII art using "x" to denote active multiindices and "o" to denote admissible inactive forward neighbors.
+  /** Visualizes a two-dimensional MultiIndexSet as ASCII art using "a" to denote active multiindices, "r" to denoted multiindices in the reduced margin (not active), and "m" to denoted multiindices in the margin (also not active).
+      Note that the `MultiIndexSet::at` and `MultiIndexSet::IndexToMulti` only provide access to the active multiindices.  The inactive multiindices in the margin
+      are typically only used for adaptation.
+      
    The output for a total order limited set with max order 11 looks like 
   @code 
-12 | o  
-11 | x  o  
-10 | x  x  o  
- 9 | x  x  x  o  
- 8 | x  x  x  x  o  
- 7 | x  x  x  x  x  o  
- 6 | x  x  x  x  x  x  o  
- 5 | x  x  x  x  x  x  x  o  
- 4 | x  x  x  x  x  x  x  x  o  
- 3 | x  x  x  x  x  x  x  x  x  o  
- 2 | x  x  x  x  x  x  x  x  x  x  o  
- 1 | x  x  x  x  x  x  x  x  x  x  x  o  
- 0 | x  x  x  x  x  x  x  x  x  x  x  x  o  
+12 | r  
+11 | a  r  
+10 | a  a  r  
+ 9 | a  a  a  r  
+ 8 | a  a  a  a  r  
+ 7 | a  a  a  a  a  r  
+ 6 | a  a  a  a  a  a  r  
+ 5 | a  a  a  a  a  a  a  r  
+ 4 | a  a  a  a  a  a  a  a  r  
+ 3 | a  a  a  a  a  a  a  a  a  r  
+ 2 | a  a  a  a  a  a  a  a  a  a  r  
+ 1 | a  a  a  a  a  a  a  a  a  a  a  r  
+ 0 | a  a  a  a  a  a  a  a  a  a  a  a  r  
     ----------------------------------------
      0  1  2  3  4  5  6  7  8  9  10 11 12 
   @endcode 
 
 Another example for an adaptively constructed set is
   @code 
- 4 | o  
- 3 | x  o  
- 2 | x  o  
- 1 | x  x  o  o  
- 0 | x  x  x  x  o  
+ 4 | r  
+ 3 | a  m  
+ 2 | a  r  
+ 1 | a  a  r  m  
+ 0 | a  a  a  a  r  
     ----------------
      0  1  2  3  4 
   @endcode
 
 The following is the same set as before, but with a multiindex limiter preventing expansion of mixed terms
 @code 
- 4 | o  
- 3 | x  
- 2 | x  
- 1 | x  x  
- 0 | x  x  x  x  o  
+ 4 | r  
+ 3 | a  
+ 2 | a  
+ 1 | a  a  
+ 0 | a  a  a  a  r  
     ----------------
      0  1  2  3  4
 @endcode
