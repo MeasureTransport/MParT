@@ -457,7 +457,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK5mpart13MultiIndexSet8FrontierEv">
 <span id="_CPPv3NK5mpart13MultiIndexSet8FrontierEv"></span><span id="_CPPv2NK5mpart13MultiIndexSet8FrontierEv"></span><span id="mpart::MultiIndexSet::FrontierC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a3f1c2f291238395240b3633049c5144e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Frontier</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet8FrontierEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>Here, we define a term on the “frontier” of the multiindex set as one that has at least one inactive admissable forward neighbors. These terms are expandable. </p>
+<dd><p>Here, we define a term on the “frontier” of the multiindex set as one that has at least one inactive admissable forward neighbors. These terms are expandable. Note that a forward neighbor must be admissible according to the limiter currently in place to be considered in the definition of the frontier. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A vector with linear indices for active multi-indices on the frontier. </p>
@@ -468,7 +468,7 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK5mpart13MultiIndexSet14StrictFrontierEv">
 <span id="_CPPv3NK5mpart13MultiIndexSet14StrictFrontierEv"></span><span id="_CPPv2NK5mpart13MultiIndexSet14StrictFrontierEv"></span><span id="mpart::MultiIndexSet::StrictFrontierC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a1f88361750dafb7bca0c16189a5168dd"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StrictFrontier</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet14StrictFrontierEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>We define the strict frontier to be the collection of multiindices, whose forward neighbors are all inactive. </p>
+<dd><p>We define the strict frontier to be the collection of multiindices, where all admissible forward neighbors are inactive. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>A vector with linear indices for active multi-indices on the strict frontier. </p>
