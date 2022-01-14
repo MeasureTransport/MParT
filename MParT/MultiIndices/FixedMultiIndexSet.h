@@ -12,6 +12,20 @@ class FixedMultiIndexSet
 {
 public:
 
+    /** @brief Construct a fixed multiindex set in dense form.
+        
+        All components of the multiindex are stored.  This requires more memory for high 
+        dimensional problems, but might be easier to work with for some families of 
+        basis functions.
+    */
+    FixedMultiIndexSet(unsigned int                _dim,
+                       Kokkos::View<unsigned int*> _orders);
+
+    /** @brief Construct a fixed multiindex set in compressed form.  
+    
+        Only nonzero orders are stored in this representation.   For multivariate polynomials,
+        the compressed representation can yield faster polynomial evaluations.
+    */
     FixedMultiIndexSet(unsigned int                _dim,
                        Kokkos::View<unsigned int*> _nzStarts,
                        Kokkos::View<unsigned int*> _nzDims,
@@ -37,7 +51,10 @@ public:
 
     const unsigned int dim;
 
+    const bool isCompressed;
+
 private:
+
     // Computes the number of terms in the multiindexset as well as the total number of nonzero components
     std::pair<unsigned int, unsigned int> TotalOrderSize(unsigned int maxOrder, unsigned int currDim);
 

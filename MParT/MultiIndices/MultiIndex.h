@@ -9,30 +9,11 @@ namespace mpart {
 
 class MultiIndexSet;
 
+
 /**
 @class MultiIndex
-@ingroup MultiIndices
-@brief A multi-index determines the powers of a multi-dimensional polynomial
-
-<p> In its simplest form, a multiindex is simply a vector of nonnegative
-    integers, say \f$ \mathbf{j}=[j_1,j_2,\dots,j_D]\f$, where \f$D\f$ is a
-    user-specified dimension.  In MUQ, these multiindices are used to define
-    multivariate polynomial expansions.
-
-    <p> The reason we use this class, instead of just storing the vectors
-    directly, is that this class provides sparse storage scheme for the
-    multiindex; only elements of \f$\mathbf{j}\f$ that are nonzero are
-    actually stored.  This type of sparse storage is particularly
-    advantageous for polynomial expansions that do not have a large number
-    of cross terms, e.g., diagonal transport maps or highly anisotropic
-    polynomial chaos expansions.
-    </p>
-
-    <p> This class is mostly used behind the scenes.  However, the GetVector()
-        function may come in useful for users that need to extract the
-        multiindex vector. </p>
-
-    */
+@brief A class for working with vectors of nonnnegative integers.
+*/
 class MultiIndex {
     friend class MultiIndexSet;
 
@@ -61,7 +42,7 @@ public:
     MultiIndex(const unsigned int* fullVec, unsigned int length);
 
     /** Allows users to intiailize the multiindex with curly braces.  For
-        example, @code MultiIndex temp{1,0,2,3} #endcode would create a
+        example, @code MultiIndex temp{1,0,2,3} @endcode would create a
         multiindex with length four and values 1, 0, 2, and 3.
     */
     MultiIndex(std::initializer_list<unsigned int> const& indIn);

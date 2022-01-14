@@ -21,7 +21,7 @@ TEST_CASE("Conversions between MultiIndexSet types", "[MultiIndexSet Conversions
     unsigned int dim = 10;
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, 3);
 
-    FixedMultiIndexSet fixedSet = mset.Compress();
+    FixedMultiIndexSet fixedSet = mset.Fix();
 
     REQUIRE(mset.Size() == fixedSet.Size() );
 

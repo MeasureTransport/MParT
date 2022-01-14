@@ -4,9 +4,18 @@ using namespace mpart;
 
 
 FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
+                                       Kokkos::View<unsigned int*> _nzOrders) : dim(_dim),
+                                                                                isCompressed(false),
+                                                                                nzOrders(_nzOrders)
+
+{
+}
+
+FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
                                        Kokkos::View<unsigned int*> _nzStarts,
                                        Kokkos::View<unsigned int*> _nzDims,
                                        Kokkos::View<unsigned int*> _nzOrders) : dim(_dim),
+                                                                                isCompressed(true),
                                                                                 nzStarts(_nzStarts), 
                                                                                 nzDims(_nzDims),
                                                                                 nzOrders(_nzOrders)
@@ -14,7 +23,7 @@ FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
 }
 
 FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim, 
-                             unsigned int _maxOrder) : dim(_dim)
+                                       unsigned int _maxOrder) : dim(_dim), isCompressed(true)
 {   
     // Figure out the number of terms in the total order
     unsigned int numTerms, numNz;
@@ -39,11 +48,17 @@ std::vector<unsigned int> FixedMultiIndexSet::GetMaxOrders() const
 {   
     std::vector<unsigned int> maxOrders(dim, 0);
 
-    for(unsigned int i=0; i<nzOrders.extent(0); ++i){
-        if(nzOrders(i)>maxOrders.at(nzDims(i)))
-            maxOrders.at(nzDims(i)) = nzOrders(i);
+    if(isCompressed){
+        for(unsigned int i=0; i<nzOrders.extent(0); ++i){
+            if(nzOrders(i)>maxOrders.at(nzDims(i)))
+                maxOrders.at(nzDims(i)) = nzOrders(i);
+        }
+    }else{
+        for(unsigned int i=0; i<nzOrders.extent(0); ++i){
+            if(nzOrders(i)>maxOrders.at(i%dim))
+                maxOrders.at(i%dim) = nzOrders(i);
+        }
     }
-
     return maxOrders;
 }
 
@@ -52,62 +67,89 @@ std::vector<unsigned int> FixedMultiIndexSet::IndexToMulti(unsigned int index) c
 {   
     std::vector<unsigned int> output(dim,0);
     
-    for(unsigned int i=nzStarts(index); i<nzStarts(index+1); ++i)
-        output.at( nzDims(i) ) = nzOrders(i);
-    
+    if(isCompressed){
+        for(unsigned int i=nzStarts(index); i<nzStarts(index+1); ++i)
+            output.at( nzDims(i) ) = nzOrders(i);
+    }else{
+        for(unsigned int i=0; i<dim; ++i)
+            output.at(i) = nzOrders(i + dim*index);
+    }
     return output;
 }
 
 int FixedMultiIndexSet::MultiToIndex(std::vector<unsigned int> const& multi) const
 {   
-    // Figure out how many nonzeros are in this multiindex
-    unsigned int nnz = 0;
-    for(auto& val : multi)
-        nnz += (val>0) ? 1:0;
-    
-    // Now search for the matching multi
-    for(unsigned int i=0; i<nzStarts.extent(0); ++i){
+    if(isCompressed){
 
-        // First, check if the number of nonzeros matches
-        if((nzStarts(i+1)-nzStarts(i))==nnz){
+        // Figure out how many nonzeros are in this multiindex
+        unsigned int nnz = 0;
+        for(auto& val : multi)
+            nnz += (val>0) ? 1:0;
+        
+        // Now search for the matching multi
+        for(unsigned int i=0; i<nzStarts.extent(0); ++i){
+            
+            // First, check if the number of nonzeros matches
+            if((nzStarts(i+1)-nzStarts(i))==nnz){
 
-            // Now check the contents
-            bool matches = true;
-            for(unsigned int j=nzStarts(i); j<nzStarts(i+1); ++j){
-                if(nzOrders(j)!=multi.at(nzDims(j))){
-                    matches=false;
+                // Now check the contents
+                bool matches = true;
+                for(unsigned int j=nzStarts(i); j<nzStarts(i+1); ++j){
+                    if(nzOrders(j)!=multi.at(nzDims(j))){
+                        matches=false;
+                        break;
+                    }
+                }
+
+                // We found it!  Return the current index
+                if(matches)
+                    return i;
+            }
+        }
+
+        // We didn't find it, return a negative value
+        return -1;
+
+    }else{
+        unsigned int numTerms = Size();
+        for(unsigned int i=0; i<numTerms; ++i){
+
+            bool isMatch = true;
+            for(unsigned int d=0; d<dim; ++d){
+                if(multi.at(d) != nzOrders(d + i*dim)){
+                    isMatch = false;
                     break;
                 }
             }
 
-            // We found it!  Return the current index
-            if(matches)
+            if(isMatch)
                 return i;
         }
-    }
 
-    // We didn't find it, return a negative value
-    return -1;
+        return -1;
+
+    }
 }
 
 
 void FixedMultiIndexSet::Print() const
-{
-    std::cout << "Starts:\n";
-    for(int i=0; i<nzStarts.extent(0); ++i)
-        std::cout << nzStarts(i) << "  ";
-    std::cout << std::endl;
+{   
+    if(isCompressed){
+        std::cout << "Starts:\n";
+        for(int i=0; i<nzStarts.extent(0); ++i)
+            std::cout << nzStarts(i) << "  ";
+        std::cout << std::endl;
 
-    std::cout << "\nDims:\n";
-    for(int i=0; i<nzDims.extent(0); ++i)
-        std::cout << nzDims(i) << "  ";
-    std::cout << std::endl;
-    
-    std::cout << "\nOrders:\n";
-    for(int i=0; i<nzOrders.extent(0); ++i)
-        std::cout << nzOrders(i) << "  ";
-    std::cout << std::endl;
-    
+        std::cout << "\nDims:\n";
+        for(int i=0; i<nzDims.extent(0); ++i)
+            std::cout << nzDims(i) << "  ";
+        std::cout << std::endl;
+        
+        std::cout << "\nOrders:\n";
+        for(int i=0; i<nzOrders.extent(0); ++i)
+            std::cout << nzOrders(i) << "  ";
+        std::cout << std::endl;
+    }
 
     std::cout << "\nMultis:\n";
     std::vector<unsigned int> multi;
@@ -125,7 +167,11 @@ void FixedMultiIndexSet::Print() const
 
 unsigned int FixedMultiIndexSet::Size() const
 {
-    return nzStarts.extent(0)-1;
+    if(isCompressed){
+        return nzStarts.extent(0)-1;
+    }else{
+        return nzOrders.extent(0) / dim;
+    }
 }   
 
 

@@ -9,6 +9,7 @@
 #include <functional>
 
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
+#include "MParT/MultiIndices/MultiIndexNeighborhood.h"
 #include "MParT/MultiIndices/MultiIndex.h"
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
 
@@ -18,46 +19,12 @@ namespace mpart{
 class MultiIndexSet;
 
 /** @class MultiIndexSet
-  @ingroup MultiIndices
   @brief A class for holding, sorting, and adapting sets of multiindices.
-  @details <p>In the context of polynomial expansions, a multiindex defines a
-    single multivariate polynomial.  A finite expansion of multivariate
-    polynomials is then defined by a collection of multiindices, one for
-    each term in the expansion.  This class is a tool for defining such a
-    multiindex set, relating members within the set (i.e. defining
-    neighbors), and expanding the set. </p>
+  @details This class is a tool for defining such a multiindex set, relating members
+within the set (i.e. definingneighbors), and expanding the set.
 
-  <p>Let \f$\mbox{j}=[j_1,j_2,\dots,j_D]\f$ be a \f$D\f$-dimensional
-    multiindex.  The backwards neighbors of \f$\mbox{j}\f$ are the multiindices
-    given by multiindices who are only different from \f$\mbox{j}\f$ in one
-    component, and in that component, the difference is -1.  For example,
-    \f$[j_1-1, j_2,\dots,j_D]\f$ and \f$[j_1, j_2-1,\dots,j_D]\f$ are
-    backwards neighbors of \f$\mbox{j}\f$, but \f$[j_1-1,
-    j_2-1,\dots,j_D]\f$ and \f$[j_1, j_2-2,\dots,j_D]\f$ are not.  Forward
-    neighbors are similarly defined, but with +1. Examples of forward
-    neighbors include \f$[j_1+1, j_2,\dots,j_D]\f$ and \f$[j_1,
-    j_2+1,\dots,j_D]\f$.   As far as this class is concerned, multiindices
-    can be in three different categories: active, inactive, and/or
-    admissable.  Active multiindices are those that are currently being used
-    to define a polynomial expansion, inactive multiindices are not
-    currently used but are being tracked, and admissable multiindices are
-    inactive multiindices whose backward neighbors are all active.<p>
-
-  <p>This class keeps track of both active and admissable multiindices, but
-    only active indices are included in the linear indexing.  Nonactive
-    indices are hidden (i.e. not even considered) in all the public members
-    of this class.  For example, the GetAllMultiIndices function will return
-    all active multiindices, and the IndexToMulti function will return
-    \f$i^\mbox{th}\f$ active multiindex.  Inactive multiindices are used to
-    check admissability and are added to the active set during adaptation.
-  </p>
-
-  <p>In general, members of the MultiIndexFactory class should be used to
-    construct MultiIndexSets directly.<p>
 */
 class MultiIndexSet{
-
-  friend class MultiIndexFactory;
 
 public:
 
@@ -103,19 +70,22 @@ MultiIndexSet set(length, limiter);
 
    @param[in] lengthIn The length of each multi-index in the set.
    @param[in] limiterIn An optional functor defining the possible admissible multi-indices.  Should accept a const& to MultiIndex and return a boolean.  True if the MultiIndex is allowed and false otherwise.
+   @param[in] neigh A shared_ptr to a child of the MultiIndexNeighborhood class that defines the connectivity between different multiindices.  Defaults to DefaultNeighborhood, which defines forward and backward neighbors as multiindices that differ in a single component by a 1.
   */
   MultiIndexSet(const unsigned int lengthIn,
-                LimiterType const& limiterIn = MultiIndexLimiter::None() );
+                LimiterType const& limiterIn = MultiIndexLimiter::None(),
+                std::shared_ptr<MultiIndexNeighborhood> neigh = std::make_shared<DefaultNeighborhood>() );
 
   /**
-   @brief "Compresses" this multiindex set into the fixed representation provided by the "FixedMultiIndexSet" class.
+   @brief Converts this multiindex set into the fixed representation provided by the "FixedMultiIndexSet" class.
    @details The FixedMultiIndexSet cannot easily be adapted, but stores the multiindices in a contiguous block of memory 
             in a Kokkos::View that can be more amenable to fast computation.   This function creates an instance of the 
             FixedMultiIndexSet from the current state of *this.   Note that memory is deep copied and any subsequent updates 
             to this class will not result in updates to the FixedMultiIndexSet.
+   @param[in] compress Should the fixed representation be in compressed format?
    @return An instance of the FixedMultiIndexSet class with a snapshot of the current state of this MultiIndexSet.
    */
-  FixedMultiIndexSet Compress() const;
+  FixedMultiIndexSet Fix(bool compress=true) const;
 
   /** Set the limiter of this MultiIndexSet.  This function will check to make
       sure that all currently active nodes are still feasible with the new limiter.
@@ -415,6 +385,7 @@ private:
                                       std::vector<unsigned int> &denseMulti,
                                       LimiterType const& limiter);
 
+  std::shared_ptr<MultiIndexNeighborhood> neighborhood;
   std::map<MultiIndex, unsigned int> multi2global; // map from a multiindex to an integer
 
 }; // class MultiIndexSet

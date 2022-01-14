@@ -108,44 +108,64 @@ void MultiIndexSet::RecursiveTensorFill(unsigned int   maxDegree,
 
 
 MultiIndexSet::MultiIndexSet(const unsigned int lengthIn,
-                             LimiterType const& limiterIn) : maxOrders(lengthIn,0),
-                                                             length(lengthIn),
-                                                             limiter(limiterIn)
+                             LimiterType const& limiterIn,
+                             std::shared_ptr<MultiIndexNeighborhood> neigh) : maxOrders(lengthIn,0),
+                                                                              length(lengthIn),
+                                                                              limiter(limiterIn),
+                                                                              neighborhood(neigh)
 {
 };
 
 
-FixedMultiIndexSet MultiIndexSet::Compress() const
+FixedMultiIndexSet MultiIndexSet::Fix(bool compress) const
 {
-  unsigned int numTerms = Size();
-  unsigned int totalNnz = 0; // total number of nonzero components in all multiindex
-  for(auto& activeInd : active2global)
-    totalNnz += allMultis.at(activeInd).NumNz();
+  if(compress){
 
-  
-  Kokkos::View<unsigned int*> nzStarts("Start of a Multiindex", numTerms+1);
-  Kokkos::View<unsigned int*> nzDims("Index of nz component", totalNnz);
-  Kokkos::View<unsigned int*> nzOrders("Power of nz component", totalNnz);
-  
-  unsigned int cumNz = 0;
+    unsigned int numTerms = Size();
+    unsigned int totalNnz = 0; // total number of nonzero components in all multiindex
+    for(auto& activeInd : active2global)
+      totalNnz += allMultis.at(activeInd).NumNz();
 
-  for(unsigned int i=0; i<numTerms; ++i){
-
-    unsigned int activeInd = active2global.at(i);
-    MultiIndex const& multi = allMultis.at(activeInd);
-
-    nzStarts(i) = cumNz;
     
-    for(unsigned int j=0; j<multi.nzInds.size(); ++j){
-      nzDims(cumNz + j) = multi.nzInds[j];
-      nzOrders(cumNz + j) = multi.nzVals[j];
+    Kokkos::View<unsigned int*> nzStarts("Start of a Multiindex", numTerms+1);
+    Kokkos::View<unsigned int*> nzDims("Index of nz component", totalNnz);
+    Kokkos::View<unsigned int*> nzOrders("Power of nz component", totalNnz);
+    
+    unsigned int cumNz = 0;
+
+    for(unsigned int i=0; i<numTerms; ++i){
+
+      unsigned int activeInd = active2global.at(i);
+      MultiIndex const& multi = allMultis.at(activeInd);
+
+      nzStarts(i) = cumNz;
+      
+      for(unsigned int j=0; j<multi.nzInds.size(); ++j){
+        nzDims(cumNz + j) = multi.nzInds[j];
+        nzOrders(cumNz + j) = multi.nzVals[j];
+      }
+
+      cumNz += allMultis.at(activeInd).NumNz();
+    }
+    nzStarts(numTerms) = totalNnz;
+    
+    return FixedMultiIndexSet(length, nzStarts, nzDims, nzOrders);
+
+  }else{
+
+    Kokkos::View<unsigned int*> orders("orders", length*Size());
+    std::vector<unsigned int> multi;
+
+    for(unsigned int i=0; i<Size(); ++i){
+      multi = IndexToMulti(i).Vector();
+
+      for(unsigned int d=0; d<length; ++d)
+        orders(d + i*length) = multi.at(d);
+
     }
 
-    cumNz += allMultis.at(activeInd).NumNz();
+    return FixedMultiIndexSet(length, orders);
   }
-  nzStarts(numTerms) = totalNnz;
-  
-  return FixedMultiIndexSet(length, nzStarts, nzDims, nzOrders);
 }
 
 
@@ -344,31 +364,27 @@ void MultiIndexSet::Activate(MultiIndex const& multiIndex)
 }
 
 void MultiIndexSet::AddForwardNeighbors(unsigned int globalIndex, bool addInactive)
-{
-  std::vector<unsigned int> base = allMultis.at(globalIndex).Vector();
+{ 
+  std::vector<MultiIndex> neighbors = neighborhood->ForwardNeighbors(allMultis.at(globalIndex));
 
-  for(unsigned int i=0; i<base.size(); ++i)
+  for(auto& multi : neighbors)
   {
-    base[i]++;
-
-    MultiIndex newNode(base);
-
+    
     // If this is within the limiter set
-    if(limiter(newNode)){
+    if(limiter(multi)){
 
       // Check to see if we already have this multiindex...
-      auto iter = multi2global.find(newNode);
+      auto iter = multi2global.find(multi);
       if(iter!=multi2global.end()){
         inEdges.at(iter->second).insert(globalIndex);
         outEdges.at(globalIndex).insert(iter->second);
 
       // If not, add it
       }else if(addInactive){
-        AddInactive(newNode);
+        AddInactive(multi);
       }
     }
 
-    base[i]--;
   }
 }
 
@@ -518,33 +534,25 @@ unsigned int MultiIndexSet::NumForward(unsigned int activeInd) const
 }
 
 void MultiIndexSet::AddBackwardNeighbors(unsigned int globalIndex, bool addInactive)
-{
-  std::vector<unsigned int> base = allMultis.at(globalIndex).Vector();
+{ 
+  std::vector<MultiIndex> neighbors = neighborhood->BackwardNeighbors(allMultis.at(globalIndex));
 
-  for(unsigned int i=0; i<base.size(); ++i)
+  for(auto& multi : neighbors)
   {
-    if(base[i]>0){
+    if(limiter(multi)){
 
-      base[i]--;
-
-      MultiIndex newNode(base);
-
-      if(limiter(newNode)){
-
-        // Check to see if we already have this multiindex in the set
-        auto iter = multi2global.find(newNode);
-        if(iter!=multi2global.end()){
-          outEdges.at(iter->second).insert(globalIndex);
-          inEdges.at(globalIndex).insert(iter->second);
-        
-        // If not, add it
-        }else if(addInactive){
-          AddInactive(newNode);
-        }
+      // Check to see if we already have this multiindex in the set
+      auto iter = multi2global.find(multi);
+      if(iter!=multi2global.end()){
+        outEdges.at(iter->second).insert(globalIndex);
+        inEdges.at(globalIndex).insert(iter->second);
+      
+      // If not, add it
+      }else if(addInactive){
+        AddInactive(multi);
       }
-
-      base[i]++;
     }
+
   }
 }
 

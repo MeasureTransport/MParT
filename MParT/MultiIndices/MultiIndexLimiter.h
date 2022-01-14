@@ -10,7 +10,6 @@ namespace MultiIndexLimiter{
 
 
     /** @class TotalOrderLimiter
-        @ingroup MultiIndices
         @brief Provides a cap on the total-order allowed
         @details This limter only allows terms that satisfy \f$\|\mathbf{j}\|_1\leq p_U\f$, where \f$\mathbf{j}\f$ is the multiindex, and \f$p_U\f$ is a nonnegative integer passed to the constructor of this class.
     */
