@@ -1,0 +1,5 @@
+===================
+MultiIndexLimiter
+===================
+
+.. doxygennamespace:: mpart::MultiIndexLimiter

@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>MultiIndexNeighborhood &#8212; MParT  documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="prev" title="MultiIndexLimiter" href="multiindexlimiter.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">MParT</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../getting_started/index.html">
+  Getting Started
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  API Reference
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/MeasureTransport/MParT" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../multiindex.html">
+   MultiIndices
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindex.html">
+     MultiIndex
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindexset.html">
+     MultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="fixedmultiindexset.html">
+     FixedMultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindexlimiter.html">
+     MultiIndexLimiter
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     MultiIndexNeighborhood
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="multiindexneighborhood">
+<h1>MultiIndexNeighborhood<a class="headerlink" href="#multiindexneighborhood" title="Permalink to this headline">¶</a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart22MultiIndexNeighborhoodE">
+<span id="_CPPv3N5mpart22MultiIndexNeighborhoodE"></span><span id="_CPPv2N5mpart22MultiIndexNeighborhoodE"></span><span id="mpart::MultiIndexNeighborhood"></span><span class="target" id="classmpart_1_1_multi_index_neighborhood"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MultiIndexNeighborhood</span></span></span><a class="headerlink" href="#_CPPv4N5mpart22MultiIndexNeighborhoodE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Abstract base class for <a class="reference internal" href="multiindexset.html#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> graph connectivity definitions. </p>
+<p>Subclassed by <a class="reference internal" href="#classmpart_1_1_default_neighborhood"><span class="std std-ref">mpart::DefaultNeighborhood</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart22MultiIndexNeighborhoodD0Ev">
+<span id="_CPPv3N5mpart22MultiIndexNeighborhoodD0Ev"></span><span id="_CPPv2N5mpart22MultiIndexNeighborhoodD0Ev"></span><span id="mpart::MultiIndexNeighborhood::~MultiIndexNeighborhood"></span><span class="target" id="classmpart_1_1_multi_index_neighborhood_1aa1f9294a02792d211522f6457db32f26"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~MultiIndexNeighborhood</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5mpart22MultiIndexNeighborhoodD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart22MultiIndexNeighborhood16ForwardNeighborsERK10MultiIndex">
+<span id="_CPPv3N5mpart22MultiIndexNeighborhood16ForwardNeighborsERK10MultiIndex"></span><span id="_CPPv2N5mpart22MultiIndexNeighborhood16ForwardNeighborsERK10MultiIndex"></span><span id="mpart::MultiIndexNeighborhood::ForwardNeighbors__MultiIndexCR"></span><span class="target" id="classmpart_1_1_multi_index_neighborhood_1a4f73a48db06da9bd868f2c097737392f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ForwardNeighbors</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multi</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5mpart22MultiIndexNeighborhood16ForwardNeighborsERK10MultiIndex" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart22MultiIndexNeighborhood17BackwardNeighborsERK10MultiIndex">
+<span id="_CPPv3N5mpart22MultiIndexNeighborhood17BackwardNeighborsERK10MultiIndex"></span><span id="_CPPv2N5mpart22MultiIndexNeighborhood17BackwardNeighborsERK10MultiIndex"></span><span id="mpart::MultiIndexNeighborhood::BackwardNeighbors__MultiIndexCR"></span><span class="target" id="classmpart_1_1_multi_index_neighborhood_1aeb8272b03ba9b863f85c483bbc35a6a2"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BackwardNeighbors</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multi</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5mpart22MultiIndexNeighborhood17BackwardNeighborsERK10MultiIndex" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart22MultiIndexNeighborhood9IsForwardERK10MultiIndexRK10MultiIndex">
+<span id="_CPPv3N5mpart22MultiIndexNeighborhood9IsForwardERK10MultiIndexRK10MultiIndex"></span><span id="_CPPv2N5mpart22MultiIndexNeighborhood9IsForwardERK10MultiIndexRK10MultiIndex"></span><span id="mpart::MultiIndexNeighborhood::IsForward__MultiIndexCR.MultiIndexCR"></span><span class="target" id="classmpart_1_1_multi_index_neighborhood_1ad39e7aa077aab1a58e5030653ed6006e"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsForward</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">base</span></span>, <a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">next</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5mpart22MultiIndexNeighborhood9IsForwardERK10MultiIndexRK10MultiIndex" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart22MultiIndexNeighborhood10IsBackwardERK10MultiIndexRK10MultiIndex">
+<span id="_CPPv3N5mpart22MultiIndexNeighborhood10IsBackwardERK10MultiIndexRK10MultiIndex"></span><span id="_CPPv2N5mpart22MultiIndexNeighborhood10IsBackwardERK10MultiIndexRK10MultiIndex"></span><span id="mpart::MultiIndexNeighborhood::IsBackward__MultiIndexCR.MultiIndexCR"></span><span class="target" id="classmpart_1_1_multi_index_neighborhood_1ac00a1e3620c1b4fe6a72000e047b7a41"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsBackward</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">base</span></span>, <a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">next</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N5mpart22MultiIndexNeighborhood10IsBackwardERK10MultiIndexRK10MultiIndex" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart19DefaultNeighborhoodE">
+<span id="_CPPv3N5mpart19DefaultNeighborhoodE"></span><span id="_CPPv2N5mpart19DefaultNeighborhoodE"></span><span id="mpart::DefaultNeighborhood"></span><span class="target" id="classmpart_1_1_default_neighborhood"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">DefaultNeighborhood</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5mpart22MultiIndexNeighborhoodE" title="mpart::MultiIndexNeighborhood"><span class="n"><span class="pre">MultiIndexNeighborhood</span></span></a><a class="headerlink" href="#_CPPv4N5mpart19DefaultNeighborhoodE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Defines the standard graph connectivity for a <a class="reference internal" href="multiindexset.html#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a><p>.</p>
+<p>A multiindex</p>
+<span class="math notranslate nohighlight">\(\mathbf{\alpha}\)</span> is a <strong>forward</strong> neighbor of <span class="math notranslate nohighlight">\(\mathbf{\beta}\)</span> if <span class="math notranslate nohighlight">\(\|\mathbf{\alpha}-\mathbf{\beta}|_1==1\)</span> and <span class="math notranslate nohighlight">\(\mathbf{\alpha}_i \geq \mathbf{\alpha}_i\)</span> for all <span class="math notranslate nohighlight">\(i\)</span>. </p>
+<p>A multiindex <span class="math notranslate nohighlight">\(\mathbf{\alpha}\)</span> is a <strong>backward</strong> neighbor of <span class="math notranslate nohighlight">\(\mathbf{\beta}\)</span> if <span class="math notranslate nohighlight">\(\|\mathbf{\alpha}-\mathbf{\beta}|_1==1\)</span> and <span class="math notranslate nohighlight">\(\mathbf{\alpha}_i \leq \mathbf{\alpha}_i\)</span> for all <span class="math notranslate nohighlight">\(i\)</span>. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart19DefaultNeighborhoodD0Ev">
+<span id="_CPPv3N5mpart19DefaultNeighborhoodD0Ev"></span><span id="_CPPv2N5mpart19DefaultNeighborhoodD0Ev"></span><span id="mpart::DefaultNeighborhood::~DefaultNeighborhood"></span><span class="target" id="classmpart_1_1_default_neighborhood_1af1a19c440e45c057be6a0204b86e3688"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~DefaultNeighborhood</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5mpart19DefaultNeighborhoodD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart19DefaultNeighborhood16ForwardNeighborsERK10MultiIndex">
+<span id="_CPPv3N5mpart19DefaultNeighborhood16ForwardNeighborsERK10MultiIndex"></span><span id="_CPPv2N5mpart19DefaultNeighborhood16ForwardNeighborsERK10MultiIndex"></span><span id="mpart::DefaultNeighborhood::ForwardNeighbors__MultiIndexCR"></span><span class="target" id="classmpart_1_1_default_neighborhood_1ae5a799bcce60f1a2e030e7cbf9001df7"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ForwardNeighbors</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multi</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart19DefaultNeighborhood16ForwardNeighborsERK10MultiIndex" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart19DefaultNeighborhood17BackwardNeighborsERK10MultiIndex">
+<span id="_CPPv3N5mpart19DefaultNeighborhood17BackwardNeighborsERK10MultiIndex"></span><span id="_CPPv2N5mpart19DefaultNeighborhood17BackwardNeighborsERK10MultiIndex"></span><span id="mpart::DefaultNeighborhood::BackwardNeighbors__MultiIndexCR"></span><span class="target" id="classmpart_1_1_default_neighborhood_1a51b747af5884c780bc4fee5064db32fb"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BackwardNeighbors</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multi</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart19DefaultNeighborhood17BackwardNeighborsERK10MultiIndex" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart19DefaultNeighborhood9IsForwardERK10MultiIndexRK10MultiIndex">
+<span id="_CPPv3N5mpart19DefaultNeighborhood9IsForwardERK10MultiIndexRK10MultiIndex"></span><span id="_CPPv2N5mpart19DefaultNeighborhood9IsForwardERK10MultiIndexRK10MultiIndex"></span><span id="mpart::DefaultNeighborhood::IsForward__MultiIndexCR.MultiIndexCR"></span><span class="target" id="classmpart_1_1_default_neighborhood_1af485392b0a0e597b920892204cbdbd1b"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsForward</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">base</span></span>, <a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">next</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart19DefaultNeighborhood9IsForwardERK10MultiIndexRK10MultiIndex" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart19DefaultNeighborhood10IsBackwardERK10MultiIndexRK10MultiIndex">
+<span id="_CPPv3N5mpart19DefaultNeighborhood10IsBackwardERK10MultiIndexRK10MultiIndex"></span><span id="_CPPv2N5mpart19DefaultNeighborhood10IsBackwardERK10MultiIndexRK10MultiIndex"></span><span id="mpart::DefaultNeighborhood::IsBackward__MultiIndexCR.MultiIndexCR"></span><span class="target" id="classmpart_1_1_default_neighborhood_1a955331cb46f8029de9b30c4f5417dc45"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsBackward</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">base</span></span>, <a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">prev</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart19DefaultNeighborhood10IsBackwardERK10MultiIndexRK10MultiIndex" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="multiindexlimiter.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">MultiIndexLimiter</p>
+        </div>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, The MParT development team..<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

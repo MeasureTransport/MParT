@@ -1,0 +1,313 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>MultiIndexLimiter &#8212; MParT  documentation</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet">
+  <link href="../../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/css/blank.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.be7d3bbb2ef33a8344ce.js">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="MultiIndexNeighborhood" href="multiindexneighborhood.html" />
+    <link rel="prev" title="FixedMultiIndexSet" href="fixedmultiindexset.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../../index.html">
+<p class="title">MParT</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../../getting_started/index.html">
+  Getting Started
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="../index.html">
+  API Reference
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/MeasureTransport/MParT" rel="noopener" target="_blank" title="GitHub">
+            <span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label>
+          </a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="../multiindex.html">
+   MultiIndices
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindex.html">
+     MultiIndex
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindexset.html">
+     MultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="fixedmultiindexset.html">
+     FixedMultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2 current active">
+    <a class="current reference internal" href="#">
+     MultiIndexLimiter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindexneighborhood.html">
+     MultiIndexNeighborhood
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+  </div>
+</nav>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="multiindexlimiter">
+<h1>MultiIndexLimiter<a class="headerlink" href="#multiindexlimiter" title="Permalink to this headline">¶</a></h1>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiterE">
+<span id="_CPPv3N5mpart17MultiIndexLimiterE"></span><span id="_CPPv2N5mpart17MultiIndexLimiterE"></span><span id="mpart::MultiIndexLimiter"></span><span class="target" id="namespacempart_1_1_multi_index_limiter"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MultiIndexLimiter</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiterE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter3AndE">
+<span id="_CPPv3N5mpart17MultiIndexLimiter3AndE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter3AndE"></span><span id="mpart::MultiIndexLimiter::And"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_and"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">And</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter3AndE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;MultiIndexLimiter.h&gt;</em><p>Combines two limiters through an AND operation. </p>
+<p>This class will return true if both limiters given to the constructor return true. </p>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter11AnisotropicE">
+<span id="_CPPv3N5mpart17MultiIndexLimiter11AnisotropicE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter11AnisotropicE"></span><span id="mpart::MultiIndexLimiter::Anisotropic"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_anisotropic"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Anisotropic</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter11AnisotropicE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;MultiIndexLimiter.h&gt;</em><p>Declares multiindices as feasible if their entries for less important dimensions are not too high. </p>
+<p>Given a weight vector <span class="math notranslate nohighlight">\( w = (w_i)_{i=1}^d \)</span> with <span class="math notranslate nohighlight">\( w_i \in [0,1] \)</span> and a cutoff threshold <span class="math notranslate nohighlight">\( \epsilon \in (0,1)\)</span>, this limiter declares a multiindex <span class="math notranslate nohighlight">\( \nu = (\nu_i)_{i=1}^d \)</span> as feasible if <span class="math notranslate nohighlight">\( w^\nu := \prod_{i=1}^d w_i^{\nu_i} &gt; \epsilon \)</span>. It thus implements the multiindex selection criterion for the construction of a priori anisotropic sparse grids as described in Algorithm 2 in <ul class="simple">
+<li><p>Zech, Jakob. <em>Sparse-grid approximation of high-dimensional parametric PDEs.</em> ETH Zurich, 2018. </p></li>
+</ul>
+</p>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter9DimensionE">
+<span id="_CPPv3N5mpart17MultiIndexLimiter9DimensionE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter9DimensionE"></span><span id="mpart::MultiIndexLimiter::Dimension"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_dimension"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dimension</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter9DimensionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;MultiIndexLimiter.h&gt;</em><p>Provides bounds on what dimensions are allowed to have nonzero values. </p>
+<p>This limiter only allows terms that satisfy <span class="math notranslate nohighlight">\(\mathbf{j}_d = 0 \)</span> for <span class="math notranslate nohighlight">\(d&lt;D_L\)</span> or <span class="math notranslate nohighlight">\(d&gt;=D_L+M\)</span> for a lower bound <span class="math notranslate nohighlight">\(D_L\)</span> and length <span class="math notranslate nohighlight">\(M\)</span>. </p>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter9MaxDegreeE">
+<span id="_CPPv3N5mpart17MultiIndexLimiter9MaxDegreeE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter9MaxDegreeE"></span><span id="mpart::MultiIndexLimiter::MaxDegree"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_max_degree"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaxDegree</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter9MaxDegreeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;MultiIndexLimiter.h&gt;</em><p>Provides a cap on the maximum value of each component the multiindex. </p>
+<p>This limter only allows terms that satisfy <span class="math notranslate nohighlight">\(\mathbf{j}_i\leq p_i\)</span> for <span class="math notranslate nohighlight">\(i\in \{1,2,\ldots,D\}\)</span>, where <span class="math notranslate nohighlight">\(p\)</span> is a vector of upper bounds. </p>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter4NoneE">
+<span id="_CPPv3N5mpart17MultiIndexLimiter4NoneE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter4NoneE"></span><span id="mpart::MultiIndexLimiter::None"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_none"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">None</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter4NoneE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;MultiIndexLimiter.h&gt;</em><p>Returns true for any multiindex. </p>
+<p>This class is used as a default in many places where a limiter is not always needed. IsFeasible will return true for any multiindex. </p>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter2OrE">
+<span id="_CPPv3N5mpart17MultiIndexLimiter2OrE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter2OrE"></span><span id="mpart::MultiIndexLimiter::Or"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_or"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Or</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter2OrE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;MultiIndexLimiter.h&gt;</em><p>Combines two limiters through an OR operation. </p>
+<p>This class will return true if either of the limiters given to the constructor return true. </p>
+</dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter10TotalOrderE">
+<span id="_CPPv3N5mpart17MultiIndexLimiter10TotalOrderE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter10TotalOrderE"></span><span id="mpart::MultiIndexLimiter::TotalOrder"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_total_order"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TotalOrder</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter10TotalOrderE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter3XorE">
+<span id="_CPPv3N5mpart17MultiIndexLimiter3XorE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter3XorE"></span><span id="mpart::MultiIndexLimiter::Xor"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_xor"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Xor</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter3XorE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;MultiIndexLimiter.h&gt;</em><p>Combines two limiters through an XOR operation. </p>
+<p>This class will return true if exactly one of the limiters given to the constructor returns true. </p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'> 
+    <a class='left-prev' id="prev-link" href="fixedmultiindexset.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">FixedMultiIndexSet</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="multiindexneighborhood.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">MultiIndexNeighborhood</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
+<footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, The MParT development team..<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.3.2.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>
