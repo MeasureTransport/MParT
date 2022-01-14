@@ -4,6 +4,9 @@
 # MParT: A Monotone Parameterization Toolbox
 A CPU/GPU performance-portable library for parameterizing and constructing monotone functions in the context of measure transport and regression.
 
+## Documentation
+See [measuretransport.github.io/MParT/](https://measuretransport.github.io/MParT/) for more extensive documentation.
+
 ## Installation
 
 ### Compiling from source
