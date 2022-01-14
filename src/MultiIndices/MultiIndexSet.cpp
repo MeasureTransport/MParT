@@ -151,7 +151,10 @@ FixedMultiIndexSet MultiIndexSet::Compress() const
 
 void MultiIndexSet::SetLimiter(LimiterType const& newLimiter){
 
-  // first, make sure no active terms in the set currently obey the new limiter.
+  // copy the limiter
+  limiter = newLimiter;
+
+  //  make sure no active terms in the set currently obey the new limiter.
   //  If a term is inactive, remove all edges tied to it
   for(int globalInd=0; globalInd<allMultis.size(); ++globalInd)
   {
@@ -162,6 +165,10 @@ void MultiIndexSet::SetLimiter(LimiterType const& newLimiter){
         msg << allMultis.at(globalInd).Vector() << ", is not valid with the new limiter.\n";
         throw std::invalid_argument(msg.str());
       }
+
+      // Add any newly admissible inactive forward neighbors
+      AddForwardNeighbors(globalInd,true);
+    
     }else{
 
       if(!newLimiter(allMultis.at(globalInd))){
@@ -172,8 +179,7 @@ void MultiIndexSet::SetLimiter(LimiterType const& newLimiter){
     }
   }
 
-  // copy the limiter
-  limiter = newLimiter;
+  
 }
 
 int MultiIndexSet::MultiToIndex(MultiIndex const& input) const{
@@ -414,7 +420,7 @@ void MultiIndexSet::Visualize(std::ostream &out) const
 }
 
 
-std::vector<MultiIndex>  MultiIndexSet::GetAdmissibleForwardNeighbors(unsigned int activeIndex)
+std::vector<MultiIndex>  MultiIndexSet::AdmissibleForwardNeighbors(unsigned int activeIndex)
 {
   unsigned int globalInd = active2global.at(activeIndex);
 
@@ -428,7 +434,7 @@ std::vector<MultiIndex>  MultiIndexSet::GetAdmissibleForwardNeighbors(unsigned i
   return output;
 }
 
-std::vector<unsigned int> MultiIndexSet::GetFrontier() const {
+std::vector<unsigned int> MultiIndexSet::Frontier() const {
 
   std::vector<unsigned int> frontierInds;
 
@@ -440,7 +446,7 @@ std::vector<unsigned int> MultiIndexSet::GetFrontier() const {
   return frontierInds;
 }
 
-std::vector<unsigned int> MultiIndexSet::GetStrictFrontier() const
+std::vector<unsigned int> MultiIndexSet::StrictFrontier() const
 {
   std::vector<unsigned int> frontierInds;
 
@@ -459,7 +465,7 @@ std::vector<unsigned int> MultiIndexSet::GetStrictFrontier() const
   return frontierInds;
 }
 
-std::vector<unsigned int> MultiIndexSet::GetBackwardNeighbors(unsigned int activeIndex) const
+std::vector<unsigned int> MultiIndexSet::BackwardNeighbors(unsigned int activeIndex) const
 {
   unsigned int globalInd = active2global.at(activeIndex);
 
@@ -470,7 +476,7 @@ std::vector<unsigned int> MultiIndexSet::GetBackwardNeighbors(unsigned int activ
   return output;
 }
 
-std::vector<unsigned int> MultiIndexSet::GetBackwardNeighbors(MultiIndex const& multiIndex) const
+std::vector<unsigned int> MultiIndexSet::BackwardNeighbors(MultiIndex const& multiIndex) const
 {
   auto iter = multi2global.find(multiIndex);
 

@@ -268,31 +268,31 @@ MultiIndexSet set(length, limiter);
     @param[in] activeIndex The linear index of the active multiIndex under consideration.
     @return A vector of admissible forward neighbors.
     */
-  std::vector<MultiIndex> GetAdmissibleForwardNeighbors(unsigned int activeIndex);
+  std::vector<MultiIndex> AdmissibleForwardNeighbors(unsigned int activeIndex);
 
   /** Here, we define a term on the "frontier" of the multiindex set as one
       that has at least one inactive admissable forward neighbors.  These terms are expandable.
       @return A vector with linear indices for active multi-indices on the frontier.
   */
-  std::vector<unsigned int> GetFrontier() const;
+  std::vector<unsigned int> Frontier() const;
 
   /** We define the strict frontier to be the collection of multiindices, whose
       forward neighbors are all inactive.
       @return A vector with linear indices for active multi-indices on the strict frontier.
   */
-  std::vector<unsigned int> GetStrictFrontier() const;
+  std::vector<unsigned int> StrictFrontier() const;
 
   /** Returns the indices for the backward neighbors of a currently active multiindex.
   @param[in] activeIndex The linear index of the MultiIndex of interest
   @return A std::vector containing the linear indices of the backward neighbors.
   */
-  std::vector<unsigned int> GetBackwardNeighbors(unsigned int activeIndex) const;
+  std::vector<unsigned int> BackwardNeighbors(unsigned int activeIndex) const;
 
   /** Returns indices for backward neighbors of an active or inactive multiindex. 
   @param[in] multiIndex The multiindex in question.
   @return A vector with linear indices for the backward neighbors of this multiindex.
   */
-  std::vector<unsigned int> GetBackwardNeighbors(MultiIndex const& multiIndex) const;
+  std::vector<unsigned int> BackwardNeighbors(MultiIndex const& multiIndex) const;
 
   /**
   Determines whether the input multiIndex is currently admissible.

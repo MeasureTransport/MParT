@@ -246,7 +246,7 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         MultiIndexSet indexSet = MultiIndexSet::CreateTensorProduct(2, 3);
         MultiIndex newMulti{2,1};
 
-        std::vector<unsigned int> neighbors = indexSet.GetBackwardNeighbors(indexSet.MultiToIndex(newMulti));
+        std::vector<unsigned int> neighbors = indexSet.BackwardNeighbors(indexSet.MultiToIndex(newMulti));
 
         REQUIRE(neighbors.size() == 2);
 
@@ -302,5 +302,55 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
         // Check the result of IsAdmissable().
         REQUIRE( indexFamily.IsAdmissible(multi));
+    }
+
+    /*
+        We start with a multiindex set that looks like 
+        4 | 0
+        3 | x                   
+        2 | x                 
+        1 | x   x               
+        0 | x   x   x   x   0     
+            -----------------    
+            0   1   2   3   4    
+
+       The only admissible inactive extensions are [4,0] and [0,4] because we construct this set by
+        "limiting" a total order multiindex so that the largest mixed term is [1,1].  Then we 
+        remove the limiter to end up with a set that looks like 
+
+        4 | o  
+        3 | x   o  
+        2 | x   o  
+        1 | x   x   o   o  
+        0 | x   x   x   x   o  
+           ------------------
+            0   1   2   3   4
+
+        The active indices are the same, but the "Frontier" of expandable multiindices is now much larger.  
+    */
+    SECTION("Frontier")
+    {   
+        auto limiter = [](MultiIndex const& multi){ return ( (multi.Get(0)==0)||(multi.Get(1)==0)||((multi.Get(0)<2)&&(multi.Get(1)<2)));};
+
+        REQUIRE(limiter(MultiIndex{2,0}) );
+        
+        MultiIndexSet set = MultiIndexSet::CreateTotalOrder(2, 3, limiter);
+        
+        std::vector<unsigned int> inds = set.Frontier();
+        REQUIRE( inds.size()==2);
+        REQUIRE( set.at(inds.at(0)) == MultiIndex{0,3} );
+        REQUIRE( set.at(inds.at(1)) == MultiIndex{3,0} );
+
+        // Now remove the limiter, which should allow more multiindices in the 
+        set.SetLimiter( MultiIndexLimiter::None() );
+
+        inds = set.Frontier();
+        
+        REQUIRE( inds.size() == 5);
+        REQUIRE( set.at(inds.at(0)) == MultiIndex{0,2} );
+        REQUIRE( set.at(inds.at(1)) == MultiIndex{0,3} );
+        REQUIRE( set.at(inds.at(2)) == MultiIndex{1,1} );
+        REQUIRE( set.at(inds.at(3)) == MultiIndex{2,0} );
+        REQUIRE( set.at(inds.at(4)) == MultiIndex{3,0} );
     }
 }
