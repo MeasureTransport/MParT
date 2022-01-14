@@ -272,12 +272,14 @@ MultiIndexSet set(length, limiter);
 
   /** Here, we define a term on the "frontier" of the multiindex set as one
       that has at least one inactive admissable forward neighbors.  These terms are expandable.
+      Note that a forward neighbor must be admissible according to the limiter currently in place
+      to be considered in the definition of the frontier.
       @return A vector with linear indices for active multi-indices on the frontier.
   */
   std::vector<unsigned int> Frontier() const;
 
-  /** We define the strict frontier to be the collection of multiindices, whose
-      forward neighbors are all inactive.
+  /** We define the strict frontier to be the collection of multiindices, where
+      all admissible forward neighbors are inactive.
       @return A vector with linear indices for active multi-indices on the strict frontier.
   */
   std::vector<unsigned int> StrictFrontier() const;

@@ -341,6 +341,11 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         REQUIRE( set.at(inds.at(0)) == MultiIndex{0,3} );
         REQUIRE( set.at(inds.at(1)) == MultiIndex{3,0} );
 
+        inds = set.StrictFrontier();
+        REQUIRE( inds.size()==2);
+        REQUIRE( set.at(inds.at(0)) == MultiIndex{0,3} );
+        REQUIRE( set.at(inds.at(1)) == MultiIndex{3,0} );
+        
         // Now remove the limiter, which should allow more multiindices in the 
         set.SetLimiter( MultiIndexLimiter::None() );
 
@@ -352,5 +357,12 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         REQUIRE( set.at(inds.at(2)) == MultiIndex{1,1} );
         REQUIRE( set.at(inds.at(3)) == MultiIndex{2,0} );
         REQUIRE( set.at(inds.at(4)) == MultiIndex{3,0} );
+
+        inds = set.StrictFrontier();
+        REQUIRE( inds.size()==3);
+        REQUIRE( set.at(inds.at(0)) == MultiIndex{0,3} );
+        REQUIRE( set.at(inds.at(1)) == MultiIndex{1,1} );
+        REQUIRE( set.at(inds.at(2)) == MultiIndex{3,0} );
+
     }
 }

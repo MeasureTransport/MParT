@@ -448,21 +448,28 @@ std::vector<unsigned int> MultiIndexSet::Frontier() const {
 
 std::vector<unsigned int> MultiIndexSet::StrictFrontier() const
 {
-  std::vector<unsigned int> frontierInds;
+  std::vector<unsigned int> frontInds = Frontier();
+  std::vector<unsigned int> strictInds; 
 
-  for(unsigned int activeInd = 0; activeInd<active2global.size(); ++activeInd) {
-    // loop over all the forward neighbors
+  for(unsigned int i=0; i<frontInds.size(); ++i) {
+    
+    unsigned int activeInd = frontInds.at(i);
     unsigned int globalInd = active2global.at(activeInd);
 
+    // Check to make sure all forward neighbors are inactive
     bool isStrict = true;
-    for( auto neighbor : outEdges[globalInd])
-      isStrict = isStrict && (!IsActive(neighbor));
+    for( auto neighbor : outEdges[globalInd]){
+      if(IsActive(neighbor)){
+        isStrict = false;
+        break;
+      }
+    }
 
     if(isStrict)
-      frontierInds.push_back(activeInd);
+      strictInds.push_back(activeInd);
   }
 
-  return frontierInds;
+  return strictInds;
 }
 
 std::vector<unsigned int> MultiIndexSet::BackwardNeighbors(unsigned int activeIndex) const
