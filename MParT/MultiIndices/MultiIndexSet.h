@@ -319,8 +319,9 @@ MultiIndexSet set(length, limiter);
   /// Returns the number of forward neighbors (active or inactive)
   unsigned int NumForward(unsigned int activeInd) const;
 
-  /** Visualizes a two-dimensional MultiIndexSet as ASCII art.   The output for a total order limited set with max order 11 looks like 
-  @code
+  /** Visualizes a two-dimensional MultiIndexSet as ASCII art using "x" to denote active multiindices and "o" to denote admissible inactive forward neighbors.
+   The output for a total order limited set with max order 11 looks like 
+  @code 
 12 | o  
 11 | x  o  
 10 | x  x  o  
@@ -337,6 +338,28 @@ MultiIndexSet set(length, limiter);
     ----------------------------------------
      0  1  2  3  4  5  6  7  8  9  10 11 12 
   @endcode 
+
+Another example for an adaptively constructed set is
+  @code 
+ 4 | o  
+ 3 | x  o  
+ 2 | x  o  
+ 1 | x  x  o  o  
+ 0 | x  x  x  x  o  
+    ----------------
+     0  1  2  3  4 
+  @endcode
+
+The following is the same set as before, but with a multiindex limiter preventing expansion of mixed terms
+@code 
+ 4 | o  
+ 3 | x  
+ 2 | x  
+ 1 | x  x  
+ 0 | x  x  x  x  o  
+    ----------------
+     0  1  2  3  4
+@endcode
 
   @param[in,out] out The output stream where the visualization should be written.  Defaults to std::cout.  
   */ 
