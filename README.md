@@ -9,7 +9,7 @@ See [measuretransport.github.io/MParT/](https://measuretransport.github.io/MParT
 
 ## Installation
 
-## Dependencies
+### Dependencies
 MParT uses Kokkos and eigen. Clone external repositories using: git submodule update --init --recursive
 
 ### Compiling from source
