@@ -77,5 +77,6 @@ TEST_CASE( "Testing Hermite functions", "[HermiteFunction]" ) {
         for(unsigned int i=0; i<5; ++i)
             CHECK( allderivs2[i] == Approx( -(2.0*i + 1 -x*x)*allvals[i] ).epsilon(floatTol));      
         
+        
     }
 }
