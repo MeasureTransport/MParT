@@ -14,7 +14,7 @@ For a point :math:`\mathbf{x}\in\mathbb{R}^d` and coefficients :math:`\mathbf{w}
     f(\mathbf{x}; \mathbf{w}) = \sum_{\alpha\in \mathcal{A}} w_\alpha \Phi_\alpha(\mathbf{x}),
 
 where :math:`\alpha\in\mathbb{N}^d` is a multi-index, :math:`\mathcal{A}` is a multiindex set, and :math:`\Phi_{\mathbf{\alpha}}` is a
-multivariate function defined as a tensor product of one-dimensional functions :math:`\phi_{\alpha_i} : \mathbb{R}\rightarrow \mathbb{R}`
+multivariate function defined as a tensor product of one-dimensional functions :math:`\phi_{\alpha_i}\colon  \mathbb{R}\rightarrow \mathbb{R}`
 through
 
 .. math::
@@ -41,11 +41,10 @@ Using the representation for monotone functions with a bijective :math:`g`, we c
 Triangular Transport Maps
 --------------------------
 
-Let :math:`\pi` and :math:`\eta` be two densities on :math:`\mathbb{R}^d`. In measure transport, our goal is to find a multivariate transformation :math:`T` that pushes forward :math:`\eta` to :math:`\pi`, meaning that if :math:`\mathbf{X} \sim \\eta`, then :math:`T(\mathbf{X}) \sim \pi`. Given such a map, we can easily generate samples from :math:`\\eta` by pushing samples :math:`\mathbf{x}^i \\sim \\eta` through the map :math:`T(\\mathbf{x}^i) \sim \pi`. Furthermore, we can express the push-forward density of a diffeomorphic map by :math:`T_{\sharp}\eta(\mathbf{x}) := \eta(T^{-1}(\mathbf{x}))|\nabla T^{-1}(\mathbf{x})|`.
+Let :math:`\pi` and :math:`\eta` be two densities on :math:`\mathbb{R}^d`. In measure transport, our goal is to find a multivariate transformation :math:`T` that pushes forward :math:`\eta` to :math:`\pi`, meaning that if :math:`\mathbf{X} \sim \\eta`, then :math:`T(\mathbf{X}) \sim \pi`. Given such a map, we can easily generate samples from :math:`\eta` by pushing samples :math:`\mathbf{x}^i \\sim \\eta` through the map :math:`T(\\mathbf{x}^i) \sim \pi`. Furthermore, we can express the push-forward density of a diffeomorphic map by :math:`T_{\sharp}\eta(\mathbf{x}) := \eta(T^{-1}(\mathbf{x}))|\nabla T^{-1}(\mathbf{x})|`.
 
-While there are infinitely many transformations that couple densities, if :math:`\pi` is absolutely continuous with respect to :math:`\eta`, there exists a unique lower triangular and monotone function :math:`T\colon \mathbb{R}^d \rightarrow \mathbb{R}^d`that pushes forward :math:`\pi` to :math:`\eta` of the form
+While there are infinitely many transformations that couple densities, if :math:`\pi` is absolutely continuous with respect to :math:`\eta`, there exists a unique lower triangular and monotone function :math:`T\colon \mathbb{R}^d \rightarrow \mathbb{R}^d` that pushes forward :math:`\pi` to :math:`\eta` of the form
 
 .. math::
-    T(\mathbf{x}) = \begin{bmatrix*}{l} T_1(x_1) \\ T_2(x_1,x_2) \\ \vdots \\ T_d(x_1,\dots,x_d) \end{bmatrix*}.
-
+    T(\mathbf{x}) = \begin{bmatrix*}{l} T_1(x_1) \\ T_2(x_1,x_2) \\ \vdots \\ T_d(x_1,\dots,x_d) \end{bmatrix}{l}.
 
