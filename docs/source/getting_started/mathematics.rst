@@ -7,7 +7,7 @@ Mathematical Background
 Tensor Product Expansions 
 --------------------------
 
-For a point :math:`\\mathbf{x}\\in\\mathbb{R}^d` and coefficients :math:`\\mathbf{w}`, we consider expansions of the form 
+For a point :math:`\mathbf{x}\in\mathbb{R}^d` and coefficients :math:`\\mathbf{w}`, we consider expansions of the form 
 
 .. math::
 
@@ -41,7 +41,7 @@ Using the representation for monotone functions with a bijective :math:`g`, we c
 Triangular Transport Maps
 --------------------------
 
-Let :math:`\\pi` and :math:`\\eta` be two densities on :math:`\\mathbb{R}^d`. In measure transport, our goal is to find a multivariate transformation :math:`T` that pushes forward :math:`\\eta` to :math:`\\pi`, meaning that if :math:`\\mathbf{X} \\sim \\eta`, then :math:`T(\\mathbf{X}) \\sim \\pi`. Given such a map, we can easily generate samples from :math:`\\eta` by pushing samples :math:`\\mathbf{x}^i \\sim \\eta` through the map :math:`T(\\mathbf{x}^i) \\sim \\pi`. Furthermore, we can express the push-forward density of a diffeomorphic map by :math:`T_\\sharp\\eta(\mathbf{x}) \\coloneqq \\eta(T^{-1}(\\mathbf{x}))|\\nabla T^{-1}(\\mathbf{x})|`.
+Let :math:`\\pi` and :math:`\\eta` be two densities on :math:`\\mathbb{R}^d`. In measure transport, our goal is to find a multivariate transformation :math:`T` that pushes forward :math:`\\eta` to :math:`\\pi`, meaning that if :math:`\\mathbf{X} \\sim \\eta`, then :math:`T(\\mathbf{X}) \\sim \\pi`. Given such a map, we can easily generate samples from :math:`\\eta` by pushing samples :math:`\\mathbf{x}^i \\sim \\eta` through the map :math:`T(\\mathbf{x}^i) \\sim \\pi`. Furthermore, we can express the push-forward density of a diffeomorphic map by :math:`T_{\sharp}\\eta(\mathbf{x}) \\coloneqq \\eta(T^{-1}(\\mathbf{x}))|\\nabla T^{-1}(\\mathbf{x})|`.
 
 While there are infinintely many transformations that couple densities, if :math:`\pi` is absolutely continuous with respect to :math:`\eta`, there exists a unique lower triangular and monotone function :math:`T\colon \\mathbf{R}^d \\rightarrow \\mathbf{R}^d`that pushes forward :math:`\\pi` to :math:`\\eta` of the form
 
