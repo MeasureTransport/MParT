@@ -164,6 +164,11 @@
    Monotone Parameterizations
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#triangular-transport-maps">
+   Triangular Transport Maps
+  </a>
+ </li>
 </ul>
 
 </nav>
@@ -189,20 +194,31 @@
 <span id="mathematics"></span><h1>Mathematical Background<a class="headerlink" href="#mathematical-background" title="Permalink to this headline">¶</a></h1>
 <section id="tensor-product-expansions">
 <h2>Tensor Product Expansions<a class="headerlink" href="#tensor-product-expansions" title="Permalink to this headline">¶</a></h2>
-<p>For a point $mathbf{x}inmathbb{R}^d$ and coefficients $mathbf{w}$, we consider expansions of the form</p>
+<p>For a point <span class="math notranslate nohighlight">\(\\mathbf{x}\\in\\mathbb{R}^d\)</span> and coefficients <span class="math notranslate nohighlight">\(\\mathbf{w}\)</span>, we consider expansions of the form</p>
 <div class="math notranslate nohighlight">
-\[g(\mathbf{x}; \mathbf{w}) = \sum_{\alpha\in \mathcal{A}} w_\alpha \Phi_\alpha(\mathbf{x}),\]</div>
-<p>where $alphainmathbb{N}^d$ is a multi-index, $mathcal{A}$ is a multiindex set, and $Phi_{mathbf{alpha}}$ is a
-multivariate function defined as a tensor product of one-dimensional functions $phi_{alpha_i} : mathbb{R}rightarrow mathbb{R}$
+\[f(\mathbf{x}; \mathbf{w}) = \sum_{\alpha\in \mathcal{A}} w_\alpha \Phi_\alpha(\mathbf{x}),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\\alpha\\in\\mathbb{N}^d\)</span> is a multi-index, <span class="math notranslate nohighlight">\(\\mathcal{A}\)</span> is a multiindex set, and <span class="math notranslate nohighlight">\(\\Phi_{\\mathbf{\\alpha}}\)</span> is a
+multivariate function defined as a tensor product of one-dimensional functions <span class="math notranslate nohighlight">\(\\phi_{\alpha_i} : \mathbb{R}\rightarrow \mathbb{R}\)</span>
 through</p>
 <div class="math notranslate nohighlight">
 \[\Phi_\mathbf{\alpha}(\mathbf{x}) = \prod_{\alpha_i \in \mathbf{\alpha}} \phi_{\alpha_i}(x_i).\]</div>
 </section>
 <section id="monotone-parameterizations">
 <h2>Monotone Parameterizations<a class="headerlink" href="#monotone-parameterizations" title="Permalink to this headline">¶</a></h2>
-<p>We represent monotone functions as the smooth transformation of an unconstrained function $fcolonmathbb{R}^{d} rightarrow mathbb{R}$. Let $gcolon mathbb{R} rightarrow mathbb{R}_{&gt;0}$ be a strictly positive function, such as the softplus $g(x) = log(1 + exp(x))$. Then, map component $T_{d}$ is given by</p>
+<p>We represent monotone functions as the smooth transformation of an unconstrained function <span class="math notranslate nohighlight">\(f\\colon\\mathbb{R}^{d} \\rightarrow \\mathbb{R}\)</span>. Let <span class="math notranslate nohighlight">\(g\\colon\\mathbb{R}\\rightarrow \\mathbb{R}_{&gt;0}\)</span> be a strictly positive function, such as the softplus <span class="math notranslate nohighlight">\(g(x) = \\log(1 + \\exp(x))\)</span>. Then, the d-th map component <span class="math notranslate nohighlight">\(T_{d}\)</span> is given by</p>
 <div class="math notranslate nohighlight">
-\[T_d(\mathbf{x}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt\]</div>
+\[T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt\]</div>
+<p>Other choices for the <span class="math notranslate nohighlight">\(g\)</span> include the squared and exponential functions. These choices, however, have implications for the identifiability of the coefficients. If <span class="math notranslate nohighlight">\(g\)</span> is bijective, then we can recover <span class="math notranslate nohighlight">\(f\)</span> from <span class="math notranslate nohighlight">\(T_d\)</span> as.</p>
+<div class="math notranslate nohighlight">
+\[f(\mathbf{x}_{1:d}; \mathbf{w}) = T_d(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g^{-1}( \partial_d T_d(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt\]</div>
+<p>Using the representation for monotone functions with a bijective <span class="math notranslate nohighlight">\(g\)</span>, we can approximate <span class="math notranslate nohighlight">\(T_d\)</span> by finding <span class="math notranslate nohighlight">\(f\)</span>.</p>
+</section>
+<section id="triangular-transport-maps">
+<h2>Triangular Transport Maps<a class="headerlink" href="#triangular-transport-maps" title="Permalink to this headline">¶</a></h2>
+<p>Let <span class="math notranslate nohighlight">\(\\pi\)</span> and <span class="math notranslate nohighlight">\(\\eta\)</span> be two densities on <span class="math notranslate nohighlight">\(\\mathbb{R}^d\)</span>. In measure transport, our goal is to find a multivariate transformation <span class="math notranslate nohighlight">\(T\)</span> that pushes forward <span class="math notranslate nohighlight">\(\\eta\)</span> to <span class="math notranslate nohighlight">\(\\pi\)</span>, meaning that if <span class="math notranslate nohighlight">\(\\mathbf{X} \\sim \\eta\)</span>, then <span class="math notranslate nohighlight">\(T(\\mathbf{X}) \\sim \\pi\)</span>. Given such a map, we can easily generate samples from <span class="math notranslate nohighlight">\(\\eta\)</span> by pushing samples <span class="math notranslate nohighlight">\(\\mathbf{x}^i \\sim \\eta\)</span> through the map <span class="math notranslate nohighlight">\(T(\\mathbf{x}^i) \\sim \\pi\)</span>. Furthermore, we can express the push-forward density of a diffeomorphic map by <span class="math notranslate nohighlight">\(T_\\sharp\\eta(\mathbf{x}) \\coloneqq \\eta(T^{-1}(\\mathbf{x}))|\\nabla T^{-1}(\\mathbf{x})|\)</span>.</p>
+<p>While there are infinintely many transformations that couple densities, if <span class="math notranslate nohighlight">\(\pi\)</span> is absolutely continuous with respect to <span class="math notranslate nohighlight">\(\eta\)</span>, there exists a unique lower triangular and monotone function <span class="math notranslate nohighlight">\(T\colon \\mathbf{R}^d \\rightarrow \\mathbf{R}^d\)</span>\pi` to <span class="math notranslate nohighlight">\(\\eta\)</span> of the form</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}T(\mathbf{x}) = \begin{bmatrix} T_1(x_1) \\ T_2(x_1,x_2) \\ \vdots \\ T_d(x_1,\dots,x_d) \end{bmatrix}.\end{split}\]</div>
 </section>
 </section>
 
