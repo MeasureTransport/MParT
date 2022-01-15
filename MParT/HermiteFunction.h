@@ -39,10 +39,6 @@ public:
             derivs[i] *= scale;
             vals[i] *= scale;
         }
-
-        // const double scaling = std::pow( std::pow(2, order) * std::tgamma(order+1) *std::sqrt(M_PI), -0.5);
-        // const double expPart = std::exp(-0.5*x*x);
-        // return scaling * ( -x*expPart*polyBase.Evaluate(order, x) + expPart * polyBase.Derivative(order,x) );
     }
 
 
@@ -81,7 +77,7 @@ public:
     double SecondDerivative(unsigned int const order, 
                             double const x) const
     {
-        return -(2.0*order+1-x*x)*Evaluate(order, x);
+        return -(2.0*order+1.0-x*x)*Evaluate(order, x);
     }
 
 private:
