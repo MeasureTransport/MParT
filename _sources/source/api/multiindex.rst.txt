@@ -70,7 +70,7 @@ Definitions
 
 .. topic:: Limiting Set
 
-    In general, any length :math:`D` vector in :math:`\mathbb{N}^D\` is a multiindex.  In many adaptive approaches, however,
+    In general, any length :math:`D` vector in :math:`\mathbb{N}^D` is a multiindex.  In many adaptive approaches, however,
     it is useful to only consider multiindices in some subset :math:`\mathcal{G}\subseteq \mathbb{N}^D`.   We call this subset 
     the limiting set or, more loosely, the "limiter".   In MParT, limiting sets are defined by functors that accept a 
     MultiIndex and return `true` if the multiindex is in :math:`\mathcal{G}` and `false` otherwise.  Some predefined limiting 
@@ -107,14 +107,14 @@ Definitions
 .. topic:: Margin
 
     For a multindex set :math:`\mathcal{S}\subseteq\mathcal{G}`, the margin of :math:`\mathcal{S}` is the set
-    :math:`\mathcal{M} \in \mathcal{G}\\ \mathcal{S}` containing indices that have at least one backward neighbor
+    :math:`\mathcal{M} \in \mathcal{G}\setminus\mathcal{S}` containing indices that have at least one backward neighbor
     in :math:`\mathcal{S}`.
 
 .. topic:: Reduced Margin
 
-    The reduced margin :math:`\mathcal{M}_r\subset\mathcal{M}` is a subset of the margin :math:`\mathcal{M}` containing
+    The reduced margin :math:`\mathcal{M}_r\subseteq\mathcal{M}` is a subset of the margin :math:`\mathcal{M}` containing
     indices that could be added to the set :math:`\mathcal{S}` while preserving the downward closed property of :math:`\mathcal{S}`.
-    Multiindices in the reduced margin are often called admissible.
+    Multiindices in the reduced margin are often called admissible. 
 
 .. topic:: Active/Inactive Indices
 

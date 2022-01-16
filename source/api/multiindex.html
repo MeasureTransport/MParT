@@ -8,26 +8,26 @@
 
     <title>MultiIndices &#8212; MParT  documentation</title>
     
-  <link href="../../_static/css/theme.css" rel="stylesheet">
-  <link href="../../_static/css/index.ff1ffe594081f20da1ef19478df9384b.css" rel="stylesheet">
-
+    <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  
     
-  <link rel="stylesheet"
-    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-  <link rel="preload" as="font" type="font/woff2" crossorigin
-    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-
+    <link rel="stylesheet"
+      href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
     
       
-
+  
     
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/css/blank.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/pydata-sphinx-theme.css" />
     
-  <link rel="preload" as="script" href="../../_static/js/index.be7d3bbb2ef33a8344ce.js">
-
+    <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -94,10 +94,8 @@
       <div class="navbar-end-item">
         <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
         <li class="nav-item">
-          <a class="nav-link" href="https://github.com/MeasureTransport/MParT" rel="noopener" target="_blank" title="GitHub">
-            <span><i class="fab fa-github-square"></i></span>
-            <label class="sr-only">GitHub</label>
-          </a>
+          <a class="nav-link" href="https://github.com/MeasureTransport/MParT" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
         </li>
       </ul>
       </div>
@@ -113,7 +111,8 @@
           
             
             <!-- Only show if we have sidebars configured, else just a small margin  -->
-            <div class="col-12 col-md-3 bd-sidebar"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
   <i class="icon fas fa-search"></i>
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
@@ -165,6 +164,9 @@
 
   </div>
 </nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
             </div>
             
           
@@ -267,7 +269,8 @@ basis can be defined through the tensor product of components in this family:</p
 <h2>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">¶</a></h2>
 <div class="topic">
 <p class="topic-title">Limiting Set</p>
-<p>In general, any length <span class="math notranslate nohighlight">\(D\)</span> vector in <span class="math notranslate nohighlight">\(\mathbb{N}^D\\)</span>mathcal{G}subseteq mathbb{N}^D`.   We call this subset
+<p>In general, any length <span class="math notranslate nohighlight">\(D\)</span> vector in <span class="math notranslate nohighlight">\(\mathbb{N}^D\)</span> is a multiindex.  In many adaptive approaches, however,
+it is useful to only consider multiindices in some subset <span class="math notranslate nohighlight">\(\mathcal{G}\subseteq \mathbb{N}^D\)</span>.   We call this subset
 the limiting set or, more loosely, the “limiter”.   In MParT, limiting sets are defined by functors that accept a
 MultiIndex and return <cite>true</cite> if the multiindex is in <span class="math notranslate nohighlight">\(\mathcal{G}\)</span> and <cite>false</cite> otherwise.  Some predefined limiting
 sets are defined in the MultiIndexLimiter namespace, but custom functors can also be employed.</p>
@@ -296,12 +299,12 @@ backward neighbors of <span class="math notranslate nohighlight">\(\mathbf{j}\)<
 <div class="topic">
 <p class="topic-title">Margin</p>
 <p>For a multindex set <span class="math notranslate nohighlight">\(\mathcal{S}\subseteq\mathcal{G}\)</span>, the margin of <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> is the set
-<span class="math notranslate nohighlight">\(\mathcal{M} \in \mathcal{G}\\ \mathcal{S}\)</span> containing indices that have at least one backward neighbor
+<span class="math notranslate nohighlight">\(\mathcal{M} \in \mathcal{G}\setminus\mathcal{S}\)</span> containing indices that have at least one backward neighbor
 in <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>.</p>
 </div>
 <div class="topic">
 <p class="topic-title">Reduced Margin</p>
-<p>The reduced margin <span class="math notranslate nohighlight">\(\mathcal{M}_r\subset\mathcal{M}\)</span> is a subset of the margin <span class="math notranslate nohighlight">\(\mathcal{M}\)</span> containing
+<p>The reduced margin <span class="math notranslate nohighlight">\(\mathcal{M}_r\subseteq\mathcal{M}\)</span> is a subset of the margin <span class="math notranslate nohighlight">\(\mathcal{M}\)</span> containing
 indices that could be added to the set <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> while preserving the downward closed property of <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>.
 Multiindices in the reduced margin are often called admissible.</p>
 </div>
@@ -327,7 +330,7 @@ the margin <span class="math notranslate nohighlight">\(\mathcal{M}\)</span>.   
               
               
               <!-- Previous / next buttons -->
-<div class='prev-next-area'> 
+<div class='prev-next-area'>
     <a class='left-prev' id="prev-link" href="index.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
@@ -350,8 +353,8 @@ the margin <span class="math notranslate nohighlight">\(\mathcal{M}\)</span>.   
       </div>
     </div>
   
-  <script src="../../_static/js/index.be7d3bbb2ef33a8344ce.js"></script>
-<footer class="footer mt-5 mt-md-0">
+    <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">

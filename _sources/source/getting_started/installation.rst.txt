@@ -36,7 +36,9 @@ Building Documentation
 
    conda install -c conda-forge doxygen sphinx breathe pydata-sphinx-theme
 
-2. Build the :code:`sphinx` target:
+2. If working in a conda environment, add dependency paths to conf.py
+
+3. Build the :code:`sphinx` target:
 
 .. code-block::
 
@@ -44,7 +46,7 @@ Building Documentation
     cmake .. 
     make sphinx 
 
-3. Open the sphinx output 
+4. Open the sphinx output 
 
 .. code-block::
 
