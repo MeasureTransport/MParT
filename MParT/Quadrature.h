@@ -2,7 +2,7 @@
 #define MPART_QUADRATURE_H
 
 #include <sstream>
-//#include <Eigen/Core>
+#include <Eigen/Core>
 
 namespace mpart{
 
@@ -31,7 +31,12 @@ class ClenshawCurtisQuadrature
      @param[in] order The order of the Clenshaw-Curtis rule.
      @returns A pair containing (wts,pts)
      */
-    //static std::pair<Eigen::VectorXd, Eigen::VectorXd> GetRule(unsigned int order);
+    static std::pair<Eigen::VectorXd, Eigen::VectorXd> GetRule(unsigned int order)
+    {
+        Eigen::VectorXd wts, pts;
+
+        return std::make_pair(wts,pts);
+    }
     
     
     template<class ScalarFuncType>
