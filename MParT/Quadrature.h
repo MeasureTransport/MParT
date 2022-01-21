@@ -89,7 +89,8 @@ public:
         Eigen::VectorXd wts(_order), pts(_order);
         std::tie(wts,pts) = ClenshawCurtisQuadrature::GetRule(_order);
 
-        // Rescale inputs!
+        // Rescale inputs
+        pts=0.5*(ub+lb)+0.5*(ub-lb)*pts;
 
         // Evaluate integral
         double integral;
@@ -122,18 +123,18 @@ public:
     {
         if(absTol<=0){
             std::stringstream msg;
-            msg << "In MParT::GaussKronrad: Absolute error tolerance must be strictly positive, but given a value of \"" << absTol << "\".";
+            msg << "In MParT::RecursiveQuadrature: Absolute error tolerance must be strictly positive, but given a value of \"" << absTol << "\".";
             throw std::runtime_error(msg.str());
         }
         if(relTol<=0){
             std::stringstream msg;
-            msg << "In MParT::GaussKronrad: Relative error tolerance must be strictly positive, but given a value of \"" << relTol << "\".";
+            msg << "In MParT::RecursiveQuadrature: Relative error tolerance must be strictly positive, but given a value of \"" << relTol << "\".";
             throw std::runtime_error(msg.str());
         }
         
         if(maxSub==0){
             std::stringstream msg;
-            msg << "In MParT::GaussKronrad: Maximum subintervals allowed must be greater than 0, but given a value of \"" << maxSub << "\".";
+            msg << "In MParT::RecursiveQuadrature: Maximum subintervals allowed must be greater than 0, but given a value of \"" << maxSub << "\".";
             throw std::runtime_error(msg.str());
         }
 
