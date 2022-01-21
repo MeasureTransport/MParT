@@ -2,24 +2,65 @@
 #define MPART_QUADRATURE_H
 
 #include <sstream>
+//#include <Eigen/Core>
 
 namespace mpart{
 
 /**
- @brief Adaptive GaussKronrad quadrature.
 
- Adapted from https://github.com/tbs1980/NumericalIntegration/blob/master/Integrator.h and the fortran quadpack package.
+USAGE
+@code
+ClenshawCurtisQuadrature quad(5);
+integral = quad.Integrate(f, 0,1);
+@endcode
+
+@code
+Eigen::VectorXd wts, pts;
+std::tie(wts, pts) = ClenshawCurtisQuadrature::GetRule(order);
+@endcode
+
  */
-class GaussKronrad {
+class ClenshawCurtisQuadrature
+{
+    ClenshawCurtisQuadrature(unsigned int order) : _order(order)
+    {
+    };
+
+    /**
+     @brief Returns the weights and points in a Clenshaw-Curtis rule.
+     @param[in] order The order of the Clenshaw-Curtis rule.
+     @returns A pair containing (wts,pts)
+     */
+    //static std::pair<Eigen::VectorXd, Eigen::VectorXd> GetRule(unsigned int order);
+    
+    
+    template<class ScalarFuncType>
+    double Integrate(ScalarFuncType const& f, 
+                    double                 lb, 
+                    double                 ub)
+    {   
+        return 1.0;
+    }
+
+private:
+    unsigned int _order;
+
+}; // class ClenshawCurtisQuadrature
+
+/**
+ @brief Adaptive quadrature based on applying a Clenshaw-Curtis recursively on subintervals.
+
+ */
+class RecursiveQuadrature {
 public:
 
     /**
-       @brief Construct a new adaptive Gauss-Kronrad quadrature class with specified stopping criteria.
+       @brief Construct a new adaptive quadrature class with specified stopping criteria.
        @param maxSub The maximum number of subintervals allowed.
        @param[in] absTol An absolute error tolerance used to stop the adaptive integration.
        @param[in] relTol A relative error tolerance used to stop te adaptive integration.
      */
-    GaussKronrad(unsigned int maxSub, double absTol, double relTol) : _maxSub(maxSub), _absTol(absTol), _relTol(relTol)
+    RecursiveQuadrature(unsigned int maxSub, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _absTol(absTol), _relTol(relTol)
     {
         if(absTol<=0){
             std::stringstream msg;

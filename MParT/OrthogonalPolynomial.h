@@ -27,6 +27,42 @@ public:
             output[order] = (this->ak(order)*x + this->bk(order))*output[order-1] - this->ck(order)*output[order-2];
     }
 
+    /** Evaluates the derivative of every polynomial in this family up to degree maxOrder (inclusive).
+        The results are stored in the memory pointed to by the derivs pointer.
+    */
+    void EvaluateDerivatives(double*      derivs,
+                             unsigned int maxDegree,
+                             double       x) const 
+    {   
+        double oldVal=0;
+        double oldOldVal=0;
+        double currVal;
+        currVal = this->phi0(x);
+        derivs[0] = 0.0;
+        
+        if(maxDegree>0){
+            oldVal = currVal;
+            currVal = this->phi1(x);
+            derivs[1] = this->phi1_deriv(x);
+        }
+
+        // Evaluate the polynomials and their derivatives using the three term recurrence
+        double ak, bk, ck;
+        for(unsigned int order=2; order<=maxDegree; ++order){
+            oldOldVal = oldVal;
+            oldVal = currVal;
+
+            ak = this->ak(order);
+            bk = this->bk(order);
+            ck = this->ck(order);
+            currVal = (ak*x + bk)*oldVal - ck*oldOldVal;
+            derivs[order] = ak*oldVal + (ak*x + bk)*derivs[order-1] - ck*derivs[order-2];
+        }
+    }
+
+    /** Evaluates the value and derivative of every polynomial in this family up to degree maxOrder (inclusive).
+        The results are stored in the memory pointed to by the derivs pointer.
+    */
     void EvaluateDerivatives(double*      vals,
                            double*      derivs,
                            unsigned int maxOrder,

@@ -17,7 +17,7 @@ public:
 
 
 
-TEST_CASE( "Testing Gauss-Kronrad Quadrature", "[GaussKronrad]" ) {
+TEST_CASE( "Testing Recursive Quadrature", "[RecursiveQuadrature]" ) {
 
     // Set parameters for adaptive quadrature algorithm
     unsigned int maxSub = 10;
@@ -27,7 +27,7 @@ TEST_CASE( "Testing Gauss-Kronrad Quadrature", "[GaussKronrad]" ) {
     // Set tolerance for tests
     double testTol = 1e-8;
 
-    GaussKronrad quad(maxSub,absTol,relTol);
+    RecursiveQuadrature quad(maxSub,absTol,relTol);
 
     SECTION("Class Integrand")
     {   
