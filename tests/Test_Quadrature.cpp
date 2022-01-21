@@ -15,6 +15,39 @@ public:
 
 }; // class TestIntegrand
 
+TEST_CASE( "Testing CC Quadrature", "[ClenshawCurtisQuadrature]" ) {
+
+    // Set parameters for adaptive quadrature algorithm
+    unsigned int order = 10;
+
+    // Set tolerance for tests
+    double testTol = 1e-8;
+
+    ClenshawCurtisQuadrature quad(order);
+
+    SECTION("Class Integrand")
+    {   
+        double lb = 0;
+        double ub = 1.0;
+
+        TestIntegrand integrand;
+        double integral = quad.Integrate(integrand, lb, ub);
+
+        CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+    }
+
+    SECTION("Lambda Integrand")
+    {   
+        double lb = 0;
+        double ub = 1.0;
+
+        auto integrand = [](double x){return exp(x);};
+        double integral = quad.Integrate(integrand, lb, ub);    
+
+        CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+    }
+    
+}
 
 
 TEST_CASE( "Testing Recursive Quadrature", "[RecursiveQuadrature]" ) {

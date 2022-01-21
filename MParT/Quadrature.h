@@ -1,6 +1,7 @@
 #ifndef MPART_QUADRATURE_H
 #define MPART_QUADRATURE_H
 
+#include <math.h>
 #include <sstream>
 #include <Eigen/Core>
 
@@ -20,8 +21,9 @@ std::tie(wts, pts) = ClenshawCurtisQuadrature::GetRule(order);
 @endcode
 
  */
-class ClenshawCurtisQuadrature
-{
+class ClenshawCurtisQuadrature {
+public: 
+
     ClenshawCurtisQuadrature(unsigned int order) : _order(order)
     {
     };
@@ -33,18 +35,69 @@ class ClenshawCurtisQuadrature
      */
     static std::pair<Eigen::VectorXd, Eigen::VectorXd> GetRule(unsigned int order)
     {
-        Eigen::VectorXd wts, pts;
+        Eigen::VectorXd wts(order), pts(order);
+        
+        // return results for order == 1
+        if (order == 1) {
+            pts(1) = 0.0;
+            wts(1) = 2.0;
+            return std::make_pair(wts,pts);
+        }
 
+        // define quadrature points
+        for (unsigned int i=0; i<order; ++i) {
+            pts(i) = std::cos( ( order - (i+1) ) * M_PI / ( order - 1 ) );
+        }
+        pts(0) = -1.0;
+        if ( order % 2 == 1) {
+            pts((order-1)/2) = 0.0;
+        }
+        pts(order-1) = 1.0;
+
+        // compute quadrature weights 
+        wts.setOnes();
+        for (unsigned int i=0; i<order; ++i) {            
+            double theta;
+            theta = i * M_PI / ( order - 1 );
+            for (unsigned int j=0; j<(order-1)/2; ++j){
+                double b;
+                if ( 2 * (j+1) == ( order - 1 ) ) {
+                    b = 1.0;
+                } else {
+                    b = 2.0;
+                }
+                wts(i) = wts(i) - b * std::cos ( 2.0 * (j+1) * theta ) / ( 4 * (j+1) * (j+1) - 1 );
+            }
+        }
+
+        // adjust boundary weights
+        wts(0) = wts(0) / ( order - 1.0 );
+        for (unsigned int i=1; i<(order-1); ++i){
+            wts(i) = 2.0 * wts(i) / ( order - 1.0 );
+        }
+        wts(order-1) = wts(order-1) / ( order - 1.0 );
+        
         return std::make_pair(wts,pts);
     }
-    
     
     template<class ScalarFuncType>
     double Integrate(ScalarFuncType const& f, 
                     double                 lb, 
                     double                 ub)
     {   
-        return 1.0;
+        // Compute CC rule
+        Eigen::VectorXd wts(_order), pts(_order);
+        std::tie(wts,pts) = ClenshawCurtisQuadrature::GetRule(_order);
+
+        // Rescale inputs!
+
+        // Evaluate integral
+        double integral;
+        integral = 0;
+        for (unsigned int i=0; i<_order; ++i) {
+            integral = integral + f(pts[i]) * wts[i];
+        }
+        return integral;
     }
 
 private:
@@ -83,6 +136,7 @@ public:
             msg << "In MParT::GaussKronrad: Maximum subintervals allowed must be greater than 0, but given a value of \"" << maxSub << "\".";
             throw std::runtime_error(msg.str());
         }
+
     }
 
     /**
@@ -97,7 +151,11 @@ public:
                     double                 lb, 
                     double                 ub)
     {
-        return 1.0;
+        //ClenshawCurtisQuadrature quad(5);
+        double integral;
+        //integral = quad.Integrate(f,lb,ub);
+        integral = 1.0;
+        return integral;
     }
 
 private:
@@ -105,7 +163,7 @@ private:
     double _absTol;
     double _relTol;
 
-}; // class GaussKonrad
+}; // class RecursiveQuadrature
 
 
 } // namespace mpart
