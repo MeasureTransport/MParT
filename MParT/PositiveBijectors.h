@@ -25,7 +25,7 @@ public:
     }
 
     static double Inverse(double x){
-        return std::fmin(std::log(std::exp(x) - 1.0), 0.0);
+        return std::fmin(std::log(std::exp(x) - 1.0), x);
     }
     
 };
