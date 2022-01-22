@@ -26,6 +26,12 @@ public:
 
     ClenshawCurtisQuadrature(unsigned int order) : _order(order)
     {
+        if(order<=0){
+            std::stringstream msg;
+            msg << "In MParT::RecursiveQuadrature: Quadrature order must be at least one, but given a value of \"" << order << "\".";
+            throw std::runtime_error(msg.str());
+        }
+
     };
 
     /**
@@ -96,8 +102,10 @@ public:
         Eigen::VectorXd wts(_order), pts(_order);
         std::tie(wts,pts) = ClenshawCurtisQuadrature::GetRule(_order);
 
-        // Rescale inputs
-        pts=0.5*(ub+lb)+0.5*(ub-lb)*pts;
+        // Rescale inputs to domain [L,U]
+        pts = 0.5*(ub+lb)*Eigen::VectorXd::Ones(_order) + 0.5*(ub-lb)*pts;
+        // Rescale weights
+        wts = 0.5*(ub-lb)*wts;
 
         // Evaluate integral
         double integral;
@@ -123,10 +131,11 @@ public:
     /**
        @brief Construct a new adaptive quadrature class with specified stopping criteria.
        @param maxSub The maximum number of subintervals allowed.
+       @param[in] order Number of points to use per subinterval.
        @param[in] absTol An absolute error tolerance used to stop the adaptive integration.
        @param[in] relTol A relative error tolerance used to stop te adaptive integration.
      */
-    RecursiveQuadrature(unsigned int maxSub, unsigned int order, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _order(order), _absTol(absTol), _relTol(relTol), quad(order)
+    RecursiveQuadrature(unsigned int maxSub, unsigned int order=2, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _order(order), _absTol(absTol), _relTol(relTol), quad(order)
     {
         if(absTol<=0){
             std::stringstream msg;
@@ -138,19 +147,16 @@ public:
             msg << "In MParT::RecursiveQuadrature: Relative error tolerance must be strictly positive, but given a value of \"" << relTol << "\".";
             throw std::runtime_error(msg.str());
         }
-        
         if(maxSub==0){
             std::stringstream msg;
             msg << "In MParT::RecursiveQuadrature: Maximum subintervals allowed must be greater than 0, but given a value of \"" << maxSub << "\".";
             throw std::runtime_error(msg.str());
         }
-        //ClenshawCurtisQuadrature quad(_order);
 
     }
 
     /**
       @brief Approximates and integral \f$\int_{L}^{U} f(x) dx\f$
-
       @param[in] f The function f(x) to evaluate. The ScalarFuncType must have a call operator that accepts a single double, i.e., `operator()(double x)`.
       @param[in] lb The lower bound \f$L\f$ in the integration.
       @param[in] ub The upper bound \f$U\f$ in the integration.
@@ -158,15 +164,13 @@ public:
     template<class ScalarFuncType>
     double Integrate(ScalarFuncType const& f, 
                     double                 lb, 
-                    double                 ub)
-    {
-        //ClenshawCurtisQuadrature quad(5);
+                    double                 ub) {
         double integral;
-        //integral = quad.Integrate(f,lb,ub);
-        integral = 1.0;
+        integral = RecursiveIntegrate(f, lb, ub, 0, 0.0);
         return integral;
-        
     }
+
+private:
 
     template<class ScalarFuncType>
     double RecursiveIntegrate(ScalarFuncType const& f, 
@@ -176,7 +180,7 @@ public:
                             double I1) {
 
         // update current refinement level
-        level = level + 1;
+        level += 1;
 
         // evaluate I1 on first call of function
         if (level == 1) {
@@ -193,25 +197,28 @@ public:
         double I2;
         I2 = I2_left + I2_right;
 
-        // Stop the recursion if the recursion has hit maximum depth
-        if (level == _maxSub) {
+        // Compute error and tolerance
+        double IntErr, Tol;
+        IntErr = std::abs(I2-I1);
+        Tol = std::fmax( _relTol*std::abs(I1), _absTol);
+
+        // Stop the recursion if the level hit maximum depth
+        if ( (IntErr > Tol) && (level == _maxSub) ) {
+            std::stringstream msg;
+            msg << "In MParT::RecursiveQuadrature: Reached maximum level depth \"" << _maxSub << "\", with an error of \"" << IntErr << "\".";
+            throw std::runtime_error(msg.str());
+        }
+        // If the error between levels is smaller than Tol, return the finer level result
+        else if ( IntErr <= Tol ) {
             return I2;
         }
-
-        // If the difference between levels is lower than tolerance, stop the
-        // recursion and accept the fine level result, else subdivide further
-        double I;
-        if ( std::abs(I2-I1) < std::fmax( _relTol*std::abs(I1), _absTol) ) {
-            I = I2;
-        } else {
-            // apply recursion in sub-domains
+        // Else subdivide further
+        else {
             double I_left, I_right;
             I_left = RecursiveIntegrate(f, lb, mb, level, I2_left);
             I_right = RecursiveIntegrate(f, mb, ub, level, I2_right);
-            // compute total integral
-            I = I_left + I_right;
+            return I_left + I_right;
         }
-        return I;
 
     }
 

@@ -56,11 +56,12 @@ TEST_CASE( "Testing Recursive Quadrature", "[RecursiveQuadrature]" ) {
     unsigned int maxSub = 10;
     double relTol = 1e-10;
     double absTol = 1e-10;
+    unsigned int order = 4;
 
     // Set tolerance for tests
     double testTol = 1e-8;
 
-    RecursiveQuadrature quad(maxSub,absTol,relTol);
+    RecursiveQuadrature quad(maxSub,order, absTol,relTol);
 
     SECTION("Class Integrand")
     {   
