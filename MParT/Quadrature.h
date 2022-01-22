@@ -135,7 +135,7 @@ public:
        @param[in] absTol An absolute error tolerance used to stop the adaptive integration.
        @param[in] relTol A relative error tolerance used to stop te adaptive integration.
      */
-    RecursiveQuadrature(unsigned int maxSub, unsigned int order=2, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _order(order), _absTol(absTol), _relTol(relTol), quad(order)
+    RecursiveQuadrature(unsigned int maxSub, unsigned int order=2, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _order(order), _absTol(absTol), _relTol(relTol), _quad(order)
     {
         if(absTol<=0){
             std::stringstream msg;
@@ -177,47 +177,47 @@ private:
                             double lb, 
                             double ub, 
                             int level, 
-                            double I1) {
+                            double intCoarse) {
 
         // update current refinement level
         level += 1;
 
-        // evaluate I1 on first call of function
+        // evaluate intCoarse on first call of function
         if (level == 1) {
-            double I1;
-            I1 = quad.Integrate(f, lb, ub);
+            double intCoarse;
+            intCoarse = _quad.Integrate(f, lb, ub);
         }
 
         // evluate integral on each sub-interval
-        double mb, I2_left, I2_right;
+        double mb, intFinerLeft, intFinerRight;
         mb = lb+0.5*(ub-lb);
-        I2_left  = quad.Integrate(f, lb, mb);
-        I2_right = quad.Integrate(f, mb, ub);
+        intFinerLeft  = _quad.Integrate(f, lb, mb);
+        intFinerRight = _quad.Integrate(f, mb, ub);
         // compute total integral
-        double I2;
-        I2 = I2_left + I2_right;
+        double intFiner;
+        intFiner = intFinerLeft + intFinerRight;
 
         // Compute error and tolerance
-        double IntErr, Tol;
-        IntErr = std::abs(I2-I1);
-        Tol = std::fmax( _relTol*std::abs(I1), _absTol);
+        double intErr, tol;
+        intErr = std::abs(intFiner-intCoarse);
+        tol = std::fmax( _relTol*std::abs(intCoarse), _absTol);
 
         // Stop the recursion if the level hit maximum depth
-        if ( (IntErr > Tol) && (level == _maxSub) ) {
+        if ( (intErr > tol) && (level == _maxSub) ) {
             std::stringstream msg;
-            msg << "In MParT::RecursiveQuadrature: Reached maximum level depth \"" << _maxSub << "\", with an error of \"" << IntErr << "\".";
+            msg << "In MParT::RecursiveQuadrature: Reached maximum level depth \"" << _maxSub << "\", with an error of \"" << intErr << "\".";
             throw std::runtime_error(msg.str());
         }
         // If the error between levels is smaller than Tol, return the finer level result
-        else if ( IntErr <= Tol ) {
-            return I2;
+        else if ( intErr <= tol ) {
+            return intFiner;
         }
         // Else subdivide further
         else {
-            double I_left, I_right;
-            I_left = RecursiveIntegrate(f, lb, mb, level, I2_left);
-            I_right = RecursiveIntegrate(f, mb, ub, level, I2_right);
-            return I_left + I_right;
+            double intLeft, intRight;
+            intLeft = RecursiveIntegrate(f, lb, mb, level, intFinerLeft);
+            intRight = RecursiveIntegrate(f, mb, ub, level, intFinerRight);
+            return intLeft + intRight;
         }
 
     }
@@ -227,7 +227,7 @@ private:
     unsigned int _order;
     double _absTol;
     double _relTol;
-    ClenshawCurtisQuadrature quad;
+    ClenshawCurtisQuadrature _quad;
 
 }; // class RecursiveQuadrature
 
