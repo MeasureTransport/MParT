@@ -234,9 +234,8 @@ private:
             unsigned int levelLeft, levelRight;
             std::tie(intLeft, statusLeft, levelLeft) = RecursiveIntegrate(f, lb, mb, level, intFinerLeft);
             std::tie(intRight, statusRight, levelRight) = RecursiveIntegrate(f, mb, ub, level, intFinerRight);
-
             
-            return std::make_tuple(intLeft + intRight, int( ((statusLeft<0)|(statusLeft<0))?-1:1 ), std::max(levelLeft, levelRight)); 
+            return std::make_tuple(intLeft + intRight, int( ((statusLeft<0)||(statusLeft<0))?-1:1 ), std::max(levelLeft, levelRight)); 
         }
 
     }
