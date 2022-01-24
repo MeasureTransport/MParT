@@ -53,6 +53,11 @@ public:
 
     const bool isCompressed;
 
+    Kokkos::View<unsigned int*> nzStarts;
+    Kokkos::View<unsigned int*> nzDims;
+    Kokkos::View<unsigned int*> nzOrders;
+    Kokkos::View<unsigned int*> maxDegrees; // The maximum multiindex value (i.e., degree) in each dimension
+    
 private:
 
     // Computes the number of terms in the multiindexset as well as the total number of nonzero components
@@ -72,10 +77,7 @@ private:
                         unsigned int &currNz);
 
 
-    Kokkos::View<unsigned int*> nzStarts;
-    Kokkos::View<unsigned int*> nzDims;
-    Kokkos::View<unsigned int*> nzOrders;
-    Kokkos::View<unsigned int*> maxDegrees; // The maximum multiindex value (i.e., degree) in each dimension
+    
 
 }; // class MultiIndexSet
 

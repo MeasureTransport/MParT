@@ -52,6 +52,13 @@ TEST_CASE( "Testing Probabilist Hermite polynomials", "[ProbabilistHermite]" ) {
         CHECK( allderivs[2] == Approx(2.0*x).epsilon(floatTol) );
         CHECK( allderivs[3] == Approx(3.0*x*x-3.0).epsilon(floatTol) );
         CHECK( allderivs[4] == Approx(4.0*x*x*x - 12.0*x).epsilon(floatTol) );
+
+        poly.EvaluateDerivatives(&allderivs[0], 4, x);
+        CHECK( allderivs[0] == 0.0 ); 
+        CHECK( allderivs[1] == 1.0 );
+        CHECK( allderivs[2] == Approx(2.0*x).epsilon(floatTol) );
+        CHECK( allderivs[3] == Approx(3.0*x*x-3.0).epsilon(floatTol) );
+        CHECK( allderivs[4] == Approx(4.0*x*x*x - 12.0*x).epsilon(floatTol) );
     }
 
     // Check the second derivatives

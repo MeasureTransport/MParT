@@ -7,4 +7,5 @@ set (TEST_SOURCES
      tests/Test_HermiteFunctions.cpp
      tests/Test_PositiveBijectors.cpp
      tests/Test_Quadrature.cpp
+     tests/Test_MonotoneComponent.cpp
 PARENT_SCOPE) 

@@ -64,10 +64,7 @@ FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim,
 
     maxDegrees = Kokkos::View<unsigned int*>("Maximum degrees", dim);
     for(unsigned int i=0; i<dim; ++i)
-        maxDegrees(i) = 0;
-
-    for(unsigned int i=0; i<nzOrders.extent(0); ++i)
-        maxDegrees(nzDims(i)) = std::max(maxDegrees(nzDims(i)), nzOrders(i));
+        maxDegrees(i) = _maxOrder;
 }
 
     
