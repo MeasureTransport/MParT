@@ -94,8 +94,10 @@ TEST_CASE( "Testing Recursive Quadrature", "[RecursiveQuadrature]" ) {
     {   
         double lb = 0;
         double ub = 1.0;
+        unsigned int numEvals = 0;
 
-        auto integrand = [](double x){
+        auto integrand = [&](double x){
+            numEvals++;
             if(x<0.5)
                 return exp(x);
             else 
@@ -107,8 +109,74 @@ TEST_CASE( "Testing Recursive Quadrature", "[RecursiveQuadrature]" ) {
         CHECK( integral == Approx(trueVal).epsilon(testTol) );
         CHECK( quad.Status()>0 );
         CHECK( quad.MaxLevel()<=maxSub );
+        CHECK( numEvals<400);
     }
     
 }
 
+
+
+TEST_CASE( "Testing Adaptive Simpson Integration", "[AdaptiveSimpson]" ) {
+
+    // Set parameters for adaptive quadrature algorithm
+    unsigned int maxSub = 30;
+    double relTol = 1e-7;
+    double absTol = 1e-7;
+
+    // Set tolerance for tests
+    double testTol = 1e-4;
+
+    AdaptiveSimpson quad(maxSub, absTol, relTol);
+
+    SECTION("Class Integrand")
+    {   
+        double lb = 0;
+        double ub = 1.0;
+
+        TestIntegrand integrand;
+        double integral = quad.Integrate(integrand, lb, ub);
+
+        CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+        CHECK( quad.Status()>0 );
+        CHECK( quad.MaxLevel()<maxSub );
+    }
+
+    SECTION("Lambda Integrand")
+    {   
+        double lb = 0;
+        double ub = 1.0;
+
+        auto integrand = [](double x){return exp(x);};
+        double integral = quad.Integrate(integrand, lb, ub);    
+
+        CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+        CHECK( quad.Status()>0 );
+        CHECK( quad.MaxLevel()<maxSub );
+    }
+
+
+    SECTION("Discontinuous Integrand")
+    {   
+        double lb = 0;
+        double ub = 1.0;
+
+        unsigned int numEvals = 0;
+
+        auto integrand = [&](double x){
+            numEvals++;
+            if(x<0.5)
+                return exp(x);
+            else 
+                return 1.0+exp(x);
+        };
+        double integral = quad.Integrate(integrand, lb, ub);    
+
+        double trueVal = (ub-0.5) + exp(ub)-exp(lb);
+        CHECK( integral == Approx(trueVal).epsilon(testTol) );
+        CHECK( quad.Status()>0 );
+        CHECK( quad.MaxLevel()<=maxSub );
+        CHECK( numEvals<150);
+    }
+    
+}
 

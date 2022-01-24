@@ -121,6 +121,125 @@ private:
 
 }; // class ClenshawCurtisQuadrature
 
+
+
+/**
+ @brief Adaptive Simpson-rule integration based on applying a simple Simpson 1/3 rule recursively on subintervals.
+
+ */
+class AdaptiveSimpson {
+public:
+
+    AdaptiveSimpson(unsigned int maxSub, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _absTol(absTol), _relTol(relTol), _status(0), _maxLevel(0){};
+    
+    /**
+      @brief Approximates and integral \f$\int_{L}^{U} f(x) dx\f$
+      @param[in] f The function f(x) to evaluate. The ScalarFuncType must have a call operator that accepts a single double, i.e., `operator()(double x)`.
+      @param[in] lb The lower bound \f$L\f$ in the integration.
+      @param[in] ub The upper bound \f$U\f$ in the integration.
+     */
+    template<class ScalarFuncType>
+    double Integrate(ScalarFuncType const& f, 
+                    double                 lb, 
+                    double                 ub) {
+        double integral;
+
+        double flb = f(lb);
+        double fub = f(ub);
+        double midPt = 0.5*(lb+ub);
+        double fmb = f(midPt);
+
+        double intCoarse = ((ub-lb)/6.0) * (flb + 4.0*fmb + fub);
+        
+        std::tie(integral, _status, _maxLevel) = RecursiveIntegrate(f, lb, midPt, ub, flb, fmb, fub, 0, intCoarse);
+        return integral;
+    }
+
+
+    /**
+     * @brief Returns a convergence flag for the last call to "Integrate"
+       
+       @return The convergence flag.  Positive if successful.  Negative if not.  Zero if Integrate hasn't been called yet.
+     */
+    int Status() const{return _status;};
+
+    /**
+     * @brief Returns the deepest level rea
+     * 
+     * @return int 
+     */
+    int MaxLevel() const {return _maxLevel;};
+
+private:
+
+    template<class ScalarFuncType>
+    std::tuple<double,int, unsigned int> RecursiveIntegrate(ScalarFuncType const& f, 
+                                                            double leftPt,
+                                                            double midPt,
+                                                            double rightPt,
+                                                            double leftFunc, 
+                                                            double midFunc,
+                                                            double rightFunc,
+                                                            int    level,
+                                                            double intCoarse) {
+
+        // update current refinement level
+        level += 1;
+        
+        // evluate integral on each sub-interval
+        double leftMidPt = 0.5*(leftPt+midPt);
+        double leftMidFunc = f(leftMidPt);
+
+        double rightMidPt = 0.5*(midPt+rightPt);
+        double rightMidFunc = f(rightMidPt);
+
+        double intFinerLeft, intFinerRight;
+        intFinerLeft  = ((midPt-leftPt)/6.0) * (leftFunc + 4.0*leftMidFunc + midFunc);
+        intFinerRight = ((rightPt-midPt)/6.0) * (midFunc + 4.0*rightMidFunc + rightFunc);
+
+        // compute total integral
+        double intFiner = intFinerLeft + intFinerRight;
+
+        // Compute error and tolerance
+        double intErr, tol;
+        intErr = std::abs(intFiner-intCoarse);
+        tol = std::fmax( _relTol*std::abs(intCoarse), _absTol);
+      
+        // Stop the recursion if the level hit maximum depth
+        if ( (intErr > tol) && (level == _maxSub) ) {
+            return std::make_tuple(intFiner, int(-1), level);
+            //std::stringstream msg;
+            //msg << "In MParT::RecursiveQuadrature: Reached maximum level depth \"" << _maxSub << "\", with an error of \"" << intErr << "\".";
+            //throw std::runtime_error(msg.str());
+        }
+        // If the error between levels is smaller than Tol, return the finer level result
+        else if ( intErr <= tol ) {
+            return std::make_tuple(intFiner, int(1), level);
+        }
+        // Else subdivide further
+        else {
+            double intLeft, intRight;
+            int statusLeft, statusRight;
+            unsigned int levelLeft, levelRight;
+            std::tie(intLeft, statusLeft, levelLeft) = RecursiveIntegrate(f, leftPt, leftMidPt, midPt, leftFunc, leftMidFunc, midFunc, level, intFinerLeft);
+            std::tie(intRight, statusRight, levelRight) = RecursiveIntegrate(f, midPt, rightMidPt, rightPt, midFunc, rightMidFunc, rightFunc, level, intFinerRight);
+            
+            return std::make_tuple(intLeft + intRight, int( ((statusLeft<0)||(statusLeft<0))?-1:1 ), std::max(levelLeft, levelRight)); 
+        }
+
+    }
+
+    const unsigned int _maxSub;
+    const double _absTol;
+    const double _relTol;
+
+    int _status;
+    unsigned int _maxLevel;
+
+}; // Class AdaptiveSimpson
+
+
+
 /**
  @brief Adaptive quadrature based on applying a Clenshaw-Curtis recursively on subintervals.
 
@@ -241,10 +360,11 @@ private:
     }
 
 private:
-    unsigned int _maxSub;
-    unsigned int _order;
-    double _absTol;
-    double _relTol;
+    const unsigned int _maxSub;
+    const unsigned int _order;
+    const double _absTol;
+    const double _relTol;
+
     ClenshawCurtisQuadrature _quad;
 
     // Saved convergence diagnostics
