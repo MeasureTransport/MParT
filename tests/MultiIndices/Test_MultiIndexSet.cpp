@@ -12,14 +12,20 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
 
     FixedMultiIndexSet mset(dim,maxOrder);
 
-    REQUIRE( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
+    CHECK( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
+
+    Kokkos::View<const unsigned int*> maxDegrees = mset.MaxDegrees();
+    REQUIRE(maxDegrees.extent(0)==2);
+    CHECK(maxDegrees(0)==maxOrder);
+    CHECK(maxDegrees(1)==maxOrder);
 }
 
 
 TEST_CASE("Conversions between MultiIndexSet types", "[MultiIndexSet Conversions]" ) {
 
     unsigned int dim = 10;
-    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, 3);
+    unsigned int maxDegree = 3;
+    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
     FixedMultiIndexSet fixedSet = mset.Fix();
 
@@ -31,8 +37,13 @@ TEST_CASE("Conversions between MultiIndexSet types", "[MultiIndexSet Conversions
         std::vector<unsigned int> vec = mset.IndexToMulti(i).Vector();
 
         for(unsigned int d=0; d<dim; ++d)
-            REQUIRE(fixedVec.at(d)==vec.at(d));
+            CHECK(fixedVec.at(d)==vec.at(d));
     }
+
+    Kokkos::View<const unsigned int*> maxDegrees = fixedSet.MaxDegrees();
+    REQUIRE(maxDegrees.extent(0)==dim);
+    for(unsigned int i=0; i<dim; ++i)
+        CHECK(maxDegrees(i)==maxDegree);
 }
 
 TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {

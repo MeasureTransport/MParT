@@ -36,8 +36,8 @@ public:
     FixedMultiIndexSet(unsigned int _dim, 
                        unsigned int _maxOrder);
 
-    // Returns the maximum order in the dimension dim
-    std::vector<unsigned int> GetMaxOrders() const;
+    // Returns the maximum degree in the dimension dim
+    Kokkos::View<const unsigned int*> MaxDegrees() const;
 
     // Returns the multiindex with a given linear index
     std::vector<unsigned int> IndexToMulti(unsigned int index) const;
@@ -75,6 +75,7 @@ private:
     Kokkos::View<unsigned int*> nzStarts;
     Kokkos::View<unsigned int*> nzDims;
     Kokkos::View<unsigned int*> nzOrders;
+    Kokkos::View<unsigned int*> maxDegrees; // The maximum multiindex value (i.e., degree) in each dimension
 
 }; // class MultiIndexSet
 

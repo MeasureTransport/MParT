@@ -9,6 +9,21 @@ FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
                                                                                 nzOrders(_nzOrders)
 
 {
+    unsigned int numTerms = nzOrders.extent(0) / dim;
+    
+    nzStarts = Kokkos::View<unsigned int*>("Start of a Multiindex", numTerms+1);
+    for(unsigned int i=0; i<numTerms+1; ++i)
+        nzStarts(i) = i*dim;
+
+    nzDims = Kokkos::View<unsigned int*>("Index of nz component", numTerms);
+    for(unsigned int i=0; i<numTerms; ++i)
+        nzDims(i) = i%dim;
+
+    maxDegrees = Kokkos::View<unsigned int*>("Maximum degrees", dim);
+    for(unsigned int i=0; i<dim; ++i)
+        maxDegrees(i) = 0;
+    for(unsigned int i=0; i<nzOrders.extent(0); ++i)
+        maxDegrees(nzDims(i)) = std::max(maxDegrees(nzDims(i)), nzOrders(i));
 }
 
 FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
@@ -20,6 +35,12 @@ FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
                                                                                 nzDims(_nzDims),
                                                                                 nzOrders(_nzOrders)
 {
+    maxDegrees = Kokkos::View<unsigned int*>("Maximum degrees", dim);
+    for(unsigned int i=0; i<dim; ++i)
+        maxDegrees(i) = 0;
+
+    for(unsigned int i=0; i<nzOrders.extent(0); ++i)
+        maxDegrees(nzDims(i)) = std::max(maxDegrees(nzDims(i)), nzOrders(i));
 }
 
 FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim, 
@@ -40,26 +61,20 @@ FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim,
     unsigned int currTerm=0;
     
     FillTotalOrder(_maxOrder, workspace, 0, currTerm, currNz);
+
+    maxDegrees = Kokkos::View<unsigned int*>("Maximum degrees", dim);
+    for(unsigned int i=0; i<dim; ++i)
+        maxDegrees(i) = 0;
+
+    for(unsigned int i=0; i<nzOrders.extent(0); ++i)
+        maxDegrees(nzDims(i)) = std::max(maxDegrees(nzDims(i)), nzOrders(i));
 }
 
     
 
-std::vector<unsigned int> FixedMultiIndexSet::GetMaxOrders() const
+Kokkos::View<const unsigned int*> FixedMultiIndexSet::MaxDegrees() const
 {   
-    std::vector<unsigned int> maxOrders(dim, 0);
-
-    if(isCompressed){
-        for(unsigned int i=0; i<nzOrders.extent(0); ++i){
-            if(nzOrders(i)>maxOrders.at(nzDims(i)))
-                maxOrders.at(nzDims(i)) = nzOrders(i);
-        }
-    }else{
-        for(unsigned int i=0; i<nzOrders.extent(0); ++i){
-            if(nzOrders(i)>maxOrders.at(i%dim))
-                maxOrders.at(i%dim) = nzOrders(i);
-        }
-    }
-    return maxOrders;
+    return maxDegrees;
 }
 
 
