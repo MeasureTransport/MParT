@@ -33,7 +33,7 @@ if(NOT Kokkos_FOUND)
 endif()
 
 # Add Eigen
-find_package(Eigen3 3.3 NO_MODULE)
+find_package(Eigen3)
 if(NOT Eigen3_FOUND)
     UpdateGitSubmodule(eigen)
     add_subdirectory(external/eigen)
@@ -48,7 +48,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # MParT library
 add_subdirectory(src)
 add_library(mpart ${MPART_SOURCES})
-target_link_libraries(mpart Kokkos::kokkos)
+target_link_libraries(mpart Kokkos::kokkos Eigen3::Eigen)
 
 
 ##############################################################
