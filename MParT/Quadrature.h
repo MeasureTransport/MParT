@@ -135,7 +135,7 @@ public:
        @param[in] absTol An absolute error tolerance used to stop the adaptive integration.
        @param[in] relTol A relative error tolerance used to stop te adaptive integration.
      */
-    RecursiveQuadrature(unsigned int maxSub, unsigned int order=2, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _order(order), _absTol(absTol), _relTol(relTol), _quad(order)
+    RecursiveQuadrature(unsigned int maxSub, unsigned int order=2, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _order(order), _absTol(absTol), _relTol(relTol), _quad(order), _status(0), _maxLevel(0)
     {
         if(absTol<=0){
             std::stringstream msg;
@@ -166,58 +166,77 @@ public:
                     double                 lb, 
                     double                 ub) {
         double integral;
-        integral = RecursiveIntegrate(f, lb, ub, 0, 0.0);
+        std::tie(integral, _status, _maxLevel) = RecursiveIntegrate(f, lb, ub, 0, 0.0);
         return integral;
     }
+
+
+    /**
+     * @brief Returns a convergence flag for the last call to "Integrate"
+       
+       @return The convergence flag.  Positive if successful.  Negative if not.  Zero if Integrate hasn't been called yet.
+     */
+    int Status() const{return _status;};
+
+    /**
+     * @brief Returns the deepest level rea
+     * 
+     * @return int 
+     */
+    int MaxLevel() const {return _maxLevel;};
 
 private:
 
     template<class ScalarFuncType>
-    double RecursiveIntegrate(ScalarFuncType const& f, 
-                            double lb, 
-                            double ub, 
-                            int level, 
-                            double intCoarse) {
+    std::tuple<double,int, unsigned int> RecursiveIntegrate(ScalarFuncType const& f, 
+                                             double lb, 
+                                             double ub, 
+                                             int level, 
+                                             double intCoarse) {
 
         // update current refinement level
         level += 1;
 
         // evaluate intCoarse on first call of function
         if (level == 1) {
-            double intCoarse;
             intCoarse = _quad.Integrate(f, lb, ub);
         }
-
+        
         // evluate integral on each sub-interval
         double mb, intFinerLeft, intFinerRight;
         mb = lb+0.5*(ub-lb);
         intFinerLeft  = _quad.Integrate(f, lb, mb);
         intFinerRight = _quad.Integrate(f, mb, ub);
+
         // compute total integral
-        double intFiner;
-        intFiner = intFinerLeft + intFinerRight;
+        double intFiner = intFinerLeft + intFinerRight;
 
         // Compute error and tolerance
         double intErr, tol;
         intErr = std::abs(intFiner-intCoarse);
         tol = std::fmax( _relTol*std::abs(intCoarse), _absTol);
-
+      
         // Stop the recursion if the level hit maximum depth
         if ( (intErr > tol) && (level == _maxSub) ) {
-            std::stringstream msg;
-            msg << "In MParT::RecursiveQuadrature: Reached maximum level depth \"" << _maxSub << "\", with an error of \"" << intErr << "\".";
-            throw std::runtime_error(msg.str());
+            return std::make_tuple(intFiner, int(-1), level);
+            //std::stringstream msg;
+            //msg << "In MParT::RecursiveQuadrature: Reached maximum level depth \"" << _maxSub << "\", with an error of \"" << intErr << "\".";
+            //throw std::runtime_error(msg.str());
         }
         // If the error between levels is smaller than Tol, return the finer level result
         else if ( intErr <= tol ) {
-            return intFiner;
+            return std::make_tuple(intFiner, int(1), level);
         }
         // Else subdivide further
         else {
             double intLeft, intRight;
-            intLeft = RecursiveIntegrate(f, lb, mb, level, intFinerLeft);
-            intRight = RecursiveIntegrate(f, mb, ub, level, intFinerRight);
-            return intLeft + intRight;
+            int statusLeft, statusRight;
+            unsigned int levelLeft, levelRight;
+            std::tie(intLeft, statusLeft, levelLeft) = RecursiveIntegrate(f, lb, mb, level, intFinerLeft);
+            std::tie(intRight, statusRight, levelRight) = RecursiveIntegrate(f, mb, ub, level, intFinerRight);
+
+            
+            return std::make_tuple(intLeft + intRight, int( ((statusLeft<0)|(statusLeft<0))?-1:1 ), std::max(levelLeft, levelRight)); 
         }
 
     }
@@ -228,6 +247,10 @@ private:
     double _absTol;
     double _relTol;
     ClenshawCurtisQuadrature _quad;
+
+    // Saved convergence diagnostics
+    int _status;
+    unsigned _maxLevel;
 
 }; // class RecursiveQuadrature
 
