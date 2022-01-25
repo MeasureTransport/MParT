@@ -8,3 +8,4 @@ API Reference
    :maxdepth: 2
 
    multiindex
+   quadrature
