@@ -10,9 +10,8 @@ namespace mpart{
 /**
 @class ClenshawCurtisQuadrature
 @brief Implementation of the Clenshaw-Curtis 1d quadrature rule.
-
-@paragraph Example Usage
-@code
+@details
+@code{.cpp}
 
 // Define the integrand using a lambda function
 auto f = [](double x){return exp(x);};
@@ -66,6 +65,7 @@ public:
 
     /**
      @brief Returns the weights and points in a Clenshaw-Curtis rule.
+     @details
      @param[in] order The order of the Clenshaw-Curtis rule.
      @returns A pair containing (wts,pts)
      */
@@ -117,70 +117,39 @@ public:
     }
     
     /**
-     @brief Approximates the integral \f$\int_{L}^{U} f(x) dx\f$ using a Clenshaw-Curtis quadrature rule.
-     @param[in] f The integrand
-     @param[in] lb The lower bound \f$L\f$ in the integration.
-     @param[in] lb The upper bound \f$U\f$ in the integration.
-     @returns A pair containing (wts,pts)
+     @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$ using a Clenshaw-Curtis quadrature rule.
+     @details
+     @param[in] f The integrand.  Can return any type that overloads multiplication with a double and the += operator.  doubles and Eigen::VectorXd are examples.
+     @param[in] lb The lower bound \f$x_L\f$ in the integration.
+     @param[in] lb The upper bound \f$x_U\f$ in the integration.
+     @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
+
+     @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
-    template<class ScalarFuncType>
-    double Integrate(ScalarFuncType const& f, 
-                    double                 lb, 
-                    double                 ub)
+    template<class FunctionType>
+    auto Integrate(FunctionType const& f, 
+                   double              lb, 
+                   double              ub) -> decltype(f(0.0))
     {   
+        
         // Compute CC rule
-        Eigen::VectorXd wts(_order), pts(_order);
+        Eigen::VectorXd wts,pts;
         std::tie(wts,pts) = ClenshawCurtisQuadrature::GetRule(_order);
 
         // Rescale inputs to domain [L,U]
         pts = 0.5*(ub+lb)*Eigen::VectorXd::Ones(_order) + 0.5*(ub-lb)*pts;
+
         // Rescale weights
         wts = 0.5*(ub-lb)*wts;
 
-        // Evaluate integral
-        double integral;
-        integral = 0;
-        for (unsigned int i=0; i<_order; ++i) {
-            integral = integral + f(pts[i]) * wts[i];
-        }
-        return integral;
-    }
+        // Create an output variable
+        decltype(f(0.0)) output = wts[0]*f(pts[0]);
 
-    /** @brief Integrates two functions over the same domain using the same points.  
-    
-        @details For non-adaptive quadrature rules, like the Clenshaw-Curtis rule, this is equivalent to
-        integrating the two functions independently.   However, this function enables adaptive rules to
-        return consistent estimates (i.e., using the same weights and points).  This function is only 
-        included in the Clenshaw Curtis class to maintain a common interface across quadrature rules.
+        // Evaluate integral and store results in output
+        for (unsigned int i=1; i<pts.size(); ++i)
+            output += wts[i] * f(pts[i]);
 
-        @param[in] ScalarFuncType1 f1 
-        @param[in] ScalarFuncType2 f2
-        @tparam ScalarFuncType1 The type of the first integrand.  Must provide an operator() function that accepts a single double and returns a single double.
-        @tparam ScalarFuncType2 The type of the second integrand.  Must provide an operator() function that accepts a single double and returns a single double.
-    */
-    template<class ScalarFuncType1, class ScalarFuncType2>
-    std::pair<double,double> Integrate(ScalarFuncType1 const& f1, 
-                                       ScalarFuncType2 const& f2,
-                                       double                 lb, 
-                                       double                 ub)
-    {   
-        // Compute CC rule
-        Eigen::VectorXd wts(_order), pts(_order);
-        std::tie(wts,pts) = ClenshawCurtisQuadrature::GetRule(_order);
-
-        // Rescale inputs to domain [L,U]
-        pts = 0.5*(ub+lb)*Eigen::VectorXd::Ones(_order) + 0.5*(ub-lb)*pts;
-        // Rescale weights
-        wts = 0.5*(ub-lb)*wts;
-
-        // Evaluate integral
-        double integral1 = 0;
-        double integral2 = 0;
-        for (unsigned int i=0; i<pts.size(); ++i) {
-            integral1 = integral1 + f1(pts[i]) * wts[i];
-            integral2 = integral2 + f2(pts[i]) * wts[i];
-        }
-        return std::make_pair(integral1,integral2);
+        return output;
     }
 
 
@@ -201,74 +170,77 @@ public:
     AdaptiveSimpson(unsigned int maxSub, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _absTol(absTol), _relTol(relTol), _status(0), _maxLevel(0){};
     
     /**
-      @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$
-      @param[in] f The function f(x) to evaluate. 
-      @param[in] lb The lower bound \f$L\f$ in the integration.
-      @param[in] ub The upper bound \f$U\f$ in the integration.
-      @tparam ScalarFuncType The type of the integrand.  This can be a functor or lambda function but must have a call operator that accepts a single double, i.e., `operator()(double x)`.
+     @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$
+     @details
+     @param[in] f The integrand.  Can return any type that overloads multiplication with a double and the += operator.  doubles and Eigen::VectorXd are examples.
+     @param[in] lb The lower bound \f$x_L\f$ in the integration.
+     @param[in] lb The upper bound \f$x_U\f$ in the integration.
+     @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
+
+     @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
-    template<class ScalarFuncType>
-    double Integrate(ScalarFuncType const& f, 
-                     double                 lb, 
-                     double                 ub) {
-        double integral;
-
-        double flb = f(lb);
-        double fub = f(ub);
+    template<class FunctionType>
+    auto Integrate(FunctionType const& f, 
+                   double              lb, 
+                   double              ub) -> decltype(f(0.0))
+    { 
+        auto flb = f(lb);
+        auto fub = f(ub);
         double midPt = 0.5*(lb+ub);
-        double fmb = f(midPt);
+        auto fmb = f(midPt);
 
-        double intCoarse = ((ub-lb)/6.0) * (flb + 4.0*fmb + fub);
+        decltype(flb) intCoarse = ((ub-lb)/6.0) * (flb + 4.0*fmb + fub);
         
+        decltype(flb) integral;
         std::tie(integral, _status, _maxLevel) = RecursiveIntegrate(f, lb, midPt, ub, flb, fmb, fub, 0, intCoarse);
         return integral;
     }
 
 
-    /** @brief Integrates two functions over the same domain using the same points.  
+    // /** @brief Integrates two functions over the same domain using the same points.  
     
-        @details This function simultaneously approximates two integrals
-        \f\[
-            \begin{aligned}
-            I_1 & = \int_{x_L}^{x_U} f_1(x) dx\\
-            I_2 & = \int_{x_L}^{x_U} f_2(x) dx.
-            \end{aligned}
-        \f\] 
-        An adaptive Simpson rule is used to approximate the integrals.  While the same points will be used to 
-        approximation \f$I_1\f$ and \f$I_2\f$, the adaptation will be driven solely by estimated errors in computing 
-        \f$I_1\f$.   The approximation for \f$I_1\f$ is therefore the same as what would be returned by the single-integrand 
-        `Integrate` function.   
+    //     @details This function simultaneously approximates two integrals
+    //     \f\[
+    //         \begin{aligned}
+    //         I_1 & = \int_{x_L}^{x_U} f_1(x) dx\\
+    //         I_2 & = \int_{x_L}^{x_U} f_2(x) dx.
+    //         \end{aligned}
+    //     \f\] 
+    //     An adaptive Simpson rule is used to approximate the integrals.  While the same points will be used to 
+    //     approximation \f$I_1\f$ and \f$I_2\f$, the adaptation will be driven solely by estimated errors in computing 
+    //     \f$I_1\f$.   The approximation for \f$I_1\f$ is therefore the same as what would be returned by the single-integrand 
+    //     `Integrate` function.   
 
-        @param[in] f1 The first integrand \f$f_1\f$.
-        @param[in] f2 The second integrand \f$f_2\f$.
-        @return A pair of estimates \f$(\hat{I}_1, \hat{I}_2)\f$.
-        @tparam ScalarFuncType1 The type of the first integrand.  Must provide an operator() function that accepts a single double and returns a single double.
-        @tparam ScalarFuncType2 The type of the second integrand.  Must provide an operator() function that accepts a single double and returns a single double.
-    */
-    template<class ScalarFuncType1, class ScalarFuncType2>
-    std::pair<double,double> Integrate(ScalarFuncType1 const& f1, 
-                                       ScalarFuncType2 const& f2,
-                                       double                 lb, 
-                                       double                 ub)
-    {   
-        double integral1, integral2;
+    //     @param[in] f1 The first integrand \f$f_1\f$.
+    //     @param[in] f2 The second integrand \f$f_2\f$.
+    //     @return A pair of estimates \f$(\hat{I}_1, \hat{I}_2)\f$.
+    //     @tparam ScalarFuncType1 The type of the first integrand.  Must provide an operator() function that accepts a single double and returns a single double.
+    //     @tparam ScalarFuncType2 The type of the second integrand.  Must provide an operator() function that accepts a single double and returns a single double.
+    // */
+    // template<class ScalarFuncType1, class ScalarFuncType2>
+    // std::pair<double,double> Integrate(ScalarFuncType1 const& f1, 
+    //                                    ScalarFuncType2 const& f2,
+    //                                    double                 lb, 
+    //                                    double                 ub)
+    // {   
+    //     double integral1, integral2;
 
-        double f1lb = f1(lb);
-        double f2lb = f2(lb);
+    //     double f1lb = f1(lb);
+    //     double f2lb = f2(lb);
 
-        double f1ub = f1(ub);
-        double f2ub = f2(ub);
+    //     double f1ub = f1(ub);
+    //     double f2ub = f2(ub);
 
-        double midPt = 0.5*(lb+ub);
-        double f1mb = f1(midPt);
-        double f2mb = f2(midPt);
+    //     double midPt = 0.5*(lb+ub);
+    //     double f1mb = f1(midPt);
+    //     double f2mb = f2(midPt);
 
-        double intCoarse1 = ((ub-lb)/6.0) * (f1lb + 4.0*f1mb + f1ub);
-        double intCoarse2 = ((ub-lb)/6.0) * (f2lb + 4.0*f2mb + f2ub);
+    //     double intCoarse1 = ((ub-lb)/6.0) * (f1lb + 4.0*f1mb + f1ub);
+    //     double intCoarse2 = ((ub-lb)/6.0) * (f2lb + 4.0*f2mb + f2ub);
         
-        std::tie(integral1, integral2, _status, _maxLevel) = RecursiveIntegrate2(f1, f2, lb, midPt, ub, f1lb, f1mb, f1ub, f2lb, f2mb, f2ub, 0, intCoarse1, intCoarse2);
-        return std::make_pair(integral1, integral2);
-    }
+    //     std::tie(integral1, integral2, _status, _maxLevel) = RecursiveIntegrate2(f1, f2, lb, midPt, ub, f1lb, f1mb, f1ub, f2lb, f2mb, f2ub, 0, intCoarse1, intCoarse2);
+    //     return std::make_pair(integral1, integral2);
+    // }
 
     /**
      * @brief Returns a convergence flag for the last call to "Integrate"
@@ -286,39 +258,58 @@ public:
 
 private:
 
+    template<typename IntegralValueType>
+    std::pair<double, double> EstimateError(IntegralValueType const& coarseVal,
+                                            IntegralValueType const& fineVal)
+    {
+        double error = std::abs(fineVal - coarseVal);
+        double tol = std::fmax( _relTol*std::abs(coarseVal), _absTol);
+
+        return std::make_pair(error, tol);
+    }
+
+    std::pair<double, double> EstimateError(Eigen::VectorXd const& coarseVal,
+                                            Eigen::VectorXd const& fineVal)
+    {
+        
+        double error = std::abs(fineVal(0)-coarseVal(0));
+        double tol = std::fmax( _relTol*std::abs(coarseVal(0)), _absTol);
+
+        return std::make_pair(error, tol);
+    }
+
     template<class ScalarFuncType>
-    std::tuple<double,int, unsigned int> RecursiveIntegrate(ScalarFuncType const& f, 
-                                                            double leftPt,
-                                                            double midPt,
-                                                            double rightPt,
-                                                            double leftFunc, 
-                                                            double midFunc,
-                                                            double rightFunc,
-                                                            int    level,
-                                                            double intCoarse) {
+    auto RecursiveIntegrate(ScalarFuncType const& f, 
+                            double leftPt,
+                            double midPt,
+                            double rightPt,
+                            decltype(f(0.0)) leftFunc, 
+                            decltype(f(0.0)) midFunc,
+                            decltype(f(0.0)) rightFunc,
+                            int    level,
+                            decltype(f(0.0)) intCoarse) -> std::tuple<decltype(f(0.0)), int, unsigned int>
+    {
 
         // update current refinement level
         level += 1;
         
         // evluate integral on each sub-interval
         double leftMidPt = 0.5*(leftPt+midPt);
-        double leftMidFunc = f(leftMidPt);
+        auto leftMidFunc = f(leftMidPt);
 
         double rightMidPt = 0.5*(midPt+rightPt);
-        double rightMidFunc = f(rightMidPt);
+        auto rightMidFunc = f(rightMidPt);
 
-        double intFinerLeft, intFinerRight;
-        intFinerLeft  = ((midPt-leftPt)/6.0) * (leftFunc + 4.0*leftMidFunc + midFunc);
-        intFinerRight = ((rightPt-midPt)/6.0) * (midFunc + 4.0*rightMidFunc + rightFunc);
+        auto intFinerLeft  = ((midPt-leftPt)/6.0) * (leftFunc + 4.0*leftMidFunc + midFunc);
+        auto intFinerRight = ((rightPt-midPt)/6.0) * (midFunc + 4.0*rightMidFunc + rightFunc);
 
         // compute total integral
-        double intFiner = intFinerLeft + intFinerRight;
+        auto intFiner = intFinerLeft + intFinerRight;
 
         // Compute error and tolerance
         double intErr, tol;
-        intErr = std::abs(intFiner-intCoarse);
-        tol = std::fmax( _relTol*std::abs(intCoarse), _absTol);
-      
+        std::tie(intErr, tol) = EstimateError(intCoarse, intFiner);
+
         // Stop the recursion if the level hit maximum depth
         if ( (intErr > tol) && (level == _maxSub) ) {
             return std::make_tuple(intFiner, int(-1), level);
@@ -332,82 +323,13 @@ private:
         }
         // Else subdivide further
         else {
-            double intLeft, intRight;
+            decltype(f(0.0)) intLeft, intRight;
             int statusLeft, statusRight;
             unsigned int levelLeft, levelRight;
             std::tie(intLeft, statusLeft, levelLeft) = RecursiveIntegrate(f, leftPt, leftMidPt, midPt, leftFunc, leftMidFunc, midFunc, level, intFinerLeft);
             std::tie(intRight, statusRight, levelRight) = RecursiveIntegrate(f, midPt, rightMidPt, rightPt, midFunc, rightMidFunc, rightFunc, level, intFinerRight);
             
             return std::make_tuple(intLeft + intRight, int( ((statusLeft<0)||(statusLeft<0))?-1:1 ), std::max(levelLeft, levelRight)); 
-        }
-
-    }
-
-    template<class ScalarFuncType1, class ScalarFuncType2>
-    std::tuple<double, double, int, unsigned int> RecursiveIntegrate2(ScalarFuncType1 const& f1, 
-                                                                      ScalarFuncType2 const& f2,
-                                                                      double leftPt,
-                                                                      double midPt,
-                                                                      double rightPt,
-                                                                      double leftFunc1, 
-                                                                      double midFunc1,
-                                                                      double rightFunc1,
-                                                                      double leftFunc2, 
-                                                                      double midFunc2,
-                                                                      double rightFunc2,
-                                                                      int    level,
-                                                                      double intCoarse1,
-                                                                      double intCoarse2) {
-
-        // update current refinement level
-        level += 1;
-        
-        // evluate integral on each sub-interval
-        double leftMidPt = 0.5*(leftPt+midPt);
-        double leftMidFunc1 = f1(leftMidPt);
-        double leftMidFunc2 = f2(leftMidPt);
-
-        double rightMidPt = 0.5*(midPt+rightPt);
-        double rightMidFunc1 = f1(rightMidPt);
-        double rightMidFunc2 = f2(rightMidPt);
-
-        double intFinerLeft1, intFinerRight1;
-        intFinerLeft1  = ((midPt-leftPt)/6.0) * (leftFunc1 + 4.0*leftMidFunc1 + midFunc1);
-        intFinerRight1 = ((rightPt-midPt)/6.0) * (midFunc1 + 4.0*rightMidFunc1 + rightFunc1);
-
-        double intFinerLeft2, intFinerRight2;
-        intFinerLeft2  = ((midPt-leftPt)/6.0) * (leftFunc2 + 4.0*leftMidFunc2 + midFunc2);
-        intFinerRight2 = ((rightPt-midPt)/6.0) * (midFunc2 + 4.0*rightMidFunc2 + rightFunc2);
-
-        // compute total integral
-        double intFiner1 = intFinerLeft1 + intFinerRight1;
-        double intFiner2 = intFinerLeft2 + intFinerRight2;
-
-        // Compute error and tolerance
-        double intErr, tol;
-        intErr = std::abs(intFiner1-intCoarse1);
-        tol = std::fmax( _relTol*std::abs(intCoarse1), _absTol);
-      
-        // Stop the recursion if the level hit maximum depth
-        if ( (intErr > tol) && (level == _maxSub) ) {
-            return std::make_tuple(intFiner1, intFiner2, int(-1), level);
-            //std::stringstream msg;
-            //msg << "In MParT::RecursiveQuadrature: Reached maximum level depth \"" << _maxSub << "\", with an error of \"" << intErr << "\".";
-            //throw std::runtime_error(msg.str());
-        }
-        // If the error between levels is smaller than Tol, return the finer level result
-        else if ( intErr <= tol ) {
-            return std::make_tuple(intFiner1, intFiner2, int(1), level);
-        }
-        // Else subdivide further
-        else {
-            double intLeft1, intLeft2, intRight1, intRight2;
-            int statusLeft, statusRight;
-            unsigned int levelLeft, levelRight;
-            std::tie(intLeft1, intLeft2, statusLeft, levelLeft) = RecursiveIntegrate2(f1, f2, leftPt, leftMidPt, midPt, leftFunc1, leftMidFunc1, midFunc1, leftFunc2, leftMidFunc2, midFunc2, level, intFinerLeft1, intFinerLeft2);
-            std::tie(intRight1, intRight2, statusRight, levelRight) = RecursiveIntegrate2(f1, f2, midPt, rightMidPt, rightPt, midFunc1, rightMidFunc1, rightFunc1, midFunc2, rightMidFunc2, rightFunc2, level, intFinerRight1, intFinerRight2);
-            
-            return std::make_tuple(intLeft1 + intRight1, intLeft2+intRight2, int( ((statusLeft<0)||(statusLeft<0))?-1:1 ), std::max(levelLeft, levelRight)); 
         }
 
     }
@@ -458,48 +380,24 @@ public:
     }
 
     /**
-      @brief Approximates and integral \f$\int_{L}^{U} f(x) dx\f$
-      @param[in] f The function f(x) to evaluate. The ScalarFuncType must have a call operator that accepts a single double, i.e., `operator()(double x)`.
-      @param[in] lb The lower bound \f$L\f$ in the integration.
-      @param[in] ub The upper bound \f$U\f$ in the integration.
+     @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$
+     @details
+     @param[in] f The integrand.  Can return any type that overloads multiplication with a double and the += operator.  doubles and Eigen::VectorXd are examples.
+     @param[in] lb The lower bound \f$x_L\f$ in the integration.
+     @param[in] lb The upper bound \f$x_U\f$ in the integration.
+     @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
+
+     @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
-    template<class ScalarFuncType>
-    double Integrate(ScalarFuncType const& f, 
-                    double                 lb, 
-                    double                 ub) {
-        double integral;
-        std::tie(integral, _status, _maxLevel) = RecursiveIntegrate(f, lb, ub, 0, 0.0);
+    template<class FunctionType>
+    auto Integrate(FunctionType const& f, 
+                   double              lb, 
+                   double              ub) -> decltype(f(0.0))
+    {   
+        auto intCoarse = _quad.Integrate(f, lb, ub);
+        decltype(f(0.0)) integral;
+        std::tie(integral, _status, _maxLevel) = RecursiveIntegrate(f, lb, ub, 0, intCoarse);
         return integral;
-    }
-
-    /** @brief Integrates two functions over the same domain using the same points.  
-    
-        @details This function simultaneously approximates two integrals
-        \f\[
-            \begin{aligned}
-            I_1 & = \int_{x_L}^{x_U} f_1(x) dx\\
-            I_2 & = \int_{x_L}^{x_U} f_2(x) dx.
-            \end{aligned}
-        \f\] 
-        The recursive application of a Clenshaw-Curtis rule is used to approximate the integrals.  While the same points will be used to 
-        approximation \f$I_1\f$ and \f$I_2\f$, the adaptation will be driven solely by estimated errors in computing 
-        \f$I_1\f$.   The approximation for \f$I_1\f$ is therefore the same as what would be returned by the single-integrand 
-        `Integrate` function.   
-
-        @param[in] f1 The first integrand \f$f_1\f$.
-        @param[in] f2 The second integrand \f$f_2\f$.
-        @return A pair of estimates \f$(\hat{I}_1, \hat{I}_2)\f$.
-        @tparam ScalarFuncType1 The type of the first integrand.  Must provide an operator() function that accepts a single double and returns a single double.
-        @tparam ScalarFuncType2 The type of the second integrand.  Must provide an operator() function that accepts a single double and returns a single double.
-    */
-    template<class ScalarFuncType1, class ScalarFuncType2>
-    std::pair<double,double> Integrate(ScalarFuncType1 const& f1, 
-                                       ScalarFuncType2 const& f2,
-                                       double                 lb, 
-                                       double                 ub) {
-        double integral1, integral2;
-        std::tie(integral1, integral2, _status, _maxLevel) = RecursiveIntegrate2(f1, f2, lb, ub, 0, 0.0, 0.0);
-        return std::make_pair(integral1, integral2);
     }
 
 
@@ -519,35 +417,49 @@ public:
 
 private:
 
-    template<class ScalarFuncType>
-    std::tuple<double,int, unsigned int> RecursiveIntegrate(ScalarFuncType const& f, 
-                                             double lb, 
-                                             double ub, 
-                                             int level, 
-                                             double intCoarse) {
+    template<typename IntegralValueType>
+    std::pair<double, double> EstimateError(IntegralValueType const& coarseVal,
+                                            IntegralValueType const& fineVal)
+    {
+        double error = std::abs(fineVal - coarseVal);
+        double tol = std::fmax( _relTol*std::abs(coarseVal), _absTol);
+
+        return std::make_pair(error, tol);
+    }
+
+    std::pair<double, double> EstimateError(Eigen::VectorXd const& coarseVal,
+                                            Eigen::VectorXd const& fineVal)
+    {
+        
+        double error = std::abs(fineVal(0)-coarseVal(0));
+        double tol = std::fmax( _relTol*std::abs(coarseVal(0)), _absTol);
+
+        return std::make_pair(error, tol);
+    }
+
+    template<class FunctionType>
+    auto RecursiveIntegrate(FunctionType const& f, 
+                            double lb, 
+                            double ub, 
+                            int level, 
+                            decltype(f(0.0)) intCoarse) -> std::tuple<decltype(f(0.0)),int, unsigned int>
+    {
 
         // update current refinement level
         level += 1;
 
-        // evaluate intCoarse on first call of function
-        if (level == 1) {
-            intCoarse = _quad.Integrate(f, lb, ub);
-        }
-        
         // evluate integral on each sub-interval
-        double mb, intFinerLeft, intFinerRight;
-        mb = lb+0.5*(ub-lb);
-        intFinerLeft  = _quad.Integrate(f, lb, mb);
-        intFinerRight = _quad.Integrate(f, mb, ub);
+        double mb = lb+0.5*(ub-lb);
+        auto intFinerLeft  = _quad.Integrate(f, lb, mb);
+        auto intFinerRight = _quad.Integrate(f, mb, ub);
 
         // compute total integral
-        double intFiner = intFinerLeft + intFinerRight;
+        decltype(intCoarse) intFiner = intFinerLeft + intFinerRight;
 
         // Compute error and tolerance
         double intErr, tol;
-        intErr = std::abs(intFiner-intCoarse);
-        tol = std::fmax( _relTol*std::abs(intCoarse), _absTol);
-      
+        std::tie(intErr, tol) = EstimateError(intCoarse, intFiner);
+        
         // Stop the recursion if the level hit maximum depth
         if ( (intErr > tol) && (level == _maxSub) ) {
             return std::make_tuple(intFiner, int(-1), level);
@@ -561,74 +473,13 @@ private:
         }
         // Else subdivide further
         else {
-            double intLeft, intRight;
+            decltype(intCoarse) intLeft, intRight;
             int statusLeft, statusRight;
             unsigned int levelLeft, levelRight;
             std::tie(intLeft, statusLeft, levelLeft) = RecursiveIntegrate(f, lb, mb, level, intFinerLeft);
             std::tie(intRight, statusRight, levelRight) = RecursiveIntegrate(f, mb, ub, level, intFinerRight);
             
             return std::make_tuple(intLeft + intRight, int( ((statusLeft<0)||(statusLeft<0))?-1:1 ), std::max(levelLeft, levelRight)); 
-        }
-
-    }
-
-    template<class ScalarFuncType1, class ScalarFuncType2>
-    std::tuple<double, double, int, unsigned int> RecursiveIntegrate2(ScalarFuncType1 const& f1, 
-                                                                      ScalarFuncType2 const& f2,
-                                                                      double lb, 
-                                                                      double ub, 
-                                                                      int level, 
-                                                                      double intCoarse1,
-                                                                      double intCoarse2) {
-
-        // update current refinement level
-        level += 1;
-
-        // evaluate intCoarse on first call of function
-        if (level == 1) {
-            intCoarse1 = _quad.Integrate(f1, lb, ub);
-            intCoarse2 = _quad.Integrate(f2, lb, ub);
-        }
-        
-        // evluate integral on each sub-interval
-        double mb, intFinerLeft1, intFinerRight1, intFinerLeft2, intFinerRight2;
-        mb = lb+0.5*(ub-lb);
-        intFinerLeft1  = _quad.Integrate(f1, lb, mb);
-        intFinerRight1 = _quad.Integrate(f1, mb, ub);
-
-        intFinerLeft2  = _quad.Integrate(f2, lb, mb);
-        intFinerRight2 = _quad.Integrate(f2, mb, ub);
-
-
-        // compute total integral
-        double intFiner1 = intFinerLeft1 + intFinerRight1;
-        double intFiner2 = intFinerLeft2 + intFinerRight2;
-
-        // Compute error and tolerance
-        double intErr, tol;
-        intErr = std::abs(intFiner1-intCoarse1);
-        tol = std::fmax( _relTol*std::abs(intCoarse1), _absTol);
-      
-        // Stop the recursion if the level hit maximum depth
-        if ( (intErr > tol) && (level == _maxSub) ) {
-            return std::make_tuple(intFiner1, intFiner2, int(-1), level);
-            //std::stringstream msg;
-            //msg << "In MParT::RecursiveQuadrature: Reached maximum level depth \"" << _maxSub << "\", with an error of \"" << intErr << "\".";
-            //throw std::runtime_error(msg.str());
-        }
-        // If the error between levels is smaller than Tol, return the finer level result
-        else if ( intErr <= tol ) {
-            return std::make_tuple(intFiner1, intFiner2, int(1), level);
-        }
-        // Else subdivide further
-        else {
-            double intLeft1, intRight1, intLeft2, intRight2;
-            int statusLeft, statusRight;
-            unsigned int levelLeft, levelRight;
-            std::tie(intLeft1, intLeft2, statusLeft, levelLeft) = RecursiveIntegrate2(f1, f2, lb, mb, level, intFinerLeft1, intFinerLeft2);
-            std::tie(intRight1, intRight2, statusRight, levelRight) = RecursiveIntegrate2(f1, f2, mb, ub, level, intFinerRight1, intFinerRight2);
-            
-            return std::make_tuple(intLeft1+intRight1, intLeft2+intRight2, int( ((statusLeft<0)||(statusLeft<0))?-1:1 ), std::max(levelLeft, levelRight)); 
         }
 
     }

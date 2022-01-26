@@ -47,21 +47,20 @@ TEST_CASE( "Testing CC Quadrature", "[ClenshawCurtisQuadrature]" ) {
         CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
     }
 
-    SECTION("Double Integrand")
-    {   
-        double lb = 0;
+    SECTION("Vector-Valued Integrand")
+    {
+        double lb = 0.0;
         double ub = 1.0;
 
-        auto f1 = [](double x){return exp(x);};
-        auto f2 = [](double x){return cos(x);};
-        double I1, I2;
-        std::tie(I1,I2) = quad.Integrate(f1,f2, lb, ub);    
+        auto integrand = [](double x)->Eigen::VectorXd {return exp(x)*Eigen::VectorXd::Ones(2).eval();};
 
-        CHECK( I1 == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
-        CHECK( I2 == Approx(sin(ub)-sin(lb)).epsilon(testTol) );
+        auto integral = quad.Integrate(integrand, lb, ub);    
+
+        REQUIRE(integral.size()==2);
+        CHECK( integral(0) == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+        CHECK( integral(1) == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
     }
 
-    
 }
 
 
@@ -126,21 +125,20 @@ TEST_CASE( "Testing Recursive Quadrature", "[RecursiveQuadrature]" ) {
         CHECK( quad.MaxLevel()<=maxSub );
         CHECK( numEvals<400);
     }
-
-    SECTION("Double Integrand")
-    {   
-        double lb = 0;
+    
+    SECTION("Vector-Valued Integrand")
+    {
+        double lb = 0.0;
         double ub = 1.0;
 
-        auto f1 = [](double x){return exp(x);};
-        auto f2 = [](double x){return cos(x);};
-        double I1, I2;
-        std::tie(I1,I2) = quad.Integrate(f1,f2, lb, ub);    
+        auto integrand = [](double x)->Eigen::VectorXd {return exp(x)*Eigen::VectorXd::Ones(2).eval();};
 
-        CHECK( I1 == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
-        CHECK( I2 == Approx(sin(ub)-sin(lb)).epsilon(testTol) );
+        auto integral = quad.Integrate(integrand, lb, ub);    
+
+        REQUIRE(integral.size()==2);
+        CHECK( integral(0) == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+        CHECK( integral(1) == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
     }
-    
 }
 
 
@@ -206,19 +204,19 @@ TEST_CASE( "Testing Adaptive Simpson Integration", "[AdaptiveSimpson]" ) {
         CHECK( quad.MaxLevel()<=maxSub );
         CHECK( numEvals<150);
     }
-    
-    SECTION("Double Integrand")
-    {   
-        double lb = 0;
+
+    SECTION("Vector-Valued Integrand")
+    {
+        double lb = 0.0;
         double ub = 1.0;
 
-        auto f1 = [](double x){return exp(x);};
-        auto f2 = [](double x){return cos(x);};
-        double I1, I2;
-        std::tie(I1,I2) = quad.Integrate(f1,f2, lb, ub);    
+        auto integrand = [](double x)->Eigen::VectorXd {return exp(x)*Eigen::VectorXd::Ones(2).eval();};
 
-        CHECK( I1 == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
-        CHECK( I2 == Approx(sin(ub)-sin(lb)).epsilon(testTol) );
+        auto integral = quad.Integrate(integrand, lb, ub);    
+
+        REQUIRE(integral.size()==2);
+        CHECK( integral(0) == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+        CHECK( integral(1) == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
     }
 }
 

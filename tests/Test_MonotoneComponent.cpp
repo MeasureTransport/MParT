@@ -29,7 +29,7 @@ TEST_CASE( "Testing monotone component integrand", "[MonotoneIntegrand]") {
     coeffs(1) = 1.0; // Linear term
 
     auto maxDegrees = mset.MaxDegrees();
-    CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], startPos, maxDegrees, mset, coeffs);
+    CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs);
     
     CHECK(integrand(0.0) == Approx(exp(1)).epsilon(testTol));
     CHECK(integrand(0.5) == Approx(exp(1)).epsilon(testTol));
@@ -105,5 +105,54 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(output(i) == Approx(1+exp(1)*(exp(evalPts(0,i))-1)).epsilon(testTol));
         }
+    }
+}
+
+
+TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivative]" ) {
+
+    const double testTol = 1e-4;
+    unsigned int dim = 2;
+    const double fdStep = 1e-4;
+
+    // Create points evently space on [lb,ub]
+    unsigned int numPts = 20;
+    double lb = -0.5;
+    double ub = 0.5;
+
+    Kokkos::View<double**> evalPts("Evaluate Points", dim, numPts);
+    for(unsigned int i=0; i<numPts; ++i){
+        evalPts(0,i) = (i/double(numPts-1))*(ub-lb) - lb;
+        evalPts(1,i) = evalPts(0,i);
+    }
+    
+    Kokkos::View<double**> rightEvalPts("Finite difference points", dim, numPts);
+    for(unsigned int i=0; i<numPts; ++i){
+        rightEvalPts(0,i) = evalPts(0,i);
+        rightEvalPts(1,i) = evalPts(1,i) + fdStep;
+    }
+    
+    unsigned int maxDegree = 2; 
+    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+
+    unsigned int maxSub = 30;
+    double relTol = 1e-7;
+    double absTol = 1e-7;
+    AdaptiveSimpson quad(maxSub, absTol, relTol);
+
+    MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
+    
+    // Create some arbitrary coefficients
+    Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
+    for(unsigned int i=0; i<coeffs.extent(0); ++i)
+        coeffs(i) = std::cos( 0.01*i );
+
+    Kokkos::View<double*> evals = comp.Evaluate(evalPts, coeffs);
+    Kokkos::View<double*> rightEvals = comp.Evaluate(rightEvalPts, coeffs);
+    Kokkos::View<double*> derivs = comp.ContinuousDerivative(evalPts, coeffs);
+
+    for(unsigned int i=0; i<numPts; ++i){
+        double fdDeriv = (rightEvals(i)-evals(i))/fdStep;
+        CHECK( derivs(i) == Approx(fdDeriv).epsilon(testTol) );
     }
 }
