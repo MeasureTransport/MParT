@@ -5,7 +5,12 @@
 
 namespace mpart{
 
+    /** @defgroup ArrayUtilities
+        @brief Code for converting between different array types.  Often used in bindings to other languages.
+    */
+    
     /** @brief Converts a pointer to a 1d unmanaged Kokkos view.  
+        @ingroup ArrayUtilities
         @details Creates a Kokkos unmanaged view around a preallocated block of memory.  
                  The unmanaged view will not free the memory so all allocations and deallocations 
                  need to be handled manually (or via another object like an Eigen::Matrix).  Currently
@@ -24,6 +29,7 @@ namespace mpart{
     }
 
     /** @brief Converts a pointer to a 2d unmanaged Kokkos view.  
+        @ingroup ArrayUtilities
         @details Creates a Kokkos unmanaged view around a preallocated block of memory. 
                  The unmanaged view will not free the memory so all allocations and deallocations 
                  need to be handled manually (or via another object like an Eigen::Matrix).  Currently

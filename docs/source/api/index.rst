@@ -9,3 +9,4 @@ API Reference
 
    multiindex
    quadrature
+   utilities/kokkoswrappers
