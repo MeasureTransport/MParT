@@ -8,4 +8,5 @@ set (TEST_SOURCES
      tests/Test_PositiveBijectors.cpp
      tests/Test_Quadrature.cpp
      tests/Test_MonotoneComponent.cpp
+     tests/Test_ArrayConversions.cpp
 PARENT_SCOPE) 
