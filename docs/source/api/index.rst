@@ -10,3 +10,4 @@ API Reference
    multiindex
    quadrature
    utilities/kokkoswrappers
+   monotonecomponent

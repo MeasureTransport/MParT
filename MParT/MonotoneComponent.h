@@ -4,6 +4,8 @@
 #include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
+#include <Eigen/Core>
+
 #include <Kokkos_Core.hpp>
 
 namespace mpart{
@@ -34,26 +36,29 @@ class CachedMonotoneIntegrand{
 public:
 
     /**
-      @param cache A pointer to memory storing evaluations of x_i^p for each i.  These terms need to be evaluated outside this class for \f$i\in\{0,\ldots,D-1\}\f$. 
+      @param cache A pointer to memory storing evaluations of \phi_{i,p}(x_i) for each i.  These terms need to be evaluated outside this class for \f$i\in\{0,\ldots,D-1\}\f$. 
       @param startPos Precomputed indices denoting the start of segments in cache for each dimension.
       @param maxDegree The maximum degree for each dimension.  Should be the same size as startPos.
       @param dim The length of both startPos and maxOrders.  If maxOrders was a vector, dim=maxOrders.size()
+      @param computeDeriv Whether or not the derviative \f$\partial T_d / \partial x_d\f$ should be computed as well.  If true, the operator in this function will return a two component vector.  The first component is the integrand necessary to evaluate the function \f$T_d\f$ itself and the second is the integrand needed to compute \f$\partial T_d / \partial x_d\f$.
 
       @tparam ViewType2d A 2d Kokkos::View type
      */
-    CachedMonotoneIntegrand(double*                            cache, 
+    CachedMonotoneIntegrand(double*                            cache,
                             double                             xd,
                             Kokkos::View<unsigned int*> const& startPos,
                             Kokkos::View<const unsigned int*> const& maxDegrees,
                             FixedMultiIndexSet          const& multiSet,
-                            Kokkos::View<double*>       const& coeffs) : _cache(cache),
-                                                                         _xd(xd),
-                                                                         _startPos(startPos),
-                                                                         _maxDegrees(maxDegrees),
-                                                                         _dim(maxDegrees.extent(0)),
-                                                                         _multiSet(multiSet),
-                                                                         _coeffs(coeffs)
-    {
+                            Kokkos::View<double*>       const& coeffs,
+                            bool                               computeDeriv) : _cache(cache),
+                                                                               _xd(xd),
+                                                                               _startPos(startPos),
+                                                                               _maxDegrees(maxDegrees),
+                                                                               _dim(maxDegrees.extent(0)),
+                                                                               _multiSet(multiSet),
+                                                                               _coeffs(coeffs),
+                                                                               _computeDeriv(computeDeriv)
+    {   
     }
 
     /**
@@ -61,14 +66,25 @@ public:
      and the value of \f$t\f$ passed to this function.  Note that we assume t ranges from [0,1].  The change of variables to x_d*t is
      taken care of inside this function.
     */
-    double operator()(double t) const
+    Eigen::VectorXd operator()(double t) const
     {   
         const unsigned int numTerms = _multiSet.Size();
 
-        double output = 0;
+        double f = 0;
 
-        // Evaluate the orthgonal polynomial at the quadrature point
-        _basis.EvaluateDerivatives(&_cache[_startPos(_dim-1)], _maxDegrees(_dim-1), t*_xd);
+        // Evaluate the orthogonal polynomial and its derivatives at the quadrature point
+        if(_computeDeriv){
+            _basis.EvaluateSecondDerivatives(&_cache[_startPos(_dim-1)], // basis vals
+                                             &_cache[_startPos(_dim)],   // basis derivatives
+                                             &_cache[_startPos(_dim+1)], // basis second derivatives 
+                                              _maxDegrees(_dim-1),       // largest basis degree
+                                              t*_xd);                    // point to evaluate at
+        }else{
+            _basis.EvaluateDerivatives(&_cache[_startPos(_dim-1)], // basis vals
+                                       &_cache[_startPos(_dim)], // basis derivatives
+                                        _maxDegrees(_dim-1),       // largest basis degree
+                                        t*_xd);                    // point to evaluate at
+        }
        
         // Compute coeff * polyval for each term
         for(unsigned int termInd=0; termInd<numTerms; ++termInd)
@@ -77,21 +93,63 @@ public:
             double termVal = 1.0;
             bool hasDeriv = false;
             for(unsigned int i=_multiSet.nzStarts(termInd); i<_multiSet.nzStarts(termInd+1); ++i){
-                termVal *= _cache[_startPos(_multiSet.nzDims(i)) + _multiSet.nzOrders(i)];
-                if(_multiSet.nzDims(i)==_dim-1)
+                if(_multiSet.nzDims(i)==_dim-1){
+                    termVal *= _cache[_startPos(_dim) + _multiSet.nzOrders(i)];
                     hasDeriv = true;
+                }else{
+                    termVal *= _cache[_startPos(_multiSet.nzDims(i)) + _multiSet.nzOrders(i)];
+                }
+                
             }
             if(hasDeriv){
                 // Multiply by the coefficients to get the contribution to the output
-                output += termVal*_coeffs(termInd);
+                f += termVal*_coeffs(termInd);
             }
         }
+        double gf = PosFuncType::Evaluate(f);
 
-        return _xd*_posFunc.Evaluate(output);
+        // If we're only computing the integrand, just return here
+        if(!_computeDeriv){
+            return _xd*gf*Eigen::VectorXd::Ones(1);
+        }else{
+            
+            double deriv = 0;
+            
+            // Compute coeff * polyval for each term
+            for(unsigned int termInd=0; termInd<numTerms; ++termInd)
+            {   
+                // Compute the value of this term in the expansion
+                double termVal = 1.0;
+                bool hasDeriv = false;
+                for(unsigned int i=_multiSet.nzStarts(termInd); i<_multiSet.nzStarts(termInd+1); ++i){
+                    
+                    if(_multiSet.nzDims(i)==_dim-1){
+                        termVal *= _cache[_startPos(_dim+1) + _multiSet.nzOrders(i)];
+                        hasDeriv = true;
+                    }else{
+                        termVal *= _cache[_startPos(_multiSet.nzDims(i)) + _multiSet.nzOrders(i)];
+                    }
+                }
+                if(hasDeriv){
+                    // Multiply by the coefficients to get the contribution to the output
+                    deriv += termVal*_coeffs(termInd);
+                }
+            }
+
+            // The deriv variable currently holds the second derivative of f
+
+            deriv *= _xd*t*PosFuncType::Derivative(f);
+            deriv += gf;
+
+            Eigen::VectorXd output(2);
+            output << _xd*gf, deriv;
+            return output;
+        }
     }
 
 private:
     double* _cache;
+
     double  _xd;
     Kokkos::View<unsigned int*> const& _startPos;
     Kokkos::View<const unsigned int*> const& _maxDegrees;
@@ -101,12 +159,15 @@ private:
     PosFuncType _posFunc;
     FixedMultiIndexSet const& _multiSet;
     Kokkos::View<double*> const& _coeffs;
+
+    bool _computeDeriv;
 };
 
 
 /**
-Defines a function \f$T:R^N\rightarrow R\f$ such that \f$\partial T / \partial x_N >0\f$ is strictly positive.
+@brief Defines a function \f$T:R^N\rightarrow R\f$ such that \f$\partial T / \partial x_N >0\f$ is strictly positive.
 
+@details 
 The function \f$T\f$ is based on another (generally non-monotone) function \f$f : R^N\rightarrow R\f$ and a strictly positve function 
 \f$g : R\rightarrow R^+\f$.   Together, these functions define the monotone component $T$ through
 
@@ -137,14 +198,14 @@ public:
        
      * @param pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
      * @param coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
-     * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N}\f$.
+     * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
     Kokkos::View<double*> Evaluate(Kokkos::View<double**> const& pts, 
                                    Kokkos::View<double*> const& coeffs)
     {   
-        unsigned int numPts = pts.extent(1);
-        unsigned int numTerms = _multiSet.Size();
-        unsigned int dim = pts.extent(0);
+        const unsigned int numPts = pts.extent(1);
+        const unsigned int numTerms = _multiSet.Size();
+        const unsigned int dim = pts.extent(0);
 
         assert(coeffs.extent(0)==numTerms);
 
@@ -152,12 +213,14 @@ public:
 
         // Figure how much scratch space is needed to store the cached values 
         Kokkos::View<const unsigned int*> maxDegrees = _multiSet.MaxDegrees();
-        Kokkos::View<unsigned int*> startPos("Indices for start of 1d basis evaluations", maxDegrees.extent(0)+1);
+        Kokkos::View<unsigned int*> startPos("Indices for start of 1d basis evaluations", dim+2); // each dimension + one for derivatives + one for end
+       
         startPos(0) = 0;
-        for(unsigned int i=1; i<maxDegrees.extent(0)+1; ++i)
+        for(unsigned int i=1; i<dim+1; ++i)
             startPos(i) = startPos(i-1) + maxDegrees(i-1)+1;
-
-        unsigned int cacheSize = startPos[maxDegrees.extent(0)];
+        startPos(dim+1) = startPos(dim) + maxDegrees(dim-1)+1;
+        
+        unsigned int cacheSize = startPos(dim+1);
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
         Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
@@ -172,14 +235,15 @@ public:
             BasisEvaluatorType basis;
             double* polyCache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
 
+            // Evaluate all degrees of all 1d polynomials except the last dimension, which will be evaluated inside the integrand
             for(unsigned int d=0; d<dim-1; ++d)
                 basis.EvaluateAll(&polyCache[startPos(d)], maxDegrees(d), pts(d,ptInd));
-            
+
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-            CachedMonotoneIntegrand<BasisEvaluatorType, PosFuncType> integrand(polyCache, pts(dim-1,ptInd), startPos, maxDegrees, _multiSet, coeffs);
+            CachedMonotoneIntegrand<BasisEvaluatorType, PosFuncType> integrand(polyCache, pts(dim-1,ptInd), startPos, maxDegrees, _multiSet, coeffs, false);
             
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt
-            output(ptInd) = _quad.Integrate(integrand, 0, 1);
+            output(ptInd) = _quad.Integrate(integrand, 0, 1)(0);
 
             // Now add the f(x_1,...,x_{D-1},0) evaluation that lies outside the integral
             basis.EvaluateAll(&polyCache[startPos(dim-1)], maxDegrees(dim-1), 0.0);
@@ -201,26 +265,38 @@ public:
     }
 
     /**
-     * @brief Computes the derivative \f$\frac{\partial T}{\partial x_D}\f$
-
-     \f\[
-    \begin{aligned}
-        T(x_1, x_2, ..., x_D) &= f(x_1,x_2,..., x_{D-1}, 0) + \int_0^{x_D}  g\left( \frac{\partial f}{\partial x_D}(x_1,x_2,..., x_{D-1}, t) \right) dt\\
-        \frac{\partial T}}{\partial x_D} & = \frac{\partial}{\partial x_D}\left[\int_0^{x_D}  g\left( \frac{\partial f}{\partial x_D}(x_1,x_2,..., x_{D-1}, t) \right) dt\right]\\
-        &= g\left( \frac{\partial f}{\partial x_D}(x_1,x_2,..., x_{D-1}, x_D) \right)
-      \end{aligned}
-      \f\]
-
+       @brief Approximates the "continuous derivative" \f$\frac{\partial T}{\partial x_D}\f$ derived from the exact integral form of the transport map.
+        @details See the <a href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives.
         @param pts  The points where we want to evaluate the derivative.  Each column represents one point.
         @param coeffs The ceofficients in an expansion for \f$f\f$.
-        @return Kokkos::View<double*> The values of \f$ \frac{\partial T}}{\partial x_D}\f$ at each point.
+        @return Kokkos::View<double*> The values of \f$\frac{\partial T}{\partial x_D}\f$ at each point.
+     */
+    Kokkos::View<double*>  ContinuousDerivative(Kokkos::View<double**> const& pts, 
+                                              Kokkos::View<double*>  const& coeffs)
+    {   
+        const unsigned int numPts = pts.extent(1);
+        Kokkos::View<double*> evals("Component Evaluations", numPts);
+        Kokkos::View<double*> derivs("Component Derivatives", numPts);
+        
+        ContinuousDerivative(pts,coeffs, evals, derivs);
+
+        return derivs;
+    }
+
+    /**
+        @brief Approximates the "continuous derivative" \f$\frac{\partial T}{\partial x_D}\f$ derived from the exact integral form of the transport map.
+        @details See the <a href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives.
+        @param[in] pts  The points where we want to evaluate the derivative.  Each column represents one point.
+        @param[in] coeffs The ceofficients in an expansion for \f$f\f$.
+        @param[in,out] evals  The values of map component itself \f$T\f$ at each point.
+        @param[in,out] derivs The values of \f$ \frac{\partial T}{\partial x_D}\f$ at each point.
      */
     Kokkos::View<double*> ContinuousDerivative(Kokkos::View<double**> const& pts, 
                                                Kokkos::View<double*> const& coeffs)
     {   
-        unsigned int numPts = pts.extent(1);
-        unsigned int numTerms = _multiSet.Size();
-        unsigned int dim = pts.extent(0);
+        const unsigned int numPts = pts.extent(1);
+        const unsigned int numTerms = _multiSet.Size();
+        const unsigned int dim = pts.extent(0);
 
         assert(coeffs.extent(0)==numTerms);
 
@@ -228,12 +304,14 @@ public:
 
         // Figure how much scratch space is needed to store the cached values 
         Kokkos::View<const unsigned int*> maxDegrees = _multiSet.MaxDegrees();
-        Kokkos::View<unsigned int*> startPos("Indices for start of 1d basis evaluations", maxDegrees.extent(0)+1);
+        Kokkos::View<unsigned int*> startPos("Indices for start of 1d basis evaluations", dim+2); // each dimension + one for derivatives + one for end
+        
         startPos(0) = 0;
-        for(unsigned int i=1; i<maxDegrees.extent(0)+1; ++i)
+        for(unsigned int i=1; i<dim+1; ++i)
             startPos(i) = startPos(i-1) + maxDegrees(i-1)+1;
+        startPos(dim+1) = startPos(dim) + maxDegrees(dim-1)+1;
 
-        unsigned int cacheSize = startPos[maxDegrees.extent(0)];
+        unsigned int cacheSize = startPos(dim+1);
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
         Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
@@ -252,7 +330,10 @@ public:
                 basis.EvaluateAll(&polyCache[startPos(d)], maxDegrees(d), pts(d,ptInd));
             
             // Evaluate df/dx_d(x_1,...,x_d)
-            basis.EvaluateDerivatives(&polyCache[startPos(dim-1)], maxDegrees(dim-1), pts(dim-1,ptInd));
+            basis.EvaluateDerivatives(&polyCache[startPos(dim-1)], // Holds the values
+                                      &polyCache[startPos(dim)],  // Holds the derivatives 
+                                       maxDegrees(dim-1), 
+                                       pts(dim-1,ptInd));
             output(ptInd) = 0.0;
 
             for(unsigned int termInd=0; termInd<numTerms; ++termInd)
@@ -261,9 +342,12 @@ public:
                 double termVal = 1.0;
                 bool hasDeriv = false;
                 for(unsigned int i=_multiSet.nzStarts(termInd); i<_multiSet.nzStarts(termInd+1); ++i){
-                    termVal *= polyCache[startPos(_multiSet.nzDims(i)) + _multiSet.nzOrders(i)];
-                    if(_multiSet.nzDims(i)==dim-1)
+                    if(_multiSet.nzDims(i)==dim-1){
+                        termVal *= polyCache[startPos(dim) + _multiSet.nzOrders(i)];
                         hasDeriv = true;
+                    }else{
+                        termVal *= polyCache[startPos(_multiSet.nzDims(i)) + _multiSet.nzOrders(i)];
+                    }
                 }
 
                 // Multiply by the coefficients to get the contribution to the output
@@ -278,13 +362,35 @@ public:
         return output;
     }
 
-
-    Kokkos::View<double*> DiscreteDerivative(Kokkos::View<double**> const& pts, 
-                                             Kokkos::View<double*> const& coeffs)
+    
+    Kokkos::View<double*>  DiscreteDerivative(Kokkos::View<double**> const& pts, 
+                                              Kokkos::View<double*>  const& coeffs)
     {   
-        unsigned int numPts = pts.extent(1);
-        unsigned int numTerms = _multiSet.Size();
-        unsigned int dim = pts.extent(0);
+        const unsigned int numPts = pts.extent(1);
+        Kokkos::View<double*> evals("Component Evaluations", numPts);
+        Kokkos::View<double*> derivs("Component Derivatives", numPts);
+        
+        DiscreteDerivative(pts,coeffs, evals, derivs);
+
+        return derivs;
+    }
+
+    /**
+     * @brief Approximates the "discrete derivative" of the quadrature-based approximation \f$\tilde{T}\f$.
+        @details See the <a href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives. `mathematics`_
+        @param[in] pts  The points where we want to evaluate the derivative.  Each column represents one point.
+        @param[in] coeffs The ceofficients in an expansion for \f$f\f$.
+        @param[in,out] evals  The values of map component itself \f$\tilde{T}\f$ at each point.
+        @param[in,out] derivs Kokkos::View<double*> The values of \f$ \frac{\partial \tilde{T}}{\partial x_D}\f$ at each point.
+     */
+    void  DiscreteDerivative(Kokkos::View<double**> const& pts, 
+                             Kokkos::View<double*>  const& coeffs,
+                             Kokkos::View<double*>       & evals, 
+                             Kokkos::View<double*>       & derivs)
+    {   
+        const unsigned int numPts = pts.extent(1);
+        const unsigned int numTerms = _multiSet.Size();
+        const unsigned int dim = pts.extent(0);
 
         assert(coeffs.extent(0)==numTerms);
 
@@ -292,15 +398,20 @@ public:
 
         // Figure how much scratch space is needed to store the cached values 
         Kokkos::View<const unsigned int*> maxDegrees = _multiSet.MaxDegrees();
-        Kokkos::View<unsigned int*> startPos("Indices for start of 1d basis evaluations", maxDegrees.extent(0)+1);
-        startPos(0) = 0;
-        for(unsigned int i=1; i<maxDegrees.extent(0)+1; ++i)
-            startPos(i) = startPos(i-1) + maxDegrees(i-1)+1;
 
-        unsigned int cacheSize = startPos[maxDegrees.extent(0)];
+        Kokkos::View<unsigned int*> startPos("Indices for start of 1d basis evaluations", maxDegrees.extent(0)+3); // each dimension + derivs in d + 2nd derivs in d + ending
+        startPos(0) = 0;
+        for(unsigned int i=1; i<dim+1; ++i)
+            startPos(i) = startPos(i-1) + maxDegrees(i-1)+1;
+        startPos(dim+1) = startPos(dim) + maxDegrees(dim-1)+1;
+        startPos(dim+2) = startPos(dim+1) + maxDegrees(dim-1)+1;
+        
+        
+        unsigned int cacheSize = startPos(dim+2);
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
         Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
+
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA (auto team_member) {
@@ -311,35 +422,35 @@ public:
             BasisEvaluatorType basis;
             double* polyCache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
 
-            // Precompute all off-diagonal 1d values
+            // Evaluate all of the 1d orthogonal polynomials except the last dimension
             for(unsigned int d=0; d<dim-1; ++d)
                 basis.EvaluateAll(&polyCache[startPos(d)], maxDegrees(d), pts(d,ptInd));
             
-            // Evaluate df/dx_d(x_1,...,x_d)
-            basis.EvaluateDerivatives(&polyCache[startPos(dim-1)], maxDegrees(dim-1), pts(dim-1,ptInd));
-            output(ptInd) = 0.0;
+            
+            // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
+            CachedMonotoneIntegrand<BasisEvaluatorType, PosFuncType> integrand(polyCache, pts(dim-1,ptInd), startPos, maxDegrees, _multiSet, coeffs, true);
+            
+            // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt
+            Eigen::VectorXd both = _quad.Integrate(integrand, 0, 1);
+
+            evals(ptInd) = both(0);
+            derivs(ptInd) = both(1);
+
+            // Now add the f(x_1,...,x_{D-1},0) evaluation that lies outside the integral
+            basis.EvaluateAll(&polyCache[startPos(dim-1)], maxDegrees(dim-1), 0.0);
 
             for(unsigned int termInd=0; termInd<numTerms; ++termInd)
             {   
                 // Compute the value of this term in the expansion
                 double termVal = 1.0;
-                bool hasDeriv = false;
-                for(unsigned int i=_multiSet.nzStarts(termInd); i<_multiSet.nzStarts(termInd+1); ++i){
+                for(unsigned int i=_multiSet.nzStarts(termInd); i<_multiSet.nzStarts(termInd+1); ++i)
                     termVal *= polyCache[startPos(_multiSet.nzDims(i)) + _multiSet.nzOrders(i)];
-                    if(_multiSet.nzDims(i)==dim-1)
-                        hasDeriv = true;
-                }
 
                 // Multiply by the coefficients to get the contribution to the output
-                if(hasDeriv)
-                    output(ptInd) += termVal*coeffs(termInd);
+                evals(ptInd) += termVal*coeffs(termInd);
             }
-
-            // Compute g(df/dx)
-            output(ptInd) = _posFunc.Evaluate(output(ptInd));
+            
         });
-
-        return output;
     }
 
     /** The map \f$T(x_1, x_2, ..., x_D; w)\f$ is parameterized by coefficients \f$w\f$. This function

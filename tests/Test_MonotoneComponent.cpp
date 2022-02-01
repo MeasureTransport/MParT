@@ -9,7 +9,7 @@ using namespace mpart;
 using namespace Catch;
 
 TEST_CASE( "Testing monotone component integrand", "[MonotoneIntegrand]") {
-    
+
     const double testTol = 1e-7;
 
     unsigned int dim = 1;
@@ -17,23 +17,45 @@ TEST_CASE( "Testing monotone component integrand", "[MonotoneIntegrand]") {
     FixedMultiIndexSet mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
     // Make room for the cache
-    std::vector<double> cache(dim*maxDegree);
+    std::vector<double> cache((dim+2)*maxDegree);
 
     
-    Kokkos::View<unsigned int*> startPos("Starting Positions", dim+1);
-    for(unsigned int i=0; i<dim+1; ++i)
-        startPos(i) = i;
+    Kokkos::View<unsigned int*> startPos("Starting Positions", dim+3);
+    startPos(0) = 0;
+    for(unsigned int i=1; i<dim+1; ++i)
+        startPos(i) = startPos(i-1) + maxDegree;
+    startPos(dim+1) = startPos(dim) + maxDegree;
+    startPos(dim+2) = startPos(dim+1) + maxDegree;
 
     Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
     coeffs(0) = 1.0; // Constant term
     coeffs(1) = 1.0; // Linear term
 
+
     auto maxDegrees = mset.MaxDegrees();
-    CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs);
-    
-    CHECK(integrand(0.0) == Approx(exp(1)).epsilon(testTol));
-    CHECK(integrand(0.5) == Approx(exp(1)).epsilon(testTol));
-    CHECK(integrand(-0.5) == Approx(exp(1)).epsilon(testTol));
+
+    SECTION("Integral") {
+        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, false);
+        
+        REQUIRE(integrand(0.0).size() == 1);
+        CHECK(integrand(0.0)(0) == Approx(exp(1)).epsilon(testTol));
+        CHECK(integrand(0.5)(0) == Approx(exp(1)).epsilon(testTol));
+        CHECK(integrand(-0.5)(0) == Approx(exp(1)).epsilon(testTol));
+    }
+
+    SECTION("Integral Derivative") {
+        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, true);
+        
+        REQUIRE(integrand(0.0).size() == 2);
+        Eigen::Vector2d test = integrand(0.0);
+        CHECK(test(0) == Approx(exp(1)).epsilon(testTol));
+
+        test = integrand(0.5);
+        CHECK(test(0) == Approx(exp(1)).epsilon(testTol));
+        
+        test = integrand(00.5);
+        CHECK(test(0) == Approx(exp(1)).epsilon(testTol));
+    }
 }
 
 
@@ -149,10 +171,12 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
 
     Kokkos::View<double*> evals = comp.Evaluate(evalPts, coeffs);
     Kokkos::View<double*> rightEvals = comp.Evaluate(rightEvalPts, coeffs);
-    Kokkos::View<double*> derivs = comp.ContinuousDerivative(evalPts, coeffs);
+    Kokkos::View<double*> contDerivs = comp.ContinuousDerivative(evalPts, coeffs);
+    Kokkos::View<double*> discDerivs = comp.DiscreteDerivative(evalPts, coeffs);
 
     for(unsigned int i=0; i<numPts; ++i){
         double fdDeriv = (rightEvals(i)-evals(i))/fdStep;
-        CHECK( derivs(i) == Approx(fdDeriv).epsilon(testTol) );
+        CHECK( contDerivs(i) == Approx(fdDeriv).epsilon(testTol) );
+        CHECK( discDerivs(i) == Approx(fdDeriv).epsilon(testTol) );
     }
 }
