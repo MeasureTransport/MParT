@@ -120,11 +120,17 @@ public:
             if(hasDeriv){
                 // Multiply by the coefficients to get the contribution to the output
                 f += termVal*_coeffs(termInd);
+
+                if(_derivType==DerivativeType::Parameters)
+                    output(termInd+1) = termVal;
             }
         }
 
-
         double gf = PosFuncType::Evaluate(f);
+
+        if(_derivType==DerivativeType::Parameters)
+            output *= _xd*PosFuncType::Derivative(f);
+
         output(0) = _xd*gf;
         
         // Compute the derivative with respect to x_d
@@ -159,35 +165,6 @@ public:
             deriv += gf;
 
             output(1) = deriv;
-            
-        // Compute the gradient with respect to the expansion parameters
-        }else if(_derivType==DerivativeType::Parameters){
-
-            // Compute coeff * polyval for each term
-            for(unsigned int termInd=0; termInd<numTerms; ++termInd)
-            {   
-                // Compute the value of this term in the expansion
-                double termVal = 1.0;
-                bool hasDeriv = false;
-                for(unsigned int i=_multiSet.nzStarts(termInd); i<_multiSet.nzStarts(termInd+1); ++i){
-                    
-                    if(_multiSet.nzDims(i)==_dim-1){
-                        termVal *= _cache[_startPos(_dim) + _multiSet.nzOrders(i)];
-                        hasDeriv = true;
-                    }else{
-                        termVal *= _cache[_startPos(_multiSet.nzDims(i)) + _multiSet.nzOrders(i)];
-                    }
-                }
-                if(hasDeriv)
-                    output(termInd+1) = termVal;
-                
-            }
-
-            output *= _xd*PosFuncType::Derivative(f);
-            output(0) = _xd*gf;
-
-            return output;
-
         }
 
         return output;
