@@ -198,3 +198,57 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
         CHECK( discDerivs(i) == Approx(fdDeriv).epsilon(testTol) );
     }
 }
+
+
+TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
+    
+    unsigned int numPts = 100;
+    Kokkos::View<double**> pts("Training Points", 1,numPts);
+    for(unsigned int i=0; i<numPts; ++i)
+        pts(0,i) = i/(numPts-1.0);
+    
+
+    Kokkos::View<double*> fvals("Training Values", numPts);
+    for(unsigned int i=0; i<numPts; ++i)
+        fvals(i) = pts(0,i)*pts(0,i) + pts(0,i);
+
+    
+    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(1, 2);
+
+    unsigned int maxSub = 30;
+    double relTol = 1e-3;
+    double absTol = 1e-3;
+    AdaptiveSimpson quad(maxSub, absTol, relTol);
+
+    MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
+
+    unsigned int numTerms = mset.Size();
+    Kokkos::View<double*> coeffs("Coefficients", numTerms);
+    Kokkos::View<double*> grad("Gradient", numTerms);
+    Kokkos::View<double*> preds("Predictions", numPts);
+    Kokkos::View<double*> sens("Sensitivities", numPts);
+
+    double stepSize = 1.0;
+    double objective;
+
+    for(unsigned int optIt=0; optIt<100; ++optIt){
+
+        preds = comp.Evaluate(pts, coeffs);
+
+        objective = 0.0;
+        for(unsigned int i=0; i<numPts; ++i){
+            double diff = preds(i) - fvals(i);
+            objective += 0.5*diff*diff/numPts;
+            sens(i) = diff/numPts;
+        }
+
+        grad = comp.CoeffGradient(pts,coeffs,sens);
+
+        // Take a step in the negative gradient direction
+        for(unsigned int i=0; i<numTerms; ++i)
+            coeffs(i) -= stepSize*grad(i);
+    }
+
+    CHECK(objective<1e-2);
+    
+}

@@ -553,7 +553,7 @@ public:
             CachedMonotoneIntegrand<BasisEvaluatorType, PosFuncType> integrand(polyCache, pts(dim-1,ptInd), startPos, maxDegrees, _multiSet, coeffs, DerivativeType::Parameters);
             
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt
-            Eigen::VectorXd integral = _quad.Integrate(integrand, 0, 1)(0);
+            Eigen::VectorXd integral = _quad.Integrate(integrand, 0, 1);
             
             // Now add the f(x_1,...,x_{D-1},0) evaluation that lies outside the integral
             basis.EvaluateAll(&polyCache[startPos(dim-1)], maxDegrees(dim-1), 0.0);
