@@ -51,7 +51,7 @@ Computationally, we approximate the integral in the definition of :math:`T_d(\ma
 
 where the :math:`x_d` term outside the summation comes from a change of integration domains from :math:`[0,1]` to :math:`[0,x_d]`. 
 
-Map Component Derivatives
+Diagonal Derivatives
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 We will often require derivatives of :math:`T_d` with respect to an input :math:`x_i` or the parameters :math:`\mathbf{w}`.  When computing these derivatives however, we have a choice of whether to differentiate the continuous map form in :eq:`cont_map` or the discretized map in :eq:`discr_map`.  This is similar to the "discretize-then-optimize" or "optimize-then-discretize" choice in PDE-constrained optimization.  When the quadrature rule is accurate, there might not be a large practical difference in these approaches.  For approximate rules however, using the continuous derivative can cause issues because the derivative will not be consistent with the discreteized map: a finite difference approximation will not converge to the continuous derivative.   In these cases, it is preferrable to differentiate the discrete map in :eq:`discr_map`.   
@@ -71,6 +71,19 @@ The discrete derivative on the other hand is more complicated:
     \frac{\partial \tilde{T}_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) &= \frac{\partial}{\partial x_d} \left[x_d \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) )\right]\\
     & = \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \\
     &+ x_d \sum_{i=1}^N c^{(i)} t^{(i)} \partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \partial^2_{dd}f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) .
+
+
+Coefficient Derivatives 
+^^^^^^^^^^^^^^^^^^^^^^^^
+In addition to computing :math:`\partial T_d/\partial d`, we will also often need the gradient of the monotone function :math:`T_d` with respect to the parameters :math:`\mathbf{w}`, denoted by :math:`\nabla_{\mathbf{w}}T_d`. 
+
+.. math::
+    :label: coeff_deriv 
+
+    \nabla_{\mathbf{w}} T_d(\mathbf{x}_{1:d}; \mathbf{w}) &= \nabla_{\mathbf{w}} f(x_1,\ldots, x_{d-1},0; \mathbf{w})\\
+     &+ \int_0^{x_d} \partial g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) \nabla_{\mathbf{w}}\left[\partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w})\right] dt \\
+     &\approx \nabla_{\mathbf{w}} f(x_1,\ldots, x_{d-1},0; \mathbf{w})\\
+    & + x_d \sum_{i=1}^N c^{(i)} \partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \nabla_{\mathbf{w}}\left[\partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w})\right]
 
 
 

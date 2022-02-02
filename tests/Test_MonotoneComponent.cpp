@@ -34,8 +34,8 @@ TEST_CASE( "Testing monotone component integrand", "[MonotoneIntegrand]") {
 
     auto maxDegrees = mset.MaxDegrees();
 
-    SECTION("Integral") {
-        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, false);
+    SECTION("Integrand Only") {
+        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, DerivativeType::None);
         
         REQUIRE(integrand(0.0).size() == 1);
         CHECK(integrand(0.0)(0) == Approx(exp(1)).epsilon(testTol));
@@ -43,8 +43,8 @@ TEST_CASE( "Testing monotone component integrand", "[MonotoneIntegrand]") {
         CHECK(integrand(-0.5)(0) == Approx(exp(1)).epsilon(testTol));
     }
 
-    SECTION("Integral Derivative") {
-        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, true);
+    SECTION("Integrand Derivative") {
+        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, DerivativeType::Diagonal);
         
         REQUIRE(integrand(0.0).size() == 2);
         Eigen::Vector2d test = integrand(0.0);
@@ -56,6 +56,24 @@ TEST_CASE( "Testing monotone component integrand", "[MonotoneIntegrand]") {
         test = integrand(00.5);
         CHECK(test(0) == Approx(exp(1)).epsilon(testTol));
     }
+
+    SECTION("Integrand Parameters Gradient") {
+        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, DerivativeType::Parameters);
+        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand2(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, DerivativeType::None);
+        
+        Eigen::VectorXd testVal = integrand(0.5);
+        REQUIRE(testVal.size() == 1+mset.Size());
+
+        const double fdStep = 1e-4;
+        for(unsigned int termInd=0; termInd<mset.Size(); ++termInd){
+            coeffs(termInd) += fdStep;
+            Eigen::VectorXd testVal2 = integrand2(0.5);
+            double fdDeriv = (testVal2(0) - testVal(0))/fdStep;
+            CHECK(testVal(termInd+1) == Approx(fdDeriv).epsilon(1e-4));
+        }
+
+    }
+
 }
 
 
