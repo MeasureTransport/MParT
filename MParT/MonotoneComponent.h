@@ -131,8 +131,9 @@ public:
         if(_derivType==DerivativeType::Parameters)
             output *= _xd*PosFuncType::Derivative(f);
 
+        // First output is always the integrand itself
         output(0) = _xd*gf;
-        
+            
         // Compute the derivative with respect to x_d
         if(_derivType==DerivativeType::Diagonal){
             

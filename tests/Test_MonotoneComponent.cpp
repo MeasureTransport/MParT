@@ -220,7 +220,7 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
     double absTol = 1e-3;
     AdaptiveSimpson quad(maxSub, absTol, relTol);
 
-    MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
+    MonotoneComponent<ProbabilistHermite, SoftPlus, AdaptiveSimpson> comp(mset, quad);
 
     unsigned int numTerms = mset.Size();
     Kokkos::View<double*> coeffs("Coefficients", numTerms);
@@ -243,12 +243,12 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
         }
 
         grad = comp.CoeffGradient(pts,coeffs,sens);
-
+        
         // Take a step in the negative gradient direction
         for(unsigned int i=0; i<numTerms; ++i)
             coeffs(i) -= stepSize*grad(i);
     }
 
-    CHECK(objective<1e-2);
-    
+    CHECK(objective<1e-3);
+
 }
