@@ -133,7 +133,7 @@ public:
 
         // First output is always the integrand itself
         output(0) = _xd*gf;
-            
+
         // Compute the derivative with respect to x_d
         if(_derivType==DerivativeType::Diagonal){
             
@@ -293,6 +293,8 @@ public:
         @param pts  The points where we want to evaluate the derivative.  Each column represents one point.
         @param coeffs The ceofficients in an expansion for \f$f\f$.
         @return Kokkos::View<double*> The values of \f$\frac{\partial T}{\partial x_D}\f$ at each point.
+
+        @see DiscreteDerivative
      */
     Kokkos::View<double*>  ContinuousDerivative(Kokkos::View<double**> const& pts, 
                                               Kokkos::View<double*>  const& coeffs)
@@ -312,6 +314,8 @@ public:
         @param[in] coeffs The ceofficients in an expansion for \f$f\f$.
         @param[in,out] evals  The values of map component itself \f$T\f$ at each point.
         @param[in,out] derivs The values of \f$ \frac{\partial T}{\partial x_D}\f$ at each point.
+
+        @see DiscreteDerivative
      */
     void ContinuousDerivative(Kokkos::View<double**> const& pts, 
                               Kokkos::View<double*>  const& coeffs,
@@ -381,7 +385,15 @@ public:
         });
     }
 
-    
+    /**
+    @brief Approximates the "discrete derivative" of the quadrature-based approximation \f$\tilde{T}\f$.
+        @details See the <a href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives.
+        @param[in] pts  The points where we want to evaluate the derivative.  Each column represents one point.
+        @param[in] coeffs The ceofficients in an expansion for \f$f\f$.
+        @returns Kokkos::View<double*> The values of \f$ \frac{\partial \tilde{T}}{\partial x_D}\f$ at each point.
+
+        @see ContinuousDerivative
+    */
     Kokkos::View<double*>  DiscreteDerivative(Kokkos::View<double**> const& pts, 
                                               Kokkos::View<double*>  const& coeffs)
     {   
@@ -395,12 +407,14 @@ public:
     }
 
     /**
-     * @brief Approximates the "discrete derivative" of the quadrature-based approximation \f$\tilde{T}\f$.
-        @details See the <a href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives. `mathematics`_
+       @brief Approximates the "discrete derivative" of the quadrature-based approximation \f$\tilde{T}\f$.
+        @details See the <a href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives.
         @param[in] pts  The points where we want to evaluate the derivative.  Each column represents one point.
         @param[in] coeffs The ceofficients in an expansion for \f$f\f$.
         @param[in,out] evals  The values of map component itself \f$\tilde{T}\f$ at each point.
         @param[in,out] derivs Kokkos::View<double*> The values of \f$ \frac{\partial \tilde{T}}{\partial x_D}\f$ at each point.
+
+        @see ContinuousDerivative
      */
     void  DiscreteDerivative(Kokkos::View<double**> const& pts, 
                              Kokkos::View<double*>  const& coeffs,
@@ -472,7 +486,90 @@ public:
         });
     }
 
-    /** @brief Returns the gradient of the map with respect to the parameters \f$\mathbf{w}\f$.
+    /** @brief Returns the gradient of the map with respect to the parameters \f$\mathbf{w}\f$ at multiple points.
+
+        @details 
+        Consider \f$N\f$ points \f$\{\mathbf{x}^{(1)},\ldots,\mathbf{x}^{(N)}\}\f$ and let 
+        \f$y_d^{(i)} = T_d(\mathbf{x}^{(i)}; \mathbf{w})\f$.   This function computes \f$\nabla_{\mathbf{w}} y_d^{(i)}\f$
+        for each output \f$y_d^{(i)}\f$.
+        
+        @param[in] pts A \f$D\times N\f$ matrix containing the points \f$x^{(1)},\ldots,x^{(N)}\f$.  Each column is a point.
+        @param[in] coeffs A vector of coefficients defining the function \f$f(\mathbf{x}; \mathbf{w})\f$.
+        @param[out] evaluations A vector containing the \f$N\f$ predictions \f$y_d^{(i)}\f$.  The vector must be preallocated and have \f$N\f$ components when passed to this function.  An assertion will be thrown in this vector is not the correct size.
+        @param[out] jacobian A matrix containing the \f$N\times M\f$ Jacobian matrix, where \f$M\f$ is the length of the parameter vector \f$\mathbf{w}\f$.  This matrix must be sized correctly or an assertion will be thrown.
+        
+        @see CoeffGradient
+    */
+    void CoeffJacobian(Kokkos::View<double**> const& pts, 
+                       Kokkos::View<double*>  const& coeffs,
+                       Kokkos::View<double*>       & evaluations,
+                       Kokkos::View<double**>      & jacobian)
+    {
+        const unsigned int numPts = pts.extent(1);
+        const unsigned int numTerms = _multiSet.Size();
+        const unsigned int dim = pts.extent(0);
+
+        assert(coeffs.extent(0)==numTerms);
+        assert(jacobian.extent(0)==numPts);
+        assert(jacobian.extent(1)==numTerms);
+        assert(evaluations.extent(0)==numPts);
+
+        // Figure how much scratch space is needed to store the cached values 
+        Kokkos::View<const unsigned int*> maxDegrees = _multiSet.MaxDegrees();
+        Kokkos::View<unsigned int*> startPos("Indices for start of 1d basis evaluations", dim+2); // each dimension + one for derivatives + one for end
+       
+        startPos(0) = 0;
+        for(unsigned int i=1; i<dim+1; ++i)
+            startPos(i) = startPos(i-1) + maxDegrees(i-1)+1;
+        startPos(dim+1) = startPos(dim) + maxDegrees(dim-1)+1;
+        
+        unsigned int cacheSize = startPos(dim+1);
+
+        // Create a policy with enough scratch memory to cache the polynomial evaluations
+        Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
+
+
+        // Paralel loop over each point computing T(x_1,...,x_D) for that point
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA (auto team_member) {
+            
+            unsigned int ptInd = team_member.league_rank();
+
+            // Evaluate the orthgonal polynomials in each direction (except the last) for all possible orders
+            BasisEvaluatorType basis;
+            double* polyCache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
+
+            // Evaluate all degrees of all 1d polynomials except the last dimension, which will be evaluated inside the integrand
+            for(unsigned int d=0; d<dim-1; ++d)
+                basis.EvaluateAll(&polyCache[startPos(d)], maxDegrees(d), pts(d,ptInd));
+
+            // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
+            CachedMonotoneIntegrand<BasisEvaluatorType, PosFuncType> integrand(polyCache, pts(dim-1,ptInd), startPos, maxDegrees, _multiSet, coeffs, DerivativeType::Parameters);
+            
+            // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt
+            Eigen::VectorXd integral = _quad.Integrate(integrand, 0, 1);
+            
+            evaluations(ptInd) = integral(0);
+
+            // Now add the f(x_1,...,x_{D-1},0) evaluation that lies outside the integral
+            basis.EvaluateAll(&polyCache[startPos(dim-1)], maxDegrees(dim-1), 0.0);
+
+            for(unsigned int termInd=0; termInd<numTerms; ++termInd)
+            {      
+                // Compute the value of this term in the expansion
+                double termVal = 1.0;
+                for(unsigned int i=_multiSet.nzStarts(termInd); i<_multiSet.nzStarts(termInd+1); ++i)
+                    termVal *= polyCache[startPos(_multiSet.nzDims(i)) + _multiSet.nzOrders(i)];
+
+                // Multiply by the coefficients to get the contribution to the output
+                jacobian(ptInd, termInd) = termVal + integral(termInd+1);
+                evaluations(ptInd) += termVal*coeffs(termInd);
+            }
+            
+        });
+    }
+
+
+    /** @brief Returns the gradient of the map with respect to the parameters \f$\mathbf{w}\f$ averaged over multiple points.
 
         @details 
         Consider \f$N\f$ points \f$\{\mathbf{x}^{(1)},\ldots,\mathbf{x}^{(N)}\}\f$ and let 
@@ -552,17 +649,20 @@ public:
         return gradient;
     }
 
+    Kokkos::View<double*> ContinuousMixedJacobian(Kokkos::View<double**> const& pts, 
+                                                  Kokkos::View<double*>  const& coeffs,
+                                                  Kokkos::View<double*>       & evals, 
+                                                  Kokkos::View<double*>       & derivs,
+                                                  Kokkos::View<double**>      & jacobian)
+    {   
+        
+    }
 
-    /** The map \f$T(x_1, x_2, ..., x_D; w)\f$ is parameterized by coefficients \f$w\f$.  This function computes
-        mixed second derivatives \f$ \nabla_w \left[\frac{\partial}{\partial x_D} T(x_1, x_2, ..., x_D; w)\right]\f$ 
-        at multiple points.  Columns in the output correspond to points.  Rows correspond to input dimensions.
-
-        @param pts  The points where we want to evaluate the derivative.  Each column represents one point.
-        @param coeffs The ceofficients in an expansion characterizing \f$f\f$.
-        @return Kokkos::View<double**> The values of \f$\nabla_w \left[\frac{\partial}{\partial x_D} T(x_1, x_2, ..., x_D; w)\f$ at each point.
-    */
-    Kokkos::View<double**> MixedSecondDerivative(Kokkos::View<double**> const& pts, 
-                                                 Kokkos::View<double*>  const& coeffs)
+    Kokkos::View<double*> DiscreteMixedJacobian(Kokkos::View<double**> const& pts, 
+                                                Kokkos::View<double*>  const& coeffs,
+                                                Kokkos::View<double*>       & evals, 
+                                                Kokkos::View<double*>       & derivs,
+                                                Kokkos::View<double**>      & jacobian)
     {   
         
     }

@@ -5,6 +5,8 @@
 #include "MParT/Quadrature.h"
 #include "MParT/OrthogonalPolynomial.h"
 
+#include <Eigen/Dense>
+
 using namespace mpart;
 using namespace Catch;
 
@@ -174,6 +176,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
     
     unsigned int maxDegree = 2; 
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+    unsigned int numTerms = mset.Size();
 
     unsigned int maxSub = 30;
     double relTol = 1e-7;
@@ -196,6 +199,29 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
         double fdDeriv = (rightEvals(i)-evals(i))/fdStep;
         CHECK( contDerivs(i) == Approx(fdDeriv).epsilon(testTol) );
         CHECK( discDerivs(i) == Approx(fdDeriv).epsilon(testTol) );
+    }
+
+    SECTION("Coefficient Jacobian"){
+
+        Kokkos::View<double*> evals2("FD Evals", numPts);
+        Kokkos::View<double**> jac("Jacobian", numPts, numTerms);
+
+        comp.CoeffJacobian(evalPts, coeffs, evals2, jac);
+
+        for(unsigned int i=0; i<numPts; ++i)    
+            CHECK(evals2(i) == Approx(evals(i)).epsilon(1e-12));
+
+        const double fdStep = 1e-4;
+
+        for(unsigned j=0; j<numTerms; ++j){
+            coeffs(j) += fdStep;
+            evals2 = comp.Evaluate(evalPts, coeffs);
+
+            for(unsigned int i=0; i<numPts; ++i) 
+                CHECK(jac(i,j) == Approx((evals2(i)-evals(i))/fdStep).epsilon(1e-4*abs(evals(i))));
+
+            coeffs(j) -= fdStep;
+        }
     }
 }
 
@@ -224,29 +250,28 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
 
     unsigned int numTerms = mset.Size();
     Kokkos::View<double*> coeffs("Coefficients", numTerms);
-    Kokkos::View<double*> grad("Gradient", numTerms);
+    Kokkos::View<double**> jac("Gradient", numPts, numTerms);
     Kokkos::View<double*> preds("Predictions", numPts);
-    Kokkos::View<double*> sens("Sensitivities", numPts);
 
-    double stepSize = 1.0;
+
     double objective;
 
-    for(unsigned int optIt=0; optIt<100; ++optIt){
+    Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor>> jacMat(&jac(0,0), numPts, numTerms);
 
-        preds = comp.Evaluate(pts, coeffs);
+    Eigen::Map<Eigen::VectorXd> predVec(&preds(0), numPts);
+    Eigen::Map<Eigen::VectorXd> obsVec(&fvals(0), numPts);
+    Eigen::Map<Eigen::VectorXd> coeffVec(&coeffs(0), numTerms);
 
-        objective = 0.0;
-        for(unsigned int i=0; i<numPts; ++i){
-            double diff = preds(i) - fvals(i);
-            objective += 0.5*diff*diff/numPts;
-            sens(i) = diff/numPts;
-        }
+    Eigen::VectorXd objGrad;
 
-        grad = comp.CoeffGradient(pts,coeffs,sens);
+    for(unsigned int optIt=0; optIt<5; ++optIt){
+
+        comp.CoeffJacobian(pts, coeffs, preds, jac);
         
-        // Take a step in the negative gradient direction
-        for(unsigned int i=0; i<numTerms; ++i)
-            coeffs(i) -= stepSize*grad(i);
+        objGrad = predVec-obsVec;
+        
+        objective = 0.5*objGrad.squaredNorm();
+        coeffVec -= jacMat.colPivHouseholderQr().solve(objGrad);
     }
 
     CHECK(objective<1e-3);
