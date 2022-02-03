@@ -82,7 +82,7 @@ TEST_CASE("Multivariate evaluation and benchmarking of monotone component", "[Mo
 {   
     const double testTol = 1e-7;
     unsigned int dim = 5;
-    unsigned int maxDegree = 4; 
+    unsigned int maxDegree = 3; 
 
     // Create points evently space on [lb,ub]
     unsigned int numPts = 2;
