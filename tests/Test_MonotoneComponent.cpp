@@ -82,10 +82,10 @@ TEST_CASE("Multivariate evaluation and benchmarking of monotone component", "[Mo
 {   
     const double testTol = 1e-7;
     unsigned int dim = 5;
-    unsigned int maxDegree = 3; 
+    unsigned int maxDegree = 5; 
 
     // Create points evently space on [lb,ub]
-    unsigned int numPts = 2;
+    unsigned int numPts = 2000;
     double lb = -2.0;
     double ub = 2.0;
 
@@ -112,9 +112,10 @@ TEST_CASE("Multivariate evaluation and benchmarking of monotone component", "[Mo
     double absTol = 1e-7;
     AdaptiveSimpson quad(maxSub, absTol, relTol);
 
-    MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
-
-    Kokkos::View<double*> output = comp.Evaluate(evalPts, coeffs);
+    MonotoneComponent<ProbabilistHermite, SoftPlus, AdaptiveSimpson> comp(mset, quad);
+    
+    Kokkos::View<double*> evals("Evaluatons", numPts);
+    comp.Evaluate(evalPts, coeffs, evals);
 }
 
 TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]" ) {

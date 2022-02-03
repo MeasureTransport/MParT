@@ -102,6 +102,14 @@ public:
                                         t*_xd);                    // point to evaluate at
         }
         
+        // std::cout << "cache @ t=" << t << std::endl;
+        // for(unsigned int i=0; i<_startPos.extent(0)-1; ++i){
+        //     std::cout << "    ";
+        //     for(unsigned int j=_startPos(i); j<_startPos(i+1); ++j)
+        //         std::cout << _cache[j] << "  ";
+        //     std::cout << std::endl;
+        // }
+
 
         // Compute coeff * polyval for each term
         for(unsigned int termInd=0; termInd<numTerms; ++termInd)
@@ -128,6 +136,15 @@ public:
         }
 
         double gf = PosFuncType::Evaluate(f);
+
+        // Check for infs or nans
+        if(std::isinf(gf)){
+            std::stringstream msg;
+            msg << "In CachedMonotoneIntegrand, value of g(df(...)) is inf.  The value of df(...) is " << f << ", and the value of g(df(...)) is " << gf << ".";
+            throw std::domain_error(msg.str());
+        }else if(std::isnan(gf)){
+            throw std::domain_error("In CachedMonotoneIntegrand, A nan was encountered in value of g(df(...)).");
+        }
 
         if(_derivType==DerivativeType::Parameters)
             output *= _xd*PosFuncType::Derivative(f);
@@ -168,7 +185,6 @@ public:
 
             output(1) = deriv;
         }
-
         return output;
     }
 
