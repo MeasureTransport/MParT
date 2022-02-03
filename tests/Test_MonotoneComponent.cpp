@@ -78,6 +78,44 @@ TEST_CASE( "Testing monotone component integrand", "[MonotoneIntegrand]") {
 
 }
 
+TEST_CASE("Multivariate evaluation and benchmarking of monotone component", "[MonotoneComponentBenchmark]")
+{   
+    const double testTol = 1e-7;
+    unsigned int dim = 5;
+    unsigned int maxDegree = 4; 
+
+    // Create points evently space on [lb,ub]
+    unsigned int numPts = 2;
+    double lb = -2.0;
+    double ub = 2.0;
+
+    Kokkos::View<double**> evalPts("Evaluate Points", dim, numPts);
+    if(numPts==1){
+        for(unsigned int d=0; d<dim; ++d)   
+            evalPts(d,0) = 0.5*(lb+ub);
+    }else{
+        for(unsigned int d=0; d<dim; ++d){
+            for(unsigned int i=0; i<numPts; ++i)
+                evalPts(d,i) = (i/(numPts-1.0))*(ub-lb) - lb;
+        }
+    }
+
+    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+    
+    
+    Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
+    for(unsigned int i=0; i<mset.Size(); ++i)
+        coeffs(i) = std::exp(-0.1*mset.at(i).Max());
+    
+    unsigned int maxSub = 30;
+    double relTol = 1e-7;
+    double absTol = 1e-7;
+    AdaptiveSimpson quad(maxSub, absTol, relTol);
+
+    MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
+
+    Kokkos::View<double*> output = comp.Evaluate(evalPts, coeffs);
+}
 
 TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]" ) {
 
@@ -239,7 +277,7 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
         fvals(i) = pts(0,i)*pts(0,i) + pts(0,i);
 
     
-    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(1, 2);
+    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(1, 6);
 
     unsigned int maxSub = 30;
     double relTol = 1e-3;
@@ -271,9 +309,10 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
         objGrad = predVec-obsVec;
         
         objective = 0.5*objGrad.squaredNorm();
+
         coeffVec -= jacMat.colPivHouseholderQr().solve(objGrad);
     }
-
+    
     CHECK(objective<1e-3);
 
 }

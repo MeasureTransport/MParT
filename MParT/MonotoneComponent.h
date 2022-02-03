@@ -101,7 +101,8 @@ public:
                                         _maxDegrees(_dim-1),       // largest basis degree
                                         t*_xd);                    // point to evaluate at
         }
-       
+        
+
         // Compute coeff * polyval for each term
         for(unsigned int termInd=0; termInd<numTerms; ++termInd)
         {   
@@ -216,24 +217,26 @@ public:
     {
     }
 
+
     /**
        @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
        
-     * @param pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
-     * @param coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
-     * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
+     * @param[in] pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
+     * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
+     * @param[out] output Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
-    Kokkos::View<double*> Evaluate(Kokkos::View<double**> const& pts, 
-                                   Kokkos::View<double*> const& coeffs)
-    {   
+
+    void Evaluate(Kokkos::View<double**> const& pts, 
+                  Kokkos::View<double*>  const& coeffs,
+                  Kokkos::View<double*>       & output)
+    {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = _multiSet.Size();
         const unsigned int dim = pts.extent(0);
 
         assert(coeffs.extent(0)==numTerms);
-
-        Kokkos::View<double*> output("ExpansionOutput", numPts);
-
+        assert(output.extent(0)==numPts);
+        
         // Figure how much scratch space is needed to store the cached values 
         Kokkos::View<const unsigned int*> maxDegrees = _multiSet.MaxDegrees();
         Kokkos::View<unsigned int*> startPos("Indices for start of 1d basis evaluations", dim+2); // each dimension + one for derivatives + one for end
@@ -253,7 +256,7 @@ public:
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA (auto team_member) {
             
             unsigned int ptInd = team_member.league_rank();
-
+            
             // Evaluate the orthgonal polynomials in each direction (except the last) for all possible orders
             BasisEvaluatorType basis;
             double* polyCache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
@@ -264,7 +267,7 @@ public:
 
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
             CachedMonotoneIntegrand<BasisEvaluatorType, PosFuncType> integrand(polyCache, pts(dim-1,ptInd), startPos, maxDegrees, _multiSet, coeffs, DerivativeType::None);
-            
+
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt
             output(ptInd) = _quad.Integrate(integrand, 0, 1)(0);
 
@@ -283,9 +286,27 @@ public:
             }
             
         });
+    }
+
+    /**
+       @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
+       
+     * @param[in] pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
+     * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
+     * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
+     */
+    Kokkos::View<double*> Evaluate(Kokkos::View<double**> const& pts, 
+                                   Kokkos::View<double*> const& coeffs)
+    {   
+        const unsigned int numPts = pts.extent(1);
+        Kokkos::View<double*> output("ExpansionOutput", numPts);
+
+        Evaluate(pts, coeffs, output);
 
         return output;
     }
+
+    
 
     /**
        @brief Approximates the "continuous derivative" \f$\frac{\partial T}{\partial x_D}\f$ derived from the exact integral form of the transport map.

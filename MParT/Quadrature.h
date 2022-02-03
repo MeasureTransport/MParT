@@ -5,6 +5,8 @@
 #include <sstream>
 #include <Eigen/Core>
 
+#include <iostream>
+
 namespace mpart{
 
 /**
@@ -131,7 +133,10 @@ public:
                    double              lb, 
                    double              ub) -> decltype(f(0.0))
     {   
-        
+        if(ub<lb+1e-14){
+            return 0.0*f(lb);
+        }
+
         // Compute CC rule
         Eigen::VectorXd wts,pts;
         std::tie(wts,pts) = ClenshawCurtisQuadrature::GetRule(_order);
@@ -289,6 +294,9 @@ private:
                             int    level,
                             decltype(f(0.0)) intCoarse) -> std::tuple<decltype(f(0.0)), int, unsigned int>
     {
+        if((rightPt-leftPt)<1e-14){
+            return std::make_tuple((leftPt-rightPt)*midFunc, -1, level);
+        }
 
         // update current refinement level
         level += 1;
