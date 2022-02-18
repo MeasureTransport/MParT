@@ -5,48 +5,30 @@
 #include <sstream>
 #include <Eigen/Core>
 
-#include <iostream>
-
 namespace mpart{
 
+namespace QuadError{
+
+    /**
+        @brief Flags for controlling how the error between levels is computed for multivariate integrands.
+     */
+    enum Type {
+        First,  ///< Only the first component of the integral estimates will be used
+        NormInf,///< The infinity norm (i.e., max of abs) of the difference will be used 
+        Norm2,  ///< The L2 norm of the difference will be used
+        Norm1   ///< The L1 norm (sum of bas) of the difference will be used
+    };
+}
+
 /**
-@class ClenshawCurtisQuadrature
-@brief Implementation of the Clenshaw-Curtis 1d quadrature rule.
-@details
-@code{.cpp}
 
-// Define the integrand using a lambda function
-auto f = [](double x){return exp(x);};
-
-// Define a 5 point quadrature rule
+USAGE
+@code
 ClenshawCurtisQuadrature quad(5);
-
-// Integrate the function
-double integral = quad.Integrate(f, 0,1);
+integral = quad.Integrate(f, 0,1);
 @endcode
 
-@code 
-// Define the integrand as a class
-class ExpIntegrand{
-public:
-    double operator()(double x){
-        return exp(x);
-    };
-};
-
-// Create an instance of the integrand
-ExpIntegrand f;
-
-// Define a 5 point quadrature rule
-ClenshawCurtisQuadrature quad(5);
-
-// Integrate the function
-double integral = quad.Integrate(f, 0,1);
-
-@endcode 
-
 @code
-// Get the points and weights used in the rule
 Eigen::VectorXd wts, pts;
 std::tie(wts, pts) = ClenshawCurtisQuadrature::GetRule(order);
 @endcode
@@ -67,7 +49,6 @@ public:
 
     /**
      @brief Returns the weights and points in a Clenshaw-Curtis rule.
-     @details
      @param[in] order The order of the Clenshaw-Curtis rule.
      @returns A pair containing (wts,pts)
      */
@@ -125,7 +106,6 @@ public:
      @param[in] lb The lower bound \f$x_L\f$ in the integration.
      @param[in] lb The upper bound \f$x_U\f$ in the integration.
      @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
-
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
     template<class FunctionType>
@@ -157,11 +137,99 @@ public:
         return output;
     }
 
-
 private:
     unsigned int _order;
 
 }; // class ClenshawCurtisQuadrature
+
+
+class RecursiveQuadratureBase
+{
+
+public:
+    
+    RecursiveQuadratureBase(unsigned int maxSub, 
+                            double absTol, 
+                            double relTol,
+                            QuadError::Type errorMetric) :  _maxSub(maxSub), 
+                                                            _absTol(absTol),
+                                                            _relTol(relTol),
+                                                            _status(0),
+                                                            _maxLevel(0),
+                                                            _errorMetric(errorMetric) 
+    {
+        if(absTol<=0){
+            std::stringstream msg;
+            msg << "In MParT::RecursiveQuadrature: Absolute error tolerance must be strictly positive, but given a value of \"" << absTol << "\".";
+            throw std::runtime_error(msg.str());
+        }
+        if(relTol<=0){
+            std::stringstream msg;
+            msg << "In MParT::RecursiveQuadrature: Relative error tolerance must be strictly positive, but given a value of \"" << relTol << "\".";
+            throw std::runtime_error(msg.str());
+        }
+        if(maxSub==0){
+            std::stringstream msg;
+            msg << "In MParT::RecursiveQuadrature: Maximum subintervals allowed must be greater than 0, but given a value of \"" << maxSub << "\".";
+            throw std::runtime_error(msg.str());
+        }
+    };
+
+    /**
+     * @brief Returns a convergence flag for the last call to "Integrate"
+       
+       @return The convergence flag.  Positive if successful.  Negative if not.  Zero if Integrate hasn't been called yet.
+     */
+    int Status() const{return _status;};
+
+    /**
+     * @brief Returns the deepest level rea
+     * 
+     * @return int 
+     */
+    int MaxLevel() const {return _maxLevel;};
+
+
+protected:
+    template<typename IntegralValueType>
+    std::pair<double, double> EstimateError(IntegralValueType const& coarseVal,
+                                            IntegralValueType const& fineVal)
+    {
+        double error = std::abs(fineVal - coarseVal);
+        double tol = std::fmax( _relTol*std::abs(coarseVal), _absTol);
+
+        return std::make_pair(error, tol);
+    }
+
+    std::pair<double, double> EstimateError(Eigen::VectorXd const& coarseVal,
+                                            Eigen::VectorXd const& fineVal)
+    {   
+        double error, tol, relRefVal;
+        if(_errorMetric==QuadError::First){   
+            error = std::abs(fineVal(0)-coarseVal(0));
+            relRefVal = std::abs(coarseVal(0));
+        }else if(_errorMetric==QuadError::NormInf){
+            error = (fineVal-coarseVal).array().abs().maxCoeff(); 
+            relRefVal = coarseVal.array().abs().maxCoeff();
+        }else if(_errorMetric==QuadError::Norm2){
+            error = (fineVal-coarseVal).norm();
+            relRefVal = coarseVal.norm();
+        }else if(_errorMetric==QuadError::Norm1){
+            error = (fineVal-coarseVal).array().abs().sum(); //std::abs(fineVal(0)-coarseVal(0));
+            relRefVal = coarseVal.array().abs().sum();
+        }
+        tol = std::fmax( _relTol*relRefVal, _absTol);
+        return std::make_pair(error, tol);
+    }
+
+    const unsigned int _maxSub;
+    const double _absTol;
+    const double _relTol;
+
+    int _status;
+    unsigned int _maxLevel;
+    QuadError::Type _errorMetric;
+};
 
 
 
@@ -169,19 +237,21 @@ private:
  @brief Adaptive Simpson-rule integration based on applying a simple Simpson 1/3 rule recursively on subintervals.
 
  */
-class AdaptiveSimpson {
+class AdaptiveSimpson : public RecursiveQuadratureBase {
 public:
 
-    AdaptiveSimpson(unsigned int maxSub, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _absTol(absTol), _relTol(relTol), _status(0), _maxLevel(0){};
-    
-    /**
+    AdaptiveSimpson(unsigned int maxSub, 
+                    double absTol, 
+                    double relTol,
+                    QuadError::Type errorMetric) : RecursiveQuadratureBase(maxSub, absTol, relTol, errorMetric){};
+
+        /**
      @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$
      @details
      @param[in] f The integrand.  Can return any type that overloads multiplication with a double and the += operator.  doubles and Eigen::VectorXd are examples.
      @param[in] lb The lower bound \f$x_L\f$ in the integration.
      @param[in] lb The upper bound \f$x_U\f$ in the integration.
      @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
-
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
     template<class FunctionType>
@@ -201,88 +271,7 @@ public:
         return integral;
     }
 
-
-    // /** @brief Integrates two functions over the same domain using the same points.  
-    
-    //     @details This function simultaneously approximates two integrals
-    //     \f\[
-    //         \begin{aligned}
-    //         I_1 & = \int_{x_L}^{x_U} f_1(x) dx\\
-    //         I_2 & = \int_{x_L}^{x_U} f_2(x) dx.
-    //         \end{aligned}
-    //     \f\] 
-    //     An adaptive Simpson rule is used to approximate the integrals.  While the same points will be used to 
-    //     approximation \f$I_1\f$ and \f$I_2\f$, the adaptation will be driven solely by estimated errors in computing 
-    //     \f$I_1\f$.   The approximation for \f$I_1\f$ is therefore the same as what would be returned by the single-integrand 
-    //     `Integrate` function.   
-
-    //     @param[in] f1 The first integrand \f$f_1\f$.
-    //     @param[in] f2 The second integrand \f$f_2\f$.
-    //     @return A pair of estimates \f$(\hat{I}_1, \hat{I}_2)\f$.
-    //     @tparam ScalarFuncType1 The type of the first integrand.  Must provide an operator() function that accepts a single double and returns a single double.
-    //     @tparam ScalarFuncType2 The type of the second integrand.  Must provide an operator() function that accepts a single double and returns a single double.
-    // */
-    // template<class ScalarFuncType1, class ScalarFuncType2>
-    // std::pair<double,double> Integrate(ScalarFuncType1 const& f1, 
-    //                                    ScalarFuncType2 const& f2,
-    //                                    double                 lb, 
-    //                                    double                 ub)
-    // {   
-    //     double integral1, integral2;
-
-    //     double f1lb = f1(lb);
-    //     double f2lb = f2(lb);
-
-    //     double f1ub = f1(ub);
-    //     double f2ub = f2(ub);
-
-    //     double midPt = 0.5*(lb+ub);
-    //     double f1mb = f1(midPt);
-    //     double f2mb = f2(midPt);
-
-    //     double intCoarse1 = ((ub-lb)/6.0) * (f1lb + 4.0*f1mb + f1ub);
-    //     double intCoarse2 = ((ub-lb)/6.0) * (f2lb + 4.0*f2mb + f2ub);
-        
-    //     std::tie(integral1, integral2, _status, _maxLevel) = RecursiveIntegrate2(f1, f2, lb, midPt, ub, f1lb, f1mb, f1ub, f2lb, f2mb, f2ub, 0, intCoarse1, intCoarse2);
-    //     return std::make_pair(integral1, integral2);
-    // }
-
-    /**
-     * @brief Returns a convergence flag for the last call to "Integrate"
-       
-       @return The convergence flag.  Positive if successful.  Negative if not.  Zero if Integrate hasn't been called yet.
-     */
-    int Status() const{return _status;};
-
-    /**
-     * @brief Returns the deepest level rea
-     * 
-     * @return int 
-     */
-    int MaxLevel() const {return _maxLevel;};
-
 private:
-
-    template<typename IntegralValueType>
-    std::pair<double, double> EstimateError(IntegralValueType const& coarseVal,
-                                            IntegralValueType const& fineVal)
-    {
-        double error = std::abs(fineVal - coarseVal);
-        double tol = std::fmax( _relTol*std::abs(coarseVal), _absTol);
-
-        return std::make_pair(error, tol);
-    }
-
-    std::pair<double, double> EstimateError(Eigen::VectorXd const& coarseVal,
-                                            Eigen::VectorXd const& fineVal)
-    {
-        
-        double error = std::abs(fineVal(0)-coarseVal(0));
-        double tol = std::fmax( _relTol*std::abs(coarseVal(0)), _absTol);
-
-        return std::make_pair(error, tol);
-    }
-
     template<class ScalarFuncType>
     auto RecursiveIntegrate(ScalarFuncType const& f, 
                             double leftPt,
@@ -342,50 +331,30 @@ private:
 
     }
 
-    const unsigned int _maxSub;
-    const double _absTol;
-    const double _relTol;
-
-    int _status;
-    unsigned int _maxLevel;
-
-}; // Class AdaptiveSimpson
-
+}; // Class AdaptiveSimpsonMixin
 
 
 /**
  @brief Adaptive quadrature based on applying a Clenshaw-Curtis recursively on subintervals.
-
  */
-class RecursiveQuadrature {
+class AdaptiveClenshawCurtis : public RecursiveQuadratureBase{
 public:
 
     /**
        @brief Construct a new adaptive quadrature class with specified stopping criteria.
        @param maxSub The maximum number of subintervals allowed.
-       @param[in] order Number of points to use per subinterval.
        @param[in] absTol An absolute error tolerance used to stop the adaptive integration.
        @param[in] relTol A relative error tolerance used to stop te adaptive integration.
+       @param[in] errorMetric A flag specifying the type of error metric to use.
+       @param[in] order Number of points to use per subinterval.
      */
-    RecursiveQuadrature(unsigned int maxSub, unsigned int order=2, double absTol=1e-8, double relTol=1e-10) : _maxSub(maxSub), _order(order), _absTol(absTol), _relTol(relTol), _quad(order), _status(0), _maxLevel(0)
-    {
-        if(absTol<=0){
-            std::stringstream msg;
-            msg << "In MParT::RecursiveQuadrature: Absolute error tolerance must be strictly positive, but given a value of \"" << absTol << "\".";
-            throw std::runtime_error(msg.str());
-        }
-        if(relTol<=0){
-            std::stringstream msg;
-            msg << "In MParT::RecursiveQuadrature: Relative error tolerance must be strictly positive, but given a value of \"" << relTol << "\".";
-            throw std::runtime_error(msg.str());
-        }
-        if(maxSub==0){
-            std::stringstream msg;
-            msg << "In MParT::RecursiveQuadrature: Maximum subintervals allowed must be greater than 0, but given a value of \"" << maxSub << "\".";
-            throw std::runtime_error(msg.str());
-        }
-
-    }
+    AdaptiveClenshawCurtis(unsigned int maxSub, 
+                    double              absTol, 
+                    double              relTol,
+                    QuadError::Type     errorMetric,
+                    unsigned int        order) : RecursiveQuadratureBase(maxSub, absTol, relTol, errorMetric),
+                                                 _order(order), 
+                                                 _quad(order){};
 
     /**
      @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$
@@ -394,7 +363,6 @@ public:
      @param[in] lb The lower bound \f$x_L\f$ in the integration.
      @param[in] lb The upper bound \f$x_U\f$ in the integration.
      @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
-
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
     template<class FunctionType>
@@ -408,42 +376,7 @@ public:
         return integral;
     }
 
-
-    /**
-     * @brief Returns a convergence flag for the last call to "Integrate"
-       
-       @return The convergence flag.  Positive if successful.  Negative if not.  Zero if Integrate hasn't been called yet.
-     */
-    int Status() const{return _status;};
-
-    /**
-     * @brief Returns the deepest level rea
-     * 
-     * @return int 
-     */
-    int MaxLevel() const {return _maxLevel;};
-
 private:
-
-    template<typename IntegralValueType>
-    std::pair<double, double> EstimateError(IntegralValueType const& coarseVal,
-                                            IntegralValueType const& fineVal)
-    {
-        double error = std::abs(fineVal - coarseVal);
-        double tol = std::fmax( _relTol*std::abs(coarseVal), _absTol);
-
-        return std::make_pair(error, tol);
-    }
-
-    std::pair<double, double> EstimateError(Eigen::VectorXd const& coarseVal,
-                                            Eigen::VectorXd const& fineVal)
-    {
-        
-        double error = std::abs(fineVal(0)-coarseVal(0));
-        double tol = std::fmax( _relTol*std::abs(coarseVal(0)), _absTol);
-
-        return std::make_pair(error, tol);
-    }
 
     template<class FunctionType>
     auto RecursiveIntegrate(FunctionType const& f, 
@@ -471,9 +404,6 @@ private:
         // Stop the recursion if the level hit maximum depth
         if ( (intErr > tol) && (level == _maxSub) ) {
             return std::make_tuple(intFiner, int(-1), level);
-            //std::stringstream msg;
-            //msg << "In MParT::RecursiveQuadrature: Reached maximum level depth \"" << _maxSub << "\", with an error of \"" << intErr << "\".";
-            //throw std::runtime_error(msg.str());
         }
         // If the error between levels is smaller than Tol, return the finer level result
         else if ( intErr <= tol ) {
@@ -493,18 +423,11 @@ private:
     }
 
 private:
-    const unsigned int _maxSub;
-    const unsigned int _order;
-    const double _absTol;
-    const double _relTol;
 
+    const unsigned int _order;
     ClenshawCurtisQuadrature _quad;
 
-    // Saved convergence diagnostics
-    int _status;
-    unsigned _maxLevel;
-
-}; // class RecursiveQuadrature
+}; // class AdaptiveClenshawCurtis
 
 
 } // namespace mpart

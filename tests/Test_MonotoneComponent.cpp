@@ -110,7 +110,7 @@ TEST_CASE("Multivariate evaluation and benchmarking of monotone component", "[Mo
     unsigned int maxSub = 30;
     double relTol = 1e-7;
     double absTol = 1e-7;
-    AdaptiveSimpson quad(maxSub, absTol, relTol);
+    AdaptiveSimpson quad(maxSub, absTol, relTol, QuadError::First);
 
     MonotoneComponent<ProbabilistHermite, SoftPlus, AdaptiveSimpson> comp(mset, quad);
     
@@ -148,7 +148,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         unsigned int maxSub = 30;
         double relTol = 1e-7;
         double absTol = 1e-7;
-        AdaptiveSimpson quad(maxSub, absTol, relTol);
+        AdaptiveSimpson quad(maxSub, absTol, relTol, QuadError::First);
 
         MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
 
@@ -177,7 +177,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         unsigned int maxSub = 30;
         double relTol = 1e-7;
         double absTol = 1e-7;
-        AdaptiveSimpson quad(maxSub, absTol, relTol);
+        AdaptiveSimpson quad(maxSub, absTol, relTol,QuadError::First);
 
         MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
 
@@ -220,7 +220,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
     unsigned int maxSub = 30;
     double relTol = 1e-7;
     double absTol = 1e-7;
-    AdaptiveSimpson quad(maxSub, absTol, relTol);
+    AdaptiveSimpson quad(maxSub, absTol, relTol,QuadError::First);
 
     MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
     
@@ -283,7 +283,7 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
     unsigned int maxSub = 30;
     double relTol = 1e-3;
     double absTol = 1e-3;
-    AdaptiveSimpson quad(maxSub, absTol, relTol);
+    AdaptiveSimpson quad(maxSub, absTol, relTol, QuadError::First);
 
     MonotoneComponent<ProbabilistHermite, SoftPlus, AdaptiveSimpson> comp(mset, quad);
 

@@ -75,7 +75,7 @@ TEST_CASE( "Testing Recursive Quadrature", "[RecursiveQuadrature]" ) {
     // Set tolerance for tests
     double testTol = 1e-4;
 
-    RecursiveQuadrature quad(maxSub, order, absTol, relTol);
+    AdaptiveClenshawCurtis quad(maxSub, absTol, relTol,QuadError::First, order);
 
     SECTION("Class Integrand")
     {   
@@ -153,7 +153,7 @@ TEST_CASE( "Testing Adaptive Simpson Integration", "[AdaptiveSimpson]" ) {
     // Set tolerance for tests
     double testTol = 1e-4;
 
-    AdaptiveSimpson quad(maxSub, absTol, relTol);
+    AdaptiveSimpson quad(maxSub, absTol, relTol, QuadError::First);
 
     SECTION("Class Integrand")
     {   
