@@ -62,13 +62,19 @@ public:
      @brief Returns the size of the cache needed to evaluate the expansion (in terms of number of doubles).
      @return unsigned int  The length of the required cache vector.
      */
-    unsigned int CacheSize() const{ return _startPos(_startPos.extent(0)-1);};
+    unsigned int CacheSize() const { return _startPos(_startPos.extent(0)-1);};
 
     /**
      @brief Returns the number of coefficients in this expansion.
      @return unsigned int The number of terms in the multiindexset, which corresponds to the number of coefficients needed to define the expansion.
      */
-    unsigned int NumCoeffs() const{return _multiSet.Size();};
+    unsigned int NumCoeffs() const {return _multiSet.Size();};
+
+    /** 
+    @brief Returns the dimension of inputs to this multivariate expansion.
+    @return unsigned int The dimension of an input point.
+    */
+    unsigned int InputSize() const {return _multiSet.dim;};
 
     /**
      @brief Precomputes parts of the cache using all but the last component of the point, i.e., using only \f$x_1,x_2,\ldots,x_{d-1}\f$, not \f$x_d\f$.
