@@ -122,8 +122,8 @@ public:
         Eigen::Ref<Eigen::VectorXd> gradTail = grad.tail(_f2.NumCoeffs());
         df2 = _f2.MixedDerivative(&cache[_f1.CacheSize()], coeffs2, derivOrder, gradTail);
 
-        grad.head(_f1.NumCoeffs()) *= df2;
-        grad.tail(_f2.NumCoeffs()) *= f1;
+        gradHead *= df2;
+        gradTail *= f1;
 
         return f1*df2;
     }

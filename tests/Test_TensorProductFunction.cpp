@@ -83,7 +83,18 @@ TEST_CASE( "Testing tensor product function", "[TensorProductFunction]") {
     for(unsigned int i=0; i<dim1; ++i)
         CHECK((f2val*grad1(i))==Approx(grad(i)).epsilon(1e-15));
     for(unsigned int i=0; i<dim2; ++i)
-        CHECK((f1val*grad2(i))==Approx(grad(f1.NumCoeffs()+i)).epsilon(1e-15));    
+        CHECK((f1val*grad2(i))==Approx(grad(f1.NumCoeffs()+i)).epsilon(1e-15));  
 
+    // Check the mixed gradients  
+    f2.MixedDerivative(&cache[f1.CacheSize()], coeffs2, 1, grad2);
+    f.MixedDerivative(&cache[0], coeffs, 1, grad);
+
+    ftemp = f.MixedDerivative(&cache[0], coeffs, 1, grad);
+    CHECK(ftemp==Approx(df).epsilon(1e-15));
+
+    for(unsigned int i=0; i<dim1; ++i)
+        CHECK((df2val*grad1(i))==Approx(grad(i)).epsilon(1e-15));
+    for(unsigned int i=0; i<dim2; ++i)
+        CHECK((f1val*grad2(i))==Approx(grad(f1.NumCoeffs()+i)).epsilon(1e-15));  
 }
 
