@@ -84,7 +84,7 @@ TEST_CASE( "Testing product expansion", "[ProductExpansion]") {
 
 
     // Mixed first derivatives
-    df2 = expansion.MixedDerivative(&cache[0], coeffs, grad, 1);
+    df2 = expansion.MixedDerivative(&cache[0], coeffs, 1, grad);
     CHECK(df2==Approx(df).epsilon(1e-15));
 
     df2 = expansion.DiagonalDerivative(&cache[0], coeffs2, 1);
@@ -92,7 +92,7 @@ TEST_CASE( "Testing product expansion", "[ProductExpansion]") {
 
     
     // Mixed second derivatives (grad of d2f wrt coeffs)
-    double d2f2 = expansion.MixedDerivative(&cache[0], coeffs, grad, 2);
+    double d2f2 = expansion.MixedDerivative(&cache[0], coeffs, 2, grad);
     CHECK(d2f2==Approx(d2f).epsilon(1e-15));
 
     d2f2 = expansion.DiagonalDerivative(&cache[0], coeffs2, 2);

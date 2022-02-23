@@ -41,7 +41,10 @@ class ProductExpansion
 {
 public:
 
-    ProductExpansion(FixedMultiIndexSet const& multiSet,
+    ProductExpansion(MultiIndexSet const& multiSet,
+                     BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : ProductExpansion(multiSet.Fix(), basis1d){};
+
+    ProductExpansion(FixedMultiIndexSet const& multiSet,    
                      BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : _dim(multiSet.dim),
                                                                                  _multiSet(multiSet),
                                                                                  _basis1d(basis1d),
@@ -61,6 +64,11 @@ public:
      */
     unsigned int CacheSize() const{ return _startPos(_startPos.extent(0)-1);};
 
+    /**
+     @brief Returns the number of coefficients in this expansion.
+     @return unsigned int The number of terms in the multiindexset, which corresponds to the number of coefficients needed to define the expansion.
+     */
+    unsigned int NumCoeffs() const{return _multiSet.Size();};
 
     /**
      @brief Precomputes parts of the cache using all but the last component of the point, i.e., using only \f$x_1,x_2,\ldots,x_{d-1}\f$, not \f$x_d\f$.
@@ -216,7 +224,7 @@ public:
     }
 
     template<typename CoeffVecType, typename GradVecType>
-    double MixedDerivative(const double* cache, CoeffVecType const& coeffs, GradVecType& grad, unsigned int derivOrder) const
+    double MixedDerivative(const double* cache, CoeffVecType const& coeffs, unsigned int derivOrder, GradVecType& grad) const
     {   
         const unsigned int numTerms = _multiSet.Size();
 

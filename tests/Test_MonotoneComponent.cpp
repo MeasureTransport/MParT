@@ -4,6 +4,8 @@
 #include "MParT/PositiveBijectors.h"
 #include "MParT/Quadrature.h"
 #include "MParT/OrthogonalPolynomial.h"
+#include "MParT/ProductExpansion.h"
+#include "MParT/MonotoneIntegrand.h"
 
 #include <Eigen/Dense>
 
@@ -18,26 +20,21 @@ TEST_CASE( "Testing monotone component integrand", "[MonotoneIntegrand]") {
     unsigned int maxDegree = 1; 
     FixedMultiIndexSet mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
-    // Make room for the cache
-    std::vector<double> cache((dim+2)*maxDegree);
+    ProbabilistHermite poly1d;
+    ProductExpansion<ProbabilistHermite> expansion(mset);
 
-    
-    Kokkos::View<unsigned int*> startPos("Starting Positions", dim+3);
-    startPos(0) = 0;
-    for(unsigned int i=1; i<dim+1; ++i)
-        startPos(i) = startPos(i-1) + maxDegree;
-    startPos(dim+1) = startPos(dim) + maxDegree;
-    startPos(dim+2) = startPos(dim+1) + maxDegree;
+    // Make room for the cache
+    std::vector<double> cache(expansion.CacheSize());
 
     Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
     coeffs(0) = 1.0; // Constant term
     coeffs(1) = 1.0; // Linear term
 
-
-    auto maxDegrees = mset.MaxDegrees();
+    Kokkos::View<double*> pt("evaluation point", dim);
+    pt(0) = 1.0;
 
     SECTION("Integrand Only") {
-        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, DerivativeType::None);
+        MonotoneIntegrand<ProductExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
         
         REQUIRE(integrand(0.0).size() == 1);
         CHECK(integrand(0.0)(0) == Approx(exp(1)).epsilon(testTol));
@@ -46,7 +43,7 @@ TEST_CASE( "Testing monotone component integrand", "[MonotoneIntegrand]") {
     }
 
     SECTION("Integrand Derivative") {
-        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, DerivativeType::Diagonal);
+        MonotoneIntegrand<ProductExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal);
         
         REQUIRE(integrand(0.0).size() == 2);
         Eigen::Vector2d test = integrand(0.0);
@@ -60,8 +57,8 @@ TEST_CASE( "Testing monotone component integrand", "[MonotoneIntegrand]") {
     }
 
     SECTION("Integrand Parameters Gradient") {
-        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, DerivativeType::Parameters);
-        CachedMonotoneIntegrand<ProbabilistHermite, Exp> integrand2(&cache[0], 1.0, startPos, maxDegrees, mset, coeffs, DerivativeType::None);
+        MonotoneIntegrand<ProductExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters);
+        MonotoneIntegrand<ProductExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
         
         Eigen::VectorXd testVal = integrand(0.5);
         REQUIRE(testVal.size() == 1+mset.Size());
@@ -89,7 +86,7 @@ TEST_CASE("Multivariate evaluation and benchmarking of monotone component", "[Mo
     double lb = -2.0;
     double ub = 2.0;
 
-    Kokkos::View<double**> evalPts("Evaluate Points", dim, numPts);
+    Kokkos::View<double**> evalPts("Evaluation Points", dim, numPts);
     if(numPts==1){
         for(unsigned int d=0; d<dim; ++d)   
             evalPts(d,0) = 0.5*(lb+ub);
@@ -102,6 +99,8 @@ TEST_CASE("Multivariate evaluation and benchmarking of monotone component", "[Mo
 
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
     
+    ProbabilistHermite poly1d;
+    ProductExpansion<ProbabilistHermite> expansion(mset);
     
     Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
     for(unsigned int i=0; i<mset.Size(); ++i)
@@ -112,7 +111,7 @@ TEST_CASE("Multivariate evaluation and benchmarking of monotone component", "[Mo
     double absTol = 1e-7;
     AdaptiveSimpson quad(maxSub, absTol, relTol, QuadError::First);
 
-    MonotoneComponent<ProbabilistHermite, SoftPlus, AdaptiveSimpson> comp(mset, quad);
+    MonotoneComponent<ProductExpansion<ProbabilistHermite>, SoftPlus, AdaptiveSimpson> comp(mset, quad);
     
     Kokkos::View<double*> evals("Evaluatons", numPts);
     comp.Evaluate(evalPts, coeffs, evals);
@@ -140,6 +139,8 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         unsigned int maxDegree = 1; 
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
         
+        ProbabilistHermite poly1d;
+        ProductExpansion<ProbabilistHermite> expansion(mset);
         
         Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
         coeffs(0) = 1.0; // Constant term
@@ -150,7 +151,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         double absTol = 1e-7;
         AdaptiveSimpson quad(maxSub, absTol, relTol, QuadError::First);
 
-        MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
+        MonotoneComponent<ProductExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
 
         Kokkos::View<double*> output = comp.Evaluate(evalPts, coeffs);
 
@@ -168,6 +169,8 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
     SECTION("Quadratic Map"){
         unsigned int maxDegree = 2; 
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+        ProbabilistHermite poly1d;
+        ProductExpansion<ProbabilistHermite> expansion(mset);
         
         Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
         coeffs(1) = 1.0; // Linear term = x ^1
@@ -179,7 +182,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         double absTol = 1e-7;
         AdaptiveSimpson quad(maxSub, absTol, relTol,QuadError::First);
 
-        MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
+        MonotoneComponent<ProductExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
 
         Kokkos::View<double*> output = comp.Evaluate(evalPts, coeffs);
 
@@ -215,6 +218,9 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
     
     unsigned int maxDegree = 2; 
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+    ProductExpansion<ProbabilistHermite> expansion(mset);
+        
+
     unsigned int numTerms = mset.Size();
 
     unsigned int maxSub = 30;
@@ -222,7 +228,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
     double absTol = 1e-7;
     AdaptiveSimpson quad(maxSub, absTol, relTol,QuadError::First);
 
-    MonotoneComponent<ProbabilistHermite, Exp, AdaptiveSimpson> comp(mset, quad);
+    MonotoneComponent<ProductExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
     
     // Create some arbitrary coefficients
     Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
@@ -279,13 +285,14 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
 
     
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(1, 6);
-
+    ProductExpansion<ProbabilistHermite> expansion(mset);
+   
     unsigned int maxSub = 30;
     double relTol = 1e-3;
     double absTol = 1e-3;
     AdaptiveSimpson quad(maxSub, absTol, relTol, QuadError::First);
 
-    MonotoneComponent<ProbabilistHermite, SoftPlus, AdaptiveSimpson> comp(mset, quad);
+    MonotoneComponent<ProductExpansion<ProbabilistHermite>, SoftPlus, AdaptiveSimpson> comp(expansion, quad);
 
     unsigned int numTerms = mset.Size();
     Kokkos::View<double*> coeffs("Coefficients", numTerms);
@@ -310,7 +317,6 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
         objGrad = predVec-obsVec;
         
         objective = 0.5*objGrad.squaredNorm();
-
         coeffVec -= jacMat.colPivHouseholderQr().solve(objGrad);
     }
     
