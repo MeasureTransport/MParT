@@ -1,6 +1,6 @@
 #include <catch2/catch_all.hpp>
 
-#include "MParT/ProductExpansion.h"
+#include "MParT/MultivariateExpansion.h"
 #include "MParT/OrthogonalPolynomial.h"
 
 #include <Eigen/Dense>
@@ -8,7 +8,7 @@
 using namespace mpart;
 using namespace Catch;
 
-TEST_CASE( "Testing product expansion", "[ProductExpansion]") {
+TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
 
     const double testTol = 1e-7;
 
@@ -17,7 +17,7 @@ TEST_CASE( "Testing product expansion", "[ProductExpansion]") {
     FixedMultiIndexSet mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
     ProbabilistHermite poly1d;
-    ProductExpansion<ProbabilistHermite> expansion(mset);
+    MultivariateExpansion<ProbabilistHermite> expansion(mset);
 
     unsigned int cacheSize = expansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(dim+2));

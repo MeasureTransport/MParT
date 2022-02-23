@@ -1,5 +1,5 @@
-#ifndef MPART_PRODUCTEXPANSION_H
-#define MPART_PRODUCTEXPANSION_H
+#ifndef MPART_MULTIVARIATEEXPANSION_H
+#define MPART_MULTIVARIATEEXPANSION_H
 
 #include "MParT/DerivativeFlags.h"
 
@@ -37,15 +37,15 @@ namespace mpart{
  @tparam BasisEvaluatorType The family of 1d basis functions to employ.
  */
 template<class BasisEvaluatorType>
-class ProductExpansion
+class MultivariateExpansion
 {
 public:
 
-    ProductExpansion(MultiIndexSet const& multiSet,
-                     BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : ProductExpansion(multiSet.Fix(), basis1d){};
+    MultivariateExpansion(MultiIndexSet const& multiSet,
+                          BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : MultivariateExpansion(multiSet.Fix(), basis1d){};
 
-    ProductExpansion(FixedMultiIndexSet const& multiSet,    
-                     BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : _dim(multiSet.dim),
+    MultivariateExpansion(FixedMultiIndexSet const& multiSet,    
+                          BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : _dim(multiSet.dim),
                                                                                  _multiSet(multiSet),
                                                                                  _basis1d(basis1d),
                                                                                  _startPos("Indices for start of 1d basis evaluations", multiSet.dim+3),
@@ -162,7 +162,7 @@ public:
     {   
         if((derivOrder==0)||(derivOrder>2)){
             std::stringstream msg;
-            msg << "Error in ProductExpansion::DiagonalDerivative.  The derivative order is " << derivOrder << ", but only orders of {1,2} are currently supported.";
+            msg << "Error in MultivariateExpansion::DiagonalDerivative.  The derivative order is " << derivOrder << ", but only orders of {1,2} are currently supported.";
             throw std::runtime_error(msg.str());
         }
 
@@ -230,7 +230,7 @@ public:
 
         if((derivOrder==0)||(derivOrder>2)){
             std::stringstream msg;
-            msg << "Error in ProductExpansion::DiagonalDerivative.  The derivative order is " << derivOrder << ", but only orders of {1,2} are currently supported.";
+            msg << "Error in MultivariateExpansion::DiagonalDerivative.  The derivative order is " << derivOrder << ", but only orders of {1,2} are currently supported.";
             throw std::runtime_error(msg.str());
         }
 
@@ -277,10 +277,10 @@ private:
     Kokkos::View<unsigned int*> _startPos;
     Kokkos::View<const unsigned int*> _maxDegrees;
 
-}; // class TensorProductExpansion
+}; // class MultivariateExpansion
 
 } // namespace mpart
 
 
 
-#endif  // #ifndef MPART_TENSORPRODUCTEXPANSION_H
+#endif  // #ifndef MPART_MULTIVARIATEEXPANSION_H

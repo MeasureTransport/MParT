@@ -8,6 +8,6 @@ set (TEST_SOURCES
      tests/Test_PositiveBijectors.cpp
      tests/Test_Quadrature.cpp
      tests/Test_MonotoneComponent.cpp
-     tests/Test_ProductExpansion.cpp
+     tests/Test_MultivariateExpansion.cpp
      tests/Test_ArrayConversions.cpp
 PARENT_SCOPE) 
