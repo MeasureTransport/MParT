@@ -70,14 +70,14 @@ public:
         unsigned int numOutputs = 1;
         if(_derivType==DerivativeFlags::Diagonal)
             numOutputs++;
-        if(_derivType==DerivativeFlags::Parameters)
+        if((_derivType==DerivativeFlags::Parameters) || (_derivType==DerivativeFlags::Mixed))
             numOutputs += numTerms;
 
         Eigen::VectorXd output = Eigen::VectorXd::Zero(numOutputs);
 
 
         // Finish filling in the cache at the quadrature point (FillCache1 is called outside this class)
-        if(_derivType==DerivativeFlags::Diagonal){
+        if((_derivType==DerivativeFlags::Diagonal)||(_derivType==DerivativeFlags::Mixed)){
             _expansion.FillCache2(_cache, _pt, t*_pt(_dim-1), DerivativeFlags::Diagonal2);
         }else{
             _expansion.FillCache2(_cache, _pt, t*_pt(_dim-1), DerivativeFlags::Diagonal);
@@ -89,6 +89,19 @@ public:
             Eigen::Ref<Eigen::VectorXd> gradSeg(output.tail(numTerms));
             df = _expansion.MixedDerivative(_cache, _coeffs, 1, gradSeg);
             output *= _pt(_dim-1)*PosFuncType::Derivative(df);
+
+        }else if(_derivType==DerivativeFlags::Mixed){
+            Eigen::Ref<Eigen::VectorXd> gradSeg(output.tail(numTerms));
+            Eigen::VectorXd temp(numTerms);
+
+            double df2 = _expansion.MixedDerivative(_cache, _coeffs, 2, temp);
+            temp *= _pt(_dim-1)*t * PosFuncType::Derivative(df);
+
+            df = _expansion.MixedDerivative(_cache, _coeffs, 1, gradSeg);
+
+            gradSeg *= ( _pt(_dim-1)*t*df2*PosFuncType::SecondDerivative(df) + PosFuncType::Derivative(df) );
+            gradSeg += temp;
+
         }else{
             df = _expansion.DiagonalDerivative(_cache, _coeffs, 1);
         }

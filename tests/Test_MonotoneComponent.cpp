@@ -199,7 +199,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
     unsigned int dim = 2;
     const double fdStep = 1e-4;
 
-    // Create points evently space on [lb,ub]
+    // Create points evently spaced on [lb,ub]
     unsigned int numPts = 20;
     double lb = -0.5;
     double ub = 0.5;
@@ -268,7 +268,29 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
             coeffs(j) -= fdStep;
         }
     }
+
+
+     SECTION("Mixed Discrete Jacobian"){
+
+        Kokkos::View<double*> derivs("Derivatives", numPts);
+        Kokkos::View<double**> jac("Jacobian", numPts, numTerms);
+
+        comp.DiscreteMixedJacobian(evalPts, coeffs, derivs, jac);
+
+
+
+    }
+
+    SECTION("Mixed Continuous Jacobian"){
+
+        Kokkos::View<double*> derivs("Derivatives", numPts);
+        Kokkos::View<double**> jac("Jacobian", numPts, numTerms);
+
+        comp.ContinuousMixedJacobian(evalPts, coeffs, derivs, jac);
+
+    }
 }
+
 
 
 TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
