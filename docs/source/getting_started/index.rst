@@ -54,7 +54,6 @@ Build a transport map from samples
 
         unsigned int dim = 2;
         unsigned int maxDegree = 3;
-        MonotoneComponent T(); 
 
 .. tabbed:: python
 
@@ -62,7 +61,13 @@ Build a transport map from samples
         
         dim = 2
         maxDegree = 3 
-        MonotoneComponent T()
+
+.. tabbed:: matlab
+
+    .. code-block:: matlab
+        
+        dim = 2
+        maxDegree = 3 
 
 Contents 
 ----------------------
