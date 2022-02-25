@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Installation &#8212; MParT  documentation</title>
+    <title>Quadrature &#8212; MParT  documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -37,8 +37,8 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Mathematical Background" href="mathematics.html" />
-    <link rel="prev" title="Getting Started" href="index.html" />
+    <link rel="next" title="Clenshaw Curtis Quadrature" href="quadrature/clenshawcurtis.html" />
+    <link rel="prev" title="MultiIndexNeighborhood" href="multiindices/multiindexneighborhood.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -73,14 +73,14 @@
       
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 current active nav-item">
- <a class="reference internal nav-link" href="index.html">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_started/index.html">
   Getting Started
  </a>
 </li>
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../api/index.html">
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
   API Reference
  </a>
 </li>
@@ -125,15 +125,84 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
-    <ul class="current nav bd-sidenav">
- <li class="toctree-l1 current active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="multiindex.html">
+   MultiIndices
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindex.html">
+     MultiIndex
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexset.html">
+     MultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/fixedmultiindexset.html">
+     FixedMultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexlimiter.html">
+     MultiIndexLimiter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexneighborhood.html">
+     MultiIndexNeighborhood
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active has-children">
   <a class="current reference internal" href="#">
-   Installation
+   Quadrature
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/clenshawcurtis.html">
+     Clenshaw Curtis Quadrature
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/adaptivesimpson.html">
+     Adaptive Simpson Integration
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/recursivequadrature.html">
+     Recursive Adaptive Quadrature
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/kokkoswrappers.html">
+   Kokkos Array Conversions
   </a>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="mathematics.html">
-   Mathematical Background
+  <a class="reference internal" href="monotonecomponent.html">
+   Monotone Component
   </a>
  </li>
 </ul>
@@ -160,18 +229,8 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#compiling-from-source">
-   Compiling from Source
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#linking-to-mpart">
-   Linking to MParT
-  </a>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#building-documentation">
-   Building Documentation
+  <a class="reference internal nav-link" href="#c-objects">
+   C++ Objects
   </a>
  </li>
 </ul>
@@ -195,53 +254,16 @@
               
               <div>
                 
-  <section id="installation">
-<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<section id="compiling-from-source">
-<h2>Compiling from Source<a class="headerlink" href="#compiling-from-source" title="Permalink to this headline">¶</a></h2>
-<p>MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir build
-<span class="nb">cd</span> build
-cmake -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON -DKokkos_ENABLE_SERIAL<span class="o">=</span>ON ..
-make
-</pre></div>
-</div>
-<p>This will compile the <cite>mpart</cite> library and also create a test executable called <cite>RunTests</cite>.  The tests can be run with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">RunTests</span>
-</pre></div>
-</div>
-<p>Or, with the additional specification of the number of Kokkos threads to use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">RunTests</span> <span class="o">--</span><span class="n">kokkos</span><span class="o">-</span><span class="n">threads</span><span class="o">=</span><span class="mi">4</span>
-</pre></div>
-</div>
-</section>
-<section id="linking-to-mpart">
-<h2>Linking to MParT<a class="headerlink" href="#linking-to-mpart" title="Permalink to this headline">¶</a></h2>
-<p>Coming soon!</p>
-</section>
-<section id="building-documentation">
-<h2>Building Documentation<a class="headerlink" href="#building-documentation" title="Permalink to this headline">¶</a></h2>
-<ol class="arabic simple">
-<li><p>Make sure doxygen, sphinx, breathe, and the pydata-sphinx-theme are installed.  This is easily done with anaconda:</p></li>
-</ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">doxygen</span> <span class="n">sphinx</span> <span class="n">breathe</span> <span class="n">pydata</span><span class="o">-</span><span class="n">sphinx</span><span class="o">-</span><span class="n">theme</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">panels</span>
-</pre></div>
-</div>
-<ol class="arabic simple" start="2">
-<li><p>If working in a conda environment, add dependency paths to conf.py</p></li>
-<li><p>Build the <code class="code docutils literal notranslate"><span class="pre">sphinx</span></code> target:</p></li>
-</ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">build</span>
-<span class="n">cmake</span> <span class="o">..</span>
-<span class="n">make</span> <span class="n">sphinx</span>
-</pre></div>
-</div>
-<ol class="arabic simple" start="4">
-<li><p>Open the sphinx output</p></li>
-</ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">open</span> <span class="n">docs</span><span class="o">/</span><span class="n">sphinx</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
-</pre></div>
+  <section id="quadrature">
+<h1>Quadrature<a class="headerlink" href="#quadrature" title="Permalink to this headline">¶</a></h1>
+<section id="c-objects">
+<h2>C++ Objects<a class="headerlink" href="#c-objects" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="quadrature/clenshawcurtis.html">Clenshaw Curtis Quadrature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quadrature/adaptivesimpson.html">Adaptive Simpson Integration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="quadrature/recursivequadrature.html">Recursive Adaptive Quadrature</a></li>
+</ul>
 </div>
 </section>
 </section>
@@ -252,17 +274,17 @@ make
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="multiindices/multiindexneighborhood.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Getting Started</p>
+            <p class="prev-next-title">MultiIndexNeighborhood</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="mathematics.html" title="next page">
+    <a class='right-next' id="next-link" href="quadrature/clenshawcurtis.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Mathematical Background</p>
+        <p class="prev-next-title">Clenshaw Curtis Quadrature</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

@@ -1,0 +1,474 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Monotone Component &#8212; MParT  documentation</title>
+    
+    <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  
+    
+    <link rel="stylesheet"
+      href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+    
+      
+  
+    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/pydata-sphinx-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+    <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Development" href="../development/index.html" />
+    <link rel="prev" title="Kokkos Array Conversions" href="utilities/kokkoswrappers.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">MParT</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_started/index.html">
+  Getting Started
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../development/index.html">
+  Development
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/MeasureTransport/MParT" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="multiindex.html">
+   MultiIndices
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindex.html">
+     MultiIndex
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexset.html">
+     MultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/fixedmultiindexset.html">
+     FixedMultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexlimiter.html">
+     MultiIndexLimiter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexneighborhood.html">
+     MultiIndexNeighborhood
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="quadrature.html">
+   Quadrature
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/clenshawcurtis.html">
+     Clenshaw Curtis Quadrature
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/adaptivesimpson.html">
+     Adaptive Simpson Integration
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/recursivequadrature.html">
+     Recursive Adaptive Quadrature
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/kokkoswrappers.html">
+   Kokkos Array Conversions
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Monotone Component
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="monotone-component">
+<h1>Monotone Component<a class="headerlink" href="#monotone-component" title="Permalink to this headline">¶</a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I000EN5mpart17MonotoneComponentE">
+<span id="_CPPv3I000EN5mpart17MonotoneComponentE"></span><span id="_CPPv2I000EN5mpart17MonotoneComponentE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ExpansionType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PosFuncType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">QuadratureType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_monotone_component"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MonotoneComponent</span></span></span><a class="headerlink" href="#_CPPv4I000EN5mpart17MonotoneComponentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Defines a function <span class="math notranslate nohighlight">\(T:R^N\rightarrow R\)</span> such that <span class="math notranslate nohighlight">\(\partial T / \partial x_N &gt;0\)</span> is strictly positive. </p>
+<p>The function <span class="math notranslate nohighlight">\(T\)</span> is based on another (generally non-monotone) function <span class="math notranslate nohighlight">\(f : R^N\rightarrow R\)</span> and a strictly positve function <span class="math notranslate nohighlight">\(g : R\rightarrow R_{&gt;0}\)</span>. Together, these functions define the monotone component $T$ through</p>
+<p>$$ T(x_1, x_2, …, x_D) = f(x_1,x_2,…, x_{D-1}, 0) + \int_0^{x_D} g\left( \partial_D f(x_1,x_2,…, x_{D-1}, t) \right) dt $$</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>BasisEvaluatorType</strong> – A class defining the family of 1d basis functions used to parameterize the function <span class="math notranslate nohighlight">\(f\)</span>. The MParT::HermiteFunction and MParT::ProbabilistHermite classes are examples of types that implement the required interface. </p></li>
+<li><p><strong>PosFuncType</strong> – A class defining the function <span class="math notranslate nohighlight">\(g\)</span>. This class must have <code class="docutils literal notranslate"><span class="pre">Evaluate</span></code> and <code class="docutils literal notranslate"><span class="pre">Derivative</span></code> functions accepting a double and returning a double. The MParT::SoftPlus and MParT::Exp classes in PositiveBijectors.h are examples of classes defining this interface. </p></li>
+<li><p><strong>QuadratureType</strong> – A class defining the integration scheme used to approximate <span class="math notranslate nohighlight">\(\int_0^{x_N} g\left( \frac{\partial f}{\partial x_d}(x_1,x_2,..., x_{N-1}, t) \right) dt\)</span>. The type must have a function <code class="docutils literal notranslate"><span class="pre">Integrate(f,lb,ub)</span></code> that accepts a functor <code class="docutils literal notranslate"><span class="pre">f</span></code>, a double lower bound <code class="docutils literal notranslate"><span class="pre">lb</span></code>, a double upper bound <code class="docutils literal notranslate"><span class="pre">ub</span></code>, and returns a double with an estimate of the integral. The MParT::AdaptiveSimpson and MParT::RecursiveQuadrature classes provide this interface. </p></li>
+</ul>
+</dd>
+</dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent17MonotoneComponentERK13ExpansionTypeRK14QuadratureType">
+<span id="_CPPv3N5mpart17MonotoneComponent17MonotoneComponentERK13ExpansionTypeRK14QuadratureType"></span><span id="_CPPv2N5mpart17MonotoneComponent17MonotoneComponentERK13ExpansionTypeRK14QuadratureType"></span><span id="mpart::MonotoneComponent::MonotoneComponent__ExpansionTypeCR.QuadratureTypeCR"></span><span class="target" id="classmpart_1_1_monotone_component_1ac41c6f4b482292db7b0fb13b7dd6bc79"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MonotoneComponent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I000EN5mpart17MonotoneComponentE" title="mpart::MonotoneComponent::ExpansionType"><span class="n"><span class="pre">ExpansionType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">expansion</span></span>, <a class="reference internal" href="#_CPPv4I000EN5mpart17MonotoneComponentE" title="mpart::MonotoneComponent::QuadratureType"><span class="n"><span class="pre">QuadratureType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quad</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent17MonotoneComponentERK13ExpansionTypeRK14QuadratureType" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent8EvaluateERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE">
+<span id="_CPPv3N5mpart17MonotoneComponent8EvaluateERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE"></span><span id="_CPPv2N5mpart17MonotoneComponent8EvaluateERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE"></span><span id="mpart::MonotoneComponent::Evaluate__Kokkos::View:doublePP:CR.Kokkos::View:doubleP:CR.Kokkos::View:doubleP:R"></span><span class="target" id="classmpart_1_1_monotone_component_1af4bd5d60e8f625e8e42ceaa9112f2339"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Evaluate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent8EvaluateERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Evaluates the monotone function <span class="math notranslate nohighlight">\(T(x_1,\ldots,x_D)\)</span> at multiple points. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – <strong>[in]</strong> A <span class="math notranslate nohighlight">\(D\times N\)</span> array containing the <span class="math notranslate nohighlight">\(N\)</span> points in <span class="math notranslate nohighlight">\(\mathbb{R}^D\)</span> where we want to evaluate the monotone component. Each column is a point. </p></li>
+<li><p><strong>coeffs</strong> – <strong>[in]</strong> The coefficients in the expansion defining <span class="math notranslate nohighlight">\(f\)</span>. The length of this array must be the same as the number of terms in the multiindex set passed to the constructor. </p></li>
+<li><p><strong>output</strong> – <strong>[out]</strong> Kokkos::View&lt;double*&gt; An array containing the evaluattions <span class="math notranslate nohighlight">\(T(x^{(i)}_1,\ldots,x^{(i)}_D)\)</span> for each <span class="math notranslate nohighlight">\(i\in\{0,\ldots,N\}\)</span>. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent8EvaluateERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE">
+<span id="_CPPv3N5mpart17MonotoneComponent8EvaluateERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE"></span><span id="_CPPv2N5mpart17MonotoneComponent8EvaluateERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE"></span><span id="mpart::MonotoneComponent::Evaluate__Kokkos::View:doublePP:CR.Kokkos::View:doubleP:CR"></span><span class="target" id="classmpart_1_1_monotone_component_1a070ac6c746066a22c0ee7cc84ed78bb0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Evaluate</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent8EvaluateERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Evaluates the monotone function <span class="math notranslate nohighlight">\(T(x_1,\ldots,x_D)\)</span> at multiple points. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – <strong>[in]</strong> A <span class="math notranslate nohighlight">\(D\times N\)</span> array containing the <span class="math notranslate nohighlight">\(N\)</span> points in <span class="math notranslate nohighlight">\(\mathbb{R}^D\)</span> where we want to evaluate the monotone component. Each column is a point. </p></li>
+<li><p><strong>coeffs</strong> – <strong>[in]</strong> The coefficients in the expansion defining <span class="math notranslate nohighlight">\(f\)</span>. The length of this array must be the same as the number of terms in the multiindex set passed to the constructor. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Kokkos::View&lt;double*&gt; An array containing the evaluattions <span class="math notranslate nohighlight">\(T(x^{(i)}_1,\ldots,x^{(i)}_D)\)</span> for each <span class="math notranslate nohighlight">\(i\in\{0,\ldots,N\}\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent20ContinuousDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE">
+<span id="_CPPv3N5mpart17MonotoneComponent20ContinuousDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE"></span><span id="_CPPv2N5mpart17MonotoneComponent20ContinuousDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE"></span><span id="mpart::MonotoneComponent::ContinuousDerivative__Kokkos::View:doublePP:CR.Kokkos::View:doubleP:CR"></span><span class="target" id="classmpart_1_1_monotone_component_1acf43b3fec95a3816a164499db4ddb01b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContinuousDerivative</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent20ContinuousDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Approximates the “continuous derivative” <span class="math notranslate nohighlight">\(\frac{\partial T}{\partial x_D}\)</span> derived from the exact integral form of the transport map. </p>
+<p>See the <a class="reference external" href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#classmpart_1_1_monotone_component_1a9faac8bca007302c1957a5687dca8ff3"><span class="std std-ref">DiscreteDerivative</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – The points where we want to evaluate the derivative. Each column represents one point. </p></li>
+<li><p><strong>coeffs</strong> – The ceofficients in an expansion for <span class="math notranslate nohighlight">\(f\)</span>. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Kokkos::View&lt;double*&gt; The values of <span class="math notranslate nohighlight">\(\frac{\partial T}{\partial x_D}\)</span> at each point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent20ContinuousDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE">
+<span id="_CPPv3N5mpart17MonotoneComponent20ContinuousDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE"></span><span id="_CPPv2N5mpart17MonotoneComponent20ContinuousDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE"></span><span id="mpart::MonotoneComponent::ContinuousDerivative__Kokkos::View:doublePP:CR.Kokkos::View:doubleP:CR.Kokkos::View:doubleP:R"></span><span class="target" id="classmpart_1_1_monotone_component_1aa2c50a4d35afccdb69c9612fa1dec272"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContinuousDerivative</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">derivs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent20ContinuousDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Approximates the “continuous derivative” <span class="math notranslate nohighlight">\(\frac{\partial T}{\partial x_D}\)</span> derived from the exact integral form of the transport map. </p>
+<p>See the <a class="reference external" href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#classmpart_1_1_monotone_component_1a9faac8bca007302c1957a5687dca8ff3"><span class="std std-ref">DiscreteDerivative</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – <strong>[in]</strong> The points where we want to evaluate the derivative. Each column represents one point. </p></li>
+<li><p><strong>coeffs</strong> – <strong>[in]</strong> The ceofficients in an expansion for <span class="math notranslate nohighlight">\(f\)</span>. </p></li>
+<li><p><strong>evals</strong> – <strong>[inout]</strong> The values of map component itself <span class="math notranslate nohighlight">\(T\)</span> at each point. </p></li>
+<li><p><strong>derivs</strong> – <strong>[inout]</strong> The values of <span class="math notranslate nohighlight">\( \frac{\partial T}{\partial x_D}\)</span> at each point.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent18DiscreteDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE">
+<span id="_CPPv3N5mpart17MonotoneComponent18DiscreteDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE"></span><span id="_CPPv2N5mpart17MonotoneComponent18DiscreteDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE"></span><span id="mpart::MonotoneComponent::DiscreteDerivative__Kokkos::View:doublePP:CR.Kokkos::View:doubleP:CR"></span><span class="target" id="classmpart_1_1_monotone_component_1a9faac8bca007302c1957a5687dca8ff3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiscreteDerivative</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent18DiscreteDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Approximates the “discrete derivative” of the quadrature-based approximation <span class="math notranslate nohighlight">\(\tilde{T}\)</span>. </p>
+<p>See the <a class="reference external" href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#classmpart_1_1_monotone_component_1acf43b3fec95a3816a164499db4ddb01b"><span class="std std-ref">ContinuousDerivative</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – <strong>[in]</strong> The points where we want to evaluate the derivative. Each column represents one point. </p></li>
+<li><p><strong>coeffs</strong> – <strong>[in]</strong> The ceofficients in an expansion for <span class="math notranslate nohighlight">\(f\)</span>. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Kokkos::View&lt;double*&gt; The values of <span class="math notranslate nohighlight">\( \frac{\partial \tilde{T}}{\partial x_D}\)</span> at each point.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent18DiscreteDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE">
+<span id="_CPPv3N5mpart17MonotoneComponent18DiscreteDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE"></span><span id="_CPPv2N5mpart17MonotoneComponent18DiscreteDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE"></span><span id="mpart::MonotoneComponent::DiscreteDerivative__Kokkos::View:doublePP:CR.Kokkos::View:doubleP:CR.Kokkos::View:doubleP:R.Kokkos::View:doubleP:R"></span><span class="target" id="classmpart_1_1_monotone_component_1a39317d78c44edde2bbb4446d8fbb8f53"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiscreteDerivative</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">evals</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">derivs</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent18DiscreteDerivativeERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Approximates the “discrete derivative” of the quadrature-based approximation <span class="math notranslate nohighlight">\(\tilde{T}\)</span>. </p>
+<p>See the <a class="reference external" href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives. <div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#classmpart_1_1_monotone_component_1acf43b3fec95a3816a164499db4ddb01b"><span class="std std-ref">ContinuousDerivative</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – <strong>[in]</strong> The points where we want to evaluate the derivative. Each column represents one point. </p></li>
+<li><p><strong>coeffs</strong> – <strong>[in]</strong> The ceofficients in an expansion for <span class="math notranslate nohighlight">\(f\)</span>. </p></li>
+<li><p><strong>evals</strong> – <strong>[out]</strong> The values of the map component itself <span class="math notranslate nohighlight">\(\tilde{T}\)</span> at each point. </p></li>
+<li><p><strong>derivs</strong> – <strong>[out]</strong> Kokkos::View&lt;double*&gt; The values of <span class="math notranslate nohighlight">\( \frac{\partial \tilde{T}}{\partial x_D}\)</span> at each point.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent13CoeffJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE">
+<span id="_CPPv3N5mpart17MonotoneComponent13CoeffJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE"></span><span id="_CPPv2N5mpart17MonotoneComponent13CoeffJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE"></span><span id="mpart::MonotoneComponent::CoeffJacobian__Kokkos::View:doublePP:CR.Kokkos::View:doubleP:CR.Kokkos::View:doubleP:R.Kokkos::View:doublePP:R"></span><span class="target" id="classmpart_1_1_monotone_component_1a2e1bff5dcc38b7e72501955d2de0f9f9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffJacobian</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">evaluations</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">jacobian</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent13CoeffJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the gradient of the map with respect to the parameters <span class="math notranslate nohighlight">\(\mathbf{w}\)</span> at multiple points. </p>
+<p>Consider <span class="math notranslate nohighlight">\(N\)</span> points <span class="math notranslate nohighlight">\(\{\mathbf{x}^{(1)},\ldots,\mathbf{x}^{(N)}\}\)</span> and let <span class="math notranslate nohighlight">\(y_d^{(i)} = T_d(\mathbf{x}^{(i)}; \mathbf{w})\)</span>. This function computes <span class="math notranslate nohighlight">\(\nabla_{\mathbf{w}} y_d^{(i)}\)</span> for each output <span class="math notranslate nohighlight">\(y_d^{(i)}\)</span>.</p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p>CoeffGradient </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – <strong>[in]</strong> A <span class="math notranslate nohighlight">\(D\times N\)</span> matrix containing the points <span class="math notranslate nohighlight">\(x^{(1)},\ldots,x^{(N)}\)</span>. Each column is a point. </p></li>
+<li><p><strong>coeffs</strong> – <strong>[in]</strong> A vector of coefficients defining the function <span class="math notranslate nohighlight">\(f(\mathbf{x}; \mathbf{w})\)</span>. </p></li>
+<li><p><strong>evaluations</strong> – <strong>[out]</strong> A vector containing the <span class="math notranslate nohighlight">\(N\)</span> predictions <span class="math notranslate nohighlight">\(y_d^{(i)}\)</span>. The vector must be preallocated and have <span class="math notranslate nohighlight">\(N\)</span> components when passed to this function. An assertion will be thrown in this vector is not the correct size. </p></li>
+<li><p><strong>jacobian</strong> – <strong>[out]</strong> A matrix containing the <span class="math notranslate nohighlight">\(N\times M\)</span> Jacobian matrix, where <span class="math notranslate nohighlight">\(M\)</span> is the length of the parameter vector <span class="math notranslate nohighlight">\(\mathbf{w}\)</span>. This matrix must be sized correctly or an assertion will be thrown.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent23ContinuousMixedJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE">
+<span id="_CPPv3N5mpart17MonotoneComponent23ContinuousMixedJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE"></span><span id="_CPPv2N5mpart17MonotoneComponent23ContinuousMixedJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE"></span><span id="mpart::MonotoneComponent::ContinuousMixedJacobian__Kokkos::View:doublePP:CR.Kokkos::View:doubleP:CR.Kokkos::View:doublePP:R"></span><span class="target" id="classmpart_1_1_monotone_component_1ac22e2f8ea73bcd8fda341610b8aebbf5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ContinuousMixedJacobian</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">jacobian</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent23ContinuousMixedJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent21DiscreteMixedJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE">
+<span id="_CPPv3N5mpart17MonotoneComponent21DiscreteMixedJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE"></span><span id="_CPPv2N5mpart17MonotoneComponent21DiscreteMixedJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE"></span><span id="mpart::MonotoneComponent::DiscreteMixedJacobian__Kokkos::View:doublePP:CR.Kokkos::View:doubleP:CR.Kokkos::View:doublePP:R"></span><span class="target" id="classmpart_1_1_monotone_component_1a808899fd23512ba0ef3c91f921bc7007"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiscreteMixedJacobian</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">jacobian</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent21DiscreteMixedJacobianERKN6Kokkos4ViewIPPdEERKN6Kokkos4ViewIPdEERN6Kokkos4ViewIPPdEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="utilities/kokkoswrappers.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Kokkos Array Conversions</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../development/index.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Development</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+    <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, The MParT development team..<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

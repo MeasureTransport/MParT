@@ -168,6 +168,43 @@
    </li>
   </ul>
  </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../quadrature.html">
+   Quadrature
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../quadrature/clenshawcurtis.html">
+     Clenshaw Curtis Quadrature
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../quadrature/adaptivesimpson.html">
+     Adaptive Simpson Integration
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../quadrature/recursivequadrature.html">
+     Recursive Adaptive Quadrature
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../utilities/kokkoswrappers.html">
+   Kokkos Array Conversions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../monotonecomponent.html">
+   Monotone Component
+  </a>
+ </li>
 </ul>
 
   </div>
@@ -234,8 +271,8 @@
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK5mpart18FixedMultiIndexSet12GetMaxOrdersEv">
-<span id="_CPPv3NK5mpart18FixedMultiIndexSet12GetMaxOrdersEv"></span><span id="_CPPv2NK5mpart18FixedMultiIndexSet12GetMaxOrdersEv"></span><span id="mpart::FixedMultiIndexSet::GetMaxOrdersC"></span><span class="target" id="classmpart_1_1_fixed_multi_index_set_1a4f10a74e70ea956a697c08e08d28bff7"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMaxOrders</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart18FixedMultiIndexSet12GetMaxOrdersEv" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart18FixedMultiIndexSet10MaxDegreesEv">
+<span id="_CPPv3NK5mpart18FixedMultiIndexSet10MaxDegreesEv"></span><span id="_CPPv2NK5mpart18FixedMultiIndexSet10MaxDegreesEv"></span><span id="mpart::FixedMultiIndexSet::MaxDegreesC"></span><span class="target" id="classmpart_1_1_fixed_multi_index_set_1ae7de905f011ebc9cbfdc7f04277d228b"></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaxDegrees</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart18FixedMultiIndexSet10MaxDegreesEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
@@ -269,6 +306,26 @@
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart18FixedMultiIndexSet12isCompressedE">
 <span id="_CPPv3N5mpart18FixedMultiIndexSet12isCompressedE"></span><span id="_CPPv2N5mpart18FixedMultiIndexSet12isCompressedE"></span><span id="mpart::FixedMultiIndexSet::isCompressed__bC"></span><span class="target" id="classmpart_1_1_fixed_multi_index_set_1a86f0502cffbb1fd51f4bb3ddb98bbcfe"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isCompressed</span></span></span><a class="headerlink" href="#_CPPv4N5mpart18FixedMultiIndexSet12isCompressedE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart18FixedMultiIndexSet8nzStartsE">
+<span id="_CPPv3N5mpart18FixedMultiIndexSet8nzStartsE"></span><span id="_CPPv2N5mpart18FixedMultiIndexSet8nzStartsE"></span><span id="mpart::FixedMultiIndexSet::nzStarts__Kokkos::View:unsigned-iP:"></span><span class="target" id="classmpart_1_1_fixed_multi_index_set_1ae7bef00616942556593f6ec7903ad8be"></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nzStarts</span></span></span><a class="headerlink" href="#_CPPv4N5mpart18FixedMultiIndexSet8nzStartsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart18FixedMultiIndexSet6nzDimsE">
+<span id="_CPPv3N5mpart18FixedMultiIndexSet6nzDimsE"></span><span id="_CPPv2N5mpart18FixedMultiIndexSet6nzDimsE"></span><span id="mpart::FixedMultiIndexSet::nzDims__Kokkos::View:unsigned-iP:"></span><span class="target" id="classmpart_1_1_fixed_multi_index_set_1a122292dfa95ea89d88e12f122467995e"></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nzDims</span></span></span><a class="headerlink" href="#_CPPv4N5mpart18FixedMultiIndexSet6nzDimsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart18FixedMultiIndexSet8nzOrdersE">
+<span id="_CPPv3N5mpart18FixedMultiIndexSet8nzOrdersE"></span><span id="_CPPv2N5mpart18FixedMultiIndexSet8nzOrdersE"></span><span id="mpart::FixedMultiIndexSet::nzOrders__Kokkos::View:unsigned-iP:"></span><span class="target" id="classmpart_1_1_fixed_multi_index_set_1acc505dbabbce9f29a34b754f67dcc986"></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nzOrders</span></span></span><a class="headerlink" href="#_CPPv4N5mpart18FixedMultiIndexSet8nzOrdersE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart18FixedMultiIndexSet10maxDegreesE">
+<span id="_CPPv3N5mpart18FixedMultiIndexSet10maxDegreesE"></span><span id="_CPPv2N5mpart18FixedMultiIndexSet10maxDegreesE"></span><span id="mpart::FixedMultiIndexSet::maxDegrees__Kokkos::View:unsigned-iP:"></span><span class="target" id="classmpart_1_1_fixed_multi_index_set_1a0156aa3c045840f96fb607224aa4a13b"></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">maxDegrees</span></span></span><a class="headerlink" href="#_CPPv4N5mpart18FixedMultiIndexSet10maxDegreesE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>

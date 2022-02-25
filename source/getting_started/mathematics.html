@@ -169,6 +169,23 @@
   <a class="reference internal nav-link" href="#monotone-parameterizations">
    Monotone Parameterizations
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#numerical-integration">
+     Numerical Integration
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#diagonal-derivatives">
+     Diagonal Derivatives
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#coefficient-derivatives">
+     Coefficient Derivatives
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#triangular-transport-maps">
@@ -212,12 +229,51 @@ through</p>
 <section id="monotone-parameterizations">
 <h2>Monotone Parameterizations<a class="headerlink" href="#monotone-parameterizations" title="Permalink to this headline">¶</a></h2>
 <p>We represent monotone functions as the smooth transformation of an unconstrained function <span class="math notranslate nohighlight">\(f\colon\mathbb{R}^{d} \rightarrow \mathbb{R}\)</span>. Let <span class="math notranslate nohighlight">\(g\colon\mathbb{R}\rightarrow \mathbb{R}_{&gt;0}\)</span> be a strictly positive function, such as the softplus <span class="math notranslate nohighlight">\(g(x) = \log(1 + \exp(x))\)</span>. Then, the d-th map component <span class="math notranslate nohighlight">\(T_{d}\)</span> is given by</p>
-<div class="math notranslate nohighlight">
-\[T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt.\]</div>
-<p>Other choices for the <span class="math notranslate nohighlight">\(g\)</span> include the squared and exponential functions. These choices, however, have implications for the identifiability of the coefficients. If <span class="math notranslate nohighlight">\(g\)</span> is bijective, then we can recover <span class="math notranslate nohighlight">\(f\)</span> from <span class="math notranslate nohighlight">\(T_d\)</span> as.</p>
+<div class="math notranslate nohighlight" id="equation-cont-map">
+<span class="eqno">(1)<a class="headerlink" href="#equation-cont-map" title="Permalink to this equation">¶</a></span>\[T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt.\]</div>
+<p>Other choices for the <span class="math notranslate nohighlight">\(g\)</span> include the squared and exponential functions. These choices, however, have implications for the identifiability of the coefficients. If <span class="math notranslate nohighlight">\(g\)</span> is bijective, then we can recover <span class="math notranslate nohighlight">\(f\)</span> from <span class="math notranslate nohighlight">\(T_d\)</span> as</p>
 <div class="math notranslate nohighlight">
 \[f(\mathbf{x}_{1:d}; \mathbf{w}) = T_d(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g^{-1}( \partial_d T_d(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt.\]</div>
 <p>Using the representation for monotone functions with a bijective <span class="math notranslate nohighlight">\(g\)</span>, we can approximate <span class="math notranslate nohighlight">\(T_d\)</span> by finding <span class="math notranslate nohighlight">\(f\)</span>.</p>
+<section id="numerical-integration">
+<h3>Numerical Integration<a class="headerlink" href="#numerical-integration" title="Permalink to this headline">¶</a></h3>
+<p>Computationally, we approximate the integral in the definition of <span class="math notranslate nohighlight">\(T_d(\mathbf{x}_{1:d}; \mathbf{w})\)</span> using a quadrature rule with <span class="math notranslate nohighlight">\(N\)</span> points <span class="math notranslate nohighlight">\(\{t^{(1)}, \ldots, t^{(N)}\}\)</span> and corresponding weights <span class="math notranslate nohighlight">\(\{c^{(1)}, \ldots, c^{(N)}\}\)</span> designed to approximate integrals over <span class="math notranslate nohighlight">\([0,1]\)</span>.  Note that these points and weights will often be chosen adaptively.    The quadrature rule yields an approximation of the map component in <a class="reference internal" href="#equation-cont-map">(1)</a> with the form</p>
+<div class="math notranslate nohighlight" id="equation-discr-map">
+<span class="eqno">(2)<a class="headerlink" href="#equation-discr-map" title="Permalink to this equation">¶</a></span>\[\tilde{T}_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + x_d \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ),\]</div>
+<p>where the <span class="math notranslate nohighlight">\(x_d\)</span> term outside the summation comes from a change of integration domains from <span class="math notranslate nohighlight">\([0,1]\)</span> to <span class="math notranslate nohighlight">\([0,x_d]\)</span>.</p>
+</section>
+<section id="diagonal-derivatives">
+<h3>Diagonal Derivatives<a class="headerlink" href="#diagonal-derivatives" title="Permalink to this headline">¶</a></h3>
+<p>We will often require derivatives of <span class="math notranslate nohighlight">\(T_d\)</span> with respect to an input <span class="math notranslate nohighlight">\(x_i\)</span> or the parameters <span class="math notranslate nohighlight">\(\mathbf{w}\)</span>.  When computing these derivatives however, we have a choice of whether to differentiate the continuous map form in <a class="reference internal" href="#equation-cont-map">(1)</a> or the discretized map in <a class="reference internal" href="#equation-discr-map">(2)</a>.  This is similar to the “discretize-then-optimize” or “optimize-then-discretize” choice in PDE-constrained optimization.  When the quadrature rule is accurate, there might not be a large practical difference in these approaches.  For approximate rules however, using the continuous derivative may cause issues during optimization because the derivative will not be consistent with the discreteized map: a finite difference approximation will not converge to the continuous derivative.   In these cases, it is preferrable to differentiate the discrete map in <a class="reference internal" href="#equation-discr-map">(2)</a>.</p>
+<p>The derivative <span class="math notranslate nohighlight">\(\partial T_d / \partial x_d\)</span> is particularly important when using the monotone function <span class="math notranslate nohighlight">\(T_d\)</span> in a measure transformation.   The continuous version of this derivative is simply</p>
+<div class="math notranslate nohighlight" id="equation-cont-deriv">
+<span class="eqno">(3)<a class="headerlink" href="#equation-cont-deriv" title="Permalink to this equation">¶</a></span>\[\frac{\partial T_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) = g(\, \partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\, ).\]</div>
+<p>The discrete derivative on the other hand is more complicated:</p>
+<div class="math notranslate nohighlight" id="equation-discr-deriv">
+<span class="eqno">(4)<a class="headerlink" href="#equation-discr-deriv" title="Permalink to this equation">¶</a></span>\[\begin{split}\frac{\partial \tilde{T}_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) &amp;= \frac{\partial}{\partial x_d} \left[x_d \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) )\right]\\
+&amp; = \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \\
+&amp;+ x_d \sum_{i=1}^N c^{(i)} t^{(i)} \partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \partial^2_{dd}f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) .\end{split}\]</div>
+</section>
+<section id="coefficient-derivatives">
+<h3>Coefficient Derivatives<a class="headerlink" href="#coefficient-derivatives" title="Permalink to this headline">¶</a></h3>
+<p>In addition to computing <span class="math notranslate nohighlight">\(\partial T_d/\partial d\)</span>, we will also need the gradient of the monotone function <span class="math notranslate nohighlight">\(T_d\)</span> with respect to the parameters <span class="math notranslate nohighlight">\(\mathbf{w}\)</span>, denoted by <span class="math notranslate nohighlight">\(\nabla_{\mathbf{w}}T_d\)</span>.</p>
+<div class="math notranslate nohighlight" id="equation-coeff-deriv">
+<span class="eqno">(5)<a class="headerlink" href="#equation-coeff-deriv" title="Permalink to this equation">¶</a></span>\[\begin{split}\nabla_{\mathbf{w}} T_d(\mathbf{x}_{1:d}; \mathbf{w}) &amp;= \nabla_{\mathbf{w}} f(x_1,\ldots, x_{d-1},0; \mathbf{w})\\
+ &amp;+ \int_0^{x_d} \partial g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) \nabla_{\mathbf{w}}\left[\partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w})\right] dt \\
+ &amp;\approx \nabla_{\mathbf{w}} f(x_1,\ldots, x_{d-1},0; \mathbf{w})\\
+&amp; + x_d \sum_{i=1}^N c^{(i)} \partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \nabla_{\mathbf{w}}\left[\partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w})\right]\end{split}\]</div>
+<p>If is also possible to compute the gradient of the diagonal derivative <span class="math notranslate nohighlight">\(\nabla_{\mathbf{w}}\left( \partial T_d/\partial d\right)\)</span> with respect to the parameters, but like before, there is a question of whether the derivative of the exact map or the derivative of the quadrature-based approximate map should be used.    In the case of the exact map, the mixed coefficient gradient has the simple form</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\nabla_{\mathbf{w}}\left[ \frac{\partial T_d}{\partial d}\right] &amp; = \nabla_{\mathbf{w}}\left[ g(\, \partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\, ) \right] \\
+&amp; = \partial g(\, \partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\, )  \nabla_{\mathbf{w}}\left[\partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\right].\end{split}\]</div>
+<p>The gradient of the discrete derivative is more expansive and takes the form</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\nabla_{\mathbf{w}}\left[ \frac{\partial \tilde{T}_d}{\partial d}\right] &amp;= \sum_{i=1}^N c^{(i)} \nabla_{\mathbf{w}}\left[g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \right] \\
+&amp; + x_d \sum_{i=1}^N c^{(i)} t^{(i)} \nabla_{\mathbf{w}}\left[\partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \partial^2_{dd}f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) \right] \\
+&amp;= \sum_{i=1}^N c^{(i)} \partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w})) \nabla_{\mathbf{w}}\left[ \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) \right] \\
+&amp;+ x_d \sum_{i=1}^N c^{(i)} t^{(i)} \partial^2 g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \partial^2_{dd}f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) \nabla_{\mathbf{w}}\left[ \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) \right]  \\
+&amp;  + x_d \sum_{i=1}^N c^{(i)} t^{(i)} \partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) )  \nabla_{\mathbf{w}}\left[\partial^2_{dd}f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w})\right].\end{split}\]</div>
+</section>
 </section>
 <section id="triangular-transport-maps">
 <h2>Triangular Transport Maps<a class="headerlink" href="#triangular-transport-maps" title="Permalink to this headline">¶</a></h2>

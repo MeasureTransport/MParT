@@ -27,6 +27,11 @@ Or, with the additional specification of the number of Kokkos threads to use:
    ./RunTests --kokkos-threads=4
 
 
+Linking to MParT 
+----------------------
+Coming soon!
+
+
 Building Documentation
 ----------------------
 
