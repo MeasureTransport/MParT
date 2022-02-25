@@ -91,15 +91,18 @@ public:
             output *= _pt(_dim-1)*PosFuncType::Derivative(df);
 
         }else if(_derivType==DerivativeFlags::Mixed){
+            df = _expansion.DiagonalDerivative(_cache, _coeffs, 1);
+
             Eigen::Ref<Eigen::VectorXd> gradSeg(output.tail(numTerms));
             Eigen::VectorXd temp(numTerms);
 
+            double dgdf = PosFuncType::Derivative(df);
             double df2 = _expansion.MixedDerivative(_cache, _coeffs, 2, temp);
-            temp *= _pt(_dim-1)*t * PosFuncType::Derivative(df);
+            temp *= _pt(_dim-1)* t * dgdf;
 
             df = _expansion.MixedDerivative(_cache, _coeffs, 1, gradSeg);
 
-            gradSeg *= ( _pt(_dim-1)*t*df2*PosFuncType::SecondDerivative(df) + PosFuncType::Derivative(df) );
+            gradSeg *= ( _pt(_dim-1)*t*df2*PosFuncType::SecondDerivative(df) + dgdf );
             gradSeg += temp;
 
         }else{
