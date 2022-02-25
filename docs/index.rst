@@ -9,19 +9,7 @@ MParT: Monotone Parameterization Toolbox
 ========================================
 :mod:`mpart` is a toolbox for constructing and using monotone functions for measure transport and regression.
 
-Introduction
-------------
-Some background will go here ....
-
-License
----------
-
-We still need to pick a license...  
-
-
-Citing 
--------------
-How do we want people to cite us?  We should provide an example bibtex entry.
+.. image:: _static/pics/Transformation2d.png
 
 Contents 
 -------------
@@ -31,3 +19,52 @@ Contents
 
    source/getting_started/index
    source/api/index
+   source/development/index
+
+Citing 
+-------------
+
+When citing MParT, we recommend citing both MParT as a whole and any original research articles for the specific algorithms
+used by MParT in your problem.  Refer to MParT's documentation for the relevant algorithmic  references.  The general MParT
+reference is 
+
+.. epigraph::
+
+   MParT Development Team. <YEAR>. MParT: A Monotone Parameterization Toolbox, <VERSION>. https://measuretransport.github.io/MParT/
+
+In bibtex, this is::
+
+   @misc{mpart2022,
+      title = {{MParT: A Monotone Parameterization Toolbox}},
+      author = {{MParT Development Team}},
+      note = {Version 0.0.1},
+      year = {2022},
+      url = {https://measuretransport.github.io/MParT/},
+   }
+
+License
+---------
+
+MParT is release under the MIT License.
+
+.. epigraph::
+
+   Copyright (c) 2022 Trustees of Dartmouth College
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE. 

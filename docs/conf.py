@@ -32,6 +32,7 @@ extensions = [ 'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax', 
+    'sphinx_panels',
     'breathe' ]
 
 breathe_default_project = "mpart"
