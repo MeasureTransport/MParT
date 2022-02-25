@@ -43,7 +43,26 @@ Installation
         :classes: btn-secondary stretched-link
 
 
+Quick Start 
+----------------------
 
+Build a transport map from samples 
+
+.. tabbed:: c++
+
+    .. code-block:: c++
+
+        unsigned int dim = 2;
+        unsigned int maxDegree = 3;
+        MonotoneComponent T(); 
+
+.. tabbed:: python
+
+    .. code-block:: python
+        
+        dim = 2
+        maxDegree = 3 
+        MonotoneComponent T()
 
 Contents 
 ----------------------
