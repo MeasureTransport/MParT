@@ -18,7 +18,7 @@ jobs:
         run: sudo apt-get install -y doxygen
         
       - name: Install sphinx extensions 
-        run: pip3 install -U sphinx breathe pydata-sphinx-theme jinja2
+        run: pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels
 
       - name: Run CMake
         run: |
