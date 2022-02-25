@@ -35,6 +35,7 @@ Building Documentation
 .. code-block::
 
    conda install -c conda-forge doxygen sphinx breathe pydata-sphinx-theme
+   pip install sphinx-panels
 
 2. If working in a conda environment, add dependency paths to conf.py
 

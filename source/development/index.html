@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Getting Started &#8212; MParT  documentation</title>
+    <title>Development &#8212; MParT  documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -37,8 +37,7 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Installation" href="installation.html" />
-    <link rel="prev" title="MParT: Monotone Parameterization Toolbox" href="../../index.html" />
+    <link rel="prev" title="MultiIndexNeighborhood" href="../api/multiindices/multiindexneighborhood.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -73,8 +72,8 @@
       
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
-    <li class="toctree-l1 current active nav-item">
- <a class="current reference internal nav-link" href="#">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_started/index.html">
   Getting Started
  </a>
 </li>
@@ -85,8 +84,8 @@
  </a>
 </li>
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../development/index.html">
+<li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
   Development
  </a>
 </li>
@@ -125,19 +124,7 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
-    <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="installation.html">
-   Installation
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="mathematics.html">
-   Mathematical Background
-  </a>
- </li>
-</ul>
-
+    
   </div>
 </nav>
               </div>
@@ -160,13 +147,18 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#installation">
-   Installation
+  <a class="reference internal nav-link" href="#reporting-a-bug">
+   Reporting a Bug
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#contents">
-   Contents
+  <a class="reference internal nav-link" href="#requesting-a-feature">
+   Requesting a Feature
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#contributing">
+   Contributing
   </a>
  </li>
 </ul>
@@ -190,64 +182,17 @@
               
               <div>
                 
-  <section id="getting-started">
-<span id="id1"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<div class="sphinx-bs container-lg pb-3 docutils">
-<div class="row docutils">
-<div class="d-flex col-lg-12 p-2 docutils">
-<div class="card w-100 shadow docutils">
-<div class="card-header docutils">
-<p class="card-text">Install from Conda</p>
-</div>
-<div class="card-body docutils">
-<p class="card-text">COMING SOON!</p>
-</div>
-<div class="card-footer docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge mpart
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-<div class="d-flex col-lg-12 p-2 docutils">
-<div class="card w-100 shadow docutils">
-<div class="card-header docutils">
-<p class="card-text">Compiling from Source</p>
-</div>
-<div class="card-body docutils">
-<p class="card-text">MParT is configured with CMake and a basic compilation can be achieve with</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir build
-<span class="nb">cd</span> build
-cmake -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;some path&gt; ..
-make install
-</pre></div>
-</div>
-<p class="card-text"><a class="sphinx-bs btn text-wrap btn-secondary stretched-link reference external" href="./installation.html"><span>Learn more</span></a></p>
-</div>
-</div>
-</div>
-</div>
-</div>
+  <section id="development">
+<span id="id1"></span><h1>Development<a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h1>
+<p>We’re always looking to grow the MParT development team.   Below is information on how you can help make MParT better.</p>
+<section id="reporting-a-bug">
+<h2>Reporting a Bug<a class="headerlink" href="#reporting-a-bug" title="Permalink to this headline">¶</a></h2>
 </section>
-<section id="contents">
-<h2>Contents<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#compiling-from-source">Compiling from Source</a></li>
-<li class="toctree-l2"><a class="reference internal" href="installation.html#building-documentation">Building Documentation</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="mathematics.html">Mathematical Background</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="mathematics.html#tensor-product-expansions">Tensor Product Expansions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mathematics.html#monotone-parameterizations">Monotone Parameterizations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mathematics.html#triangular-transport-maps">Triangular Transport Maps</a></li>
-</ul>
-</li>
-</ul>
-</div>
+<section id="requesting-a-feature">
+<h2>Requesting a Feature<a class="headerlink" href="#requesting-a-feature" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
 </section>
 </section>
 
@@ -257,19 +202,12 @@ make install
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../../index.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="../api/multiindices/multiindexneighborhood.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">MParT: Monotone Parameterization Toolbox</p>
+            <p class="prev-next-title">MultiIndexNeighborhood</p>
         </div>
-    </a>
-    <a class='right-next' id="next-link" href="installation.html" title="next page">
-    <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Installation</p>
-    </div>
-    <i class="fas fa-angle-right"></i>
     </a>
 </div>
               
