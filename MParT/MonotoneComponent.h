@@ -331,8 +331,7 @@ public:
 
 
     void ContinuousMixedJacobian(Kokkos::View<double**> const& pts, 
-                                 Kokkos::View<double*>  const& coeffs, 
-                                 Kokkos::View<double*>       & derivs,
+                                 Kokkos::View<double*>  const& coeffs,
                                  Kokkos::View<double**>      & jacobian)
     {   
         const unsigned int numPts = pts.extent(1);
@@ -365,20 +364,18 @@ public:
             _expansion.FillCache2(cache, pt, pt(dim-1), DerivativeFlags::Diagonal);
 
             // Compute \partial_d f
-            derivs(ptInd) = _expansion.MixedDerivative(cache, coeffs, 1, jacView);
-
+            double df = _expansion.MixedDerivative(cache, coeffs, 1, jacView);
+            double dgdf = PosFuncType::Derivative(df);
+            
             // Scale the jacobian by dg(df)
             for(unsigned int i=0; i<numTerms; ++i)
-                jacView(i) *= PosFuncType::Derivative(derivs(ptInd));
+                jacView(i) *= dgdf;
 
-            // Compute g(df/dx)
-            derivs(ptInd) = PosFuncType::Evaluate(derivs(ptInd));
         });
     }
 
     void DiscreteMixedJacobian(Kokkos::View<double**> const& pts, 
                                Kokkos::View<double*>  const& coeffs,
-                               Kokkos::View<double*>       & derivs,
                                Kokkos::View<double**>      & jacobian)
     {   
         const unsigned int numPts = pts.extent(1);
@@ -416,11 +413,6 @@ public:
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
             Eigen::VectorXd integral = _quad.Integrate(integrand, 0, 1);
             
-            //evaluations(ptInd) = integral(0);
-
-            //_expansion.FillCache2(cache, pt,  0.0, DerivativeFlags::None);
-            //evaluations(ptInd) += _expansion.CoeffDerivative(cache, coeffs, jacView);
-
             // Add the Integral to the coefficient gradient
             for(unsigned int termInd=0; termInd<numTerms; ++termInd)
                 jacView(termInd) += integral(termInd+1);

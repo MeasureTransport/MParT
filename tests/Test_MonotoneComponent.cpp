@@ -399,7 +399,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
             evals2 = comp.Evaluate(evalPts, coeffs);
 
             for(unsigned int i=0; i<numPts; ++i) 
-                CHECK(jac(i,j) == Approx((evals2(i)-evals(i))/fdStep).epsilon(1e-4*abs(evals(i))));
+                CHECK(jac(i,j) == Approx((evals2(i)-evals(i))/fdStep).epsilon(5e-4).margin(1e-4));
 
             coeffs(j) -= fdStep;
         }
@@ -408,15 +408,15 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
 
      SECTION("Mixed Discrete Jacobian"){
 
-        const double fdStep = 1e-2;
+        const double fdStep = 1e-4;
 
         Kokkos::View<double*> derivs("Derivatives", numPts);
         Kokkos::View<double*> derivs2("Derivatives2", numPts);
-        Kokkos::View<double*> evals2("Evals2", numPts);
         
         Kokkos::View<double**> jac("Jacobian", numPts, numTerms);
 
-        comp.DiscreteMixedJacobian(evalPts, coeffs, derivs, jac);
+        comp.DiscreteMixedJacobian(evalPts, coeffs, jac);
+        derivs = comp.DiscreteDerivative(evalPts, coeffs);
 
         // Perturb the coefficients and recompute
         Kokkos::View<double*> coeffs2("Coefficients2", numTerms);
@@ -437,15 +437,15 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
 
     SECTION("Mixed Continuous Jacobian"){
 
-        const double fdStep = 1e-3;
+        const double fdStep = 1e-4;
 
         Kokkos::View<double*> derivs("Derivatives", numPts);
         Kokkos::View<double*> derivs2("Derivatives2", numPts);
-        Kokkos::View<double*> evals2("Evals2", numPts);
         
         Kokkos::View<double**> jac("Jacobian", numPts, numTerms);
 
-        comp.ContinuousMixedJacobian(evalPts, coeffs, derivs, jac);
+        comp.ContinuousMixedJacobian(evalPts, coeffs, jac);
+        derivs = comp.ContinuousDerivative(evalPts, coeffs);
 
         // Perturb the coefficients and recompute
         Kokkos::View<double*> coeffs2("Coefficients2", numTerms);
@@ -453,10 +453,10 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
 
         for(unsigned int j=0; j<coeffs.extent(0); ++j){
             coeffs2(j) += fdStep;
-            derivs2 = comp.DiscreteDerivative(evalPts, coeffs2);
+            derivs2 = comp.ContinuousDerivative(evalPts, coeffs2);
 
             for(unsigned int i=0; i<derivs2.extent(0); ++i){
-                CHECK(jac(i,j)==Approx((derivs2(i) - derivs(i))/fdStep).epsilon(5e-2).margin(1e-3));
+                CHECK(jac(i,j)==Approx((derivs2(i) - derivs(i))/fdStep).epsilon(1e-4).margin(1e-3));
             }
 
             coeffs2(j) = coeffs(j);
