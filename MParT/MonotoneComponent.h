@@ -26,7 +26,7 @@ $$
 T(x_1, x_2, ..., x_D) = f(x_1,x_2,..., x_{D-1}, 0) + \int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt
 $$
 
-@tparam BasisEvaluatorType A class defining the family of 1d basis functions used to parameterize the function \f$f\f$.  The MParT::HermiteFunction and MParT::ProbabilistHermite classes are examples of types that implement the required interface.
+@tparam ExpansionType A class defining the function \f$f\f$.  It must satisfy the cached parameterization concept.
 @tparam PosFuncType A class defining the function \f$g\f$.  This class must have `Evaluate` and `Derivative` functions accepting a double and returning a double.  The MParT::SoftPlus and MParT::Exp classes in PositiveBijectors.h are examples of classes defining this interface.
 @tparam QuadratureType A class defining the integration scheme used to approximate \f$\int_0^{x_N}  g\left( \frac{\partial f}{\partial x_d}(x_1,x_2,..., x_{N-1}, t) \right) dt\f$.  The type must have a function `Integrate(f,lb,ub)` that accepts a functor `f`, a double lower bound `lb`, a double upper bound `ub`, and returns a double with an estimate of the integral.   The MParT::AdaptiveSimpson and MParT::RecursiveQuadrature classes provide this interface. 
 */
@@ -366,7 +366,7 @@ public:
             // Compute \partial_d f
             double df = _expansion.MixedDerivative(cache, coeffs, 1, jacView);
             double dgdf = PosFuncType::Derivative(df);
-            
+
             // Scale the jacobian by dg(df)
             for(unsigned int i=0; i<numTerms; ++i)
                 jacView(i) *= dgdf;

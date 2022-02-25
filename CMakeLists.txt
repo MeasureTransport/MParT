@@ -21,6 +21,8 @@ endif()
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+
 ##############################################################
 # Dependencies
 
@@ -77,19 +79,6 @@ target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2)
 ##############################################################
 # Documentation
 find_package(Doxygen)
-
-# if(Doxygen_FOUND)
-
-#     message(STATUS "To build documentation, run 'make doc'")
-
-#     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/mpart.doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile @ONLY)
-#     add_custom_target(doc
-#         COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile
-#         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-#         COMMENT "Generating API documentation with Doxygen" VERBATIM
-#     )
-
-# endif()
 
 
 find_package(Sphinx)
