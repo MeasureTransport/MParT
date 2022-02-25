@@ -18,6 +18,7 @@ Contents
    :maxdepth: 2
 
    source/getting_started/index
+   source/tutorials/index
    source/api/index
    source/development/index
 

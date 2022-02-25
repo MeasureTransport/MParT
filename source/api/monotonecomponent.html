@@ -38,8 +38,8 @@
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Development" href="../development/index.html" />
-    <link rel="prev" title="Kokkos Array Conversions" href="utilities/kokkoswrappers.html" />
+    <link rel="next" title="MultiIndices" href="multiindex.html" />
+    <link rel="prev" title="Parameterized Function Concept" href="concepts/parameterizedfunction.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -77,6 +77,12 @@
     <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../getting_started/index.html">
   Getting Started
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials/index.html">
+  Tutorials
  </a>
 </li>
 
@@ -132,12 +138,46 @@
  </span>
 </p>
 <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active has-children">
+  <a class="reference internal" href="templateconcepts.html">
+   Template Concepts
+  </a>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul class="current">
+   <li class="toctree-l2">
+    <a class="reference internal" href="concepts/cachedparameterization.html">
+     Cached Parameterization Concept
+    </a>
+   </li>
+   <li class="toctree-l2 current active has-children">
+    <a class="reference internal" href="concepts/parameterizedfunction.html">
+     Parameterized Function Concept
+    </a>
+    <input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul class="current">
+     <li class="toctree-l3 current active">
+      <a class="current reference internal" href="#">
+       Monotone Component
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
  <li class="toctree-l1 has-children">
   <a class="reference internal" href="multiindex.html">
    MultiIndices
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -173,8 +213,8 @@
   <a class="reference internal" href="quadrature.html">
    Quadrature
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-  <label for="toctree-checkbox-2">
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -204,6 +244,11 @@
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
    Monotone Component
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="multivariateexpansion.html">
+   Multivariate Expansion
   </a>
  </li>
 </ul>
@@ -256,7 +301,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Template Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>BasisEvaluatorType</strong> – A class defining the family of 1d basis functions used to parameterize the function <span class="math notranslate nohighlight">\(f\)</span>. The MParT::HermiteFunction and MParT::ProbabilistHermite classes are examples of types that implement the required interface. </p></li>
+<li><p><strong>ExpansionType</strong> – A class defining the function <span class="math notranslate nohighlight">\(f\)</span>. It must satisfy the cached parameterization concept. </p></li>
 <li><p><strong>PosFuncType</strong> – A class defining the function <span class="math notranslate nohighlight">\(g\)</span>. This class must have <code class="docutils literal notranslate"><span class="pre">Evaluate</span></code> and <code class="docutils literal notranslate"><span class="pre">Derivative</span></code> functions accepting a double and returning a double. The MParT::SoftPlus and MParT::Exp classes in PositiveBijectors.h are examples of classes defining this interface. </p></li>
 <li><p><strong>QuadratureType</strong> – A class defining the integration scheme used to approximate <span class="math notranslate nohighlight">\(\int_0^{x_N} g\left( \frac{\partial f}{\partial x_d}(x_1,x_2,..., x_{N-1}, t) \right) dt\)</span>. The type must have a function <code class="docutils literal notranslate"><span class="pre">Integrate(f,lb,ub)</span></code> that accepts a functor <code class="docutils literal notranslate"><span class="pre">f</span></code>, a double lower bound <code class="docutils literal notranslate"><span class="pre">lb</span></code>, a double upper bound <code class="docutils literal notranslate"><span class="pre">ub</span></code>, and returns a double with an estimate of the integral. The MParT::AdaptiveSimpson and MParT::RecursiveQuadrature classes provide this interface. </p></li>
 </ul>
@@ -430,17 +475,17 @@
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="utilities/kokkoswrappers.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="concepts/parameterizedfunction.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Kokkos Array Conversions</p>
+            <p class="prev-next-title">Parameterized Function Concept</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="../development/index.html" title="next page">
+    <a class='right-next' id="next-link" href="multiindex.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Development</p>
+        <p class="prev-next-title">MultiIndices</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

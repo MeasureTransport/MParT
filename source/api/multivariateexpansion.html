@@ -1,0 +1,504 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Multivariate Expansion &#8212; MParT  documentation</title>
+    
+    <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  
+    
+    <link rel="stylesheet"
+      href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+    <link rel="preload" as="font" type="font/woff2" crossorigin
+      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+  
+    
+      
+  
+    
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/pydata-sphinx-theme.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+    <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+  
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Development" href="../development/index.html" />
+    <link rel="prev" title="Kokkos Array Conversions" href="utilities/kokkoswrappers.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+    <nav class="navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="container-xl">
+
+  <div id="navbar-start">
+    
+    
+<a class="navbar-brand" href="../../index.html">
+<p class="title">MParT</p>
+</a>
+
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_started/index.html">
+  Getting Started
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../development/index.html">
+  Development
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/MeasureTransport/MParT" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+            
+            <!-- Only show if we have sidebars configured, else just a small margin  -->
+            <div class="col-12 col-md-3 bd-sidebar">
+              <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="templateconcepts.html">
+   Template Concepts
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="concepts/cachedparameterization.html">
+     Cached Parameterization Concept
+    </a>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="concepts/parameterizedfunction.html">
+     Parameterized Function Concept
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="monotonecomponent.html">
+       Monotone Component
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="multiindex.html">
+   MultiIndices
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindex.html">
+     MultiIndex
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexset.html">
+     MultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/fixedmultiindexset.html">
+     FixedMultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexlimiter.html">
+     MultiIndexLimiter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexneighborhood.html">
+     MultiIndexNeighborhood
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="quadrature.html">
+   Quadrature
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/clenshawcurtis.html">
+     Clenshaw Curtis Quadrature
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/adaptivesimpson.html">
+     Adaptive Simpson Integration
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/recursivequadrature.html">
+     Recursive Adaptive Quadrature
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/kokkoswrappers.html">
+   Kokkos Array Conversions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="monotonecomponent.html">
+   Monotone Component
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Multivariate Expansion
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+              </div>
+              <div class="sidebar-end-items">
+              </div>
+            </div>
+            
+          
+
+          
+          <div class="d-none d-xl-block col-xl-2 bd-toc">
+            
+              
+              <div class="toc-item">
+                
+
+<nav id="bd-toc-nav">
+    
+</nav>
+              </div>
+              
+              <div class="toc-item">
+                
+              </div>
+              
+            
+          </div>
+          
+
+          
+          
+            
+          
+          <main class="col-12 col-md-9 col-xl-7 py-md-5 pl-md-5 pr-md-4 bd-content" role="main">
+              
+              <div>
+                
+  <section id="multivariate-expansion">
+<h1>Multivariate Expansion<a class="headerlink" href="#multivariate-expansion" title="Permalink to this headline">¶</a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN5mpart21MultivariateExpansionE">
+<span id="_CPPv3I0EN5mpart21MultivariateExpansionE"></span><span id="_CPPv2I0EN5mpart21MultivariateExpansionE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BasisEvaluatorType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansion</span></span></span><a class="headerlink" href="#_CPPv4I0EN5mpart21MultivariateExpansionE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Defines a function in terms of the tensor product of unary basis functions. </p>
+<p><ul class="simple">
+<li><p>Cache memory managed elsewhere <div class="math notranslate nohighlight">
+\[\begin{split} \text{cache} = \left[\begin{array}{c} \phi_1^0(x_1)\\ \phi_1^1(x_1)\\ \vdots \phi_1^{p_1}\\ \phi_2^0(x_2)\\ \vdots\\ \phi_2^{p_2}(x_2)\\ \vdots \\ \phi_d^{p_d}(x_d)\\ \frac{\partial}{\partial x_d}\phi_d^0(x_d)\\ \vdots\\ \frac{\partial}{\partial x_d}\phi_d^{p_d}(x_d)\\ \frac{\partial^2}{\partial x_d}\phi_d^0(x_d^2)\\ \vdots\\ \frac{\partial^2}{\partial x_d^2}\phi_d^{p_d}(x_d) \end{array} \right] \end{split}\]</div>
+</p></li>
+</ul>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters</dt>
+<dd class="field-odd"><p><strong>BasisEvaluatorType</strong> – The family of 1d basis functions to employ. </p>
+</dd>
+</dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart21MultivariateExpansion21MultivariateExpansionERK13MultiIndexSetRK18BasisEvaluatorType">
+<span id="_CPPv3N5mpart21MultivariateExpansion21MultivariateExpansionERK13MultiIndexSetRK18BasisEvaluatorType"></span><span id="_CPPv2N5mpart21MultivariateExpansion21MultivariateExpansionERK13MultiIndexSetRK18BasisEvaluatorType"></span><span id="mpart::MultivariateExpansion::MultivariateExpansion__MultiIndexSetCR.BasisEvaluatorTypeCR"></span><span class="target" id="classmpart_1_1_multivariate_expansion_1af5d581d1e41aa002b39fed6eb50f0fcb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansion</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindices/multiindexset.html#_CPPv4N5mpart13MultiIndexSetE" title="mpart::MultiIndexSet"><span class="n"><span class="pre">MultiIndexSet</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multiSet</span></span>, <a class="reference internal" href="#_CPPv4I0EN5mpart21MultivariateExpansionE" title="mpart::MultivariateExpansion::BasisEvaluatorType"><span class="n"><span class="pre">BasisEvaluatorType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">basis1d</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart21MultivariateExpansionE" title="mpart::MultivariateExpansion::BasisEvaluatorType"><span class="n"><span class="pre">BasisEvaluatorType</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart21MultivariateExpansion21MultivariateExpansionERK13MultiIndexSetRK18BasisEvaluatorType" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart21MultivariateExpansion21MultivariateExpansionERK18FixedMultiIndexSetRK18BasisEvaluatorType">
+<span id="_CPPv3N5mpart21MultivariateExpansion21MultivariateExpansionERK18FixedMultiIndexSetRK18BasisEvaluatorType"></span><span id="_CPPv2N5mpart21MultivariateExpansion21MultivariateExpansionERK18FixedMultiIndexSetRK18BasisEvaluatorType"></span><span id="mpart::MultivariateExpansion::MultivariateExpansion__FixedMultiIndexSetCR.BasisEvaluatorTypeCR"></span><span class="target" id="classmpart_1_1_multivariate_expansion_1a08e6e5423b29dbc381286a22915350f1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansion</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSetE" title="mpart::FixedMultiIndexSet"><span class="n"><span class="pre">FixedMultiIndexSet</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multiSet</span></span>, <a class="reference internal" href="#_CPPv4I0EN5mpart21MultivariateExpansionE" title="mpart::MultivariateExpansion::BasisEvaluatorType"><span class="n"><span class="pre">BasisEvaluatorType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">basis1d</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart21MultivariateExpansionE" title="mpart::MultivariateExpansion::BasisEvaluatorType"><span class="n"><span class="pre">BasisEvaluatorType</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart21MultivariateExpansion21MultivariateExpansionERK18FixedMultiIndexSetRK18BasisEvaluatorType" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart21MultivariateExpansion9CacheSizeEv">
+<span id="_CPPv3NK5mpart21MultivariateExpansion9CacheSizeEv"></span><span id="_CPPv2NK5mpart21MultivariateExpansion9CacheSizeEv"></span><span id="mpart::MultivariateExpansion::CacheSizeC"></span><span class="target" id="classmpart_1_1_multivariate_expansion_1a5fc47afad5aece8f47970670ec0ebdaf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CacheSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart21MultivariateExpansion9CacheSizeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the size of the cache needed to evaluate the expansion (in terms of number of doubles). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>unsigned int The length of the required cache vector. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart21MultivariateExpansion9NumCoeffsEv">
+<span id="_CPPv3NK5mpart21MultivariateExpansion9NumCoeffsEv"></span><span id="_CPPv2NK5mpart21MultivariateExpansion9NumCoeffsEv"></span><span id="mpart::MultivariateExpansion::NumCoeffsC"></span><span class="target" id="classmpart_1_1_multivariate_expansion_1a4e93c4902377e0af11401daff57f5915"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumCoeffs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart21MultivariateExpansion9NumCoeffsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the number of coefficients in this expansion. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>unsigned int The number of terms in the multiindexset, which corresponds to the number of coefficients needed to define the expansion. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart21MultivariateExpansion9InputSizeEv">
+<span id="_CPPv3NK5mpart21MultivariateExpansion9InputSizeEv"></span><span id="_CPPv2NK5mpart21MultivariateExpansion9InputSizeEv"></span><span id="mpart::MultivariateExpansion::InputSizeC"></span><span class="target" id="classmpart_1_1_multivariate_expansion_1ab0e562a2eff9e2a74efd070d41007283"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InputSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart21MultivariateExpansion9InputSizeEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns the dimension of inputs to this multivariate expansion. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>unsigned int The dimension of an input point. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK5mpart21MultivariateExpansion10FillCache1EvPdRK9PointTypeN15DerivativeFlags14DerivativeTypeE">
+<span id="_CPPv3I0ENK5mpart21MultivariateExpansion10FillCache1EPdRK9PointTypeN15DerivativeFlags14DerivativeTypeE"></span><span id="_CPPv2I0ENK5mpart21MultivariateExpansion10FillCache1EPdRK9PointTypeN15DerivativeFlags14DerivativeTypeE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PointType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_1af2c5d933c418b8bfb18a191e25782f9c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FillCache1</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I0ENK5mpart21MultivariateExpansion10FillCache1EvPdRK9PointTypeN15DerivativeFlags14DerivativeTypeE" title="mpart::MultivariateExpansion::FillCache1::PointType"><span class="n"><span class="pre">PointType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pt</span></span>, <span class="n"><span class="pre">DerivativeFlags</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">DerivativeType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derivType</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart21MultivariateExpansion10FillCache1EvPdRK9PointTypeN15DerivativeFlags14DerivativeTypeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Precomputes parts of the cache using all but the last component of the point, i.e., using only <span class="math notranslate nohighlight">\(x_1,x_2,\ldots,x_{d-1}\)</span>, not <span class="math notranslate nohighlight">\(x_d\)</span>. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#classmpart_1_1_multivariate_expansion_1aead704833648a05c9dc68a9453cad5b6"><span class="std std-ref">FillCache2</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters</dt>
+<dd class="field-odd"><p><strong>PointType</strong> – The vector type used to define the point. Can be anything allowing access to components with operator(). Examples are Kokkos::View&lt;double*&gt; or Eigen::VectorXd. Only the first d-1 components of the vector will be accessed in this function. </p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>polyCache</strong> – A pointer to the start of the cache. This memory must be allocated before calling this function. </p></li>
+<li><p><strong>pt</strong> – The point (at least the first <span class="math notranslate nohighlight">\(d-1\)</span> components) to use when filling in the cache. </p></li>
+<li><p><strong>derivType</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK5mpart21MultivariateExpansion10FillCache2EvPdRK9PointTypedN15DerivativeFlags14DerivativeTypeE">
+<span id="_CPPv3I0ENK5mpart21MultivariateExpansion10FillCache2EPdRK9PointTypedN15DerivativeFlags14DerivativeTypeE"></span><span id="_CPPv2I0ENK5mpart21MultivariateExpansion10FillCache2EPdRK9PointTypedN15DerivativeFlags14DerivativeTypeE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PointType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_1aead704833648a05c9dc68a9453cad5b6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FillCache2</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I0ENK5mpart21MultivariateExpansion10FillCache2EvPdRK9PointTypedN15DerivativeFlags14DerivativeTypeE" title="mpart::MultivariateExpansion::FillCache2::PointType"><span class="n"><span class="pre">PointType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pt</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xd</span></span>, <span class="n"><span class="pre">DerivativeFlags</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">DerivativeType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derivType</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart21MultivariateExpansion10FillCache2EvPdRK9PointTypedN15DerivativeFlags14DerivativeTypeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Precomputes parts of the cache that depend on the <span class="math notranslate nohighlight">\(d^{th}\)</span> component of the point <span class="math notranslate nohighlight">\(x\)</span>. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#classmpart_1_1_multivariate_expansion_1af2c5d933c418b8bfb18a191e25782f9c"><span class="std std-ref">FillCache1</span></a> </p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters</dt>
+<dd class="field-odd"><p><strong>PointType</strong> – The vector type used to define the point. Can be anything allowing access to components with operator(). Examples are Kokkos::View&lt;double*&gt; or Eigen::VectorXd. Only the first d-1 components of the vector will be accessed in this function. </p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>polyCache</strong> – A pointer to the start of the cache. This memory must be allocated before calling this function. </p></li>
+<li><p><strong>pt</strong> – The point to use when filling in the cache. Should contain <span class="math notranslate nohighlight">\([x_1,\ldots,x_{d-1}]\)</span>. The vector itself can have more than <span class="math notranslate nohighlight">\(d-1\)</span> components, but only the first <span class="math notranslate nohighlight">\(d-1\)</span> will be accessed. The value of <span class="math notranslate nohighlight">\(x_d\)</span> is passed through the <code class="docutils literal notranslate"><span class="pre">xd</span></code> argument. </p></li>
+<li><p><strong>xd</strong> – The value of <span class="math notranslate nohighlight">\(x_d\)</span>. This is passed separate from <span class="math notranslate nohighlight">\([x_1,\ldots,x_{d-1}]\)</span> to make integrating over the last component more efficient. A copy of the point does not need to be created. </p></li>
+<li><p><strong>derivType</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK5mpart21MultivariateExpansion8EvaluateEdPKdRK12CoeffVecType">
+<span id="_CPPv3I0ENK5mpart21MultivariateExpansion8EvaluateEPKdRK12CoeffVecType"></span><span id="_CPPv2I0ENK5mpart21MultivariateExpansion8EvaluateEPKdRK12CoeffVecType"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_1aec346f9bf079b36a1ce72a36856d38e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Evaluate</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I0ENK5mpart21MultivariateExpansion8EvaluateEdPKdRK12CoeffVecType" title="mpart::MultivariateExpansion::Evaluate::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart21MultivariateExpansion8EvaluateEdPKdRK12CoeffVecType" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK5mpart21MultivariateExpansion18DiagonalDerivativeEdPKdRK12CoeffVecTypej">
+<span id="_CPPv3I0ENK5mpart21MultivariateExpansion18DiagonalDerivativeEPKdRK12CoeffVecTypej"></span><span id="_CPPv2I0ENK5mpart21MultivariateExpansion18DiagonalDerivativeEPKdRK12CoeffVecTypej"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_1afbf4755f76b631ac90d6c0bc919c75aa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiagonalDerivative</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I0ENK5mpart21MultivariateExpansion18DiagonalDerivativeEdPKdRK12CoeffVecTypej" title="mpart::MultivariateExpansion::DiagonalDerivative::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derivOrder</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart21MultivariateExpansion18DiagonalDerivativeEdPKdRK12CoeffVecTypej" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Evaluates the derivative of the expansion wrt x_{D-1}. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters</dt>
+<dd class="field-odd"><p><strong>CoeffVecType</strong> – </p>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>polyCache</strong> – </p></li>
+<li><p><strong>coeffs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>double </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType">
+<span id="_CPPv3I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEPKdRK12CoeffVecTypeR11GradVecType"></span><span id="_CPPv2I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEPKdRK12CoeffVecTypeR11GradVecType"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GradVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_1a6e87668c4b524f885ffbf6d147100d7c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffDerivative</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="mpart::MultivariateExpansion::CoeffDerivative::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="mpart::MultivariateExpansion::CoeffDerivative::GradVecType"><span class="n"><span class="pre">GradVecType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grad</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="Permalink to this definition">¶</a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Template Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>CoeffVecType</strong> – </p></li>
+<li><p><strong>GradVecType</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>polyCache</strong> – </p></li>
+<li><p><strong>coeffs</strong> – </p></li>
+<li><p><strong>grad</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00ENK5mpart21MultivariateExpansion15MixedDerivativeEdPKdRK12CoeffVecTypejR11GradVecType">
+<span id="_CPPv3I00ENK5mpart21MultivariateExpansion15MixedDerivativeEPKdRK12CoeffVecTypejR11GradVecType"></span><span id="_CPPv2I00ENK5mpart21MultivariateExpansion15MixedDerivativeEPKdRK12CoeffVecTypejR11GradVecType"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GradVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_1a0f82b86c6617c80c8077eeb16549b87f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MixedDerivative</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cache</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart21MultivariateExpansion15MixedDerivativeEdPKdRK12CoeffVecTypejR11GradVecType" title="mpart::MultivariateExpansion::MixedDerivative::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derivOrder</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart21MultivariateExpansion15MixedDerivativeEdPKdRK12CoeffVecTypejR11GradVecType" title="mpart::MultivariateExpansion::MixedDerivative::GradVecType"><span class="n"><span class="pre">GradVecType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grad</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I00ENK5mpart21MultivariateExpansion15MixedDerivativeEdPKdRK12CoeffVecTypejR11GradVecType" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+              </div>
+              
+              
+              <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="utilities/kokkoswrappers.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Kokkos Array Conversions</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="../development/index.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Development</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+              
+          </main>
+          
+
+      </div>
+    </div>
+  
+    <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+  <footer class="footer mt-5 mt-md-0">
+  <div class="container">
+    
+    <div class="footer-item">
+      <p class="copyright">
+    &copy; Copyright 2022, The MParT development team..<br>
+</p>
+    </div>
+    
+    <div class="footer-item">
+      <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+</p>
+    </div>
+    
+  </div>
+</footer>
+  </body>
+</html>

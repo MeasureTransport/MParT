@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Quadrature &#8212; MParT  documentation</title>
+    <title>Tutorials &#8212; MParT  documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -37,8 +37,8 @@
     <script src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Clenshaw Curtis Quadrature" href="quadrature/clenshawcurtis.html" />
-    <link rel="prev" title="MultiIndexNeighborhood" href="multiindices/multiindexneighborhood.html" />
+    <link rel="next" title="API Reference" href="../api/index.html" />
+    <link rel="prev" title="Mathematical Background" href="../getting_started/mathematics.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -79,14 +79,14 @@
  </a>
 </li>
 
-<li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../tutorials/index.html">
+<li class="toctree-l1 current active nav-item">
+ <a class="current reference internal nav-link" href="#">
   Tutorials
  </a>
 </li>
 
-<li class="toctree-l1 current active nav-item">
- <a class="reference internal nav-link" href="index.html">
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api/index.html">
   API Reference
  </a>
 </li>
@@ -131,127 +131,7 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
-    <p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  API
- </span>
-</p>
-<ul class="current nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="templateconcepts.html">
-   Template Concepts
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="concepts/cachedparameterization.html">
-     Cached Parameterization Concept
-    </a>
-   </li>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="concepts/parameterizedfunction.html">
-     Parameterized Function Concept
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-    <label for="toctree-checkbox-2">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="monotonecomponent.html">
-       Monotone Component
-      </a>
-     </li>
-    </ul>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="multiindex.html">
-   MultiIndices
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-  <label for="toctree-checkbox-3">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="multiindices/multiindex.html">
-     MultiIndex
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="multiindices/multiindexset.html">
-     MultiIndexSet
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="multiindices/fixedmultiindexset.html">
-     FixedMultiIndexSet
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="multiindices/multiindexlimiter.html">
-     MultiIndexLimiter
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="multiindices/multiindexneighborhood.html">
-     MultiIndexNeighborhood
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 current active has-children">
-  <a class="current reference internal" href="#">
-   Quadrature
-  </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-  <label for="toctree-checkbox-4">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="quadrature/clenshawcurtis.html">
-     Clenshaw Curtis Quadrature
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="quadrature/adaptivesimpson.html">
-     Adaptive Simpson Integration
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="quadrature/recursivequadrature.html">
-     Recursive Adaptive Quadrature
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="utilities/kokkoswrappers.html">
-   Kokkos Array Conversions
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="monotonecomponent.html">
-   Monotone Component
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="multivariateexpansion.html">
-   Multivariate Expansion
-  </a>
- </li>
-</ul>
-
+    
   </div>
 </nav>
               </div>
@@ -267,19 +147,9 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
-    <i class="fas fa-list"></i> On this page
-</div>
 
 <nav id="bd-toc-nav">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#c-objects">
-   C++ Objects
-  </a>
- </li>
-</ul>
-
+    
 </nav>
               </div>
               
@@ -299,18 +169,48 @@
               
               <div>
                 
-  <section id="quadrature">
-<h1>Quadrature<a class="headerlink" href="#quadrature" title="Permalink to this headline">¶</a></h1>
-<section id="c-objects">
-<h2>C++ Objects<a class="headerlink" href="#c-objects" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="quadrature/clenshawcurtis.html">Clenshaw Curtis Quadrature</a></li>
-<li class="toctree-l1"><a class="reference internal" href="quadrature/adaptivesimpson.html">Adaptive Simpson Integration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="quadrature/recursivequadrature.html">Recursive Adaptive Quadrature</a></li>
-</ul>
+  <section id="tutorials">
+<span id="id1"></span><h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this headline">¶</a></h1>
+<div class="sphinx-bs container pb-4 docutils">
+<div class="row docutils">
+<div class="d-flex col-lg-6 col-md-6 col-sm-6 col-xs-12 p-2 docutils">
+<div class="card w-100 shadow docutils">
+<img alt="img-top" class="card-img-top pl-4 pr-4" src="../../_images/Samples.png" />
+<div class="card-header docutils">
+<p class="card-text"><strong>Map from Samples</strong></p>
 </div>
-</section>
+<div class="card-body docutils">
+<p class="card-text">Construct a transport map using samples of a distribution.</p>
+<p class="card-text"><a class="sphinx-bs btn text-wrap btn-secondary stretched-link reference external" href="./fromsamples.html"><span>Learn more</span></a></p>
+</div>
+</div>
+</div>
+<div class="d-flex col-lg-6 col-md-6 col-sm-6 col-xs-12 p-2 docutils">
+<div class="card w-100 shadow docutils">
+<img alt="img-top" class="card-img-top pl-4 pr-4" src="../../_images/Density.png" />
+<div class="card-header docutils">
+<p class="card-text"><strong>Map from Density</strong></p>
+</div>
+<div class="card-body docutils">
+<p class="card-text">Construct a transport map using density evaluations.</p>
+<p class="card-text"><a class="sphinx-bs btn text-wrap btn-secondary stretched-link reference external" href="./fromdensity.html"><span>Learn more</span></a></p>
+</div>
+</div>
+</div>
+<div class="d-flex col-lg-6 col-md-6 col-sm-6 col-xs-12 p-2 docutils">
+<div class="card w-100 shadow docutils">
+<img alt="img-top" class="card-img-top pl-4 pr-4" src="../../_images/Regression.png" />
+<div class="card-header docutils">
+<p class="card-text"><strong>Monotone Regression</strong></p>
+</div>
+<div class="card-body docutils">
+<p class="card-text">Fit data with a monotone function.</p>
+<p class="card-text"><a class="sphinx-bs btn text-wrap btn-secondary stretched-link reference external" href="./regression.html"><span>Learn more</span></a></p>
+</div>
+</div>
+</div>
+</div>
+</div>
 </section>
 
 
@@ -319,17 +219,17 @@
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="multiindices/multiindexneighborhood.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="../getting_started/mathematics.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">MultiIndexNeighborhood</p>
+            <p class="prev-next-title">Mathematical Background</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="quadrature/clenshawcurtis.html" title="next page">
+    <a class='right-next' id="next-link" href="../api/index.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Clenshaw Curtis Quadrature</p>
+        <p class="prev-next-title">API Reference</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

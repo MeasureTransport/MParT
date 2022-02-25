@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Quadrature &#8212; MParT  documentation</title>
+    <title>Template Concepts &#8212; MParT  documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -35,10 +35,11 @@
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Clenshaw Curtis Quadrature" href="quadrature/clenshawcurtis.html" />
-    <link rel="prev" title="MultiIndexNeighborhood" href="multiindices/multiindexneighborhood.html" />
+    <link rel="next" title="Cached Parameterization Concept" href="concepts/cachedparameterization.html" />
+    <link rel="prev" title="API Reference" href="index.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -137,11 +138,11 @@
  </span>
 </p>
 <ul class="current nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="templateconcepts.html">
+ <li class="toctree-l1 current active has-children">
+  <a class="current reference internal" href="#">
    Template Concepts
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
   <label for="toctree-checkbox-1">
    <i class="fas fa-chevron-down">
    </i>
@@ -208,11 +209,11 @@
    </li>
   </ul>
  </li>
- <li class="toctree-l1 current active has-children">
-  <a class="current reference internal" href="#">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="quadrature.html">
    Quadrature
   </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
   <label for="toctree-checkbox-4">
    <i class="fas fa-chevron-down">
    </i>
@@ -267,19 +268,9 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
-    <i class="fas fa-list"></i> On this page
-</div>
 
 <nav id="bd-toc-nav">
-    <ul class="visible nav section-nav flex-column">
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#c-objects">
-   C++ Objects
-  </a>
- </li>
-</ul>
-
+    
 </nav>
               </div>
               
@@ -299,18 +290,23 @@
               
               <div>
                 
-  <section id="quadrature">
-<h1>Quadrature<a class="headerlink" href="#quadrature" title="Permalink to this headline">¶</a></h1>
-<section id="c-objects">
-<h2>C++ Objects<a class="headerlink" href="#c-objects" title="Permalink to this headline">¶</a></h2>
+  <section id="template-concepts">
+<h1>Template Concepts<a class="headerlink" href="#template-concepts" title="Permalink to this headline">¶</a></h1>
+<p>Many of the lower-level classes in MParT are templated to allow for generic implementations.  Using templates instead of other programming techniques, like virtual inheritance, makes it simpler to copy these classes to/from a GPU and can sometimes even result in more efficient CPU code.    For example, the MonotoneComponent class, which uses a generic function <span class="math notranslate nohighlight">\(f(x)\)</span> to define a monotone function <span class="math notranslate nohighlight">\(T_d(x)\)</span>, is templated on the type of the <span class="math notranslate nohighlight">\(f\)</span> function.   It is therefore possible to construct a monotone function from any class defining <span class="math notranslate nohighlight">\(f(x)\)</span> with the interface expected by the MonotoneComponent class.  The interface expected by MonotoneComponent is described by a concept.</p>
+<div class="topic">
+<p class="topic-title">Concept</p>
+<p>A concept is a set of requirements defining the interface expected by a templated function or class.</p>
+</div>
+<p>Specific concepts used throughout MParT can be found on the following pages.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="quadrature/clenshawcurtis.html">Clenshaw Curtis Quadrature</a></li>
-<li class="toctree-l1"><a class="reference internal" href="quadrature/adaptivesimpson.html">Adaptive Simpson Integration</a></li>
-<li class="toctree-l1"><a class="reference internal" href="quadrature/recursivequadrature.html">Recursive Adaptive Quadrature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts/cachedparameterization.html">Cached Parameterization Concept</a></li>
+<li class="toctree-l1"><a class="reference internal" href="concepts/parameterizedfunction.html">Parameterized Function Concept</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="monotonecomponent.html">Monotone Component</a></li>
+</ul>
+</li>
 </ul>
 </div>
-</section>
 </section>
 
 
@@ -319,17 +315,17 @@
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="multiindices/multiindexneighborhood.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="index.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">MultiIndexNeighborhood</p>
+            <p class="prev-next-title">API Reference</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="quadrature/clenshawcurtis.html" title="next page">
+    <a class='right-next' id="next-link" href="concepts/cachedparameterization.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Clenshaw Curtis Quadrature</p>
+        <p class="prev-next-title">Cached Parameterization Concept</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
