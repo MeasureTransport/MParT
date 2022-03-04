@@ -17,9 +17,10 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
 ```
 mkdir build
 cd build
-cmake                           \
-  -DKokkos_ENABLE_PTHREAD=ON    \
-  -DKokkos_ENABLE_SERIAL=ON     \
+cmake                                        \
+  -DCMAKE_INSTALL_PREFIX=<your/install/path> \
+  -DKokkos_ENABLE_PTHREAD=ON                 \
+  -DKokkos_ENABLE_SERIAL=ON                  \
 ..
 make
 ```

@@ -1,7 +1,8 @@
-set(MPART_SOURCES
-    src/MultiIndices/MultiIndex.cpp
-    src/MultiIndices/MultiIndexLimiter.cpp
-    src/MultiIndices/MultiIndexSet.cpp
-    src/MultiIndices/FixedMultiIndexSet.cpp
-    src/MultiIndices/MultiIndexNeighborhood.cpp
-PARENT_SCOPE)
+target_sources(mpart 
+    PRIVATE
+    MultiIndices/MultiIndex.cpp
+    MultiIndices/MultiIndexLimiter.cpp
+    MultiIndices/MultiIndexSet.cpp
+    MultiIndices/FixedMultiIndexSet.cpp
+    MultiIndices/MultiIndexNeighborhood.cpp
+)

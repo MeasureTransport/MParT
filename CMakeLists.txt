@@ -1,10 +1,15 @@
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required (VERSION 3.13)
 project(MParT VERSION 0.0.1)
 
 
 # Add the cmake folder as a search path and include files
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 INCLUDE(Submodules)
+
+##############################################################
+# Options 
+
+option(MPART_PYTHON "Build python bindings with pybind11" ON)
 
 ##############################################################
 # Compiler configuration
@@ -27,7 +32,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 # Dependencies
 
 # Add Kokkos
-find_package(Kokkos)
+find_package(Kokkos QUIET)
 if(NOT Kokkos_FOUND)
     UpdateGitSubmodule(kokkos)
     add_subdirectory(external/kokkos)
@@ -35,11 +40,19 @@ if(NOT Kokkos_FOUND)
 endif()
 
 # Add Eigen
-find_package(Eigen3)
+find_package(Eigen3 QUIET)
 if(NOT Eigen3_FOUND)
     UpdateGitSubmodule(eigen)
     add_subdirectory(external/eigen)
     include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/eigen)
+endif()
+
+# Add pybind11 if necessary 
+if(MPART_PYTHON)
+  find_package(pybind11 CONFIG QUIET)
+  if(NOT pybind11_FOUND)
+    add_subdirectory(external/pybind11)
+  endif()
 endif()
 
 # Add the current source directory as an include directory
@@ -48,16 +61,19 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 ##############################################################
 # MParT library
+add_library(mpart "")
 add_subdirectory(src)
-add_library(mpart ${MPART_SOURCES})
 target_link_libraries(mpart Kokkos::kokkos Eigen3::Eigen)
 
+if(MPART_PYTHON)
+    add_subdirectory(bindings/python)
+endif()
 
 ##############################################################
 # Testing 
 
 # Install Catch2
-find_package(Catch2 3)
+find_package(Catch2 3 QUIET)
 if(NOT Catch2_FOUND)
     Include(FetchContent)
 
@@ -75,6 +91,14 @@ endif()
 add_subdirectory(tests)
 add_executable(RunTests ${TEST_SOURCES})
 target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2)
+
+##############################################################
+# Instalaltion 
+install(TARGETS mpart DESTINATION lib)
+
+install(DIRECTORY MParT
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/include"
+	      FILES_MATCHING PATTERN "*.h")
 
 ##############################################################
 # Documentation
