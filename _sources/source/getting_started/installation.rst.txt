@@ -1,7 +1,7 @@
 .. _installation:
 
-Installation
-============
+Manual Installation
+===================
 
 Compiling from Source
 ---------------------
@@ -11,10 +11,14 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
 
    mkdir build
    cd build
-   cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON ..
-   make
+   cmake                                         \
+     -DCMAKE_INSTALL_PREFIX=<your/install/path>  \
+     -DKokkos_ENABLE_PTHREAD=ON                  \
+     -DKokkos_ENABLE_SERIAL=ON                   \
+   ..
+   make install 
    
-This will compile the `mpart` library and also create a test executable called `RunTests`.  The tests can be run with:
+This will compile the `mpart` library and the python bindings.  It will also create a test executable called `RunTests`.  The tests can be run with:
 
 .. code-block::
 
@@ -27,9 +31,46 @@ Or, with the additional specification of the number of Kokkos threads to use:
    ./RunTests --kokkos-threads=4
 
 
-Linking to MParT 
+.. tip::
+   Depending on your python configuration, pybind11 may throw an error during configuration that looks like 
+
+   .. code-block::
+
+      CMake Error in bindings/python/CMakeLists.txt:
+        Imported target "pybind11::module" includes non-existent path
+   
+   This often results when due to conda environment mismatches, but can typically be circumvented by explicitly setting the path to your python executable.  When calling cmake, add :code:`-DPYTHON_EXECUTABLE=`which python``.
+
+Using MParT 
 ----------------------
-Coming soon!
+
+C++
+^^^^^^^^^
+Coming soon.
+
+Python 
+^^^^^^^^^
+First, make sure the relevant path variables include the installation of MParT:
+
+.. tabbed:: OSX
+
+    .. code-block:: bash
+
+        export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
+        export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
+
+.. tabbed:: Linux
+
+    .. code-block:: bash
+
+         export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
+         export LD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
+
+You should now be able to run python and import the MParT package!
+
+.. code-block:: python 
+
+   import mpart 
 
 
 Building Documentation

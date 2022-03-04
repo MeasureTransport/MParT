@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Installation &#8212; MParT  documentation</title>
+    <title>Manual Installation &#8212; MParT  documentation</title>
     
     <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
@@ -134,7 +134,7 @@
     <ul class="current nav bd-sidenav">
  <li class="toctree-l1 current active">
   <a class="current reference internal" href="#">
-   Installation
+   Manual Installation
   </a>
  </li>
  <li class="toctree-l1">
@@ -171,9 +171,21 @@
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#linking-to-mpart">
-   Linking to MParT
+  <a class="reference internal nav-link" href="#using-mpart">
+   Using MParT
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#c">
+     C++
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#python">
+     Python
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#building-documentation">
@@ -201,18 +213,22 @@
               
               <div>
                 
-  <section id="installation">
-<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+  <section id="manual-installation">
+<span id="installation"></span><h1>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h1>
 <section id="compiling-from-source">
 <h2>Compiling from Source<a class="headerlink" href="#compiling-from-source" title="Permalink to this headline">¶</a></h2>
 <p>MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir build
 <span class="nb">cd</span> build
-cmake -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON -DKokkos_ENABLE_SERIAL<span class="o">=</span>ON ..
-make
+cmake                                         <span class="se">\</span>
+  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/install/path&gt;  <span class="se">\</span>
+  -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON                  <span class="se">\</span>
+  -DKokkos_ENABLE_SERIAL<span class="o">=</span>ON                   <span class="se">\</span>
+..
+make install
 </pre></div>
 </div>
-<p>This will compile the <cite>mpart</cite> library and also create a test executable called <cite>RunTests</cite>.  The tests can be run with:</p>
+<p>This will compile the <cite>mpart</cite> library and the python bindings.  It will also create a test executable called <cite>RunTests</cite>.  The tests can be run with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">RunTests</span>
 </pre></div>
 </div>
@@ -220,10 +236,48 @@ make
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">RunTests</span> <span class="o">--</span><span class="n">kokkos</span><span class="o">-</span><span class="n">threads</span><span class="o">=</span><span class="mi">4</span>
 </pre></div>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Depending on your python configuration, pybind11 may throw an error during configuration that looks like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CMake</span> <span class="n">Error</span> <span class="ow">in</span> <span class="n">bindings</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">CMakeLists</span><span class="o">.</span><span class="n">txt</span><span class="p">:</span>
+  <span class="n">Imported</span> <span class="n">target</span> <span class="s2">&quot;pybind11::module&quot;</span> <span class="n">includes</span> <span class="n">non</span><span class="o">-</span><span class="n">existent</span> <span class="n">path</span>
+</pre></div>
+</div>
+<p>This often results when due to conda environment mismatches, but can typically be circumvented by explicitly setting the path to your python executable.  When calling cmake, add <code class="code docutils literal notranslate"><span class="pre">-DPYTHON_EXECUTABLE=`which</span> <span class="pre">python`</span></code>.</p>
+</div>
 </section>
-<section id="linking-to-mpart">
-<h2>Linking to MParT<a class="headerlink" href="#linking-to-mpart" title="Permalink to this headline">¶</a></h2>
-<p>Coming soon!</p>
+<section id="using-mpart">
+<h2>Using MParT<a class="headerlink" href="#using-mpart" title="Permalink to this headline">¶</a></h2>
+<section id="c">
+<h3>C++<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h3>
+<p>Coming soon.</p>
+</section>
+<section id="python">
+<h3>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h3>
+<p>First, make sure the relevant path variables include the installation of MParT:</p>
+<div class="tabbed-set docutils">
+<input checked="checked" id="8f290c99-e611-4632-9c69-cdf1a44bffd0" name="aea4bfdd-6b0a-4bcb-9c00-0faebebb7d2d" type="radio">
+</input><label class="tabbed-label" for="8f290c99-e611-4632-9c69-cdf1a44bffd0">
+OSX</label><div class="tabbed-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
+<span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
+</pre></div>
+</div>
+</div>
+<input id="f0fe0400-b468-472a-be1a-c6a05f4219b7" name="aea4bfdd-6b0a-4bcb-9c00-0faebebb7d2d" type="radio">
+</input><label class="tabbed-label" for="f0fe0400-b468-472a-be1a-c6a05f4219b7">
+Linux</label><div class="tabbed-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
+<span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
+</pre></div>
+</div>
+</div>
+</div>
+<p>You should now be able to run python and import the MParT package!</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mpart</span>
+</pre></div>
+</div>
+</section>
 </section>
 <section id="building-documentation">
 <h2>Building Documentation<a class="headerlink" href="#building-documentation" title="Permalink to this headline">¶</a></h2>
