@@ -22,7 +22,7 @@ cmake                                        \
   -DKokkos_ENABLE_PTHREAD=ON                 \
   -DKokkos_ENABLE_SERIAL=ON                  \
 ..
-make
+make install
 ```
 This will compile the `mpart` library and also create a test executable called `RunTests`.  The tests can be run with:
 ```
