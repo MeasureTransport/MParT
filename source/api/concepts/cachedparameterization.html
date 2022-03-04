@@ -35,9 +35,10 @@
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Parameterized Function Concept" href="parameterizedfunction.html" />
+    <link rel="next" title="Multivariate Expansion" href="../multivariateexpansion.html" />
     <link rel="prev" title="Template Concepts" href="../templateconcepts.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -147,17 +148,34 @@
    </i>
   </label>
   <ul class="current">
-   <li class="toctree-l2 current active">
+   <li class="toctree-l2 current active has-children">
     <a class="current reference internal" href="#">
      Cached Parameterization Concept
     </a>
+    <input checked="" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../multivariateexpansion.html">
+       Multivariate Expansion
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../tensorproductfunction.html">
+       Tensor Product Function
+      </a>
+     </li>
+    </ul>
    </li>
    <li class="toctree-l2 has-children">
     <a class="reference internal" href="parameterizedfunction.html">
      Parameterized Function Concept
     </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-    <label for="toctree-checkbox-2">
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
      <i class="fas fa-chevron-down">
      </i>
     </label>
@@ -175,8 +193,8 @@
   <a class="reference internal" href="../multiindex.html">
    MultiIndices
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-  <label for="toctree-checkbox-3">
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -212,8 +230,8 @@
   <a class="reference internal" href="../quadrature.html">
    Quadrature
   </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-  <label for="toctree-checkbox-4">
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
    <i class="fas fa-chevron-down">
    </i>
   </label>
@@ -267,9 +285,29 @@
               
               <div class="toc-item">
                 
+<div class="tocsection onthispage pt-5 pb-3">
+    <i class="fas fa-list"></i> On this page
+</div>
 
 <nav id="bd-toc-nav">
-    
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#potential-usage">
+   Potential Usage
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#specific-requirements">
+   Specific Requirements
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#implementations">
+   Implementations
+  </a>
+ </li>
+</ul>
+
 </nav>
               </div>
               
@@ -291,6 +329,192 @@
                 
   <section id="cached-parameterization-concept">
 <h1>Cached Parameterization Concept<a class="headerlink" href="#cached-parameterization-concept" title="Permalink to this headline">¶</a></h1>
+<p>This concept provides the interface expected by the <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> class for the definition of the generally non-monotone function <span class="math notranslate nohighlight">\(f(x) : \mathbb{R}^d \rightarrow \mathbb{R}\)</span>.  This concept defines the <code class="code docutils literal notranslate"><span class="pre">ExpansionType</span></code> template argument in the <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> definition.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> class will evaluate <span class="math notranslate nohighlight">\(f(x)\)</span> at many points <span class="math notranslate nohighlight">\(x^{(k)}\)</span> that differ only in the <span class="math notranslate nohighlight">\(d^{th}\)</span> component.  That is, for any <span class="math notranslate nohighlight">\(k_1\)</span> and <span class="math notranslate nohighlight">\(k_2\)</span>, <span class="math notranslate nohighlight">\(x_j^{(k_1)} = x_j^{(k_2)}\)</span> for <span class="math notranslate nohighlight">\(j&lt;d\)</span>.   In many cases, it is possible to take advantage of this fact to precompute some quantities related to <span class="math notranslate nohighlight">\(x_{1:d-1}\)</span> that we know will not change as the <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> class varies <span class="math notranslate nohighlight">\(x_d\)</span>.</p>
+<p>To enable this, <code class="code docutils literal notranslate"><span class="pre">ExpansionType</span></code> needs to be able to interact with a preallocated block of memory called the cache below.  The cache will be allocated outside the <code class="code docutils literal notranslate"><span class="pre">ExpansionType</span></code> class, and then passed to <code class="code docutils literal notranslate"><span class="pre">ExpansionType::FillCache1</span></code> to do any necessary precomputations.</p>
+<p>When the value of the last component <span class="math notranslate nohighlight">\(x_d\)</span> is altered, the <code class="code docutils literal notranslate"><span class="pre">ExpansionType::FillCache2</span></code> function will then be called, before calling <code class="code docutils literal notranslate"><span class="pre">ExpansionType::Evaluate</span></code> to actually evaluate <span class="math notranslate nohighlight">\(f(x)\)</span>.   The <code class="code docutils literal notranslate"><span class="pre">ExpansionType::Evaluate</span></code> function only has access to the memory in the cache, so its important to perform all necessary computations in either the <code class="code docutils literal notranslate"><span class="pre">ExpansionType::FillCache1</span></code> or <code class="code docutils literal notranslate"><span class="pre">ExpansionType::FillCache2</span></code> functions.</p>
+<p>The details of these functions, as well as all the functions that <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> expects <code class="code docutils literal notranslate"><span class="pre">ExpansionType</span></code> to have, are provided in the <a class="reference internal" href="#specific-requirements">Specific Requirements</a> section below.</p>
+<section id="potential-usage">
+<h2>Potential Usage<a class="headerlink" href="#potential-usage" title="Permalink to this headline">¶</a></h2>
+<p>Below is an example of how a class implementing the cached parameterization concept could be used to evaluate <span class="math notranslate nohighlight">\(f(x;c)\)</span> at a randomly chosen point <span class="math notranslate nohighlight">\(x\)</span> and randomly chosen coefficients <span class="math notranslate nohighlight">\(c\)</span>.</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">ExpansionType</span> <span class="n">expansion</span><span class="p">;</span>
+<span class="c1">// ... Define the expansion</span>
+
+<span class="c1">// Evaluate the</span>
+<span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span> <span class="n">cache</span><span class="p">(</span> <span class="n">expansion</span><span class="p">.</span><span class="n">CacheSize</span><span class="p">()</span> <span class="p">);</span>
+
+<span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Random</span><span class="p">(</span> <span class="n">expansion</span><span class="p">.</span><span class="n">NumCoeffs</span><span class="p">()</span> <span class="p">);</span>
+
+<span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">dim</span> <span class="o">=</span> <span class="n">expansion</span><span class="p">.</span><span class="n">InputSize</span><span class="p">();</span>
+<span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span> <span class="n">evalPt</span> <span class="o">=</span> <span class="n">Eigen</span><span class="o">::</span><span class="n">VectorXd</span><span class="o">::</span><span class="n">Random</span><span class="p">(</span> <span class="n">dim</span> <span class="p">);</span>
+
+<span class="n">expansion</span><span class="p">.</span><span class="n">FillCache1</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">evalPt</span><span class="p">,</span> <span class="n">DerivativeFlags</span><span class="o">::</span><span class="n">None</span><span class="p">);</span>
+<span class="n">expansion</span><span class="p">.</span><span class="n">FillCache2</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">evalPt</span><span class="p">,</span> <span class="n">evalPt</span><span class="p">(</span><span class="n">dim</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">DerivativeFlags</span><span class="o">::</span><span class="n">None</span><span class="p">);</span>
+
+<span class="kt">double</span> <span class="n">f</span> <span class="o">=</span> <span class="n">expansion</span><span class="p">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">coeffs</span><span class="p">);</span>
+
+<span class="c1">// Now perturb x_d and re-evaluate</span>
+<span class="kt">double</span> <span class="n">xd</span> <span class="o">=</span> <span class="n">evalPt</span><span class="p">(</span><span class="n">dim</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1e-2</span><span class="p">;</span>
+<span class="n">expansion</span><span class="p">.</span><span class="n">FillCache2</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">evalPt</span><span class="p">,</span> <span class="n">xd</span><span class="p">,</span> <span class="n">DerivativeFlags</span><span class="o">::</span><span class="n">None</span><span class="p">);</span>
+
+<span class="kt">double</span> <span class="n">f2</span> <span class="o">=</span> <span class="n">expansion</span><span class="p">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cache</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">coeffs</span><span class="p">);</span>
+</pre></div>
+</div>
+</section>
+<section id="specific-requirements">
+<h2>Specific Requirements<a class="headerlink" href="#specific-requirements" title="Permalink to this headline">¶</a></h2>
+<div class="sphinx-bs container-lg pb-3 docutils">
+<div class="row docutils">
+<div class="d-flex col-lg-12 p-2 border-0 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-header docutils">
+<p class="card-text">Cache Size</p>
+</div>
+<div class="card-body docutils">
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">CacheSize</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</pre></div>
+</div>
+<p class="card-text">Returns the number of doubles required in the cache memory allocation.</p>
+</div>
+</div>
+</div>
+<div class="d-flex col-lg-12 p-2 border-0 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-header docutils">
+<p class="card-text">Number of Coefficients</p>
+</div>
+<div class="card-body docutils">
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">NumCoeffs</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</pre></div>
+</div>
+<p class="card-text">Returns the number of coefficients in the parameterization.</p>
+</div>
+</div>
+</div>
+<div class="d-flex col-lg-12 p-2 border-0 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-header docutils">
+<p class="card-text">Dimension</p>
+</div>
+<div class="card-body docutils">
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="nf">InputSize</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</pre></div>
+</div>
+<p class="card-text">Returns the dimension (i.e., number of components) in the input vector  <span class="math notranslate nohighlight">\(x\)</span></p>
+</div>
+</div>
+</div>
+<div class="d-flex col-lg-12 p-2 border-0 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-header docutils">
+<p class="card-text">Fill Cache 1</p>
+</div>
+<div class="card-body docutils">
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">PointType</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="n">FillCache1</span><span class="p">(</span><span class="kt">double</span><span class="o">*</span>                           <span class="n">cache</span><span class="p">,</span>
+                <span class="n">PointType</span>                  <span class="k">const</span><span class="o">&amp;</span> <span class="n">pt</span><span class="p">,</span>
+                <span class="n">DerivativeFlags</span><span class="o">::</span><span class="n">DerivativeType</span>   <span class="n">derivType</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+</pre></div>
+</div>
+<p class="card-text">Precomputes parts of the cache using all but the last component of the point, i.e., using only <span class="math notranslate nohighlight">\(x_1,x_2,\ldots,x_{d-1}\)</span>, not <span class="math notranslate nohighlight">\(x_d\)</span>. Can be an empty function if no precomputations are possible without using the <span class="math notranslate nohighlight">\(d^{th}\)</span> component of the input <span class="math notranslate nohighlight">\(x_d\)</span>.</p>
+</div>
+</div>
+</div>
+<div class="d-flex col-lg-12 p-2 border-0 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-header docutils">
+<p class="card-text">Fill Cache 2</p>
+</div>
+<div class="card-body docutils">
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">PointType</span><span class="o">&gt;</span>
+<span class="kt">void</span> <span class="n">FillCache2</span><span class="p">(</span><span class="kt">double</span><span class="o">*</span>                         <span class="n">cache</span><span class="p">,</span>
+                <span class="n">PointType</span> <span class="k">const</span><span class="o">&amp;</span>                <span class="n">pt</span><span class="p">,</span>
+                <span class="kt">double</span>                          <span class="n">xd</span><span class="p">,</span>
+                <span class="n">DerivativeFlags</span><span class="o">::</span><span class="n">DerivativeType</span> <span class="n">derivType</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+</pre></div>
+</div>
+<p class="card-text">This function is called just before calling <code class="code docutils literal notranslate"><span class="pre">Evaluate</span></code>.   After this call, the <code class="code docutils literal notranslate"><span class="pre">cache</span></code> variable and a vector of coefficients should be sufficient for evaluating the function <span class="math notranslate nohighlight">\(f(x)\)</span> or its derivatives.   If <code class="code docutils literal notranslate"><span class="pre">derivType==None</span></code>, then the cache will not be used for evaluating any derivatives.  If <code class="code docutils literal notranslate"><span class="pre">derivType==Diagonal</span></code>, then the cache may be used for evaluating the diagonal derivative <span class="math notranslate nohighlight">\(\partial_d f\)</span>.   If <code class="code docutils literal notranslate"><span class="pre">derivType==Diagonal2</span></code>, then the cache may be used for evaluating <span class="math notranslate nohighlight">\(\partial_d^2 f\)</span> or the mixed derivatives <span class="math notranslate nohighlight">\(\nabla_c [\partial_d f]\)</span>.</p>
+<p class="card-text">Note that the <span class="math notranslate nohighlight">\(d^{th}\)</span> component of the <code class="code docutils literal notranslate"><span class="pre">pt</span></code> argument should not be used.  The value of the <span class="math notranslate nohighlight">\(x_d\)</span> should be taken from the <code class="code docutils literal notranslate"><span class="pre">xd</span></code> argument only.  This is a subtle choice that makes it possible for <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> to integrate over <span class="math notranslate nohighlight">\(x_d\)</span> without copying the entire point pt.</p>
+</div>
+</div>
+</div>
+<div class="d-flex col-lg-12 p-2 border-0 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-header docutils">
+<p class="card-text">Evaluate <span class="math notranslate nohighlight">\(f(x)\)</span></p>
+</div>
+<div class="card-body docutils">
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">CoeffVecType</span><span class="o">&gt;</span>
+<span class="kt">double</span> <span class="n">Evaluate</span><span class="p">(</span><span class="k">const</span> <span class="kt">double</span><span class="o">*</span>       <span class="n">cache</span><span class="p">,</span>
+                <span class="n">CoeffVecType</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">coeffs</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+</pre></div>
+</div>
+<p class="card-text">Uses the cache (after calls to <code class="code docutils literal notranslate"><span class="pre">FillCache1</span></code> and <code class="code docutils literal notranslate"><span class="pre">FillCache2</span></code>) and a vector of coefficients to evaluate <span class="math notranslate nohighlight">\(f(x)\)</span>.  The <code class="code docutils literal notranslate"><span class="pre">CoeffVecType</span></code> type is guaranteed to have a paranthetical access operator <cite>double operator()(unsigned int)</cite> and be at least the length returned by the <code class="code docutils literal notranslate"><span class="pre">NumCoeffs()</span></code> function.</p>
+</div>
+</div>
+</div>
+<div class="d-flex col-lg-12 p-2 border-0 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-header docutils">
+<p class="card-text">Derivative <span class="math notranslate nohighlight">\(\partial_d f\)</span></p>
+</div>
+<div class="card-body docutils">
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">CoeffVecType</span><span class="o">&gt;</span>
+<span class="kt">double</span> <span class="n">DiagonalDerivative</span><span class="p">(</span><span class="k">const</span> <span class="kt">double</span><span class="o">*</span>       <span class="n">cache</span><span class="p">,</span>
+                          <span class="n">CoeffVecType</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">coeffs</span><span class="p">,</span>
+                          <span class="kt">unsigned</span> <span class="kt">int</span>        <span class="n">derivOrder</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+</pre></div>
+</div>
+<p class="card-text">Uses the cache (after calls to <code class="code docutils literal notranslate"><span class="pre">FillCache1</span></code> and <code class="code docutils literal notranslate"><span class="pre">FillCache2</span></code>) and a vector of coefficients to evaluate <span class="math notranslate nohighlight">\(\partial_d f(x)\)</span> or <span class="math notranslate nohighlight">\(\partial^2_{dd} f(x)\)</span>.  The <code class="code docutils literal notranslate"><span class="pre">CoeffVecType</span></code> type is guaranteed to have a paranthetical access operator <cite>double operator()(unsigned int)</cite> and be at least the length returned by the <code class="code docutils literal notranslate"><span class="pre">NumCoeffs()</span></code> function.   <code class="code docutils literal notranslate"><span class="pre">derivOrder</span></code> will be either <span class="math notranslate nohighlight">\(1\)</span> or <span class="math notranslate nohighlight">\(2\)</span> to specify if <span class="math notranslate nohighlight">\(\partial_d f(x)\)</span> or <span class="math notranslate nohighlight">\(\partial^2_{dd} f(x)\)</span> should be computed.</p>
+</div>
+</div>
+</div>
+<div class="d-flex col-lg-12 p-2 border-0 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-header docutils">
+<p class="card-text">Coefficient Gradient <span class="math notranslate nohighlight">\(\nabla_c f\)</span></p>
+</div>
+<div class="card-body docutils">
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">CoeffVecType</span><span class="p">,</span> <span class="k">typename</span> <span class="n">GradVecType</span><span class="o">&gt;</span>
+<span class="kt">double</span> <span class="n">CoeffDerivative</span><span class="p">(</span><span class="k">const</span> <span class="kt">double</span><span class="o">*</span>       <span class="n">cache</span><span class="p">,</span>
+                       <span class="n">CoeffVecType</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">coeffs</span><span class="p">,</span>
+                       <span class="n">GradVecType</span><span class="o">&amp;</span>        <span class="n">grad</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+</pre></div>
+</div>
+<p class="card-text">Computes the gradient <span class="math notranslate nohighlight">\(\nabla_c f\)</span> at a single point.  The gradient is stored in the preallocated <code class="code docutils literal notranslate"><span class="pre">grad</span></code> vector.  The <code class="code docutils literal notranslate"><span class="pre">double</span></code> returned by this function should return the value of <span class="math notranslate nohighlight">\(f(x)\)</span>.   Both the <code class="code docutils literal notranslate"><span class="pre">CoeffVecType</span></code> and <code class="code docutils literal notranslate"><span class="pre">GradVecType</span></code> types will provide the parantheses operator <code class="code docutils literal notranslate"><span class="pre">()</span></code> for accessing and setting values.   The <code class="code docutils literal notranslate"><span class="pre">grad</span></code> will be preallocated, but might not be initialized; values of grad should therefore be set even if they are <span class="math notranslate nohighlight">\(0\)</span>.</p>
+</div>
+</div>
+</div>
+<div class="d-flex col-lg-12 p-2 border-0 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-header docutils">
+<p class="card-text">Mixed Gradient <span class="math notranslate nohighlight">\(\nabla_c \partial_d f\)</span></p>
+</div>
+<div class="card-body docutils">
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">CoeffVecType</span><span class="p">,</span> <span class="k">typename</span> <span class="n">GradVecType</span><span class="o">&gt;</span>
+<span class="kt">double</span> <span class="n">MixedDerivative</span><span class="p">(</span><span class="k">const</span> <span class="kt">double</span><span class="o">*</span>       <span class="n">cache</span><span class="p">,</span>
+                       <span class="n">CoeffVecType</span> <span class="k">const</span><span class="o">&amp;</span> <span class="n">coeffs</span><span class="p">,</span>
+                       <span class="kt">unsigned</span> <span class="kt">int</span>        <span class="n">derivOrder</span><span class="p">,</span>
+                       <span class="n">GradVecType</span><span class="o">&amp;</span>        <span class="n">grad</span><span class="p">)</span> <span class="k">const</span><span class="p">;</span>
+</pre></div>
+</div>
+<p class="card-text">Computes the mixed gradient <span class="math notranslate nohighlight">\(\nabla_c[ \partial_d f]\)</span> or <span class="math notranslate nohighlight">\(\nabla_c[ \partial^2_{dd} f]\)</span> at a single point.  The gradient should be stored in the preallocated <code class="code docutils literal notranslate"><span class="pre">grad</span></code> vector.  The <code class="code docutils literal notranslate"><span class="pre">double</span></code> returned by this function should contain <span class="math notranslate nohighlight">\(\partial_d\)</span> if <code class="code docutils literal notranslate"><span class="pre">derivOrder==1</span></code> or <span class="math notranslate nohighlight">\(\partial^2_{dd}\)</span> if <code class="code docutils literal notranslate"><span class="pre">derivOrder==2</span></code>.   Both the <code class="code docutils literal notranslate"><span class="pre">CoeffVecType</span></code> and <code class="code docutils literal notranslate"><span class="pre">GradVecType</span></code> types will provide the parantheses operator <code class="code docutils literal notranslate"><span class="pre">()</span></code> for accessing and setting values.   The <code class="code docutils literal notranslate"><span class="pre">grad</span></code> will be preallocated, but might not be initialized; values of grad should therefore be set even if they are <span class="math notranslate nohighlight">\(0\)</span>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="implementations">
+<h2>Implementations<a class="headerlink" href="#implementations" title="Permalink to this headline">¶</a></h2>
+<p>The following classes currently implement this concept.</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../multivariateexpansion.html">Multivariate Expansion</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tensorproductfunction.html">Tensor Product Function</a></li>
+</ul>
+</div>
+</section>
 </section>
 
 
@@ -306,10 +530,10 @@
             <p class="prev-next-title">Template Concepts</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="parameterizedfunction.html" title="next page">
+    <a class='right-next' id="next-link" href="../multivariateexpansion.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Parameterized Function Concept</p>
+        <p class="prev-next-title">Multivariate Expansion</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>
