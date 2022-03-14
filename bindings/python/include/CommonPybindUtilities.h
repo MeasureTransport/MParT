@@ -32,7 +32,6 @@ namespace python{
         KokkosCustomPointer( ) : guard(GetKokkosGuard()) {};
         explicit KokkosCustomPointer(T *p) : guard(GetKokkosGuard()), impl(p) {}
         T* get() const { return impl.get(); }
-        T** operator&() { throw std::logic_error("Call of overloaded operator& is not expected"); }
     };
 } // namespace mpart
 } // namespace python 
