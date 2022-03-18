@@ -119,6 +119,37 @@ public:
             throw std::invalid_argument(msg.str());
         }
 
+        // Extract the xtol and ytol option if they exist
+        double xtol, ytol;
+        if(options.count("xtol")){
+            xtol = std::stod(options["xtol"]);
+            if(xtol<0){
+                std::stringstream msg;
+                msg << "Invalid tolerance \"xtol\" given to MonotoneComponent::Inverse.  Value must be non-negative, but given " << xtol;
+                throw std::invalid_argument(msg.str());
+            }
+        }else{
+            xtol = 1e-6;
+        }
+        if(options.count("ytol")){
+            ytol = std::stod(options["ytol"]);
+            if(ytol<0){
+                std::stringstream msg;
+                msg << "Invalid tolerance \"ytol\" given to MonotoneComponent::Inverse.  Value must be non-negative, but given " << ytol;
+                throw std::invalid_argument(msg.str());
+            }
+        }else{
+            ytol = 1e-6;
+        }
+
+        if((ytol<=std::numeric_limits<double>::epsilon())&&(xtol<=std::numeric_limits<double>::epsilon())){
+            std::stringstream msg;
+            msg << "Invalid tolerances given to MonotoneComponent::Inverse.  Either \"xtol\" or \"ytol\" must be nonzero, but given values are " << xtol << " and " << ytol;
+            throw std::invalid_argument(msg.str());
+        }
+        
+
+
         // Set up the cache for each point
         const unsigned int numPts = ys.extent(0); 
         const unsigned int numXs = xs.extent(1); // The number of input points
@@ -160,7 +191,7 @@ public:
             _expansion.FillCache1(cache, pt, DerivativeFlags::None);
 
             // Compute the inverse 
-            output(ptInd) = InverseSingleBracket(cache, pt, ys(ptInd), coeffs, options);
+            output(ptInd) = InverseSingleBracket(cache, pt, ys(ptInd), coeffs, xtol, ytol);
         });
     }
     
@@ -554,11 +585,9 @@ private:
                                PointType                    const& pt,
                                double                              yd,
                                CoeffsType                   const& coeffs,
-                               std::map<std::string, std::string>  options)
+                               const double xtol, const double ftol)
     {   
         double stepSize=1.0;
-        const double xtol = 1e-8;
-        const double ftol = 1e-10;
         const unsigned int maxIts = 10000;
 
         // First, we need to find two points that bound the solution.
