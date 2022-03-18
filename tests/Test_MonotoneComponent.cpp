@@ -400,9 +400,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
 
         Kokkos::View<double*> ys = comp.Evaluate(evalPts, coeffs);
-        Kokkos::View<double*> testInverse("Test output", numPts);
-
-        comp.Inverse(evalPts, ys, coeffs, testInverse);
+        Kokkos::View<double*> testInverse = comp.Inverse(evalPts, ys, coeffs);
 
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(testTol));
@@ -433,9 +431,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
 
         Kokkos::View<double*> ys = comp.Evaluate(evalPts, coeffs);
-        Kokkos::View<double*> testInverse("Test output", numPts);
-
-        comp.Inverse(x, ys, coeffs, testInverse);
+        Kokkos::View<double*> testInverse = comp.Inverse(x, ys, coeffs);
 
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(1e-6));

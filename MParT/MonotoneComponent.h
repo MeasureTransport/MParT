@@ -40,6 +40,25 @@ public:
                       QuadratureType const& quad) : _expansion(expansion), _quad(quad), _dim(expansion.InputSize()){};
 
 
+
+    /**
+       @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
+       
+     * @param[in] pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
+     * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
+     * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
+     */
+    Kokkos::View<double*> Evaluate(Kokkos::View<double**> const& pts, 
+                                   Kokkos::View<double*> const& coeffs)
+    {   
+        const unsigned int numPts = pts.extent(1);
+        Kokkos::View<double*> output("Monotone Component Evaluations", numPts);
+
+        Evaluate(pts, coeffs, output);
+
+        return output;
+    }
+
     /**
        @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
        
@@ -82,6 +101,27 @@ public:
     }
 
 
+    /**
+       @brief Evaluates the inverse of the \f$D^{th}\f$ componeot of the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
+       @param xs A \f$D\times N_1\f$ array containing \f$N_1\f$ \f$x_{1:D-1}\f$ points.  Note that this matrix must have either 1 or N columns and at least \f$D\f$ rows.  The \f$D\f$ row will serve as an initial guess for \f$x_D\f$ during the inversion.
+       @param ys A length \f$N\f$ array containing \f$N\f$ values of \f$y_D\f$ for use in the solve.
+       @param coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
+       @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
+       @returns A length \f$N\f$ Kokkos::View<double*> containing \f$y_D^{(i)}\f$.
+    */
+    Kokkos::View<double*> Inverse(Kokkos::View<double**>       const& xs, 
+                                  Kokkos::View<double*>        const& ys, 
+                                  Kokkos::View<double*>        const& coeffs,
+                                  std::map<std::string, std::string>  options=std::map<std::string,std::string>())
+    {   
+        const unsigned int numPts = ys.extent(0);
+        Kokkos::View<double*> output("Monotone Component Inverse Evaluations", numPts);
+
+        Inverse(xs, ys, coeffs, output, options);
+
+        return output;
+    }
+
 
     /**
      @brief Evaluates the inverse of the diagonal of the monotone component.  
@@ -94,7 +134,7 @@ public:
      @param xs A \f$D\times N_1\f$ array containing \f$N_1\f$ \f$x_{1:D-1}\f$ points.  Note that this matrix must have either 1 or N columns and at least \f$D\f$ rows.  The \f$D\f$ row will serve as an initial guess for \f$x_D\f$ during the inversion.
      @param ys A length \f$N\f$ array containing \f$N\f$ values of \f$y_D\f$ for use in the solve.
      @param coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
-     @param output An array containing the values of \f$y_D^{(i)}\f$
+     @param output An array for storing the computed values of \f$y_D^{(i)}\f$.  Memory for this array must be preallocated before calling this function.
      @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
      */
     void Inverse(Kokkos::View<double**>       const& xs, 
@@ -196,23 +236,7 @@ public:
     
 
 
-    /**
-       @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
-       
-     * @param[in] pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
-     * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
-     * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
-     */
-    Kokkos::View<double*> Evaluate(Kokkos::View<double**> const& pts, 
-                                   Kokkos::View<double*> const& coeffs)
-    {   
-        const unsigned int numPts = pts.extent(1);
-        Kokkos::View<double*> output("Monotone Component Evaluations", numPts);
-
-        Evaluate(pts, coeffs, output);
-
-        return output;
-    }
+    
 
     
 
