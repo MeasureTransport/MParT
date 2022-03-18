@@ -408,6 +408,39 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
             CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(testTol));
         }
     }
+
+
+    SECTION("Same x, multiple ys"){
+
+        Kokkos::View<double**> x("Evaluate Points", dim, 1);
+        x(0,0) = 0.5*(lb+ub);
+        
+        unsigned int maxDegree = 2; 
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+        ProbabilistHermite poly1d;
+        MultivariateExpansion<ProbabilistHermite> expansion(mset);
+        
+        Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
+        coeffs(1) = 1.0; // Linear term = x ^1
+        coeffs(2) = 0.5; // Quadratic term = x^2 - 1.0
+        coeffs(0) = 1.0 + coeffs(2); // Constant term = x^0
+
+        unsigned int maxSub = 30;
+        double relTol = 1e-7;
+        double absTol = 1e-7;
+        AdaptiveSimpson quad(maxSub, absTol, relTol,QuadError::First);
+
+        MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
+
+        Kokkos::View<double*> ys = comp.Evaluate(evalPts, coeffs);
+        Kokkos::View<double*> testInverse("Test output", numPts);
+
+        comp.Inverse(x, ys, coeffs, testInverse);
+
+        for(unsigned int i=0; i<numPts; ++i){
+            CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(1e-6));
+        }
+    }
 }
 
 

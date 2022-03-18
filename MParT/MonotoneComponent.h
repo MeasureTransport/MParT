@@ -154,9 +154,6 @@ public:
         const unsigned int numPts = ys.extent(0); 
         const unsigned int numXs = xs.extent(1); // The number of input points
 
-        // We haven't implemented the case for a single x yet
-        assert(numXs == numPts);
-
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = xs.extent(0);
 
@@ -182,9 +179,12 @@ public:
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA (auto team_member) {
 
             unsigned int ptInd = team_member.league_rank();
-            
+            unsigned int xInd = ptInd;
+            if(numXs==1)
+                xInd = 0;
+                
             // Create a subview containing x_{1:d-1}
-            auto pt = Kokkos::subview(xs, Kokkos::ALL(), ptInd);
+            auto pt = Kokkos::subview(xs, Kokkos::ALL(), xInd);
 
             // Fill in the cache with everything that doesn't depend on x_d
             double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
