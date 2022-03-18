@@ -109,6 +109,7 @@ find_package(Doxygen)
 find_package(Sphinx)
 if(Sphinx_FOUND AND Doxygen_FOUND)
 
+    message("SPHINX Executable = ${SPHINX_EXECUTABLE}")
     set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/docs)
     set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
 

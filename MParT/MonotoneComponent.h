@@ -94,9 +94,8 @@ public:
      @param xs A \f$D\times N_1\f$ array containing \f$N_1\f$ \f$x_{1:D-1}\f$ points.  Note that this matrix must have either 1 or N columns and at least \f$D\f$ rows.  The \f$D\f$ row will serve as an initial guess for \f$x_D\f$ during the inversion.
      @param ys A length \f$N\f$ array containing \f$N\f$ values of \f$y_D\f$ for use in the solve.
      @param coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
-     @param output 
-     @param options A map containing options for the method (e.g., converge criteria, step sizes).   This top level function only works with 
-                    the "Method" option (`options["Method"]`).  Currently, the only method options is "Bracket".
+     @param output An array containing the values of \f$y_D^{(i)}\f$
+     @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
      */
     void Inverse(Kokkos::View<double**>       const& xs, 
                  Kokkos::View<double*>        const& ys,
@@ -182,7 +181,7 @@ public:
             unsigned int xInd = ptInd;
             if(numXs==1)
                 xInd = 0;
-                
+
             // Create a subview containing x_{1:d-1}
             auto pt = Kokkos::subview(xs, Kokkos::ALL(), xInd);
 
