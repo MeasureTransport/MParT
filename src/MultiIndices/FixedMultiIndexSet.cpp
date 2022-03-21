@@ -1,5 +1,9 @@
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
+#include <algorithm>
+#include <tuple>
+#include <utility>
+
 using namespace mpart;
 
 
@@ -10,7 +14,7 @@ FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
 
 {
     unsigned int numTerms = nzOrders.extent(0) / dim;
-    
+
     nzStarts = Kokkos::View<unsigned int*>("Start of a Multiindex", numTerms+1);
     for(unsigned int i=0; i<numTerms+1; ++i)
         nzStarts(i) = i*dim;
@@ -31,7 +35,7 @@ FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
                                        Kokkos::View<unsigned int*> _nzDims,
                                        Kokkos::View<unsigned int*> _nzOrders) : dim(_dim),
                                                                                 isCompressed(true),
-                                                                                nzStarts(_nzStarts), 
+                                                                                nzStarts(_nzStarts),
                                                                                 nzDims(_nzDims),
                                                                                 nzOrders(_nzOrders)
 {
@@ -43,13 +47,13 @@ FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
         maxDegrees(nzDims(i)) = std::max(maxDegrees(nzDims(i)), nzOrders(i));
 }
 
-FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim, 
+FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim,
                                        unsigned int _maxOrder) : dim(_dim), isCompressed(true)
-{   
+{
     // Figure out the number of terms in the total order
     unsigned int numTerms, numNz;
     std::tie(numTerms,numNz) = TotalOrderSize(_maxOrder, 0);
-    
+
     // Allocate space for the multis in compressed form
     nzStarts = Kokkos::View<unsigned int*>("nzStarts", numTerms+1);
     nzDims   = Kokkos::View<unsigned int*>("nzDims", numNz);
@@ -59,7 +63,7 @@ FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim,
     std::vector<unsigned int> workspace(dim);
     unsigned int currNz=0;
     unsigned int currTerm=0;
-    
+
     FillTotalOrder(_maxOrder, workspace, 0, currTerm, currNz);
 
     maxDegrees = Kokkos::View<unsigned int*>("Maximum degrees", dim);
@@ -67,18 +71,18 @@ FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim,
         maxDegrees(i) = _maxOrder;
 }
 
-    
+
 
 Kokkos::View<const unsigned int*> FixedMultiIndexSet::MaxDegrees() const
-{   
+{
     return maxDegrees;
 }
 
 
 std::vector<unsigned int> FixedMultiIndexSet::IndexToMulti(unsigned int index) const
-{   
+{
     std::vector<unsigned int> output(dim,0);
-    
+
     if(isCompressed){
         for(unsigned int i=nzStarts(index); i<nzStarts(index+1); ++i)
             output.at( nzDims(i) ) = nzOrders(i);
@@ -90,17 +94,17 @@ std::vector<unsigned int> FixedMultiIndexSet::IndexToMulti(unsigned int index) c
 }
 
 int FixedMultiIndexSet::MultiToIndex(std::vector<unsigned int> const& multi) const
-{   
+{
     if(isCompressed){
 
         // Figure out how many nonzeros are in this multiindex
         unsigned int nnz = 0;
         for(auto& val : multi)
             nnz += (val>0) ? 1:0;
-        
+
         // Now search for the matching multi
         for(unsigned int i=0; i<nzStarts.extent(0); ++i){
-            
+
             // First, check if the number of nonzeros matches
             if((nzStarts(i+1)-nzStarts(i))==nnz){
 
@@ -145,7 +149,7 @@ int FixedMultiIndexSet::MultiToIndex(std::vector<unsigned int> const& multi) con
 
 
 void FixedMultiIndexSet::Print() const
-{   
+{
     if(isCompressed){
         std::cout << "Starts:\n";
         for(int i=0; i<nzStarts.extent(0); ++i)
@@ -156,7 +160,7 @@ void FixedMultiIndexSet::Print() const
         for(int i=0; i<nzDims.extent(0); ++i)
             std::cout << nzDims(i) << "  ";
         std::cout << std::endl;
-        
+
         std::cout << "\nOrders:\n";
         for(int i=0; i<nzOrders.extent(0); ++i)
             std::cout << nzOrders(i) << "  ";
@@ -167,10 +171,10 @@ void FixedMultiIndexSet::Print() const
     std::vector<unsigned int> multi;
     for(unsigned int term=0; term<nzStarts.extent(0)-1; ++term){
         multi = IndexToMulti(term);
-        
+
         for(auto& m : multi)
             std::cout << m << "  ";
-        
+
         std::cout << std::endl;
     }
 
@@ -184,7 +188,7 @@ unsigned int FixedMultiIndexSet::Size() const
     }else{
         return nzOrders.extent(0) / dim;
     }
-}   
+}
 
 
 std::pair<unsigned int, unsigned int> FixedMultiIndexSet::TotalOrderSize(unsigned int maxOrder, unsigned int currDim)
@@ -207,11 +211,11 @@ std::pair<unsigned int, unsigned int> FixedMultiIndexSet::TotalOrderSize(unsigne
 }
 
 void FixedMultiIndexSet::FillTotalOrder(unsigned int maxOrder,
-                                        std::vector<unsigned int> &workspace, 
-                                        unsigned int currDim, 
+                                        std::vector<unsigned int> &workspace,
+                                        unsigned int currDim,
                                         unsigned int &currTerm,
                                         unsigned int &currNz)
-{   
+{
 
     if(currDim<dim-1) {
         for(unsigned int pow=0; pow<=maxOrder; ++pow){

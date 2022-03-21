@@ -1,6 +1,7 @@
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
 
-#include <math.h>
+#include <cmath>
+#include <stdexcept>
 
 using namespace mpart;
 using namespace mpart::MultiIndexLimiter;
@@ -23,7 +24,7 @@ bool Dimension::operator()(MultiIndex const& multi) const
 
 
 Anisotropic::Anisotropic(std::vector<double> const& weightsIn,
-                         double                     epsilonIn) : weights(weightsIn), 
+                         double                     epsilonIn) : weights(weightsIn),
                                                                  epsilon(epsilonIn)
 {
     // validate weight vector
@@ -40,20 +41,20 @@ Anisotropic::Anisotropic(std::vector<double> const& weightsIn,
 
 bool Anisotropic::operator()(MultiIndex const& multi) const
 {
-    
+
     if(multi.Length() != weights.size())
         return false;
 
     double prod = 1;
     for(unsigned int i=0; i<multi.Length(); ++i)
         prod *= pow(weights.at(i), (int)multi.Get(i));
-    
+
     return prod >= epsilon;
 }
 
 
 bool MaxDegree::operator()(MultiIndex const& multi) const
-{   
+{
     if(multi.Length() != maxDegrees.size())
         return false;
 
