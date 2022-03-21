@@ -3,7 +3,7 @@
 using namespace mpart;
 
 
-std::vector<MultiIndex> DefaultNeighborhood::ForwardNeighbors(MultiIndex const& multi) 
+std::vector<MultiIndex> DefaultNeighborhood::ForwardNeighbors(MultiIndex const& multi)
 {
     std::vector<MultiIndex> output;
     std::vector<unsigned int> vec = multi.Vector();
@@ -34,7 +34,7 @@ std::vector<MultiIndex> DefaultNeighborhood::BackwardNeighbors(MultiIndex const&
     return output;
 }
 
-bool DefaultNeighborhood::IsForward(MultiIndex const& base, 
+bool DefaultNeighborhood::IsForward(MultiIndex const& base,
                                     MultiIndex const& next)
 {
 
@@ -44,7 +44,7 @@ bool DefaultNeighborhood::IsForward(MultiIndex const& base,
     if((nextNnz>baseNnz+1) || (nextNnz<baseNnz))
         return false;
 
-    
+
     // Now check each dimension
     const unsigned int length = next.Length();
     unsigned int nextVal, baseVal;
@@ -64,7 +64,7 @@ bool DefaultNeighborhood::IsForward(MultiIndex const& base,
     return (diffSum==1);
 }
 
-bool DefaultNeighborhood::IsBackward(MultiIndex const& base, 
+bool DefaultNeighborhood::IsBackward(MultiIndex const& base,
                                      MultiIndex const& prev)
 {
     return IsForward(prev,base);

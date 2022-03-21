@@ -1,7 +1,7 @@
 #ifndef MPART_POSITIVEBIJECTORS_H
 #define MPART_POSITIVEBIJECTORS_H
 
-#include <math.h>
+#include <cmath>
 
 namespace mpart{
 
@@ -27,7 +27,7 @@ public:
     static double Inverse(double x){
         return std::fmin(std::log(std::exp(x) - 1.0), x);
     }
-    
+
 };
 
 /**
@@ -56,4 +56,4 @@ public:
 
 } // namespace mpart
 
-#endif 
+#endif
