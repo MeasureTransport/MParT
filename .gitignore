@@ -5,3 +5,4 @@ bin
 include
 lib
 /python
+bindings/python/tests/__pycache__/
