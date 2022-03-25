@@ -10,7 +10,7 @@ TEST_CASE( "Testing MultiIndex", "[MultiIndex]" ) {
 
     MultiIndex multi;
     REQUIRE( multi.Length()==0 );
-    
+
     // Use the constructor to create a multiindex of all zeros
     multi = MultiIndex(length);
     REQUIRE( multi.Length()==length );
@@ -18,6 +18,14 @@ TEST_CASE( "Testing MultiIndex", "[MultiIndex]" ) {
     REQUIRE( multi.Get(1) == 0);
     REQUIRE( multi.Max() == 0);
     REQUIRE( multi.Sum() == 0);
+
+    MultiIndex multi2;
+    multi2 = MultiIndex(length, 2);
+    REQUIRE( multi2.Length()==length );
+    REQUIRE( multi2.NumNz() == length);
+    REQUIRE( multi2.Get(1) == 2);
+    REQUIRE( multi2.Max() == 2);
+    REQUIRE( multi2.Sum() == 2*length);
 
     std::vector<unsigned int> dense;
     dense = multi.Vector();
@@ -28,7 +36,7 @@ TEST_CASE( "Testing MultiIndex", "[MultiIndex]" ) {
     denseStr = multi.String();
     REQUIRE( denseStr == "0 0 0 0");
 
-    // Set one of the values 
+    // Set one of the values
     multi.Set(2,1);
 
     REQUIRE( multi.Length()==length );
@@ -51,7 +59,7 @@ TEST_CASE( "Testing MultiIndex", "[MultiIndex]" ) {
     REQUIRE( denseStr == "0 0 1 0");
 
 
-    // Set another new value 
+    // Set another new value
     multi.Set(1,2);
 
     REQUIRE( multi.Length()==length );
