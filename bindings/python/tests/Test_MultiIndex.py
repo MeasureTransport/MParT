@@ -5,19 +5,34 @@ import unittest
 
 class TestStringMethods(unittest.TestCase):
 
-    def test_sum(self):
+    # This one passes :-)
+    def test_sum_1(self):
+        
+        idx = mpart.MultiIndex(30,2)
+        idx[0] = 2  # should do nothing
+        assert idx.sum() == 60
+
+    # This one fails :-(
+    def test_sum_2(self):
         
         idx = mpart.MultiIndex(30,2)
 
-        
         assert idx.sum() == 60
 
-    def test_max(self):
+    # This one passes :-)
+    def test_max_1(self):
 
         idx = mpart.MultiIndex(30,2)
         idx[0] = 100
 
         assert idx.max() == 100
+    
+    def test_max_2(self):
+
+        idx = mpart.MultiIndex(30,2)
+        
+
+        assert idx.max() == 2
 
     def test_count_nonzero(self):
         idx = mpart.MultiIndex(30,0)
