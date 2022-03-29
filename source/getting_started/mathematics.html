@@ -8,29 +8,26 @@
 
     <title>Mathematical Background &#8212; MParT  documentation</title>
     
-    <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-  
+
     
-    <link rel="stylesheet"
-      href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-  
-    
-      
-  
-    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/pydata-sphinx-theme.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
-    <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -47,7 +44,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -160,7 +157,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -220,9 +217,9 @@
               <div>
                 
   <section id="mathematical-background">
-<span id="mathematics"></span><h1>Mathematical Background<a class="headerlink" href="#mathematical-background" title="Permalink to this headline">¶</a></h1>
+<span id="mathematics"></span><h1>Mathematical Background<a class="headerlink" href="#mathematical-background" title="Permalink to this headline">#</a></h1>
 <section id="tensor-product-expansions">
-<h2>Tensor Product Expansions<a class="headerlink" href="#tensor-product-expansions" title="Permalink to this headline">¶</a></h2>
+<h2>Tensor Product Expansions<a class="headerlink" href="#tensor-product-expansions" title="Permalink to this headline">#</a></h2>
 <p>For a point <span class="math notranslate nohighlight">\(\mathbf{x}\in\mathbb{R}^d\)</span> and coefficients <span class="math notranslate nohighlight">\(\mathbf{w}\)</span>, we consider expansions of the form</p>
 <div class="math notranslate nohighlight">
 \[f(\mathbf{x}; \mathbf{w}) = \sum_{\alpha\in \mathcal{A}} w_\alpha \Phi_\alpha(\mathbf{x}),\]</div>
@@ -233,38 +230,38 @@ through</p>
 \[\Phi_\mathbf{\alpha}(\mathbf{x}) = \prod_{\alpha_i \in \mathbf{\alpha}} \phi_{\alpha_i}(x_i).\]</div>
 </section>
 <section id="monotone-parameterizations">
-<h2>Monotone Parameterizations<a class="headerlink" href="#monotone-parameterizations" title="Permalink to this headline">¶</a></h2>
+<h2>Monotone Parameterizations<a class="headerlink" href="#monotone-parameterizations" title="Permalink to this headline">#</a></h2>
 <p>We represent monotone functions as the smooth transformation of an unconstrained function <span class="math notranslate nohighlight">\(f\colon\mathbb{R}^{d} \rightarrow \mathbb{R}\)</span>. Let <span class="math notranslate nohighlight">\(g\colon\mathbb{R}\rightarrow \mathbb{R}_{&gt;0}\)</span> be a strictly positive function, such as the softplus <span class="math notranslate nohighlight">\(g(x) = \log(1 + \exp(x))\)</span>. Then, the d-th map component <span class="math notranslate nohighlight">\(T_{d}\)</span> is given by</p>
 <div class="math notranslate nohighlight" id="equation-cont-map">
-<span class="eqno">(1)<a class="headerlink" href="#equation-cont-map" title="Permalink to this equation">¶</a></span>\[T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt.\]</div>
+<span class="eqno">(1)<a class="headerlink" href="#equation-cont-map" title="Permalink to this equation">#</a></span>\[T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt.\]</div>
 <p>Other choices for the <span class="math notranslate nohighlight">\(g\)</span> include the squared and exponential functions. These choices, however, have implications for the identifiability of the coefficients. If <span class="math notranslate nohighlight">\(g\)</span> is bijective, then we can recover <span class="math notranslate nohighlight">\(f\)</span> from <span class="math notranslate nohighlight">\(T_d\)</span> as</p>
 <div class="math notranslate nohighlight">
 \[f(\mathbf{x}_{1:d}; \mathbf{w}) = T_d(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g^{-1}( \partial_d T_d(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt.\]</div>
 <p>Using the representation for monotone functions with a bijective <span class="math notranslate nohighlight">\(g\)</span>, we can approximate <span class="math notranslate nohighlight">\(T_d\)</span> by finding <span class="math notranslate nohighlight">\(f\)</span>.</p>
 <section id="numerical-integration">
-<h3>Numerical Integration<a class="headerlink" href="#numerical-integration" title="Permalink to this headline">¶</a></h3>
+<h3>Numerical Integration<a class="headerlink" href="#numerical-integration" title="Permalink to this headline">#</a></h3>
 <p>Computationally, we approximate the integral in the definition of <span class="math notranslate nohighlight">\(T_d(\mathbf{x}_{1:d}; \mathbf{w})\)</span> using a quadrature rule with <span class="math notranslate nohighlight">\(N\)</span> points <span class="math notranslate nohighlight">\(\{t^{(1)}, \ldots, t^{(N)}\}\)</span> and corresponding weights <span class="math notranslate nohighlight">\(\{c^{(1)}, \ldots, c^{(N)}\}\)</span> designed to approximate integrals over <span class="math notranslate nohighlight">\([0,1]\)</span>.  Note that these points and weights will often be chosen adaptively.    The quadrature rule yields an approximation of the map component in <a class="reference internal" href="#equation-cont-map">(1)</a> with the form</p>
 <div class="math notranslate nohighlight" id="equation-discr-map">
-<span class="eqno">(2)<a class="headerlink" href="#equation-discr-map" title="Permalink to this equation">¶</a></span>\[\tilde{T}_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + x_d \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ),\]</div>
+<span class="eqno">(2)<a class="headerlink" href="#equation-discr-map" title="Permalink to this equation">#</a></span>\[\tilde{T}_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + x_d \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ),\]</div>
 <p>where the <span class="math notranslate nohighlight">\(x_d\)</span> term outside the summation comes from a change of integration domains from <span class="math notranslate nohighlight">\([0,1]\)</span> to <span class="math notranslate nohighlight">\([0,x_d]\)</span>.</p>
 </section>
 <section id="diagonal-derivatives">
-<h3>Diagonal Derivatives<a class="headerlink" href="#diagonal-derivatives" title="Permalink to this headline">¶</a></h3>
+<h3>Diagonal Derivatives<a class="headerlink" href="#diagonal-derivatives" title="Permalink to this headline">#</a></h3>
 <p>We will often require derivatives of <span class="math notranslate nohighlight">\(T_d\)</span> with respect to an input <span class="math notranslate nohighlight">\(x_i\)</span> or the parameters <span class="math notranslate nohighlight">\(\mathbf{w}\)</span>.  When computing these derivatives however, we have a choice of whether to differentiate the continuous map form in <a class="reference internal" href="#equation-cont-map">(1)</a> or the discretized map in <a class="reference internal" href="#equation-discr-map">(2)</a>.  This is similar to the “discretize-then-optimize” or “optimize-then-discretize” choice in PDE-constrained optimization.  When the quadrature rule is accurate, there might not be a large practical difference in these approaches.  For approximate rules however, using the continuous derivative may cause issues during optimization because the derivative will not be consistent with the discreteized map: a finite difference approximation will not converge to the continuous derivative.   In these cases, it is preferrable to differentiate the discrete map in <a class="reference internal" href="#equation-discr-map">(2)</a>.</p>
 <p>The derivative <span class="math notranslate nohighlight">\(\partial T_d / \partial x_d\)</span> is particularly important when using the monotone function <span class="math notranslate nohighlight">\(T_d\)</span> in a measure transformation.   The continuous version of this derivative is simply</p>
 <div class="math notranslate nohighlight" id="equation-cont-deriv">
-<span class="eqno">(3)<a class="headerlink" href="#equation-cont-deriv" title="Permalink to this equation">¶</a></span>\[\frac{\partial T_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) = g(\, \partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\, ).\]</div>
+<span class="eqno">(3)<a class="headerlink" href="#equation-cont-deriv" title="Permalink to this equation">#</a></span>\[\frac{\partial T_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) = g(\, \partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\, ).\]</div>
 <p>The discrete derivative on the other hand is more complicated:</p>
 <div class="math notranslate nohighlight" id="equation-discr-deriv">
-<span class="eqno">(4)<a class="headerlink" href="#equation-discr-deriv" title="Permalink to this equation">¶</a></span>\[\begin{split}\frac{\partial \tilde{T}_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) &amp;= \frac{\partial}{\partial x_d} \left[x_d \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) )\right]\\
+<span class="eqno">(4)<a class="headerlink" href="#equation-discr-deriv" title="Permalink to this equation">#</a></span>\[\begin{split}\frac{\partial \tilde{T}_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) &amp;= \frac{\partial}{\partial x_d} \left[x_d \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) )\right]\\
 &amp; = \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \\
 &amp;+ x_d \sum_{i=1}^N c^{(i)} t^{(i)} \partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \partial^2_{dd}f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) .\end{split}\]</div>
 </section>
 <section id="coefficient-derivatives">
-<h3>Coefficient Derivatives<a class="headerlink" href="#coefficient-derivatives" title="Permalink to this headline">¶</a></h3>
+<h3>Coefficient Derivatives<a class="headerlink" href="#coefficient-derivatives" title="Permalink to this headline">#</a></h3>
 <p>In addition to computing <span class="math notranslate nohighlight">\(\partial T_d/\partial d\)</span>, we will also need the gradient of the monotone function <span class="math notranslate nohighlight">\(T_d\)</span> with respect to the parameters <span class="math notranslate nohighlight">\(\mathbf{w}\)</span>, denoted by <span class="math notranslate nohighlight">\(\nabla_{\mathbf{w}}T_d\)</span>.</p>
 <div class="math notranslate nohighlight" id="equation-coeff-deriv">
-<span class="eqno">(5)<a class="headerlink" href="#equation-coeff-deriv" title="Permalink to this equation">¶</a></span>\[\begin{split}\nabla_{\mathbf{w}} T_d(\mathbf{x}_{1:d}; \mathbf{w}) &amp;= \nabla_{\mathbf{w}} f(x_1,\ldots, x_{d-1},0; \mathbf{w})\\
+<span class="eqno">(5)<a class="headerlink" href="#equation-coeff-deriv" title="Permalink to this equation">#</a></span>\[\begin{split}\nabla_{\mathbf{w}} T_d(\mathbf{x}_{1:d}; \mathbf{w}) &amp;= \nabla_{\mathbf{w}} f(x_1,\ldots, x_{d-1},0; \mathbf{w})\\
  &amp;+ \int_0^{x_d} \partial g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) \nabla_{\mathbf{w}}\left[\partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w})\right] dt \\
  &amp;\approx \nabla_{\mathbf{w}} f(x_1,\ldots, x_{d-1},0; \mathbf{w})\\
 &amp; + x_d \sum_{i=1}^N c^{(i)} \partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \nabla_{\mathbf{w}}\left[\partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w})\right]\end{split}\]</div>
@@ -282,7 +279,7 @@ through</p>
 </section>
 </section>
 <section id="triangular-transport-maps">
-<h2>Triangular Transport Maps<a class="headerlink" href="#triangular-transport-maps" title="Permalink to this headline">¶</a></h2>
+<h2>Triangular Transport Maps<a class="headerlink" href="#triangular-transport-maps" title="Permalink to this headline">#</a></h2>
 <p>Let <span class="math notranslate nohighlight">\(\pi\)</span> and <span class="math notranslate nohighlight">\(\eta\)</span> be two densities on <span class="math notranslate nohighlight">\(\mathbb{R}^d\)</span>. In measure transport, our goal is to find a multivariate transformation <span class="math notranslate nohighlight">\(T\)</span> that pushes forward <span class="math notranslate nohighlight">\(\eta\)</span> to <span class="math notranslate nohighlight">\(\pi\)</span>, meaning that if <span class="math notranslate nohighlight">\(\mathbf{X} \sim \eta\)</span>, then <span class="math notranslate nohighlight">\(T(\mathbf{X}) \sim \pi\)</span>. Given such a map, we can easily generate samples from <span class="math notranslate nohighlight">\(\eta\)</span> by pushing samples <span class="math notranslate nohighlight">\(\mathbf{x}^i \sim \eta\)</span> through the map <span class="math notranslate nohighlight">\(T(\mathbf{x}^i) \sim \pi\)</span>. Furthermore, we can express the push-forward density of a diffeomorphic map by <span class="math notranslate nohighlight">\(T_{\sharp}\eta(\mathbf{x}) := \eta(T^{-1}(\mathbf{x}))|\nabla T^{-1}(\mathbf{x})|\)</span>.</p>
 <p>While there are infinitely many transformations that couple densities, if <span class="math notranslate nohighlight">\(\pi\)</span> is absolutely continuous with respect to <span class="math notranslate nohighlight">\(\eta\)</span>, there exists a unique lower triangular and monotone function <span class="math notranslate nohighlight">\(T\colon \mathbb{R}^d \rightarrow \mathbb{R}^d\)</span> that pushes forward <span class="math notranslate nohighlight">\(\pi\)</span> to <span class="math notranslate nohighlight">\(\eta\)</span> of the form</p>
 <div class="math notranslate nohighlight">
@@ -318,8 +315,9 @@ through</p>
       </div>
     </div>
   
-    <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  <footer class="footer mt-5 mt-md-0">
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
@@ -330,7 +328,7 @@ through</p>
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

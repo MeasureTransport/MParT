@@ -8,29 +8,26 @@
 
     <title>Cached Parameterization Concept &#8212; MParT  documentation</title>
     
-    <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-  
+
     
-    <link rel="stylesheet"
-      href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-  
-    
-      
-  
-    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/pydata-sphinx-theme.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
-    <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -47,7 +44,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -285,7 +282,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -328,14 +325,14 @@
               <div>
                 
   <section id="cached-parameterization-concept">
-<h1>Cached Parameterization Concept<a class="headerlink" href="#cached-parameterization-concept" title="Permalink to this headline">¶</a></h1>
+<h1>Cached Parameterization Concept<a class="headerlink" href="#cached-parameterization-concept" title="Permalink to this headline">#</a></h1>
 <p>This concept provides the interface expected by the <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> class for the definition of the generally non-monotone function <span class="math notranslate nohighlight">\(f(x) : \mathbb{R}^d \rightarrow \mathbb{R}\)</span>.  This concept defines the <code class="code docutils literal notranslate"><span class="pre">ExpansionType</span></code> template argument in the <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> definition.</p>
 <p>The <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> class will evaluate <span class="math notranslate nohighlight">\(f(x)\)</span> at many points <span class="math notranslate nohighlight">\(x^{(k)}\)</span> that differ only in the <span class="math notranslate nohighlight">\(d^{th}\)</span> component.  That is, for any <span class="math notranslate nohighlight">\(k_1\)</span> and <span class="math notranslate nohighlight">\(k_2\)</span>, <span class="math notranslate nohighlight">\(x_j^{(k_1)} = x_j^{(k_2)}\)</span> for <span class="math notranslate nohighlight">\(j&lt;d\)</span>.   In many cases, it is possible to take advantage of this fact to precompute some quantities related to <span class="math notranslate nohighlight">\(x_{1:d-1}\)</span> that we know will not change as the <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> class varies <span class="math notranslate nohighlight">\(x_d\)</span>.</p>
 <p>To enable this, <code class="code docutils literal notranslate"><span class="pre">ExpansionType</span></code> needs to be able to interact with a preallocated block of memory called the cache below.  The cache will be allocated outside the <code class="code docutils literal notranslate"><span class="pre">ExpansionType</span></code> class, and then passed to <code class="code docutils literal notranslate"><span class="pre">ExpansionType::FillCache1</span></code> to do any necessary precomputations.</p>
 <p>When the value of the last component <span class="math notranslate nohighlight">\(x_d\)</span> is altered, the <code class="code docutils literal notranslate"><span class="pre">ExpansionType::FillCache2</span></code> function will then be called, before calling <code class="code docutils literal notranslate"><span class="pre">ExpansionType::Evaluate</span></code> to actually evaluate <span class="math notranslate nohighlight">\(f(x)\)</span>.   The <code class="code docutils literal notranslate"><span class="pre">ExpansionType::Evaluate</span></code> function only has access to the memory in the cache, so its important to perform all necessary computations in either the <code class="code docutils literal notranslate"><span class="pre">ExpansionType::FillCache1</span></code> or <code class="code docutils literal notranslate"><span class="pre">ExpansionType::FillCache2</span></code> functions.</p>
 <p>The details of these functions, as well as all the functions that <code class="code docutils literal notranslate"><span class="pre">MonotoneComponent</span></code> expects <code class="code docutils literal notranslate"><span class="pre">ExpansionType</span></code> to have, are provided in the <a class="reference internal" href="#specific-requirements">Specific Requirements</a> section below.</p>
 <section id="potential-usage">
-<h2>Potential Usage<a class="headerlink" href="#potential-usage" title="Permalink to this headline">¶</a></h2>
+<h2>Potential Usage<a class="headerlink" href="#potential-usage" title="Permalink to this headline">#</a></h2>
 <p>Below is an example of how a class implementing the cached parameterization concept could be used to evaluate <span class="math notranslate nohighlight">\(f(x;c)\)</span> at a randomly chosen point <span class="math notranslate nohighlight">\(x\)</span> and randomly chosen coefficients <span class="math notranslate nohighlight">\(c\)</span>.</p>
 <div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="n">ExpansionType</span> <span class="n">expansion</span><span class="p">;</span>
 <span class="c1">// ... Define the expansion</span>
@@ -362,7 +359,7 @@
 </div>
 </section>
 <section id="specific-requirements">
-<h2>Specific Requirements<a class="headerlink" href="#specific-requirements" title="Permalink to this headline">¶</a></h2>
+<h2>Specific Requirements<a class="headerlink" href="#specific-requirements" title="Permalink to this headline">#</a></h2>
 <div class="sphinx-bs container-lg pb-3 docutils">
 <div class="row docutils">
 <div class="d-flex col-lg-12 p-2 border-0 docutils">
@@ -506,7 +503,7 @@
 </div>
 </section>
 <section id="implementations">
-<h2>Implementations<a class="headerlink" href="#implementations" title="Permalink to this headline">¶</a></h2>
+<h2>Implementations<a class="headerlink" href="#implementations" title="Permalink to this headline">#</a></h2>
 <p>The following classes currently implement this concept.</p>
 <div class="toctree-wrapper compound">
 <ul>
@@ -545,8 +542,9 @@
       </div>
     </div>
   
-    <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  <footer class="footer mt-5 mt-md-0">
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
@@ -557,7 +555,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

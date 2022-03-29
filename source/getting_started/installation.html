@@ -8,29 +8,26 @@
 
     <title>Manual Installation &#8212; MParT  documentation</title>
     
-    <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-  
+
     
-    <link rel="stylesheet"
-      href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-  
-    
-      
-  
-    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/pydata-sphinx-theme.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
-    <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
@@ -46,7 +43,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -159,7 +156,7 @@
               
               <div class="toc-item">
                 
-<div class="tocsection onthispage pt-5 pb-3">
+<div class="tocsection onthispage mt-5 pt-1 pb-3">
     <i class="fas fa-list"></i> On this page
 </div>
 
@@ -214,9 +211,9 @@
               <div>
                 
   <section id="manual-installation">
-<span id="installation"></span><h1>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h1>
+<span id="installation"></span><h1>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">#</a></h1>
 <section id="compiling-from-source">
-<h2>Compiling from Source<a class="headerlink" href="#compiling-from-source" title="Permalink to this headline">¶</a></h2>
+<h2>Compiling from Source<a class="headerlink" href="#compiling-from-source" title="Permalink to this headline">#</a></h2>
 <p>MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir build
 <span class="nb">cd</span> build
@@ -247,25 +244,25 @@ make install
 </div>
 </section>
 <section id="using-mpart">
-<h2>Using MParT<a class="headerlink" href="#using-mpart" title="Permalink to this headline">¶</a></h2>
+<h2>Using MParT<a class="headerlink" href="#using-mpart" title="Permalink to this headline">#</a></h2>
 <section id="c">
-<h3>C++<a class="headerlink" href="#c" title="Permalink to this headline">¶</a></h3>
+<h3>C++<a class="headerlink" href="#c" title="Permalink to this headline">#</a></h3>
 <p>Coming soon.</p>
 </section>
 <section id="python">
-<h3>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h3>
+<h3>Python<a class="headerlink" href="#python" title="Permalink to this headline">#</a></h3>
 <p>First, make sure the relevant path variables include the installation of MParT:</p>
 <div class="tabbed-set docutils">
-<input checked="checked" id="18dfbcf4-b99e-4e2b-b485-0f31a6a6fd6b" name="d8c7b50b-8bdd-43f7-ae2b-662a2ecde282" type="radio">
-</input><label class="tabbed-label" for="18dfbcf4-b99e-4e2b-b485-0f31a6a6fd6b">
+<input checked="checked" id="55128582-4809-4211-962e-d76cac2c6064" name="42ca1ebe-b3a2-4d6e-a4ff-98220ab3d184" type="radio">
+</input><label class="tabbed-label" for="55128582-4809-4211-962e-d76cac2c6064">
 OSX</label><div class="tabbed-content docutils">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
 <span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
 </pre></div>
 </div>
 </div>
-<input id="c6b950a6-6f76-4816-8025-3b29f112b0e1" name="d8c7b50b-8bdd-43f7-ae2b-662a2ecde282" type="radio">
-</input><label class="tabbed-label" for="c6b950a6-6f76-4816-8025-3b29f112b0e1">
+<input id="848eaca8-8874-4c91-a3c5-b0d23e3a5cd7" name="42ca1ebe-b3a2-4d6e-a4ff-98220ab3d184" type="radio">
+</input><label class="tabbed-label" for="848eaca8-8874-4c91-a3c5-b0d23e3a5cd7">
 Linux</label><div class="tabbed-content docutils">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
 <span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
@@ -280,7 +277,7 @@ Linux</label><div class="tabbed-content docutils">
 </section>
 </section>
 <section id="building-documentation">
-<h2>Building Documentation<a class="headerlink" href="#building-documentation" title="Permalink to this headline">¶</a></h2>
+<h2>Building Documentation<a class="headerlink" href="#building-documentation" title="Permalink to this headline">#</a></h2>
 <ol class="arabic simple">
 <li><p>Make sure doxygen, sphinx, breathe, and the pydata-sphinx-theme are installed.  This is easily done with anaconda:</p></li>
 </ol>
@@ -334,8 +331,9 @@ Linux</label><div class="tabbed-content docutils">
       </div>
     </div>
   
-    <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  <footer class="footer mt-5 mt-md-0">
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
@@ -346,7 +344,7 @@ Linux</label><div class="tabbed-content docutils">
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     

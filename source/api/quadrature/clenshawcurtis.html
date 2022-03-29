@@ -8,29 +8,26 @@
 
     <title>Clenshaw Curtis Quadrature &#8212; MParT  documentation</title>
     
-    <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
 <link href="../../../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
-  
+
     
-    <link rel="stylesheet"
-      href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
-    <link rel="preload" as="font" type="font/woff2" crossorigin
-      href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
-  
-    
-      
-  
-    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/styles/pydata-sphinx-theme.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
-    <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
-  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
@@ -47,7 +44,7 @@
     <!-- Google Analytics -->
     
   </head>
-  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
     
     <div class="container-fluid" id="banner"></div>
 
@@ -308,10 +305,10 @@
               <div>
                 
   <section id="clenshaw-curtis-quadrature">
-<h1>Clenshaw Curtis Quadrature<a class="headerlink" href="#clenshaw-curtis-quadrature" title="Permalink to this headline">¶</a></h1>
+<h1>Clenshaw Curtis Quadrature<a class="headerlink" href="#clenshaw-curtis-quadrature" title="Permalink to this headline">#</a></h1>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart24ClenshawCurtisQuadratureE">
-<span id="_CPPv3N5mpart24ClenshawCurtisQuadratureE"></span><span id="_CPPv2N5mpart24ClenshawCurtisQuadratureE"></span><span id="mpart::ClenshawCurtisQuadrature"></span><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">ClenshawCurtisQuadrature</span></span></span><a class="headerlink" href="#_CPPv4N5mpart24ClenshawCurtisQuadratureE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N5mpart24ClenshawCurtisQuadratureE"></span><span id="_CPPv2N5mpart24ClenshawCurtisQuadratureE"></span><span id="mpart::ClenshawCurtisQuadrature"></span><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">ClenshawCurtisQuadrature</span></span></span><a class="headerlink" href="#_CPPv4N5mpart24ClenshawCurtisQuadratureE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>USAGE <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ClenshawCurtisQuadrature</span> <span class="n">quad</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
 <span class="n">integral</span> <span class="o">=</span> <span class="n">quad</span><span class="o">.</span><span class="n">Integrate</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
 </pre></div>
@@ -326,12 +323,12 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart24ClenshawCurtisQuadrature24ClenshawCurtisQuadratureEj">
-<span id="_CPPv3N5mpart24ClenshawCurtisQuadrature24ClenshawCurtisQuadratureEj"></span><span id="_CPPv2N5mpart24ClenshawCurtisQuadrature24ClenshawCurtisQuadratureEj"></span><span id="mpart::ClenshawCurtisQuadrature::ClenshawCurtisQuadrature__unsigned-i"></span><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature_1a538bb79234112909e2ffd6de96dda8b7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClenshawCurtisQuadrature</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">order</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart24ClenshawCurtisQuadrature24ClenshawCurtisQuadratureEj" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N5mpart24ClenshawCurtisQuadrature24ClenshawCurtisQuadratureEj"></span><span id="_CPPv2N5mpart24ClenshawCurtisQuadrature24ClenshawCurtisQuadratureEj"></span><span id="mpart::ClenshawCurtisQuadrature::ClenshawCurtisQuadrature__unsigned-i"></span><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature_1a538bb79234112909e2ffd6de96dda8b7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClenshawCurtisQuadrature</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">order</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart24ClenshawCurtisQuadrature24ClenshawCurtisQuadratureEj" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4I0EN5mpart24ClenshawCurtisQuadrature9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd">
-<span id="_CPPv3I0EN5mpart24ClenshawCurtisQuadrature9IntegrateERK12FunctionTypedd"></span><span id="_CPPv2I0EN5mpart24ClenshawCurtisQuadrature9IntegrateERK12FunctionTypedd"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature_1aaf4c3733b32a9d4922b849f4ea83b8e8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Integrate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN5mpart24ClenshawCurtisQuadrature9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd" title="mpart::ClenshawCurtisQuadrature::Integrate::FunctionType"><span class="n"><span class="pre">FunctionType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lb</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ub</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0EN5mpart24ClenshawCurtisQuadrature9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd" title="mpart::ClenshawCurtisQuadrature::Integrate::f"><span class="n"><span class="pre">f</span></span></a><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4I0EN5mpart24ClenshawCurtisQuadrature9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3I0EN5mpart24ClenshawCurtisQuadrature9IntegrateERK12FunctionTypedd"></span><span id="_CPPv2I0EN5mpart24ClenshawCurtisQuadrature9IntegrateERK12FunctionTypedd"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature_1aaf4c3733b32a9d4922b849f4ea83b8e8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Integrate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN5mpart24ClenshawCurtisQuadrature9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd" title="mpart::ClenshawCurtisQuadrature::Integrate::FunctionType"><span class="n"><span class="pre">FunctionType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lb</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ub</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0EN5mpart24ClenshawCurtisQuadrature9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd" title="mpart::ClenshawCurtisQuadrature::Integrate::f"><span class="n"><span class="pre">f</span></span></a><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4I0EN5mpart24ClenshawCurtisQuadrature9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Approximates the integral <span class="math notranslate nohighlight">\(\int_{x_L}^{x_U} f(x) dx\)</span> using a Clenshaw-Curtis quadrature rule. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -355,7 +352,7 @@
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart24ClenshawCurtisQuadrature7GetRuleEj">
-<span id="_CPPv3N5mpart24ClenshawCurtisQuadrature7GetRuleEj"></span><span id="_CPPv2N5mpart24ClenshawCurtisQuadrature7GetRuleEj"></span><span id="mpart::ClenshawCurtisQuadrature::GetRule__unsigned-i"></span><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature_1a3b8a9e6e5915a0f36d59639e685f6932"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorXd</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorXd</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRule</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">order</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart24ClenshawCurtisQuadrature7GetRuleEj" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N5mpart24ClenshawCurtisQuadrature7GetRuleEj"></span><span id="_CPPv2N5mpart24ClenshawCurtisQuadrature7GetRuleEj"></span><span id="mpart::ClenshawCurtisQuadrature::GetRule__unsigned-i"></span><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature_1a3b8a9e6e5915a0f36d59639e685f6932"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">pair</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorXd</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorXd</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRule</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">order</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart24ClenshawCurtisQuadrature7GetRuleEj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns the weights and points in a Clenshaw-Curtis rule. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -400,8 +397,9 @@
       </div>
     </div>
   
-    <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
-  <footer class="footer mt-5 mt-md-0">
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+<footer class="footer mt-5 mt-md-0">
   <div class="container">
     
     <div class="footer-item">
@@ -412,7 +410,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.4.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
 </p>
     </div>
     
