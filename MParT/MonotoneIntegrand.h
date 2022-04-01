@@ -29,38 +29,60 @@ namespace mpart{
     components $x_1,x_2,\ldots,x_{d-1}$ are all known apriori, as are the maximum degrees in each of those
     directions.   The values of \f$\phi_{\alpha_d}(x_d)\f$ for \f$d<D\f$ can thus be precomputed and reused
     during the integration of \f$g( f(x_1,x_2,\ldots,x_{d-1},t) )\f$.
+    
+    After the constructor has been called, cache[startPos[d]][p] will contain \phi_p(x_d).
 
-    After the constructor has been called, cache[startPos[d]][p] will contain \phi_p(x_d)
-
+    Note that some private member variables are stored by reference.  The user of this function must make sure that the
+    arguments given to the constructor persist longer than the life of this class.
+ 
    @tparam BasisEvaluatorType A class defining the family of 1d basis functions used to parameterize the function \f$f\f$.  The MParT::HermiteFunction and MParT::ProbabilistHermite classes are examples of types that implement the required interface.
    @tparam PosFuncType A class defining the function \f$g\f$.  This class must have `Evaluate` and `Derivative` functions accepting a double and returning a double.  The MParT::SoftPlus and MParT::Exp classes in PositiveBijectors.h are examples of classes defining this interface.
-   @tparam PointType
+   @tparam PointType The type of array used to store the point.  Should be some form of Kokkos::View<double*>.
+   @tparam CoeffsType The type of array used to store the coeffs.  Should be some form of Kokkos::View<double*>.
  */
-template<class ExpansionType, class PosFuncType, class PointType>
+template<class ExpansionType, class PosFuncType, class PointType, class CoeffsType>
 class MonotoneIntegrand{
 public:
 
 
 
     /**
-      @param cache A pointer to memory storing evaluations of \phi_{i,p}(x_i) for each i.  These terms need to be evaluated outside this class for \f$i\in\{0,\ldots,D-1\}\f$.
-      @param expansion
-      @param xd
+      @param cache A pointer to memory storing evaluations of \phi_{i,p}(x_i) for each i.  These terms need 
+                   to be evaluated outside this class (e.g., using `_expansion.FillCache1` for \f$i\in\{0,\ldots,D-1\}\f$. 
+      @param expansion 
+      @param pt
       @param coeffs
       @param derivType
      */
     MonotoneIntegrand(double*                            cache,
                       ExpansionType               const& expansion,
                       PointType                   const& pt,
-                      Kokkos::View<double*>       const& coeffs,
+                      CoeffsType                  const& coeffs,
                       DerivativeFlags::DerivativeType    derivType) : _dim(pt.extent(0)),
                                                                       _cache(cache),
                                                                       _expansion(expansion),
                                                                       _pt(pt),
+                                                                      _xd(pt(_dim-1)),
+                                                                      _coeffs(coeffs),
+                                                                      _derivType(derivType)
+    {   
+    }
+
+    MonotoneIntegrand(double*                            cache,
+                      ExpansionType               const& expansion,
+                      PointType                   const& pt,
+                      double                             xd,
+                      CoeffsType                  const& coeffs,
+                      DerivativeFlags::DerivativeType    derivType) : _dim(pt.extent(0)),
+                                                                      _cache(cache),
+                                                                      _expansion(expansion),
+                                                                      _pt(pt),
+                                                                      _xd(xd),
                                                                       _coeffs(coeffs),
                                                                       _derivType(derivType)
     {
     }
+
 
     /**
      Evaluates \f$g( \partial_d f(x_1,x_2,\ldots, x_d*t))\f$ using the cached values of \f$x\f$ given to the constructor
@@ -82,9 +104,9 @@ public:
 
         // Finish filling in the cache at the quadrature point (FillCache1 is called outside this class)
         if((_derivType==DerivativeFlags::Diagonal)||(_derivType==DerivativeFlags::Mixed)){
-            _expansion.FillCache2(_cache, _pt, t*_pt(_dim-1), DerivativeFlags::Diagonal2);
+            _expansion.FillCache2(_cache, _pt, t*_xd, DerivativeFlags::Diagonal2);
         }else{
-            _expansion.FillCache2(_cache, _pt, t*_pt(_dim-1), DerivativeFlags::Diagonal);
+            _expansion.FillCache2(_cache, _pt, t*_xd, DerivativeFlags::Diagonal);
         }
 
         // Use the cache to evaluate \partial_d f and, optionally, the gradient of \partial_d f wrt the coefficients.
@@ -92,7 +114,7 @@ public:
         if(_derivType==DerivativeFlags::Parameters){
             Eigen::Ref<Eigen::VectorXd> gradSeg(output.tail(numTerms));
             df = _expansion.MixedDerivative(_cache, _coeffs, 1, gradSeg);
-            output *= _pt(_dim-1)*PosFuncType::Derivative(df);
+            output *= _xd*PosFuncType::Derivative(df);
 
         }else if(_derivType==DerivativeFlags::Mixed){
             df = _expansion.DiagonalDerivative(_cache, _coeffs, 1);
@@ -102,11 +124,11 @@ public:
 
             double dgdf = PosFuncType::Derivative(df);
             double df2 = _expansion.MixedDerivative(_cache, _coeffs, 2, temp);
-            temp *= _pt(_dim-1)* t * dgdf;
+            temp *= _xd* t * dgdf;
 
             df = _expansion.MixedDerivative(_cache, _coeffs, 1, gradSeg);
 
-            gradSeg *= ( _pt(_dim-1)*t*df2*PosFuncType::SecondDerivative(df) + dgdf );
+            gradSeg *= ( _xd*t*df2*PosFuncType::SecondDerivative(df) + dgdf );
             gradSeg += temp;
 
         }else{
@@ -115,7 +137,7 @@ public:
 
         // First output is always the integrand itself
         double gf = PosFuncType::Evaluate(df);
-        output(0) = _pt(_dim-1)*gf;
+        output(0) = _xd*gf;
 
         // Check for infs or nans
         if(std::isinf(gf)){
@@ -133,7 +155,7 @@ public:
             output(1) = _expansion.DiagonalDerivative(_cache, _coeffs, 2);
 
             // Use the chain rule to get \partial_d g(f)
-            output(1) *= _pt(_dim-1)*t*PosFuncType::Derivative(df);
+            output(1) *= _xd*t*PosFuncType::Derivative(df);
             output(1) += gf;
         }
 
@@ -146,7 +168,8 @@ private:
     double* _cache;
     ExpansionType const& _expansion;
     PointType const& _pt;
-    Kokkos::View<double*> const& _coeffs;
+    double _xd;
+    CoeffsType const& _coeffs;
     DerivativeFlags::DerivativeType _derivType;
 
 }; // class MonotoneIntegrand
