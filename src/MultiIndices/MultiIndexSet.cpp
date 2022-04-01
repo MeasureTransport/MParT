@@ -1,14 +1,15 @@
-#include "MParT/MultiIndices/MultiIndexSet.h"
-
 #include <algorithm>
 #include <sstream>
+#include <stdexcept>
+
+#include "MParT/MultiIndices/MultiIndexSet.h"
 
 using namespace mpart;
 
-MultiIndexSet MultiIndexSet::CreateTotalOrder(unsigned int length, 
-                                              unsigned int maxOrder, 
+MultiIndexSet MultiIndexSet::CreateTotalOrder(unsigned int length,
+                                              unsigned int maxOrder,
                                               LimiterType const& limiter)
-{ 
+{
     assert(length>0);
 
     // create an empy multiindex set
@@ -23,10 +24,10 @@ MultiIndexSet MultiIndexSet::CreateTotalOrder(unsigned int length,
 }
 
 
-MultiIndexSet MultiIndexSet::CreateTensorProduct(unsigned int length, 
-                                                 unsigned int maxDegree, 
+MultiIndexSet MultiIndexSet::CreateTensorProduct(unsigned int length,
+                                                 unsigned int maxDegree,
                                                  LimiterType const& limiter)
-{ 
+{
     assert(length>0);
 
     // create an empy multiindex set
@@ -40,12 +41,12 @@ MultiIndexSet MultiIndexSet::CreateTensorProduct(unsigned int length,
     return output;
 }
 
-void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder, 
+void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder,
                                             MultiIndexSet &output,
                                             unsigned int currDim,
                                             std::vector<unsigned int> &base,
                                             LimiterType const& limiter)
-{   
+{
     unsigned int currOrder = 0;
     for(unsigned int i=0; i<currDim; ++i)
         currOrder += base.at(i);
@@ -75,7 +76,7 @@ void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder,
 }
 
 
-void MultiIndexSet::RecursiveTensorFill(unsigned int   maxDegree, 
+void MultiIndexSet::RecursiveTensorFill(unsigned int   maxDegree,
                                         MultiIndexSet &output,
                                         unsigned int currDim,
                                         std::vector<unsigned int> &base,
@@ -126,11 +127,11 @@ FixedMultiIndexSet MultiIndexSet::Fix(bool compress) const
     for(auto& activeInd : active2global)
       totalNnz += allMultis.at(activeInd).NumNz();
 
-    
+
     Kokkos::View<unsigned int*> nzStarts("Start of a Multiindex", numTerms+1);
     Kokkos::View<unsigned int*> nzDims("Index of nz component", totalNnz);
     Kokkos::View<unsigned int*> nzOrders("Power of nz component", totalNnz);
-    
+
     unsigned int cumNz = 0;
 
     for(unsigned int i=0; i<numTerms; ++i){
@@ -139,7 +140,7 @@ FixedMultiIndexSet MultiIndexSet::Fix(bool compress) const
       MultiIndex const& multi = allMultis.at(activeInd);
 
       nzStarts(i) = cumNz;
-      
+
       for(unsigned int j=0; j<multi.nzInds.size(); ++j){
         nzDims(cumNz + j) = multi.nzInds[j];
         nzOrders(cumNz + j) = multi.nzVals[j];
@@ -148,7 +149,7 @@ FixedMultiIndexSet MultiIndexSet::Fix(bool compress) const
       cumNz += allMultis.at(activeInd).NumNz();
     }
     nzStarts(numTerms) = totalNnz;
-    
+
     return FixedMultiIndexSet(length, nzStarts, nzDims, nzOrders);
 
   }else{
@@ -188,7 +189,7 @@ void MultiIndexSet::SetLimiter(LimiterType const& newLimiter){
 
       // Add any newly admissible inactive forward neighbors
       AddForwardNeighbors(globalInd,true);
-    
+
     }else{
 
       if(!newLimiter(allMultis.at(globalInd))){
@@ -199,7 +200,7 @@ void MultiIndexSet::SetLimiter(LimiterType const& newLimiter){
     }
   }
 
-  
+
 }
 
 int MultiIndexSet::MultiToIndex(MultiIndex const& input) const{
@@ -217,7 +218,7 @@ int MultiIndexSet::MultiToIndex(MultiIndex const& input) const{
 int MultiIndexSet::AddMulti(MultiIndex const& newMulti)
 {
   allMultis.push_back(newMulti);
-  
+
   int globalInd = allMultis.size() - 1;
   multi2global[allMultis.back()] = globalInd;
 
@@ -237,7 +238,7 @@ int MultiIndexSet::AddMulti(MultiIndex const& newMulti)
 int MultiIndexSet::AddActive(MultiIndex const& newNode)
 {
   int globalInd = AddInactive(newNode);
-  
+
   if(globalInd>=0){
 
     Activate(globalInd);
@@ -308,7 +309,7 @@ bool MultiIndexSet::IsAdmissible(unsigned int globalIndex) const
 bool MultiIndexSet::IsAdmissible(MultiIndex const& multiIndex) const
 {
   auto iter = multi2global.find(multiIndex);
-    
+
   if(iter==multi2global.end()){
     return false;
   }else{
@@ -364,12 +365,12 @@ void MultiIndexSet::Activate(MultiIndex const& multiIndex)
 }
 
 void MultiIndexSet::AddForwardNeighbors(unsigned int globalIndex, bool addInactive)
-{ 
+{
   std::vector<MultiIndex> neighbors = neighborhood->ForwardNeighbors(allMultis.at(globalIndex));
 
   for(auto& multi : neighbors)
   {
-    
+
     // If this is within the limiter set
     if(limiter(multi)){
 
@@ -430,13 +431,13 @@ void MultiIndexSet::Visualize(std::ostream &out) const
 
   out << "\n     ";
   for(unsigned int j=0; j<=maxOrders.at(0)+1; ++j){
-    
+
     if(j<10)
       out << j << "  ";
     else
       out << j << " ";
   }
-  out << std::endl; 
+  out << std::endl;
 
 }
 
@@ -518,10 +519,10 @@ std::vector<MultiIndex> MultiIndexSet::ReducedMargin() const
 std::vector<unsigned int> MultiIndexSet::StrictFrontier() const
 {
   std::vector<unsigned int> frontInds = Frontier();
-  std::vector<unsigned int> strictInds; 
+  std::vector<unsigned int> strictInds;
 
   for(unsigned int i=0; i<frontInds.size(); ++i) {
-    
+
     unsigned int activeInd = frontInds.at(i);
     unsigned int globalInd = active2global.at(activeInd);
 
@@ -587,7 +588,7 @@ unsigned int MultiIndexSet::NumForward(unsigned int activeInd) const
 }
 
 void MultiIndexSet::AddBackwardNeighbors(unsigned int globalIndex, bool addInactive)
-{ 
+{
   std::vector<MultiIndex> neighbors = neighborhood->BackwardNeighbors(allMultis.at(globalIndex));
 
   for(auto& multi : neighbors)
@@ -599,7 +600,7 @@ void MultiIndexSet::AddBackwardNeighbors(unsigned int globalIndex, bool addInact
       if(iter!=multi2global.end()){
         outEdges.at(iter->second).insert(globalIndex);
         inEdges.at(globalIndex).insert(iter->second);
-      
+
       // If not, add it
       }else if(addInactive){
         AddInactive(multi);

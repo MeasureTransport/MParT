@@ -18,8 +18,8 @@ namespace mpart{
 /**
 @brief Defines a function \f$T:R^N\rightarrow R\f$ such that \f$\partial T / \partial x_N >0\f$ is strictly positive.
 
-@details 
-The function \f$T\f$ is based on another (generally non-monotone) function \f$f : R^N\rightarrow R\f$ and a strictly positve function 
+@details
+The function \f$T\f$ is based on another (generally non-monotone) function \f$f : R^N\rightarrow R\f$ and a strictly positve function
 \f$g : R\rightarrow R_{>0}\f$.   Together, these functions define the monotone component $T$ through
 
 $$
@@ -28,7 +28,7 @@ $$
 
 @tparam ExpansionType A class defining the function \f$f\f$.  It must satisfy the cached parameterization concept.
 @tparam PosFuncType A class defining the function \f$g\f$.  This class must have `Evaluate` and `Derivative` functions accepting a double and returning a double.  The MParT::SoftPlus and MParT::Exp classes in PositiveBijectors.h are examples of classes defining this interface.
-@tparam QuadratureType A class defining the integration scheme used to approximate \f$\int_0^{x_N}  g\left( \frac{\partial f}{\partial x_d}(x_1,x_2,..., x_{N-1}, t) \right) dt\f$.  The type must have a function `Integrate(f,lb,ub)` that accepts a functor `f`, a double lower bound `lb`, a double upper bound `ub`, and returns a double with an estimate of the integral.   The MParT::AdaptiveSimpson and MParT::RecursiveQuadrature classes provide this interface. 
+@tparam QuadratureType A class defining the integration scheme used to approximate \f$\int_0^{x_N}  g\left( \frac{\partial f}{\partial x_d}(x_1,x_2,..., x_{N-1}, t) \right) dt\f$.  The type must have a function `Integrate(f,lb,ub)` that accepts a functor `f`, a double lower bound `lb`, a double upper bound `ub`, and returns a double with an estimate of the integral.   The MParT::AdaptiveSimpson and MParT::RecursiveQuadrature classes provide this interface.
 */
 template<class ExpansionType, class PosFuncType, class QuadratureType>
 class MonotoneComponent
@@ -61,13 +61,13 @@ public:
 
     /**
        @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
-       
+
      * @param[in] pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
      * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
      * @param[out] output Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
 
-    void Evaluate(Kokkos::View<double**> const& pts, 
+    void Evaluate(Kokkos::View<double**> const& pts,
                   Kokkos::View<double*>  const& coeffs,
                   Kokkos::View<double*>       & output)
     {
@@ -86,8 +86,8 @@ public:
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA (auto team_member) {
 
             unsigned int ptInd = team_member.league_rank();
-            
-            // Create a subview containing only the current point 
+
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
 
             // Get a pointer to the shared memory that Kokkos set up for this team
@@ -249,12 +249,12 @@ public:
 
         @see DiscreteDerivative
      */
-    Kokkos::View<double*>  ContinuousDerivative(Kokkos::View<double**> const& pts, 
+    Kokkos::View<double*>  ContinuousDerivative(Kokkos::View<double**> const& pts,
                                               Kokkos::View<double*>  const& coeffs)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*> derivs("Monotone Component Derivatives", numPts);
-        
+
         ContinuousDerivative(pts,coeffs, derivs);
 
         return derivs;
@@ -270,10 +270,10 @@ public:
 
         @see DiscreteDerivative
      */
-    void ContinuousDerivative(Kokkos::View<double**> const& pts, 
+    void ContinuousDerivative(Kokkos::View<double**> const& pts,
                               Kokkos::View<double*>  const& coeffs,
                               Kokkos::View<double*>       & derivs)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
@@ -286,11 +286,11 @@ public:
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA (auto team_member) {
-            
+
             // The index of the for loop
             unsigned int ptInd = team_member.league_rank();
 
-            // Create a subview containing only the current point 
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
 
             // Evaluate the orthgonal polynomials in each direction (except the last) for all possible orders
@@ -319,13 +319,13 @@ public:
 
         @see ContinuousDerivative
     */
-    Kokkos::View<double*>  DiscreteDerivative(Kokkos::View<double**> const& pts, 
+    Kokkos::View<double*>  DiscreteDerivative(Kokkos::View<double**> const& pts,
                                               Kokkos::View<double*>  const& coeffs)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*> evals("Component Evaluations", numPts);
         Kokkos::View<double*> derivs("Component Derivatives", numPts);
-        
+
         DiscreteDerivative(pts,coeffs, evals, derivs);
 
         return derivs;
@@ -341,11 +341,11 @@ public:
 
         @see ContinuousDerivative
      */
-    void  DiscreteDerivative(Kokkos::View<double**> const& pts, 
+    void  DiscreteDerivative(Kokkos::View<double**> const& pts,
                              Kokkos::View<double*>  const& coeffs,
-                             Kokkos::View<double*>       & evals, 
+                             Kokkos::View<double*>       & evals,
                              Kokkos::View<double*>       & derivs)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
@@ -362,18 +362,18 @@ public:
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA (auto team_member) {
-            
+
             unsigned int ptInd = team_member.league_rank();
 
-            // Create a subview containing only the current point 
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
 
             // Get a pointer to the shared memory Kokkos is managing for the cache
             double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
-            
+
             // Fill in the cache with anything that doesn't depend on x_d
             _expansion.FillCache1(cache, pt, DerivativeFlags::None);
-            
+
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
             MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt), Kokkos::View<double*>> integrand(cache, _expansion, pt, coeffs, DerivativeFlags::Diagonal);
             
@@ -385,25 +385,25 @@ public:
             // Add f(x_1,x_2,...,x_{d-1},0) to the evaluation output
             _expansion.FillCache2(cache, pt, 0.0, DerivativeFlags::None);
             evals(ptInd) += _expansion.Evaluate(cache, coeffs);
-            
+
         });
     }
 
     /** @brief Returns the gradient of the map with respect to the parameters \f$\mathbf{w}\f$ at multiple points.
 
-        @details 
-        Consider \f$N\f$ points \f$\{\mathbf{x}^{(1)},\ldots,\mathbf{x}^{(N)}\}\f$ and let 
+        @details
+        Consider \f$N\f$ points \f$\{\mathbf{x}^{(1)},\ldots,\mathbf{x}^{(N)}\}\f$ and let
         \f$y_d^{(i)} = T_d(\mathbf{x}^{(i)}; \mathbf{w})\f$.   This function computes \f$\nabla_{\mathbf{w}} y_d^{(i)}\f$
         for each output \f$y_d^{(i)}\f$.
-        
+
         @param[in] pts A \f$D\times N\f$ matrix containing the points \f$x^{(1)},\ldots,x^{(N)}\f$.  Each column is a point.
         @param[in] coeffs A vector of coefficients defining the function \f$f(\mathbf{x}; \mathbf{w})\f$.
         @param[out] evaluations A vector containing the \f$N\f$ predictions \f$y_d^{(i)}\f$.  The vector must be preallocated and have \f$N\f$ components when passed to this function.  An assertion will be thrown in this vector is not the correct size.
         @param[out] jacobian A matrix containing the \f$N\times M\f$ Jacobian matrix, where \f$M\f$ is the length of the parameter vector \f$\mathbf{w}\f$.  This matrix must be sized correctly or an assertion will be thrown.
-        
+
         @see CoeffGradient
     */
-    void CoeffJacobian(Kokkos::View<double**> const& pts, 
+    void CoeffJacobian(Kokkos::View<double**> const& pts,
                        Kokkos::View<double*>  const& coeffs,
                        Kokkos::View<double*>       & evaluations,
                        Kokkos::View<double**>      & jacobian)
@@ -425,10 +425,10 @@ public:
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA (auto team_member) {
-            
+
             unsigned int ptInd = team_member.league_rank();
 
-            // Create a subview containing only the current point 
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
             auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
 
@@ -437,13 +437,13 @@ public:
 
             // Fill in the cache with anything that doesn't depend on x_d
             _expansion.FillCache1(cache, pt, DerivativeFlags::None);
-            
+
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
             MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),Kokkos::View<double*>> integrand(cache, _expansion, pt, coeffs, DerivativeFlags::Parameters);
             
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
             Eigen::VectorXd integral = _quad.Integrate(integrand, 0, 1);
-            
+
             evaluations(ptInd) = integral(0);
 
             _expansion.FillCache2(cache, pt,  0.0, DerivativeFlags::None);
@@ -452,15 +452,15 @@ public:
             // Add the Integral to the coefficient gradient
             for(unsigned int termInd=0; termInd<numTerms; ++termInd)
                 jacView(termInd) += integral(termInd+1);
-            
+
         });
     }
 
 
-    void ContinuousMixedJacobian(Kokkos::View<double**> const& pts, 
+    void ContinuousMixedJacobian(Kokkos::View<double**> const& pts,
                                  Kokkos::View<double*>  const& coeffs,
                                  Kokkos::View<double**>      & jacobian)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
@@ -473,11 +473,11 @@ public:
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA (auto team_member) {
-            
+
             // The index of the for loop
             unsigned int ptInd = team_member.league_rank();
 
-            // Create a subview containing only the current point 
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
             auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
 
@@ -501,10 +501,10 @@ public:
         });
     }
 
-    void DiscreteMixedJacobian(Kokkos::View<double**> const& pts, 
+    void DiscreteMixedJacobian(Kokkos::View<double**> const& pts,
                                Kokkos::View<double*>  const& coeffs,
                                Kokkos::View<double**>      & jacobian)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
@@ -521,10 +521,10 @@ public:
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA (auto team_member) {
-            
+
             unsigned int ptInd = team_member.league_rank();
 
-            // Create a subview containing only the current point 
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
             auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
 
@@ -533,17 +533,17 @@ public:
 
             // Fill in the cache with anything that doesn't depend on x_d
             _expansion.FillCache1(cache, pt, DerivativeFlags::None);
-            
+
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
             MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),Kokkos::View<double*>> integrand(cache, _expansion, pt, coeffs, DerivativeFlags::Mixed);
             
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
             Eigen::VectorXd integral = _quad.Integrate(integrand, 0, 1);
-            
+
             // Add the Integral to the coefficient gradient
             for(unsigned int termInd=0; termInd<numTerms; ++termInd)
                 jacView(termInd) += integral(termInd+1);
-            
+
         });
     }
 
@@ -710,4 +710,4 @@ private:
 };
 
 } // namespace mpart
-#endif 
+#endif

@@ -8,9 +8,9 @@ using namespace mpart;
 
 MultiIndex::MultiIndex() : MultiIndex((unsigned int)0, (unsigned int)0) {};
 
-MultiIndex::MultiIndex(unsigned int lengthIn, unsigned val) : length(lengthIn), 
-                                                                maxValue(0), 
-                                                                totalOrder(0)
+MultiIndex::MultiIndex(unsigned int lengthIn, unsigned val) : length(lengthIn),
+                                                                maxValue(val),
+                                                                totalOrder(lengthIn*val)
 {
   if(val>0){
       nzVals.resize(length,val);
@@ -22,7 +22,7 @@ MultiIndex::MultiIndex(unsigned int lengthIn, unsigned val) : length(lengthIn),
 }
 
 
-MultiIndex::MultiIndex(const unsigned int* fullVec, 
+MultiIndex::MultiIndex(const unsigned int* fullVec,
                        unsigned int lengthIn) : MultiIndex(lengthIn, 0)
 {
     for(unsigned int i=0; i<length; ++i){
@@ -61,7 +61,7 @@ std::vector<unsigned int>MultiIndex::Vector() const
 
   for(unsigned int i=0; i<nzVals.size(); ++i)
       output[nzInds[i]] = nzVals[i];
- 
+
   return output;
 }
 
@@ -73,7 +73,7 @@ bool MultiIndex::Set(unsigned int ind, unsigned int val)
   }else{
 
     bool existingNz = false;
-    
+
     // Get an iterator into the nzInds that matches ind, or is where we want to insert a new value
     auto indIter = std::lower_bound(nzInds.begin(), nzInds.end(), ind);
     unsigned int index = std::distance(nzInds.begin(), indIter);
@@ -89,7 +89,7 @@ bool MultiIndex::Set(unsigned int ind, unsigned int val)
 
         // If the new value is nonzero, update the value
         if(val>0){
-            existingNz = true;    
+            existingNz = true;
             nzVals.at(index) = val;
 
         // If the new value is zero, erase this entry
@@ -135,7 +135,7 @@ unsigned int MultiIndex::MultiIndex::Get(unsigned ind) const
 
   }else{
       auto indIter = std::lower_bound(nzInds.begin(), nzInds.end(), ind);
-      
+
       if(indIter!=nzInds.end()){
         if((*indIter)==ind){
             unsigned int index = std::distance(nzInds.begin(), indIter);
