@@ -36,7 +36,6 @@ find_package(Kokkos QUIET)
 if(NOT Kokkos_FOUND)
     UpdateGitSubmodule(kokkos)
     add_subdirectory(external/kokkos)
-    include_directories(${Kokkos_INCLUDE_DIRS_RET})
 endif()
 
 # Add Eigen
@@ -44,7 +43,6 @@ find_package(Eigen3 QUIET)
 if(NOT Eigen3_FOUND)
     UpdateGitSubmodule(eigen)
     add_subdirectory(external/eigen)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/eigen)
 endif()
 
 # Add pybind11 if necessary 
