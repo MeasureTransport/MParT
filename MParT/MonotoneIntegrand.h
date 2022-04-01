@@ -1,10 +1,6 @@
 #ifndef MPART_MONOTONEINTEGRAND_H
 #define MPART_MONOTONEINTEGRAND_H
 
-#include <cmath>
-#include <sstream>
-#include <stdexcept>
-
 #include "MParT/DerivativeFlags.h"
 
 #include <Eigen/Core>
@@ -16,18 +12,18 @@ namespace mpart{
 
 /**
     @brief Computes the integrand  \f$g( \partial_d f(x_1,x_2,\ldots,x_{d-1},t) )\f$ used in a monotone component.
-
+      
     This class assumes f is given through an expansion containing a tensor product basis functions
     \f[
       f(x_1,x_2,\ldots,x_d) = \sum_\alpha c_{\alpha\in\mathcal{A}} \prod_{d=1^D} \phi_{\alpha_d}(x_d),
     \f]
-    where \f$\alpha\f$ is a multiindex in some set \f$\mathcal{A}\f$ and \f$\phi_{\alpha_d}\f$ is a univariate
-    function with degree (or general index) \f$\alpha_d\f$.   The BasisEvaluatorType template argument defines
-    the family of \f$\phi_{\alpha_d}\f$ functions.  When \f$\phi_{\alpha_d}\f$ is an orthongal polynomial,
-    it is possible to efficiently evaluate all degrees less than \f$P\f$ using the three term recurrence
-    relationship of the polynomial.  This is leveraged here to accelerate the evaluation of the integrand.  The
-    components $x_1,x_2,\ldots,x_{d-1}$ are all known apriori, as are the maximum degrees in each of those
-    directions.   The values of \f$\phi_{\alpha_d}(x_d)\f$ for \f$d<D\f$ can thus be precomputed and reused
+    where \f$\alpha\f$ is a multiindex in some set \f$\mathcal{A}\f$ and \f$\phi_{\alpha_d}\f$ is a univariate 
+    function with degree (or general index) \f$\alpha_d\f$.   The BasisEvaluatorType template argument defines 
+    the family of \f$\phi_{\alpha_d}\f$ functions.  When \f$\phi_{\alpha_d}\f$ is an orthongal polynomial, 
+    it is possible to efficiently evaluate all degrees less than \f$P\f$ using the three term recurrence 
+    relationship of the polynomial.  This is leveraged here to accelerate the evaluation of the integrand.  The 
+    components $x_1,x_2,\ldots,x_{d-1}$ are all known apriori, as are the maximum degrees in each of those 
+    directions.   The values of \f$\phi_{\alpha_d}(x_d)\f$ for \f$d<D\f$ can thus be precomputed and reused 
     during the integration of \f$g( f(x_1,x_2,\ldots,x_{d-1},t) )\f$.
     
     After the constructor has been called, cache[startPos[d]][p] will contain \phi_p(x_d).
@@ -44,13 +40,13 @@ template<class ExpansionType, class PosFuncType, class PointType, class CoeffsTy
 class MonotoneIntegrand{
 public:
 
-
+    
 
     /**
       @param cache A pointer to memory storing evaluations of \phi_{i,p}(x_i) for each i.  These terms need 
                    to be evaluated outside this class (e.g., using `_expansion.FillCache1` for \f$i\in\{0,\ldots,D-1\}\f$. 
       @param expansion 
-      @param pt
+      @param xd 
       @param coeffs
       @param derivType
      */
@@ -80,19 +76,19 @@ public:
                                                                       _xd(xd),
                                                                       _coeffs(coeffs),
                                                                       _derivType(derivType)
-    {
+    {   
     }
 
 
     /**
-     Evaluates \f$g( \partial_d f(x_1,x_2,\ldots, x_d*t))\f$ using the cached values of \f$x\f$ given to the constructor
+     Evaluates \f$g( \partial_d f(x_1,x_2,\ldots, x_d*t))\f$ using the cached values of \f$x\f$ given to the constructor 
      and the value of \f$t\f$ passed to this function.  Note that we assume t ranges from [0,1].  The change of variables to x_d*t is
      taken care of inside this function.
     */
     Eigen::VectorXd operator()(double t) const
-    {
+    {   
         const unsigned int numTerms = _expansion.NumCoeffs();
-
+        
         unsigned int numOutputs = 1;
         if(_derivType==DerivativeFlags::Diagonal)
             numOutputs++;
@@ -108,7 +104,7 @@ public:
         }else{
             _expansion.FillCache2(_cache, _pt, t*_xd, DerivativeFlags::Diagonal);
         }
-
+        
         // Use the cache to evaluate \partial_d f and, optionally, the gradient of \partial_d f wrt the coefficients.
         double df = 0;
         if(_derivType==DerivativeFlags::Parameters){
@@ -134,7 +130,7 @@ public:
         }else{
             df = _expansion.DiagonalDerivative(_cache, _coeffs, 1);
         }
-
+        
         // First output is always the integrand itself
         double gf = PosFuncType::Evaluate(df);
         output(0) = _xd*gf;
@@ -150,7 +146,7 @@ public:
 
         // Compute the derivative with respect to x_d
         if(_derivType==DerivativeFlags::Diagonal){
-
+            
             // Compute \partial^2_d f
             output(1) = _expansion.DiagonalDerivative(_cache, _coeffs, 2);
 

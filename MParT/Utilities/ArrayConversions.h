@@ -23,7 +23,7 @@ namespace mpart{
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
     template<typename ScalarType>
-    Kokkos::View<ScalarType*> ToKokkos(ScalarType* ptr, unsigned int dim)
+    Kokkos::View<ScalarType*, Kokkos::HostSpace> ToKokkos(ScalarType* ptr, unsigned int dim)
     {
         return Kokkos::View<ScalarType*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, dim);
     }
@@ -44,7 +44,7 @@ namespace mpart{
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
     template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft>
-    Kokkos::View<ScalarType**, LayoutType> ToKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
+    Kokkos::View<ScalarType**, LayoutType,Kokkos::HostSpace> ToKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
     {   
         return Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }

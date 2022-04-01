@@ -23,6 +23,7 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+set(CMAKE_CXX_FLAGS "-Wno-deprecated-gpu-targets")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -34,8 +35,11 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 # Add Kokkos
 find_package(Kokkos QUIET)
 if(NOT Kokkos_FOUND)
+    message(STATUS "Could not find Kokkos. Will build internally.")
     UpdateGitSubmodule(kokkos)
     add_subdirectory(external/kokkos)
+else() 
+    message(STATUS "Found Kokkos.")
 endif()
 
 # Add Eigen
@@ -90,6 +94,9 @@ endif()
 add_subdirectory(tests)
 add_executable(RunTests ${TEST_SOURCES})
 target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2)
+
+add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
+target_link_libraries(PrintKokkosInfo Kokkos::kokkos)
 
 ##############################################################
 # Instalaltion 
