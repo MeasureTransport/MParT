@@ -3,6 +3,8 @@
 #include "MParT/MultivariateExpansion.h"
 #include "MParT/OrthogonalPolynomial.h"
 
+#include "MParT/Utilities/ArrayConversions.h"
+
 #include <Eigen/Dense>
 
 using namespace mpart;
@@ -98,3 +100,53 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     d2f2 = expansion.DiagonalDerivative(&cache[0], coeffs2, 2);
     CHECK( grad.dot(stepDir) == Approx((d2f2-d2f)/fdStep).epsilon(1e-4));
 }
+
+
+#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+
+TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionDevice]") {
+
+    typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
+
+    const double testTol = 1e-7;
+
+    unsigned int dim = 3;
+    unsigned int maxDegree = 3; 
+    FixedMultiIndexSet<Kokkos::HostSpace> hset(dim,maxDegree);
+    FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice(); // Create a total order limited fixed multindex set
+
+    MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace> hexpansion(hset);
+    MultivariateExpansion<ProbabilistHermite,DeviceSpace> dexpansion(dset);
+
+    unsigned int cacheSize = hexpansion.CacheSize();
+    CHECK(cacheSize == (maxDegree+1)*(dim+2));
+
+    // Allocate some memory for the cache 
+    Kokkos::View<double*, Kokkos::HostSpace> hcache("host cache", cacheSize);
+    Kokkos::View<double*, Kokkos::HostSpace> hcache2("host copy of device cache", cacheSize);
+    
+    Kokkos::View<double*, DeviceSpace> dcache("device cache", cacheSize);
+
+    Kokkos::View<double*,Kokkos::HostSpace> hpt("host point", dim);
+    Kokkos::View<double*,DeviceSpace> dpt = ToDevice<DeviceSpace>(hpt);
+
+    // Fill in the cache with the first d-1 components of the cache  
+    hexpansion.FillCache1(hcache.data(), hpt, DerivativeFlags::None);
+    
+    // Run the fill cache funciton, using a parallel_for loop to ensure it's run on the device
+    Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
+        dexpansion.FillCache1(dcache.data(), dpt, DerivativeFlags::None);
+    });
+
+    // Copy the device cache back to the host
+    Kokkos::deep_copy(hcache2, dcache);
+
+    // Check to make sure they're equal
+    for(unsigned int d=0; d<dim-1;++d){
+        for(unsigned int i=0; i<maxDegree+1; ++i){
+            CHECK(hcache2[i + d*(maxDegree+1)] == Approx( hcache[i+d*(maxDegree+1)]).epsilon(1e-15) );
+        }
+    }
+}
+
+#endif 

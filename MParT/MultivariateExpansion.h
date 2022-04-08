@@ -14,7 +14,7 @@ struct MultivariateExpansionMaxDegreeFunctor {
 
     MultivariateExpansionMaxDegreeFunctor(unsigned int dim, Kokkos::View<unsigned int*, MemorySpace> startPos, Kokkos::View<const unsigned int*, MemorySpace> maxDegrees) : dim(dim), startPos(startPos), maxDegrees(maxDegrees) {};
 
-    void operator()(const int i, unsigned int& update, const bool final) const{
+    KOKKOS_INLINE_FUNCTION void operator()(const int i, unsigned int& update, const bool final) const{
         const unsigned int val_i = startPos(i); 
         if(final)
             startPos(i) = update;
@@ -105,7 +105,7 @@ public:
      @see FillCache2
      */
     template<typename PointType>
-    void FillCache1(double*          polyCache, 
+    KOKKOS_INLINE_FUNCTION void FillCache1(double*          polyCache, 
                     PointType const& pt, 
                     DerivativeFlags::DerivativeType   derivType) const
     {
@@ -127,7 +127,7 @@ public:
      */
 
     template<typename PointType>
-    void FillCache2(double*          polyCache, 
+    KOKKOS_INLINE_FUNCTION void FillCache2(double*          polyCache, 
                     PointType const& pt,
                     double           xd,
                     DerivativeFlags::DerivativeType derivType) const
@@ -154,7 +154,7 @@ public:
 
 
     template<typename CoeffVecType>
-    double Evaluate(const double* polyCache, CoeffVecType const& coeffs) const
+    KOKKOS_INLINE_FUNCTION double Evaluate(const double* polyCache, CoeffVecType const& coeffs) const
     {   
         const unsigned int numTerms = multiSet_.Size();
 
@@ -182,12 +182,13 @@ public:
      * @return double 
      */
     template<typename CoeffVecType>
-    double DiagonalDerivative(const double* polyCache, CoeffVecType const& coeffs, unsigned int derivOrder) const
+    KOKKOS_INLINE_FUNCTION double DiagonalDerivative(const double* polyCache, CoeffVecType const& coeffs, unsigned int derivOrder) const
     {   
         if((derivOrder==0)||(derivOrder>2)){
-            std::stringstream msg;
-            msg << "Error in MultivariateExpansion::DiagonalDerivative.  The derivative order is " << derivOrder << ", but only orders of {1,2} are currently supported.";
-            throw std::runtime_error(msg.str());
+            assert((derivOrder==1)||(derivOrder==2));
+            // std::stringstream msg;
+            // msg << "Error in MultivariateExpansion::DiagonalDerivative.  The derivative order is " << derivOrder << ", but only orders of {1,2} are currently supported.";
+            // throw std::runtime_error(msg.str());
         }
 
         const unsigned int numTerms = multiSet_.Size();
@@ -228,7 +229,7 @@ public:
      * @param grad 
      */
     template<typename CoeffVecType, typename GradVecType>
-    double CoeffDerivative(const double* polyCache, CoeffVecType const& coeffs, GradVecType& grad) const
+    KOKKOS_INLINE_FUNCTION double CoeffDerivative(const double* polyCache, CoeffVecType const& coeffs, GradVecType& grad) const
     {       
         const unsigned int numTerms = multiSet_.Size();
         double f=0;
@@ -248,14 +249,15 @@ public:
     }
 
     template<typename CoeffVecType, typename GradVecType>
-    double MixedDerivative(const double* cache, CoeffVecType const& coeffs, unsigned int derivOrder, GradVecType& grad) const
+    KOKKOS_INLINE_FUNCTION double MixedDerivative(const double* cache, CoeffVecType const& coeffs, unsigned int derivOrder, GradVecType& grad) const
     {   
         const unsigned int numTerms = multiSet_.Size();
 
         if((derivOrder==0)||(derivOrder>2)){
-            std::stringstream msg;
-            msg << "Error in MultivariateExpansion::DiagonalDerivative.  The derivative order is " << derivOrder << ", but only orders of {1,2} are currently supported.";
-            throw std::runtime_error(msg.str());
+            assert((derivOrder==1) || (derivOrder==2));
+            // std::stringstream msg;
+            // msg << "Error in MultivariateExpansion::DiagonalDerivative.  The derivative order is " << derivOrder << ", but only orders of {1,2} are currently supported.";
+            // throw std::runtime_error(msg.str());
         }
 
         double df=0;
