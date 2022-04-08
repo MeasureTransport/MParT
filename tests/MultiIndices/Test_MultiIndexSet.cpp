@@ -14,11 +14,26 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
 
     CHECK( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
 
-    Kokkos::View<const unsigned int*> maxDegrees = mset.MaxDegrees();
+    Kokkos::View<const unsigned int*, Kokkos::HostSpace> maxDegrees = mset.MaxDegrees();
     REQUIRE(maxDegrees.extent(0)==2);
     CHECK(maxDegrees(0)==maxOrder);
     CHECK(maxDegrees(1)==maxOrder);
 }
+
+#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+
+TEST_CASE( "Testing the FixedMultiIndexSet class copy to device", "[FixedMultiIndexSet]" ) {
+
+    const unsigned int dim = 2;
+    const unsigned int maxOrder = 5;
+
+    FixedMultiIndexSet<Kokkos::HostSpace> mset(dim,maxOrder);
+
+    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> deviceSet = mset.ToDevice();
+
+}
+#endif 
+
 
 
 TEST_CASE("Conversions between MultiIndexSet types", "[MultiIndexSet Conversions]" ) {
@@ -40,7 +55,7 @@ TEST_CASE("Conversions between MultiIndexSet types", "[MultiIndexSet Conversions
             CHECK(fixedVec.at(d)==vec.at(d));
     }
 
-    Kokkos::View<const unsigned int*> maxDegrees = fixedSet.MaxDegrees();
+    Kokkos::View<const unsigned int*, Kokkos::HostSpace> maxDegrees = fixedSet.MaxDegrees();
     REQUIRE(maxDegrees.extent(0)==dim);
     for(unsigned int i=0; i<dim; ++i)
         CHECK(maxDegrees(i)==maxDegree);

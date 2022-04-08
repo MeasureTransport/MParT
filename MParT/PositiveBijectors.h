@@ -1,7 +1,8 @@
 #ifndef MPART_POSITIVEBIJECTORS_H
 #define MPART_POSITIVEBIJECTORS_H
 
-#include <cmath>
+#include <Kokkos_Core.hpp>
+#include <math.h>
 
 namespace mpart{
 
@@ -11,23 +12,23 @@ namespace mpart{
 class SoftPlus{
 public:
 
-    static double Evaluate(double x){
+    KOKKOS_INLINE_FUNCTION static double Evaluate(double x){
         //stable implementation of std::log(1.0 + std::exp(x)) for large values
         return std::log(1.0 + std::exp(-1.0 * std::abs(x))) + std::fmax(x,0.0);
     }
 
-    static double Derivative(double x){
+    KOKKOS_INLINE_FUNCTION static double Derivative(double x){
         return 1.0 / (1.0 + std::exp(-1.0 * x));
     }
 
-    static double SecondDerivative(double x){
+    KOKKOS_INLINE_FUNCTION static double SecondDerivative(double x){
         return 1.0 / (2.0 + std::exp(-1.0 * x) + std::exp(x));
     }
 
-    static double Inverse(double x){
+    KOKKOS_INLINE_FUNCTION static double Inverse(double x){
         return std::fmin(std::log(std::exp(x) - 1.0), x);
     }
-
+    
 };
 
 /**
@@ -36,19 +37,19 @@ public:
 class Exp{
 public:
 
-    static double Evaluate(double x){
+    KOKKOS_INLINE_FUNCTION static double Evaluate(double x){
         return std::exp(x);
     }
 
-    static double Derivative(double x){
+    KOKKOS_INLINE_FUNCTION static double Derivative(double x){
         return std::exp(x);
     }
 
-    static double SecondDerivative(double x){
+    KOKKOS_INLINE_FUNCTION static double SecondDerivative(double x){
         return std::exp(x);
     }
 
-    static double Inverse(double x){
+    KOKKOS_INLINE_FUNCTION static double Inverse(double x){
         return std::log(x);
     }
 
@@ -56,4 +57,4 @@ public:
 
 } // namespace mpart
 
-#endif
+#endif 

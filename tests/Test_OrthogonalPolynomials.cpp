@@ -2,6 +2,8 @@
 
 #include "MParT/OrthogonalPolynomial.h"
 
+#include "MParT/Utilities/ArrayConversions.h"
+
 using namespace mpart;
 using namespace Catch;
 
@@ -115,3 +117,43 @@ TEST_CASE( "Testing Physicist Hermite polynomials", "[PhysicistHermite]" ) {
         CHECK( allvals[4] == Approx(16.0*x*x*x*x - 48.0*x*x + 12.0).epsilon(floatTol) );
     }
 }
+
+
+#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+
+TEST_CASE( "Device Hermite polynomial evaluation", "[PhysicistHermiteDevice]" ) {
+
+    const double floatTol = 1e-15;
+
+    PhysicistHermite poly;
+
+    std::vector<double> xs{-1.0, -0.5, 0.0, 0.1, 1.0};
+    std::vector<double> allvals(5);
+    
+    Kokkos::View<double*,Kokkos::HostSpace> xs_host("host xs", 5);
+    xs_host(0) = -1.0;
+    xs_host(1) = -0.5;
+    xs_host(2) = 0.0;
+    xs_host(3) = 0.1;
+    xs_host(4) = 1.0;
+
+    auto xs_device = ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(xs_host);
+
+    Kokkos::View<double*,Kokkos::DefaultExecutionSpace::memory_space> ys_device("evals", xs.size());
+
+    for(unsigned int p=0; p<10; ++p){
+        Kokkos::parallel_for(xs.size(), KOKKOS_LAMBDA(const size_t ind){
+            ys_device(ind) = poly.Evaluate(p, xs_device(ind));
+        });
+        
+        auto ys_host = ToHost(ys_device);
+        double trueVal;
+        for(unsigned int i=0; i<xs.size(); ++i){
+            trueVal = poly.Evaluate(p,xs_host(i));
+            CHECK(ys_host(i) == Approx(trueVal).epsilon(floatTol));
+        }
+    }
+}
+
+
+#endif 

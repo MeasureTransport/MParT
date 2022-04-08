@@ -49,6 +49,84 @@ namespace mpart{
         return Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 
+    /**
+    @brief Copies a Kokkos array from device memory to host memory
+    @details
+    @param[in] inview A kokkos array in device memory.
+    @return A kokkos array in host memory.  Note that the layout (row-major or col-major) might be different than the default on the Host.  The layout will match the device's default layout.
+    */
+    template<typename DeviceMemoryType, typename ScalarType>
+    Kokkos::View<ScalarType, Kokkos::HostSpace> ToHost(Kokkos::View<ScalarType,DeviceMemoryType> const& inview){
+        typename Kokkos::View<ScalarType>::HostMirror outview = Kokkos::create_mirror_view(inview);
+        Kokkos::deep_copy (outview, inview);
+        return outview;
+    }
+
+    /**
+    @brief Copies a range of elements from a Kokkos array in device to host memory
+    @details
+    Typical usage for a 1d array is something like:
+    @code{cpp}
+    const unsigned int N = 10;
+    Kokkos::View<double*,Kokkos::CudaSpace> deviceView("Some stuff on the device", N);
+    Kokkos::View<double*,Kokkos::HostSpace> hostView = ToHost(deviceView, std::make_pair(2, 3)); // Similar to python notation: deviceView[2:3]
+    @endcode
+    Similarly, usage for a 2d array might be something like
+    @code{cpp}
+    const unsigned int N1 = 10;
+    const unsigned int N2 = 100;
+    Kokkos::View<double**,Kokkos::CudaSpace> deviceView("Some stuff on the device", N1, N2);
+    Kokkos::View<double*,Kokkos::HostSpace> hostView = ToHost(deviceView, std::make_pair(2,4), std::make_pair(3,50) ); // Similar to python notation: deviceView[2:4,3:50]
+    @endcode
+    Extracting an entire row or column of a Kokkos::View can be accomplished with the Kokkos::All() function
+    @code{cpp}
+    const unsigned int N1 = 10;
+    const unsigned int N2 = 100;
+    Kokkos::View<double**,Kokkos::CudaSpace> deviceView("Some stuff on the device", N1, N2);
+    Kokkos::View<double*,Kokkos::HostSpace> hostView = ToHost(deviceView, 2, Kokkos::All() ); // Similar to python notation: deviceView[2,:]
+    @endcode
+    
+    @param[in] inview A kokkos array in device memory.
+    @param[in] sliceParams One or more parameters defining a Kokkos::subview.  See the [Kokkos Subview documentation](https://github.com/kokkos/kokkos/wiki/Subviews#112-how-to-take-a-subview) for more details.
+    @return A kokkos array in host memory.  Note that the layout (row-major or col-major) might be different than the default on the Host.  The layout will match the device's default layout.
+
+    @tparam DeviceMemoryType The memory space (e.g., Kokkos::CudaSpace) or the device
+    @tparam ScalarType The type and dimension of the Kokkos::View (e.g., double*, double**, or int*)
+    @tparam SliceTypes A variadic parameter pack containing options for constructing a Kokkos::subview of the device view.
+    */
+    template<typename DeviceMemoryType, typename ScalarType, class... SliceTypes>
+    Kokkos::View<ScalarType, Kokkos::HostSpace> ToHost(Kokkos::View<ScalarType,DeviceMemoryType> const& inview, SliceTypes... sliceParams){
+        auto subview = Kokkos::subview(inview, sliceParams...); // Construct the subview
+        typename Kokkos::View<ScalarType>::HostMirror outview = Kokkos::create_mirror_view(subview);
+        Kokkos::deep_copy (outview, subview);
+        return outview;
+    }
+
+
+#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+
+    /**
+    @brief Copies a 1d Kokkos array from host memory to device memory.
+    @details
+    @param[in] inview A kokkos array in host memory. 
+    @return A kokkos array in device memory. 
+    */
+    template<typename DeviceMemoryType,typename ScalarType>
+    Kokkos::View<ScalarType*, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType*, Kokkos::HostSpace> const& inview){
+
+        Kokkos::View<ScalarType*, DeviceMemoryType> outview("Device Copy", inview.extent(0));
+        Kokkos::deep_copy(outview, inview);
+        return outview;
+
+    }
+
+    template<typename DeviceMemoryType,typename ScalarType>
+    Kokkos::View<ScalarType*, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType*, DeviceMemoryType> const& inview){
+        return inview;
+    }
+
+#endif
+
 }
 
 #endif  // #ifndef ARRAYCONVERSIONS_H

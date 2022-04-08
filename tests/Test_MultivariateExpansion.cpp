@@ -14,10 +14,10 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
 
     unsigned int dim = 3;
     unsigned int maxDegree = 3; 
-    FixedMultiIndexSet mset(dim, maxDegree); // Create a total order limited fixed multindex set
+    FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
     ProbabilistHermite poly1d;
-    MultivariateExpansion<ProbabilistHermite> expansion(mset);
+    MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace> expansion(mset);
 
     unsigned int cacheSize = expansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(dim+2));
