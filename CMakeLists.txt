@@ -65,9 +65,9 @@ if(MPART_JULIA)
   find_package(JlCxx)
   get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
   get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
+  get_filename_component(JlCxx_src ${JlCxx_location} DIRECTORY)
   set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
-
-  message(STATUS "Found JlCxx at ${JlCxx_location}")
+  include_directories(${JlCxx_src}/include)
 endif()
 
 ##############################################################
