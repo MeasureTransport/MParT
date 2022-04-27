@@ -10,6 +10,7 @@ INCLUDE(Submodules)
 # Options 
 
 option(MPART_PYTHON "Build python bindings with pybind11" ON)
+option(MPART_MATLAB "Build matlab bindings" ON)
 
 ##############################################################
 # Compiler configuration
@@ -27,6 +28,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
+
+set(CMAKE_MACOSX_RPATH 1)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 ##############################################################
 # Dependencies
@@ -56,6 +60,7 @@ if(MPART_PYTHON)
   endif()
 endif()
 
+
 # Add the current source directory as an include directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
@@ -68,6 +73,16 @@ target_link_libraries(mpart Kokkos::kokkos Eigen3::Eigen)
 
 if(MPART_PYTHON)
     add_subdirectory(bindings/python)
+endif()
+
+# Add matlab if necessary
+if(MPART_MATLAB)
+    find_package(Matlab)
+    if(Matlab_FOUND)
+        add_subdirectory(bindings/matlab)
+    else()
+        message(STATUS "Could not find matlab.  Matlab bindings will not be built.")
+    endif()
 endif()
 
 ##############################################################
