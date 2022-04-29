@@ -5,4 +5,6 @@ target_sources(mpart
     MultiIndices/MultiIndexSet.cpp
     MultiIndices/FixedMultiIndexSet.cpp
     MultiIndices/MultiIndexNeighborhood.cpp
+
+    ConditionalMapBase.cpp
 )

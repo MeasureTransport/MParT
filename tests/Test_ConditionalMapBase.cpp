@@ -11,11 +11,15 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
     class MyIdentityMap : public ConditionalMapBase{
     public:
         MyIdentityMap(unsigned int dim) : ConditionalMapBase(dim,dim){};
-        virtual ~MyIdentityMap() = default;
-        virtual Kokkos::View<double**, Kokkos::HostSpace> Evaluate(Kokkos::View<double**, Kokkos::HostSpace> const& pts) override{return pts;};
         
-        virtual Kokkos::View<double**, Kokkos::HostSpace> Inverse(Kokkos::View<double**, Kokkos::HostSpace> const& x1, 
-                                                                  Kokkos::View<double**, Kokkos::HostSpace> const& r) override{return r;};
+        virtual ~MyIdentityMap() = default;
+
+        virtual void Evaluate(Kokkos::View<double**, Kokkos::HostSpace> const& pts, 
+                              Kokkos::View<double**, Kokkos::HostSpace>      &output) override{output = pts;};
+        
+        virtual void Inverse(Kokkos::View<double**, Kokkos::HostSpace> const& x1, 
+                             Kokkos::View<double**, Kokkos::HostSpace> const& r,
+                             Kokkos::View<double**, Kokkos::HostSpace>      & output) override{output = r;};
     };
 
 
@@ -42,9 +46,9 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
     // Now check using a slice of the coefficients
     unsigned int start = 2;
     unsigned int end = 4;
-    auto coeff_slice = Kokkos::subview(coeffs, std::make_pair(start, end));
+    auto coeffSlice = Kokkos::subview(coeffs, std::make_pair(start, end));
 
-    map.Coeffs() = coeff_slice;
+    map.Coeffs() = coeffSlice;
     CHECK(coeffs.extent(0) == numCoeffs);
     CHECK(map.Coeffs().extent(0)==(end-start));
 

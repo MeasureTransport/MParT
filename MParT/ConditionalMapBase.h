@@ -35,19 +35,29 @@ namespace mpart {
             is particularly convenient when simultaneously optimizing the coefficients over many conditional maps because 
             each map can just use a slice into the larger vector of all coefficients that is updated by the optimizer.
         */
-        virtual Kokkos::View<double*, Kokkos::HostSpace>& Coeffs(){return this->coeffs;};
+        virtual Kokkos::View<double*, Kokkos::HostSpace>& Coeffs(){return this->savedCoeffs;};
 
         /** Const version of the Coeffs() function. */
-        virtual Kokkos::View<const double*, Kokkos::HostSpace> Coeffs() const{return this->coeffs;};
+        virtual Kokkos::View<const double*, Kokkos::HostSpace> Coeffs() const{return this->savedCoeffs;};
 
 
-        virtual Kokkos::View<double**, Kokkos::HostSpace> Evaluate(Kokkos::View<double**, Kokkos::HostSpace> const& pts) = 0;
+        virtual Kokkos::View<double**, Kokkos::HostSpace> Evaluate(Kokkos::View<double**, Kokkos::HostSpace> const& pts);
+
+
+        virtual void Evaluate(Kokkos::View<double**, Kokkos::HostSpace> const& pts,
+                              Kokkos::View<double**, Kokkos::HostSpace>      & output) = 0;
+
+
 
         /** Returns the value of \f$x_2\f$ given \f$x_1\f$ and \f$r\f$.   Note that the \f$x1\f$ view may contain more 
             than \f$N\f$ rows, but only the first \f$N\f$ will be used in this function. 
         */
         virtual Kokkos::View<double**, Kokkos::HostSpace> Inverse(Kokkos::View<double**, Kokkos::HostSpace> const& x1, 
-                                                                  Kokkos::View<double**, Kokkos::HostSpace> const& r) = 0;
+                                                                  Kokkos::View<double**, Kokkos::HostSpace> const& r);
+
+        virtual void Inverse(Kokkos::View<double**, Kokkos::HostSpace> const& x1, 
+                             Kokkos::View<double**, Kokkos::HostSpace> const& r,
+                             Kokkos::View<double**, Kokkos::HostSpace>      & output) = 0;
 
 
         const unsigned int inputDim; // The total dimension of the input N+M
@@ -55,7 +65,7 @@ namespace mpart {
 
     protected:
 
-        Kokkos::View<double*, Kokkos::HostSpace> coeffs;
+        Kokkos::View<double*, Kokkos::HostSpace> savedCoeffs;
 
     }; // class ConditionalMapBase
 }
