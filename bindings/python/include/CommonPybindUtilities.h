@@ -71,6 +71,8 @@ KokkosRuntime KokkosInit(pybind11::dict opts);
  */
 void CommonUtilitiesWrapper(pybind11::module &m);
 
+void MultiIndexWrapper(pybind11::module &m);
+
 } // namespace python
 } // namespace mpart
 
