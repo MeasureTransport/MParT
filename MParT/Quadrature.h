@@ -1,12 +1,10 @@
 #ifndef MPART_QUADRATURE_H
 #define MPART_QUADRATURE_H
 
-#include <cmath>
-#include <sstream>
-#include <stdexcept>
-#include <utility>
-#include <tuple>
+#include <Kokkos_Core.hpp>
 
+#include <math.h>
+#include <sstream>
 #include <Eigen/Core>
 
 namespace mpart{
@@ -18,7 +16,7 @@ namespace QuadError{
      */
     enum Type {
         First,  ///< Only the first component of the integral estimates will be used
-        NormInf,///< The infinity norm (i.e., max of abs) of the difference will be used
+        NormInf,///< The infinity norm (i.e., max of abs) of the difference will be used 
         Norm2,  ///< The L2 norm of the difference will be used
         Norm1   ///< The L1 norm (sum of bas) of the difference will be used
     };
@@ -39,7 +37,7 @@ std::tie(wts, pts) = ClenshawCurtisQuadrature::GetRule(order);
 
  */
 class ClenshawCurtisQuadrature {
-public:
+public: 
 
     ClenshawCurtisQuadrature(unsigned int order) : _order(order)
     {
@@ -51,20 +49,28 @@ public:
 
     };
 
+    static std::pair<Eigen::VectorXd, Eigen::VectorXd> GetRule(unsigned int order)
+    {
+        Eigen::VectorXd wts, pts;
+        ClenshawCurtisQuadrature::GetRule(order, wts, pts);
+        return std::make_pair(wts,pts);
+    }
+
     /**
      @brief Returns the weights and points in a Clenshaw-Curtis rule.
      @param[in] order The order of the Clenshaw-Curtis rule.
      @returns A pair containing (wts,pts)
      */
-    static std::pair<Eigen::VectorXd, Eigen::VectorXd> GetRule(unsigned int order)
+    KOKKOS_FUNCTION static void GetRule(unsigned int order, Eigen::VectorXd &wts, Eigen::VectorXd &pts)
     {
-        Eigen::VectorXd wts(order), pts(order);
-
+        wts.resize(order);
+        pts.resize(order);
+        
         // return results for order == 1
         if (order == 1) {
             pts(1) = 0.0;
             wts(1) = 2.0;
-            return std::make_pair(wts,pts);
+            return;
         }
 
         // define quadrature points
@@ -77,9 +83,9 @@ public:
         }
         pts(order-1) = 1.0;
 
-        // compute quadrature weights
+        // compute quadrature weights 
         wts.setOnes();
-        for (unsigned int i=0; i<order; ++i) {
+        for (unsigned int i=0; i<order; ++i) {            
             double theta;
             theta = i * M_PI / ( order - 1 );
             for (unsigned int j=0; j<(order-1)/2; ++j){
@@ -99,10 +105,8 @@ public:
             wts(i) = 2.0 * wts(i) / ( order - 1.0 );
         }
         wts(order-1) = wts(order-1) / ( order - 1.0 );
-
-        return std::make_pair(wts,pts);
     }
-
+    
     /**
      @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$ using a Clenshaw-Curtis quadrature rule.
      @details
@@ -112,18 +116,18 @@ public:
      @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
-    template<class FunctionType>
-    auto Integrate(FunctionType const& f,
-                   double              lb,
-                   double              ub) -> decltype(f(0.0))
-    {
+    template<typename OutputType, class FunctionType>
+    KOKKOS_FUNCTION OutputType Integrate(FunctionType const& f, 
+                   double              lb, 
+                   double              ub) const
+    {   
         if(ub<lb+1e-14){
             return 0.0*f(lb);
         }
 
         // Compute CC rule
         Eigen::VectorXd wts,pts;
-        std::tie(wts,pts) = ClenshawCurtisQuadrature::GetRule(_order);
+        ClenshawCurtisQuadrature::GetRule(_order, wts, pts);
 
         // Rescale inputs to domain [L,U]
         pts = 0.5*(ub+lb)*Eigen::VectorXd::Ones(_order) + 0.5*(ub-lb)*pts;
@@ -132,8 +136,8 @@ public:
         wts = 0.5*(ub-lb)*wts;
 
         // Create an output variable
-        decltype(f(0.0)) output = wts[0]*f(pts[0]);
-
+        OutputType output = wts[0]*f(pts[0]);
+        
         // Evaluate integral and store results in output
         for (unsigned int i=1; i<pts.size(); ++i)
             output += wts[i] * f(pts[i]);
@@ -151,16 +155,16 @@ class RecursiveQuadratureBase
 {
 
 public:
-
-    RecursiveQuadratureBase(unsigned int maxSub,
-                            double absTol,
+    
+    RecursiveQuadratureBase(unsigned int maxSub, 
+                            double absTol, 
                             double relTol,
-                            QuadError::Type errorMetric) :  _maxSub(maxSub),
+                            QuadError::Type errorMetric) :  _maxSub(maxSub), 
                                                             _absTol(absTol),
                                                             _relTol(relTol),
-                                                            _status(0),
-                                                            _maxLevel(0),
-                                                            _errorMetric(errorMetric)
+                                                            //_status(0),
+                                                            //_maxLevel(0),
+                                                            _errorMetric(errorMetric) 
     {
         if(absTol<=0){
             std::stringstream msg;
@@ -181,39 +185,41 @@ public:
 
     /**
      * @brief Returns a convergence flag for the last call to "Integrate"
-
+       
        @return The convergence flag.  Positive if successful.  Negative if not.  Zero if Integrate hasn't been called yet.
      */
-    int Status() const{return _status;};
+    // int Status() const{return _status;};
 
     /**
      * @brief Returns the deepest level rea
-     *
-     * @return int
+     * 
+     * @return int 
      */
-    int MaxLevel() const {return _maxLevel;};
+    //int MaxLevel() const {return _maxLevel;};
 
 
 protected:
     template<typename IntegralValueType>
-    std::pair<double, double> EstimateError(IntegralValueType const& coarseVal,
-                                            IntegralValueType const& fineVal)
+    KOKKOS_INLINE_FUNCTION void EstimateError(IntegralValueType const& coarseVal,
+                                              IntegralValueType const& fineVal,
+                                              double                 & error,
+                                              double                 & tol) const
     {
-        double error = std::abs(fineVal - coarseVal);
-        double tol = std::fmax( _relTol*std::abs(coarseVal), _absTol);
-
-        return std::make_pair(error, tol);
+        error = std::abs(fineVal - coarseVal);
+        tol = std::fmax( _relTol*std::abs(coarseVal), _absTol);
     }
 
-    std::pair<double, double> EstimateError(Eigen::VectorXd const& coarseVal,
-                                            Eigen::VectorXd const& fineVal)
-    {
-        double error, tol, relRefVal;
-        if(_errorMetric==QuadError::First){
+    KOKKOS_FUNCTION void EstimateError(Eigen::VectorXd const& coarseVal,
+                                              Eigen::VectorXd const& fineVal,
+                                              double               & error,
+                                              double               & tol) const
+    {   
+        double relRefVal;
+        if(_errorMetric==QuadError::First){   
             error = std::abs(fineVal(0)-coarseVal(0));
             relRefVal = std::abs(coarseVal(0));
         }else if(_errorMetric==QuadError::NormInf){
-            error = (fineVal-coarseVal).array().abs().maxCoeff();
+            error = (fineVal-coarseVal).array().abs().maxCoeff(); 
             relRefVal = coarseVal.array().abs().maxCoeff();
         }else if(_errorMetric==QuadError::Norm2){
             error = (fineVal-coarseVal).norm();
@@ -223,15 +229,14 @@ protected:
             relRefVal = coarseVal.array().abs().sum();
         }
         tol = std::fmax( _relTol*relRefVal, _absTol);
-        return std::make_pair(error, tol);
     }
 
     const unsigned int _maxSub;
     const double _absTol;
     const double _relTol;
 
-    int _status;
-    unsigned int _maxLevel;
+    //int _status;
+    //unsigned int _maxLevel;
     QuadError::Type _errorMetric;
 };
 
@@ -244,8 +249,8 @@ protected:
 class AdaptiveSimpson : public RecursiveQuadratureBase {
 public:
 
-    AdaptiveSimpson(unsigned int maxSub,
-                    double absTol,
+    AdaptiveSimpson(unsigned int maxSub, 
+                    double absTol, 
                     double relTol,
                     QuadError::Type errorMetric) : RecursiveQuadratureBase(maxSub, absTol, relTol, errorMetric){};
 
@@ -258,42 +263,52 @@ public:
      @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
-    template<class FunctionType>
-    auto Integrate(FunctionType const& f,
-                   double              lb,
-                   double              ub) -> decltype(f(0.0))
-    {
+    template<typename OutputType, class FunctionType>
+    KOKKOS_FUNCTION OutputType Integrate(FunctionType const& f, 
+                   double              lb, 
+                   double              ub) const
+    { 
         auto flb = f(lb);
         auto fub = f(ub);
         double midPt = 0.5*(lb+ub);
         auto fmb = f(midPt);
 
-        decltype(flb) intCoarse = ((ub-lb)/6.0) * (flb + 4.0*fmb + fub);
+        OutputType intCoarse = ((ub-lb)/6.0) * (flb + 4.0*fmb + fub);
+        
+        OutputType integral = intCoarse;
+        int status = 1; 
+        unsigned int maxLevel = 0;
+        RecursiveIntegrate<OutputType>(f, lb, midPt, ub, flb, fmb, fub, 0, intCoarse, integral, status, maxLevel);
 
-        decltype(flb) integral;
-        std::tie(integral, _status, _maxLevel) = RecursiveIntegrate(f, lb, midPt, ub, flb, fmb, fub, 0, intCoarse);
         return integral;
     }
 
 private:
-    template<class ScalarFuncType>
-    auto RecursiveIntegrate(ScalarFuncType const& f,
+
+    template<typename OutputType,class ScalarFuncType>
+    KOKKOS_FUNCTION void RecursiveIntegrate(ScalarFuncType const& f, 
                             double leftPt,
                             double midPt,
                             double rightPt,
-                            decltype(f(0.0)) leftFunc,
+                            decltype(f(0.0)) leftFunc, 
                             decltype(f(0.0)) midFunc,
                             decltype(f(0.0)) rightFunc,
                             int    level,
-                            decltype(f(0.0)) intCoarse) -> std::tuple<decltype(f(0.0)), int, unsigned int>
+                            decltype(f(0.0)) intCoarse,
+                            OutputType &integral, 
+                            int       &status, 
+                            unsigned int &levelOut) const
     {
         if((rightPt-leftPt)<1e-14){
-            return std::make_tuple((leftPt-rightPt)*midFunc, -1, level);
+            integral = (rightPt-leftPt)*midFunc;
+            status = -1;
+            levelOut = level;
+            return;
         }
 
         // update current refinement level
         level += 1;
-
+        
         // evluate integral on each sub-interval
         double leftMidPt = 0.5*(leftPt+midPt);
         auto leftMidFunc = f(leftMidPt);
@@ -309,30 +324,36 @@ private:
 
         // Compute error and tolerance
         double intErr, tol;
-        std::tie(intErr, tol) = EstimateError(intCoarse, intFiner);
+        EstimateError(intCoarse, intFiner, intErr, tol);
 
         // Stop the recursion if the level hit maximum depth
         if ( (intErr > tol) && (level == _maxSub) ) {
-            return std::make_tuple(intFiner, int(-1), level);
-            //std::stringstream msg;
-            //msg << "In MParT::RecursiveQuadrature: Reached maximum level depth \"" << _maxSub << "\", with an error of \"" << intErr << "\".";
-            //throw std::runtime_error(msg.str());
+            integral = intFiner;
+            status = -1;
+            levelOut = level;
+            return;
         }
         // If the error between levels is smaller than Tol, return the finer level result
         else if ( intErr <= tol ) {
-            return std::make_tuple(intFiner, int(1), level);
+            integral = intFiner;
+            status = 1;
+            levelOut = level;
+            return;
         }
         // Else subdivide further
         else {
-            decltype(f(0.0)) intLeft, intRight;
+            OutputType intLeft, intRight;
             int statusLeft, statusRight;
             unsigned int levelLeft, levelRight;
-            std::tie(intLeft, statusLeft, levelLeft) = RecursiveIntegrate(f, leftPt, leftMidPt, midPt, leftFunc, leftMidFunc, midFunc, level, intFinerLeft);
-            std::tie(intRight, statusRight, levelRight) = RecursiveIntegrate(f, midPt, rightMidPt, rightPt, midFunc, rightMidFunc, rightFunc, level, intFinerRight);
 
-            return std::make_tuple(intLeft + intRight, int( ((statusLeft<0)||(statusLeft<0))?-1:1 ), std::max(levelLeft, levelRight));
+            RecursiveIntegrate<OutputType>(f, leftPt, leftMidPt, midPt, leftFunc, leftMidFunc, midFunc, level, intFinerLeft, intLeft, statusLeft, levelLeft);
+            RecursiveIntegrate<OutputType>(f, midPt, rightMidPt, rightPt, midFunc, rightMidFunc, rightFunc, level, intFinerRight, intRight, statusRight, levelRight);
+            
+            integral = intLeft + intRight;
+            status = int( ((statusLeft<0)||(statusLeft<0))?-1:1 );
+            levelOut =  std::max(levelLeft, levelRight);
+            return; 
         }
-
     }
 
 }; // Class AdaptiveSimpsonMixin
@@ -352,12 +373,12 @@ public:
        @param[in] errorMetric A flag specifying the type of error metric to use.
        @param[in] order Number of points to use per subinterval.
      */
-    AdaptiveClenshawCurtis(unsigned int maxSub,
-                    double              absTol,
+    AdaptiveClenshawCurtis(unsigned int maxSub, 
+                    double              absTol, 
                     double              relTol,
                     QuadError::Type     errorMetric,
                     unsigned int        order) : RecursiveQuadratureBase(maxSub, absTol, relTol, errorMetric),
-                                                 _order(order),
+                                                 _order(order), 
                                                  _quad(order){};
 
     /**
@@ -369,25 +390,30 @@ public:
      @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
-    template<class FunctionType>
-    auto Integrate(FunctionType const& f,
-                   double              lb,
-                   double              ub) -> decltype(f(0.0))
-    {
-        auto intCoarse = _quad.Integrate(f, lb, ub);
-        decltype(f(0.0)) integral;
-        std::tie(integral, _status, _maxLevel) = RecursiveIntegrate(f, lb, ub, 0, intCoarse);
+    template<typename OutputType, class FunctionType>
+    KOKKOS_FUNCTION OutputType Integrate(FunctionType const& f, 
+                   double              lb, 
+                   double              ub) const
+    {   
+        auto intCoarse = _quad.Integrate<OutputType>(f, lb, ub);
+        OutputType integral;
+        int status;
+        unsigned int maxLevel;
+        RecursiveIntegrate<OutputType>(f, lb, ub, 0, intCoarse, integral, status, maxLevel);
         return integral;
     }
 
 private:
 
-    template<class FunctionType>
-    auto RecursiveIntegrate(FunctionType const& f,
-                            double lb,
-                            double ub,
-                            int level,
-                            decltype(f(0.0)) intCoarse) -> std::tuple<decltype(f(0.0)),int, unsigned int>
+    template<typename OutputType, class FunctionType>
+    KOKKOS_FUNCTION void RecursiveIntegrate(FunctionType const& f, 
+                            double lb, 
+                            double ub, 
+                            int level, 
+                            OutputType intCoarse,
+                            OutputType &integral, 
+                            int       &status, 
+                            unsigned int &levelOut) const
     {
 
         // update current refinement level
@@ -395,33 +421,42 @@ private:
 
         // evluate integral on each sub-interval
         double mb = lb+0.5*(ub-lb);
-        auto intFinerLeft  = _quad.Integrate(f, lb, mb);
-        auto intFinerRight = _quad.Integrate(f, mb, ub);
+        auto intFinerLeft  = _quad.Integrate<OutputType>(f, lb, mb);
+        auto intFinerRight = _quad.Integrate<OutputType>(f, mb, ub);
 
         // compute total integral
         decltype(intCoarse) intFiner = intFinerLeft + intFinerRight;
 
         // Compute error and tolerance
         double intErr, tol;
-        std::tie(intErr, tol) = EstimateError(intCoarse, intFiner);
-
+        EstimateError(intCoarse, intFiner, intErr, tol);
+        
         // Stop the recursion if the level hit maximum depth
         if ( (intErr > tol) && (level == _maxSub) ) {
-            return std::make_tuple(intFiner, int(-1), level);
+            integral = intFiner;
+            status = -1;
+            levelOut = level;
+            return;
         }
         // If the error between levels is smaller than Tol, return the finer level result
         else if ( intErr <= tol ) {
-            return std::make_tuple(intFiner, int(1), level);
+            integral = intFiner;
+            status = 1;
+            levelOut = level;
+            return;
         }
         // Else subdivide further
         else {
-            decltype(intCoarse) intLeft, intRight;
+            OutputType intLeft, intRight;
             int statusLeft, statusRight;
             unsigned int levelLeft, levelRight;
-            std::tie(intLeft, statusLeft, levelLeft) = RecursiveIntegrate(f, lb, mb, level, intFinerLeft);
-            std::tie(intRight, statusRight, levelRight) = RecursiveIntegrate(f, mb, ub, level, intFinerRight);
-
-            return std::make_tuple(intLeft + intRight, int( ((statusLeft<0)||(statusLeft<0))?-1:1 ), std::max(levelLeft, levelRight));
+            RecursiveIntegrate<OutputType>(f, lb, mb, level, intFinerLeft, intLeft, statusLeft, levelLeft);
+            RecursiveIntegrate<OutputType>(f, mb, ub, level, intFinerRight, intRight, statusRight, levelRight);
+            
+            integral = intLeft + intRight;
+            status = int( ((statusLeft<0)||(statusLeft<0))?-1:1 );
+            levelOut = std::max(levelLeft, levelRight);
+            return;
         }
 
     }
@@ -436,4 +471,4 @@ private:
 
 } // namespace mpart
 
-#endif
+#endif 
