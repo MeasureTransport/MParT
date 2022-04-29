@@ -2,6 +2,7 @@
 #define MPART_COMMONJULIAUTILITIES_H
 
 #include "jlcxx/jlcxx.hpp"
+#include "jlcxx/functions.hpp"
 
 #include <string>
 #include <vector>
