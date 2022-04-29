@@ -8,6 +8,8 @@
 #include <chrono>
 
 #include "../../common/include/CommonUtilities.h"
+// Note that this macro must be called in the top level namespace, which is why there are two separate namespace blocks in this file
+PYBIND11_DECLARE_HOLDER_TYPE(T, mpart::binding::KokkosCustomPointer<T>);
 
 namespace mpart{
 namespace binding{
