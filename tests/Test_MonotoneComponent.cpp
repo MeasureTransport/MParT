@@ -34,7 +34,7 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     pt(0) = 1.0;
 
     SECTION("Integrand Only") {
-        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
+        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
         
         REQUIRE(integrand(0.0).size() == 1);
         CHECK(integrand(0.0)(0) == Approx(exp(1)).epsilon(testTol));
@@ -43,7 +43,7 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     }
 
     SECTION("Integrand Derivative") {
-        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal);
+        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal);
         
         REQUIRE(integrand(0.0).size() == 2);
         Eigen::Vector2d test = integrand(0.0);
@@ -57,8 +57,8 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     }
 
     SECTION("Integrand Parameters Gradient") {
-        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters);
-        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
+        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>,Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters);
+        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>,Kokkos::View<double*>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
         
         Eigen::VectorXd testVal = integrand(0.5);
         REQUIRE(testVal.size() == 1+mset.Size());
@@ -75,8 +75,8 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
 
 
     SECTION("Integrand Mixed Gradient") {
-        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed);
-        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal);
+        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>,Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed);
+        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>,Kokkos::View<double*>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal);
         
         Eigen::VectorXd testVal = integrand(0.5);
         REQUIRE(testVal.size() == 1+mset.Size());
@@ -122,7 +122,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     SECTION("Integrand Only") {
         
         // Construct the integrand
-        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
+        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>,Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
         REQUIRE(integrand(0.0).size() == 1);
 
         // Evaluate the expansion 
@@ -136,7 +136,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     }
 
     SECTION("Integrand Derivative") {
-        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal);
+        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>,Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal);
         REQUIRE(integrand(0.0).size() == 2);
 
         // Evaluate the expansion 
@@ -153,7 +153,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     }
 
     SECTION("Integrand Parameters Gradient") {
-        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters);
+        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>,Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters);
         REQUIRE(integrand(0.0).size() == numTerms+1);
 
         // Evaluate the expansion 
@@ -176,7 +176,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     }
 
     SECTION("Integrand Mixed Gradient") {
-        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed);
+        MonotoneIntegrand<MultivariateExpansion<ProbabilistHermite>, Exp, Kokkos::View<double*>,Kokkos::View<double*>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed);
         REQUIRE(integrand(0.0).size() == numTerms+1);
 
         // Evaluate the expansion 
@@ -327,6 +327,118 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         }
     }
 }
+
+
+TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBracketInverse]" ) {
+
+    const double testTol = 1e-7;
+    unsigned int dim = 1;
+
+    // Create points evently space on [lb,ub]
+    unsigned int numPts = 20;
+    double lb = -2.0;
+    double ub = 2.0;
+
+    Kokkos::View<double**> evalPts("Evaluate Points", dim, numPts);
+    for(unsigned int i=0; i<numPts; ++i)
+        evalPts(0,i) = (i/double(numPts-1))*(ub-lb) - lb;
+    
+    /* Create and evaluate an affine map
+       - Set coefficients so that f(x) = 1.0 + x
+       - f(0) + int_0^x exp( d f(t) ) dt =  1.0 + int_0^x exp(1) dt = 1 + |x| * exp(1)
+    */
+    SECTION("Affine Map"){
+        unsigned int maxDegree = 1; 
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+        
+        ProbabilistHermite poly1d;
+        MultivariateExpansion<ProbabilistHermite> expansion(mset);
+        
+        Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
+        coeffs(0) = 1.0; // Constant term
+        coeffs(1) = 1.0; // Linear term
+
+        unsigned int maxSub = 30;
+        double relTol = 1e-7;
+        double absTol = 1e-7;
+        AdaptiveSimpson quad(maxSub, absTol, relTol, QuadError::First);
+
+        MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
+
+        Kokkos::View<double*> ys = comp.Evaluate(evalPts, coeffs);
+        Kokkos::View<double*> testInverse("Test output", numPts);
+
+        comp.Inverse(evalPts, ys, coeffs, testInverse);
+
+        for(unsigned int i=0; i<numPts; ++i){
+            CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(testTol));
+        }
+    }
+
+
+    /* Create and evaluate a quadratic map
+       - Set coefficients so that f(x) = 1.0 + x + 0.5*x^2
+       - df/dt = 1.0 + t
+       - f(0) + int_0^x exp( df/dt ) dt =  1.0 + int_0^x exp(1+t) dt = 1+exp(1+x)
+    */
+    SECTION("Quadratic Map"){
+        unsigned int maxDegree = 2; 
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+        ProbabilistHermite poly1d;
+        MultivariateExpansion<ProbabilistHermite> expansion(mset);
+        
+        Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
+        coeffs(1) = 1.0; // Linear term = x ^1
+        coeffs(2) = 0.5; // Quadratic term = x^2 - 1.0
+        coeffs(0) = 1.0 + coeffs(2); // Constant term = x^0
+
+        unsigned int maxSub = 30;
+        double relTol = 1e-7;
+        double absTol = 1e-7;
+        AdaptiveSimpson quad(maxSub, absTol, relTol,QuadError::First);
+
+        MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
+
+        Kokkos::View<double*> ys = comp.Evaluate(evalPts, coeffs);
+        Kokkos::View<double*> testInverse = comp.Inverse(evalPts, ys, coeffs);
+
+        for(unsigned int i=0; i<numPts; ++i){
+            CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(testTol));
+        }
+    }
+
+
+    SECTION("Same x, multiple ys"){
+
+        Kokkos::View<double**> x("Evaluate Points", dim, 1);
+        x(0,0) = 0.5*(lb+ub);
+        
+        unsigned int maxDegree = 2; 
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+        ProbabilistHermite poly1d;
+        MultivariateExpansion<ProbabilistHermite> expansion(mset);
+        
+        Kokkos::View<double*> coeffs("Expansion coefficients", mset.Size());
+        coeffs(1) = 1.0; // Linear term = x ^1
+        coeffs(2) = 0.5; // Quadratic term = x^2 - 1.0
+        coeffs(0) = 1.0 + coeffs(2); // Constant term = x^0
+
+        unsigned int maxSub = 30;
+        double relTol = 1e-7;
+        double absTol = 1e-7;
+        AdaptiveSimpson quad(maxSub, absTol, relTol,QuadError::First);
+
+        MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
+
+        Kokkos::View<double*> ys = comp.Evaluate(evalPts, coeffs);
+        Kokkos::View<double*> testInverse = comp.Inverse(x, ys, coeffs);
+
+        for(unsigned int i=0; i<numPts; ++i){
+            CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(1e-6));
+        }
+    }
+}
+
 
 
 TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivative]" ) {

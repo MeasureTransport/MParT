@@ -1,7 +1,7 @@
 
 
 function(UpdateGitSubmodule subfolder)
-    message(STATUS "Updating GIT Submodule ${name}")
+    message(STATUS "Updating GIT Submodule ${subfolder}")
 
     find_package(Git QUIET)
     if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
