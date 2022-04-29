@@ -9,9 +9,9 @@
 #include <pybind11/pybind11.h>
 
 namespace py = pybind11;
-using namespace mpart::python;
+using namespace mpart::binding;
 
-void mpart::python::MultiIndexWrapper(py::module &m)
+void mpart::binding::MultiIndexWrapper(py::module &m)
 {
     py::class_<MultiIndex, KokkosCustomPointer<MultiIndex>>(m, "MultiIndex")
         .def(py::init<>())
