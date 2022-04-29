@@ -7,7 +7,7 @@
 #include <vector>
 #include <chrono>
 
-#include "../../utils/include/CommonUtilities.h"
+#include "../../common/include/CommonUtilities.h"
 
 namespace mpart{
 namespace binding{
