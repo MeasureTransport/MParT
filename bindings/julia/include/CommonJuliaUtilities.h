@@ -14,12 +14,12 @@ namespace jlcxx{
 
 namespace mpart{
 namespace binding{
-/** Define a wrapper around Kokkos::Initialize that accepts a python dictionary instead of argc and argv. */
+/** Define a wrapper around Kokkos::Initialize that accepts a sequence of Cstrings. */
 KokkosRuntime KokkosInit(jlcxx::ArrayRef<char*>);
 
 /**
-   @brief Adds the pybind11 bindings to the existing module pybind11 module m. 
-   @param m pybind11 module
+   @brief Adds the Kokkos bindings to the existing module m. 
+   @param m CxxWrap.jl module
  */
 void CommonUtilitiesWrapper(jlcxx::Module&);
 
