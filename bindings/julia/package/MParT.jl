@@ -1,7 +1,7 @@
 # Wrapping code to make the Julia module usable
 module MParT
     using CxxWrap
-    @wrapmodule("libmpartjl")
+    @wrapmodule(joinpath(".","libmpartjl"))
 
     function __init__()
         @initcxx
