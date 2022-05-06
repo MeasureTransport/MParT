@@ -18,6 +18,16 @@ namespace mpart{
                  need to be handled manually (or via another object like an Eigen::Matrix).  Currently
                  only works for memory on the Host device.  
 
+        <h3>Usage Examples </h3>
+
+        Conversion from a std::vector of doubles to a a Kokkos array.
+        @code{cpp}
+        std::vector<double> array;
+        // fill in array here....
+
+        Kokkos::View<double*> view = ToKokkos<double>(&array[0], array.size());
+        @endcode
+
         @param[in] ptr A pointer to a block of memory defining the array.  Note 
         @param[in] dim The length of the array.
         @return A Kokkos view wrapping around the memory pointed to by ptr.
@@ -35,6 +45,28 @@ namespace mpart{
                  The unmanaged view will not free the memory so all allocations and deallocations 
                  need to be handled manually (or via another object like an Eigen::Matrix).  Currently
                  only works for memory on the Host device.  
+
+        <h3>Usage Examples </h3>
+
+        Conversion from a block of memory containing a \f$N\times M\f$ matrix (in a **column**-major layout):
+        @code{cpp}
+        unsigned int N = 10;
+        unsigned int M = 20;
+        std::vector<double> array(N*M);
+        // fill in matrix here....
+
+        Kokkos::View<double*> view = ToKokkos<double>(&array[0], N, M);
+        @endcode
+
+        It is also possible to specify the layout of the data (e.g., row major) by adding an additional template argument.  Here is the conversion from a block of memory containing a \f$N\times M\f$ **row**-major matrix:
+        @code{cpp}
+        unsigned int N = 10;
+        unsigned int M = 20;
+        std::vector<double> array(N*M);
+        // fill in matrix here....
+
+        Kokkos::View<double*> view = ToKokkos<double,Kokkos::LayoutRight>(&array[0], N, M);
+        @endcode
 
         @param[in] ptr A pointer to a block of memory defining the array.  Note that this array must have at least rows*cols allocated after this pointer or a segfault is likely.
         @param[in] rows The number of rows in the matrix.
