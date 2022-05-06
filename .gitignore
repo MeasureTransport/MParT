@@ -2,7 +2,6 @@ build
 .vscode
 docs/_build
 bin
-include
 lib
 /python
 bindings/python/tests/__pycache__/
