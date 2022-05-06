@@ -162,7 +162,7 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 2D", "[EigenArrayConversions2
     }
 
     SECTION("contiguous"){
-        auto x_view = MatToKokkos<double>(x);
+        Kokkos::View<double**, Kokkos::LayoutLeft,Kokkos::HostSpace> x_view = MatToKokkos<double>(x);
         for(unsigned int j=0; j<cols; ++j){
             for(unsigned int i=0; i<rows; ++i){
                 CHECK(x_view(i,j)==x(i,j));   
@@ -171,12 +171,13 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 2D", "[EigenArrayConversions2
         }
     }
 
+
     SECTION("block"){
-        auto x_view = MatToKokkos<double>(x.topLeftCorner(10,10));
+        Kokkos::View<double**, Kokkos::LayoutStride,Kokkos::HostSpace> x_view = MatToKokkos<double>(x.block(2,3,10,10));
         for(unsigned int i=0; i<10; ++i){
             for(unsigned int j=0; j<10; ++j){
-                CHECK(x_view(i,j)==x(i,j));   
-                CHECK(&x_view(i,j) == &x(i,j));
+                CHECK(x_view(i,j)==x(2+i,3+j));   
+                CHECK(&x_view(i,j) == &x(2+i,3+j));
             }
         }
     }

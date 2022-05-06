@@ -49,10 +49,33 @@ namespace mpart{
         return Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 
+    
     /** @brief Converts a column major 2d Eigen::Ref of a matrix to an unmanaged Kokkos view.  
         @ingroup ArrayUtilities
         @details Creates a Kokkos unmanaged view around an existing Eigen object. 
                  Currently only works with objects on the Host.
+
+                Note that this function returns a Kokkos::View with strided layout.  This is different than the typical 
+                Kokkos::LayoutLeft and Kokkos::LayoutRight layouts typically used by default.   A list of admissable 
+                conversions between layout types can be found in [the Kokkos documentation](https://github.com/kokkos/kokkos/wiki/View#655-conversion-rules-and-function-specialization).
+        
+        <h4>Usage examples:</h4>
+        @code{.cpp}
+        Eigen::MatrixXd A;
+        // Fill in A... ;
+
+        // Create a 2d view to the matrix
+        auto view = MatToKokkos<double>(A);
+        @endcode 
+
+        @code{.cpp}
+        Eigen::MatrxXd A;
+        // Fill in A... ;
+
+        // Create a 2d view to a 10x10 block of the matrix
+        auto view = MatToKokkos<double>( A.block(1,2,10,10) );
+        @endcode 
+
 
         @param[in] ref The reference to the eigen reference.
         @return A 2D Kokkos unmanaged view wrapping the same memory as the eigen ref and using the same strides as the eigen object.
@@ -71,6 +94,31 @@ namespace mpart{
         @details Creates a Kokkos unmanaged view around an existing Eigen object. 
                  Currently only works with objects on the Host.
 
+        <h3>Usage examples:</h3>
+        @code{cpp}
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> A;
+        // Fill in A... ;
+
+        // Create a 2d view to the matrix
+        auto view = MatToKokkos<double>(A);
+        @endcode 
+
+        @code{cpp}
+        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> A;
+        // Fill in A... ;
+
+        // Create a 2d view to a 10x10 block of the matrix
+        auto view = MatToKokkos<double>( A.block(1,2,10,10) );
+        @endcode 
+
+        @code{cpp}
+        Eigen::MatrixXd A;
+        // Fill in A... ;
+
+        // Create a 2d view to the transpose of the matrix
+        auto view = MatToKokkos<double>( A.transpose() );
+        @endcode 
+
         @param[in] ref The reference to the eigen reference.
         @return A 2D Kokkos unmanaged view wrapping the same memory as the eigen ref and using the same strides as the eigen object.
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
@@ -87,6 +135,23 @@ namespace mpart{
         @ingroup ArrayUtilities
         @details Creates a Kokkos unmanaged view around an existing Eigen object. 
                  Currently only works with objects on the Host.
+
+        <h4>Usage examples:</h4>
+        @code{.cpp}
+        Eigen::VectorXd x;
+        // Fill in x... ;
+
+        // Create a 1d view to the vector
+        auto view = VecToKokkos<double>(x);
+        @endcode 
+
+        @code{.cpp}
+        Eigen::MatrxXd A;
+        // Fill in x... ;
+
+        // Create a 1d view to the first row of the matrix
+        auto view = VecToKokkos<double>(A.row(0));
+        @endcode 
 
         @param[in] ref The reference to the eigen reference.
         @return A 1d Kokkos unmanaged view wrapping the same memory as the eigen ref and using the same stride as the eigen object.
