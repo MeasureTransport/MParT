@@ -1,6 +1,6 @@
 set(JULIA_BINDING_SOURCES
   src/Wrapper.cpp
-#   src/CommonJuliaUtilities.cpp
+  src/CommonJuliaUtilities.cpp
 )
 
 include_directories(./include)
