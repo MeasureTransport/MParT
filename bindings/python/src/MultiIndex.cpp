@@ -1,6 +1,7 @@
 #include "CommonPybindUtilities.h"
 #include "MParT/MultiIndices/MultiIndex.h"
-
+#include "MParT/MultiIndices/FixedMultiIndexSet.h"
+#include "MParT/Utilities/ArrayConversions.h"
 #include <pybind11/stl.h>
 #include <pybind11/eigen.h>
 
@@ -13,6 +14,7 @@ using namespace mpart::binding;
 
 void mpart::binding::MultiIndexWrapper(py::module &m)
 {
+    // MultiIndex
     py::class_<MultiIndex, KokkosCustomPointer<MultiIndex>>(m, "MultiIndex")
         .def(py::init<>())
         .def(py::init<unsigned int, unsigned int>())
@@ -33,16 +35,15 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("__le__", &MultiIndex::operator<=)
         .def("__ge__", &MultiIndex::operator>=);
         
-        //.def("maxvalue", &MultiIndex::maxValue);
 
-    // // Will be used for MultiIndexSet
-    // py::class_<MultiIndexSet, KokkosCustomPointer<MultiIndex>>(m, "MultiIndex")
-    //     .def(py::init<>())
-    //     .def(py::init<unsigned int, unsigned int>())
-    //     .def(py::init<std::vector<unsigned int> const&>())
 
-    //     .def("Sum", &MultiIndex::Sum)
-    //     .def("Max", &MultiIndex::Max)
-    //     .def("Set", &MultiIndex::Set);
-    
+    // FixedMultiIndexSet
+    py::class_<FixedMultiIndexSet, KokkosCustomPointer<FixedMultiIndexSet>>(m, "FixedMultiIndex")
+
+        .def(py::init( [](unsigned int dim, Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> const& orders){
+            return new FixedMultiIndexSet(dim, VecToKokkos<unsigned int>(orders));
+            }
+            )
+            );
+
 }
