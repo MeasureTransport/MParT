@@ -589,7 +589,7 @@ public:
      @return double 
      */
     template<typename PointType, typename CoeffsType>
-    KOKKOS_FUNCTION static double EvaluateSingle(double*                  cache,
+    static KOKKOS_FUNCTION double EvaluateSingle(double*                  cache,
                                                         PointType         const& pt,
                                                         double                   xd,
                                                         CoeffsType        const& coeffs, 
