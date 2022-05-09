@@ -41,6 +41,19 @@ Or, with the additional specification of the number of Kokkos threads to use:
    
    This often results when due to conda environment mismatches, but can typically be circumvented by explicitly setting the path to your python executable.  When calling cmake, add :code:`-DPYTHON_EXECUTABLE=`which python``.
 
+
+Compiling with Julia Bindings
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia `CxxWrap` package is installed.   To install `CxxWrap`, run the following command in your Julia prompt:
+
+.. code-block:: julia 
+
+    import Pkg; Pkg.add("CxxWrap")
+
+If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify :code:`JULIA_EXE` variable during configuration.  For example, adding `-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia` will tell CMake to use the Julia executable installed by anaconda in the `mpart` conda environment.
+
+To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set :code:`MPART_JULIA=OFF` during the CMake configuration.
+
 Using MParT 
 ----------------------
 

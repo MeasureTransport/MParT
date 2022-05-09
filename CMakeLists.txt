@@ -60,13 +60,27 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Add Julia if necessary
 if(MPART_JULIA)
+  
+  # Set the julie executable and look for the location of cxxwrap
+  if(NOT DEFINED JULIA_EXE)
+      set(JULIA_EXE "julia")
+  endif()
+  execute_process(COMMAND ${JULIA_EXE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
+  list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}" )
+  
   find_package(JlCxx)
-  get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
-  get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
-  get_filename_component(JlCxx_src ${JlCxx_location} DIRECTORY)
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
-  include_directories(${Julia_INCLUDE_DIRS})
-  include_directories(${JlCxx_src}/include)
+
+  if(NOT JlCxx_FOUND)
+    set(MPART_JULIA OFF)
+    message(WARNING "Request Julia bindings but CMake could not find JlCxx package.  Setting MPART_JULIA=OFF.")
+  else()
+    get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
+    get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
+    get_filename_component(JlCxx_src ${JlCxx_location} DIRECTORY)
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
+    include_directories(${Julia_INCLUDE_DIRS} ${JlCxx_src}/include)
+  endif()
+
 endif()
 
 ##############################################################
