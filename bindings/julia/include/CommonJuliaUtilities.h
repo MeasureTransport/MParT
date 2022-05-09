@@ -9,7 +9,7 @@
 // Note that this macro must be called in the jlcxx namespace, which is why there are two separate namespace blocks in this file
 namespace jlcxx{
   template<typename T> struct IsSmartPointerType<mpart::binding::KokkosCustomPointer<T>> : std::true_type { };
-  template<typename T> struct ConstructorPointerType<mpart::binding::KokkosCustomPointer<T>> { typedef std::shared_ptr<T> type; };
+  template<typename T> struct ConstructorPointerType<mpart::binding::KokkosCustomPointer<T>> { typedef mpart::binding::KokkosCustomPointer<T> type; };
 }
 
 namespace mpart{

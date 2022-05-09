@@ -1,15 +1,15 @@
 using Test
-import .MParT
+using .MParT
 
 function test_sum()
     idx = MParT.MultiIndex(30,2)
     @test sum(idx) == 60
-    idx[1] = 2
-    @test sum(idx) == 60
+    idx[1] = 3
+    @test sum(idx) == 61
 end
 
 function test_max()
-    idx = mpart.MultiIndex(30,2)
+    idx = MParT.MultiIndex(30,2)
     @test maximum(idx) == 2
     idx[1] = 100
     @test maximum(idx) == 100
