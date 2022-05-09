@@ -1,5 +1,5 @@
 using Test
-using .MParT
+import .MParT
 
 function test_sum()
     idx = MParT.MultiIndex(30,2)
@@ -17,10 +17,10 @@ end
 
 function test_count_nonzero()
     idx = MParT.MultiIndex(30)
-    @test count_nonzero(idx) == 0
+    @test MParT.count_nonzero(idx) == 0
     idx[4] = 1
     idx[27] = 3
-    @test count_nonzero(idx) == 2
+    @test MParT.count_nonzero(idx) == 2
 end
 
 @testset verbose=true "MParT" begin
