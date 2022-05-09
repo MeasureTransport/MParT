@@ -166,6 +166,13 @@
   <a class="reference internal nav-link" href="#compiling-from-source">
    Compiling from Source
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#compiling-with-julia-bindings">
+     Compiling with Julia Bindings
+    </a>
+   </li>
+  </ul>
  </li>
  <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#using-mpart">
@@ -180,6 +187,11 @@
    <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#python">
      Python
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#julia">
+     Julia
     </a>
    </li>
   </ul>
@@ -242,6 +254,15 @@ make install
 </div>
 <p>This often results when due to conda environment mismatches, but can typically be circumvented by explicitly setting the path to your python executable.  When calling cmake, add <code class="code docutils literal notranslate"><span class="pre">-DPYTHON_EXECUTABLE=`which</span> <span class="pre">python`</span></code>.</p>
 </div>
+<section id="compiling-with-julia-bindings">
+<h3>Compiling with Julia Bindings<a class="headerlink" href="#compiling-with-julia-bindings" title="Permalink to this headline">#</a></h3>
+<p>By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia <cite>CxxWrap</cite> package is installed.   To install <cite>CxxWrap</cite>, run the following command in your Julia prompt:</p>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="n">Pkg</span><span class="p">;</span> <span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;CxxWrap&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify <code class="code docutils literal notranslate"><span class="pre">JULIA_EXE</span></code> variable during configuration.  For example, adding <cite>-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia</cite> will tell CMake to use the Julia executable installed by anaconda in the <cite>mpart</cite> conda environment.</p>
+<p>To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=OFF</span></code> during the CMake configuration.</p>
+</section>
 </section>
 <section id="using-mpart">
 <h2>Using MParT<a class="headerlink" href="#using-mpart" title="Permalink to this headline">#</a></h2>
@@ -253,16 +274,16 @@ make install
 <h3>Python<a class="headerlink" href="#python" title="Permalink to this headline">#</a></h3>
 <p>First, make sure the relevant path variables include the installation of MParT:</p>
 <div class="tabbed-set docutils">
-<input checked="checked" id="cd57aaa0-8a85-4c0f-8eba-0061cb2dde67" name="101ab6ab-34cb-453d-ab67-05aae8f45d82" type="radio">
-</input><label class="tabbed-label" for="cd57aaa0-8a85-4c0f-8eba-0061cb2dde67">
+<input checked="checked" id="9784d895-162b-4330-8ca1-44a989557e43" name="9b440902-e14f-4cda-985e-5702a4ec18f8" type="radio">
+</input><label class="tabbed-label" for="9784d895-162b-4330-8ca1-44a989557e43">
 OSX</label><div class="tabbed-content docutils">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
 <span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
 </pre></div>
 </div>
 </div>
-<input id="982982d3-9949-4bb4-bf95-aa2af9a4b1d1" name="101ab6ab-34cb-453d-ab67-05aae8f45d82" type="radio">
-</input><label class="tabbed-label" for="982982d3-9949-4bb4-bf95-aa2af9a4b1d1">
+<input id="2f5e7431-8626-41e3-a23e-2fbfaaa4cbfb" name="9b440902-e14f-4cda-985e-5702a4ec18f8" type="radio">
+</input><label class="tabbed-label" for="2f5e7431-8626-41e3-a23e-2fbfaaa4cbfb">
 Linux</label><div class="tabbed-content docutils">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
 <span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
@@ -272,6 +293,40 @@ Linux</label><div class="tabbed-content docutils">
 </div>
 <p>You should now be able to run python and import the MParT package!</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mpart</span>
+
+<span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">idx</span> <span class="o">=</span> <span class="n">mpart</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="julia">
+<h3>Julia<a class="headerlink" href="#julia" title="Permalink to this headline">#</a></h3>
+<p>First, make sure your library path includes the installation of MParT:</p>
+<div class="tabbed-set docutils">
+<input checked="checked" id="5cfea04b-1f44-49f0-81de-a2fa6db9b0e4" name="4a6a725b-ea8c-453c-a682-86c021390536" type="radio">
+</input><label class="tabbed-label" for="5cfea04b-1f44-49f0-81de-a2fa6db9b0e4">
+OSX</label><div class="tabbed-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
+</pre></div>
+</div>
+</div>
+<input id="ea4bbb91-8989-4faa-9c63-0ed4319453da" name="4a6a725b-ea8c-453c-a682-86c021390536" type="radio">
+</input><label class="tabbed-label" for="ea4bbb91-8989-4faa-9c63-0ed4319453da">
+Linux</label><div class="tabbed-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
+</pre></div>
+</div>
+</div>
+</div>
+<p>You should now be able to use MParT from Julia by including MParT as a local package.  For example:</p>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">include</span><span class="p">(</span><span class="s">&quot;&lt;your/install/path&gt;/julia/mpart/MParT.jl&quot;</span><span class="p">)</span>
+
+<span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">idx</span> <span class="o">=</span> <span class="n">MParT</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+<span class="n">print</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
