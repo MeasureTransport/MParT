@@ -15,9 +15,9 @@ class OrthogonalPolynomial : public Mixer
 public:
 
     /* Evaluates all polynomials up to a specified order. */
-    KOKKOS_INLINE_FUNCTION void EvaluateAll(double*              output,
-                     unsigned int         maxOrder,
-                     double               x) const
+    KOKKOS_FUNCTION void EvaluateAll(double*              output,
+                                     unsigned int         maxOrder,
+                                     double               x) const
     {
         output[0] = this->phi0(x);
         
@@ -31,7 +31,7 @@ public:
     /** Evaluates the derivative of every polynomial in this family up to degree maxOrder (inclusive).
         The results are stored in the memory pointed to by the derivs pointer.
     */
-    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(double*      derivs,
+    KOKKOS_FUNCTION void EvaluateDerivatives(double*      derivs,
                              unsigned int maxDegree,
                              double       x) const 
     {   
@@ -64,7 +64,7 @@ public:
     /** Evaluates the value and derivative of every polynomial in this family up to degree maxOrder (inclusive).
         The results are stored in the memory pointed to by the derivs pointer.
     */
-    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(double*      vals,
+    KOKKOS_FUNCTION void EvaluateDerivatives(double*      vals,
                            double*      derivs,
                            unsigned int maxOrder,
                            double       x) const 
@@ -88,7 +88,7 @@ public:
         }
     }
 
-    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(double*      vals,
+    KOKKOS_FUNCTION void EvaluateSecondDerivatives(double*      vals,
                                    double*      derivs,
                                    double*      secondDerivs,
                                    unsigned int maxOrder,
@@ -118,7 +118,7 @@ public:
 
 
 
-    KOKKOS_INLINE_FUNCTION double Evaluate(unsigned int const order, 
+    KOKKOS_FUNCTION double Evaluate(unsigned int const order, 
                     double const x) const
     {
         if(order==0){
@@ -147,7 +147,7 @@ public:
         }
     }
 
-    KOKKOS_INLINE_FUNCTION double Derivative(unsigned int const order,
+    KOKKOS_FUNCTION double Derivative(unsigned int const order,
                       double const x) const
     {
         if(order==0){
@@ -183,7 +183,7 @@ public:
         }
     }
 
-    KOKKOS_INLINE_FUNCTION double SecondDerivative(unsigned int const order,
+    KOKKOS_FUNCTION double SecondDerivative(unsigned int const order,
                       double const x) const
     {
         if(order<=1){

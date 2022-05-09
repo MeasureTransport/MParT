@@ -22,14 +22,6 @@ namespace QuadError{
     };
 }
 
-template<typename T>
-void printtype(T val){
-    printf("Output %0.4f\n", val);
-}
-
-void printtype(Eigen::VectorXd val){
-    printf("Output %0.4f\n", val(0));
-}
 /**
 
 USAGE
@@ -69,7 +61,7 @@ public:
      @param[in] order The order of the Clenshaw-Curtis rule.
      @returns A pair containing (wts,pts)
      */
-    KOKKOS_INLINE_FUNCTION static void GetRule(unsigned int order, Eigen::VectorXd &wts, Eigen::VectorXd &pts)
+    KOKKOS_FUNCTION static void GetRule(unsigned int order, Eigen::VectorXd &wts, Eigen::VectorXd &pts)
     {
         wts.resize(order);
         pts.resize(order);
@@ -125,9 +117,9 @@ public:
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
     template<typename OutputType, class FunctionType>
-    KOKKOS_INLINE_FUNCTION OutputType Integrate(FunctionType const& f, 
-                   double              lb, 
-                   double              ub) const
+    KOKKOS_FUNCTION OutputType Integrate(FunctionType const& f, 
+                                         double              lb, 
+                                         double              ub) const
     {   
         if(ub<lb+1e-14){
             return 0.0*f(lb);
@@ -217,7 +209,7 @@ protected:
         tol = std::fmax( _relTol*std::abs(coarseVal), _absTol);
     }
 
-    KOKKOS_INLINE_FUNCTION void EstimateError(Eigen::VectorXd const& coarseVal,
+    KOKKOS_FUNCTION void EstimateError(Eigen::VectorXd const& coarseVal,
                                               Eigen::VectorXd const& fineVal,
                                               double               & error,
                                               double               & tol) const
@@ -272,15 +264,16 @@ public:
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
     template<typename OutputType, class FunctionType>
-    KOKKOS_INLINE_FUNCTION OutputType Integrate(FunctionType const& f, 
+    KOKKOS_FUNCTION OutputType Integrate(FunctionType const& f, 
                    double              lb, 
                    double              ub) const
     { 
         auto flb = f(lb);
         auto fub = f(ub);
+
         double midPt = 0.5*(lb+ub);
         auto fmb = f(midPt);
-
+        
         OutputType intCoarse = ((ub-lb)/6.0) * (flb + 4.0*fmb + fub);
         
         OutputType integral = intCoarse;
@@ -294,7 +287,7 @@ public:
 private:
 
     template<typename OutputType,class ScalarFuncType>
-    KOKKOS_INLINE_FUNCTION void RecursiveIntegrate(ScalarFuncType const& f, 
+    KOKKOS_FUNCTION void RecursiveIntegrate(ScalarFuncType const& f, 
                             double leftPt,
                             double midPt,
                             double rightPt,
@@ -359,7 +352,7 @@ private:
             
             integral = intLeft + intRight;
             status = int( ((statusLeft<0)||(statusLeft<0))?-1:1 );
-            levelOut =  std::max(levelLeft, levelRight);
+            levelOut =  fmax(levelLeft, levelRight);
             return; 
         }
     }
@@ -399,7 +392,7 @@ public:
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
     template<typename OutputType, class FunctionType>
-    KOKKOS_INLINE_FUNCTION OutputType Integrate(FunctionType const& f, 
+    KOKKOS_FUNCTION OutputType Integrate(FunctionType const& f, 
                    double              lb, 
                    double              ub) const
     {   
@@ -414,7 +407,7 @@ public:
 private:
 
     template<typename OutputType, class FunctionType>
-    KOKKOS_INLINE_FUNCTION void RecursiveIntegrate(FunctionType const& f, 
+    KOKKOS_FUNCTION void RecursiveIntegrate(FunctionType const& f, 
                             double lb, 
                             double ub, 
                             int level, 

@@ -23,7 +23,12 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wno-deprecated-gpu-targets")
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-Wno-deprecated-gpu-targets" COMPILER_IS_NVCC)
+if(COMPILER_IS_NVCC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-gpu-targets --expt-relaxed-constexpr")
+endif()
+
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 

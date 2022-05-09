@@ -120,10 +120,24 @@ namespace mpart{
 
     }
 
+    template<typename DeviceMemoryType, typename ScalarType, class... OtherTraits>
+    Kokkos::View<ScalarType**, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, OtherTraits...>const& inview){
+
+        Kokkos::View<ScalarType**, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
+        Kokkos::deep_copy(outview, inview);
+        return outview;
+    }
+
     template<typename DeviceMemoryType,typename ScalarType>
     Kokkos::View<ScalarType*, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType*, DeviceMemoryType> const& inview){
         return inview;
     }
+
+    template<typename DeviceMemoryType,typename ScalarType>
+    Kokkos::View<ScalarType**, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, DeviceMemoryType> const& inview){
+        return inview;
+    }
+
 
 #endif
 

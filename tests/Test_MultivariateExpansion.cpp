@@ -128,6 +128,8 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionDe
     Kokkos::View<double*, DeviceSpace> dcache("device cache", cacheSize);
 
     Kokkos::View<double*,Kokkos::HostSpace> hpt("host point", dim);
+    for(unsigned int i=0; i<dim; ++i)
+        hpt(i) = double(i)/dim;
     Kokkos::View<double*,DeviceSpace> dpt = ToDevice<DeviceSpace>(hpt);
 
     // Fill in the cache with the first d-1 components of the cache  
@@ -136,6 +138,7 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionDe
     // Run the fill cache funciton, using a parallel_for loop to ensure it's run on the device
     Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
         dexpansion.FillCache1(dcache.data(), dpt, DerivativeFlags::None);
+        dexpansion.FillCache2(dcache.data(), dpt, 0.5 * dpt(dim-1), DerivativeFlags::None);
     });
 
     // Copy the device cache back to the host

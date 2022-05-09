@@ -50,7 +50,7 @@ public:
       @param coeffs
       @param derivType
      */
-    MonotoneIntegrand(double*                            cache,
+    KOKKOS_INLINE_FUNCTION MonotoneIntegrand(double*                            cache,
                       ExpansionType               const& expansion,
                       PointType                   const& pt,
                       CoeffsType                  const& coeffs,
@@ -64,7 +64,7 @@ public:
     {   
     }
 
-    MonotoneIntegrand(double*                            cache,
+    KOKKOS_INLINE_FUNCTION MonotoneIntegrand(double*                            cache,
                       ExpansionType               const& expansion,
                       PointType                   const& pt,
                       double                             xd,
@@ -85,7 +85,7 @@ public:
      and the value of \f$t\f$ passed to this function.  Note that we assume t ranges from [0,1].  The change of variables to x_d*t is
      taken care of inside this function.
     */
-    Eigen::VectorXd operator()(double t) const
+    KOKKOS_INLINE_FUNCTION Eigen::VectorXd operator()(double t) const
     {   
         const unsigned int numTerms = _expansion.NumCoeffs();
         
@@ -96,7 +96,6 @@ public:
             numOutputs += numTerms;
 
         Eigen::VectorXd output = Eigen::VectorXd::Zero(numOutputs);
-
 
         // Finish filling in the cache at the quadrature point (FillCache1 is called outside this class)
         if((_derivType==DerivativeFlags::Diagonal)||(_derivType==DerivativeFlags::Mixed)){
@@ -137,11 +136,9 @@ public:
 
         // Check for infs or nans
         if(std::isinf(gf)){
-            std::stringstream msg;
-            msg << "In MonotoneIntegrand, value of g(df(...)) is inf.  The value of df(...) is " << df << ", and the value of g(df(...)) is " << gf << ".";
-            throw std::domain_error(msg.str());
+            printf("\nERROR: In MonotoneIntegrand, value of g(df(...)) is inf.  The value of df(...) is %0.4f, and the value of f(df(...)) is %0.4f.\n\n", df, gf);
         }else if(std::isnan(gf)){
-            throw std::domain_error("In MonotoneIntegrand, A nan was encountered in value of g(df(...)).");
+            printf("\nERROR: In MonotoneIntegrand, A nan was encountered in value of g(df(...)).\n\n");
         }
 
         // Compute the derivative with respect to x_d

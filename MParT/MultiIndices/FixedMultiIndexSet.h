@@ -48,7 +48,14 @@ public:
 
     void Print() const;
 
-    unsigned int Size() const;
+    KOKKOS_INLINE_FUNCTION unsigned int Size() const
+    {
+        if(isCompressed){
+            return nzStarts.extent(0)-1;
+        }else{
+            return nzOrders.extent(0) / dim;
+        }
+    } 
 
     const unsigned int dim;
 

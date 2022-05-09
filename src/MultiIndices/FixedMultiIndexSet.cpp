@@ -273,15 +273,15 @@ void FixedMultiIndexSet<MemorySpace>::Print() const
 
 }
 
-template<typename MemorySpace>
-unsigned int FixedMultiIndexSet<MemorySpace>::Size() const
-{
-    if(isCompressed){
-        return nzStarts.extent(0)-1;
-    }else{
-        return nzOrders.extent(0) / dim;
-    }
-}   
+// template<typename MemorySpace>
+// unsigned int FixedMultiIndexSet<MemorySpace>::Size() const
+// {
+//     if(isCompressed){
+//         return nzStarts.extent(0)-1;
+//     }else{
+//         return nzOrders.extent(0) / dim;
+//     }
+// }   
 
 template<typename MemorySpace>
 std::pair<unsigned int, unsigned int> FixedMultiIndexSet<MemorySpace>::TotalOrderSize(unsigned int maxOrder, unsigned int currDim)

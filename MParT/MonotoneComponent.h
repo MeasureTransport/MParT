@@ -7,13 +7,16 @@
 #include "MParT/DerivativeFlags.h"
 #include "MParT/MonotoneIntegrand.h"
 
+#include "MParT/Utilities/Miscellaneous.h"
+
+#include "MParT/Utilities/KokkosSpaceMappings.h"
+
 #include <Eigen/Core>
 
 #include <Kokkos_Core.hpp>
 
 
 namespace mpart{
-
 
 /**
 @brief Defines a function \f$T:R^N\rightarrow R\f$ such that \f$\partial T / \partial x_N >0\f$ is strictly positive.
@@ -48,14 +51,16 @@ public:
      * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
      * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
-    Kokkos::View<double*> Evaluate(Kokkos::View<double**> const& pts, 
-                                   Kokkos::View<double*> const& coeffs)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, class... OtherTraits>
+    Kokkos::View<double*, MemorySpace> Evaluate(Kokkos::View<double**, OtherTraits...> const& pts, 
+                                                Kokkos::View<double*, MemorySpace > const& coeffs)
     {   
         const unsigned int numPts = pts.extent(1);
-        Kokkos::View<double*> output("Monotone Component Evaluations", numPts);
+        Kokkos::View<double*,MemorySpace> output("Monotone Component Evaluations", numPts);
 
-        Evaluate(pts, coeffs, output);
-
+        Evaluate<MemorySpace, ExecutionSpace>(pts, coeffs, output);
+        Kokkos::fence();
+        
         return output;
     }
 
@@ -67,10 +72,10 @@ public:
      * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
      * @param[out] output Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
-
-    void Evaluate(Kokkos::View<double**> const& pts, 
-                  Kokkos::View<double*>  const& coeffs,
-                  Kokkos::View<double*>       & output)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, class... OtherTraits>
+    void Evaluate(Kokkos::View<double**,OtherTraits...> const& pts, 
+                  Kokkos::View<double*,MemorySpace>  const& coeffs,
+                  Kokkos::View<double*,MemorySpace>       & output)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
@@ -81,10 +86,11 @@ public:
         const unsigned int cacheSize = _expansion.CacheSize();
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
-        Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
+        auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
+        Kokkos::TeamPolicy<ExecutionSpace> policy = Kokkos::TeamPolicy<ExecutionSpace>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (Kokkos::TeamPolicy<>::member_type team_member) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
             unsigned int ptInd = team_member.league_rank();
             
@@ -92,13 +98,13 @@ public:
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
 
             // Get a pointer to the shared memory that Kokkos set up for this team
-            double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
+            Kokkos::View<double*,MemorySpace> cache(team_member.team_scratch(1), cacheSize);
 
             // Fill in entries in the cache that are independent of x_d.  By passing DerivativeFlags::None, we are telling the expansion that no derivatives with wrt x_1,...x_{d-1} will be needed.
-            _expansion.FillCache1(cache, pt, DerivativeFlags::None);
-
-            output(ptInd) = EvaluateSingle(cache, pt, pt(_dim-1), coeffs, _quad, _expansion);            
+            _expansion.FillCache1(cache.data(), pt, DerivativeFlags::None);
+            output(ptInd) = EvaluateSingle(cache.data(), pt, pt(_dim-1), coeffs, _quad, _expansion); 
         });
+
     }
 
 
@@ -110,15 +116,16 @@ public:
        @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
        @returns A length \f$N\f$ Kokkos::View<double*> containing \f$y_D^{(i)}\f$.
     */
-    Kokkos::View<double*> Inverse(Kokkos::View<double**>       const& xs, 
-                                  Kokkos::View<double*>        const& ys, 
-                                  Kokkos::View<double*>        const& coeffs,
-                                  std::map<std::string, std::string>  options=std::map<std::string,std::string>())
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    Kokkos::View<double*,MemorySpace> Inverse(Kokkos::View<double**,MemorySpace>       const& xs, 
+                                              Kokkos::View<double*,MemorySpace>        const& ys, 
+                                              Kokkos::View<double*,MemorySpace>        const& coeffs,
+                                              std::map<std::string, std::string>              options=std::map<std::string,std::string>())
     {   
         const unsigned int numPts = ys.extent(0);
-        Kokkos::View<double*> output("Monotone Component Inverse Evaluations", numPts);
+        Kokkos::View<double*,MemorySpace> output("Monotone Component Inverse Evaluations", numPts);
 
-        Inverse(xs, ys, coeffs, output, options);
+        Inverse<MemorySpace, ExecutionSpace>(xs, ys, coeffs, output, options);
 
         return output;
     }
@@ -138,11 +145,12 @@ public:
      @param output An array for storing the computed values of \f$y_D^{(i)}\f$.  Memory for this array must be preallocated before calling this function.
      @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
      */
-    void Inverse(Kokkos::View<double**>       const& xs, 
-                 Kokkos::View<double*>        const& ys,
-                 Kokkos::View<double*>        const& coeffs,
-                 Kokkos::View<double*>             & output,
-                 std::map<std::string, std::string>  options=std::map<std::string,std::string>())
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    void Inverse(Kokkos::View<double**,MemorySpace>       const& xs, 
+                 Kokkos::View<double*,MemorySpace>        const& ys,
+                 Kokkos::View<double*,MemorySpace>        const& coeffs,
+                 Kokkos::View<double*,MemorySpace>             & output,
+                 std::map<std::string, std::string>              options=std::map<std::string,std::string>())
     {   
         // Extract the method from the options map
         std::string method;
@@ -213,10 +221,11 @@ public:
         const unsigned int cacheSize = _expansion.CacheSize();
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
-        Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
+        auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
+        Kokkos::TeamPolicy<ExecutionSpace> policy = Kokkos::TeamPolicy<ExecutionSpace>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
 
         // Paralel loop over each point computing x_D = T^{-1}(x_1,...,x_{D-1},y_D) for that point
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (Kokkos::TeamPolicy<>::member_type team_member) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
             unsigned int ptInd = team_member.league_rank();
             unsigned int xInd = ptInd;
@@ -227,11 +236,11 @@ public:
             auto pt = Kokkos::subview(xs, Kokkos::ALL(), xInd);
 
             // Fill in the cache with everything that doesn't depend on x_d
-            double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
-            _expansion.FillCache1(cache, pt, DerivativeFlags::None);
+            Kokkos::View<double*,MemorySpace> cache(team_member.team_scratch(1), cacheSize);
+            _expansion.FillCache1(cache.data(), pt, DerivativeFlags::None);
 
             // Compute the inverse 
-            output(ptInd) = InverseSingleBracket(cache, pt, ys(ptInd), coeffs, xtol, ytol, _quad, _expansion);
+            output(ptInd) = InverseSingleBracket(cache.data(), pt, ys(ptInd), coeffs, xtol, ytol, _quad, _expansion);
         });
     }
 
@@ -245,13 +254,14 @@ public:
 
         @see DiscreteDerivative
      */
-    Kokkos::View<double*>  ContinuousDerivative(Kokkos::View<double**> const& pts, 
-                                                Kokkos::View<double*>  const& coeffs)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
+                                                            Kokkos::View<double*,MemorySpace>  const& coeffs)
     {   
         const unsigned int numPts = pts.extent(1);
-        Kokkos::View<double*> derivs("Monotone Component Derivatives", numPts);
+        Kokkos::View<double*,MemorySpace> derivs("Monotone Component Derivatives", numPts);
         
-        ContinuousDerivative(pts,coeffs, derivs);
+        ContinuousDerivative<MemorySpace,ExecutionSpace>(pts,coeffs, derivs);
 
         return derivs;
     }
@@ -266,9 +276,10 @@ public:
 
         @see DiscreteDerivative
      */
-    void ContinuousDerivative(Kokkos::View<double**> const& pts, 
-                              Kokkos::View<double*>  const& coeffs,
-                              Kokkos::View<double*>       & derivs)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    void ContinuousDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
+                              Kokkos::View<double*,MemorySpace>  const& coeffs,
+                              Kokkos::View<double*,MemorySpace>       & derivs)
     {   
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
@@ -278,10 +289,11 @@ public:
         const unsigned int cacheSize = _expansion.CacheSize();
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
-        Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
+        auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
+        Kokkos::TeamPolicy<ExecutionSpace> policy = Kokkos::TeamPolicy<ExecutionSpace>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (Kokkos::TeamPolicy<>::member_type team_member) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
             
             // The index of the for loop
             unsigned int ptInd = team_member.league_rank();
@@ -290,16 +302,16 @@ public:
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
 
             // Evaluate the orthgonal polynomials in each direction (except the last) for all possible orders
-            double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
+            Kokkos::View<double*,MemorySpace> cache(team_member.team_scratch(1), cacheSize);
 
             // Precompute anything that does not depend on x_d.  The DerivativeFlags::None arguments specifies that we won't want to derivative wrt to x_i for i<d
-            _expansion.FillCache1(cache, pt, DerivativeFlags::None);
+            _expansion.FillCache1(cache.data(), pt, DerivativeFlags::None);
 
             // Fill in parts of the cache that depend on x_d.  Tell the expansion we're going to want first derivatives wrt x_d
-            _expansion.FillCache2(cache, pt, pt(dim-1), DerivativeFlags::Diagonal);
+            _expansion.FillCache2(cache.data(), pt, pt(dim-1), DerivativeFlags::Diagonal);
 
             // Compute \partial_d f
-            derivs(ptInd) = _expansion.DiagonalDerivative(cache, coeffs,1);
+            derivs(ptInd) = _expansion.DiagonalDerivative(cache.data(), coeffs,1);
 
             // Compute g(df/dx)
             derivs(ptInd) = PosFuncType::Evaluate(derivs(ptInd));
@@ -315,14 +327,15 @@ public:
 
         @see ContinuousDerivative
     */
-    Kokkos::View<double*>  DiscreteDerivative(Kokkos::View<double**> const& pts, 
-                                              Kokkos::View<double*>  const& coeffs)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
+                                                           Kokkos::View<double*,MemorySpace>  const& coeffs)
     {   
         const unsigned int numPts = pts.extent(1);
-        Kokkos::View<double*> evals("Component Evaluations", numPts);
-        Kokkos::View<double*> derivs("Component Derivatives", numPts);
+        Kokkos::View<double*,MemorySpace> evals("Component Evaluations", numPts);
+        Kokkos::View<double*,MemorySpace> derivs("Component Derivatives", numPts);
         
-        DiscreteDerivative(pts,coeffs, evals, derivs);
+        DiscreteDerivative<MemorySpace, ExecutionSpace>(pts,coeffs, evals, derivs);
 
         return derivs;
     }
@@ -338,10 +351,11 @@ public:
 
         @see ContinuousDerivative
      */
-    void  DiscreteDerivative(Kokkos::View<double**> const& pts, 
-                             Kokkos::View<double*>  const& coeffs,
-                             Kokkos::View<double*>       & evals, 
-                             Kokkos::View<double*>       & derivs)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    void  DiscreteDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
+                             Kokkos::View<double*,MemorySpace>  const& coeffs,
+                             Kokkos::View<double*,MemorySpace>       & evals, 
+                             Kokkos::View<double*,MemorySpace>       & derivs)
     {   
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
@@ -349,17 +363,18 @@ public:
 
         assert(coeffs.extent(0)==numTerms);
 
-        Kokkos::View<double*> output("ExpansionOutput", numPts);
+        Kokkos::View<double*,MemorySpace> output("ExpansionOutput", numPts);
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = _expansion.CacheSize();
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
-        Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
+        auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
+        Kokkos::TeamPolicy<ExecutionSpace> policy = Kokkos::TeamPolicy<ExecutionSpace>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
 
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (Kokkos::TeamPolicy<>::member_type team_member) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
             
             unsigned int ptInd = team_member.league_rank();
 
@@ -367,22 +382,22 @@ public:
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
 
             // Get a pointer to the shared memory Kokkos is managing for the cache
-            double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
+            Kokkos::View<double*,MemorySpace> cache(team_member.team_scratch(1), cacheSize);
             
             // Fill in the cache with anything that doesn't depend on x_d
-            _expansion.FillCache1(cache, pt, DerivativeFlags::None);
+            _expansion.FillCache1(cache.data(), pt, DerivativeFlags::None);
             
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-            MonotoneIntegrand<ExpansionType, PosFuncType, Kokkos::View<double*>, Kokkos::View<double*>> integrand(cache, _expansion, pt, coeffs, DerivativeFlags::Diagonal);
+            MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt), decltype(coeffs)> integrand(cache.data(), _expansion, pt, coeffs, DerivativeFlags::Diagonal);
             
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt
-            Eigen::VectorXd both = _quad.Integrate<Eigen::VectorXd>(integrand, 0, 1);
+            Eigen::VectorXd both = _quad.template Integrate<Eigen::VectorXd>(integrand, 0, 1);
             evals(ptInd) = both(0);
             derivs(ptInd) = both(1);
 
             // Add f(x_1,x_2,...,x_{d-1},0) to the evaluation output
-            _expansion.FillCache2(cache, pt, 0.0, DerivativeFlags::None);
-            evals(ptInd) += _expansion.Evaluate(cache, coeffs);
+            _expansion.FillCache2(cache.data(), pt, 0.0, DerivativeFlags::None);
+            evals(ptInd) += _expansion.Evaluate(cache.data(), coeffs);
             
         });
     }
@@ -401,10 +416,11 @@ public:
         
         @see CoeffGradient
     */
-    void CoeffJacobian(Kokkos::View<double**> const& pts, 
-                       Kokkos::View<double*>  const& coeffs,
-                       Kokkos::View<double*>       & evaluations,
-                       Kokkos::View<double**>      & jacobian)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    void CoeffJacobian(Kokkos::View<double**,MemorySpace> const& pts, 
+                       Kokkos::View<double*,MemorySpace>  const& coeffs,
+                       Kokkos::View<double*,MemorySpace>       & evaluations,
+                       Kokkos::View<double**,MemorySpace>      & jacobian)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
@@ -418,11 +434,12 @@ public:
         const unsigned int cacheSize = _expansion.CacheSize();
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
-        Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
+        auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
+        Kokkos::TeamPolicy<ExecutionSpace> policy = Kokkos::TeamPolicy<ExecutionSpace>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
 
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (Kokkos::TeamPolicy<>::member_type team_member) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
             
             unsigned int ptInd = team_member.league_rank();
 
@@ -431,21 +448,21 @@ public:
             auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
 
             // Get a pointer to the shared memory that Kokkos has set up for the cache
-            double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
+            Kokkos::View<double*,MemorySpace> cache(team_member.team_scratch(1), cacheSize);
 
             // Fill in the cache with anything that doesn't depend on x_d
-            _expansion.FillCache1(cache, pt, DerivativeFlags::None);
+            _expansion.FillCache1(cache.data(), pt, DerivativeFlags::None);
             
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-            MonotoneIntegrand<ExpansionType, PosFuncType, Kokkos::View<double*>,Kokkos::View<double*>> integrand(cache, _expansion, pt, coeffs, DerivativeFlags::Parameters);
+            MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs)> integrand(cache.data(), _expansion, pt, coeffs, DerivativeFlags::Parameters);
             
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
-            Eigen::VectorXd integral = _quad.Integrate<Eigen::VectorXd>(integrand, 0, 1);
+            Eigen::VectorXd integral = _quad.template Integrate<Eigen::VectorXd>(integrand, 0, 1);
             
             evaluations(ptInd) = integral(0);
 
-            _expansion.FillCache2(cache, pt,  0.0, DerivativeFlags::None);
-            evaluations(ptInd) += _expansion.CoeffDerivative(cache, coeffs, jacView);
+            _expansion.FillCache2(cache.data(), pt,  0.0, DerivativeFlags::None);
+            evaluations(ptInd) += _expansion.CoeffDerivative(cache.data(), coeffs, jacView);
 
             // Add the Integral to the coefficient gradient
             for(unsigned int termInd=0; termInd<numTerms; ++termInd)
@@ -454,10 +471,10 @@ public:
         });
     }
 
-
-    void ContinuousMixedJacobian(Kokkos::View<double**> const& pts, 
-                                 Kokkos::View<double*>  const& coeffs,
-                                 Kokkos::View<double**>      & jacobian)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    void ContinuousMixedJacobian(Kokkos::View<double**,MemorySpace> const& pts, 
+                                 Kokkos::View<double*,MemorySpace>  const& coeffs,
+                                 Kokkos::View<double**,MemorySpace>      & jacobian)
     {   
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
@@ -467,10 +484,11 @@ public:
         const unsigned int cacheSize = _expansion.CacheSize();
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
-        Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
+        auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
+        Kokkos::TeamPolicy<ExecutionSpace> policy = Kokkos::TeamPolicy<ExecutionSpace>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (Kokkos::TeamPolicy<>::member_type team_member) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
             
             // The index of the for loop
             unsigned int ptInd = team_member.league_rank();
@@ -480,16 +498,16 @@ public:
             auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
 
             // Evaluate the orthgonal polynomials in each direction (except the last) for all possible orders
-            double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
+            Kokkos::View<double*,MemorySpace> cache(team_member.team_scratch(1), cacheSize);
 
             // Precompute anything that does not depend on x_d.  The DerivativeFlags::None arguments specifies that we won't want to derivative wrt to x_i for i<d
-            _expansion.FillCache1(cache, pt, DerivativeFlags::None);
+            _expansion.FillCache1(cache.data(), pt, DerivativeFlags::None);
 
             // Fill in parts of the cache that depend on x_d.  Tell the expansion we're going to want first derivatives wrt x_d
-            _expansion.FillCache2(cache, pt, pt(dim-1), DerivativeFlags::Diagonal);
+            _expansion.FillCache2(cache.data(), pt, pt(dim-1), DerivativeFlags::Diagonal);
 
             // Compute \partial_d f
-            double df = _expansion.MixedDerivative(cache, coeffs, 1, jacView);
+            double df = _expansion.MixedDerivative(cache.data(), coeffs, 1, jacView);
             double dgdf = PosFuncType::Derivative(df);
 
             // Scale the jacobian by dg(df)
@@ -499,9 +517,10 @@ public:
         });
     }
 
-    void DiscreteMixedJacobian(Kokkos::View<double**> const& pts, 
-                               Kokkos::View<double*>  const& coeffs,
-                               Kokkos::View<double**>      & jacobian)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    void DiscreteMixedJacobian(Kokkos::View<double**,MemorySpace> const& pts, 
+                               Kokkos::View<double*,MemorySpace>  const& coeffs,
+                               Kokkos::View<double**,MemorySpace>      & jacobian)
     {   
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
@@ -514,11 +533,12 @@ public:
         const unsigned int cacheSize = _expansion.CacheSize();
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
-        Kokkos::TeamPolicy<> policy = Kokkos::TeamPolicy<>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
+        auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
+        Kokkos::TeamPolicy<ExecutionSpace> policy = Kokkos::TeamPolicy<ExecutionSpace>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
 
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (Kokkos::TeamPolicy<>::member_type team_member) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
             
             unsigned int ptInd = team_member.league_rank();
 
@@ -527,16 +547,16 @@ public:
             auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
 
             // Get a pointer to the shared memory that Kokkos has set up for the cache
-            double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
+            Kokkos::View<double*,MemorySpace> cache(team_member.team_scratch(1), cacheSize);
 
             // Fill in the cache with anything that doesn't depend on x_d
-            _expansion.FillCache1(cache, pt, DerivativeFlags::None);
+            _expansion.FillCache1(cache.data(), pt, DerivativeFlags::None);
             
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-            MonotoneIntegrand<ExpansionType, PosFuncType,  Kokkos::View<double*>,Kokkos::View<double*>> integrand(cache, _expansion, pt, coeffs, DerivativeFlags::Mixed);
+            MonotoneIntegrand<ExpansionType, PosFuncType,  decltype(pt), decltype(coeffs)> integrand(cache.data(), _expansion, pt, coeffs, DerivativeFlags::Mixed);
             
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
-            Eigen::VectorXd integral = _quad.Integrate<Eigen::VectorXd>(integrand, 0, 1);
+            Eigen::VectorXd integral = _quad.template Integrate<Eigen::VectorXd>(integrand, 0, 1);
             
             // Add the Integral to the coefficient gradient
             for(unsigned int termInd=0; termInd<numTerms; ++termInd)
@@ -555,25 +575,27 @@ public:
      @return double 
      */
     template<typename PointType, typename CoeffsType>
-    static double EvaluateSingle(double*                  cache,
-                          PointType         const& pt,
-                          double                   xd,
-                          CoeffsType        const& coeffs, QuadratureType const& quad, ExpansionType const& expansion)
+    KOKKOS_FUNCTION static double EvaluateSingle(double*                  cache,
+                                                 PointType         const& pt,
+                                                 double                   xd,
+                                                 CoeffsType        const& coeffs, 
+                                                 QuadratureType    const& quad, 
+                                                 ExpansionType     const& expansion)
     {   
         double output = 0.0;
         // Compute the integral \int_0^1 g( \partial_D f(x_1,...,x_{D-1},t*x_d)) dt 
         MonotoneIntegrand<ExpansionType, PosFuncType, PointType, CoeffsType> integrand(cache, 
-                                                                           expansion,
-                                                                           pt,
-                                                                           xd,
-                                                                           coeffs, 
-                                                                           DerivativeFlags::None);
-        output = quad.Integrate<Eigen::VectorXd>(integrand, 0, 1)(0);
-        
-        // Finish filling in the cache for an evaluation of the expansion with x_d=0
+                                                                                       expansion,
+                                                                                       pt,
+                                                                                       xd,
+                                                                                       coeffs, 
+                                                                                       DerivativeFlags::None);
+        output = quad.template Integrate<Eigen::VectorXd>(integrand, 0, 1)(0);
+    
+        // // Finish filling in the cache for an evaluation of the expansion with x_d=0
         expansion.FillCache2(cache, pt, 0.0, DerivativeFlags::None);
         output += expansion.Evaluate(cache, coeffs);   
-
+  
         return output;
     }
 
@@ -596,7 +618,7 @@ public:
      @tparam CoeffsType The type of the coefficients.  Typically Kokkos::View<double*> or a similarly structured subview.
      */
     template<typename PointType, typename CoeffsType>
-    static double InverseSingleBracket(double*                             cache,
+    KOKKOS_FUNCTION static double InverseSingleBracket(double*                             cache,
                                PointType                    const& pt,
                                double                              yd,
                                CoeffsType                   const& coeffs,
@@ -616,8 +638,9 @@ public:
 
         // We actually found an upper bound...
         if(ylb>yd){
-            std::swap(ylb,yub);
-            std::swap(xlb,xub);
+           
+            mpart::swap(ylb,yub);
+            mpart::swap(xlb,xub);
 
             // Now find a lower bound...
             unsigned int i;
@@ -625,8 +648,8 @@ public:
                 xlb = xub-stepSize;
                 ylb = EvaluateSingle(cache, pt, xlb, coeffs, quad, expansion);
                 if(ylb>yd){
-                    std::swap(ylb,yub);
-                    std::swap(xlb,xub);
+                    mpart::swap(ylb,yub);
+                    mpart::swap(xlb,xub);
                     stepSize *= 2.0;
                 }else{
                     break;
@@ -642,8 +665,8 @@ public:
                 xub = xlb+stepSize;
                 yub = EvaluateSingle(cache, pt, xub, coeffs, quad, expansion);
                 if(yub<yd){
-                    std::swap(ylb,yub);
-                    std::swap(xlb,xub);
+                    mpart::swap(ylb,yub);
+                    mpart::swap(xlb,xub);
                     stepSize *= 2.0;
                 }else{
                     break;
@@ -658,7 +681,7 @@ public:
         // Bracketed search 
         const double k1 = 0.1;
         const double k2 = 2.0;
-        const double nhalf = std::ceil(std::log2(0.5*(xub-xlb)/xtol));
+        const double nhalf = ceil(log2(0.5*(xub-xlb)/xtol));
         const double n0 = 1.0;
 
         double sigma, delta, rho;
@@ -669,23 +692,23 @@ public:
             xf = xlb - (yd-ylb)*(xub-xlb) / (yub-ylb); // regula-falsi point
 
             sigma = ((xb-xf)>0)?1.0:-1.0; // sign(xb-xf)
-            delta = std::min(k1*std::pow((xub-xlb), k2), std::abs(xb-xf));
+            delta = fmin(k1*pow((xub-xlb), k2), fabs(xb-xf));
             
             xf += delta*sigma;
             
-            rho = std::min(xtol*std::pow(2.0, nhalf + n0 - it) - 0.5*(xub-xlb), std::abs(xf - xb));
+            rho = fmin(xtol*pow(2.0, nhalf + n0 - it) - 0.5*(xub-xlb), fabs(xf - xb));
             xc = xb - sigma*rho;
 
             yc = EvaluateSingle(cache, pt, xc, coeffs, quad, expansion);
 
-            if(std::abs(yc-yd)<ftol){
+            if(abs(yc-yd)<ftol){
                 return xc;
             }else if(yc>yd){
-                std::swap(yc,yub);
-                std::swap(xc,xub);
+                mpart::swap(yc,yub);
+                mpart::swap(xc,xub);
             }else{
-                std::swap(yc,ylb);
-                std::swap(xc,xlb);
+                mpart::swap(yc,ylb);
+                mpart::swap(xc,xlb);
             }
 
             // Check for convergence 
@@ -700,12 +723,6 @@ private:
     ExpansionType _expansion;
     QuadratureType _quad;
     const unsigned int _dim;
-
-
-    
-
-
-
 };
 
 } // namespace mpart
