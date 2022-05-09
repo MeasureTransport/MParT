@@ -10,6 +10,7 @@ INCLUDE(Submodules)
 # Options 
 
 option(MPART_PYTHON "Build python bindings with pybind11" ON)
+option(MPART_JULIA "Build julia bindings with CxxWrap.jl" OFF)
 
 ##############################################################
 # Compiler configuration
@@ -57,6 +58,30 @@ endif()
 # Add the current source directory as an include directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+# Add Julia if necessary
+if(MPART_JULIA)
+  
+  # Set the julie executable and look for the location of cxxwrap
+  if(NOT DEFINED JULIA_EXE)
+      set(JULIA_EXE "julia")
+  endif()
+  execute_process(COMMAND ${JULIA_EXE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
+  list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}" )
+  
+  find_package(JlCxx)
+
+  if(NOT JlCxx_FOUND)
+    set(MPART_JULIA OFF)
+    message(WARNING "Request Julia bindings but CMake could not find JlCxx package.  Setting MPART_JULIA=OFF.")
+  else()
+    get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
+    get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
+    get_filename_component(JlCxx_src ${JlCxx_location} DIRECTORY)
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
+    include_directories(${Julia_INCLUDE_DIRS} ${JlCxx_src}/include)
+  endif()
+
+endif()
 
 ##############################################################
 # MParT library
@@ -66,6 +91,10 @@ target_link_libraries(mpart Kokkos::kokkos Eigen3::Eigen)
 
 if(MPART_PYTHON)
     add_subdirectory(bindings/python)
+endif()
+
+if(MPART_JULIA)
+    add_subdirectory(bindings/julia)
 endif()
 
 ##############################################################
