@@ -4,6 +4,7 @@
 #include <Kokkos_Core.hpp>
 
 #include <Eigen/Core>
+#include "MParT/Utilities/EigenTypes.h"
 
 namespace mpart {
 
@@ -53,10 +54,10 @@ namespace mpart {
 
         virtual Kokkos::View<double**, Kokkos::HostSpace> Evaluate(Kokkos::View<const double**, Kokkos::HostSpace> const& pts);
 
-        virtual Eigen::MatrixXd Evaluate(Eigen::MatrixXd const& pts);
+        virtual Eigen::RowMatrixXd Evaluate(Eigen::RowMatrixXd const& pts);
 
-        virtual void Evaluate(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
-                              Kokkos::View<double**, Kokkos::HostSpace>      & output) = 0;
+        virtual void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
+                                  Kokkos::View<double**, Kokkos::HostSpace>            & output) = 0;
 
 
         /** Returns the value of \f$x_2\f$ given \f$x_1\f$ and \f$r\f$.   Note that the \f$x1\f$ view may contain more 
@@ -65,11 +66,11 @@ namespace mpart {
         virtual Kokkos::View<double**, Kokkos::HostSpace> Inverse(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
                                                                   Kokkos::View<const double**, Kokkos::HostSpace> const& r);
 
-        virtual Eigen::MatrixXd Inverse(Eigen::MatrixXd const& x1, Eigen::MatrixXd const& r);
+        virtual Eigen::RowMatrixXd Inverse(Eigen::RowMatrixXd const& x1, Eigen::RowMatrixXd const& r);
 
-        virtual void Inverse(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
-                             Kokkos::View<const double**, Kokkos::HostSpace> const& r,
-                             Kokkos::View<double**, Kokkos::HostSpace>      & output) = 0;
+        virtual void InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
+                                 Kokkos::View<const double**, Kokkos::HostSpace> const& r,
+                                 Kokkos::View<double**, Kokkos::HostSpace>            & output) = 0;
 
 
         const unsigned int inputDim; // The total dimension of the input N+M

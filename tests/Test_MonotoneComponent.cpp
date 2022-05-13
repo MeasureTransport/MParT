@@ -248,7 +248,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
 
         MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
 
-        Kokkos::View<double*,Kokkos::HostSpace> output = comp.Evaluate(evalPts, coeffs);
+        Kokkos::View<double*,Kokkos::HostSpace> output = comp.EvaluateImpl(evalPts, coeffs);
 
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(output(i) == Approx(1+exp(1)*std::abs(evalPts(0,i))).epsilon(testTol));
@@ -279,7 +279,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
 
         MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
 
-        Kokkos::View<double*,Kokkos::HostSpace> output = comp.Evaluate(evalPts, coeffs);
+        Kokkos::View<double*,Kokkos::HostSpace> output = comp.EvaluateImpl(evalPts, coeffs);
 
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(output(i) == Approx(1+exp(1)*(exp(evalPts(0,i))-1)).epsilon(testTol));
@@ -323,10 +323,10 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
 
         MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
 
-        Kokkos::View<double*, Kokkos::HostSpace> ys = comp.Evaluate(evalPts, coeffs);
+        Kokkos::View<double*, Kokkos::HostSpace> ys = comp.EvaluateImpl(evalPts, coeffs);
         Kokkos::View<double*, Kokkos::HostSpace> testInverse("Test output", numPts);
 
-        comp.Inverse(evalPts, ys, coeffs, testInverse);
+        comp.InverseImpl(evalPts, ys, coeffs, testInverse);
 
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(testTol));
@@ -357,8 +357,8 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
 
         MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
 
-        Kokkos::View<double*, Kokkos::HostSpace> ys = comp.Evaluate(evalPts, coeffs);
-        Kokkos::View<double*, Kokkos::HostSpace> testInverse = comp.Inverse(evalPts, ys, coeffs);
+        Kokkos::View<double*, Kokkos::HostSpace> ys = comp.EvaluateImpl(evalPts, coeffs);
+        Kokkos::View<double*, Kokkos::HostSpace> testInverse = comp.InverseImpl(evalPts, ys, coeffs);
 
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(testTol));
@@ -387,8 +387,8 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
 
         MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson> comp(expansion, quad);
 
-        Kokkos::View<double*, Kokkos::HostSpace> ys = comp.Evaluate(evalPts, coeffs);
-        Kokkos::View<double*, Kokkos::HostSpace> testInverse = comp.Inverse(x, ys, coeffs);
+        Kokkos::View<double*, Kokkos::HostSpace> ys = comp.EvaluateImpl(evalPts, coeffs);
+        Kokkos::View<double*, Kokkos::HostSpace> testInverse = comp.InverseImpl(x, ys, coeffs);
 
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(1e-6));
@@ -440,8 +440,8 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
     for(unsigned int i=0; i<coeffs.extent(0); ++i)
         coeffs(i) = 0.1*std::cos( 0.01*i );
 
-    Kokkos::View<double*, Kokkos::HostSpace> evals = comp.Evaluate(evalPts, coeffs);
-    Kokkos::View<double*, Kokkos::HostSpace> rightEvals = comp.Evaluate(rightEvalPts, coeffs);
+    Kokkos::View<double*, Kokkos::HostSpace> evals = comp.EvaluateImpl(evalPts, coeffs);
+    Kokkos::View<double*, Kokkos::HostSpace> rightEvals = comp.EvaluateImpl(rightEvalPts, coeffs);
     Kokkos::View<double*, Kokkos::HostSpace> contDerivs = comp.ContinuousDerivative(evalPts, coeffs);
     Kokkos::View<double*, Kokkos::HostSpace> discDerivs = comp.DiscreteDerivative(evalPts, coeffs);
 
@@ -465,7 +465,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
 
         for(unsigned j=0; j<numTerms; ++j){
             coeffs(j) += fdStep;
-            evals2 = comp.Evaluate(evalPts, coeffs);
+            evals2 = comp.EvaluateImpl(evalPts, coeffs);
 
             for(unsigned int i=0; i<numPts; ++i) 
                 CHECK(jac(i,j) == Approx((evals2(i)-evals(i))/fdStep).epsilon(5e-4).margin(1e-4));
@@ -809,7 +809,7 @@ TEST_CASE( "Testing 1d monotone component evaluation on device", "[MonotoneCompo
 
         MonotoneComponent<decltype(expansion), Exp, AdaptiveSimpson> comp(expansion, quad);
 
-        Kokkos::View<double*,DeviceSpace> output = comp.Evaluate<DeviceSpace,Kokkos::Cuda>(devalPts, dcoeffs);
+        Kokkos::View<double*,DeviceSpace> output = comp.EvaluateImpl<DeviceSpace,Kokkos::Cuda>(devalPts, dcoeffs);
 
     //     // for(unsigned int i=0; i<numPts; ++i){
     //     //     CHECK(output(i) == Approx(1+exp(1)*std::abs(evalPts(0,i))).epsilon(testTol));

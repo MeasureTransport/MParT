@@ -47,20 +47,20 @@ public:
 
 
     /** Override the ConditionalMapBase Evaluate function. */
-    virtual void Evaluate(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
-                          Kokkos::View<double**, Kokkos::HostSpace>      & output) override
+    virtual void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
+                              Kokkos::View<double**, Kokkos::HostSpace>      & output) override
     {
         Kokkos::View<double*,Kokkos::HostSpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        Evaluate(pts, savedCoeffs, outputSlice);    
+        EvaluateImpl(pts, savedCoeffs, outputSlice);    
     }
 
-    virtual void Inverse(Kokkos::View<const double**, Kokkos::HostSpace> const& x1,
-                         Kokkos::View<const double**, Kokkos::HostSpace> const& r,
-                         Kokkos::View<double**, Kokkos::HostSpace>      & output) override
+    virtual void InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& x1,
+                             Kokkos::View<const double**, Kokkos::HostSpace> const& r,
+                             Kokkos::View<double**, Kokkos::HostSpace>      & output) override
     {   
         Kokkos::View<const double*,Kokkos::HostSpace> rSlice = Kokkos::subview(r,0,Kokkos::ALL());
         Kokkos::View<double*,Kokkos::HostSpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        Inverse(x1, rSlice, savedCoeffs, outputSlice);    
+        InverseImpl(x1, rSlice, savedCoeffs, outputSlice);    
     }
 
 
@@ -72,13 +72,13 @@ public:
      * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, class... OtherTraits>
-    Kokkos::View<double*, MemorySpace> Evaluate(Kokkos::View<ScalarType1**, OtherTraits...> const& pts, 
-                                                Kokkos::View<ScalarType2*, MemorySpace > const& coeffs)
+    Kokkos::View<double*, MemorySpace> EvaluateImpl(Kokkos::View<ScalarType1**, OtherTraits...> const& pts, 
+                                                    Kokkos::View<ScalarType2*, MemorySpace > const& coeffs)
     {   
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> output("Monotone Component Evaluations", numPts);
 
-        Evaluate<MemorySpace, ExecutionSpace>(pts, coeffs, output);
+        EvaluateImpl<MemorySpace, ExecutionSpace>(pts, coeffs, output);
         Kokkos::fence();
         
         return output;
@@ -93,9 +93,9 @@ public:
      * @param[out] output Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, class... OtherTraits>
-    void Evaluate(Kokkos::View<ScalarType1**,OtherTraits...> const& pts, 
-                  Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
-                  Kokkos::View<double*,MemorySpace>       & output)
+    void EvaluateImpl(Kokkos::View<ScalarType1**,OtherTraits...> const& pts, 
+                      Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
+                      Kokkos::View<double*,MemorySpace>       & output)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
@@ -137,15 +137,15 @@ public:
        @returns A length \f$N\f$ Kokkos::View<double*> containing \f$y_D^{(i)}\f$.
     */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, typename ScalarType3>
-    Kokkos::View<double*,MemorySpace> Inverse(Kokkos::View<ScalarType1**,MemorySpace>       const& xs, 
-                                              Kokkos::View<ScalarType2*,MemorySpace>        const& ys, 
-                                              Kokkos::View<ScalarType3*,MemorySpace>        const& coeffs,
-                                              std::map<std::string, std::string>              options=std::map<std::string,std::string>())
+    Kokkos::View<double*,MemorySpace> InverseImpl(Kokkos::View<ScalarType1**,MemorySpace>       const& xs, 
+                                                  Kokkos::View<ScalarType2*,MemorySpace>        const& ys, 
+                                                  Kokkos::View<ScalarType3*,MemorySpace>        const& coeffs,
+                                                  std::map<std::string, std::string>              options=std::map<std::string,std::string>())
     {   
         const unsigned int numPts = ys.extent(0);
         Kokkos::View<double*,MemorySpace> output("Monotone Component Inverse Evaluations", numPts);
 
-        Inverse<MemorySpace, ExecutionSpace>(xs, ys, coeffs, output, options);
+        InverseImpl<MemorySpace, ExecutionSpace>(xs, ys, coeffs, output, options);
 
         return output;
     }
@@ -166,7 +166,7 @@ public:
      @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, typename ScalarType3>
-    void Inverse(Kokkos::View<ScalarType1**,MemorySpace>       const& xs, 
+    void InverseImpl(Kokkos::View<ScalarType1**,MemorySpace>       const& xs, 
                  Kokkos::View<ScalarType2*,MemorySpace>        const& ys,
                  Kokkos::View<ScalarType3*,MemorySpace>        const& coeffs,
                  Kokkos::View<double*,MemorySpace>             & output,

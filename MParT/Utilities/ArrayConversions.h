@@ -121,14 +121,6 @@ namespace mpart{
         return Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
     }
 
-    template<typename ScalarType>
-    inline Kokkos::View<const ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace> ConstMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
-    {   
-        Kokkos::LayoutStride strides(ref.rows(), ref.innerStride(), ref.cols(), ref.outerStride());
-
-        return Kokkos::View<const ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
-    }
-
     /** @brief Converts a row major 2d Eigen::Ref of a matrix to an unmanaged Kokkos view.  
         @ingroup ArrayUtilities
         @details Creates a Kokkos unmanaged view around an existing Eigen object. 
@@ -170,6 +162,20 @@ namespace mpart{
 
         return Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
     }
+
+    template<typename ScalarType>
+    inline Kokkos::View<const ScalarType**, Kokkos::LayoutRight, Kokkos::HostSpace> ConstRowMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
+    {   
+        Kokkos::LayoutStride strides(ref.rows(), ref.innerStride(), ref.cols(), ref.outerStride());
+        return Kokkos::View<const ScalarType**, Kokkos::LayoutRight, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), ref.rows(), ref.cols());
+    }
+
+    template<typename ScalarType>
+    inline Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, Kokkos::HostSpace> ConstColMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
+    {   
+        return Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), ref.rows(), ref.cols());
+    }
+
 
     /** @brief Converts a 1d Eigen::Ref of a vector to an unmanaged Kokkos view.  
         @ingroup ArrayUtilities

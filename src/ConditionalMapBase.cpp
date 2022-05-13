@@ -6,16 +6,16 @@ using namespace mpart;
 Kokkos::View<double**, Kokkos::HostSpace> ConditionalMapBase::Evaluate(Kokkos::View<const double**, Kokkos::HostSpace> const& pts)
 {
     Kokkos::View<double**, Kokkos::HostSpace> output("Map Evaluations", outputDim, pts.extent(1));
-    Evaluate(pts, output);
+    EvaluateImpl(pts, output);
     return output;
 }
 
-Eigen::MatrixXd ConditionalMapBase::Evaluate(Eigen::MatrixXd const& pts)
+Eigen::RowMatrixXd ConditionalMapBase::Evaluate(Eigen::RowMatrixXd const& pts)
 {
-    Eigen::MatrixXd output(outputDim, pts.cols());
-    Kokkos::View<const double**, Kokkos::HostSpace> ptsView = ConstMatToKokkos<double>(pts);
+    Eigen::RowMatrixXd output(outputDim, pts.cols());
+    Kokkos::View<const double**, Kokkos::HostSpace> ptsView = ConstRowMatToKokkos<double>(pts);
     Kokkos::View<double**, Kokkos::HostSpace> outView = MatToKokkos<double>(output);
-    Evaluate(ptsView, outView);
+    EvaluateImpl(ptsView, outView);
     return output;
 }
 
@@ -30,20 +30,20 @@ Kokkos::View<double**, Kokkos::HostSpace> ConditionalMapBase::Inverse(Kokkos::Vi
     }
     
     Kokkos::View<double**, Kokkos::HostSpace> output("Map Inverse Evaluations", inputDim, r.extent(1));
-    Inverse(x1,r, output);
+    InverseImpl(x1,r, output);
     return output;
 }
 
 
-Eigen::MatrixXd ConditionalMapBase::Inverse(Eigen::MatrixXd const& x1, Eigen::MatrixXd const& r)
+Eigen::RowMatrixXd ConditionalMapBase::Inverse(Eigen::RowMatrixXd const& x1, Eigen::RowMatrixXd const& r)
 {
-    Eigen::MatrixXd output(inputDim, r.cols());
+    Eigen::RowMatrixXd output(inputDim, r.cols());
 
-    Kokkos::View<const double**, Kokkos::HostSpace> x1View = ConstMatToKokkos<double>(x1);
-    Kokkos::View<const double**, Kokkos::HostSpace> rView = ConstMatToKokkos<double>(r);
+    Kokkos::View<const double**, Kokkos::HostSpace> x1View = ConstRowMatToKokkos<double>(x1);
+    Kokkos::View<const double**, Kokkos::HostSpace> rView = ConstRowMatToKokkos<double>(r);
     Kokkos::View<double**, Kokkos::HostSpace> outView = MatToKokkos<double>(output);
 
-    Inverse(x1View, rView, outView);
+    InverseImpl(x1View, rView, outView);
     return output;
 }
         

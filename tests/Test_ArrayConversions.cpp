@@ -2,6 +2,7 @@
 
 #include "MParT/Utilities/ArrayConversions.h"
 
+#include "MParT/Utilities/EigenTypes.h"
 using namespace mpart;
 using namespace Catch;
 
@@ -150,6 +151,48 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 1D", "[EigenArrayConversions1
     }
 }
 
+
+TEST_CASE( "Testing constant Eigen to Kokkos Conversions in 2D", "[ConstEigenArrayConversions2D]" ) {
+
+    unsigned int rows = 64;
+    unsigned int cols = 32;
+
+    SECTION("Row Major"){
+        Eigen::MatrixXd x(rows,cols);
+        for(unsigned int j=0; j<cols; ++j){
+            for(unsigned int i=0; i<rows; ++i){
+                x(i,j) = i + j*rows;
+            }
+        }
+
+        Kokkos::View<const double**, Kokkos::LayoutLeft,Kokkos::HostSpace> x_view = ConstColMatToKokkos<double>(x);
+        for(unsigned int j=0; j<cols; ++j){
+            for(unsigned int i=0; i<rows; ++i){
+                CHECK(x_view(i,j)==x(i,j));   
+                CHECK(&x_view(i,j) == &x(i,j));
+            }
+        }
+    }
+
+    SECTION("Column Major"){
+        Eigen::RowMatrixXd x(rows,cols);
+        for(unsigned int j=0; j<cols; ++j){
+            for(unsigned int i=0; i<rows; ++i){
+                x(i,j) = i + j*rows;
+            }
+        }
+
+        Kokkos::View<const double**, Kokkos::LayoutRight,Kokkos::HostSpace> x_view = ConstRowMatToKokkos<double>(x);
+        for(unsigned int j=0; j<cols; ++j){
+            for(unsigned int i=0; i<rows; ++i){
+                CHECK(x_view(i,j)==x(i,j));   
+                CHECK(&x_view(i,j) == &x(i,j));
+            }
+        }
+    }
+}
+
+
 TEST_CASE( "Testing Eigen to Kokkos Conversions in 2D", "[EigenArrayConversions2D]" ) {
 
     unsigned int rows = 64;
@@ -195,7 +238,7 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 2D", "[EigenArrayConversions2
 
     SECTION("rowmajor"){
 
-        Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> x2(rows,cols);
+        Eigen::RowMatrixXd x2(rows,cols);
         for(unsigned int j=0; j<cols; ++j){
             for(unsigned int i=0; i<rows; ++i){
                 x2(i,j) = i + j*rows;
