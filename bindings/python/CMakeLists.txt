@@ -2,6 +2,7 @@
 set(PYTHON_BINDING_SOURCES
   src/Wrapper.cpp
   src/CommonPybindUtilities.cpp
+  src/MultiIndex.cpp
 )
 
 include_directories(./include)

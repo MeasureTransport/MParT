@@ -1,7 +1,7 @@
-==============================
-Recursive Adaptive Quadrature
-==============================
+====================================
+Adaptive Clenshaw Curtis Quadrature
+====================================
 
-.. doxygenclass:: mpart::RecursiveQuadrature
+.. doxygenclass:: mpart::AdaptiveClenshawCurtis
     :members:
     :undoc-members:

@@ -1,9 +1,10 @@
 #ifndef MPART_MULTIINDEXLIMITER_H_
 #define MPART_MULTIINDEXLIMITER_H_
 
-#include <functional>
-
 #include "MParT/MultiIndices/MultiIndex.h"
+
+#include <functional>
+#include <vector>
 
 namespace mpart{
 namespace MultiIndexLimiter{
@@ -18,7 +19,7 @@ namespace MultiIndexLimiter{
     public:
 
         TotalOrder(unsigned int totalOrderIn) : totalOrder(totalOrderIn){};
-    
+
         bool operator()(MultiIndex const& multi){return (multi.Sum() <= totalOrder);};
 
     private:
@@ -37,7 +38,7 @@ namespace MultiIndexLimiter{
     public:
 
         Dimension(unsigned int lowerDimIn, unsigned int lengthIn) : lowerDim(lowerDimIn), length(lengthIn){};
-       
+
         bool operator()(MultiIndex const& multi) const;
 
     private:
@@ -82,7 +83,7 @@ namespace MultiIndexLimiter{
     public:
         MaxDegree(unsigned int maxDegreeIn, unsigned int length) : MaxDegree(std::vector<unsigned int>(length, maxDegreeIn)){};
         MaxDegree(std::vector<unsigned int> const& maxDegreesIn) : maxDegrees(maxDegreesIn){};
-        
+
         bool operator()(MultiIndex const& multi) const;
 
     private:
@@ -108,7 +109,7 @@ namespace MultiIndexLimiter{
  class And{
 
   public:
-    And(std::function<bool(MultiIndex const&)> limitA, 
+    And(std::function<bool(MultiIndex const&)> limitA,
         std::function<bool(MultiIndex const&)> limitB) : a(limitA), b(limitB){};
 
     bool operator()(MultiIndex const& multi) const {return (a(multi) && b(multi));};
@@ -127,9 +128,9 @@ namespace MultiIndexLimiter{
   class Or{
 
    public:
-     Or(std::function<bool(MultiIndex const&)> limitA, 
+     Or(std::function<bool(MultiIndex const&)> limitA,
         std::function<bool(MultiIndex const&)> limitB) : a(limitA), b(limitB){};
-        
+
     bool operator()(MultiIndex const& multi) const {return (a(multi) || b(multi));};
 
   private:
@@ -147,9 +148,9 @@ namespace MultiIndexLimiter{
 
   public:
   public:
-    Xor(std::function<bool(MultiIndex const&)> limitA, 
+    Xor(std::function<bool(MultiIndex const&)> limitA,
         std::function<bool(MultiIndex const&)> limitB) : a(limitA), b(limitB){};
-        
+
     bool operator()(MultiIndex const& multi) const {return (a(multi) ^ b(multi));};
 
   private:

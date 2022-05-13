@@ -1,6 +1,8 @@
 #ifndef MPART_TENSORPRODUCTFUNCTION_H
 #define MPART_TENSORPRODUCTFUNCTION_H
 
+#include <utility>
+
 #include <Kokkos_Core.hpp>
 #include <Eigen/Core>
 
@@ -12,7 +14,7 @@ class TensorProductFunction {
 public:
 
     TensorProductFunction(FunctionType1 const& f1,
-                          FunctionType2 const& f2) : _f1(f1), 
+                          FunctionType2 const& f2) : _f1(f1),
                                                      _dim1(f1.InputSize()),
                                                      _f2(f2),
                                                      _dim2(f2.InputSize())
@@ -28,12 +30,12 @@ public:
     unsigned int InputSize() const {return _dim1 + _dim2;};
 
     template<class... KokkosProperties>
-    void FillCache1(double*                                           cache, 
-                    Kokkos::View<double*, KokkosProperties...> const& pt, 
+    void FillCache1(double*                                           cache,
+                    Kokkos::View<double*, KokkosProperties...> const& pt,
                     DerivativeFlags::DerivativeType                   derivType) const
-    {    
+    {
         auto pt2 = Kokkos::subview(pt, std::make_pair(_dim1, _dim1+_dim2));
-        
+
         _f1.FillCache1(cache, pt, derivType);
         _f1.FillCache2(cache, pt, pt(_dim1-1), derivType);
 
@@ -41,26 +43,26 @@ public:
     }
 
     template<class... KokkosProperties>
-    void FillCache2(double*                                           cache, 
-                    Kokkos::View<double*, KokkosProperties...> const& pt, 
+    void FillCache2(double*                                           cache,
+                    Kokkos::View<double*, KokkosProperties...> const& pt,
                     double                                            xd,
                     DerivativeFlags::DerivativeType                   derivType) const
     {
         auto pt2 = Kokkos::subview(pt, std::make_pair(int(_dim1), int(pt.extent(0))));
-        
+
         _f2.FillCache2(&cache[_f1.CacheSize()], pt2, xd, derivType);
     }
 
 
     template<class... KokkosProperties>
-    double Evaluate(const double* cache, 
+    double Evaluate(const double* cache,
                     Kokkos::View<double*, KokkosProperties...> const& coeffs) const
-    {   
+    {
         double f;
 
         auto coeffs1 = Kokkos::subview(coeffs, std::make_pair(int(0), int(_dim1)));
         f = _f1.Evaluate(cache, coeffs1);
-        
+
         auto coeffs2 = Kokkos::subview(coeffs, std::make_pair(_dim1, _dim1+_dim2));
         f *= _f2.Evaluate(&cache[_f1.CacheSize()], coeffs2);
 
@@ -72,7 +74,7 @@ public:
     double DiagonalDerivative(const double*                                     cache,
                               Kokkos::View<double*, KokkosProperties...> const& coeffs,
                               unsigned int                                      derivOrder) const
-    {   
+    {
         double df;
 
         auto coeffs1 = Kokkos::subview(coeffs, std::make_pair(int(0), int(_dim1)));
@@ -89,7 +91,7 @@ public:
     double CoeffDerivative(const double* cache,
                            Kokkos::View<double*, KokkosProperties...> const& coeffs,
                            Eigen::Ref<Eigen::VectorXd> grad) const
-    {  
+    {
         double f1, f2;
 
         auto coeffs1 = Kokkos::subview(coeffs, std::make_pair(int(0), int(_dim1)));
@@ -107,11 +109,11 @@ public:
     }
 
     template<class... KokkosProperties>
-    double MixedDerivative(const double* cache, 
+    double MixedDerivative(const double* cache,
                            Kokkos::View<double*, KokkosProperties...> const& coeffs,
                            unsigned int derivOrder,
                            Eigen::Ref<Eigen::VectorXd> grad) const
-    {   
+    {
         double f1, df2;
 
         auto coeffs1 = Kokkos::subview(coeffs, std::make_pair(int(0), int(_dim1)));
@@ -137,8 +139,8 @@ private:
     FunctionType2 _f2;
     unsigned int _dim2; //<- The number of inputs to f2
 
-}; // class TensorProductFunction 
+}; // class TensorProductFunction
 
-} // namespace mpart 
+} // namespace mpart
 
 #endif // #ifndef MPART_TENSORPRODUCTFUNCTION_H
