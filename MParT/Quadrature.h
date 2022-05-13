@@ -1,11 +1,11 @@
 #ifndef MPART_QUADRATURE_H
 #define MPART_QUADRATURE_H
 
-#include <Kokkos_Core.hpp>
-
 #include <math.h>
 #include <sstream>
-#include <Eigen/Core>
+#include <vector>
+
+#include <Kokkos_Core.hpp>
 
 namespace mpart{
 
@@ -21,6 +21,44 @@ namespace QuadError{
         Norm1   ///< The L1 norm (sum of bas) of the difference will be used
     };
 }
+
+
+class QuadratureBase {
+
+public:
+
+    KOKKOS_FUNCTION QuadratureBase(unsigned int maxDim, 
+                                   unsigned int workspaceSize) : fdim_(maxDim),
+                                                                 maxDim_(maxDim),
+                                                                 workspaceSize_(workspaceSize),
+                                                                 internalWorkspace_(workspaceSize),
+                                                                 workspace_(&internalWorkspace_[0])
+    {
+    }
+
+    KOKKOS_FUNCTION QuadratureBase(unsigned int maxDim, 
+                                   unsigned int workspaceSize,
+                                   double*      workspace) : fdim_(maxDim),
+                                                             maxDim_(maxDim),
+                                                             workspaceSize_(workspaceSize),
+                                                             workspace_(workspace)
+    {
+    }
+
+    KOKKOS_INLINE_FUNCTION void SetWorkspace(double* workspace){workspace_ = workspace;};
+    KOKKOS_INLINE_FUNCTION void SetDim(unsigned int fdim){assert(fdim<=maxDim_); fdim_ = fdim;}
+
+
+protected:
+
+    unsigned int fdim_; // The current length of f(x)
+    const unsigned int maxDim_; // The maximum length of f(x) allowed by the cache size
+    const unsigned int workspaceSize_; // The total number of doubles that could be used by this quadrature method to store function evaluations during a call to "integrate"
+
+    std::vector<double> internalWorkspace_;
+    double* workspace_;
+};
+
 
 /**
 
@@ -39,72 +77,81 @@ std::tie(wts, pts) = ClenshawCurtisQuadrature::GetRule(order);
 class ClenshawCurtisQuadrature {
 public: 
 
-    ClenshawCurtisQuadrature(unsigned int order) : _order(order)
+    /**
+     * @brief Construct a new Clenshaw Curtis Quadrature object given the number of points and maximum integrand dimension
+     * 
+     * @param numPts The number of points in the CC rule.
+     * @param maxDim The maximum dimension of the integrand.  Used to help set up workspace.
+     */
+    KOKKOS_FUNCTION ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim) : QuadratureBase(maxDim,maxDim), numPts_(numPts)
     {
-        if(order<=0){
-            std::stringstream msg;
-            msg << "In MParT::RecursiveQuadrature: Quadrature order must be at least one, but given a value of \"" << order << "\".";
-            throw std::runtime_error(msg.str());
-        }
-
+        GetRule(numPts, &workspace_[0], &workspace_[numPts]);
     };
 
-    static std::pair<Eigen::VectorXd, Eigen::VectorXd> GetRule(unsigned int order)
+    /**
+     * @brief Construct a new Clenshaw Curtis Quadrature object with a predefined workspace.
+     * 
+     * @param numPts The number of points in the CC rule.
+     * @param maxDim The maximum dimension of the integrand.  Used to help set up workspace.
+     * @param workspace A pointer to memory that is allocated as a workspace.  Must have space for at least 2*numPts+maxDim components.
+     */
+
+    KOKKOS_FUNCTION ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace) : QuadratureBase(maxDim,2*numPts, workspace), numPts_(numPts)
     {
-        Eigen::VectorXd wts, pts;
-        ClenshawCurtisQuadrature::GetRule(order, wts, pts);
-        return std::make_pair(wts,pts);
-    }
+        GetRule(numPts, &workspace_[0], &workspace_[numPts]);
+    };
 
     /**
      @brief Returns the weights and points in a Clenshaw-Curtis rule.
      @param[in] order The order of the Clenshaw-Curtis rule.
      @returns A pair containing (wts,pts)
      */
-    KOKKOS_FUNCTION static void GetRule(unsigned int order, Eigen::VectorXd &wts, Eigen::VectorXd &pts)
-    {
-        wts.resize(order);
-        pts.resize(order);
-        
+    KOKKOS_FUNCTION static void GetRule(unsigned int numPts, double* wts, double* pts)
+    {   
+        if(numPts==0){
+            return;
+        }
+
         // return results for order == 1
-        if (order == 1) {
-            pts(1) = 0.0;
-            wts(1) = 2.0;
+        if(numPts == 1) {
+            pts[0] = 0.0;
+            wts[0] = 2.0;
             return;
         }
 
         // define quadrature points
         for (unsigned int i=0; i<order; ++i) {
-            pts(i) = std::cos( ( order - (i+1) ) * M_PI / ( order - 1 ) );
+            pts[i] = std::cos( ( numPts - (i+1) ) * M_PI / ( numPts - 1 ) );
         }
-        pts(0) = -1.0;
-        if ( order % 2 == 1) {
-            pts((order-1)/2) = 0.0;
+        pts[0] = -1.0;
+        if ( numPts % 2 == 1) {
+            pts[(numPts-1)/2] = 0.0;
         }
-        pts(order-1) = 1.0;
+        pts[numPts-1] = 1.0;
 
         // compute quadrature weights 
-        wts.setOnes();
-        for (unsigned int i=0; i<order; ++i) {            
-            double theta;
-            theta = i * M_PI / ( order - 1 );
-            for (unsigned int j=0; j<(order-1)/2; ++j){
+        double theta;        
+        for (unsigned int i=0; i<numPts; ++i) {  
+            wts[i] = 1.0;
+
+            theta = i * M_PI / ( numPts - 1 );
+            for (unsigned int j=0; j<(numPts-1)/2; ++j){
                 double b;
-                if ( 2 * (j+1) == ( order - 1 ) ) {
+                if ( 2 * (j+1) == ( numPts - 1 ) ) {
                     b = 1.0;
                 } else {
                     b = 2.0;
                 }
-                wts(i) = wts(i) - b * std::cos ( 2.0 * (j+1) * theta ) / ( 4 * (j+1) * (j+1) - 1 );
+                wts[i] = wts[i] - b * std::cos ( 2.0 * (j+1) * theta ) / ( 4 * (j+1) * (j+1) - 1 );
             }
         }
 
         // adjust boundary weights
-        wts(0) = wts(0) / ( order - 1.0 );
-        for (unsigned int i=1; i<(order-1); ++i){
-            wts(i) = 2.0 * wts(i) / ( order - 1.0 );
+        wts[0] = wts[0] / ( numPts - 1.0 );
+        for (unsigned int i=1; i<(numPts-1); ++i){
+            wts(i) = 2.0 * wts[i] / ( numPts - 1.0 );
         }
-        wts(order-1) = wts(order-1) / ( order - 1.0 );
+        wts[numPts-1] = wts[numPts-1] / ( numPts - 1.0 );
     }
     
     /**
@@ -116,117 +163,116 @@ public:
      @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
-    template<typename OutputType, class FunctionType>
-    KOKKOS_FUNCTION OutputType Integrate(FunctionType const& f, 
-                                         double              lb, 
-                                         double              ub) const
+    template<class FunctionType>
+    KOKKOS_FUNCTION void Integrate(FunctionType const& f, 
+                                   double              lb, 
+                                   double              ub,
+                                   double*             res)
     {   
-        if(ub<lb+1e-14){
-            return 0.0*f(lb);
+        if((ub-lb)<15.0*std::numeric_limits<double>::epsilon()){
+
+            f(0.5*(ub+lb), res);
+            for(unsigned int i=0; i<fdim_; ++i)
+                res[i] *= (ub-lb);
+                
+            return;
         }
 
-        // Compute CC rule
-        Eigen::VectorXd wts,pts;
-        ClenshawCurtisQuadrature::GetRule(_order, wts, pts);
+        // // Rescale inputs to domain [L,U]
+        // pts = 0.5*(ub+lb)*Eigen::VectorXd::Ones(_order) + 0.5*(ub-lb)*pts;
 
-        // Rescale inputs to domain [L,U]
-        pts = 0.5*(ub+lb)*Eigen::VectorXd::Ones(_order) + 0.5*(ub-lb)*pts;
-
-        // Rescale weights
-        wts = 0.5*(ub-lb)*wts;
+        // // Rescale weights
+        // wts = 0.5*(ub-lb)*wts;
 
         // Create an output variable
-        OutputType output = wts[0]*f(pts[0]);
+        double* fval = &workspace_[2*numPts_];
         
         // Evaluate integral and store results in output
-        for (unsigned int i=1; i<pts.size(); ++i)
-            output += wts[i] * f(pts[i]);
+        for (unsigned int i=0; i<pts.size(); ++i){
+            f(0.5*(ub+lb + (ub-lb)*pts[i]), fval);
+            for(unsigned int j=0; j<fdim_; ++j)
+                res[j] += 0.5*(ub-lb)*wts[i] * f[j];
+        }
 
         return output;
     }
 
 private:
-    unsigned int _order;
+    const unsigned int numPts_;
 
 }; // class ClenshawCurtisQuadrature
 
 
-class RecursiveQuadratureBase
+class RecursiveQuadratureBase : public QuadratureBase
 {
 
 public:
     
-    RecursiveQuadratureBase(unsigned int maxSub, 
-                            double absTol, 
-                            double relTol,
-                            QuadError::Type errorMetric) :  _maxSub(maxSub), 
-                                                            _absTol(absTol),
-                                                            _relTol(relTol),
-                                                            //_status(0),
-                                                            //_maxLevel(0),
-                                                            _errorMetric(errorMetric) 
-    {
-        if(absTol<=0){
-            std::stringstream msg;
-            msg << "In MParT::RecursiveQuadrature: Absolute error tolerance must be strictly positive, but given a value of \"" << absTol << "\".";
-            throw std::runtime_error(msg.str());
-        }
-        if(relTol<=0){
-            std::stringstream msg;
-            msg << "In MParT::RecursiveQuadrature: Relative error tolerance must be strictly positive, but given a value of \"" << relTol << "\".";
-            throw std::runtime_error(msg.str());
-        }
-        if(maxSub==0){
-            std::stringstream msg;
-            msg << "In MParT::RecursiveQuadrature: Maximum subintervals allowed must be greater than 0, but given a value of \"" << maxSub << "\".";
-            throw std::runtime_error(msg.str());
-        }
-    };
+    KOKKOS_FUNCTION RecursiveQuadratureBase(unsigned int maxSub, 
+                                            unsigned int maxDim,
+                                            unsigned int ptsPerSub, 
+                                            double absTol, 
+                                            double relTol,
+                                            QuadError::Type errorMetric) :  QuadratureBase(maxDim, maxSub*ptsPerSub*maxDim),
+                                                                            _maxSub(maxSub), 
+                                                                            _absTol(absTol),
+                                                                            _relTol(relTol),
+                                                                            _errorMetric(errorMetric)
+    {}
 
-    /**
-     * @brief Returns a convergence flag for the last call to "Integrate"
-       
-       @return The convergence flag.  Positive if successful.  Negative if not.  Zero if Integrate hasn't been called yet.
-     */
-    // int Status() const{return _status;};
-
-    /**
-     * @brief Returns the deepest level rea
-     * 
-     * @return int 
-     */
-    //int MaxLevel() const {return _maxLevel;};
+    KOKKOS_FUNCTION RecursiveQuadratureBase(unsigned int maxSub, 
+                                            unsigned int maxDim,
+                                            unsigned int ptsPerSub,
+                                            double*      workspace, 
+                                            double       absTol, 
+                                            double       relTol,
+                                            QuadError::Type errorMetric) :  QuadratureBase(maxDim, maxSub*ptsPerSub*maxDim, workspace),
+                                                                            _maxSub(maxSub), 
+                                                                            _absTol(absTol),
+                                                                            _relTol(relTol),
+                                                                            _errorMetric(errorMetric)
+    {}
 
 
 protected:
-    template<typename IntegralValueType>
-    KOKKOS_INLINE_FUNCTION void EstimateError(IntegralValueType const& coarseVal,
-                                              IntegralValueType const& fineVal,
-                                              double                 & error,
-                                              double                 & tol) const
-    {
-        error = std::abs(fineVal - coarseVal);
-        tol = std::fmax( _relTol*std::abs(coarseVal), _absTol);
-    }
 
-    KOKKOS_FUNCTION void EstimateError(Eigen::VectorXd const& coarseVal,
-                                              Eigen::VectorXd const& fineVal,
-                                              double               & error,
-                                              double               & tol) const
+    KOKKOS_FUNCTION void EstimateError(const double* coarseVal,
+                                       const double* fineVal,
+                                       double      & error,
+                                       double      & tol) const
     {   
         double relRefVal;
         if(_errorMetric==QuadError::First){   
-            error = std::abs(fineVal(0)-coarseVal(0));
-            relRefVal = std::abs(coarseVal(0));
+            error = fabs(fineVal[0]-coarseVal[0]);
+            relRefVal = fabs(coarseVal[0]);
         }else if(_errorMetric==QuadError::NormInf){
-            error = (fineVal-coarseVal).array().abs().maxCoeff(); 
-            relRefVal = coarseVal.array().abs().maxCoeff();
+            error = 0;
+            relRefVal = 0;
+            for(unsigned int i=0; i<fdim_; ++i){
+                error = fmax(error, fabs(fineVal[i]-coarseVal[i]));
+                relRefVal = fmax(relRefVal, fabs(coarseVal[i]));
+            }
+
         }else if(_errorMetric==QuadError::Norm2){
-            error = (fineVal-coarseVal).norm();
-            relRefVal = coarseVal.norm();
+            
+            error = 0;
+            relRefVal = 0;
+            for(unsigned int i=0; i<fdim_; ++i){
+                error += (fineVal[i]-coarseVal[i])*(fineVal[i]-coarseVal[i]);
+                relRefVal += coarseVal[i]*coarseVal[i];
+            }
+            error = sqrt(error);
+            relRefVal = sqrt(relRefVal);
+
         }else if(_errorMetric==QuadError::Norm1){
-            error = (fineVal-coarseVal).array().abs().sum(); //std::abs(fineVal(0)-coarseVal(0));
-            relRefVal = coarseVal.array().abs().sum();
+
+            error = 0;
+            relRefVal = 0;
+            for(unsigned int i=0; i<fdim_; ++i){
+                error += fabs(fineVal[i]-coarseVal[i]);
+                relRefVal += fabs(coarseVal[i]);
+            }
+
         }
         tol = std::fmax( _relTol*relRefVal, _absTol);
     }
@@ -249,12 +295,24 @@ protected:
 class AdaptiveSimpson : public RecursiveQuadratureBase {
 public:
 
-    AdaptiveSimpson(unsigned int maxSub, 
-                    double absTol, 
-                    double relTol,
-                    QuadError::Type errorMetric) : RecursiveQuadratureBase(maxSub, absTol, relTol, errorMetric){};
+    KOKKOS_FUNCTION AdaptiveSimpson(unsigned int maxSub,
+                                    unsigned int fdim, 
+                                    double absTol, 
+                                    double relTol,
+                                    QuadError::Type errorMetric) : RecursiveQuadratureBase(maxSub, fdim, 4, absTol, relTol, errorMetric){};
 
-        /**
+     KOKKOS_FUNCTION AdaptiveSimpson(unsigned int maxSub,
+                                    unsigned int fdim, 
+                                    double* workspace,
+                                    double absTol, 
+                                    double relTol,
+                                    QuadError::Type errorMetric) : RecursiveQuadratureBase(maxSub, fdim, 4, workspace, absTol, relTol, errorMetric){};
+
+
+    /** Returns the maximum number of doubles required by this quadrature rule.  Used to preallocate memory. */
+    KOKKOS_INLINE_FUNCTION static unsigned int WorkspaceRequirement(unsigned int fdim, unsigned int maxSub){return 4*maxSub*fdim;}
+
+    /**
      @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$
      @details
      @param[in] f The integrand.  Can return any type that overloads multiplication with a double and the += operator.  doubles and Eigen::VectorXd are examples.
@@ -263,45 +321,52 @@ public:
      @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
      */
-    template<typename OutputType, class FunctionType>
-    KOKKOS_FUNCTION OutputType Integrate(FunctionType const& f, 
-                   double              lb, 
-                   double              ub) const
+    template<class FunctionType>
+    KOKKOS_FUNCTION void Integrate(FunctionType const& f, 
+                                   double              lb, 
+                                   double              ub,
+                                   double*             res)
     { 
-        auto flb = f(lb);
-        auto fub = f(ub);
+        auto flb = &workspace_[0];
+        auto fub = &workspace_[fdim_];
+        auto fmb = &workspace_[2*fdim_];
+        auto intCoarse = &workspace_[3*fdim_];
+
+        f(lb, flb);
+        f(ub, fub);
 
         double midPt = 0.5*(lb+ub);
-        auto fmb = f(midPt);
+        f(midPt, fmb);
         
-        OutputType intCoarse = ((ub-lb)/6.0) * (flb + 4.0*fmb + fub);
-        
-        OutputType integral = intCoarse;
+        // Compute ((ub-lb)/6.0) * (flb + 4.0*fmb + fub);
+        for(unsigned int i=0; i<fdim_; ++i) 
+            intCoarse[i] = ((ub-lb)/6.0) * (flb[i] + 4.0*fmb[i] + fub[i]);
+
         int status = 1; 
         unsigned int maxLevel = 0;
-        RecursiveIntegrate<OutputType>(f, lb, midPt, ub, flb, fmb, fub, 0, intCoarse, integral, status, maxLevel);
-
-        return integral;
+        RecursiveIntegrate(f, lb, midPt, ub, flb, fmb, fub, 0, intCoarse, res, status, maxLevel);
     }
 
 private:
 
-    template<typename OutputType,class ScalarFuncType>
+    template<class ScalarFuncType>
     KOKKOS_FUNCTION void RecursiveIntegrate(ScalarFuncType const& f, 
-                            double leftPt,
-                            double midPt,
-                            double rightPt,
-                            decltype(f(0.0)) leftFunc, 
-                            decltype(f(0.0)) midFunc,
-                            decltype(f(0.0)) rightFunc,
-                            int    level,
-                            decltype(f(0.0)) intCoarse,
-                            OutputType &integral, 
-                            int       &status, 
-                            unsigned int &levelOut) const
+                            double          leftPt,
+                            double          midPt,
+                            double          rightPt,
+                            const double*   leftFunc, 
+                            const double*   midFunc,
+                            const double*   rightFunc,
+                            int             level,
+                            const double*   intCoarse,
+                            double*         integral, 
+                            int           & status, 
+                            unsigned int  & levelOut)
     {
-        if((rightPt-leftPt)<1e-14){
-            integral = (rightPt-leftPt)*midFunc;
+        if((rightPt-leftPt)<15.0*std::numeric_limits<double>::epsilon()){
+
+            for(unsigned int i=0; i<fdim_; ++i)
+                integral[i] = (rightPt-leftPt)*midFunc[i];
             status = -1;
             levelOut = level;
             return;
@@ -310,47 +375,55 @@ private:
         // update current refinement level
         level += 1;
         
-        // evluate integral on each sub-interval
+        // evaluate integral on each sub-interval
+        double* leftMidFunc = &workspace_[(4*level) * fdim_];
+        double* rightMidFunc = &workspace_[(4*level+1) * fdim_];
+        double* intFinerLeft = &workspace_[(4*level+2) * fdim_];
+        double* intFinerRight = &workspace_[(4*level+3) * fdim_];
+
         double leftMidPt = 0.5*(leftPt+midPt);
-        auto leftMidFunc = f(leftMidPt);
+        f(leftMidPt, leftMidFunc);
 
         double rightMidPt = 0.5*(midPt+rightPt);
-        auto rightMidFunc = f(rightMidPt);
+        f(rightMidPt, rightMidFunc);
 
-        auto intFinerLeft  = ((midPt-leftPt)/6.0) * (leftFunc + 4.0*leftMidFunc + midFunc);
-        auto intFinerRight = ((rightPt-midPt)/6.0) * (midFunc + 4.0*rightMidFunc + rightFunc);
-
-        // compute total integral
-        auto intFiner = intFinerLeft + intFinerRight;
+        for(unsigned int i=0; i<fdim_; ++i){
+            intFinerLeft[i]  = ((midPt-leftPt)/6.0) * (leftFunc[i] + 4.0*leftMidFunc[i] + midFunc[i]);
+            intFinerRight[i] = ((rightPt-midPt)/6.0) * (midFunc[i] + 4.0*rightMidFunc[i] + rightFunc[i]);
+            integral[i] = intFinerLeft[i] + intFinerRight[i];
+        }
 
         // Compute error and tolerance
         double intErr, tol;
-        EstimateError(intCoarse, intFiner, intErr, tol);
+        EstimateError(intCoarse, integral, intErr, tol);
 
         // Stop the recursion if the level hit maximum depth
         if ( (intErr > tol) && (level == _maxSub) ) {
-            integral = intFiner;
             status = -1;
             levelOut = level;
             return;
         }
         // If the error between levels is smaller than Tol, return the finer level result
         else if ( intErr <= tol ) {
-            integral = intFiner;
             status = 1;
             levelOut = level;
             return;
         }
         // Else subdivide further
         else {
-            OutputType intLeft, intRight;
+            //OutputType intLeft, intRight;
             int statusLeft, statusRight;
             unsigned int levelLeft, levelRight;
 
-            RecursiveIntegrate<OutputType>(f, leftPt, leftMidPt, midPt, leftFunc, leftMidFunc, midFunc, level, intFinerLeft, intLeft, statusLeft, levelLeft);
-            RecursiveIntegrate<OutputType>(f, midPt, rightMidPt, rightPt, midFunc, rightMidFunc, rightFunc, level, intFinerRight, intRight, statusRight, levelRight);
-            
-            integral = intLeft + intRight;
+            RecursiveIntegrate(f, leftPt, leftMidPt, midPt, leftFunc, leftMidFunc, midFunc, level, intFinerLeft, integral, statusLeft, levelLeft);
+
+            // At this point, we no longer need intFinerLeft, so use that memory to store the new fine value of the right integral
+            RecursiveIntegrate(f, midPt, rightMidPt, rightPt, midFunc, rightMidFunc, rightFunc, level, intFinerRight, intFinerLeft, statusRight, levelRight);
+
+            // Add the left and right integrals
+            for(unsigned int i=0; i<fdim_; ++i)
+                integral[i] += intFinerLeft[i];
+
             status = int( ((statusLeft<0)||(statusLeft<0))?-1:1 );
             levelOut =  fmax(levelLeft, levelRight);
             return; 
@@ -360,114 +433,114 @@ private:
 }; // Class AdaptiveSimpsonMixin
 
 
-/**
- @brief Adaptive quadrature based on applying a Clenshaw-Curtis recursively on subintervals.
- */
-class AdaptiveClenshawCurtis : public RecursiveQuadratureBase{
-public:
+// /**
+//  @brief Adaptive quadrature based on applying a Clenshaw-Curtis recursively on subintervals.
+//  */
+// class AdaptiveClenshawCurtis : public RecursiveQuadratureBase{
+// public:
 
-    /**
-       @brief Construct a new adaptive quadrature class with specified stopping criteria.
-       @param maxSub The maximum number of subintervals allowed.
-       @param[in] absTol An absolute error tolerance used to stop the adaptive integration.
-       @param[in] relTol A relative error tolerance used to stop te adaptive integration.
-       @param[in] errorMetric A flag specifying the type of error metric to use.
-       @param[in] order Number of points to use per subinterval.
-     */
-    AdaptiveClenshawCurtis(unsigned int maxSub, 
-                    double              absTol, 
-                    double              relTol,
-                    QuadError::Type     errorMetric,
-                    unsigned int        order) : RecursiveQuadratureBase(maxSub, absTol, relTol, errorMetric),
-                                                 _order(order), 
-                                                 _quad(order){};
+//     /**
+//        @brief Construct a new adaptive quadrature class with specified stopping criteria.
+//        @param maxSub The maximum number of subintervals allowed.
+//        @param[in] absTol An absolute error tolerance used to stop the adaptive integration.
+//        @param[in] relTol A relative error tolerance used to stop te adaptive integration.
+//        @param[in] errorMetric A flag specifying the type of error metric to use.
+//        @param[in] order Number of points to use per subinterval.
+//      */
+//     AdaptiveClenshawCurtis(unsigned int maxSub, 
+//                     double              absTol, 
+//                     double              relTol,
+//                     QuadError::Type     errorMetric,
+//                     unsigned int        order) : RecursiveQuadratureBase(maxSub, absTol, relTol, errorMetric),
+//                                                  _order(order), 
+//                                                  _quad(order){};
 
-    /**
-     @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$
-     @details
-     @param[in] f The integrand.  Can return any type that overloads multiplication with a double and the += operator.  doubles and Eigen::VectorXd are examples.
-     @param[in] lb The lower bound \f$x_L\f$ in the integration.
-     @param[in] lb The upper bound \f$x_U\f$ in the integration.
-     @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
-     @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
-     */
-    template<typename OutputType, class FunctionType>
-    KOKKOS_FUNCTION OutputType Integrate(FunctionType const& f, 
-                   double              lb, 
-                   double              ub) const
-    {   
-        auto intCoarse = _quad.Integrate<OutputType>(f, lb, ub);
-        OutputType integral;
-        int status;
-        unsigned int maxLevel;
-        RecursiveIntegrate<OutputType>(f, lb, ub, 0, intCoarse, integral, status, maxLevel);
-        return integral;
-    }
+//     /**
+//      @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$
+//      @details
+//      @param[in] f The integrand.  Can return any type that overloads multiplication with a double and the += operator.  doubles and Eigen::VectorXd are examples.
+//      @param[in] lb The lower bound \f$x_L\f$ in the integration.
+//      @param[in] lb The upper bound \f$x_U\f$ in the integration.
+//      @returns An approximation of \f$\int_{x_L}^{x_U} f(x) dx\f$.  The return type will be the same as the type returned by the integrand function.
+//      @tparam FunctionType The type of the integrand.  Must have an operator()(double x) function.
+//      */
+//     template<typename OutputType, class FunctionType>
+//     KOKKOS_FUNCTION OutputType Integrate(FunctionType const& f, 
+//                    double              lb, 
+//                    double              ub) const
+//     {   
+//         auto intCoarse = _quad.Integrate<OutputType>(f, lb, ub);
+//         OutputType integral;
+//         int status;
+//         unsigned int maxLevel;
+//         RecursiveIntegrate<OutputType>(f, lb, ub, 0, intCoarse, integral, status, maxLevel);
+//         return integral;
+//     }
 
-private:
+// private:
 
-    template<typename OutputType, class FunctionType>
-    KOKKOS_FUNCTION void RecursiveIntegrate(FunctionType const& f, 
-                            double lb, 
-                            double ub, 
-                            int level, 
-                            OutputType intCoarse,
-                            OutputType &integral, 
-                            int       &status, 
-                            unsigned int &levelOut) const
-    {
+//     template<typename OutputType, class FunctionType>
+//     KOKKOS_FUNCTION void RecursiveIntegrate(FunctionType const& f, 
+//                             double lb, 
+//                             double ub, 
+//                             int level, 
+//                             OutputType intCoarse,
+//                             OutputType &integral, 
+//                             int       &status, 
+//                             unsigned int &levelOut) const
+//     {
 
-        // update current refinement level
-        level += 1;
+//         // update current refinement level
+//         level += 1;
 
-        // evluate integral on each sub-interval
-        double mb = lb+0.5*(ub-lb);
-        auto intFinerLeft  = _quad.Integrate<OutputType>(f, lb, mb);
-        auto intFinerRight = _quad.Integrate<OutputType>(f, mb, ub);
+//         // evluate integral on each sub-interval
+//         double mb = lb+0.5*(ub-lb);
+//         auto intFinerLeft  = _quad.Integrate<OutputType>(f, lb, mb);
+//         auto intFinerRight = _quad.Integrate<OutputType>(f, mb, ub);
 
-        // compute total integral
-        decltype(intCoarse) intFiner = intFinerLeft + intFinerRight;
+//         // compute total integral
+//         decltype(intCoarse) intFiner = intFinerLeft + intFinerRight;
 
-        // Compute error and tolerance
-        double intErr, tol;
-        EstimateError(intCoarse, intFiner, intErr, tol);
+//         // Compute error and tolerance
+//         double intErr, tol;
+//         EstimateError(intCoarse, intFiner, intErr, tol);
         
-        // Stop the recursion if the level hit maximum depth
-        if ( (intErr > tol) && (level == _maxSub) ) {
-            integral = intFiner;
-            status = -1;
-            levelOut = level;
-            return;
-        }
-        // If the error between levels is smaller than Tol, return the finer level result
-        else if ( intErr <= tol ) {
-            integral = intFiner;
-            status = 1;
-            levelOut = level;
-            return;
-        }
-        // Else subdivide further
-        else {
-            OutputType intLeft, intRight;
-            int statusLeft, statusRight;
-            unsigned int levelLeft, levelRight;
-            RecursiveIntegrate<OutputType>(f, lb, mb, level, intFinerLeft, intLeft, statusLeft, levelLeft);
-            RecursiveIntegrate<OutputType>(f, mb, ub, level, intFinerRight, intRight, statusRight, levelRight);
+//         // Stop the recursion if the level hit maximum depth
+//         if ( (intErr > tol) && (level == _maxSub) ) {
+//             integral = intFiner;
+//             status = -1;
+//             levelOut = level;
+//             return;
+//         }
+//         // If the error between levels is smaller than Tol, return the finer level result
+//         else if ( intErr <= tol ) {
+//             integral = intFiner;
+//             status = 1;
+//             levelOut = level;
+//             return;
+//         }
+//         // Else subdivide further
+//         else {
+//             OutputType intLeft, intRight;
+//             int statusLeft, statusRight;
+//             unsigned int levelLeft, levelRight;
+//             RecursiveIntegrate<OutputType>(f, lb, mb, level, intFinerLeft, intLeft, statusLeft, levelLeft);
+//             RecursiveIntegrate<OutputType>(f, mb, ub, level, intFinerRight, intRight, statusRight, levelRight);
             
-            integral = intLeft + intRight;
-            status = int( ((statusLeft<0)||(statusLeft<0))?-1:1 );
-            levelOut = std::max(levelLeft, levelRight);
-            return;
-        }
+//             integral = intLeft + intRight;
+//             status = int( ((statusLeft<0)||(statusLeft<0))?-1:1 );
+//             levelOut = std::max(levelLeft, levelRight);
+//             return;
+//         }
 
-    }
+//     }
 
-private:
+// private:
 
-    const unsigned int _order;
-    ClenshawCurtisQuadrature _quad;
+//     const unsigned int _order;
+//     ClenshawCurtisQuadrature _quad;
 
-}; // class AdaptiveClenshawCurtis
+// }; // class AdaptiveClenshawCurtis
 
 
 } // namespace mpart
