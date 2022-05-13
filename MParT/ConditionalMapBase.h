@@ -3,6 +3,8 @@
 
 #include <Kokkos_Core.hpp>
 
+#include <Eigen/Core>
+
 namespace mpart {
 
     /**
@@ -37,26 +39,36 @@ namespace mpart {
         */
         virtual Kokkos::View<double*, Kokkos::HostSpace>& Coeffs(){return this->savedCoeffs;};
 
+        /** Returns an eigen map wrapping around the coefficient vector, which is stored in a Kokkos::View.  Updating the 
+            components of this map should also update the view. 
+        */
+        virtual Eigen::Map<Eigen::VectorXd> CoeffMap();
+
         /** Const version of the Coeffs() function. */
         virtual Kokkos::View<const double*, Kokkos::HostSpace> Coeffs() const{return this->savedCoeffs;};
 
+        /** Returns a constant eigen map wrapping around the constant coefficient vector. */
+        //virtual Eigen::Map<const Eigen::VectorXd> CoeffMap() const;
 
-        virtual Kokkos::View<double**, Kokkos::HostSpace> Evaluate(Kokkos::View<double**, Kokkos::HostSpace> const& pts);
 
+        virtual Kokkos::View<double**, Kokkos::HostSpace> Evaluate(Kokkos::View<const double**, Kokkos::HostSpace> const& pts);
 
-        virtual void Evaluate(Kokkos::View<double**, Kokkos::HostSpace> const& pts,
+        virtual Eigen::MatrixXd Evaluate(Eigen::MatrixXd const& pts);
+
+        virtual void Evaluate(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
                               Kokkos::View<double**, Kokkos::HostSpace>      & output) = 0;
-
 
 
         /** Returns the value of \f$x_2\f$ given \f$x_1\f$ and \f$r\f$.   Note that the \f$x1\f$ view may contain more 
             than \f$N\f$ rows, but only the first \f$N\f$ will be used in this function. 
         */
-        virtual Kokkos::View<double**, Kokkos::HostSpace> Inverse(Kokkos::View<double**, Kokkos::HostSpace> const& x1, 
-                                                                  Kokkos::View<double**, Kokkos::HostSpace> const& r);
+        virtual Kokkos::View<double**, Kokkos::HostSpace> Inverse(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
+                                                                  Kokkos::View<const double**, Kokkos::HostSpace> const& r);
 
-        virtual void Inverse(Kokkos::View<double**, Kokkos::HostSpace> const& x1, 
-                             Kokkos::View<double**, Kokkos::HostSpace> const& r,
+        virtual Eigen::MatrixXd Inverse(Eigen::MatrixXd const& x1, Eigen::MatrixXd const& r);
+
+        virtual void Inverse(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
+                             Kokkos::View<const double**, Kokkos::HostSpace> const& r,
                              Kokkos::View<double**, Kokkos::HostSpace>      & output) = 0;
 
 

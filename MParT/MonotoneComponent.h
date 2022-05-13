@@ -47,18 +47,18 @@ public:
 
 
     /** Override the ConditionalMapBase Evaluate function. */
-    virtual void Evaluate(Kokkos::View<double**, Kokkos::HostSpace> const& pts,
+    virtual void Evaluate(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
                           Kokkos::View<double**, Kokkos::HostSpace>      & output) override
     {
         Kokkos::View<double*,Kokkos::HostSpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
         Evaluate(pts, savedCoeffs, outputSlice);    
     }
 
-    virtual void Inverse(Kokkos::View<double**, Kokkos::HostSpace> const& x1,
-                         Kokkos::View<double**, Kokkos::HostSpace> const& r,
+    virtual void Inverse(Kokkos::View<const double**, Kokkos::HostSpace> const& x1,
+                         Kokkos::View<const double**, Kokkos::HostSpace> const& r,
                          Kokkos::View<double**, Kokkos::HostSpace>      & output) override
     {   
-        Kokkos::View<double*,Kokkos::HostSpace> rSlice = Kokkos::subview(r,0,Kokkos::ALL());
+        Kokkos::View<const double*,Kokkos::HostSpace> rSlice = Kokkos::subview(r,0,Kokkos::ALL());
         Kokkos::View<double*,Kokkos::HostSpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
         Inverse(x1, rSlice, savedCoeffs, outputSlice);    
     }
@@ -71,9 +71,9 @@ public:
      * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
      * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, class... OtherTraits>
-    Kokkos::View<double*, MemorySpace> Evaluate(Kokkos::View<double**, OtherTraits...> const& pts, 
-                                                Kokkos::View<double*, MemorySpace > const& coeffs)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, class... OtherTraits>
+    Kokkos::View<double*, MemorySpace> Evaluate(Kokkos::View<ScalarType1**, OtherTraits...> const& pts, 
+                                                Kokkos::View<ScalarType2*, MemorySpace > const& coeffs)
     {   
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> output("Monotone Component Evaluations", numPts);
@@ -92,9 +92,9 @@ public:
      * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
      * @param[out] output Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, class... OtherTraits>
-    void Evaluate(Kokkos::View<double**,OtherTraits...> const& pts, 
-                  Kokkos::View<double*,MemorySpace>  const& coeffs,
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, class... OtherTraits>
+    void Evaluate(Kokkos::View<ScalarType1**,OtherTraits...> const& pts, 
+                  Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                   Kokkos::View<double*,MemorySpace>       & output)
     {
         const unsigned int numPts = pts.extent(1);
@@ -136,10 +136,10 @@ public:
        @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
        @returns A length \f$N\f$ Kokkos::View<double*> containing \f$y_D^{(i)}\f$.
     */
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    Kokkos::View<double*,MemorySpace> Inverse(Kokkos::View<double**,MemorySpace>       const& xs, 
-                                              Kokkos::View<double*,MemorySpace>        const& ys, 
-                                              Kokkos::View<double*,MemorySpace>        const& coeffs,
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, typename ScalarType3>
+    Kokkos::View<double*,MemorySpace> Inverse(Kokkos::View<ScalarType1**,MemorySpace>       const& xs, 
+                                              Kokkos::View<ScalarType2*,MemorySpace>        const& ys, 
+                                              Kokkos::View<ScalarType3*,MemorySpace>        const& coeffs,
                                               std::map<std::string, std::string>              options=std::map<std::string,std::string>())
     {   
         const unsigned int numPts = ys.extent(0);
@@ -165,10 +165,10 @@ public:
      @param output An array for storing the computed values of \f$y_D^{(i)}\f$.  Memory for this array must be preallocated before calling this function.
      @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
      */
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void Inverse(Kokkos::View<double**,MemorySpace>       const& xs, 
-                 Kokkos::View<double*,MemorySpace>        const& ys,
-                 Kokkos::View<double*,MemorySpace>        const& coeffs,
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, typename ScalarType3>
+    void Inverse(Kokkos::View<ScalarType1**,MemorySpace>       const& xs, 
+                 Kokkos::View<ScalarType2*,MemorySpace>        const& ys,
+                 Kokkos::View<ScalarType3*,MemorySpace>        const& coeffs,
                  Kokkos::View<double*,MemorySpace>             & output,
                  std::map<std::string, std::string>              options=std::map<std::string,std::string>())
     {   
@@ -273,9 +273,9 @@ public:
 
         @see DiscreteDerivative
      */
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
-                                                            Kokkos::View<double*,MemorySpace>  const& coeffs)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
+    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+                                                            Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs)
     {   
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> derivs("Monotone Component Derivatives", numPts);
@@ -295,9 +295,9 @@ public:
 
         @see DiscreteDerivative
      */
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void ContinuousDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
-                              Kokkos::View<double*,MemorySpace>  const& coeffs,
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
+    void ContinuousDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+                              Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                               Kokkos::View<double*,MemorySpace>       & derivs)
     {   
         const unsigned int numPts = pts.extent(1);
@@ -345,9 +345,9 @@ public:
 
         @see ContinuousDerivative
     */
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
-                                                           Kokkos::View<double*,MemorySpace>  const& coeffs)
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
+    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+                                                           Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs)
     {   
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> evals("Component Evaluations", numPts);
@@ -369,9 +369,9 @@ public:
 
         @see ContinuousDerivative
      */
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void  DiscreteDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
-                             Kokkos::View<double*,MemorySpace>  const& coeffs,
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
+    void  DiscreteDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+                             Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                              Kokkos::View<double*,MemorySpace>       & evals, 
                              Kokkos::View<double*,MemorySpace>       & derivs)
     {   
@@ -433,9 +433,9 @@ public:
         
         @see CoeffGradient
     */
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void CoeffJacobian(Kokkos::View<double**,MemorySpace> const& pts, 
-                       Kokkos::View<double*,MemorySpace>  const& coeffs,
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
+    void CoeffJacobian(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+                       Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                        Kokkos::View<double*,MemorySpace>       & evaluations,
                        Kokkos::View<double**,MemorySpace>      & jacobian)
     {
@@ -487,9 +487,9 @@ public:
         });
     }
 
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void ContinuousMixedJacobian(Kokkos::View<double**,MemorySpace> const& pts, 
-                                 Kokkos::View<double*,MemorySpace>  const& coeffs,
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
+    void ContinuousMixedJacobian(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+                                 Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                                  Kokkos::View<double**,MemorySpace>      & jacobian)
     {   
         const unsigned int numPts = pts.extent(1);
@@ -532,9 +532,9 @@ public:
         });
     }
 
-    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void DiscreteMixedJacobian(Kokkos::View<double**,MemorySpace> const& pts, 
-                               Kokkos::View<double*,MemorySpace>  const& coeffs,
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
+    void DiscreteMixedJacobian(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+                               Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                                Kokkos::View<double**,MemorySpace>      & jacobian)
     {   
         const unsigned int numPts = pts.extent(1);

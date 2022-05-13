@@ -14,12 +14,12 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
         
         virtual ~MyIdentityMap() = default;
 
-        virtual void Evaluate(Kokkos::View<double**, Kokkos::HostSpace> const& pts, 
-                              Kokkos::View<double**, Kokkos::HostSpace>      &output) override{output = pts;};
+        virtual void Evaluate(Kokkos::View<const double**, Kokkos::HostSpace> const& pts, 
+                              Kokkos::View<double**, Kokkos::HostSpace>      &output) override{Kokkos::deep_copy(output,pts);};
         
-        virtual void Inverse(Kokkos::View<double**, Kokkos::HostSpace> const& x1, 
-                             Kokkos::View<double**, Kokkos::HostSpace> const& r,
-                             Kokkos::View<double**, Kokkos::HostSpace>      & output) override{output = r;};
+        virtual void Inverse(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
+                             Kokkos::View<const double**, Kokkos::HostSpace> const& r,
+                             Kokkos::View<double**, Kokkos::HostSpace>      & output) override{Kokkos::deep_copy(output,r);};
     };
 
 
@@ -27,36 +27,55 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
     CHECK(map.inputDim == 4);
     CHECK(map.outputDim == 4);
 
-    unsigned int numCoeffs = 10;
-    Kokkos::View<double*, Kokkos::HostSpace> coeffs("New Coeffs", numCoeffs);
-    for(unsigned int i=0; i<numCoeffs; ++i)
-        coeffs(i) = i;
+    SECTION("Using Kokkos"){
     
-    map.Coeffs() = coeffs;
-    CHECK(map.Coeffs().extent(0) == numCoeffs);
+        unsigned int numCoeffs = 10;
+        Kokkos::View<double*, Kokkos::HostSpace> coeffs("New Coeffs", numCoeffs);
+        for(unsigned int i=0; i<numCoeffs; ++i)
+            coeffs(i) = i;
+        
+        map.Coeffs() = coeffs;
+        CHECK(map.Coeffs().extent(0) == numCoeffs);
 
-    for(unsigned int i=0; i<numCoeffs; ++i)
-        CHECK(map.Coeffs()(i) == coeffs(i));
+        for(unsigned int i=0; i<numCoeffs; ++i)
+            CHECK(map.Coeffs()(i) == coeffs(i));
 
-    coeffs(0) = 100;
-    for(unsigned int i=0; i<numCoeffs; ++i)
-        CHECK(map.Coeffs()(i) == coeffs(i));
+        coeffs(0) = 100;
+        for(unsigned int i=0; i<numCoeffs; ++i)
+            CHECK(map.Coeffs()(i) == coeffs(i));
 
 
-    // Now check using a slice of the coefficients
-    unsigned int start = 2;
-    unsigned int end = 4;
-    auto coeffSlice = Kokkos::subview(coeffs, std::make_pair(start, end));
+        // Now check using a slice of the coefficients
+        unsigned int start = 2;
+        unsigned int end = 4;
+        auto coeffSlice = Kokkos::subview(coeffs, std::make_pair(start, end));
 
-    map.Coeffs() = coeffSlice;
-    CHECK(coeffs.extent(0) == numCoeffs);
-    CHECK(map.Coeffs().extent(0)==(end-start));
+        map.Coeffs() = coeffSlice;
+        CHECK(coeffs.extent(0) == numCoeffs);
+        CHECK(map.Coeffs().extent(0)==(end-start));
 
-    for(unsigned int i=0; i<end-start; ++i)
-        CHECK(map.Coeffs()(i)==coeffs(i+start));
+        for(unsigned int i=0; i<end-start; ++i)
+            CHECK(map.Coeffs()(i)==coeffs(i+start));
 
-    coeffs(start) = 1024;
-    for(unsigned int i=0; i<end-start; ++i)
-        CHECK(map.Coeffs()(i)==coeffs(i+start));
+        coeffs(start) = 1024;
+        for(unsigned int i=0; i<end-start; ++i)
+            CHECK(map.Coeffs()(i)==coeffs(i+start));
+
+    }
+
+    SECTION("Using Eigen"){
+
+        unsigned int numCoeffs = 10;
+        Eigen::VectorXd coeffs(numCoeffs);
+        for(unsigned int i=0; i<numCoeffs; ++i)
+            coeffs(i) = i;
+        
+        Kokkos::resize(map.Coeffs(), numCoeffs);
+        map.CoeffMap() = coeffs;
+        CHECK(map.Coeffs().extent(0) == numCoeffs);
+
+        for(unsigned int i=0; i<numCoeffs; ++i)
+            CHECK(map.Coeffs()(i) == coeffs(i));            
+    }
 
 }
