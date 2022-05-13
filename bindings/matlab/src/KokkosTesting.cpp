@@ -43,7 +43,7 @@ MEX_DEFINE(delete) (int nlhs, mxArray* plhs[],
 
 MEX_DEFINE(Evaluate1d) (int nlhs, mxArray* plhs[],
                         int nrhs, const mxArray* prhs[]) {
-  InputArguments input(nrhs, prhs, 1);
+  InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
   const TestExp& expObj = Session<TestExp>::getConst(input.get(0));
 
