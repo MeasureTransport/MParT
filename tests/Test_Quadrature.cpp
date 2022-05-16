@@ -16,6 +16,38 @@ public:
 
 }; // class TestIntegrand
 
+TEST_CASE("Testing Nested CC Quadrature", "[NestedClenshawCurtis]") {
+
+    unsigned int nestedLevel = 3;
+    unsigned int coarseNum = std::pow(2,nestedLevel) + 1;
+    unsigned int fineNum = std::pow(2,nestedLevel+1) + 1;
+    
+    Kokkos::View<double*,Kokkos::HostSpace> wts1("Coarse Wts", coarseNum);
+    Kokkos::View<double*,Kokkos::HostSpace> pts1("Coarse Pts", coarseNum);
+    ClenshawCurtisQuadrature<Kokkos::HostSpace>::GetRule(coarseNum, wts1.data(), pts1.data());
+
+    Kokkos::View<double*,Kokkos::HostSpace> wts2("Coarse Wts", fineNum);
+    Kokkos::View<double*,Kokkos::HostSpace> pts2("Coarse Pts", fineNum);
+    ClenshawCurtisQuadrature<Kokkos::HostSpace>::GetRule(fineNum, wts2.data(), pts2.data());
+
+    std::cout << "Coarse Rule:\n";
+    for(unsigned int i=0; i<coarseNum; ++i)
+        std::cout << "  " << pts1(i);
+    std::cout << std::endl;
+
+    std::cout << "Fine Rule:\n";
+    for(unsigned int i=0; i<fineNum; ++i)
+        std::cout << "  " << pts2(i);
+    std::cout << std::endl;
+
+    std::cout << "Coarse rule on [-1,0]:\n";
+    for(unsigned int i=0; i<coarseNum; ++i)
+        std::cout << "  " << 0.5*pts1(i)-0.5;
+    std::cout << std::endl;
+
+}
+
+
 TEST_CASE( "Testing CC Quadrature", "[ClenshawCurtisQuadrature]" ) {
 
     // Set parameters for adaptive quadrature algorithm
@@ -24,7 +56,7 @@ TEST_CASE( "Testing CC Quadrature", "[ClenshawCurtisQuadrature]" ) {
     // Set tolerance for tests
     double testTol = 1e-8;
 
-    ClenshawCurtisQuadrature quad(order);
+    ClenshawCurtisQuadrature quad(order,2);
 
     SECTION("Class Integrand")
     {   
@@ -32,7 +64,9 @@ TEST_CASE( "Testing CC Quadrature", "[ClenshawCurtisQuadrature]" ) {
         double ub = 1.0;
 
         TestIntegrand integrand;
-        double integral = quad.Integrate<double>(integrand, lb, ub);
+        double integral;
+        quad.SetDim(1);
+        quad.Integrate(integrand, lb, ub, &integral);
 
         CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
     }
@@ -42,8 +76,10 @@ TEST_CASE( "Testing CC Quadrature", "[ClenshawCurtisQuadrature]" ) {
         double lb = 0;
         double ub = 1.0;
 
-        auto integrand = [](double x){return exp(x);};
-        double integral = quad.Integrate<double>(integrand, lb, ub);    
+        auto integrand = [](double x, double* f){f[0]=exp(x);};
+        double integral;
+        quad.SetDim(1);
+        quad.Integrate(integrand, lb, ub, &integral);    
 
         CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
     }
@@ -53,94 +89,134 @@ TEST_CASE( "Testing CC Quadrature", "[ClenshawCurtisQuadrature]" ) {
         double lb = 0.0;
         double ub = 1.0;
 
-        auto integrand = [](double x)->Eigen::VectorXd {return exp(x)*Eigen::VectorXd::Ones(2).eval();};
+        auto integrand = [](double x, double* f){f[0] = exp(x); f[1]=2.0*exp(x);};
 
-        auto integral = quad.Integrate<Eigen::VectorXd>(integrand, lb, ub);    
+        double integral[2];
+        quad.SetDim(2);
+        quad.Integrate(integrand, lb, ub, integral);    
 
-        REQUIRE(integral.size()==2);
-        CHECK( integral(0) == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
-        CHECK( integral(1) == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+        CHECK( integral[0] == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+        CHECK( integral[1] == Approx(2.0*(exp(ub)-exp(lb))).epsilon(testTol) );
+    }
+
+        SECTION("Vector-Valued with External Workspace")
+    {   
+        ClenshawCurtisQuadrature quad2(order,2);
+        
+        std::vector<double> workspace(quad2.WorkspaceSize());
+        quad2.SetWorkspace(&workspace[0]);
+        
+        double lb = 0.0;
+        double ub = 1.0;
+
+        auto integrand = [](double x, double* f){f[0]=exp(x); f[1]=exp(x);};
+
+        double integral[2];
+        quad2.Integrate(integrand, lb, ub, integral);    
+
+        CHECK( integral[0] == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+        CHECK( integral[1] == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
     }
 
 }
 
 
-// TEST_CASE( "Testing Recursive Quadrature", "[RecursiveQuadrature]" ) {
+TEST_CASE( "Testing Adaptive Clenshaw-Curtis Quadrature", "[AdaptiveClenshawCurtis]" ) {
 
-//     // Set parameters for adaptive quadrature algorithm
-//     unsigned int maxSub = 10;
-//     double relTol = 1e-7;
-//     double absTol = 1e-7;
-//     unsigned int order = 8;
+    // Set parameters for adaptive quadrature algorithm
+    unsigned int maxSub = 10;
+    unsigned int maxDim = 2;
 
-//     // Set tolerance for tests
-//     double testTol = 1e-4;
+    double relTol = 1e-7;
+    double absTol = 1e-7;
 
-//     AdaptiveClenshawCurtis quad(maxSub, absTol, relTol,QuadError::First, order);
+    // Set tolerance for tests
+    double testTol = 1e-4;
 
-//     SECTION("Class Integrand")
-//     {   
-//         double lb = 0;
-//         double ub = 1.0;
+    AdaptiveClenshawCurtis quad(2, maxSub, maxDim, absTol, relTol, QuadError::First);
+    quad.SetDim(1); // The maximum dimension of f is 2, but the first few examples only have a dimension of 1
 
-//         TestIntegrand integrand;
-//         double integral = quad.Integrate<double>(integrand, lb, ub);
+    SECTION("Class Integrand")
+    {   
+        double lb = 0;
+        double ub = 1.0;
 
-//         CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
-//         //CHECK( quad.Status()>0 );
-//         //CHECK( quad.MaxLevel()<maxSub );
-//     }
+        TestIntegrand integrand;
+        double integral;
+        quad.Integrate(integrand, lb, ub, &integral);
 
-//     SECTION("Lambda Integrand")
-//     {   
-//         double lb = 0;
-//         double ub = 1.0;
+        CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+    }
 
-//         auto integrand = [](double x){return exp(x);};
-//         double integral = quad.Integrate<double>(integrand, lb, ub);    
+    SECTION("Lambda Integrand")
+    {   
+        double lb = 0;
+        double ub = 1.0;
 
-//         CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
-//         //CHECK( quad.Status()>0 );
-//         //CHECK( quad.MaxLevel()<maxSub );
-//     }
+        auto integrand = [](double x, double* f){f[0]=exp(x);};
+        double integral;
+        quad.Integrate(integrand, lb, ub, &integral);    
+
+        CHECK( integral == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+    }
 
 
-//     SECTION("Discontinuous Integrand")
-//     {   
-//         double lb = 0;
-//         double ub = 1.0;
-//         unsigned int numEvals = 0;
+    SECTION("Discontinuous Integrand")
+    {   
+        double lb = 0;
+        double ub = 1.0;
 
-//         auto integrand = [&](double x){
-//             numEvals++;
-//             if(x<0.5)
-//                 return exp(x);
-//             else 
-//                 return 1.0+exp(x);
-//         };
-//         double integral = quad.Integrate<double>(integrand, lb, ub);    
+        unsigned int numEvals = 0;
 
-//         double trueVal = (ub-0.5) + exp(ub)-exp(lb);
-//         CHECK( integral == Approx(trueVal).epsilon(testTol) );
-//         //CHECK( quad.Status()>0 );
-//         //CHECK( quad.MaxLevel()<=maxSub );
-//         CHECK( numEvals<400);
-//     }
-    
-//     SECTION("Vector-Valued Integrand")
-//     {
-//         double lb = 0.0;
-//         double ub = 1.0;
+        auto integrand = [&](double x, double* f){
+            numEvals++;
+            if(x<0.5)
+                f[0]=exp(x);
+            else 
+                f[0]=1.0+exp(x);
+        };
+        double integral;
+        quad.Integrate(integrand, lb, ub, &integral);    
 
-//         auto integrand = [](double x)->Eigen::VectorXd {return exp(x)*Eigen::VectorXd::Ones(2).eval();};
+        double trueVal = (ub-0.5) + exp(ub)-exp(lb);
+        CHECK( integral == Approx(trueVal).epsilon(testTol) );
+        CHECK( numEvals<150);
+    }
 
-//         auto integral = quad.Integrate<Eigen::VectorXd>(integrand, lb, ub);    
+    SECTION("Vector-Valued Integrand")
+    {
+        double lb = 0.0;
+        double ub = 1.0;
+        quad.SetDim(2);
 
-//         REQUIRE(integral.size()==2);
-//         CHECK( integral(0) == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
-//         CHECK( integral(1) == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
-//     }
-// }
+        auto integrand = [](double x, double* f){f[0]=exp(x); f[1]=exp(x);};
+
+        double integral[2];
+        quad.Integrate(integrand, lb, ub, integral);    
+
+        CHECK( integral[0] == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+        CHECK( integral[1] == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+    }
+
+    SECTION("Vector-Valued with External Workspace")
+    {   
+        AdaptiveClenshawCurtis quad2(2, maxSub, maxDim, nullptr, absTol, relTol, QuadError::First);
+        
+        std::vector<double> workspace(quad2.WorkspaceSize());
+        quad2.SetWorkspace(&workspace[0]);
+
+        double lb = 0.0;
+        double ub = 1.0;
+
+        auto integrand = [](double x, double* f){f[0]=exp(x); f[1]=exp(x);};
+
+        double integral[2];
+        quad2.Integrate(integrand, lb, ub, integral);    
+
+        CHECK( integral[0] == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+        CHECK( integral[1] == Approx(exp(ub)-exp(lb)).epsilon(testTol) );
+    }
+}
 
 
 
@@ -223,8 +299,10 @@ TEST_CASE( "Testing Adaptive Simpson Integration", "[AdaptiveSimpson]" ) {
 
     SECTION("Vector-Valued with External Workspace")
     {   
-        std::vector<double> workspace(AdaptiveSimpson::WorkspaceRequirement(maxDim, maxSub));
-        AdaptiveSimpson quad2(maxSub, maxDim, &workspace[0], absTol, relTol, QuadError::First);
+        AdaptiveSimpson quad2(maxSub, maxDim, nullptr, absTol, relTol, QuadError::First);
+        
+        std::vector<double> workspace(quad2.WorkspaceSize());
+        quad2.SetWorkspace(&workspace[0]);
 
         double lb = 0.0;
         double ub = 1.0;
