@@ -329,106 +329,150 @@ public:
     {   
         assert(this->workspace_);
 
-        auto flb = &this->workspace_[0];
-        auto fub = &this->workspace_[this->fdim_];
-        auto fmb = &this->workspace_[2*this->fdim_];
-        auto intCoarse = &this->workspace_[3*this->fdim_];
+        for(unsigned int i=0; i<this->fdim_; ++i){
+            res[i] = 0;
+        }
 
-        f(lb, flb);
-        f(ub, fub);
+        unsigned int currLevel = 0;
+
+        unsigned int currSegment = 0;
+        bool done = false;
+        bool success = false;
+
 
         double midPt = 0.5*(lb+ub);
-        f(midPt, fmb);
-        
-        // Compute ((ub-lb)/6.0) * (flb + 4.0*fmb + fub);
-        for(unsigned int i=0; i<this->fdim_; ++i) 
-            intCoarse[i] = ((ub-lb)/6.0) * (flb[i] + 4.0*fmb[i] + fub[i]);
 
-        int status = 1; 
-        unsigned int maxLevel = 0;
-        RecursiveIntegrate(f, lb, midPt, ub, flb, fmb, fub, 0, intCoarse, res, status, maxLevel);
+        double* leftFunc = &this->workspace_[0];
+        f(lb, leftFunc);
+
+        double* rightFunc = &this->workspace_[this->fdim_];
+        f(ub, rightFunc);
+
+        double* midFunc = &this->workspace_[2*this->fdim_];
+        f(midPt, midFunc);
+
+        double* intCoarse = &this->workspace_[3*this->fdim_];
+        double* intFine = &this->workspace_[4*this->fdim_];
+
+        double* leftPt  = &this->workspace_[5*this->fdim_];
+        *leftPt = lb;
+        double* rightPt  = &this->workspace_[5*this->fdim_+1];
+        *rightPt = ub;
+
+        double leftMidPt;
+        double* leftMidFunc;
+
+        double rightMidPt;
+        double* rightMidFunc;        
+
+        unsigned int workStartInd =  5*this->fdim_;
+        unsigned int prevStartInd = 0;
+
+        double error, errorTol;
+
+        while(true){
+            
+            leftPt = &this->workspace_[workStartInd];
+            rightPt = &this->workspace_[workStartInd+1];
+            
+            // std::cout << "Level " << currLevel << "   " << std::bitset<sizeof(currSegment)*8>(currSegment) << std::endl;
+            // std::cout << "    log(f): " << std::log(leftFunc[0]) << ",  " << std::log(midFunc[0]) << ", " << std::log(rightFunc[0]) << std::endl;
+            // std::cout << "    lb/ub:  " << *leftPt << ",  " << *rightPt << std::endl;
+
+            // Compute the subinterval mid points
+            midPt = 0.5*((*leftPt) + (*rightPt));
+            leftMidPt = 0.5*((*leftPt)+midPt);
+            rightMidPt = 0.5*(midPt+(*rightPt));
+
+            // Evaluate the integrand at the subinterval mid points
+            leftMidFunc = &this->workspace_[workStartInd + 2];
+            f(leftMidPt, leftMidFunc);
+
+            rightMidFunc = &this->workspace_[workStartInd + 2 + this->fdim_];
+            f(rightMidPt, rightMidFunc);
+
+            // Compute the coarse and fine integrals
+            for(unsigned int i=0; i<this->fdim_; ++i){
+                intCoarse[i] = (((*rightPt)-(*leftPt))/6.0) * (leftFunc[i] + 4.0*midFunc[i] + rightFunc[i]);
+                intFine[i]  = ((midPt-(*leftPt))/6.0) * (leftFunc[i] + 4.0*leftMidFunc[i] + midFunc[i]);
+                intFine[i] += (((*rightPt)-midPt)/6.0) * (midFunc[i] + 4.0*rightMidFunc[i] + rightFunc[i]);
+            }
+
+            // Check to see if the error is small enough or if we've hit the maximum number of subdivisions
+            this->EstimateError(intCoarse, intFine, error, errorTol);
+
+            // Checking for convergence
+            //success = (currLevel==this->maxSub_-1);
+            if((error<errorTol)||(currLevel==this->maxSub_-1)){
+                
+                for(unsigned int i=0; i<this->fdim_; ++i){
+                    res[i] += intFine[i];
+                }
+
+                // Find the lowest previous level where we are working on the "left" branch of the tree.
+                while(((currSegment >> currLevel) & 1U)&&(currLevel>0)){
+                    currSegment &= ~(1UL << currLevel); // Set the side on this level to the left
+                    currLevel--;
+                }
+
+                // If we're back at level 0, then we're done
+                if(currLevel==0){
+                    break;
+                }
+                
+                // Specify that we're now working on the right side
+                currSegment |= 1UL << currLevel;
+                
+                // Set the left and right endpoints of this level based on the previous level 
+                workStartInd = (2*currLevel + 5)*this->fdim_ + 2*currLevel;
+
+                if(currLevel>0){
+                    prevStartInd = (2*(currLevel-1) + 5)*this->fdim_ + 2*(currLevel-1);
+                    this->workspace_[workStartInd] = 0.5*(this->workspace_[prevStartInd] + this->workspace_[prevStartInd+1]); // Set the left point at the next level
+                    this->workspace_[workStartInd+1] = this->workspace_[prevStartInd+1];
+                }else{
+                    this->workspace_[workStartInd] = 0.5*(lb+ub);
+                    this->workspace_[workStartInd+1] = ub;
+                }
+                
+                UpdateValues(currLevel, currSegment, leftFunc, midFunc, rightFunc);
+
+                
+            // If not successful, move on to the left segment at the next level
+            }else{
+                
+                currLevel++;
+
+                rightFunc = midFunc;
+                midFunc = leftMidFunc;
+                
+                workStartInd = (2*currLevel + 5)*this->fdim_ + 2*currLevel;
+                this->workspace_[workStartInd] = *leftPt; // Set the left point at the next level
+                this->workspace_[workStartInd+1] = midPt; // Set the right point at the next level
+            }
+
+
+        }
+
     }
 
 private:
 
-    template<class ScalarFuncType>
-    KOKKOS_FUNCTION void RecursiveIntegrate(ScalarFuncType const& f, 
-                            double          leftPt,
-                            double          midPt,
-                            double          rightPt,
-                            const double*   leftFunc, 
-                            const double*   midFunc,
-                            const double*   rightFunc,
-                            int             level,
-                            const double*   intCoarse,
-                            double*         integral, 
-                            int           & status, 
-                            unsigned int  & levelOut)
+    void UpdateValues(unsigned int currLevel, unsigned int currSegment, double* &leftVal, double* &midVal, double* &rightVal)
     {
-        if((rightPt-leftPt)<15.0*std::numeric_limits<double>::epsilon()){
+        leftVal = &this->workspace_[0];
+        midVal = &this->workspace_[2*this->fdim_];
+        rightVal = &this->workspace_[this->fdim_];
 
-            for(unsigned int i=0; i<this->fdim_; ++i)
-                integral[i] = (rightPt-leftPt)*midFunc[i];
-            status = -1;
-            levelOut = level;
-            return;
-        }
-
-        // update current refinement level
-        level += 1;
-        
-        // evaluate integral on each sub-interval
-        double* leftMidFunc = &this->workspace_[(4*level) * this->fdim_];
-        double* rightMidFunc = &this->workspace_[(4*level+1) * this->fdim_];
-        double* intFinerLeft = &this->workspace_[(4*level+2) * this->fdim_];
-        double* intFinerRight = &this->workspace_[(4*level+3) * this->fdim_];
-
-        double leftMidPt = 0.5*(leftPt+midPt);
-        f(leftMidPt, leftMidFunc);
-
-        double rightMidPt = 0.5*(midPt+rightPt);
-        f(rightMidPt, rightMidFunc);
-
-        for(unsigned int i=0; i<this->fdim_; ++i){
-            intFinerLeft[i]  = ((midPt-leftPt)/6.0) * (leftFunc[i] + 4.0*leftMidFunc[i] + midFunc[i]);
-            intFinerRight[i] = ((rightPt-midPt)/6.0) * (midFunc[i] + 4.0*rightMidFunc[i] + rightFunc[i]);
-            integral[i] = intFinerLeft[i] + intFinerRight[i];
-        }
-
-        // Compute error and tolerance
-        double intErr, tol;
-        this->EstimateError(intCoarse, integral, intErr, tol);
-
-        // Stop the recursion if the level hit maximum depth
-        if ( (intErr > tol) && (level == this->maxSub_) ) {
-            status = -1;
-            levelOut = level;
-            return;
-        }
-        // If the error between levels is smaller than Tol, return the finer level result
-        else if ( intErr <= tol ) {
-            status = 1;
-            levelOut = level;
-            return;
-        }
-        // Else subdivide further
-        else {
-            //OutputType intLeft, intRight;
-            int statusLeft, statusRight;
-            unsigned int levelLeft, levelRight;
-
-            RecursiveIntegrate(f, leftPt, leftMidPt, midPt, leftFunc, leftMidFunc, midFunc, level, intFinerLeft, integral, statusLeft, levelLeft);
-
-            // At this point, we no longer need intFinerLeft, so use that memory to store the new fine value of the right integral
-            RecursiveIntegrate(f, midPt, rightMidPt, rightPt, midFunc, rightMidFunc, rightFunc, level, intFinerRight, intFinerLeft, statusRight, levelRight);
-
-            // Add the left and right integrals
-            for(unsigned int i=0; i<this->fdim_; ++i)
-                integral[i] += intFinerLeft[i];
-
-            status = int( ((statusLeft<0)||(statusLeft<0))?-1:1 );
-            levelOut =  fmax(levelLeft, levelRight);
-            return; 
+        for(unsigned int level=0; level<currLevel; ++level){
+            // If we branch to the right, the left value will be the mid point on the coarse level
+            if( (currSegment >> (level+1)) & 1U ){
+                leftVal = midVal;
+                midVal = &this->workspace_[(2*level+5+1) * this->fdim_ + 2*level+2];
+            }else{
+                rightVal = midVal;
+                midVal = &this->workspace_[(2*level+5) * this->fdim_ + 2*level+2];
+            }
         }
     }
 

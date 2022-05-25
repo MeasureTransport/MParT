@@ -226,8 +226,8 @@ TEST_CASE( "Testing Adaptive Simpson Integration", "[AdaptiveSimpson]" ) {
     unsigned int maxSub = 30;
     unsigned int maxDim = 2;
 
-    double relTol = 1e-7;
-    double absTol = 1e-7;
+    double relTol = 1e-8;
+    double absTol = 1e-8;
 
     // Set tolerance for tests
     double testTol = 1e-4;
