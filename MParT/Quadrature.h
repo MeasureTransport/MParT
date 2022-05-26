@@ -189,7 +189,7 @@ public:
 
         for(unsigned int j=0; j<this->fdim_; ++j)
             res[j] = 0.0;
-            
+
         // Create an output variable
         double* fval = this->workspace_;
         
@@ -485,7 +485,7 @@ private:
  @brief Adaptive quadrature based on applying a Clenshaw-Curtis recursively on subintervals.
  @details The points in a Clenshaw-Curtis quadrature rule with \f$2^{L}+1\f$ points are a subset of the points in a rule with \f$2^{L+1}+1\f$ points.
           This "nesting" allows us to approximate the integral at two different levels with minimal additional integrand evaluations.  Comparing the
-          integral at these values gives an indication of the error in the integral approximation.  If the error is unacceptable large, we can subdivide
+          integral at these values gives an indication of the error in the integral approximation.  If the error is unacceptably large, we can subdivide
           the integration domain and apply Clenshaw-Curtis rules on each subinterval.   This class implements a recursive version of this process.  Two nested
           Clenshaw-Curtis rules are used to estimate the integral, and its error.  If the error is too large, then the integration domain is split into 
           two equal halves, where the nested quadrature rules can again be applied.  This recursive subdivision repeats until an acceptable error level
