@@ -20,6 +20,31 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     CHECK(maxDegrees(1)==maxOrder);
 }
 
+TEST_CASE( "Testing the FixedMultiIndexSet class with anisotropic degrees", "[AnisotropicFixedMultiIndexSet]" ) {
+
+    const unsigned int dim = 2;
+    const unsigned int maxOrder = 5;
+
+    // Set multiindices to [0,1], [5,2], [4,3]
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> degrees("Degrees", 3*dim);
+    degrees(0) = 0;
+    degrees(1) = 1;
+    degrees(2) = 5;
+    degrees(3) = 2;
+    degrees(4) = 4;
+    degrees(5) = 3;
+
+    FixedMultiIndexSet mset(dim,degrees);
+
+    CHECK( mset.Size()==3);
+
+    Kokkos::View<const unsigned int*, Kokkos::HostSpace> maxDegrees = mset.MaxDegrees();
+    REQUIRE(maxDegrees.extent(0)==2);
+    CHECK(maxDegrees(0)==5);
+    CHECK(maxDegrees(1)==3);
+}
+
+
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
 
 TEST_CASE( "Testing the FixedMultiIndexSet class copy to device", "[FixedMultiIndexSet]" ) {

@@ -9,18 +9,29 @@ using namespace mpart;
 namespace mpart{
     
     template<typename MemorySpace>
-    struct TermSetter {
+    struct StartSetter {
 
-        TermSetter(Kokkos::View<unsigned int*, MemorySpace> nzStarts, 
-                   Kokkos::View<unsigned int*, MemorySpace> nzDims,
-                   unsigned int dim) : _nzStarts(nzStarts), _nzDims(nzDims), _dim(dim){};
+        StartSetter(Kokkos::View<unsigned int*, MemorySpace> nzStarts,
+                   unsigned int dim) : _nzStarts(nzStarts), _dim(dim){};
         
         KOKKOS_INLINE_FUNCTION void operator()(const size_t i) const{
             this->_nzStarts(i) = i*_dim;
-            this->_nzDims(i) = i%_dim;
         };
 
         Kokkos::View<unsigned int*, MemorySpace> _nzStarts;
+        const unsigned int _dim;
+    };
+
+    template<typename MemorySpace>
+    struct DimSetter {
+
+        DimSetter(Kokkos::View<unsigned int*, MemorySpace> nzDims,
+                  unsigned int dim) : _nzDims(nzDims), _dim(dim){};
+        
+        KOKKOS_INLINE_FUNCTION void operator()(const size_t i) const{
+            this->_nzDims(i) = i%_dim;
+        };
+
         Kokkos::View<unsigned int*, MemorySpace> _nzDims;
         const unsigned int _dim;
     };
@@ -64,7 +75,8 @@ template<typename MemorySpace>
 FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int                dim,
                                        Kokkos::View<unsigned int*, MemorySpace> nzOrders) : dim(dim),
                                                                                             isCompressed(false),
-                                                                                            nzOrders(nzOrders)
+                                                                                            nzOrders(nzOrders),
+                                                                                            nzDims("Nonzero dims", nzOrders.extent(0))
 {
     SetupTerms();
     CalculateMaxDegrees();
@@ -77,7 +89,8 @@ void FixedMultiIndexSet<MemorySpace>::SetupTerms()
     unsigned int numTerms = nzOrders.extent(0) / dim;
 
     nzStarts = Kokkos::View<unsigned int*, MemorySpace>("Start of a Multiindex", numTerms+1);
-    Kokkos::parallel_for(numTerms, TermSetter<MemorySpace>(nzStarts,nzDims,dim));
+    Kokkos::parallel_for(numTerms, StartSetter<MemorySpace>(nzStarts,dim));
+    Kokkos::parallel_for(dim*numTerms, DimSetter<MemorySpace>(nzDims,dim));
 }
 template<>
 void FixedMultiIndexSet<Kokkos::HostSpace>::SetupTerms()
@@ -86,9 +99,16 @@ void FixedMultiIndexSet<Kokkos::HostSpace>::SetupTerms()
     unsigned int numTerms = nzOrders.extent(0) / dim;
 
     nzStarts = Kokkos::View<unsigned int*, Kokkos::HostSpace>("Start of a Multiindex", numTerms+1);
-    TermSetter<Kokkos::HostSpace> functor(nzStarts,nzDims,dim);
+    {
+    StartSetter<Kokkos::HostSpace> functor(nzStarts,dim);
     for(unsigned int i=0; i<numTerms; ++i)
         functor(i);
+    }
+    {
+    DimSetter<Kokkos::HostSpace> functor(nzDims,dim);
+    for(unsigned int i=0; i<dim*numTerms; ++i)
+        functor(i);
+    }
 }
 
 
