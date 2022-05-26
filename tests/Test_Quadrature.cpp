@@ -30,21 +30,10 @@ TEST_CASE("Testing Nested CC Quadrature", "[NestedClenshawCurtis]") {
     Kokkos::View<double*,Kokkos::HostSpace> pts2("Coarse Pts", fineNum);
     ClenshawCurtisQuadrature<Kokkos::HostSpace>::GetRule(fineNum, wts2.data(), pts2.data());
 
-    std::cout << "Coarse Rule:\n";
-    for(unsigned int i=0; i<coarseNum; ++i)
-        std::cout << "  " << pts1(i);
-    std::cout << std::endl;
 
-    std::cout << "Fine Rule:\n";
-    for(unsigned int i=0; i<fineNum; ++i)
-        std::cout << "  " << pts2(i);
-    std::cout << std::endl;
-
-    std::cout << "Coarse rule on [-1,0]:\n";
-    for(unsigned int i=0; i<coarseNum; ++i)
-        std::cout << "  " << 0.5*pts1(i)-0.5;
-    std::cout << std::endl;
-
+    for(unsigned int i=0; i<coarseNum; ++i){
+        CHECK(pts1(i) == pts2(2*i));
+    }
 }
 
 
@@ -99,7 +88,7 @@ TEST_CASE( "Testing CC Quadrature", "[ClenshawCurtisQuadrature]" ) {
         CHECK( integral[1] == Approx(2.0*(exp(ub)-exp(lb))).epsilon(testTol) );
     }
 
-        SECTION("Vector-Valued with External Workspace")
+    SECTION("Vector-Valued with External Workspace")
     {   
         ClenshawCurtisQuadrature quad2(order,2);
         
@@ -270,9 +259,9 @@ TEST_CASE( "Testing Adaptive Simpson Integration", "[AdaptiveSimpson]" ) {
         auto integrand = [&](double x, double* f){
             numEvals++;
             if(x<0.5)
-                f[0]= 1.0;//exp(x);
+                f[0]= exp(x);
             else 
-                f[0]=2.0;//+exp(x);
+                f[0]=1.0+exp(x);
         };
         double integral;
         quad.Integrate(integrand, lb, ub, &integral);    

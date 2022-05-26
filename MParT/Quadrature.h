@@ -187,6 +187,9 @@ public:
             return;
         }
 
+        for(unsigned int j=0; j<this->fdim_; ++j)
+            res[j] = 0.0;
+            
         // Create an output variable
         double* fval = this->workspace_;
         
