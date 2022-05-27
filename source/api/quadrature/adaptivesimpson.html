@@ -21,8 +21,8 @@
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -35,7 +35,7 @@
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Recursive Adaptive Quadrature" href="recursivequadrature.html" />
+    <link rel="next" title="Kokkos Array Conversions" href="../utilities/kokkoswrappers.html" />
     <link rel="prev" title="Clenshaw Curtis Quadrature" href="clenshawcurtis.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
@@ -243,11 +243,6 @@
      Adaptive Simpson Integration
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="recursivequadrature.html">
-     Recursive Adaptive Quadrature
-    </a>
-   </li>
   </ul>
  </li>
  <li class="toctree-l1">
@@ -318,8 +313,8 @@
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I0EN5mpart15AdaptiveSimpson9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd">
-<span id="_CPPv3I0EN5mpart15AdaptiveSimpson9IntegrateERK12FunctionTypedd"></span><span id="_CPPv2I0EN5mpart15AdaptiveSimpson9IntegrateERK12FunctionTypedd"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_adaptive_simpson_1aa5a2f81c7a45156ff74ad665d597745f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">auto</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Integrate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN5mpart15AdaptiveSimpson9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd" title="mpart::AdaptiveSimpson::Integrate::FunctionType"><span class="n"><span class="pre">FunctionType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lb</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ub</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="o"><span class="pre">-&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">decltype</span></span><span class="p"><span class="pre">(</span></span><a class="reference internal" href="#_CPPv4I0EN5mpart15AdaptiveSimpson9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd" title="mpart::AdaptiveSimpson::Integrate::f"><span class="n"><span class="pre">f</span></span></a><span class="p"><span class="pre">(</span></span><span class="m"><span class="pre">0.0</span></span><span class="p"><span class="pre">)</span></span><span class="p"><span class="pre">)</span></span><a class="headerlink" href="#_CPPv4I0EN5mpart15AdaptiveSimpson9IntegrateEDTcl1fL0.0EEERK12FunctionTypedd" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4I00ENK5mpart15AdaptiveSimpson9IntegrateE10OutputTypeRK12FunctionTypedd">
+<span id="_CPPv3I00ENK5mpart15AdaptiveSimpson9IntegrateERK12FunctionTypedd"></span><span id="_CPPv2I00ENK5mpart15AdaptiveSimpson9IntegrateERK12FunctionTypedd"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OutputType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_adaptive_simpson_1af6330a4ce5dc900f47a42db5e1590237"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00ENK5mpart15AdaptiveSimpson9IntegrateE10OutputTypeRK12FunctionTypedd" title="mpart::AdaptiveSimpson::Integrate::OutputType"><span class="n"><span class="pre">OutputType</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Integrate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00ENK5mpart15AdaptiveSimpson9IntegrateE10OutputTypeRK12FunctionTypedd" title="mpart::AdaptiveSimpson::Integrate::FunctionType"><span class="n"><span class="pre">FunctionType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lb</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ub</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I00ENK5mpart15AdaptiveSimpson9IntegrateE10OutputTypeRK12FunctionTypedd" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Approximates the integral <span class="math notranslate nohighlight">\(\int_{x_L}^{x_U} f(x) dx\)</span>. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -356,10 +351,10 @@
             <p class="prev-next-title">Clenshaw Curtis Quadrature</p>
         </div>
     </a>
-    <a class='right-next' id="next-link" href="recursivequadrature.html" title="next page">
+    <a class='right-next' id="next-link" href="../utilities/kokkoswrappers.html" title="next page">
     <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Recursive Adaptive Quadrature</p>
+        <p class="prev-next-title">Kokkos Array Conversions</p>
     </div>
     <i class="fas fa-angle-right"></i>
     </a>

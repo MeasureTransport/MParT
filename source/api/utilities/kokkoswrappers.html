@@ -21,8 +21,8 @@
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -36,7 +36,7 @@
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
     <link rel="next" title="Development" href="../../development/index.html" />
-    <link rel="prev" title="Recursive Adaptive Quadrature" href="../quadrature/recursivequadrature.html" />
+    <link rel="prev" title="Adaptive Simpson Integration" href="../quadrature/adaptivesimpson.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="None">
     
@@ -241,11 +241,6 @@
    <li class="toctree-l2">
     <a class="reference internal" href="../quadrature/adaptivesimpson.html">
      Adaptive Simpson Integration
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../quadrature/recursivequadrature.html">
-     Recursive Adaptive Quadrature
     </a>
    </li>
   </ul>
@@ -501,6 +496,66 @@
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE11KokkosToVecN5Eigen3MapIN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEEEERKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE">
+<span id="_CPPv3I0DpE11KokkosToVecRKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE"></span><span id="_CPPv2I0DpE11KokkosToVecRKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScalarType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">OtherTraits</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="group___array_utilities_1ga03e5666968a893c141b3129d7b22b120"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11KokkosToVecN5Eigen3MapIN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEEEERKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE" title="KokkosToVec::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Dynamic</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KokkosToVec</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11KokkosToVecN5Eigen3MapIN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEEEERKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE" title="KokkosToVec::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE11KokkosToVecN5Eigen3MapIN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEEEERKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE" title="KokkosToVec::OtherTraits"><span class="n"><span class="pre">OtherTraits</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">view</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE11KokkosToVecN5Eigen3MapIN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEEEERKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Converts a 1d Kokkos view with <strong>contiguous</strong> memory to an Eigen::Map. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ScalarType</strong> – The scalar type stored in the view, typically double, int, or unsigned int. </p></li>
+<li><p><strong>OtherTraits</strong> – Additional traits, like the memory space, used to define the view. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>view</strong> – The Kokkos::View we wish to wrap. </p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Eigen::Map&lt;Eigen::VectorXd&gt; A map wrapped around the memory stored by the view. Note that this map will only be valid as long as the view’s memory is being managed. Segfaults could occur if the map is accessed after the view goes out of scope. To avoid this, copy the map into a vector or use the CopyKokkosToVec function. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE11KokkosToVecN5Eigen3MapIN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEEXL0EEN5Eigen11InnerStrideIEEEERKN6Kokkos4ViewIP10ScalarTypeN6Kokkos12LayoutStrideEDp11OtherTraitsEE">
+<span id="_CPPv3I0DpE11KokkosToVecRKN6Kokkos4ViewIP10ScalarTypeN6Kokkos12LayoutStrideEDp11OtherTraitsEE"></span><span id="_CPPv2I0DpE11KokkosToVecRKN6Kokkos4ViewIP10ScalarTypeN6Kokkos12LayoutStrideEDp11OtherTraitsEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScalarType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">OtherTraits</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="group___array_utilities_1ga52d828c47b9ce8aece1347f4a3aec1e1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11KokkosToVecN5Eigen3MapIN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEEXL0EEN5Eigen11InnerStrideIEEEERKN6Kokkos4ViewIP10ScalarTypeN6Kokkos12LayoutStrideEDp11OtherTraitsEE" title="KokkosToVec::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Dynamic</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">InnerStride</span></span><span class="p"><span class="pre">&lt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KokkosToVec</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE11KokkosToVecN5Eigen3MapIN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEEXL0EEN5Eigen11InnerStrideIEEEERKN6Kokkos4ViewIP10ScalarTypeN6Kokkos12LayoutStrideEDp11OtherTraitsEE" title="KokkosToVec::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutStride</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE11KokkosToVecN5Eigen3MapIN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEEXL0EEN5Eigen11InnerStrideIEEEERKN6Kokkos4ViewIP10ScalarTypeN6Kokkos12LayoutStrideEDp11OtherTraitsEE" title="KokkosToVec::OtherTraits"><span class="n"><span class="pre">OtherTraits</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">view</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE11KokkosToVecN5Eigen3MapIN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEEXL0EEN5Eigen11InnerStrideIEEEERKN6Kokkos4ViewIP10ScalarTypeN6Kokkos12LayoutStrideEDp11OtherTraitsEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Converts a 1d Kokkos view with <strong>strided</strong> memory access to an Eigen::Map. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ScalarType</strong> – The scalar type stored in the view, typically double, int, or unsigned int. </p></li>
+<li><p><strong>OtherTraits</strong> – Additional traits, like the memory space, used to define the view. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>view</strong> – The Kokkos::View we wish to wrap. </p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Eigen::Map&lt;Eigen::VectorXd&gt; A map wrapped around the memory stored by the view. Note that this map will only be valid as long as the view’s memory is being managed. Segfaults could occur if the map is accessed after the view goes out of scope. To avoid this, copy the map into a vector or use the CopyKokkosToVec function. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpE15CopyKokkosToVecN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEERKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE">
+<span id="_CPPv3I0DpE15CopyKokkosToVecRKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE"></span><span id="_CPPv2I0DpE15CopyKokkosToVecRKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScalarType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">OtherTraits</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="group___array_utilities_1gaac78bc0f22140d20f8cc6f66ae4dc425"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Matrix</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE15CopyKokkosToVecN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEERKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE" title="CopyKokkosToVec::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Dynamic</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CopyKokkosToVec</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpE15CopyKokkosToVecN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEERKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE" title="CopyKokkosToVec::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpE15CopyKokkosToVecN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEERKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE" title="CopyKokkosToVec::OtherTraits"><span class="n"><span class="pre">OtherTraits</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">view</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE15CopyKokkosToVecN5Eigen6MatrixI10ScalarTypeN5Eigen7DynamicEXL1EEEERKN6Kokkos4ViewIP10ScalarTypeDp11OtherTraitsEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Copies memory in a 1d Kokkos to an Eigen::VectorXd. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ScalarType</strong> – The scalar type stored in the view, typically double, int, or unsigned int. </p></li>
+<li><p><strong>OtherTraits</strong> – Additional traits, like the memory space, used to define the view. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Parameters</dt>
+<dd class="field-even"><p><strong>view</strong> – The Kokkos::View we wish to copy. </p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Eigen::Matrix&lt;ScalarType,Eigen::Dynamic,1&gt; An Eigen vector with a copy of the contents in the Kokkos view. </p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 </dd></dl>
 
@@ -512,11 +567,11 @@
               
               <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-    <a class='left-prev' id="prev-link" href="../quadrature/recursivequadrature.html" title="previous page">
+    <a class='left-prev' id="prev-link" href="../quadrature/adaptivesimpson.html" title="previous page">
         <i class="fas fa-angle-left"></i>
         <div class="prev-next-info">
             <p class="prev-next-subtitle">previous</p>
-            <p class="prev-next-title">Recursive Adaptive Quadrature</p>
+            <p class="prev-next-title">Adaptive Simpson Integration</p>
         </div>
     </a>
     <a class='right-next' id="next-link" href="../../development/index.html" title="next page">
