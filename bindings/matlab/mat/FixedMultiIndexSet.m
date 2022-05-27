@@ -16,46 +16,54 @@ classdef FixedMultiIndexSet < handle
 %
 
 properties (Access = private)
-  id_ % ID of the session.
+  id_
 end
 
 methods
   function this = FixedMultiIndexSet(dim,maxOrder)
   %DATABASE Create a new database.
-    this.id_ = FixedMultiIndexSet_('new', dim, maxOrder);
+    this.id_ = BigLibrary_('newFixedMultiIndexSet', dim, maxOrder);
   end
 
   function delete(this)
   %DELETE Destructor.
-    FixedMultiIndexSet_('delete', this.id_);
+    BigLibrary_('deleteFixedMultiIndexSet', this.id_);
   end
 
   function result = MaxDegrees(this)
-    result = FixedMultiIndexSet_('MaxDegrees',this.id_);
+    result = BigLibrary_('MaxDegrees',this.id_);
+  end
+
+  function result = get_id(this)
+    result = this.id_;
+  end
+
+  function [result,mset_id] = MaxDegrees2(this,mset2)
+    [result,mset_id] = BigLibrary_('MaxDegrees2',this.id_,mset2.id_);
   end
 
   function result = IndexToMulti(this, ind)
-    result = FixedMultiIndexSet_('IndexToMulti', this.id_, ind);
+    result = BigLibrary_('IndexToMulti', this.id_, ind);
   end
 
   function result = MultiToIndex(this, ind)
-    result = FixedMultiIndexSet_('MultiToIndex', this.id_, ind);
+    result = BigLibrary_('MultiToIndex', this.id_, ind);
   end
 
   function Print(this)
-     FixedMultiIndexSet_('Print', this.id_);
+     BigLibrary_('Print', this.id_);
   end
 
   function result = Size(this)
-    result = FixedMultiIndexSet_('Size', this.id_);
+    result = BigLibrary_('Size', this.id_);
   end
 
   function result = dim(this)
-    result = FixedMultiIndexSet_('dim', this.id_);
+    result = BigLibrary_('dim', this.id_);
   end
 
   function result = isCompressed(this)
-    result = FixedMultiIndexSet_('isCompressed', this.id_);
+    result = BigLibrary_('isCompressed', this.id_);
   end
   
 end
