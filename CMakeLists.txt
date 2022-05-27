@@ -28,6 +28,7 @@ include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-Wno-deprecated-gpu-targets" COMPILER_IS_NVCC)
 if(COMPILER_IS_NVCC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-gpu-targets --expt-relaxed-constexpr")
+    add_compile_definitions(EIGEN_NO_CUDA)
 endif()
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g")

@@ -3,6 +3,8 @@
 #include "MParT/Quadrature.h"
 #include "MParT/Utilities/ArrayConversions.h"
 
+#include "MParT/Utilities/KokkosSpaceMappings.h"
+
 using namespace mpart;
 using namespace Catch;
 
@@ -10,10 +12,13 @@ using namespace Catch;
 class TestIntegrand {
 public:
 
+    TestIntegrand(double shift=0) : shift_(shift){};
+
     KOKKOS_INLINE_FUNCTION void operator()(double x, double* f) const{
-        f[0] = exp(x);
+        f[0] = exp(x) + shift_;
     }
 
+    const double shift_;
 }; // class TestIntegrand
 
 TEST_CASE("Testing Nested CC Quadrature", "[NestedClenshawCurtis]") {
@@ -188,8 +193,14 @@ TEST_CASE( "Testing Adaptive Clenshaw-Curtis Quadrature", "[AdaptiveClenshawCurt
     }
 
     SECTION("Vector-Valued with External Workspace")
-    {   
-        AdaptiveClenshawCurtis quad2(2, maxSub, maxDim, nullptr, absTol, relTol, QuadError::First);
+    {       
+        unsigned int level = 2;
+        Kokkos::View<double*, Kokkos::HostSpace> cPts("Coarse Points", std::pow(2,level)+1);
+        Kokkos::View<double*, Kokkos::HostSpace> cWts("Coarse Weights", std::pow(2,level)+1);
+        Kokkos::View<double*, Kokkos::HostSpace> fPts("Fine Points", std::pow(2,level+1)+1);
+        Kokkos::View<double*, Kokkos::HostSpace> fWts("Fine Weights", std::pow(2,level+1)+1);
+
+        AdaptiveClenshawCurtis quad2(cPts,cWts,fPts,fWts, maxSub, maxDim, nullptr, absTol, relTol, QuadError::First);
         
         std::vector<double> workspace(quad2.WorkspaceSize());
         quad2.SetWorkspace(&workspace[0]);
@@ -315,31 +326,45 @@ TEST_CASE( "Testing Adaptive Simpson Integration", "[AdaptiveSimpson]" ) {
 TEST_CASE( "Testing CC Quadrature on device", "[ClenshawCurtisDevice]" ) {
 
     typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
+    typedef typename MemoryToExecution<DeviceSpace>::Space ExecutionSpace;
 
     // Set parameters for adaptive quadrature algorithm
-    unsigned int order = 10;
-    unsigned int numRepeats = 5;
+    unsigned int order = 5;
+    unsigned int numRepeats = 320;
 
     // Set tolerance for tests
     double testTol = 1e-8;
     double lb = 0;
     double ub = 1.0;
 
-    TestIntegrand integrand;
-    ClenshawCurtisQuadrature quad(order);
+    
+    ClenshawCurtisQuadrature<DeviceSpace> quad(order, 1, nullptr);
     
     // TestIntegrand integrand;
     Kokkos::View<double*, DeviceSpace> dres("integrals", numRepeats);
-    Kokkos::parallel_for(numRepeats, KOKKOS_LAMBDA(const unsigned int i){
-        dres(i) = quad.Integrate<double>(integrand, lb, ub);
+    unsigned int workspaceSize = quad.WorkspaceSize();
+
+    auto cacheBytes = Kokkos::View<double*,DeviceSpace>::shmem_size(workspaceSize);
+    auto policy = Kokkos::TeamPolicy<ExecutionSpace>(numRepeats/32, 32).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
+
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member){
+        unsigned int i = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
+
+        Kokkos::View<double*,DeviceSpace> workspace(team_member.thread_scratch(1), workspaceSize);
+        TestIntegrand integrand(i);
+        quad.Integrate(workspace.data(), integrand, lb, ub, &dres(i));
     });
 
     Kokkos::fence();
     Kokkos::View<double*, Kokkos::HostSpace> hres = ToHost(dres);
-    double integral = quad.Integrate<double>(integrand, lb, ub);
+
+    ClenshawCurtisQuadrature<Kokkos::HostSpace> quad2(order, 1);
+    double integral;
+    TestIntegrand integrand(0);
+    quad2.Integrate(integrand, lb, ub, &integral);
 
     for(unsigned int i=0; i<numRepeats; ++i)
-        CHECK(hres(i) == Approx(integral).epsilon(1e-7));
+        CHECK(hres(i) == Approx(integral+i*(ub-lb)).epsilon(1e-7));
 
 }
 
@@ -348,8 +373,9 @@ TEST_CASE( "Testing CC Quadrature on device", "[ClenshawCurtisDevice]" ) {
 TEST_CASE( "Testing Adaptive Simpson Quadrature on device", "[AdaptiveSimpsonDevice]" ) {
 
     typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
+    typedef typename MemoryToExecution<DeviceSpace>::Space ExecutionSpace;
 
-    unsigned int numRepeats = 5;
+    unsigned int numRepeats = 64;
 
     // Set parameters for adaptive quadrature algorithm
     unsigned int maxSub = 30;
@@ -361,22 +387,34 @@ TEST_CASE( "Testing Adaptive Simpson Quadrature on device", "[AdaptiveSimpsonDev
     double lb = 0;
     double ub = 1.0;
 
-    TestIntegrand integrand;
-    AdaptiveSimpson quad(maxSub, absTol, relTol, QuadError::First);
+    AdaptiveSimpson<DeviceSpace> quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
 
-    
     // TestIntegrand integrand;
     Kokkos::View<double*, DeviceSpace> dres("integrals", numRepeats);
-    Kokkos::parallel_for(numRepeats, KOKKOS_LAMBDA(const unsigned int i){
-        dres(i) = quad.Integrate<double>(integrand, lb, ub);
+    unsigned int workspaceSize = quad.WorkspaceSize();
+
+    auto cacheBytes = Kokkos::View<double*,DeviceSpace>::shmem_size(workspaceSize);
+    auto policy = Kokkos::TeamPolicy<ExecutionSpace>(numRepeats/32, 32).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
+
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member){
+        unsigned int i = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
+
+        Kokkos::View<double*,DeviceSpace> workspace(team_member.thread_scratch(1), workspaceSize);
+
+        TestIntegrand integrand(i);
+        quad.Integrate(workspace.data(), integrand, lb, ub, &dres(i));
     });
 
     Kokkos::fence();
     Kokkos::View<double*, Kokkos::HostSpace> hres = ToHost(dres);
-    double integral = quad.Integrate<double>(integrand, lb, ub);
+    
+    AdaptiveSimpson<Kokkos::HostSpace> quad2(maxSub, 1, absTol, relTol, QuadError::First);
+    double integral;
+    TestIntegrand integrand;
+    quad2.Integrate(integrand, lb, ub, &integral);
 
     for(unsigned int i=0; i<numRepeats; ++i)
-        CHECK(hres(i) == Approx(integral).epsilon(1e-3));
+        CHECK(hres(i) == Approx(integral + i*(ub-lb)).epsilon(1e-3));
 
 }
 
@@ -384,8 +422,9 @@ TEST_CASE( "Testing Adaptive Simpson Quadrature on device", "[AdaptiveSimpsonDev
 TEST_CASE( "Testing Adaptive Clenshaw Curtis on device", "[AdaptiveCCDevice]" ) {
 
     typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
+    typedef typename MemoryToExecution<DeviceSpace>::Space ExecutionSpace;
 
-    unsigned int numRepeats = 5;
+    unsigned int numRepeats = 320;
 
     unsigned int maxSub = 10;
     double relTol = 1e-7;
@@ -397,24 +436,33 @@ TEST_CASE( "Testing Adaptive Clenshaw Curtis on device", "[AdaptiveCCDevice]" ) 
     double lb = 0;
     double ub = 1.0;
 
-    AdaptiveClenshawCurtis quad(maxSub, absTol, relTol,QuadError::First, order);
+    AdaptiveClenshawCurtis<DeviceSpace> quad(order, maxSub, 1, nullptr, absTol, relTol, QuadError::First);
 
-    TestIntegrand integrand;
-
-    
-    // TestIntegrand integrand;
     Kokkos::View<double*, DeviceSpace> dres("integrals", numRepeats);
-    Kokkos::parallel_for(numRepeats, KOKKOS_LAMBDA(const unsigned int i){
-        dres(i) = quad.Integrate<double>(integrand, lb, ub);
+    unsigned int workspaceSize = quad.WorkspaceSize();
+
+    auto cacheBytes = Kokkos::View<double*,DeviceSpace>::shmem_size(workspaceSize);
+    auto policy = Kokkos::TeamPolicy<ExecutionSpace>(numRepeats/32, 32).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
+
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member){
+        unsigned int i = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
+
+        Kokkos::View<double*,DeviceSpace> workspace(team_member.thread_scratch(1), workspaceSize);
+
+        TestIntegrand integrand(i);
+        quad.Integrate(workspace.data(), integrand, lb, ub, &dres(i));
     });
 
     Kokkos::fence();
     Kokkos::View<double*, Kokkos::HostSpace> hres = ToHost(dres);
-    double integral = quad.Integrate<double>(integrand, lb, ub);
+
+    AdaptiveClenshawCurtis<Kokkos::HostSpace> quad2(order, maxSub, 1, absTol, relTol,QuadError::First); 
+    TestIntegrand integrand;   
+    double integral;
+    quad2.Integrate(integrand, lb, ub, &integral);
 
     for(unsigned int i=0; i<numRepeats; ++i)
-        CHECK(hres(i) == Approx(integral).epsilon(1e-3));
-
+        CHECK(hres(i) == Approx(integral+i*(ub-lb)).epsilon(1e-3));
 }
 
 

@@ -29,11 +29,11 @@ class QuadratureBase {
 public:
 
     /** Constructs a quadrature rule with internally managed workspace. */
-    KOKKOS_FUNCTION QuadratureBase(unsigned int maxDim, unsigned int workspaceSize) : fdim_(maxDim), 
-                                                                                      maxDim_(maxDim), 
-                                                                                      workspaceSize_(workspaceSize), 
-                                                                                      internalWork_("Workspace", workspaceSize), 
-                                                                                      workspace_(internalWork_.data())
+    QuadratureBase(unsigned int maxDim, unsigned int workspaceSize) : fdim_(maxDim), 
+                                                                      maxDim_(maxDim), 
+                                                                      workspaceSize_(workspaceSize), 
+                                                                      internalWork_("Workspace", workspaceSize), 
+                                                                      workspace_(internalWork_.data())
     {}
 
     /** Constructs a quadrature rule with externally managed workspace. */
@@ -66,16 +66,43 @@ protected:
 /**
 
 USAGE
+
+With internally constructed workspace:
 @code
-ClenshawCurtisQuadrature quad(5);
-integral = quad.Integrate(f, 0,1);
+unsigned int fdim = 1; // Size of vector-valued integrand.  Set to 1 for scalar integrand
+auto f = [](double x, double* fval){ fval[0] = x*x;};
+
+ClenshawCurtisQuadrature quad(5,fdim);
+
+double integral;
+quad.Integrate(f, 0, 1, &integral); // Integrate x^2 from 0 to 1 and store in "integral"
 @endcode
 
+With external workspace specified at construction
 @code
-Eigen::VectorXd wts, pts;
-std::tie(wts, pts) = ClenshawCurtisQuadrature::GetRule(order);
+unsigned int fdim = 1;
+auto f = [](double x, double* fval){ fval[0] = x*x;};
+
+std::vector<double> workspace(ClenshawCurtisQuadrature::GetWorkspaceSize(fdim));
+
+ClenshawCurtisQuadrature quad(5, fdim, *workspace[0]);
+
+double integral;
+quad.Integrate(f, 0, 1, &integral); // Integrate x^2 from 0 to 1 and store in "integral"
 @endcode
 
+With external workspace specified at integration time.  This is often useful when integration is performed in a Kokkos parallel_for loop.
+@code
+unsigned int fdim = 1;
+auto f = [](double x, double* fval){ fval[0] = x*x;};
+
+ClenshawCurtisQuadrature quad(5, fdim, nullptr);
+
+std::vector<double> workspace(ClenshawCurtisQuadrature::GetWorkspaceSize(fdim));
+
+double integral;
+quad.Integrate(&workspace[0], f, 0, 1, &integral); // Integrate x^2 from 0 to 1 and store in "integral"
+@endcode
  */
 template<typename MemorySpace=Kokkos::HostSpace>
 class ClenshawCurtisQuadrature : public QuadratureBase<MemorySpace>{
@@ -88,23 +115,35 @@ public:
      * @param maxDim The maximum dimension of the integrand.  Used to help set up workspace.
      * @param workspace A pointer to memory that is allocated as a workspace.  Must have space for at least maxDim components.
      */
-    KOKKOS_FUNCTION ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim) : QuadratureBase<MemorySpace>(maxDim,maxDim),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
-    {
-        // TODO: Add parallel for loop here with one thread to make sure rule is filled in the correct space
-        GetRule(numPts, wts_.data(), pts_.data());
-    };
+    ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim);
+
+    /** 
+        @brief Construct a new Clenshaw Curtis Quadrature object with externally allocated workspace memory.
+        
+        @param numPts The number of points in the CC rule.
+        @param maxDim The maximum dimension of the integrand.  Used to help set up workspace.
+        @param workspace A pointer to memory that is allocated as a workspace.  Must have space for at least maxDim components.  Set to null ptr if workspace memory will be allocated later using the SetWorkspace function. 
+    */
+    ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace);
+
+    /** @brief Returns the size of a double array needed as a workspace to integrate a function with dimension fdim.
+        @param fdim The dimension of a vector-valued integrand.
+        @return The minimum length of a double array needed for the workspace.
+    */
+    KOKKOS_FUNCTION static unsigned int GetWorkspaceSize(unsigned int fdim){return fdim;};
 
     /**
-     * @brief Construct a new Clenshaw Curtis Quadrature object without allocating workspace memory.
+     * @brief Construct a new Clenshaw Curtis Quadrature object without allocating workspace memory and specifying views where the points and weights should be stored.
      * 
-     * @param numPts The number of points in the CC rule.
-     * @param maxDim The maximum dimension of the integrand.  Used to help set up workspace.
-     * @param workspace A pointer to memory that is allocated as a workspace.  Must have space for at least maxDim components.  Set to null ptr if workspace memory will be allocated later using the SetWorkspace function.
+       @param pts A view to hold the points in the quadrature rule.  Does not need to contain the points themselves, just memory to store them. The length of this view dictates how many points are in the quadrature rule.
+       @param wts A view to hold the weights in the quadrature rule.  Like the pts view, this does not need to contain the weights, just space to store them.  Must be the same length as pts.
+       @param numPts The number of points in the CC rule.
+       @param maxDim The maximum dimension of the integrand.  Used to help set up workspace.
+       @param workspace A pointer to memory that is allocated as a workspace.  Must have space for at least maxDim components.  Set to null ptr if workspace memory will be allocated later using the SetWorkspace function.
      */
-    KOKKOS_FUNCTION ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace) : QuadratureBase<MemorySpace>(maxDim,maxDim,workspace),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
+    KOKKOS_FUNCTION ClenshawCurtisQuadrature(Kokkos::View<double*, MemorySpace> pts, Kokkos::View<double*, MemorySpace> wts, unsigned int maxDim, double* workspace) : QuadratureBase<MemorySpace>(maxDim,maxDim,workspace),  pts_(pts), wts_(wts), numPts_(pts.extent(0))
     {
-        // TODO: Add parallel for loop here with one thread to make sure rule is filled in the correct space
-        GetRule(numPts, wts_.data(), pts_.data());
+        GetRule(numPts_, wts_.data(), pts_.data());
     };
 
     /**
@@ -174,9 +213,20 @@ public:
     KOKKOS_FUNCTION void Integrate(FunctionType const& f, 
                                    double              lb, 
                                    double              ub,
-                                   double*             res)
+                                   double*             res) const
     {   
         assert(this->workspace_);
+        Integrate(this->workspace_, f, lb, ub, res);
+    }
+
+
+    template<class FunctionType>
+    KOKKOS_FUNCTION void Integrate(double*             workspace, 
+                                   FunctionType const& f, 
+                                   double              lb, 
+                                   double              ub,
+                                   double*             res) const
+    {   
 
         if((ub-lb)<15.0*std::numeric_limits<double>::epsilon()){
 
@@ -191,7 +241,7 @@ public:
             res[j] = 0.0;
 
         // Create an output variable
-        double* fval = this->workspace_;
+        double* fval = workspace;
         
         // Evaluate integral and store results in output
         for (unsigned int i=0; i<pts_.size(); ++i){
@@ -210,21 +260,63 @@ private:
 
 
 template<typename MemorySpace>
+struct GetRuleFunctor{
+
+    GetRuleFunctor(unsigned int numPts, double* pts, double* wts) : numPts_(numPts), pts_(pts), wts_(wts){};
+
+    KOKKOS_INLINE_FUNCTION void operator()(const size_t i) const{
+        ClenshawCurtisQuadrature<MemorySpace>::GetRule(numPts_,wts_, pts_);
+    };
+
+    unsigned int numPts_;
+    double* pts_;
+    double* wts_;
+}; 
+
+template<typename MemorySpace>
+ClenshawCurtisQuadrature<MemorySpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim) : QuadratureBase<MemorySpace>(maxDim,maxDim),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
+{
+    // TODO: Add parallel for loop here with one thread to make sure rule is filled in the correct space
+    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(numPts, pts_.data(), wts_.data()));
+};
+
+template<>
+ClenshawCurtisQuadrature<Kokkos::HostSpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim) : QuadratureBase<Kokkos::HostSpace>(maxDim,maxDim),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
+{
+    GetRule(numPts, wts_.data(), pts_.data());
+};
+
+
+template<typename MemorySpace>
+ClenshawCurtisQuadrature<MemorySpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace) : QuadratureBase<MemorySpace>(maxDim,maxDim,workspace),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
+{
+    // TODO: Add parallel for loop here with one thread to make sure rule is filled in the correct space
+    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(numPts, pts_.data(), wts_.data()));
+};
+
+template<>
+ClenshawCurtisQuadrature<Kokkos::HostSpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace) : QuadratureBase<Kokkos::HostSpace>(maxDim,maxDim,workspace),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
+{
+    GetRule(numPts, wts_.data(), pts_.data());
+};
+
+
+template<typename MemorySpace>
 class RecursiveQuadratureBase : public QuadratureBase<MemorySpace>
 {
 
 public:
     
-    KOKKOS_FUNCTION RecursiveQuadratureBase(unsigned int maxSub, 
-                                            unsigned int maxDim,
-                                            unsigned int workspaceSize, 
-                                            double absTol, 
-                                            double relTol,
-                                            QuadError::Type errorMetric) :  QuadratureBase<MemorySpace>(maxDim, workspaceSize),
-                                                                            maxSub_(maxSub), 
-                                                                            absTol_(absTol),
-                                                                            relTol_(relTol),
-                                                                            errorMetric_(errorMetric)
+    RecursiveQuadratureBase(unsigned int maxSub, 
+                            unsigned int maxDim,
+                            unsigned int workspaceSize, 
+                            double absTol, 
+                            double relTol,
+                            QuadError::Type errorMetric) :  QuadratureBase<MemorySpace>(maxDim, workspaceSize),
+                                                            maxSub_(maxSub), 
+                                                            absTol_(absTol),
+                                                            relTol_(relTol),
+                                                            errorMetric_(errorMetric)
     {}
 
     KOKKOS_FUNCTION RecursiveQuadratureBase(unsigned int maxSub, 
@@ -301,18 +393,21 @@ template<typename MemorySpace=Kokkos::HostSpace>
 class AdaptiveSimpson : public RecursiveQuadratureBase<MemorySpace> {
 public:
 
-    KOKKOS_FUNCTION AdaptiveSimpson(unsigned int maxSub,
-                                    unsigned int fdim, 
-                                    double absTol, 
-                                    double relTol,
-                                    QuadError::Type errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, fdim, (2*maxSub+5)*fdim + 2*maxSub, absTol, relTol, errorMetric){};
+    AdaptiveSimpson(unsigned int maxSub,
+                    unsigned int fdim, 
+                    double absTol, 
+                    double relTol,
+                    QuadError::Type errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, fdim, GetWorkspaceSize(maxSub,fdim), absTol, relTol, errorMetric){};
 
     KOKKOS_FUNCTION AdaptiveSimpson(unsigned int maxSub,
                                     unsigned int fdim, 
                                     double* workspace,
                                     double absTol, 
                                     double relTol,
-                                    QuadError::Type errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, fdim, (2*maxSub+5)*fdim + 2*maxSub, workspace, absTol, relTol, errorMetric){};
+                                    QuadError::Type errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, fdim, GetWorkspaceSize(maxSub,fdim), workspace, absTol, relTol, errorMetric){};
+
+
+    KOKKOS_FUNCTION static unsigned int GetWorkspaceSize(unsigned int maxSub, unsigned int fdim){return (2*maxSub+5)*fdim + 2*maxSub;};
 
 
     /**
@@ -328,9 +423,19 @@ public:
     KOKKOS_FUNCTION void Integrate(FunctionType const& f, 
                                    double              lb, 
                                    double              ub,
-                                   double*             res)
+                                   double*             res) const
     {   
         assert(this->workspace_);
+        Integrate(this->workspace_, f, lb, ub, res);
+    }
+
+    template<class FunctionType>
+    KOKKOS_FUNCTION void Integrate(double* workspace, 
+                                   FunctionType const& f, 
+                                   double              lb, 
+                                   double              ub,
+                                   double*             res) const
+    {  
 
         for(unsigned int i=0; i<this->fdim_; ++i){
             res[i] = 0;
@@ -339,27 +444,24 @@ public:
         unsigned int currLevel = 0;
 
         unsigned int currSegment = 0;
-        bool done = false;
-        bool success = false;
-
 
         double midPt = 0.5*(lb+ub);
 
-        double* leftFunc = &this->workspace_[0];
+        double* leftFunc = &workspace[0];
         f(lb, leftFunc);
-
-        double* rightFunc = &this->workspace_[this->fdim_];
+        
+        double* rightFunc = &workspace[this->fdim_];
         f(ub, rightFunc);
 
-        double* midFunc = &this->workspace_[2*this->fdim_];
+        double* midFunc = &workspace[2*this->fdim_];
         f(midPt, midFunc);
 
-        double* intCoarse = &this->workspace_[3*this->fdim_];
-        double* intFine = &this->workspace_[4*this->fdim_];
+        double* intCoarse = &workspace[3*this->fdim_];
+        double* intFine = &workspace[4*this->fdim_];
 
-        double* leftPt  = &this->workspace_[5*this->fdim_];
+        double* leftPt  = &workspace[5*this->fdim_];
         *leftPt = lb;
-        double* rightPt  = &this->workspace_[5*this->fdim_+1];
+        double* rightPt  = &workspace[5*this->fdim_+1];
         *rightPt = ub;
 
         double leftMidPt;
@@ -375,8 +477,8 @@ public:
 
         while(true){
             
-            leftPt = &this->workspace_[workStartInd];
-            rightPt = &this->workspace_[workStartInd+1];
+            leftPt = &workspace[workStartInd];
+            rightPt = &workspace[workStartInd+1];
             
             // std::cout << "Level " << currLevel << "   " << std::bitset<sizeof(currSegment)*8>(currSegment) << std::endl;
             // std::cout << "    log(f): " << std::log(leftFunc[0]) << ",  " << std::log(midFunc[0]) << ", " << std::log(rightFunc[0]) << std::endl;
@@ -388,10 +490,10 @@ public:
             rightMidPt = 0.5*(midPt+(*rightPt));
 
             // Evaluate the integrand at the subinterval mid points
-            leftMidFunc = &this->workspace_[workStartInd + 2];
+            leftMidFunc = &workspace[workStartInd + 2];
             f(leftMidPt, leftMidFunc);
 
-            rightMidFunc = &this->workspace_[workStartInd + 2 + this->fdim_];
+            rightMidFunc = &workspace[workStartInd + 2 + this->fdim_];
             f(rightMidPt, rightMidFunc);
 
             // Compute the coarse and fine integrals
@@ -430,14 +532,14 @@ public:
 
                 if(currLevel>0){
                     prevStartInd = (2*(currLevel-1) + 5)*this->fdim_ + 2*(currLevel-1);
-                    this->workspace_[workStartInd] = 0.5*(this->workspace_[prevStartInd] + this->workspace_[prevStartInd+1]); // Set the left point at the next level
-                    this->workspace_[workStartInd+1] = this->workspace_[prevStartInd+1];
+                    workspace[workStartInd] = 0.5*(workspace[prevStartInd] + workspace[prevStartInd+1]); // Set the left point at the next level
+                    workspace[workStartInd+1] = workspace[prevStartInd+1];
                 }else{
-                    this->workspace_[workStartInd] = 0.5*(lb+ub);
-                    this->workspace_[workStartInd+1] = ub;
+                    workspace[workStartInd] = 0.5*(lb+ub);
+                    workspace[workStartInd+1] = ub;
                 }
                 
-                UpdateValues(currLevel, currSegment, leftFunc, midFunc, rightFunc);
+                UpdateValues(workspace, currLevel, currSegment, leftFunc, midFunc, rightFunc);
 
                 
             // If not successful, move on to the left segment at the next level
@@ -449,8 +551,8 @@ public:
                 midFunc = leftMidFunc;
                 
                 workStartInd = (2*currLevel + 5)*this->fdim_ + 2*currLevel;
-                this->workspace_[workStartInd] = *leftPt; // Set the left point at the next level
-                this->workspace_[workStartInd+1] = midPt; // Set the right point at the next level
+                workspace[workStartInd] = *leftPt; // Set the left point at the next level
+                workspace[workStartInd+1] = midPt; // Set the right point at the next level
             }
 
 
@@ -460,20 +562,20 @@ public:
 
 private:
 
-    KOKKOS_FUNCTION void UpdateValues(unsigned int currLevel, unsigned int currSegment, double* &leftVal, double* &midVal, double* &rightVal)
+    KOKKOS_FUNCTION void UpdateValues(double* workspace, unsigned int currLevel, unsigned int currSegment, double* &leftVal, double* &midVal, double* &rightVal) const
     {
-        leftVal = &this->workspace_[0];
-        midVal = &this->workspace_[2*this->fdim_];
-        rightVal = &this->workspace_[this->fdim_];
+        leftVal = &workspace[0];
+        midVal = &workspace[2*this->fdim_];
+        rightVal = &workspace[this->fdim_];
 
         for(unsigned int level=0; level<currLevel; ++level){
             // If we branch to the right, the left value will be the mid point on the coarse level
             if( (currSegment >> (level+1)) & 1U ){
                 leftVal = midVal;
-                midVal = &this->workspace_[(2*level+5+1) * this->fdim_ + 2*level+2];
+                midVal = &workspace[(2*level+5+1) * this->fdim_ + 2*level+2];
             }else{
                 rightVal = midVal;
-                midVal = &this->workspace_[(2*level+5) * this->fdim_ + 2*level+2];
+                midVal = &workspace[(2*level+5) * this->fdim_ + 2*level+2];
             }
         }
     }
@@ -504,38 +606,45 @@ public:
        @param[in] errorMetric A flag specifying the type of error metric to use.
        @param[in] level The nesting level \f$L\f$.  A coarse rule with \f$2^{L}+1\f$ points will be used and a fine rule with \f$w^{L+1}+1\f$ points will be used.
      */
-   KOKKOS_FUNCTION AdaptiveClenshawCurtis(unsigned int      level,
-                           unsigned int      maxSub,
-                           unsigned int      maxDim, 
-                           double            absTol, 
-                           double            relTol,
-                           QuadError::Type   errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, (maxSub+5)*maxDim + 2*maxSub, absTol, relTol, errorMetric),
-                                                            coarsePts_("Coarse Pts", std::pow(2,level)+1),
-                                                            coarseWts_("Coarse Wts", std::pow(2,level)+1),
-                                                            finePts_("Fine Pts", std::pow(2,level+1)+1),
-                                                            fineWts_("Coarse Pts", std::pow(2,level+1)+1)
-    {
-        assert(std::pow(2,level)+1 >=3);
-        ClenshawCurtisQuadrature<MemorySpace>::GetRule(std::pow(2,level)+1,  coarseWts_.data(), coarsePts_.data());
-        ClenshawCurtisQuadrature<MemorySpace>::GetRule(std::pow(2,level+1)+1,  fineWts_.data(), finePts_.data());
-    };
+   AdaptiveClenshawCurtis(unsigned int      level,
+                          unsigned int      maxSub,
+                          unsigned int      maxDim, 
+                          double            absTol, 
+                          double            relTol,
+                          QuadError::Type   errorMetric);
 
-    KOKKOS_FUNCTION AdaptiveClenshawCurtis(unsigned int      level,
+    AdaptiveClenshawCurtis(unsigned int      level,
                            unsigned int      maxSub,
                            unsigned int      maxDim, 
                            double*           workspace,
                            double            absTol, 
                            double            relTol,
-                           QuadError::Type   errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, (maxSub+5)*maxDim + 2*maxSub, workspace, absTol, relTol, errorMetric),
-                                                            coarsePts_("Coarse Pts", std::pow(2,level)+1),
-                                                            coarseWts_("Coarse Wts", std::pow(2,level)+1),
-                                                            finePts_("Fine Pts", std::pow(2,level+1)+1),
-                                                            fineWts_("Coarse Pts", std::pow(2,level+1)+1)
+                           QuadError::Type   errorMetric);
+
+    KOKKOS_FUNCTION AdaptiveClenshawCurtis(Kokkos::View<double*,MemorySpace> coarsePts,
+                                           Kokkos::View<double*,MemorySpace> coarseWts,
+                                           Kokkos::View<double*,MemorySpace> finePts,
+                                           Kokkos::View<double*,MemorySpace> fineWts,
+                                           unsigned int      maxSub,
+                                           unsigned int      maxDim, 
+                                           double*           workspace,
+                                           double            absTol, 
+                                           double            relTol,
+                                           QuadError::Type   errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), workspace, absTol, relTol, errorMetric),
+                                                                                coarsePts_(coarsePts),
+                                                                                coarseWts_(coarseWts),
+                                                                                finePts_(finePts),
+                                                                                fineWts_(fineWts)
     {
+        const unsigned int level = std::log2(coarsePts.extent(0)-2);
         assert(std::pow(2,level)+1 >=3);
+
         ClenshawCurtisQuadrature<MemorySpace>::GetRule(std::pow(2,level)+1,  coarseWts_.data(), coarsePts_.data());
         ClenshawCurtisQuadrature<MemorySpace>::GetRule(std::pow(2,level+1)+1,  fineWts_.data(), finePts_.data());
     };
+
+
+    KOKKOS_FUNCTION static unsigned int GetWorkspaceSize(unsigned int maxSub, unsigned int fdim){return (maxSub+5)*fdim + 2*maxSub;};
 
 
 
@@ -552,10 +661,20 @@ public:
     KOKKOS_FUNCTION void Integrate(FunctionType const& f, 
                                    double              lb, 
                                    double              ub,
-                                   double*             res)
+                                   double*             res) const
     {   
         assert(this->workspace_);
+        Integrate(this->workspace_, f, lb, ub, res);
+    }
 
+
+    template<class FunctionType>
+    KOKKOS_FUNCTION void Integrate(double*             workspace,
+                                   FunctionType const& f, 
+                                   double              lb, 
+                                   double              ub,
+                                   double*             res) const
+    {   
         for(unsigned int i=0; i<this->fdim_; ++i){
             res[i] = 0;
         }
@@ -563,28 +682,24 @@ public:
         unsigned int currLevel = 0;
 
         unsigned int currSegment = 0;
-        bool done = false;
-        bool success = false;
-
-    
+      
         double midPt = 0.5*(lb+ub);
         double scale = (ub-lb);
 
-        double* leftFunc = &this->workspace_[0];
+        double* leftFunc = &workspace[0];
         f(lb, leftFunc);
 
-        double* rightFunc = &this->workspace_[this->fdim_];
+        double* rightFunc = &workspace[this->fdim_];
         f(ub, rightFunc);
-
         
-        double* fval = &this->workspace_[2*this->fdim_];
+        double* fval = &workspace[2*this->fdim_];
         
-        double* intCoarse = &this->workspace_[3*this->fdim_];
-        double* intFine = &this->workspace_[4*this->fdim_];
+        double* intCoarse = &workspace[3*this->fdim_];
+        double* intFine = &workspace[4*this->fdim_];
 
-        double* leftPt  = &this->workspace_[5*this->fdim_];
+        double* leftPt  = &workspace[5*this->fdim_];
         *leftPt = lb;
-        double* rightPt  = &this->workspace_[5*this->fdim_+1];
+        double* rightPt  = &workspace[5*this->fdim_+1];
         *rightPt = ub;
         double* midFunc;
         
@@ -596,17 +711,16 @@ public:
         unsigned int coarseRightIndex, coarseMidIndex, fineRightIndex, fineMidIndex;
 
         while(true){
-            
 
-            leftPt = &this->workspace_[workStartInd];
-            rightPt = &this->workspace_[workStartInd+1];
+            leftPt = &workspace[workStartInd];
+            rightPt = &workspace[workStartInd+1];
             
             // Compute mid point and scale
             midPt = 0.5*((*leftPt) + (*rightPt));
             scale = 0.5*((*rightPt) - (*leftPt));
 
             // Evaluate the integrand at the midpoint and store in the workspace
-            midFunc = &this->workspace_[workStartInd + 2];
+            midFunc = &workspace[workStartInd + 2];
             f(midPt, midFunc);
 
             // std::cout << "Level " << currLevel << "   " << std::bitset<sizeof(currSegment)*8>(currSegment) << std::endl;
@@ -683,14 +797,14 @@ public:
 
                 if(currLevel>0){
                     prevStartInd = ((currLevel-1) + 5)*this->fdim_ + 2*(currLevel-1);
-                    this->workspace_[workStartInd] = 0.5*(this->workspace_[prevStartInd] + this->workspace_[prevStartInd+1]); // Set the left point at the next level
-                    this->workspace_[workStartInd+1] = this->workspace_[prevStartInd+1];
+                    workspace[workStartInd] = 0.5*(workspace[prevStartInd] + workspace[prevStartInd+1]); // Set the left point at the next level
+                    workspace[workStartInd+1] = workspace[prevStartInd+1];
                 }else{
-                    this->workspace_[workStartInd] = midPt;
-                    this->workspace_[workStartInd+1] = ub;
+                    workspace[workStartInd] = midPt;
+                    workspace[workStartInd+1] = ub;
                 }
                 
-                UpdateValues(currLevel, currSegment, leftFunc, rightFunc);
+                UpdateValues(workspace, currLevel, currSegment, leftFunc, rightFunc);
                 
             // If not successful, move on to the left segment at the next level
             }else{
@@ -700,8 +814,8 @@ public:
                 rightFunc = midFunc;
                 
                 workStartInd = (currLevel + 5)*this->fdim_ + 2*currLevel;
-                this->workspace_[workStartInd] = *leftPt; // Set the left point at the next level
-                this->workspace_[workStartInd+1] = midPt; // Set the right point at the next level
+                workspace[workStartInd] = *leftPt; // Set the left point at the next level
+                workspace[workStartInd+1] = midPt; // Set the right point at the next level
             }
 
 
@@ -709,21 +823,22 @@ public:
 
     }
 
+
 private:
 
 
-    KOKKOS_FUNCTION void UpdateValues(unsigned int currLevel, unsigned int currSegment, double* &leftVal, double* &rightVal)
+    KOKKOS_FUNCTION void UpdateValues(double* workspace, unsigned int currLevel, unsigned int currSegment, double* &leftVal, double* &rightVal) const
     {
-        leftVal = &this->workspace_[0];
-        rightVal = &this->workspace_[this->fdim_];
+        leftVal = &workspace[0];
+        rightVal = &workspace[this->fdim_];
 
         for(unsigned int level=0; level<currLevel; ++level){
 
             // If we branch to the right, the left value will be the mid point on the coarse level
             if( (currSegment >> (level+1)) & 1U ){
-                leftVal = &this->workspace_[(level + 5)*this->fdim_ + 2*(level+1)];
+                leftVal = &workspace[(level + 5)*this->fdim_ + 2*(level+1)];
             }else{
-                rightVal = &this->workspace_[(level + 5)*this->fdim_ + 2*(level+1)];
+                rightVal = &workspace[(level + 5)*this->fdim_ + 2*(level+1)];
             }
         }
     }
@@ -732,6 +847,81 @@ private:
     Kokkos::View<double*,MemorySpace> coarsePts_, coarseWts_, finePts_, fineWts_;
 
 }; // class AdaptiveClenshawCurtis
+
+template<typename MemorySpace>
+AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int      level,
+                          unsigned int      maxSub,
+                          unsigned int      maxDim, 
+                          double            absTol, 
+                          double            relTol,
+                          QuadError::Type   errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), absTol, relTol, errorMetric),
+                                                            coarsePts_("Coarse Pts", std::pow(2,level)+1),
+                                                            coarseWts_("Coarse Wts", std::pow(2,level)+1),
+                                                            finePts_("Fine Pts", std::pow(2,level+1)+1),
+                                                            fineWts_("Coarse Pts", std::pow(2,level+1)+1)
+{
+    assert(std::pow(2,level)+1 >=3);
+
+    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(std::pow(2,level)+1, coarsePts_.data(), coarseWts_.data()));
+    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(std::pow(2,level+1)+1, finePts_.data(), fineWts_.data()));
+};
+
+template<>
+AdaptiveClenshawCurtis<Kokkos::HostSpace>::AdaptiveClenshawCurtis(unsigned int      level,
+                          unsigned int      maxSub,
+                          unsigned int      maxDim, 
+                          double            absTol, 
+                          double            relTol,
+                          QuadError::Type   errorMetric) : RecursiveQuadratureBase<Kokkos::HostSpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), absTol, relTol, errorMetric),
+                                                            coarsePts_("Coarse Pts", std::pow(2,level)+1),
+                                                            coarseWts_("Coarse Wts", std::pow(2,level)+1),
+                                                            finePts_("Fine Pts", std::pow(2,level+1)+1),
+                                                            fineWts_("Coarse Pts", std::pow(2,level+1)+1)
+{
+    assert(std::pow(2,level)+1 >=3);
+    ClenshawCurtisQuadrature<Kokkos::HostSpace>::GetRule(std::pow(2,level)+1,  coarseWts_.data(), coarsePts_.data());
+    ClenshawCurtisQuadrature<Kokkos::HostSpace>::GetRule(std::pow(2,level+1)+1,  fineWts_.data(), finePts_.data());    
+};
+
+
+
+template<typename MemorySpace>
+AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int      level,
+                          unsigned int      maxSub,
+                          unsigned int      maxDim, 
+                          double*           workspace,
+                          double            absTol, 
+                          double            relTol,
+                          QuadError::Type   errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), workspace, absTol, relTol, errorMetric),
+                                                            coarsePts_("Coarse Pts", std::pow(2,level)+1),
+                                                            coarseWts_("Coarse Wts", std::pow(2,level)+1),
+                                                            finePts_("Fine Pts", std::pow(2,level+1)+1),
+                                                            fineWts_("Coarse Pts", std::pow(2,level+1)+1)
+{
+    assert(std::pow(2,level)+1 >=3);
+
+    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(std::pow(2,level)+1, coarsePts_.data(), coarseWts_.data()));
+    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(std::pow(2,level+1)+1, finePts_.data(), fineWts_.data()));
+};
+
+template<>
+AdaptiveClenshawCurtis<Kokkos::HostSpace>::AdaptiveClenshawCurtis(unsigned int      level,
+                          unsigned int      maxSub,
+                          unsigned int      maxDim, 
+                          double*           workspace,
+                          double            absTol, 
+                          double            relTol,
+                          QuadError::Type   errorMetric) : RecursiveQuadratureBase<Kokkos::HostSpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), workspace, absTol, relTol, errorMetric),
+                                                            coarsePts_("Coarse Pts", std::pow(2,level)+1),
+                                                            coarseWts_("Coarse Wts", std::pow(2,level)+1),
+                                                            finePts_("Fine Pts", std::pow(2,level+1)+1),
+                                                            fineWts_("Coarse Pts", std::pow(2,level+1)+1)
+{
+    assert(std::pow(2,level)+1 >=3);
+    ClenshawCurtisQuadrature<Kokkos::HostSpace>::GetRule(std::pow(2,level)+1,  coarseWts_.data(), coarsePts_.data());
+    ClenshawCurtisQuadrature<Kokkos::HostSpace>::GetRule(std::pow(2,level+1)+1,  fineWts_.data(), finePts_.data());    
+};
+
 
 
 } // namespace mpart

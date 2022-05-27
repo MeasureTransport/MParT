@@ -26,8 +26,11 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
 
     // Allocate some memory for the cache 
     std::vector<double> cache(cacheSize);
-    Eigen::VectorXd pt = Eigen::VectorXd::Random(dim);
-
+    Kokkos::View<double*,Kokkos::HostSpace> pt("Point", dim);
+    pt(0) = 0.2;
+    pt(1) = 0.1;
+    pt(2) = 0.345;
+    
     // Fill in the cache the first d-1 components of the cache  
     expansion.FillCache1(&cache[0], pt, DerivativeFlags::None);
     for(unsigned int d=0; d<dim-1;++d){
@@ -43,7 +46,8 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     }
 
     // Evaluate the expansion using the cache 
-    Eigen::VectorXd coeffs = Eigen::VectorXd::Random(mset.Size());
+    Eigen::VectorXd coeffsEig = Eigen::VectorXd::Random(mset.Size());
+    Kokkos::View<double*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> coeffs(coeffsEig.data(), coeffsEig.size());
     double f = expansion.Evaluate(&cache[0], coeffs);
 
     
@@ -70,7 +74,9 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     // Coefficient derivatives 
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
     
-    Eigen::VectorXd grad(mset.Size());
+    Eigen::VectorXd gradEig(mset.Size());
+    Kokkos::View<double*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> grad(gradEig.data(), gradEig.size());
+    
     f2 = expansion.CoeffDerivative(&cache[0], coeffs, grad);
     CHECK(f2==Approx(f).epsilon(1e-15));
 
@@ -78,10 +84,12 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     Eigen::VectorXd stepDir = Eigen::VectorXd::Random(mset.Size());
     stepDir /= stepDir.norm();
 
-    Eigen::VectorXd coeffs2 = coeffs + fdStep * stepDir;
+    Eigen::VectorXd coeffs2Eig = coeffsEig + fdStep * stepDir;
+    Kokkos::View<double*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> coeffs2(coeffs2Eig.data(), coeffs2Eig.size());
+    
     f2 = expansion.Evaluate(&cache[0], coeffs2);
 
-    CHECK( grad.dot(stepDir) == Approx((f2-f)/fdStep).epsilon(1e-4));
+    CHECK( gradEig.dot(stepDir) == Approx((f2-f)/fdStep).epsilon(1e-4));
 
 
 
@@ -90,7 +98,7 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     CHECK(df2==Approx(df).epsilon(1e-15));
 
     df2 = expansion.DiagonalDerivative(&cache[0], coeffs2, 1);
-    CHECK( grad.dot(stepDir) == Approx((df2-df)/fdStep).epsilon(1e-4));
+    CHECK( gradEig.dot(stepDir) == Approx((df2-df)/fdStep).epsilon(1e-4));
 
     
     // Mixed second derivatives (grad of d2f wrt coeffs)
@@ -98,7 +106,7 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     CHECK(d2f2==Approx(d2f).epsilon(1e-15));
 
     d2f2 = expansion.DiagonalDerivative(&cache[0], coeffs2, 2);
-    CHECK( grad.dot(stepDir) == Approx((d2f2-d2f)/fdStep).epsilon(1e-4));
+    CHECK( gradEig.dot(stepDir) == Approx((d2f2-d2f)/fdStep).epsilon(1e-4));
 }
 
 
