@@ -56,7 +56,7 @@ protected:
 
     unsigned int fdim_; // The current length of f(x)
     const unsigned int maxDim_; // The maximum length of f(x) allowed by the cache size
-    const unsigned int workspaceSize_; // The total number of doubles that could be used by this quadrature method to store function evaluations during a call to "integrate"
+    unsigned int workspaceSize_; // The total number of doubles that could be used by this quadrature method to store function evaluations during a call to "integrate"
 
     Kokkos::View<double*,MemorySpace> internalWork_;
     double* workspace_;
@@ -115,7 +115,7 @@ public:
      * @param maxDim The maximum dimension of the integrand.  Used to help set up workspace.
      * @param workspace A pointer to memory that is allocated as a workspace.  Must have space for at least maxDim components.
      */
-    ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim);
+    inline ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim);
 
     /** 
         @brief Construct a new Clenshaw Curtis Quadrature object with externally allocated workspace memory.
@@ -124,13 +124,24 @@ public:
         @param maxDim The maximum dimension of the integrand.  Used to help set up workspace.
         @param workspace A pointer to memory that is allocated as a workspace.  Must have space for at least maxDim components.  Set to null ptr if workspace memory will be allocated later using the SetWorkspace function. 
     */
-    ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace);
+    inline ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace);
 
     /** @brief Returns the size of a double array needed as a workspace to integrate a function with dimension fdim.
         @param fdim The dimension of a vector-valued integrand.
         @return The minimum length of a double array needed for the workspace.
     */
     KOKKOS_FUNCTION static unsigned int GetWorkspaceSize(unsigned int fdim){return fdim;};
+
+    KOKKOS_INLINE_FUNCTION void SetDim(unsigned int fdim){
+
+        // If the workspace is managed internally, we need to make sure we won't required too much memory
+        if(this->internalWork_.extent(0)>0)
+            assert(fdim<=this->maxDim_); 
+
+        this->fdim_ = fdim; 
+        this->workspaceSize_=GetWorkspaceSize(fdim);
+        assert((this->internalWork_.extent(0)==0)||(this->internalWork_.extent(0)>=this->workspaceSize_));
+    }
 
     /**
      * @brief Construct a new Clenshaw Curtis Quadrature object without allocating workspace memory and specifying views where the points and weights should be stored.
@@ -274,28 +285,28 @@ struct GetRuleFunctor{
 }; 
 
 template<typename MemorySpace>
-ClenshawCurtisQuadrature<MemorySpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim) : QuadratureBase<MemorySpace>(maxDim,maxDim),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
+inline ClenshawCurtisQuadrature<MemorySpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim) : QuadratureBase<MemorySpace>(maxDim,maxDim),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
 {
     // TODO: Add parallel for loop here with one thread to make sure rule is filled in the correct space
     Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(numPts, pts_.data(), wts_.data()));
 };
 
 template<>
-ClenshawCurtisQuadrature<Kokkos::HostSpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim) : QuadratureBase<Kokkos::HostSpace>(maxDim,maxDim),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
+inline ClenshawCurtisQuadrature<Kokkos::HostSpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim) : QuadratureBase<Kokkos::HostSpace>(maxDim,maxDim),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
 {
     GetRule(numPts, wts_.data(), pts_.data());
 };
 
 
 template<typename MemorySpace>
-ClenshawCurtisQuadrature<MemorySpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace) : QuadratureBase<MemorySpace>(maxDim,maxDim,workspace),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
+inline ClenshawCurtisQuadrature<MemorySpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace) : QuadratureBase<MemorySpace>(maxDim,maxDim,workspace),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
 {
     // TODO: Add parallel for loop here with one thread to make sure rule is filled in the correct space
     Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(numPts, pts_.data(), wts_.data()));
 };
 
 template<>
-ClenshawCurtisQuadrature<Kokkos::HostSpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace) : QuadratureBase<Kokkos::HostSpace>(maxDim,maxDim,workspace),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
+inline ClenshawCurtisQuadrature<Kokkos::HostSpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace) : QuadratureBase<Kokkos::HostSpace>(maxDim,maxDim,workspace),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
 {
     GetRule(numPts, wts_.data(), pts_.data());
 };
@@ -410,6 +421,17 @@ public:
     KOKKOS_FUNCTION static unsigned int GetWorkspaceSize(unsigned int maxSub, unsigned int fdim){return (2*maxSub+5)*fdim + 2*maxSub;};
 
 
+    KOKKOS_INLINE_FUNCTION void SetDim(unsigned int fdim){
+        
+        // If the workspace is managed internally, we need to make sure we won't required too much memory
+        if(this->internalWork_.extent(0)>0)
+            assert(fdim<=this->maxDim_); 
+
+        this->fdim_ = fdim; 
+        this->workspaceSize_=GetWorkspaceSize(this->maxSub_, fdim);
+        assert((this->internalWork_.extent(0)==0)||(this->internalWork_.extent(0)>=this->workspaceSize_));
+    }
+
     /**
      @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$
      @details
@@ -435,8 +457,7 @@ public:
                                    double              lb, 
                                    double              ub,
                                    double*             res) const
-    {  
-
+    {   
         for(unsigned int i=0; i<this->fdim_; ++i){
             res[i] = 0;
         }
@@ -477,6 +498,7 @@ public:
 
         while(true){
             
+            
             leftPt = &workspace[workStartInd];
             rightPt = &workspace[workStartInd+1];
             
@@ -484,15 +506,17 @@ public:
             // std::cout << "    log(f): " << std::log(leftFunc[0]) << ",  " << std::log(midFunc[0]) << ", " << std::log(rightFunc[0]) << std::endl;
             // std::cout << "    lb/ub:  " << *leftPt << ",  " << *rightPt << std::endl;
 
+
             // Compute the subinterval mid points
             midPt = 0.5*((*leftPt) + (*rightPt));
             leftMidPt = 0.5*((*leftPt)+midPt);
             rightMidPt = 0.5*(midPt+(*rightPt));
 
-            // Evaluate the integrand at the subinterval mid points
-            leftMidFunc = &workspace[workStartInd + 2];
-            f(leftMidPt, leftMidFunc);
 
+            // Evaluate the integrand at the subinterval mid points
+            leftMidFunc = &workspace[workStartInd + 2]; 
+            f(leftMidPt, leftMidFunc);
+           
             rightMidFunc = &workspace[workStartInd + 2 + this->fdim_];
             f(rightMidPt, rightMidFunc);
 
@@ -502,7 +526,7 @@ public:
                 intFine[i]  = ((midPt-(*leftPt))/6.0) * (leftFunc[i] + 4.0*leftMidFunc[i] + midFunc[i]);
                 intFine[i] += (((*rightPt)-midPt)/6.0) * (midFunc[i] + 4.0*rightMidFunc[i] + rightFunc[i]);
             }
-
+            
             // Check to see if the error is small enough or if we've hit the maximum number of subdivisions
             this->EstimateError(intCoarse, intFine, error, errorTol);
 
@@ -540,7 +564,6 @@ public:
                 }
                 
                 UpdateValues(workspace, currLevel, currSegment, leftFunc, midFunc, rightFunc);
-
                 
             // If not successful, move on to the left segment at the next level
             }else{
@@ -554,10 +577,7 @@ public:
                 workspace[workStartInd] = *leftPt; // Set the left point at the next level
                 workspace[workStartInd+1] = midPt; // Set the right point at the next level
             }
-
-
         }
-
     }
 
 private:
@@ -606,14 +626,14 @@ public:
        @param[in] errorMetric A flag specifying the type of error metric to use.
        @param[in] level The nesting level \f$L\f$.  A coarse rule with \f$2^{L}+1\f$ points will be used and a fine rule with \f$w^{L+1}+1\f$ points will be used.
      */
-   AdaptiveClenshawCurtis(unsigned int      level,
+   inline AdaptiveClenshawCurtis(unsigned int      level,
                           unsigned int      maxSub,
                           unsigned int      maxDim, 
                           double            absTol, 
                           double            relTol,
                           QuadError::Type   errorMetric);
 
-    AdaptiveClenshawCurtis(unsigned int      level,
+    inline AdaptiveClenshawCurtis(unsigned int      level,
                            unsigned int      maxSub,
                            unsigned int      maxDim, 
                            double*           workspace,
@@ -647,6 +667,15 @@ public:
     KOKKOS_FUNCTION static unsigned int GetWorkspaceSize(unsigned int maxSub, unsigned int fdim){return (maxSub+5)*fdim + 2*maxSub;};
 
 
+    KOKKOS_INLINE_FUNCTION void SetDim(unsigned int fdim){
+
+        // If the workspace is managed internally, we need to make sure we won't required too much memory
+        if(this->internalWork_.extent(0)>0)
+            assert(fdim<=this->maxDim_); 
+    
+        this->fdim_ = fdim; 
+        this->workspaceSize_=GetWorkspaceSize(this->maxSub_, fdim);
+    }
 
     /**
      @brief Approximates the integral \f$\int_{x_L}^{x_U} f(x) dx\f$
@@ -849,7 +878,7 @@ private:
 }; // class AdaptiveClenshawCurtis
 
 template<typename MemorySpace>
-AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int      level,
+inline AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int      level,
                           unsigned int      maxSub,
                           unsigned int      maxDim, 
                           double            absTol, 
@@ -867,7 +896,7 @@ AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int      le
 };
 
 template<>
-AdaptiveClenshawCurtis<Kokkos::HostSpace>::AdaptiveClenshawCurtis(unsigned int      level,
+inline AdaptiveClenshawCurtis<Kokkos::HostSpace>::AdaptiveClenshawCurtis(unsigned int      level,
                           unsigned int      maxSub,
                           unsigned int      maxDim, 
                           double            absTol, 
@@ -886,7 +915,7 @@ AdaptiveClenshawCurtis<Kokkos::HostSpace>::AdaptiveClenshawCurtis(unsigned int  
 
 
 template<typename MemorySpace>
-AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int      level,
+inline AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int      level,
                           unsigned int      maxSub,
                           unsigned int      maxDim, 
                           double*           workspace,
@@ -905,7 +934,7 @@ AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int      le
 };
 
 template<>
-AdaptiveClenshawCurtis<Kokkos::HostSpace>::AdaptiveClenshawCurtis(unsigned int      level,
+inline AdaptiveClenshawCurtis<Kokkos::HostSpace>::AdaptiveClenshawCurtis(unsigned int      level,
                           unsigned int      maxSub,
                           unsigned int      maxDim, 
                           double*           workspace,

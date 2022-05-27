@@ -12,8 +12,6 @@ using namespace Catch;
 
 TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
 
-    const double testTol = 1e-7;
-
     unsigned int dim = 3;
     unsigned int maxDegree = 3; 
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
@@ -74,7 +72,7 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     // Coefficient derivatives 
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
     
-    Eigen::VectorXd gradEig(mset.Size());
+    Eigen::VectorXd gradEig = -1.0*Eigen::VectorXd::Ones(mset.Size());
     Kokkos::View<double*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> grad(gradEig.data(), gradEig.size());
     
     f2 = expansion.CoeffDerivative(&cache[0], coeffs, grad);
@@ -90,8 +88,6 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     f2 = expansion.Evaluate(&cache[0], coeffs2);
 
     CHECK( gradEig.dot(stepDir) == Approx((f2-f)/fdStep).epsilon(1e-4));
-
-
 
     // Mixed first derivatives
     df2 = expansion.MixedDerivative(&cache[0], coeffs, 1, grad);
@@ -115,8 +111,6 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
 TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionDevice]") {
 
     typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
-
-    const double testTol = 1e-7;
 
     unsigned int dim = 3;
     unsigned int maxDegree = 3; 

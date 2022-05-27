@@ -243,13 +243,17 @@ public:
     }
 
     /**
-     * @brief 
-     * 
-     * @tparam CoeffVecType 
-     * @tparam GradVecType 
-     * @param polyCache 
-     * @param coeffs 
-     * @param grad 
+     * @brief Evaluates the expansion and also computes the gradient of the expansion output wrt the coefficients.
+       @details Using cached values in the "polyCache" argument and coefficients \f$\theta\f$ from the coeffs argument,
+        this function returns the value of the expansion \f$f(x;\theta)\f$ and computes the gradient \f$\nabla_\theta f\f$ 
+        of the expansion output with respect to the coefficients \f$\theta\f$.
+
+     @tparam CoeffVecType 
+     @tparam GradVecType 
+     @param polyCache 
+     @param coeffs 
+     @param grad A vector that will be updated with the scaled gradient.  This is the vector \f$g\f$ in the expression above.  
+     @param gradScale The scaling \f$\alpha\f$ used in the expression above. 
      */
     template<typename CoeffVecType, typename GradVecType>
     KOKKOS_FUNCTION double CoeffDerivative(const double* polyCache, CoeffVecType const& coeffs, GradVecType& grad) const
