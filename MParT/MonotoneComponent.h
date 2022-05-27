@@ -4,6 +4,7 @@
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
 
+#include "MParT/ConditionalMapBase.h"
 #include "MParT/DerivativeFlags.h"
 #include "MParT/MonotoneIntegrand.h"
 
@@ -34,36 +35,68 @@ $$
 @tparam QuadratureType A class defining the integration scheme used to approximate \f$\int_0^{x_N}  g\left( \frac{\partial f}{\partial x_d}(x_1,x_2,..., x_{N-1}, t) \right) dt\f$.  The type must have a function `Integrate(f,lb,ub)` that accepts a functor `f`, a double lower bound `lb`, a double upper bound `ub`, and returns a double with an estimate of the integral.   The MParT::AdaptiveSimpson and MParT::RecursiveQuadrature classes provide this interface. 
 */
 template<class ExpansionType, class PosFuncType, class QuadratureType>
-class MonotoneComponent
+class MonotoneComponent : public ConditionalMapBase
 {
 
 public:
 
-    MonotoneComponent(ExpansionType  const& expansion, 
-                      QuadratureType const& quad) : _expansion(expansion), _quad(quad), _dim(expansion.InputSize()){};
+    MonotoneComponent(ExpansionType  const& expansion,
+                      QuadratureType const& quad) : ConditionalMapBase(expansion.InputSize(), 1),
+                                                    _expansion(expansion),
+                                                    _quad(quad),
+                                                    _dim(expansion.InputSize()){};
 
+
+
+    /** Override the ConditionalMapBase Evaluate function. */
+    virtual void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
+                              Kokkos::View<double**, Kokkos::HostSpace>      & output) override
+    {
+        Kokkos::View<double*,Kokkos::HostSpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
+        EvaluateImpl<Kokkos::HostSpace, Kokkos::DefaultHostExecutionSpace>(pts, savedCoeffs, outputSlice);
+    }
+
+    virtual void InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& x1,
+                             Kokkos::View<const double**, Kokkos::HostSpace> const& r,
+                             Kokkos::View<double**, Kokkos::HostSpace>      & output) override
+    {
+        Kokkos::View<const double*,Kokkos::HostSpace> rSlice = Kokkos::subview(r,0,Kokkos::ALL());
+        Kokkos::View<double*,Kokkos::HostSpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
+        InverseImpl<Kokkos::HostSpace, Kokkos::DefaultHostExecutionSpace>(x1, rSlice, savedCoeffs, outputSlice);
+    }
+
+
+    // /**
+    //    @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
+
+    //  * @param[in] pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
+    //  * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
+    //  * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
+    //  */
+    // template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, class... OtherTraits>
+    // Kokkos::View<double*, MemorySpace> EvaluateImpl(Kokkos::View<const double**, OtherTraits...> const& pts, 
+    //                                                 Kokkos::View<const double*, MemorySpace > const& coeffs)
+    // {   
+    //     const unsigned int numPts = pts.extent(1);
+    //     Kokkos::View<double*,MemorySpace> output("Monotone Component Evaluations", numPts);
+
+    //     EvaluateImpl<MemorySpace, ExecutionSpace>(pts, coeffs, output);
+    //     Kokkos::fence();
+        
+    //     return output;
+    // }
 
 
     /**
-       @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
-       
-     * @param[in] pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
-     * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
-     * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
+     * @brief Support calling EvaluateImpl with non-const views.
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, class... OtherTraits>
-    Kokkos::View<double*, MemorySpace> Evaluate(Kokkos::View<double**, OtherTraits...> const& pts, 
-                                                Kokkos::View<double*, MemorySpace > const& coeffs)
-    {   
-        const unsigned int numPts = pts.extent(1);
-        Kokkos::View<double*,MemorySpace> output("Monotone Component Evaluations", numPts);
-
-        Evaluate<MemorySpace, ExecutionSpace>(pts, coeffs, output);
-        Kokkos::fence();
-        
-        return output;
+    void EvaluateImpl(Kokkos::View<double**, OtherTraits...> const& pts, 
+                      Kokkos::View<double*,MemorySpace>  const& coeffs,
+                      Kokkos::View<double*,MemorySpace>       & output)
+    {
+        EvaluateImpl<MemorySpace,ExecutionSpace,OtherTraits...>(pts,coeffs,output);
     }
-
 
     /**
        @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
@@ -73,13 +106,13 @@ public:
      * @param[out] output Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, class... OtherTraits>
-    void Evaluate(Kokkos::View<double**,OtherTraits...> const& pts, 
-                  Kokkos::View<double*,MemorySpace>  const& coeffs,
-                  Kokkos::View<double*,MemorySpace>       & output)
+    void EvaluateImpl(Kokkos::View<const double**, OtherTraits...> const& pts, 
+                      Kokkos::View<const double*,MemorySpace>  const& coeffs,
+                      Kokkos::View<double*,MemorySpace>       & output)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
-        
+
         assert(output.extent(0)==numPts);
 
         // Ask the expansion how much memory it would like for it's one-point cache
@@ -111,37 +144,47 @@ public:
     }
 
 
-    /**
-       @brief Evaluates the inverse of the \f$D^{th}\f$ componeot of the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
-       @param xs A \f$D\times N_1\f$ array containing \f$N_1\f$ \f$x_{1:D-1}\f$ points.  Note that this matrix must have either 1 or N columns and at least \f$D\f$ rows.  The \f$D\f$ row will serve as an initial guess for \f$x_D\f$ during the inversion.
-       @param ys A length \f$N\f$ array containing \f$N\f$ values of \f$y_D\f$ for use in the solve.
-       @param coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
-       @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
-       @returns A length \f$N\f$ Kokkos::View<double*> containing \f$y_D^{(i)}\f$.
-    */
+    // /**
+    //    @brief Evaluates the inverse of the \f$D^{th}\f$ componeot of the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
+    //    @param xs A \f$D\times N_1\f$ array containing \f$N_1\f$ \f$x_{1:D-1}\f$ points.  Note that this matrix must have either 1 or N columns and at least \f$D\f$ rows.  The \f$D\f$ row will serve as an initial guess for \f$x_D\f$ during the inversion.
+    //    @param ys A length \f$N\f$ array containing \f$N\f$ values of \f$y_D\f$ for use in the solve.
+    //    @param coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
+    //    @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
+    //    @returns A length \f$N\f$ Kokkos::View<double*> containing \f$y_D^{(i)}\f$.
+    // */
+    // template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    // Kokkos::View<double*,MemorySpace> InverseImpl(Kokkos::View<const double**,MemorySpace>       const& xs, 
+    //                                               Kokkos::View<const double*,MemorySpace>        const& ys, 
+    //                                               Kokkos::View<const double*,MemorySpace>        const& coeffs,
+    //                                               std::map<std::string, std::string>              options=std::map<std::string,std::string>())
+    // {   
+    //     const unsigned int numPts = ys.extent(0);
+    //     Kokkos::View<double*,MemorySpace> output("Monotone Component Inverse Evaluations", numPts);
+
+    //     InverseImpl<MemorySpace, ExecutionSpace>(xs, ys, coeffs, output, options);
+
+    //     return output;
+    // }
+
+
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    Kokkos::View<double*,MemorySpace> Inverse(Kokkos::View<double**,MemorySpace>       const& xs, 
-                                              Kokkos::View<double*,MemorySpace>        const& ys, 
-                                              Kokkos::View<double*,MemorySpace>        const& coeffs,
-                                              std::map<std::string, std::string>              options=std::map<std::string,std::string>())
-    {   
-        const unsigned int numPts = ys.extent(0);
-        Kokkos::View<double*,MemorySpace> output("Monotone Component Inverse Evaluations", numPts);
-
-        Inverse<MemorySpace, ExecutionSpace>(xs, ys, coeffs, output, options);
-
-        return output;
+    void InverseImpl(Kokkos::View<double**,MemorySpace>       const& xs, 
+                     Kokkos::View<double*,MemorySpace>        const& ys,
+                     Kokkos::View<double*,MemorySpace>        const& coeffs,
+                     Kokkos::View<double*,MemorySpace>             & output,
+                     std::map<std::string, std::string>              options=std::map<std::string,std::string>())
+    {
+        InverseImpl<MemorySpace, ExecutionSpace>(xs,ys,coeffs,output,options);
     }
 
-
     /**
-     @brief Evaluates the inverse of the diagonal of the monotone component.  
-     @details This function solve the nonlinear equation \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$ given \f$N\f$ different 
-              values of \f$y_D^{(1)},\ldots,y_D^{(N)}\f$.  It is possible to specify either a single \f$x_{1:D-1}\f$ sample or \f$N\f$ different values 
-              \f$x_{1:D-1}^{(1)},\ldots,x_{1:D-1}^{(N)}\f$.  If only a single point is given, then this function returns a vector 
-              containing \f$x_D^{(i)}=T^{-1}(x_1,\ldots,x_{D-1}, y^{(i)}_D)\f$.    When \f$N\f$N points are given, this function returns 
+     @brief Evaluates the inverse of the diagonal of the monotone component.
+     @details This function solve the nonlinear equation \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$ given \f$N\f$ different
+              values of \f$y_D^{(1)},\ldots,y_D^{(N)}\f$.  It is possible to specify either a single \f$x_{1:D-1}\f$ sample or \f$N\f$ different values
+              \f$x_{1:D-1}^{(1)},\ldots,x_{1:D-1}^{(N)}\f$.  If only a single point is given, then this function returns a vector
+              containing \f$x_D^{(i)}=T^{-1}(x_1,\ldots,x_{D-1}, y^{(i)}_D)\f$.    When \f$N\f$N points are given, this function returns
               a vector containing \f$x_D^{(i)}=T^{-1}(x_1^{(i)},\ldots,x_{D-1}^{(i)}, y^{(i)}_D)\f$.
-      
+
      @param xs A \f$D\times N_1\f$ array containing \f$N_1\f$ \f$x_{1:D-1}\f$ points.  Note that this matrix must have either 1 or N columns and at least \f$D\f$ rows.  The \f$D\f$ row will serve as an initial guess for \f$x_D\f$ during the inversion.
      @param ys A length \f$N\f$ array containing \f$N\f$ values of \f$y_D\f$ for use in the solve.
      @param coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
@@ -149,9 +192,9 @@ public:
      @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void Inverse(Kokkos::View<double**,MemorySpace>       const& xs, 
-                 Kokkos::View<double*,MemorySpace>        const& ys,
-                 Kokkos::View<double*,MemorySpace>        const& coeffs,
+    void InverseImpl(Kokkos::View<const double**,MemorySpace>       const& xs, 
+                 Kokkos::View<const double*,MemorySpace>        const& ys,
+                 Kokkos::View<const double*,MemorySpace>        const& coeffs,
                  Kokkos::View<double*,MemorySpace>             & output,
                  std::map<std::string, std::string>              options=std::map<std::string,std::string>())
     {   
@@ -198,11 +241,11 @@ public:
             msg << "Invalid tolerances given to MonotoneComponent::Inverse.  Either \"xtol\" or \"ytol\" must be nonzero, but given values are " << xtol << " and " << ytol;
             throw std::invalid_argument(msg.str());
         }
-        
+
 
 
         // Set up the cache for each point
-        const unsigned int numPts = ys.extent(0); 
+        const unsigned int numPts = ys.extent(0);
         const unsigned int numXs = xs.extent(1); // The number of input points
 
         const unsigned int numTerms = coeffs.extent(0);
@@ -243,7 +286,6 @@ public:
             // Fill in the cache with everything that doesn't depend on x_d
             Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
             _expansion.FillCache1(cache.data(), pt, DerivativeFlags::None);
-
 
             // Compute the inverse 
             Kokkos::View<double*,MemorySpace> workspace(team_member.thread_scratch(1), workspaceSize);
@@ -626,16 +668,16 @@ public:
 
     /**
      @brief Solves \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$ at a single point using the ITP bracketing method.
-     @details Uses the [Interpolate Truncate and Project (ITP)](https://en.wikipedia.org/wiki/ITP_method) method to solve 
+     @details Uses the [Interpolate Truncate and Project (ITP)](https://en.wikipedia.org/wiki/ITP_method) method to solve
               \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$.  This method is a bracketing method similar to bisection, but
               with faster convergence.   The worst case performance of ITP, in terms of required evaluations of \f$T\f$,
-              is the same as bisection. 
+              is the same as bisection.
 
      @param cache Memory set up by Kokkos for this evaluation.  The `_expansion.FillCache1` function must be
                   called before calling this function.
      @param pt Array of length \f$D\f$ containing the fixed values of \f$x_{1:D-1}\f$ and an initial guess for \f$x_D\f$ in the last component.
      @param coeffs An array of coefficients for the expansion.
-     @param options 
+     @param options
      @return The value of \f$x_D\f$ solving \f$y_D = T(x_1,\ldots,x_D)\f$
 
      @tparam PointType The type of the point.  Typically either Kokkos::View<double*> or some subview with a similar 1d signature.
@@ -706,7 +748,7 @@ public:
         assert(ylb<yub);
         assert(xlb<xub);
 
-        // Bracketed search 
+        // Bracketed search
         const double k1 = 0.1;
         const double k2 = 2.0;
         const double nhalf = ceil(log2(0.5*(xub-xlb)/xtol));
@@ -739,7 +781,7 @@ public:
                 mpart::swap(xc,xlb);
             }
 
-            // Check for convergence 
+            // Check for convergence
             if(((xub-xlb)<xtol)||((yub-ylb)<ftol))
                 break;
         };

@@ -7,6 +7,8 @@
 
 #include <Kokkos_Core.hpp>
 
+#include <Eigen/Core>
+
 namespace mpart{
 
 namespace QuadError{
@@ -156,6 +158,13 @@ public:
     {
         GetRule(numPts_, wts_.data(), pts_.data());
     };
+
+    static std::pair<Eigen::VectorXd, Eigen::VectorXd> GetRule(unsigned int order)
+    {
+        Eigen::VectorXd wts, pts;
+        ClenshawCurtisQuadrature::GetRule(order, wts, pts);
+        return std::make_pair(wts,pts);
+    }
 
     /**
      @brief Computes the weights and points in a Clenshaw-Curtis rule.
@@ -751,10 +760,6 @@ public:
             // Evaluate the integrand at the midpoint and store in the workspace
             midFunc = &workspace[workStartInd + 2];
             f(midPt, midFunc);
-
-            // std::cout << "Level " << currLevel << "   " << std::bitset<sizeof(currSegment)*8>(currSegment) << std::endl;
-            // std::cout << "    log(f): " << std::log(leftFunc[0]) << ",  " << std::log(midFunc[0]) << ", " << std::log(rightFunc[0]) << std::endl;
-            // std::cout << "    lb/ub:  " << *leftPt << ",  " << *rightPt << std::endl;
 
             // Start with the left, right, and middle points
             coarseRightIndex = this->coarseWts_.extent(0)-1;
