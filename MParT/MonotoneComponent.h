@@ -20,8 +20,8 @@ namespace mpart{
 /**
 @brief Defines a function \f$T:R^N\rightarrow R\f$ such that \f$\partial T / \partial x_N >0\f$ is strictly positive.
 
-@details 
-The function \f$T\f$ is based on another (generally non-monotone) function \f$f : R^N\rightarrow R\f$ and a strictly positve function 
+@details
+The function \f$T\f$ is based on another (generally non-monotone) function \f$f : R^N\rightarrow R\f$ and a strictly positve function
 \f$g : R\rightarrow R_{>0}\f$.   Together, these functions define the monotone component $T$ through
 
 $$
@@ -30,18 +30,18 @@ $$
 
 @tparam ExpansionType A class defining the function \f$f\f$.  It must satisfy the cached parameterization concept.
 @tparam PosFuncType A class defining the function \f$g\f$.  This class must have `Evaluate` and `Derivative` functions accepting a double and returning a double.  The MParT::SoftPlus and MParT::Exp classes in PositiveBijectors.h are examples of classes defining this interface.
-@tparam QuadratureType A class defining the integration scheme used to approximate \f$\int_0^{x_N}  g\left( \frac{\partial f}{\partial x_d}(x_1,x_2,..., x_{N-1}, t) \right) dt\f$.  The type must have a function `Integrate(f,lb,ub)` that accepts a functor `f`, a double lower bound `lb`, a double upper bound `ub`, and returns a double with an estimate of the integral.   The MParT::AdaptiveSimpson and MParT::RecursiveQuadrature classes provide this interface. 
+@tparam QuadratureType A class defining the integration scheme used to approximate \f$\int_0^{x_N}  g\left( \frac{\partial f}{\partial x_d}(x_1,x_2,..., x_{N-1}, t) \right) dt\f$.  The type must have a function `Integrate(f,lb,ub)` that accepts a functor `f`, a double lower bound `lb`, a double upper bound `ub`, and returns a double with an estimate of the integral.   The MParT::AdaptiveSimpson and MParT::RecursiveQuadrature classes provide this interface.
 */
 template<class ExpansionType, class PosFuncType, class QuadratureType>
 class MonotoneComponent : public ConditionalMapBase
 {
 
 public:
-    
-    MonotoneComponent(ExpansionType  const& expansion, 
+
+    MonotoneComponent(ExpansionType  const& expansion,
                       QuadratureType const& quad) : ConditionalMapBase(expansion.InputSize(), 1),
-                                                    _expansion(expansion), 
-                                                    _quad(quad), 
+                                                    _expansion(expansion),
+                                                    _quad(quad),
                                                     _dim(expansion.InputSize()){};
 
 
@@ -51,60 +51,60 @@ public:
                               Kokkos::View<double**, Kokkos::HostSpace>      & output) override
     {
         Kokkos::View<double*,Kokkos::HostSpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        EvaluateImpl(pts, savedCoeffs, outputSlice);    
+        EvaluateImpl(pts, savedCoeffs, outputSlice);
     }
 
     virtual void InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& x1,
                              Kokkos::View<const double**, Kokkos::HostSpace> const& r,
                              Kokkos::View<double**, Kokkos::HostSpace>      & output) override
-    {   
+    {
         Kokkos::View<const double*,Kokkos::HostSpace> rSlice = Kokkos::subview(r,0,Kokkos::ALL());
         Kokkos::View<double*,Kokkos::HostSpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        InverseImpl(x1, rSlice, savedCoeffs, outputSlice);    
+        InverseImpl(x1, rSlice, savedCoeffs, outputSlice);
     }
 
 
     /**
        @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
-       
+
      * @param[in] pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
      * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
      * @return Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, class... OtherTraits>
-    Kokkos::View<double*, MemorySpace> EvaluateImpl(Kokkos::View<ScalarType1**, OtherTraits...> const& pts, 
+    Kokkos::View<double*, MemorySpace> EvaluateImpl(Kokkos::View<ScalarType1**, OtherTraits...> const& pts,
                                                     Kokkos::View<ScalarType2*, MemorySpace > const& coeffs)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> output("Monotone Component Evaluations", numPts);
 
         EvaluateImpl<MemorySpace, ExecutionSpace>(pts, coeffs, output);
         Kokkos::fence();
-        
+
         return output;
     }
 
 
     /**
        @brief Evaluates the monotone function \f$T(x_1,\ldots,x_D)\f$ at multiple points.
-       
+
      * @param[in] pts A \f$D\times N\f$ array containing the \f$N\f$ points in \f$\mathbb{R}^D\f$ where we want to evaluate the monotone component.  Each column is a point.
      * @param[in] coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
      * @param[out] output Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, class... OtherTraits>
-    void EvaluateImpl(Kokkos::View<ScalarType1**,OtherTraits...> const& pts, 
+    void EvaluateImpl(Kokkos::View<ScalarType1**,OtherTraits...> const& pts,
                       Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                       Kokkos::View<double*,MemorySpace>       & output)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
-        
+
         assert(output.extent(0)==numPts);
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = _expansion.CacheSize();
-        
+
         // Create a policy with enough scratch memory to cache the polynomial evaluations
         Kokkos::TeamPolicy<ExecutionSpace> policy = Kokkos::TeamPolicy<ExecutionSpace>(numPts, 1).set_scratch_size(1,Kokkos::PerTeam(cacheSize*sizeof(double)), Kokkos::PerThread(0));
 
@@ -112,8 +112,8 @@ public:
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
             unsigned int ptInd = team_member.league_rank();
-            
-            // Create a subview containing only the current point 
+
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
 
             // Get a pointer to the shared memory that Kokkos set up for this team
@@ -122,7 +122,7 @@ public:
             // Fill in entries in the cache that are independent of x_d.  By passing DerivativeFlags::None, we are telling the expansion that no derivatives with wrt x_1,...x_{d-1} will be needed.
             _expansion.FillCache1(cache, pt, DerivativeFlags::None);
 
-            output(ptInd) = EvaluateSingle(cache, pt, pt(_dim-1), coeffs, _quad, _expansion);            
+            output(ptInd) = EvaluateSingle(cache, pt, pt(_dim-1), coeffs, _quad, _expansion);
         });
 
     }
@@ -137,11 +137,11 @@ public:
        @returns A length \f$N\f$ Kokkos::View<double*> containing \f$y_D^{(i)}\f$.
     */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, typename ScalarType3>
-    Kokkos::View<double*,MemorySpace> InverseImpl(Kokkos::View<ScalarType1**,MemorySpace>       const& xs, 
-                                                  Kokkos::View<ScalarType2*,MemorySpace>        const& ys, 
+    Kokkos::View<double*,MemorySpace> InverseImpl(Kokkos::View<ScalarType1**,MemorySpace>       const& xs,
+                                                  Kokkos::View<ScalarType2*,MemorySpace>        const& ys,
                                                   Kokkos::View<ScalarType3*,MemorySpace>        const& coeffs,
                                                   std::map<std::string, std::string>              options=std::map<std::string,std::string>())
-    {   
+    {
         const unsigned int numPts = ys.extent(0);
         Kokkos::View<double*,MemorySpace> output("Monotone Component Inverse Evaluations", numPts);
 
@@ -152,13 +152,13 @@ public:
 
 
     /**
-     @brief Evaluates the inverse of the diagonal of the monotone component.  
-     @details This function solve the nonlinear equation \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$ given \f$N\f$ different 
-              values of \f$y_D^{(1)},\ldots,y_D^{(N)}\f$.  It is possible to specify either a single \f$x_{1:D-1}\f$ sample or \f$N\f$ different values 
-              \f$x_{1:D-1}^{(1)},\ldots,x_{1:D-1}^{(N)}\f$.  If only a single point is given, then this function returns a vector 
-              containing \f$x_D^{(i)}=T^{-1}(x_1,\ldots,x_{D-1}, y^{(i)}_D)\f$.    When \f$N\f$N points are given, this function returns 
+     @brief Evaluates the inverse of the diagonal of the monotone component.
+     @details This function solve the nonlinear equation \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$ given \f$N\f$ different
+              values of \f$y_D^{(1)},\ldots,y_D^{(N)}\f$.  It is possible to specify either a single \f$x_{1:D-1}\f$ sample or \f$N\f$ different values
+              \f$x_{1:D-1}^{(1)},\ldots,x_{1:D-1}^{(N)}\f$.  If only a single point is given, then this function returns a vector
+              containing \f$x_D^{(i)}=T^{-1}(x_1,\ldots,x_{D-1}, y^{(i)}_D)\f$.    When \f$N\f$N points are given, this function returns
               a vector containing \f$x_D^{(i)}=T^{-1}(x_1^{(i)},\ldots,x_{D-1}^{(i)}, y^{(i)}_D)\f$.
-      
+
      @param xs A \f$D\times N_1\f$ array containing \f$N_1\f$ \f$x_{1:D-1}\f$ points.  Note that this matrix must have either 1 or N columns and at least \f$D\f$ rows.  The \f$D\f$ row will serve as an initial guess for \f$x_D\f$ during the inversion.
      @param ys A length \f$N\f$ array containing \f$N\f$ values of \f$y_D\f$ for use in the solve.
      @param coeffs The coefficients in the expansion defining \f$f\f$.  The length of this array must be the same as the number of terms in the multiindex set passed to the constructor.
@@ -166,12 +166,12 @@ public:
      @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2, typename ScalarType3>
-    void InverseImpl(Kokkos::View<ScalarType1**,MemorySpace>       const& xs, 
+    void InverseImpl(Kokkos::View<ScalarType1**,MemorySpace>       const& xs,
                  Kokkos::View<ScalarType2*,MemorySpace>        const& ys,
                  Kokkos::View<ScalarType3*,MemorySpace>        const& coeffs,
                  Kokkos::View<double*,MemorySpace>             & output,
                  std::map<std::string, std::string>              options=std::map<std::string,std::string>())
-    {   
+    {
         // Extract the method from the options map
         std::string method;
         if(options.count("Method")){
@@ -215,11 +215,11 @@ public:
             msg << "Invalid tolerances given to MonotoneComponent::Inverse.  Either \"xtol\" or \"ytol\" must be nonzero, but given values are " << xtol << " and " << ytol;
             throw std::invalid_argument(msg.str());
         }
-        
+
 
 
         // Set up the cache for each point
-        const unsigned int numPts = ys.extent(0); 
+        const unsigned int numPts = ys.extent(0);
         const unsigned int numXs = xs.extent(1); // The number of input points
 
         const unsigned int numTerms = coeffs.extent(0);
@@ -258,7 +258,7 @@ public:
             double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
             _expansion.FillCache1(cache, pt, DerivativeFlags::None);
 
-            // Compute the inverse 
+            // Compute the inverse
             output(ptInd) = InverseSingleBracket(cache, pt, ys(ptInd), coeffs, xtol, ytol, _quad, _expansion);
         });
     }
@@ -274,12 +274,12 @@ public:
         @see DiscreteDerivative
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
-    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts,
                                                             Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> derivs("Monotone Component Derivatives", numPts);
-        
+
         ContinuousDerivative<MemorySpace,ExecutionSpace>(pts,coeffs, derivs);
 
         return derivs;
@@ -296,10 +296,10 @@ public:
         @see DiscreteDerivative
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
-    void ContinuousDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+    void ContinuousDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts,
                               Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                               Kokkos::View<double*,MemorySpace>       & derivs)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
@@ -312,11 +312,11 @@ public:
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
-            
+
             // The index of the for loop
             unsigned int ptInd = team_member.league_rank();
 
-            // Create a subview containing only the current point 
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
 
             // Evaluate the orthgonal polynomials in each direction (except the last) for all possible orders
@@ -346,13 +346,13 @@ public:
         @see ContinuousDerivative
     */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
-    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts,
                                                            Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> evals("Component Evaluations", numPts);
         Kokkos::View<double*,MemorySpace> derivs("Component Derivatives", numPts);
-        
+
         DiscreteDerivative<MemorySpace, ExecutionSpace>(pts,coeffs, evals, derivs);
 
         return derivs;
@@ -370,11 +370,11 @@ public:
         @see ContinuousDerivative
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
-    void  DiscreteDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+    void  DiscreteDerivative(Kokkos::View<ScalarType1**,MemorySpace> const& pts,
                              Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
-                             Kokkos::View<double*,MemorySpace>       & evals, 
+                             Kokkos::View<double*,MemorySpace>       & evals,
                              Kokkos::View<double*,MemorySpace>       & derivs)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
@@ -392,21 +392,21 @@ public:
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
 
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
-            
+
             unsigned int ptInd = team_member.league_rank();
 
-            // Create a subview containing only the current point 
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
 
             // Get a pointer to the shared memory Kokkos is managing for the cache
             double* cache = (double*) team_member.team_shmem().get_shmem(cacheSize*sizeof(double));
-            
+
             // Fill in the cache with anything that doesn't depend on x_d
             _expansion.FillCache1(cache, pt, DerivativeFlags::None);
-            
+
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
             MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt), decltype(coeffs)> integrand(cache, _expansion, pt, coeffs, DerivativeFlags::Diagonal);
-            
+
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt
             Eigen::VectorXd both = _quad.template Integrate<Eigen::VectorXd>(integrand, 0, 1);
             evals(ptInd) = both(0);
@@ -415,26 +415,26 @@ public:
             // Add f(x_1,x_2,...,x_{d-1},0) to the evaluation output
             _expansion.FillCache2(cache, pt, 0.0, DerivativeFlags::None);
             evals(ptInd) += _expansion.Evaluate(cache, coeffs);
-            
+
         });
     }
 
     /** @brief Returns the gradient of the map with respect to the parameters \f$\mathbf{w}\f$ at multiple points.
 
-        @details 
-        Consider \f$N\f$ points \f$\{\mathbf{x}^{(1)},\ldots,\mathbf{x}^{(N)}\}\f$ and let 
+        @details
+        Consider \f$N\f$ points \f$\{\mathbf{x}^{(1)},\ldots,\mathbf{x}^{(N)}\}\f$ and let
         \f$y_d^{(i)} = T_d(\mathbf{x}^{(i)}; \mathbf{w})\f$.   This function computes \f$\nabla_{\mathbf{w}} y_d^{(i)}\f$
         for each output \f$y_d^{(i)}\f$.
-        
+
         @param[in] pts A \f$D\times N\f$ matrix containing the points \f$x^{(1)},\ldots,x^{(N)}\f$.  Each column is a point.
         @param[in] coeffs A vector of coefficients defining the function \f$f(\mathbf{x}; \mathbf{w})\f$.
         @param[out] evaluations A vector containing the \f$N\f$ predictions \f$y_d^{(i)}\f$.  The vector must be preallocated and have \f$N\f$ components when passed to this function.  An assertion will be thrown in this vector is not the correct size.
         @param[out] jacobian A matrix containing the \f$N\times M\f$ Jacobian matrix, where \f$M\f$ is the length of the parameter vector \f$\mathbf{w}\f$.  This matrix must be sized correctly or an assertion will be thrown.
-        
+
         @see CoeffGradient
     */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
-    void CoeffJacobian(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+    void CoeffJacobian(Kokkos::View<ScalarType1**,MemorySpace> const& pts,
                        Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                        Kokkos::View<double*,MemorySpace>       & evaluations,
                        Kokkos::View<double**,MemorySpace>      & jacobian)
@@ -456,10 +456,10 @@ public:
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
-            
+
             unsigned int ptInd = team_member.league_rank();
 
-            // Create a subview containing only the current point 
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
             auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
 
@@ -468,13 +468,13 @@ public:
 
             // Fill in the cache with anything that doesn't depend on x_d
             _expansion.FillCache1(cache, pt, DerivativeFlags::None);
-            
+
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
             MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs)> integrand(cache, _expansion, pt, coeffs, DerivativeFlags::Parameters);
-            
+
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
             Eigen::VectorXd integral = _quad.template Integrate<Eigen::VectorXd>(integrand, 0, 1);
-            
+
             evaluations(ptInd) = integral(0);
 
             _expansion.FillCache2(cache, pt,  0.0, DerivativeFlags::None);
@@ -483,15 +483,15 @@ public:
             // Add the Integral to the coefficient gradient
             for(unsigned int termInd=0; termInd<numTerms; ++termInd)
                 jacView(termInd) += integral(termInd+1);
-            
+
         });
     }
 
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
-    void ContinuousMixedJacobian(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+    void ContinuousMixedJacobian(Kokkos::View<ScalarType1**,MemorySpace> const& pts,
                                  Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                                  Kokkos::View<double**,MemorySpace>      & jacobian)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
@@ -504,11 +504,11 @@ public:
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
-            
+
             // The index of the for loop
             unsigned int ptInd = team_member.league_rank();
 
-            // Create a subview containing only the current point 
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
             auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
 
@@ -533,10 +533,10 @@ public:
     }
 
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, typename ScalarType1, typename ScalarType2>
-    void DiscreteMixedJacobian(Kokkos::View<ScalarType1**,MemorySpace> const& pts, 
+    void DiscreteMixedJacobian(Kokkos::View<ScalarType1**,MemorySpace> const& pts,
                                Kokkos::View<ScalarType2*,MemorySpace>  const& coeffs,
                                Kokkos::View<double**,MemorySpace>      & jacobian)
-    {   
+    {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
@@ -553,10 +553,10 @@ public:
 
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
-            
+
             unsigned int ptInd = team_member.league_rank();
 
-            // Create a subview containing only the current point 
+            // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
             auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
 
@@ -565,17 +565,17 @@ public:
 
             // Fill in the cache with anything that doesn't depend on x_d
             _expansion.FillCache1(cache, pt, DerivativeFlags::None);
-            
+
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
             MonotoneIntegrand<ExpansionType, PosFuncType,  decltype(pt), decltype(coeffs)> integrand(cache, _expansion, pt, coeffs, DerivativeFlags::Mixed);
-            
+
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
             Eigen::VectorXd integral = _quad.template Integrate<Eigen::VectorXd>(integrand, 0, 1);
-            
+
             // Add the Integral to the coefficient gradient
             for(unsigned int termInd=0; termInd<numTerms; ++termInd)
                 jacView(termInd) += integral(termInd+1);
-            
+
         });
     }
 
@@ -583,49 +583,49 @@ public:
      @brief Evaluates the monotone component at a single point using an existing cache.
 
      @tparam PointType The type of point used (subview, etc...)
-     @param cache 
-     @param pt 
-     @param coeffs 
-     @return double 
+     @param cache
+     @param pt
+     @param coeffs
+     @return double
      */
     template<typename PointType, typename CoeffsType>
     static KOKKOS_FUNCTION double EvaluateSingle(double*                  cache,
                                                         PointType         const& pt,
                                                         double                   xd,
-                                                        CoeffsType        const& coeffs, 
-                                                        QuadratureType    const& quad, 
+                                                        CoeffsType        const& coeffs,
+                                                        QuadratureType    const& quad,
                                                         ExpansionType     const& expansion)
-    {   
+    {
         double output = 0.0;
-        // Compute the integral \int_0^1 g( \partial_D f(x_1,...,x_{D-1},t*x_d)) dt 
-        MonotoneIntegrand<ExpansionType, PosFuncType, PointType, CoeffsType> integrand(cache, 
+        // Compute the integral \int_0^1 g( \partial_D f(x_1,...,x_{D-1},t*x_d)) dt
+        MonotoneIntegrand<ExpansionType, PosFuncType, PointType, CoeffsType> integrand(cache,
                                                                                        expansion,
                                                                                        pt,
                                                                                        xd,
-                                                                                       coeffs, 
+                                                                                       coeffs,
                                                                                        DerivativeFlags::None);
         output = quad.template Integrate<Eigen::VectorXd>(integrand, 0, 1)(0);
-        
+
         // // Finish filling in the cache for an evaluation of the expansion with x_d=0
         expansion.FillCache2(cache, pt, 0.0, DerivativeFlags::None);
-        output += expansion.Evaluate(cache, coeffs);   
-        
+        output += expansion.Evaluate(cache, coeffs);
+
         return output;
     }
 
 
     /**
      @brief Solves \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$ at a single point using the ITP bracketing method.
-     @details Uses the [Interpolate Truncate and Project (ITP)](https://en.wikipedia.org/wiki/ITP_method) method to solve 
+     @details Uses the [Interpolate Truncate and Project (ITP)](https://en.wikipedia.org/wiki/ITP_method) method to solve
               \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$.  This method is a bracketing method similar to bisection, but
               with faster convergence.   The worst case performance of ITP, in terms of required evaluations of \f$T\f$,
-              is the same as bisection. 
+              is the same as bisection.
 
      @param cache Memory set up by Kokkos for this evaluation.  The `_expansion.FillCache1` function must be
                   called before calling this function.
      @param pt Array of length \f$D\f$ containing the fixed values of \f$x_{1:D-1}\f$ and an initial guess for \f$x_D\f$ in the last component.
      @param coeffs An array of coefficients for the expansion.
-     @param options 
+     @param options
      @return The value of \f$x_D\f$ solving \f$y_D = T(x_1,\ldots,x_D)\f$
 
      @tparam PointType The type of the point.  Typically either Kokkos::View<double*> or some subview with a similar 1d signature.
@@ -637,7 +637,7 @@ public:
                                double                              yd,
                                CoeffsType                   const& coeffs,
                                const double xtol, const double ftol, QuadratureType const& quad, ExpansionType const& expansion)
-    {   
+    {
         double stepSize=1.0;
         const unsigned int maxIts = 10000;
 
@@ -652,7 +652,7 @@ public:
 
         // We actually found an upper bound...
         if(ylb>yd){
-           
+
             std::swap(ylb,yub);
             std::swap(xlb,xub);
 
@@ -692,7 +692,7 @@ public:
         assert(ylb<yub);
         assert(xlb<xub);
 
-        // Bracketed search 
+        // Bracketed search
         const double k1 = 0.1;
         const double k2 = 2.0;
         const double nhalf = ceil(log2(0.5*(xub-xlb)/xtol));
@@ -707,9 +707,9 @@ public:
 
             sigma = ((xb-xf)>0)?1.0:-1.0; // sign(xb-xf)
             delta = std::min(k1*std::pow((xub-xlb), k2), std::abs(xb-xf));
-            
+
             xf += delta*sigma;
-            
+
             rho = std::min(xtol*std::pow(2.0, nhalf + n0 - it) - 0.5*(xub-xlb), std::abs(xf - xb));
             xc = xb - sigma*rho;
 
@@ -725,7 +725,7 @@ public:
                 std::swap(xc,xlb);
             }
 
-            // Check for convergence 
+            // Check for convergence
             if(((xub-xlb)<xtol)||((yub-ylb)<ftol))
                 break;
         };
@@ -740,4 +740,4 @@ private:
 };
 
 } // namespace mpart
-#endif 
+#endif
