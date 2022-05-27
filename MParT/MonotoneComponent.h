@@ -94,8 +94,11 @@ public:
     void EvaluateImpl(Kokkos::View<double**, OtherTraits...> const& pts, 
                       Kokkos::View<double*,MemorySpace>  const& coeffs,
                       Kokkos::View<double*,MemorySpace>       & output)
-    {
-        EvaluateImpl<MemorySpace,ExecutionSpace,OtherTraits...>(pts,coeffs,output);
+    {   
+        Kokkos::View<const double**, OtherTraits...> constPts = pts;
+        Kokkos::View<const double*,MemorySpace> constCoeffs = coeffs;
+
+        EvaluateImpl<MemorySpace,ExecutionSpace,OtherTraits...>(constPts,constCoeffs,output);
     }
 
     /**
@@ -173,8 +176,12 @@ public:
                      Kokkos::View<double*,MemorySpace>        const& coeffs,
                      Kokkos::View<double*,MemorySpace>             & output,
                      std::map<std::string, std::string>              options=std::map<std::string,std::string>())
-    {
-        InverseImpl<MemorySpace, ExecutionSpace>(xs,ys,coeffs,output,options);
+    {   
+        Kokkos::View<const double**,MemorySpace> constXs = xs;
+        Kokkos::View<const double*,MemorySpace> constYs = ys;
+        Kokkos::View<const double*,MemorySpace> constCoeffs = coeffs;
+        
+        InverseImpl<MemorySpace, ExecutionSpace>(constXs,constYs,constCoeffs,output,options);
     }
 
     /**
