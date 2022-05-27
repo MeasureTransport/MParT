@@ -11,4 +11,6 @@ set (TEST_SOURCES
      tests/Test_MultivariateExpansion.cpp
      tests/Test_ArrayConversions.cpp
      tests/Test_TensorProductFunction.cpp
+     tests/Test_ConditionalMapBase.cpp
+     tests/Test_MapFactory.cpp
 PARENT_SCOPE) 
