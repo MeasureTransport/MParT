@@ -20,7 +20,7 @@ public:
                                      double               x) const
     {
         output[0] = this->phi0(x);
-        
+
         if(maxOrder>0)
             output[1] = this->phi1(x);
 
@@ -33,14 +33,14 @@ public:
     */
     KOKKOS_FUNCTION void EvaluateDerivatives(double*      derivs,
                              unsigned int maxDegree,
-                             double       x) const 
-    {   
+                             double       x) const
+    {
         double oldVal=0;
         double oldOldVal=0;
         double currVal;
         currVal = this->phi0(x);
         derivs[0] = 0.0;
-        
+
         if(maxDegree>0){
             oldVal = currVal;
             currVal = this->phi1(x);
@@ -67,11 +67,11 @@ public:
     KOKKOS_FUNCTION void EvaluateDerivatives(double*      vals,
                            double*      derivs,
                            unsigned int maxOrder,
-                           double       x) const 
+                           double       x) const
     {
         vals[0] = this->phi0(x);
         derivs[0] = 0.0;
-        
+
         if(maxOrder>0){
             vals[1] = this->phi1(x);
             derivs[1] = this->phi1_deriv(x);
@@ -92,12 +92,12 @@ public:
                                    double*      derivs,
                                    double*      secondDerivs,
                                    unsigned int maxOrder,
-                                   double       x) const 
+                                   double       x) const
     {
         vals[0] = this->phi0(x);
         derivs[0] = 0.0;
         secondDerivs[0] = 0.0;
-        
+
         if(maxOrder>0){
             vals[1] = this->phi1(x);
             derivs[1] = this->phi1_deriv(x);
@@ -118,7 +118,7 @@ public:
 
 
 
-    KOKKOS_FUNCTION double Evaluate(unsigned int const order, 
+    KOKKOS_FUNCTION double Evaluate(unsigned int const order,
                     double const x) const
     {
         if(order==0){
@@ -141,7 +141,7 @@ public:
                 beta = -this->ck(k+2);
                 yk = alpha*yk1 + beta*yk2;
             }
-            
+
             beta = -this->ck(2);
             return yk1*this->phi1(x) + beta * this->phi0(x)*yk2;
         }
@@ -173,12 +173,12 @@ public:
                 lag1_val = next_val;
                 next_val = (ak*x + bk)*lag1_val - ck*lag2_val;
 
-                
+
                 lag2_deriv = lag1_deriv;
                 lag1_deriv = next_deriv;
                 next_deriv = ak*lag1_val + (ak*x + bk)*lag1_deriv - ck*lag2_deriv;
             }
-            
+
             return next_deriv;
         }
     }
@@ -207,7 +207,7 @@ public:
                 ak = this->ak(i);
                 bk = this->bk(i);
                 ck = this->ck(i);
-                
+
                 lag2_val = lag1_val;
                 lag1_val = next_val;
                 next_val = (ak*x + bk)*lag1_val- ck*lag2_val;
@@ -234,12 +234,12 @@ public:
 
 protected:
 
-    KOKKOS_INLINE_FUNCTION double ak(unsigned int k) const {return 1.0;}
-    KOKKOS_INLINE_FUNCTION double bk(unsigned int k) const {return 0.0;}
+    KOKKOS_INLINE_FUNCTION double ak(unsigned int) const {return 1.0;}
+    KOKKOS_INLINE_FUNCTION double bk(unsigned int) const {return 0.0;}
     KOKKOS_INLINE_FUNCTION double ck(unsigned int k) const {return k-1.0;}
-    KOKKOS_INLINE_FUNCTION double phi0(double x) const {return 1.0;}
+    KOKKOS_INLINE_FUNCTION double phi0(double) const {return 1.0;}
     KOKKOS_INLINE_FUNCTION double phi1(double x) const {return x;}
-    KOKKOS_INLINE_FUNCTION double phi1_deriv(double x) const{return 1.0;};
+    KOKKOS_INLINE_FUNCTION double phi1_deriv(double) const{return 1.0;};
 };
 
 typedef OrthogonalPolynomial<ProbabilistHermiteMixer> ProbabilistHermite;
