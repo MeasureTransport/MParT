@@ -161,8 +161,8 @@ public:
 
     static std::pair<Eigen::VectorXd, Eigen::VectorXd> GetRule(unsigned int order)
     {
-        Eigen::VectorXd wts, pts;
-        ClenshawCurtisQuadrature::GetRule(order, wts, pts);
+        Eigen::VectorXd wts(order), pts(order);
+        ClenshawCurtisQuadrature::GetRule(order, wts.data(), pts.data());
         return std::make_pair(wts,pts);
     }
 
