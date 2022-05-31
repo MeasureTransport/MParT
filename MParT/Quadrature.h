@@ -249,7 +249,7 @@ public:
     {
 
         // For sufficiently small interval, use the midpoint rule
-        double midpoint_tol = 15.0*std::numeric_limits<double>::epsilon()
+        double midpoint_tol = 15.0*std::numeric_limits<double>::epsilon();
         if((ub-lb)<midpoint_tol){
 
             f(0.5*(ub+lb), res);
