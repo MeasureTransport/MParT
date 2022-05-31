@@ -248,7 +248,9 @@ public:
                                    double*             res) const
     {
 
-        if((ub-lb)<15.0*std::numeric_limits<double>::epsilon()){
+        // For sufficiently small interval, use the midpoint rule
+        double midpoint_tol = 15.0*std::numeric_limits<double>::epsilon()
+        if((ub-lb)<midpoint_tol){
 
             f(0.5*(ub+lb), res);
             for(unsigned int i=0; i<this->fdim_; ++i)
