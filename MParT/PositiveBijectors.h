@@ -28,7 +28,7 @@ public:
     KOKKOS_INLINE_FUNCTION static double Inverse(double x){
         return std::fmin(std::log(std::exp(x) - 1.0), x);
     }
-    
+
 };
 
 /**
@@ -57,4 +57,4 @@ public:
 
 } // namespace mpart
 
-#endif 
+#endif

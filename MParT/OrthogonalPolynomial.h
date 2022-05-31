@@ -252,8 +252,8 @@ public:
 
 protected:
 
-    KOKKOS_INLINE_FUNCTION double ak(unsigned int k) const {return 2.0;}
-    KOKKOS_INLINE_FUNCTION double bk(unsigned int k) const {return 0.0;}
+    KOKKOS_INLINE_FUNCTION double ak(unsigned int) const {return 2.0;}
+    KOKKOS_INLINE_FUNCTION double bk(unsigned int) const {return 0.0;}
     KOKKOS_INLINE_FUNCTION double ck(unsigned int k) const {return 2.0*(k-1.0);}
     KOKKOS_INLINE_FUNCTION double phi0(double x) const {return 1.0;}
     KOKKOS_INLINE_FUNCTION double phi1(double x) const {return 2.0*x;}
