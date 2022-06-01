@@ -672,8 +672,8 @@ public:
         // We actually found an upper bound...
         if(ylb>yd){
 
-            mpart::swap(ylb,yub);
-            mpart::swap(xlb,xub);
+            mpart::simple_swap(ylb,yub);
+            mpart::simple_swap(xlb,xub);
 
             // Now find a lower bound...
             unsigned int i;
@@ -681,8 +681,8 @@ public:
                 xlb = xub-stepSize;
                 ylb = EvaluateSingle(workspace, cache, pt, xlb, coeffs, quad, expansion);
                 if(ylb>yd){
-                    mpart::swap(ylb,yub);
-                    mpart::swap(xlb,xub);
+                    mpart::simple_swap(ylb,yub);
+                    mpart::simple_swap(xlb,xub);
                     stepSize *= 2.0;
                 }else{
                     break;
@@ -698,8 +698,8 @@ public:
                 xub = xlb+stepSize;
                 yub = EvaluateSingle(workspace, cache, pt, xub, coeffs, quad, expansion);
                 if(yub<yd){
-                    mpart::swap(ylb,yub);
-                    mpart::swap(xlb,xub);
+                    mpart::simple_swap(ylb,yub);
+                    mpart::simple_swap(xlb,xub);
                     stepSize *= 2.0;
                 }else{
                     break;
@@ -737,11 +737,11 @@ public:
             if(abs(yc-yd)<ftol){
                 return xc;
             }else if(yc>yd){
-                mpart::swap(yc,yub);
-                mpart::swap(xc,xub);
+                mpart::simple_swap(yc,yub);
+                mpart::simple_swap(xc,xub);
             }else{
-                mpart::swap(yc,ylb);
-                mpart::swap(xc,xlb);
+                mpart::simple_swap(yc,ylb);
+                mpart::simple_swap(xc,xlb);
             }
 
             // Check for convergence
