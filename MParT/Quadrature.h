@@ -512,10 +512,6 @@ public:
             leftPt = &workspace[workStartInd];
             rightPt = &workspace[workStartInd+1];
 
-            // std::cout << "Level " << currLevel << "   " << std::bitset<sizeof(currSegment)*8>(currSegment) << std::endl;
-            // std::cout << "    log(f): " << std::log(leftFunc[0]) << ",  " << std::log(midFunc[0]) << ", " << std::log(rightFunc[0]) << std::endl;
-            // std::cout << "    lb/ub:  " << *leftPt << ",  " << *rightPt << std::endl;
-
 
             // Compute the subinterval mid points
             midPt = 0.5*((*leftPt) + (*rightPt));
@@ -805,7 +801,7 @@ public:
 
             // Check to see if the error is small enough or if we've hit the maximum number of subdivisions
             this->EstimateError(intCoarse, intFine, error, errorTol);
-            //std::cout << "    error = " << intCoarse[0] << " - " << intFine[0] << " = " << error << std::endl;
+
             // Checking for convergence or other termination criteria
             if((error<errorTol)||(currLevel==this->maxSub_-1)||(std::abs(ub-lb)<1e-14)){
 
