@@ -99,7 +99,7 @@ Building the :code:`Simple` binary involves running :code:`cmake` and then :code
 
 .. code-block:: bash 
 
-    mdkir build; cd build # Create a build directory
+    mkdir build; cd build # Create a build directory
     cmake ..              # Run CMake to configure the build
     make                  # Call make to build the executable
     ./Simple              # Run the executable
