@@ -65,6 +65,22 @@ public:
         InverseImpl<Kokkos::HostSpace, Kokkos::DefaultHostExecutionSpace>(x1, rSlice, savedCoeffs, outputSlice);
     }
 
+    virtual void LogDeterminantImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
+                                    Kokkos::View<double*, Kokkos::HostSpace>             &output) override
+    {
+        // First, get the diagonal derivative
+        ContinuousDerivative<Kokkos::HostSpace>(pts, savedCoeffs, output);
+
+        // Now take the log 
+        for(unsigned int i=0; i<output.extent(0); ++i){
+            if(output(i)<=0){
+                output(i) = -std::numeric_limits<double>::infinity();
+            }else{
+                output(i) = std::log(output(i));
+            }
+        }
+    }
+
 
     /**
      * @brief Support calling EvaluateImpl with non-const views.
@@ -267,8 +283,8 @@ public:
         @see DiscreteDerivative
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
-                                                            Kokkos::View<double*,MemorySpace>  const& coeffs)
+    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(Kokkos::View<const double**,MemorySpace> const& pts, 
+                                                            Kokkos::View<const double*,MemorySpace>  const& coeffs)
     {   
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> derivs("Monotone Component Derivatives", numPts);
@@ -277,6 +293,15 @@ public:
 
         return derivs;
     }
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
+                                                            Kokkos::View<double*,MemorySpace>  const& coeffs)
+    {   
+        Kokkos::View<const double**, MemorySpace> pts2 = pts;
+        Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
+        return ContinuousDerivative<MemorySpace,ExecutionSpace>(pts2,coeffs2);
+    }
+
 
     /**
         @brief Approximates the "continuous derivative" \f$\frac{\partial T}{\partial x_D}\f$ derived from the exact integral form of the transport map.
@@ -289,8 +314,8 @@ public:
         @see DiscreteDerivative
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void ContinuousDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
-                              Kokkos::View<double*,MemorySpace>  const& coeffs,
+    void ContinuousDerivative(Kokkos::View<const double**,MemorySpace> const& pts, 
+                              Kokkos::View<const double*,MemorySpace>  const& coeffs,
                               Kokkos::View<double*,MemorySpace>       & derivs)
     {   
         const unsigned int numPts = pts.extent(1);
@@ -330,6 +355,16 @@ public:
         });
     }
 
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    void ContinuousDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
+                              Kokkos::View<double*,MemorySpace>  const& coeffs,
+                              Kokkos::View<double*,MemorySpace>       & derivs)
+    {
+        Kokkos::View<const double**, MemorySpace> pts2 = pts;
+        Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
+        ContinuousDerivative<MemorySpace,ExecutionSpace>(pts2,coeffs2, derivs);
+    }
+
     /**
     @brief Approximates the "discrete derivative" of the quadrature-based approximation \f$\tilde{T}\f$.
         @details See the <a href="../getting_started/mathematics.html">mathematical background</a> section for more details on discrete and continuous map derivatives.
@@ -340,8 +375,8 @@ public:
         @see ContinuousDerivative
     */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
-                                                           Kokkos::View<double*,MemorySpace>  const& coeffs)
+    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(Kokkos::View<const double**,MemorySpace> const& pts, 
+                                                           Kokkos::View<const double*,MemorySpace>  const& coeffs)
     {   
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> evals("Component Evaluations", numPts);
@@ -350,6 +385,15 @@ public:
         DiscreteDerivative<MemorySpace, ExecutionSpace>(pts,coeffs, evals, derivs);
 
         return derivs;
+    }
+
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
+                                                           Kokkos::View<double*,MemorySpace>  const& coeffs)
+    {
+        Kokkos::View<const double**, MemorySpace> pts2 = pts;
+        Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
+        return DiscreteDerivative<MemorySpace, ExecutionSpace>(pts2,coeffs2);
     }
 
 
@@ -364,8 +408,8 @@ public:
         @see ContinuousDerivative
      */
     template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void  DiscreteDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
-                             Kokkos::View<double*,MemorySpace>  const& coeffs,
+    void  DiscreteDerivative(Kokkos::View<const double**,MemorySpace> const& pts, 
+                             Kokkos::View<const double*,MemorySpace>  const& coeffs,
                              Kokkos::View<double*,MemorySpace>       & evals, 
                              Kokkos::View<double*,MemorySpace>       & derivs)
     {   
@@ -417,6 +461,17 @@ public:
             evals(ptInd) += _expansion.Evaluate(cache.data(), coeffs);
             
         });
+    }
+
+    template<typename MemorySpace, typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    void  DiscreteDerivative(Kokkos::View<double**,MemorySpace> const& pts, 
+                             Kokkos::View<double*,MemorySpace>  const& coeffs,
+                             Kokkos::View<double*,MemorySpace>       & evals, 
+                             Kokkos::View<double*,MemorySpace>       & derivs)
+    {
+        Kokkos::View<const double**, MemorySpace> pts2 = pts;
+        Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
+        DiscreteDerivative(pts2, coeffs2, evals, derivs);
     }
 
     /** @brief Returns the gradient of the map with respect to the parameters \f$\mathbf{w}\f$ at multiple points.

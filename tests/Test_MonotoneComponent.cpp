@@ -307,6 +307,12 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(output(i) == Approx(1+exp(1)*(exp(evalPts(0,i))-1)).epsilon(testTol));
         }
+
+        // Test the log determinant 
+        Kokkos::View<double*, Kokkos::HostSpace> logDet("Log Determinant", numPts);
+        comp.Coeffs() = coeffs;
+        comp.LogDeterminantImpl(evalPts,logDet);
+
     }
 }
 

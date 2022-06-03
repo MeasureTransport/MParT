@@ -48,9 +48,25 @@ namespace mpart {
         /** Const version of the Coeffs() function. */
         virtual Kokkos::View<const double*, Kokkos::HostSpace> Coeffs() const{return this->savedCoeffs;};
 
-        /** Returns a constant eigen map wrapping around the constant coefficient vector. */
-        //virtual Eigen::Map<const Eigen::VectorXd> CoeffMap() const;
+        /** @brief Computes the log determinant of the map Jacobian.
+        
+        For a map \f$T:\mathbb{R}^N\rightarrow \mathbb{R}^M\f$ with \f$M\leq N\f$ and components \f$T_i(x_{1:N-M+i})\f$, this 
+        function computes the determinant of the Jacobian of \f$T\f$ with respect to \f$x_{N-M:N}\f$.  While the map is rectangular,
+        the Jacobian with respect to these inputs will be square.  The fact that the map is lower triangular will then imply that 
+        the determinant is given by the product of diagonal derviatives
+        \f[
+            \det{\nabla_{x_{N-M:N}} T} = \prod_{i=1}^M \frac{\partial T_i}{\partial x_{N-M+i}}. 
+        \f]
 
+        @param pts The points where we want to evaluate the log determinant.
+        */
+        virtual Kokkos::View<double*, Kokkos::HostSpace> LogDeterminant(Kokkos::View<const double**, Kokkos::HostSpace> const& pts);
+        
+        virtual Eigen::VectorXd LogDeterminant(Eigen::RowMatrixXd const& pts);
+
+        virtual void LogDeterminantImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
+                                        Kokkos::View<double*, Kokkos::HostSpace>             &output) = 0;
+        
 
         virtual Kokkos::View<double**, Kokkos::HostSpace> Evaluate(Kokkos::View<const double**, Kokkos::HostSpace> const& pts);
 
