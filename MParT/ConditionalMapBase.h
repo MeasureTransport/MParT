@@ -1,10 +1,10 @@
 #ifndef MPART_CONDITIONALMAPBASE_H
 #define MPART_CONDITIONALMAPBASE_H
 
-#include <Kokkos_Core.hpp>
+#include "MParT/Utilities/EigenTypes.h"
+#include "MParT/Utilities/ArrayConversions.h"
 
 #include <Eigen/Core>
-#include "MParT/Utilities/EigenTypes.h"
 
 namespace mpart {
 
@@ -40,6 +40,18 @@ namespace mpart {
         */
         virtual Kokkos::View<double*, Kokkos::HostSpace>& Coeffs(){return this->savedCoeffs;};
 
+
+        /** @briefs Set the internally stored view of coefficients.
+            @detail Performs a shallow copy of the input coefficients to the internally stored coefficients.  
+            If values in the view passed to this function are changed, the values will also change in the
+            internally stored view.
+
+            @param[in] coeffs A view to save internally.
+        */
+        virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs){ this->savedCoeffs = coeffs; }
+
+        virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs){ SetCoeffs(VecToKokkos<double>(coeffs)); }
+        
         /** Returns an eigen map wrapping around the coefficient vector, which is stored in a Kokkos::View.  Updating the 
             components of this map should also update the view. 
         */
