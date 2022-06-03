@@ -13,12 +13,9 @@ using namespace Catch;
 
 TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
 
-    std::unordered_map<std::string, std::string> options;
-    options["PolyType"] = "ProbabilistHermite";
-    options["QuadType"] = "AdaptiveSimpson";
-    options["PosType"] = "SoftPlus";
+    MapOptions options;
+    options.polyType = PolyTypes::ProbabilistHermite;
 
-    
     unsigned int dim = 3;
     unsigned int maxDegree = 5;
     FixedMultiIndexSet mset(dim,maxDegree);
