@@ -55,22 +55,3 @@ int main(int argc, char* argv[]){
     return 0;
 }
 
-    // // Set the coefficients of the map 
-    // unsigned int numCoeffs = mset.Size();
-    // Eigen::VectorXd coeffs(numCoeffs);
-    // coeffs(0) = 0; // Constant term 
-    // coeffs(1) = 1.0; // Linear term in second component 
-    // coeffs(2) = 1.0; // Quadratic term in secon component
-
-    // map->SetCoeffs(coeffs); // Maps to map->Coeffs() = VecToKokkos<double>(coeffs); on the c++ side.
-    
-    // // Updating the coeffs object will now update the coefficients used in the map
-    // Eigen::RowMatrixXd pts(dim,numPts);
-    // Eigen::RowMatrixXd evals = map->Evaluate(pts);
-    // Eigen::VectorXd logDet = map->LogDeterminant(pts);
-
-    // Eigen::RowMatrixXd rs = map->Inverse(evals);
-
-
-//     return 0;
-// }
