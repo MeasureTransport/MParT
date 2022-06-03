@@ -20,7 +20,7 @@ TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
     unsigned int maxDegree = 5;
     FixedMultiIndexSet mset(dim,maxDegree);
 
-    std::shared_ptr<ConditionalMapBase> map = CreateComponent(mset, options);
+    std::shared_ptr<ConditionalMapBase> map = MapFactory::CreateComponent(mset, options);
 
     unsigned int numPts = 100;
     Kokkos::View<double**,Kokkos::HostSpace> pts("Points", dim, numPts);

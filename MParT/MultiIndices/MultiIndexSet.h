@@ -8,10 +8,14 @@
 #include <iostream>
 #include <functional>
 
+#include <Eigen/Core>
+
+
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexNeighborhood.h"
 #include "MParT/MultiIndices/MultiIndex.h"
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
+
 
 
 namespace mpart{
@@ -75,6 +79,9 @@ MultiIndexSet set(length, limiter);
   MultiIndexSet(const unsigned int lengthIn,
                 LimiterType const& limiterIn = MultiIndexLimiter::None(),
                 std::shared_ptr<MultiIndexNeighborhood> neigh = std::make_shared<DefaultNeighborhood>() );
+
+  /** Each row of the input matrix is a multiindex. */
+  MultiIndexSet(Eigen::Ref<const Eigen::MatrixXi> const& multis);
 
   /**
    @brief Converts this multiindex set into the fixed representation provided by the "FixedMultiIndexSet" class.

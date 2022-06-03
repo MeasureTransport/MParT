@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include <Eigen/Core>
+
 namespace mpart {
 
 class MultiIndexSet;
@@ -33,6 +35,20 @@ public:
                         multiindex.
     */
     MultiIndex(std::vector<unsigned int> const& indIn) : MultiIndex(&indIn[0], indIn.size()){};
+
+    /** Constructs a multiindex from an Eigen vector. */
+    template <typename Derived>
+    MultiIndex(Eigen::MatrixBase<Derived> const& multi) : MultiIndex(multi.size(),0)
+    {
+        for(unsigned int i=0; i<length; ++i){
+            if( multi(i) > 0 ){
+                nzInds.push_back(i);
+                nzVals.push_back(multi(i));
+                maxValue = std::max<unsigned int>(maxValue, multi(i));
+                totalOrder += multi(i);
+            }
+        }
+    }
 
     /** Uses a dense vector description of the multiindex, defined through a pointer,
         and extracts the nonzero components.

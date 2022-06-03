@@ -117,6 +117,13 @@ MultiIndexSet::MultiIndexSet(const unsigned int lengthIn,
 };
 
 
+MultiIndexSet::MultiIndexSet(Eigen::Ref<const Eigen::MatrixXi> const& multis) : maxOrders(multis.cols(),0), length(multis.cols()), limiter(MultiIndexLimiter::None()), neighborhood(std::make_shared<DefaultNeighborhood>()){
+
+    for(unsigned int i=0; i<multis.rows(); ++i){
+        (*this) += MultiIndex(multis.row(i));
+    }
+}
+
 FixedMultiIndexSet<Kokkos::HostSpace> MultiIndexSet::Fix(bool compress) const
 {
   if(compress){
