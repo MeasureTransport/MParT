@@ -310,7 +310,7 @@ namespace mpart{
        @return Eigen::Map<Eigen::VectorXd> A map wrapped around the memory stored by the view.  Note that this map will only be valid as long as the view's memory is being managed.  Segfaults could occur if the map is accessed after the view goes out of scope.  To avoid this, copy the map into a vector or use the CopyKokkosToVec function.
      */
     template<typename ScalarType, typename... OtherTraits>
-    inline Eigen::Map<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>> KokkosToVec(Kokkos::View<ScalarType*, OtherTraits...> const& view){
+    inline Eigen::Map<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>> KokkosToVec(Kokkos::View<ScalarType*, OtherTraits...> view){
         return Eigen::Map<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>>(view.data(), view.extent(0));
     }
 
@@ -324,7 +324,7 @@ namespace mpart{
        @return Eigen::Map<Eigen::VectorXd> A map wrapped around the memory stored by the view.  Note that this map will only be valid as long as the view's memory is being managed.  Segfaults could occur if the map is accessed after the view goes out of scope.  To avoid this, copy the map into a vector or use the CopyKokkosToVec function.
     */
     template<typename ScalarType, typename... OtherTraits>
-    inline Eigen::Map<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<>> KokkosToVec(Kokkos::View<ScalarType*, Kokkos::LayoutStride, OtherTraits...> const& view){
+    inline Eigen::Map<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<>> KokkosToVec(Kokkos::View<ScalarType*, Kokkos::LayoutStride, OtherTraits...> view){
         
         size_t stride;
         view.stride(&stride);
@@ -341,7 +341,7 @@ namespace mpart{
        @return Eigen::Matrix<ScalarType,Eigen::Dynamic,1> An Eigen vector with a copy of the contents in the Kokkos view.
      */
     template<typename ScalarType, typename... OtherTraits>
-    inline Eigen::Matrix<ScalarType,Eigen::Dynamic,1> CopyKokkosToVec(Kokkos::View<ScalarType*, OtherTraits...> const& view){
+    inline Eigen::Matrix<ScalarType,Eigen::Dynamic,1> CopyKokkosToVec(Kokkos::View<ScalarType*, OtherTraits...> view){
         return KokkosToVec(view);
     }
 
@@ -379,7 +379,7 @@ namespace mpart{
      @return Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**,OtherTraits...>>::Type, 0, Eigen::OuterStride<>>  And Eigen::Map with dynamic outer stride and contiguous inner stride.
      */
     template<typename ScalarType, typename... OtherTraits>
-    inline Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**,OtherTraits...>>::Type, 0, Eigen::OuterStride<>> KokkosToMat(Kokkos::View<ScalarType**,OtherTraits...> const& view)
+    inline Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**,OtherTraits...>>::Type, 0, Eigen::OuterStride<>> KokkosToMat(Kokkos::View<ScalarType**,OtherTraits...> view)
     {      
         size_t strides[2];
         view.stride(strides);
@@ -410,7 +410,7 @@ namespace mpart{
      @return Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**,OtherTraits...>>::Type, 0, Eigen::Stride<Eigen::Dynamic,Eigen::Dynamic>>  And Eigen::Map with dynamic outer stride and contiguous inner stride.
      */
     template<typename ScalarType, typename... OtherTraits>
-    inline Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**, OtherTraits...>>::Type, 0, Eigen::Stride<Eigen::Dynamic,Eigen::Dynamic>> KokkosToMat(Kokkos::View<ScalarType**, Kokkos::LayoutStride, OtherTraits...> const& view){
+    inline Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**, OtherTraits...>>::Type, 0, Eigen::Stride<Eigen::Dynamic,Eigen::Dynamic>> KokkosToMat(Kokkos::View<ScalarType**, Kokkos::LayoutStride, OtherTraits...> view){
         
         size_t strides[2];
         view.stride(strides);
@@ -443,7 +443,7 @@ namespace mpart{
      @return Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**,OtherTraits...>>::Type, 0, Eigen::Stride<Eigen::Dynamic,Eigen::Dynamic>>  And Eigen::Map with dynamic outer stride and contiguous inner stride.
      */
     template<typename ViewType>
-    inline typename ViewToEigen<ViewType>::Type CopyKokkosToMat(ViewType const& view){
+    inline typename ViewToEigen<ViewType>::Type CopyKokkosToMat(ViewType view){
         return KokkosToMat(view);
     }
 
