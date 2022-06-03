@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Clenshaw Curtis Quadrature &#8212; MParT  documentation</title>
     
@@ -21,8 +21,8 @@
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -31,6 +31,7 @@
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -38,7 +39,7 @@
     <link rel="next" title="Adaptive Simpson Integration" href="adaptivesimpson.html" />
     <link rel="prev" title="Quadrature" href="../quadrature.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -300,7 +301,7 @@
               <div>
                 
   <section id="clenshaw-curtis-quadrature">
-<h1>Clenshaw Curtis Quadrature<a class="headerlink" href="#clenshaw-curtis-quadrature" title="Permalink to this headline">#</a></h1>
+<h1>Clenshaw Curtis Quadrature<a class="headerlink" href="#clenshaw-curtis-quadrature" title="Permalink to this heading">#</a></h1>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart24ClenshawCurtisQuadratureE">
 <span id="_CPPv3N5mpart24ClenshawCurtisQuadratureE"></span><span id="_CPPv2N5mpart24ClenshawCurtisQuadratureE"></span><span id="mpart::ClenshawCurtisQuadrature"></span><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">ClenshawCurtisQuadrature</span></span></span><a class="headerlink" href="#_CPPv4N5mpart24ClenshawCurtisQuadratureE" title="Permalink to this definition">#</a><br /></dt>
@@ -326,17 +327,17 @@
 <span id="_CPPv3I00ENK5mpart24ClenshawCurtisQuadrature9IntegrateERK12FunctionTypedd"></span><span id="_CPPv2I00ENK5mpart24ClenshawCurtisQuadrature9IntegrateERK12FunctionTypedd"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">OutputType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature_1aae1117704b3c6062541ed2a8725f61ea"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00ENK5mpart24ClenshawCurtisQuadrature9IntegrateE10OutputTypeRK12FunctionTypedd" title="mpart::ClenshawCurtisQuadrature::Integrate::OutputType"><span class="n"><span class="pre">OutputType</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Integrate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I00ENK5mpart24ClenshawCurtisQuadrature9IntegrateE10OutputTypeRK12FunctionTypedd" title="mpart::ClenshawCurtisQuadrature::Integrate::FunctionType"><span class="n"><span class="pre">FunctionType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lb</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ub</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I00ENK5mpart24ClenshawCurtisQuadrature9IntegrateE10OutputTypeRK12FunctionTypedd" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Approximates the integral <span class="math notranslate nohighlight">\(\int_{x_L}^{x_U} f(x) dx\)</span> using a Clenshaw-Curtis quadrature rule. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>f</strong> – <strong>[in]</strong> The integrand. Can return any type that overloads multiplication with a double and the += operator. doubles and Eigen::VectorXd are examples. </p></li>
 <li><p><strong>lb</strong> – <strong>[in]</strong> The lower bound <span class="math notranslate nohighlight">\(x_L\)</span> in the integration. </p></li>
 <li><p><strong>lb</strong> – <strong>[in]</strong> The upper bound <span class="math notranslate nohighlight">\(x_U\)</span> in the integration. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Template Parameters</dt>
+<dt class="field-even">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>FunctionType</strong> – The type of the integrand. Must have an operator()(double x) function. </p>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>An approximation of <span class="math notranslate nohighlight">\(\int_{x_L}^{x_U} f(x) dx\)</span>. The return type will be the same as the type returned by the integrand function. </p>
 </dd>
 </dl>
@@ -355,10 +356,10 @@
 <span id="_CPPv3N5mpart24ClenshawCurtisQuadrature7GetRuleEjRN5Eigen8VectorXdERN5Eigen8VectorXdE"></span><span id="_CPPv2N5mpart24ClenshawCurtisQuadrature7GetRuleEjRN5Eigen8VectorXdERN5Eigen8VectorXdE"></span><span id="mpart::ClenshawCurtisQuadrature::GetRule__unsigned-i.Eigen::VectorXdR.Eigen::VectorXdR"></span><span class="target" id="classmpart_1_1_clenshaw_curtis_quadrature_1a80448a7c21a3a3d7b274ac4ae1f4a652"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetRule</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">order</span></span>, <span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorXd</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">wts</span></span>, <span class="n"><span class="pre">Eigen</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">VectorXd</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart24ClenshawCurtisQuadrature7GetRuleEjRN5Eigen8VectorXdERN5Eigen8VectorXdE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns the weights and points in a Clenshaw-Curtis rule. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>order</strong> – <strong>[in]</strong> The order of the Clenshaw-Curtis rule. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A pair containing (wts,pts) </p>
 </dd>
 </dl>
@@ -410,7 +411,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br>
 </p>
     </div>
     

@@ -50,7 +50,7 @@ By default, MParT will look for Julia during configuration and will attempt to b
 
     import Pkg; Pkg.add("CxxWrap")
 
-If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify :code:`JULIA_EXE` variable during configuration.  For example, adding `-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia` will tell CMake to use the Julia executable installed by anaconda in the `mpart` conda environment.
+If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify :code:`JULIA_EXE` variable during configuration.  For example, adding :code:`-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia` will tell CMake to use the Julia executable installed by anaconda in the `mpart` conda environment.
 
 To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set :code:`MPART_JULIA=OFF` during the CMake configuration.
 
@@ -59,7 +59,60 @@ Using MParT
 
 C++
 ^^^^^^^^^
-Coming soon.
+Linking to MParT is straightforward using CMake.  Let's say you want to compile the following code, which simply creates a multiindex set.
+
+.. code-block:: cpp 
+    :caption: SmallExample.cpp
+
+    #include <MParT/MultiIndices/MultiIndexSet.h>
+
+    using namespace mpart; 
+    
+    int main(){
+        
+        unsigned int dim = 2;
+
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim,2);
+        mset.Visualize();
+
+        return 0;
+    }
+
+The following :code:`CMakeLists.txt` file can be used to configure the executable. 
+
+.. code-block:: cmake 
+    :caption: CMakeLists.txt 
+
+    cmake_minimum_required (VERSION 3.13)
+
+    project(SimpleExample)
+
+    set(CMAKE_CXX_STANDARD 17)
+
+    find_package(MParT REQUIRED)
+    message(STATUS "MPART_FOUND = ${MParT_FOUND}")
+
+    add_executable(Simple SimpleExample.cpp)
+    target_link_libraries(Simple MParT::mpart Kokkos::kokkos Eigen3::Eigen)
+
+Building the :code:`Simple` binary involves running :code:`cmake` and then :code:`make`:
+
+.. code-block:: bash 
+
+    mkdir build; cd build # Create a build directory
+    cmake ..              # Run CMake to configure the build
+    make                  # Call make to build the executable
+    ./Simple              # Run the executable
+
+.. tip::
+   If CMake throws an error saying it couldn't find `KokkosConfig.cmake`, try manually specifying the path to your MParT (or Kokkos) installations in your cmake call.  For example,
+
+   .. code-block:: bash
+
+       cmake -DKokkos_ROOT=~/Installations/MParT/lib/cmake/Kokkos ..
+
+
+
 
 Python 
 ^^^^^^^^^

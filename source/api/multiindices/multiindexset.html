@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>MultiIndexSet &#8212; MParT  documentation</title>
     
@@ -21,8 +21,8 @@
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -31,6 +31,7 @@
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -38,7 +39,7 @@
     <link rel="next" title="FixedMultiIndexSet" href="fixedmultiindexset.html" />
     <link rel="prev" title="MultiIndex" href="multiindex.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -300,7 +301,7 @@
               <div>
                 
   <section id="multiindexset">
-<h1>MultiIndexSet<a class="headerlink" href="#multiindexset" title="Permalink to this headline">#</a></h1>
+<h1>MultiIndexSet<a class="headerlink" href="#multiindexset" title="Permalink to this heading">#</a></h1>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart13MultiIndexSetE">
 <span id="_CPPv3N5mpart13MultiIndexSetE"></span><span id="_CPPv2N5mpart13MultiIndexSetE"></span><span id="mpart::MultiIndexSet"></span><span class="target" id="classmpart_1_1_multi_index_set"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MultiIndexSet</span></span></span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSetE" title="Permalink to this definition">#</a><br /></dt>
@@ -328,7 +329,7 @@
 </div>
  Multiple pre-defined limiter functors are defined in the mpart::MultiIndexLimiter namespace.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lengthIn</strong> – <strong>[in]</strong> The length of each multi-index in the set. </p></li>
 <li><p><strong>limiterIn</strong> – <strong>[in]</strong> An optional functor defining the possible admissible multi-indices. Should accept a const&amp; to <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> and return a boolean. True if the <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> is allowed and false otherwise. </p></li>
@@ -344,10 +345,10 @@
 <dd><p>Converts this multiindex set into the fixed representation provided by the “FixedMultiIndexSet” class. </p>
 <p>The <a class="reference internal" href="fixedmultiindexset.html#classmpart_1_1_fixed_multi_index_set"><span class="std std-ref">FixedMultiIndexSet</span></a> cannot easily be adapted, but stores the multiindices in a contiguous block of memory in a Kokkos::View that can be more amenable to fast computation. This function creates an instance of the <a class="reference internal" href="fixedmultiindexset.html#classmpart_1_1_fixed_multi_index_set"><span class="std std-ref">FixedMultiIndexSet</span></a> from the current state of *this. Note that memory is deep copied and any subsequent updates to this class will not result in updates to the <a class="reference internal" href="fixedmultiindexset.html#classmpart_1_1_fixed_multi_index_set"><span class="std std-ref">FixedMultiIndexSet</span></a>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>compress</strong> – <strong>[in]</strong> Should the fixed representation be in compressed format? </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An instance of the <a class="reference internal" href="fixedmultiindexset.html#classmpart_1_1_fixed_multi_index_set"><span class="std std-ref">FixedMultiIndexSet</span></a> class with a snapshot of the current state of this <a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a>. </p>
 </dd>
 </dl>
@@ -358,7 +359,7 @@
 <span id="_CPPv3N5mpart13MultiIndexSet10SetLimiterERK11LimiterType"></span><span id="_CPPv2N5mpart13MultiIndexSet10SetLimiterERK11LimiterType"></span><span id="mpart::MultiIndexSet::SetLimiter__LimiterTypeCR"></span><span class="target" id="classmpart_1_1_multi_index_set_1a9bbd75ae6b568498a24fb4843a88dc11"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetLimiter</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5mpart13MultiIndexSet11LimiterTypeE" title="mpart::MultiIndexSet::LimiterType"><span class="n"><span class="pre">LimiterType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">limiterIn</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet10SetLimiterERK11LimiterType" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Set the limiter of this <a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a>. This function will check to make sure that all currently active nodes are still feasible with the new limiter. If this is not the case, an assert will be thrown. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>limiterIn</strong> – <strong>[in]</strong> A functor that accepts a <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> and returns a boolean if it is allowed in the set. </p>
 </dd>
 </dl>
@@ -375,10 +376,10 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet12IndexToMultiEj"></span><span id="_CPPv2NK5mpart13MultiIndexSet12IndexToMultiEj"></span><span id="mpart::MultiIndexSet::IndexToMulti__unsigned-iC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a6ac8408e479671cb155e9f93a26a295a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">IndexToMulti</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">activeIndex</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet12IndexToMultiEj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Given an index into the set, return the corresponding multiindex as an instance of the <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> set. If all the multiindices were stored in a vector called multiVec, the functionality of this method would be equivalent to multiVec[activeIndex]. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>activeIndex</strong> – <strong>[in]</strong> Linear index of interest. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A constant reference to the <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a>. </p>
 </dd>
 </dl>
@@ -389,10 +390,10 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet12MultiToIndexERK10MultiIndex"></span><span id="_CPPv2NK5mpart13MultiIndexSet12MultiToIndexERK10MultiIndex"></span><span id="mpart::MultiIndexSet::MultiToIndex__MultiIndexCRC"></span><span class="target" id="classmpart_1_1_multi_index_set_1aaf9f82ed1a321de7f15ad183a447ff13"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultiToIndex</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">input</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet12MultiToIndexERK10MultiIndex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Given a multiindex, return the linear index where it is located. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>input</strong> – <strong>[in]</strong> An instance of the <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> class. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>If the multiindex was found in this set, a nonnegative value containing the linear index is returned. However, if the set does not contain the multiindex, -1 is returned. </p>
 </dd>
 </dl>
@@ -409,7 +410,7 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet9MaxOrdersEv"></span><span id="_CPPv2NK5mpart13MultiIndexSet9MaxOrdersEv"></span><span id="mpart::MultiIndexSet::MaxOrdersC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a9f211b3f9c2e259741fa0edefbb755f3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">MaxOrders</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet9MaxOrdersEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Assume the <span class="math notranslate nohighlight">\(\mathbf{j}^{\mbox{th}}\)</span> multiindex in this set is given by <span class="math notranslate nohighlight">\(\mathbf{j}=[j_1,j_2,\dots,j_D]\)</span>. This function returns a vector containing the maximum value of any multiindex in each direction, i.e., a vector <span class="math notranslate nohighlight">\(\mathbf{m}=[m_1,m_2,\dots,m_D]\)</span> where <span class="math notranslate nohighlight">\(m_d = \max_{\mathbf{j}} j_d\)</span>. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The vector <span class="math notranslate nohighlight">\(\mathbf{m}\)</span>. </p>
 </dd>
 </dl>
@@ -420,10 +421,10 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet2atEi"></span><span id="_CPPv2NK5mpart13MultiIndexSet2atEi"></span><span id="mpart::MultiIndexSet::at__iC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a0cbc7d9b709e238d99e50b23dbf620e9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">at</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">activeIndex</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet2atEi" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This function provides access to each of the MultiIndices. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>activeIndex</strong> – <strong>[in]</strong> The index of the active <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> to return. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A pointer to the <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> at index outputIndex. </p>
 </dd>
 </dl>
@@ -434,10 +435,10 @@
 <span id="_CPPv3NK5mpart13MultiIndexSetixEi"></span><span id="_CPPv2NK5mpart13MultiIndexSetixEi"></span><span id="mpart::MultiIndexSet::subscript-operator__iC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a8c247a002b2d1539fa2e1e4720022548"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">[]</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">activeIndex</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSetixEi" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This function provides access to each of the MultiIndices without any bounds checking on the vector. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>outputIndex</strong> – <strong>[in]</strong> The index of the active <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> we want to return. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A pointer to the <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> at index outputIndex. </p>
 </dd>
 </dl>
@@ -448,7 +449,7 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet4SizeEv"></span><span id="_CPPv2NK5mpart13MultiIndexSet4SizeEv"></span><span id="mpart::MultiIndexSet::SizeC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a6e99b7cfe525fecc548e91a5d95e90e7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet4SizeEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Get the number of active MultiIndices in this set. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>An unsigned integer with the number of active MultiIndices in the set. </p>
 </dd>
 </dl>
@@ -460,10 +461,10 @@
 <dd><p>Add another set of multiindices to this one. </p>
 <p>Any multiindices the rhs <a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> not already in (*this) are added. After calling this function, *this will contain the union or the two sets. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rhs</strong> – <strong>[in]</strong> Another <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> set to add to this one </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A reference to this <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> set, which now contains the union of this set and rhs. </p>
 </dd>
 </dl>
@@ -475,10 +476,10 @@
 <dd><p>Add a single <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> to the set. </p>
 <p>This functions checks to see if the input basis function is already in the set and if the input function is unique, it is added to the set. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rhs</strong> – <strong>[in]</strong> The <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> we want to add to the set. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A reference to this <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> set, which may now contain the new <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> in rhs. </p>
 </dd>
 </dl>
@@ -490,10 +491,10 @@
 <dd><p>Add all terms in rhs to this instance. </p>
 <p>This function adds all unique MultiIndices from the rhs into this <a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a>. In the event that a multiindex is active in one set, but not the other, the union will set that multiindex to be active. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>rhs</strong> – <strong>[in]</strong> The <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> set we want to add to this instance. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The number of unique terms from rhs that were added to this set. </p>
 </dd>
 </dl>
@@ -504,7 +505,7 @@
 <span id="_CPPv3N5mpart13MultiIndexSet8ActivateERK10MultiIndex"></span><span id="_CPPv2N5mpart13MultiIndexSet8ActivateERK10MultiIndex"></span><span id="mpart::MultiIndexSet::Activate__MultiIndexCR"></span><span class="target" id="classmpart_1_1_multi_index_set_1a9837ea88e12b9b547c041433083badd2"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Activate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multiIndex</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet8ActivateERK10MultiIndex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Make the multi-index active. If the multiIndex is not admissable, an exception will be thrown. To be admissable (according to this function), the multiIndex must already exist as an inactive member of this set. If that is not the case, use the AddActive function instead. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>multiIndex</strong> – <strong>[in]</strong> A multiindex to make active. Note that an assert will fail if multiIndex is not admissable. </p>
 </dd>
 </dl>
@@ -515,10 +516,10 @@
 <span id="_CPPv3N5mpart13MultiIndexSet9AddActiveERK10MultiIndex"></span><span id="_CPPv2N5mpart13MultiIndexSet9AddActiveERK10MultiIndex"></span><span id="mpart::MultiIndexSet::AddActive__MultiIndexCR"></span><span class="target" id="classmpart_1_1_multi_index_set_1a5523210a954aa01d4ee0acddbba8fa7c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddActive</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">newNode</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet9AddActiveERK10MultiIndex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Add the given multiindex to the set and make it active. The functionality of this function is very similar to Activate; however, this function will add the multiIndex if it does not already exist in the set. This function does not check for admissability. Instead, it will add the multiindex to the set and add all neighbors as inactive. Be careful when using this function as it is possible to create a set with active multiindices that are not admisable. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>newNode</strong> – <strong>[in]</strong> A multiindex we want to add as an active member of the set. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>An integer specifying the linear index of the now active multiindex. </p>
 </dd>
 </dl>
@@ -529,10 +530,10 @@
 <span id="_CPPv3N5mpart13MultiIndexSet6ExpandEj"></span><span id="_CPPv2N5mpart13MultiIndexSet6ExpandEj"></span><span id="mpart::MultiIndexSet::Expand__unsigned-i"></span><span class="target" id="classmpart_1_1_multi_index_set_1a6199041d58d3a5393cf42af9e07ac258"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Expand</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">activeIndex</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet6ExpandEj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>If possible, make the neighbors of this index active, and return any that become active. Do not activate a neighbor that is already part of the family. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>activeIndex</strong> – The linear index of the active multiindex to expand. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A vector containing the linear index of any multiindices activated because of the expansion. </p>
 </dd>
 </dl>
@@ -543,7 +544,7 @@
 <span id="_CPPv3N5mpart13MultiIndexSet6ExpandEv"></span><span id="_CPPv2N5mpart13MultiIndexSet6ExpandEv"></span><span id="mpart::MultiIndexSet::Expand"></span><span class="target" id="classmpart_1_1_multi_index_set_1aec4764b20c3704277cde1a979de10d49"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Expand</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet6ExpandEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Activate any inactive but admissible forward neighbors of MultiIndices on the frontier. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A vector containing the linear index of any multiindices activated because of this expansion. </p>
 </dd>
 </dl>
@@ -554,10 +555,10 @@
 <span id="_CPPv3N5mpart13MultiIndexSet14ForciblyExpandEKj"></span><span id="_CPPv2N5mpart13MultiIndexSet14ForciblyExpandEKj"></span><span id="mpart::MultiIndexSet::ForciblyExpand__unsigned-iC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a2e9f1497e5430f24758c5e77dfe745b3"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ForciblyExpand</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">activeIndex</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet14ForciblyExpandEKj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Completely expands an index, whether or not it is currently expandable. In order to maintain admissability of the set, it will add backward neighbors needed recursively, and return a list of all the indices it adds. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>activeIndex</strong> – The linear index of the active multiindex to expand. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A vector containing the linear index of any multiindices activated because of the expansion. </p>
 </dd>
 </dl>
@@ -568,10 +569,10 @@
 <span id="_CPPv3N5mpart13MultiIndexSet16ForciblyActivateERK10MultiIndex"></span><span id="_CPPv2N5mpart13MultiIndexSet16ForciblyActivateERK10MultiIndex"></span><span id="mpart::MultiIndexSet::ForciblyActivate__MultiIndexCR"></span><span class="target" id="classmpart_1_1_multi_index_set_1abf050235bad6208adfaf162a0ee36bd3"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ForciblyActivate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multiIndex</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet16ForciblyActivateERK10MultiIndex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Add the given multi-index to the active set regardless of whether it’s currently admissible. To keep the whole set admissible, recursively add any backward neighbors necessary. Returns a list of indices of any newly added elements, including itself. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>multiIndex</strong> – The <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> to forcibly add, make active, and make admissable. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A vector of linear indices indicating all the active MultiIndices added to the set in order to make the given multiIndex admissable. </p>
 </dd>
 </dl>
@@ -582,10 +583,10 @@
 <span id="_CPPv3N5mpart13MultiIndexSet26AdmissibleForwardNeighborsEj"></span><span id="_CPPv2N5mpart13MultiIndexSet26AdmissibleForwardNeighborsEj"></span><span id="mpart::MultiIndexSet::AdmissibleForwardNeighbors__unsigned-i"></span><span class="target" id="classmpart_1_1_multi_index_set_1a60d89f98a21adf930a0d0fc6dfe2af80"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdmissibleForwardNeighbors</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">activeIndex</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet26AdmissibleForwardNeighborsEj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This function returns the admissable forward neighbors of an active multiindex. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>activeIndex</strong> – <strong>[in]</strong> The linear index of the active multiIndex under consideration. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A vector of admissible forward neighbors. </p>
 </dd>
 </dl>
@@ -596,7 +597,7 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet8FrontierEv"></span><span id="_CPPv2NK5mpart13MultiIndexSet8FrontierEv"></span><span id="mpart::MultiIndexSet::FrontierC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a3f1c2f291238395240b3633049c5144e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Frontier</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet8FrontierEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Here, we define a term on the “frontier” of the multiindex set as one that has at least one inactive admissable forward neighbors. These terms are expandable. Note that a forward neighbor must be admissible according to the limiter currently in place to be considered in the definition of the frontier. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A vector with linear indices for active multi-indices on the frontier. </p>
 </dd>
 </dl>
@@ -607,7 +608,7 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet6MarginEv"></span><span id="_CPPv2NK5mpart13MultiIndexSet6MarginEv"></span><span id="mpart::MultiIndexSet::MarginC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a7bf20c67e88a25fd0b91923710e0ebc4"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Margin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet6MarginEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns multiindices in the margin of the set. The margin contains multiindices in the limiting set that also have at least one active backward neighbor. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A std::vector containing the multiindices in the margin </p>
 </dd>
 </dl>
@@ -618,7 +619,7 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet13ReducedMarginEv"></span><span id="_CPPv2NK5mpart13MultiIndexSet13ReducedMarginEv"></span><span id="mpart::MultiIndexSet::ReducedMarginC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a21337f08b4751fe41dab3f9d88eb6c48"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReducedMargin</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet13ReducedMarginEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns multiindices in the reduced margin of the set. A multiindex is in the reduced margin if it is in the limiting set and all of its backward neighbors are active. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A std::vector containing the multiindices in the reduced margin </p>
 </dd>
 </dl>
@@ -629,7 +630,7 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet14StrictFrontierEv"></span><span id="_CPPv2NK5mpart13MultiIndexSet14StrictFrontierEv"></span><span id="mpart::MultiIndexSet::StrictFrontierC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a1f88361750dafb7bca0c16189a5168dd"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StrictFrontier</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet14StrictFrontierEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>We define the strict frontier to be the collection of multiindices, where all admissible forward neighbors are inactive. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A vector with linear indices for active multi-indices on the strict frontier. </p>
 </dd>
 </dl>
@@ -640,10 +641,10 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet17BackwardNeighborsEj"></span><span id="_CPPv2NK5mpart13MultiIndexSet17BackwardNeighborsEj"></span><span id="mpart::MultiIndexSet::BackwardNeighbors__unsigned-iC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a0c96b2de4bb62a3012168509ec65f9b8"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BackwardNeighbors</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">activeIndex</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet17BackwardNeighborsEj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns the indices for the backward neighbors of a currently active multiindex. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>activeIndex</strong> – <strong>[in]</strong> The linear index of the <a class="reference internal" href="multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> of interest </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A std::vector containing the linear indices of the backward neighbors. </p>
 </dd>
 </dl>
@@ -654,10 +655,10 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet17BackwardNeighborsERK10MultiIndex"></span><span id="_CPPv2NK5mpart13MultiIndexSet17BackwardNeighborsERK10MultiIndex"></span><span id="mpart::MultiIndexSet::BackwardNeighbors__MultiIndexCRC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a27dec27c23a9d26b99201f8ea2e2444e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BackwardNeighbors</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multiIndex</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet17BackwardNeighborsERK10MultiIndex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns indices for backward neighbors of an active or inactive multiindex. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>multiIndex</strong> – <strong>[in]</strong> The multiindex in question. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>A vector with linear indices for the backward neighbors of this multiindex. </p>
 </dd>
 </dl>
@@ -668,10 +669,10 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet12IsAdmissibleERK10MultiIndex"></span><span id="_CPPv2NK5mpart13MultiIndexSet12IsAdmissibleERK10MultiIndex"></span><span id="mpart::MultiIndexSet::IsAdmissible__MultiIndexCRC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a006ba84e1270ee180f340d4325240670"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsAdmissible</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multiIndex</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet12IsAdmissibleERK10MultiIndex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Determines whether the input multiIndex is currently admissible. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>multiIndex</strong> – <strong>[in]</strong> The multiindex to consider. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>true if the multiIndex is admissible. false otherwise. </p>
 </dd>
 </dl>
@@ -682,10 +683,10 @@
 <span id="_CPPv3NK5mpart13MultiIndexSet12IsExpandableEj"></span><span id="_CPPv2NK5mpart13MultiIndexSet12IsExpandableEj"></span><span id="mpart::MultiIndexSet::IsExpandable__unsigned-iC"></span><span class="target" id="classmpart_1_1_multi_index_set_1ac3bed663e2f927c93c13872feaf135cb"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IsExpandable</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">activeIndex</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet12IsExpandableEj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Check to see if any forward neighbors of a multiIndex are admissible but not active. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>activeIndex</strong> – <strong>[in]</strong> The linear index of the multi-index in question. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>true if this multiindex has at least one admissible but inactive forward neighbor. </p>
 </dd>
 </dl>
@@ -752,7 +753,7 @@
 </div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>out</strong> – <strong>[inout]</strong> The output stream where the visualization should be written. Defaults to std::cout. </p>
 </dd>
 </dl>
@@ -766,14 +767,14 @@
 <span id="_CPPv3N5mpart13MultiIndexSet16CreateTotalOrderEjjRK11LimiterType"></span><span id="_CPPv2N5mpart13MultiIndexSet16CreateTotalOrderEjjRK11LimiterType"></span><span id="mpart::MultiIndexSet::CreateTotalOrder__unsigned-i.unsigned-i.LimiterTypeCR"></span><span class="target" id="classmpart_1_1_multi_index_set_1a0f02048e1526747e2909564176d33850"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart13MultiIndexSetE" title="mpart::MultiIndexSet"><span class="n"><span class="pre">MultiIndexSet</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CreateTotalOrder</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxOrder</span></span>, <a class="reference internal" href="#_CPPv4N5mpart13MultiIndexSet11LimiterTypeE" title="mpart::MultiIndexSet::LimiterType"><span class="n"><span class="pre">LimiterType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">limiter</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="multiindexlimiter.html#_CPPv4N5mpart17MultiIndexLimiterE" title="mpart::MultiIndexLimiter"><span class="n"><span class="pre">MultiIndexLimiter</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="multiindexlimiter.html#_CPPv4N5mpart17MultiIndexLimiter4NoneE" title="mpart::MultiIndexLimiter::None"><span class="n"><span class="pre">None</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet16CreateTotalOrderEjjRK11LimiterType" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Factory method for constructing a total order limited multiindex set. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>length</strong> – <strong>[in]</strong> The length of the multiindices stored in this set. </p></li>
 <li><p><strong>maxOrder</strong> – <strong>[in]</strong> The maximum order of multiindices to include. </p></li>
 <li><p><strong>limiter</strong> – <strong>[in]</strong> An optional additional limiter to attach to the set. Only multiindices that satisfy this limiter will be included. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> An instance of the <a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> class containing all multiindices of order &lt;= maxOrder AND satisfying the limiter. </p>
 </dd>
 </dl>
@@ -784,14 +785,14 @@
 <span id="_CPPv3N5mpart13MultiIndexSet19CreateTensorProductEjjRK11LimiterType"></span><span id="_CPPv2N5mpart13MultiIndexSet19CreateTensorProductEjjRK11LimiterType"></span><span id="mpart::MultiIndexSet::CreateTensorProduct__unsigned-i.unsigned-i.LimiterTypeCR"></span><span class="target" id="classmpart_1_1_multi_index_set_1a62bd7b6b99f460a775a6b8bfdcbefbe1"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart13MultiIndexSetE" title="mpart::MultiIndexSet"><span class="n"><span class="pre">MultiIndexSet</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CreateTensorProduct</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxOrder</span></span>, <a class="reference internal" href="#_CPPv4N5mpart13MultiIndexSet11LimiterTypeE" title="mpart::MultiIndexSet::LimiterType"><span class="n"><span class="pre">LimiterType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">limiter</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="multiindexlimiter.html#_CPPv4N5mpart17MultiIndexLimiterE" title="mpart::MultiIndexLimiter"><span class="n"><span class="pre">MultiIndexLimiter</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="multiindexlimiter.html#_CPPv4N5mpart17MultiIndexLimiter4NoneE" title="mpart::MultiIndexLimiter::None"><span class="n"><span class="pre">None</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13MultiIndexSet19CreateTensorProductEjjRK11LimiterType" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Factory method for constructing a full tensor product multiindex set. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>length</strong> – <strong>[in]</strong> The length of the multiindices stored in this set. </p></li>
 <li><p><strong>maxDegree</strong> – <strong>[in]</strong> The maximum value allowed in any multiindex. </p></li>
 <li><p><strong>limiter</strong> – <strong>[in]</strong> An optional additional limiter to attach to the set. Only multiindices that satisfy this limiter will be included. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> An instance of the <a class="reference internal" href="#classmpart_1_1_multi_index_set"><span class="std std-ref">MultiIndexSet</span></a> class containing all multiindices with components a_i &lt;= maxDegree AND satisfying the limiter. </p>
 </dd>
 </dl>
@@ -843,7 +844,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br>
 </p>
     </div>
     

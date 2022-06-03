@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>MultiIndices &#8212; MParT  documentation</title>
     
@@ -21,8 +21,8 @@
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -31,6 +31,7 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -38,7 +39,7 @@
     <link rel="next" title="MultiIndex" href="multiindices/multiindex.html" />
     <link rel="prev" title="Monotone Component" href="monotonecomponent.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -320,9 +321,9 @@
               <div>
                 
   <section id="multiindices">
-<h1>MultiIndices<a class="headerlink" href="#multiindices" title="Permalink to this headline">#</a></h1>
+<h1>MultiIndices<a class="headerlink" href="#multiindices" title="Permalink to this heading">#</a></h1>
 <section id="background">
-<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">#</a></h2>
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this heading">#</a></h2>
 <p>A multiindex is simply a length <span class="math notranslate nohighlight">\(D\)</span> vector of nonnegative integers <span class="math notranslate nohighlight">\(\mathbf{p}=[p_1,p_2,\dots,p_D]\)</span>.
 Multiindices are commonly employed for defining multivariate polynomial expansions and other function parameterizations.
 In these cases, sets of multiindices define the form of the expansion.</p>
@@ -354,7 +355,7 @@ basis can be defined through the tensor product of components in this family:</p
 <span class="math notranslate nohighlight">\(D/2\)</span> dimensions and <span class="math notranslate nohighlight">\(\mathbf{p}\)</span> is a multiindex with <span class="math notranslate nohighlight">\(D\)</span> components.</p>
 </section>
 <section id="c-objects">
-<h2>C++ Objects<a class="headerlink" href="#c-objects" title="Permalink to this headline">#</a></h2>
+<h2>C++ Objects<a class="headerlink" href="#c-objects" title="Permalink to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="multiindices/multiindex.html">MultiIndex</a></li>
@@ -366,16 +367,16 @@ basis can be defined through the tensor product of components in this family:</p
 </div>
 </section>
 <section id="definitions">
-<h2>Definitions<a class="headerlink" href="#definitions" title="Permalink to this headline">#</a></h2>
-<div class="topic">
+<h2>Definitions<a class="headerlink" href="#definitions" title="Permalink to this heading">#</a></h2>
+<aside class="topic">
 <p class="topic-title">Limiting Set</p>
 <p>In general, any length <span class="math notranslate nohighlight">\(D\)</span> vector in <span class="math notranslate nohighlight">\(\mathbb{N}^D\)</span> is a multiindex.  In many adaptive approaches, however,
 it is useful to only consider multiindices in some subset <span class="math notranslate nohighlight">\(\mathcal{G}\subseteq \mathbb{N}^D\)</span>.   We call this subset
 the limiting set or, more loosely, the “limiter”.   In MParT, limiting sets are defined by functors that accept a
 MultiIndex and return <cite>true</cite> if the multiindex is in <span class="math notranslate nohighlight">\(\mathcal{G}\)</span> and <cite>false</cite> otherwise.  Some predefined limiting
 sets are defined in the MultiIndexLimiter namespace, but custom functors can also be employed.</p>
-</div>
-<div class="topic">
+</aside>
+<aside class="topic">
 <p class="topic-title">Neighbors</p>
 <p>In most parameterization applications, there is additional structure in the multiindex set that can be represented
 through edges on a graph.   Each multiindex can be treated as a node in directed graph.  Outgoing edges connect to
@@ -390,25 +391,25 @@ the set of backward neighbors is</p>
 <div class="math notranslate nohighlight">
 \[\mathcal{F}_{\mathbf{j}} = \{\mathbf{i} : \|\mathbf{i}-\mathbf{j}\|_1=1 \text{ and } \mathbf{i}_k \geq \mathbf{j}_k \text{ for all } k \}\]</div>
 <p>The neighborhood structure of a multindex set is defined through a child of the abstract MultiIndexNeighborhood class.</p>
-</div>
-<div class="topic">
+</aside>
+<aside class="topic">
 <p class="topic-title">Downward Closed</p>
 <p>A multiindex set <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> is downward closed if for any multiindex <span class="math notranslate nohighlight">\(\mathbf{j}\in\mathcal{S}\)</span>, all
 backward neighbors of <span class="math notranslate nohighlight">\(\mathbf{j}\)</span> are also in <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>.</p>
-</div>
-<div class="topic">
+</aside>
+<aside class="topic">
 <p class="topic-title">Margin</p>
 <p>For a multindex set <span class="math notranslate nohighlight">\(\mathcal{S}\subseteq\mathcal{G}\)</span>, the margin of <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> is the set
 <span class="math notranslate nohighlight">\(\mathcal{M} \in \mathcal{G}\setminus\mathcal{S}\)</span> containing indices that have at least one backward neighbor
 in <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>.</p>
-</div>
-<div class="topic">
+</aside>
+<aside class="topic">
 <p class="topic-title">Reduced Margin</p>
 <p>The reduced margin <span class="math notranslate nohighlight">\(\mathcal{M}_r\subseteq\mathcal{M}\)</span> is a subset of the margin <span class="math notranslate nohighlight">\(\mathcal{M}\)</span> containing
 indices that could be added to the set <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> while preserving the downward closed property of <span class="math notranslate nohighlight">\(\mathcal{S}\)</span>.
 Multiindices in the reduced margin are often called admissible.</p>
-</div>
-<div class="topic">
+</aside>
+<aside class="topic">
 <p class="topic-title">Active/Inactive Indices</p>
 <p>The MultiIndexSet class stores both the set <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> and the margin <span class="math notranslate nohighlight">\(\mathcal{M}\)</span>.   In MParT,
 multiindices in <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> are sometimes called active, while multiindices in <span class="math notranslate nohighlight">\(\mathcal{M}\)</span> are called inactive.
@@ -416,12 +417,12 @@ Only active indices are included in the linear indexing.  Inactive
 indices are hidden (i.e. not even considered) in all the public members
 of this class.  Inactive multiindices are used behind the scenes to check admissability, to define the margin, and
 are added to the <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> during adaptation.</p>
-</div>
-<div class="topic">
+</aside>
+<aside class="topic">
 <p class="topic-title">Frontier</p>
 <p>The Frontier is similar but contains multiindices in <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> that have at least one forward neighbor in
 the margin <span class="math notranslate nohighlight">\(\mathcal{M}\)</span>.   We use the term “strict frontier” to describe the set of multiindices in <span class="math notranslate nohighlight">\(\mathcal{S}\)</span> that have all of their forward neighbors in the margin.</p>
-</div>
+</aside>
 </section>
 </section>
 
@@ -466,7 +467,7 @@ the margin <span class="math notranslate nohighlight">\(\mathcal{M}\)</span>.   
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br>
 </p>
     </div>
     

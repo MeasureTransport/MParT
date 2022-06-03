@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>MultiIndex &#8212; MParT  documentation</title>
     
@@ -21,8 +21,8 @@
     href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -31,6 +31,7 @@
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -38,7 +39,7 @@
     <link rel="next" title="MultiIndexSet" href="multiindexset.html" />
     <link rel="prev" title="MultiIndices" href="../multiindex.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -300,7 +301,7 @@
               <div>
                 
   <section id="multiindex">
-<h1>MultiIndex<a class="headerlink" href="#multiindex" title="Permalink to this headline">#</a></h1>
+<h1>MultiIndex<a class="headerlink" href="#multiindex" title="Permalink to this heading">#</a></h1>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart10MultiIndexE">
 <span id="_CPPv3N5mpart10MultiIndexE"></span><span id="_CPPv2N5mpart10MultiIndexE"></span><span id="mpart::MultiIndex"></span><span class="target" id="classmpart_1_1_multi_index"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MultiIndex</span></span></span><a class="headerlink" href="#_CPPv4N5mpart10MultiIndexE" title="Permalink to this definition">#</a><br /></dt>
@@ -317,7 +318,7 @@
 <span id="_CPPv3N5mpart10MultiIndex10MultiIndexEjj"></span><span id="_CPPv2N5mpart10MultiIndex10MultiIndexEjj"></span><span id="mpart::MultiIndex::MultiIndex__unsigned-i.unsigned-i"></span><span class="target" id="classmpart_1_1_multi_index_1a21d2dae337d443d567578e2a4d1f7b29"></span><span class="sig-name descname"><span class="n"><span class="pre">MultiIndex</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lengthIn</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart10MultiIndex10MultiIndexEjj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Constructor that creates a multiindex with some default value. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>lengthIn</strong> – <strong>[in]</strong> The length (i.e., number of components) in the multiindex. </p></li>
 <li><p><strong>val</strong> – <strong>[in]</strong> The value to be set for all entries. </p></li>
@@ -331,7 +332,7 @@
 <span id="_CPPv3N5mpart10MultiIndex10MultiIndexERKNSt6vectorIjEE"></span><span id="_CPPv2N5mpart10MultiIndex10MultiIndexERKNSt6vectorIjEE"></span><span id="mpart::MultiIndex::MultiIndex__std::vector:unsigned-i:CR"></span><span class="target" id="classmpart_1_1_multi_index_1aeae3bd85697d8522a88cf340e2655f7b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultiIndex</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">indIn</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart10MultiIndex10MultiIndexERKNSt6vectorIjEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Takes a dense vector description of the multiindex and extracts the nonzero components. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>indIn</strong> – <strong>[in]</strong> Row vector of unsigned integers defining the multiindex. </p>
 </dd>
 </dl>
@@ -342,7 +343,7 @@
 <span id="_CPPv3N5mpart10MultiIndex10MultiIndexEPKjj"></span><span id="_CPPv2N5mpart10MultiIndex10MultiIndexEPKjj"></span><span id="mpart::MultiIndex::MultiIndex__unsigned-iCP.unsigned-i"></span><span class="target" id="classmpart_1_1_multi_index_1a7de75424cfddd4808d6f2beffe4afc5d"></span><span class="sig-name descname"><span class="n"><span class="pre">MultiIndex</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">fullVec</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart10MultiIndex10MultiIndexEPKjj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Uses a dense vector description of the multiindex, defined through a pointer, and extracts the nonzero components. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>fullVec</strong> – <strong>[in]</strong> A pointer the memory containing the dense multiindex. </p></li>
 <li><p><strong>length</strong> – <strong>[in]</strong> The length of the multiindex. </p></li>
@@ -365,7 +366,7 @@
 <span id="_CPPv3NK5mpart10MultiIndex6VectorEv"></span><span id="_CPPv2NK5mpart10MultiIndex6VectorEv"></span><span id="mpart::MultiIndex::VectorC"></span><span class="target" id="classmpart_1_1_multi_index_1ad0d05805574fe9cacc2b1fb9383aa887"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Vector</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndex6VectorEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Get the dense representation of this multiindex. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A std::vector of unsigned integers containing the multiindex. </p>
 </dd>
 </dl>
@@ -376,7 +377,7 @@
 <span id="_CPPv3NK5mpart10MultiIndex3SumEv"></span><span id="_CPPv2NK5mpart10MultiIndex3SumEv"></span><span id="mpart::MultiIndex::SumC"></span><span class="target" id="classmpart_1_1_multi_index_1ae87d90f1c9370fe05987bd8e9ca59a8f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sum</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndex3SumEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Get the total order of this multiindex: the <span class="math notranslate nohighlight">\(\ell_1\)</span> norm. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The sum of the nonzero components: the total order of this multiindex. </p>
 </dd>
 </dl>
@@ -387,7 +388,7 @@
 <span id="_CPPv3NK5mpart10MultiIndex3MaxEv"></span><span id="_CPPv2NK5mpart10MultiIndex3MaxEv"></span><span id="mpart::MultiIndex::MaxC"></span><span class="target" id="classmpart_1_1_multi_index_1a087d0ac8a981a319da587ac67c126152"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Max</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndex3MaxEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>This function returns the maximum degree of this multiindex: the <span class="math notranslate nohighlight">\(\ell_\infty\)</span> norm. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The maximum value of the multiindex. </p>
 </dd>
 </dl>
@@ -398,13 +399,13 @@
 <span id="_CPPv3N5mpart10MultiIndex3SetEjj"></span><span id="_CPPv2N5mpart10MultiIndex3SetEjj"></span><span id="mpart::MultiIndex::Set__unsigned-i.unsigned-i"></span><span class="target" id="classmpart_1_1_multi_index_1ae2633577a16a3573353225dce061cc3c"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Set</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ind</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart10MultiIndex3SetEjj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Use this function to set the value of the an entry in the multiindex. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>ind</strong> – <strong>[in]</strong> The component of the multiindex to set (starting with 0). </p></li>
 <li><p><strong>val</strong> – <strong>[in]</strong> A non-negative value for the dim component of the multiindex. </p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>True if this function updated an already nonzero component, or false if this function added a new nonzero entry. </p>
 </dd>
 </dl>
@@ -415,10 +416,10 @@
 <span id="_CPPv3NK5mpart10MultiIndex3GetEj"></span><span id="_CPPv2NK5mpart10MultiIndex3GetEj"></span><span id="mpart::MultiIndex::Get__unsigned-iC"></span><span class="target" id="classmpart_1_1_multi_index_1aa2b1d443e9ffd4f5c018aa481512ecd5"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Get</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ind</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndex3GetEj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Obtain the a particular component of the multiindex. Notice that this function can be slow for multiindices with many nonzero components. The worst case performance requires <span class="math notranslate nohighlight">\(O(|\mathbf{j}|_0)\)</span> integer comparisons, where <span class="math notranslate nohighlight">\(|\mathbf{j}|_0\)</span> denotes the number of nonzero entries in the multiindex. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>ind</strong> – <strong>[in]</strong> The component to return. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The integer stored in component dim of the multiindex. </p>
 </dd>
 </dl>
@@ -429,7 +430,7 @@
 <span id="_CPPv3NK5mpart10MultiIndex5NumNzEv"></span><span id="_CPPv2NK5mpart10MultiIndex5NumNzEv"></span><span id="mpart::MultiIndex::NumNzC"></span><span class="target" id="classmpart_1_1_multi_index_1a43945de4ac114b7cdd7c58a8157a613e"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumNz</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndex5NumNzEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns the number of nonzero components in the multiindex. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>An unsigned integer with the number of nonzero entries in the multiindex. </p>
 </dd>
 </dl>
@@ -440,7 +441,7 @@
 <span id="_CPPv3NK5mpart10MultiIndex6StringEv"></span><span id="_CPPv2NK5mpart10MultiIndex6StringEv"></span><span id="mpart::MultiIndex::StringC"></span><span class="target" id="classmpart_1_1_multi_index_1a389f0d8dd90c57fa4f9a2f8b527b60bc"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">String</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndex6StringEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Return a string representation of the Multiindex. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>A string showing the dense representation of the multiindex, e.g., “[0,1,4,2]” </p>
 </dd>
 </dl>
@@ -451,7 +452,7 @@
 <span id="_CPPv3NK5mpart10MultiIndex6LengthEv"></span><span id="_CPPv2NK5mpart10MultiIndex6LengthEv"></span><span id="mpart::MultiIndex::LengthC"></span><span class="target" id="classmpart_1_1_multi_index_1acd98b6ef5f6f176ebd9ccbe4491845f7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Length</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndex6LengthEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Get the number of components in the index. When used to define a multivariate polynomial, this will return the dimension of the polynomial. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The length of the multiindex. When used for defining multivariate polynomials, this will be the dimension of the polynomial. </p>
 </dd>
 </dl>
@@ -462,10 +463,10 @@
 <span id="_CPPv3NK5mpart10MultiIndexeqERK10MultiIndex"></span><span id="_CPPv2NK5mpart10MultiIndexeqERK10MultiIndex"></span><span id="mpart::MultiIndex::eq-operator__MultiIndexCRC"></span><span class="target" id="classmpart_1_1_multi_index_1abba9f79cf04d265fda336d1a9af613f3"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">==</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndexeqERK10MultiIndex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Check for equality of the multiindices. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>b</strong> – <strong>[in]</strong> The multiindex to compare with *this. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>true if both multiindices have the same lengths, nonzero indices, and nonzero values. Returns false otherwise. </p>
 </dd>
 </dl>
@@ -476,10 +477,10 @@
 <span id="_CPPv3NK5mpart10MultiIndexneERK10MultiIndex"></span><span id="_CPPv2NK5mpart10MultiIndexneERK10MultiIndex"></span><span id="mpart::MultiIndex::neq-operator__MultiIndexCRC"></span><span class="target" id="classmpart_1_1_multi_index_1a5d283874a991bbabc03cfb2687e57088"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">!=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndexneERK10MultiIndex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Check if two multiindices are different. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>b</strong> – <strong>[in]</strong> The multiindex to compare with *this. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>false if both multiindices have the same lengths, nonzero indices, and nonzero values. true otherwise. </p>
 </dd>
 </dl>
@@ -497,10 +498,10 @@
 </ul>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>b</strong> – <strong>[in]</strong> The multiindex to compare with *this. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>true if *this &lt; b according to the ordering described above. false otherwise. </p>
 </dd>
 </dl>
@@ -518,10 +519,10 @@
 </ul>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>b</strong> – <strong>[in]</strong> The multiindex to compare with *this. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>true if *this &gt; b according to the ordering described above. false otherwise. </p>
 </dd>
 </dl>
@@ -532,10 +533,10 @@
 <span id="_CPPv3NK5mpart10MultiIndexgeERK10MultiIndex"></span><span id="_CPPv2NK5mpart10MultiIndexgeERK10MultiIndex"></span><span id="mpart::MultiIndex::gte-operator__MultiIndexCRC"></span><span class="target" id="classmpart_1_1_multi_index_1aa40491d51093ebaa5317203ad66c3863"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&gt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndexgeERK10MultiIndex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Check if this multiindex is greater than or equal to b. This is checked by returning “not (a&lt;b)”</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>b</strong> – <strong>[in]</strong> The multiindex to compare with *this. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>true if *this &gt;= b, false otherwise. </p>
 </dd>
 </dl>
@@ -546,10 +547,10 @@
 <span id="_CPPv3NK5mpart10MultiIndexleERK10MultiIndex"></span><span id="_CPPv2NK5mpart10MultiIndexleERK10MultiIndex"></span><span id="mpart::MultiIndex::lte-operator__MultiIndexCRC"></span><span class="target" id="classmpart_1_1_multi_index_1ae444df2bc7f7497c8929aa956406bd44"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;=</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">b</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart10MultiIndexleERK10MultiIndex" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Check if this multiindex is greater than or equal to b. This is checked by returning “not (a&gt;b)”</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>b</strong> – <strong>[in]</strong> The multiindex to compare with *this. </p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>true if *this &lt;= b, false otherwise. </p>
 </dd>
 </dl>
@@ -601,7 +602,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br>
 </p>
     </div>
     

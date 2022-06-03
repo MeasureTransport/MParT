@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
     <title>Multivariate Expansion &#8212; MParT  documentation</title>
     
@@ -21,8 +21,8 @@
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
     
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -31,6 +31,7 @@
     <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../_static/doctools.js"></script>
     <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -38,7 +39,7 @@
     <link rel="next" title="Tensor Product Function" href="tensorproductfunction.html" />
     <link rel="prev" title="Cached Parameterization Concept" href="concepts/cachedparameterization.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="docsearch:language" content="None">
+    <meta name="docsearch:language" content="en">
     
 
     <!-- Google Analytics -->
@@ -300,7 +301,7 @@
               <div>
                 
   <section id="multivariate-expansion">
-<h1>Multivariate Expansion<a class="headerlink" href="#multivariate-expansion" title="Permalink to this headline">#</a></h1>
+<h1>Multivariate Expansion<a class="headerlink" href="#multivariate-expansion" title="Permalink to this heading">#</a></h1>
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4I0EN5mpart21MultivariateExpansionE">
 <span id="_CPPv3I0EN5mpart21MultivariateExpansionE"></span><span id="_CPPv2I0EN5mpart21MultivariateExpansionE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BasisEvaluatorType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansion</span></span></span><a class="headerlink" href="#_CPPv4I0EN5mpart21MultivariateExpansionE" title="Permalink to this definition">#</a><br /></dt>
@@ -312,7 +313,7 @@
 </ul>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Template Parameters</dt>
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>BasisEvaluatorType</strong> – The family of 1d basis functions to employ. </p>
 </dd>
 </dl>
@@ -333,7 +334,7 @@
 <span id="_CPPv3NK5mpart21MultivariateExpansion9CacheSizeEv"></span><span id="_CPPv2NK5mpart21MultivariateExpansion9CacheSizeEv"></span><span id="mpart::MultivariateExpansion::CacheSizeC"></span><span class="target" id="classmpart_1_1_multivariate_expansion_1a5fc47afad5aece8f47970670ec0ebdaf"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CacheSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart21MultivariateExpansion9CacheSizeEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns the size of the cache needed to evaluate the expansion (in terms of number of doubles). </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>unsigned int The length of the required cache vector. </p>
 </dd>
 </dl>
@@ -344,7 +345,7 @@
 <span id="_CPPv3NK5mpart21MultivariateExpansion9NumCoeffsEv"></span><span id="_CPPv2NK5mpart21MultivariateExpansion9NumCoeffsEv"></span><span id="mpart::MultivariateExpansion::NumCoeffsC"></span><span class="target" id="classmpart_1_1_multivariate_expansion_1a4e93c4902377e0af11401daff57f5915"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumCoeffs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart21MultivariateExpansion9NumCoeffsEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns the number of coefficients in this expansion. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>unsigned int The number of terms in the multiindexset, which corresponds to the number of coefficients needed to define the expansion. </p>
 </dd>
 </dl>
@@ -355,7 +356,7 @@
 <span id="_CPPv3NK5mpart21MultivariateExpansion9InputSizeEv"></span><span id="_CPPv2NK5mpart21MultivariateExpansion9InputSizeEv"></span><span id="mpart::MultivariateExpansion::InputSizeC"></span><span class="target" id="classmpart_1_1_multivariate_expansion_1ab0e562a2eff9e2a74efd070d41007283"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InputSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart21MultivariateExpansion9InputSizeEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns the dimension of inputs to this multivariate expansion. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>unsigned int The dimension of an input point. </p>
 </dd>
 </dl>
@@ -371,10 +372,10 @@
 </div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Template Parameters</dt>
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>PointType</strong> – The vector type used to define the point. Can be anything allowing access to components with operator(). Examples are Kokkos::View&lt;double*&gt; or Eigen::VectorXd. Only the first d-1 components of the vector will be accessed in this function. </p>
 </dd>
-<dt class="field-even">Parameters</dt>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>polyCache</strong> – A pointer to the start of the cache. This memory must be allocated before calling this function. </p></li>
 <li><p><strong>pt</strong> – The point (at least the first <span class="math notranslate nohighlight">\(d-1\)</span> components) to use when filling in the cache. </p></li>
@@ -394,10 +395,10 @@
 </div>
 </p>
 <dl class="field-list simple">
-<dt class="field-odd">Template Parameters</dt>
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>PointType</strong> – The vector type used to define the point. Can be anything allowing access to components with operator(). Examples are Kokkos::View&lt;double*&gt; or Eigen::VectorXd. Only the first d-1 components of the vector will be accessed in this function. </p>
 </dd>
-<dt class="field-even">Parameters</dt>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>polyCache</strong> – A pointer to the start of the cache. This memory must be allocated before calling this function. </p></li>
 <li><p><strong>pt</strong> – The point to use when filling in the cache. Should contain <span class="math notranslate nohighlight">\([x_1,\ldots,x_{d-1}]\)</span>. The vector itself can have more than <span class="math notranslate nohighlight">\(d-1\)</span> components, but only the first <span class="math notranslate nohighlight">\(d-1\)</span> will be accessed. The value of <span class="math notranslate nohighlight">\(x_d\)</span> is passed through the <code class="docutils literal notranslate"><span class="pre">xd</span></code> argument. </p></li>
@@ -418,16 +419,16 @@
 <span id="_CPPv3I0ENK5mpart21MultivariateExpansion18DiagonalDerivativeEPKdRK12CoeffVecTypej"></span><span id="_CPPv2I0ENK5mpart21MultivariateExpansion18DiagonalDerivativeEPKdRK12CoeffVecTypej"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_1afbf4755f76b631ac90d6c0bc919c75aa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiagonalDerivative</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I0ENK5mpart21MultivariateExpansion18DiagonalDerivativeEdPKdRK12CoeffVecTypej" title="mpart::MultivariateExpansion::DiagonalDerivative::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derivOrder</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart21MultivariateExpansion18DiagonalDerivativeEdPKdRK12CoeffVecTypej" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Evaluates the derivative of the expansion wrt x_{D-1}. </p>
 <dl class="field-list simple">
-<dt class="field-odd">Template Parameters</dt>
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>CoeffVecType</strong> – </p>
 </dd>
-<dt class="field-even">Parameters</dt>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>polyCache</strong> – </p></li>
 <li><p><strong>coeffs</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>double </p>
 </dd>
 </dl>
@@ -437,13 +438,13 @@
 <dt class="sig sig-object cpp" id="_CPPv4I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType">
 <span id="_CPPv3I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEPKdRK12CoeffVecTypeR11GradVecType"></span><span id="_CPPv2I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEPKdRK12CoeffVecTypeR11GradVecType"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GradVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_1a6e87668c4b524f885ffbf6d147100d7c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffDerivative</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="mpart::MultivariateExpansion::CoeffDerivative::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="mpart::MultivariateExpansion::CoeffDerivative::GradVecType"><span class="n"><span class="pre">GradVecType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grad</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I00ENK5mpart21MultivariateExpansion15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="Permalink to this definition">#</a><br /></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Template Parameters</dt>
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>CoeffVecType</strong> – </p></li>
 <li><p><strong>GradVecType</strong> – </p></li>
 </ul>
 </dd>
-<dt class="field-even">Parameters</dt>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
 <li><p><strong>polyCache</strong> – </p></li>
 <li><p><strong>coeffs</strong> – </p></li>
@@ -504,7 +505,7 @@
     
     <div class="footer-item">
       <p class="sphinx-version">
-Created using <a href="http://sphinx-doc.org/">Sphinx</a> 4.5.0.<br>
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br>
 </p>
     </div>
     
