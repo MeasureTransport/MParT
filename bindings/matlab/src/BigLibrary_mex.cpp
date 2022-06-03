@@ -9,6 +9,10 @@
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/OrthogonalPolynomial.h"
 #include "MParT/MultivariateExpansion.h"
+#include "MexArrayConversions.h"
+
+#include <Eigen/Dense>
+
 
 using namespace mpart;
 using namespace mexplus;
@@ -45,6 +49,39 @@ MEX_DEFINE(NumCoeffs) (int nlhs, mxArray* plhs[],
   const MultivariateExpansion<ProbabilistHermite>& expansion = Session<MultivariateExpansion<ProbabilistHermite>>::getConst(input.get(0));
   output.set(0, expansion.NumCoeffs());
 }
+
+MEX_DEFINE(CacheSize) (int nlhs, mxArray* plhs[],
+                        int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultivariateExpansion<ProbabilistHermite>& expansion = Session<MultivariateExpansion<ProbabilistHermite>>::getConst(input.get(0));
+  output.set(0, expansion.CacheSize());
+}
+
+MEX_DEFINE(FillCache1) (int nlhs, mxArray* plhs[],
+                        int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 3);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultivariateExpansion<ProbabilistHermite>& expansion = Session<MultivariateExpansion<ProbabilistHermite>>::getConst(input.get(0));
+  // Need to bind derivative flag! just switch from string!
+  //DerivativeFlags::DerivativeType flag = None
+  std::vector<double> cache = KokkosToStd(MexToKokkos1d(input.get(1)));
+  expansion.FillCache1(&cache[0],MexToKokkos1d(input.get(2)),DerivativeFlags::None);
+  output.set(0,cache); // Need to output the cache because it is not changed in matlab otherwise
+}
+
+MEX_DEFINE(Evaluate) (int nlhs, mxArray* plhs[],
+                        int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 3);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultivariateExpansion<ProbabilistHermite>& expansion = Session<MultivariateExpansion<ProbabilistHermite>>::getConst(input.get(0));
+  std::vector<double> cache = KokkosToStd(MexToKokkos1d(input.get(1)));
+  output.set(0, expansion.Evaluate(&cache[0],MexToKokkos1d(input.get(2))));
+}
+
+
+
+// ---------- FixedMultiIndexSet related functions -------------
 
 MEX_DEFINE(newFixedMultiIndexSet) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
