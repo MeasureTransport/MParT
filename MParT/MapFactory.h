@@ -8,12 +8,15 @@
 
 namespace mpart{
 
-    /**
-     @brief 
-     @param mset The multiindex set specifying which terms should be used in the multivariate expansion.
-     */
-    std::shared_ptr<ConditionalMapBase> CreateComponent(FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
-                                                        MapOptions options = MapOptions());    
+    namespace MapFactory{
+        
+        /**
+        @brief 
+        @param mset The multiindex set specifying which terms should be used in the multivariate expansion.
+        */
+        std::shared_ptr<ConditionalMapBase> CreateComponent(FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
+                                                            MapOptions options = MapOptions());   
+    } 
 }
 
 #endif 

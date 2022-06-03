@@ -8,7 +8,7 @@
 
 using namespace mpart;
 
-std::shared_ptr<ConditionalMapBase> mpart::CreateComponent(FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
+std::shared_ptr<ConditionalMapBase> mpart::MapFactory::CreateComponent(FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
                                                            MapOptions                                   opts)
 {   
     if(opts.quadType==QuadTypes::AdaptiveSimpson){
