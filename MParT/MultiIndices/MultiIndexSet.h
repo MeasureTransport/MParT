@@ -8,10 +8,14 @@
 #include <iostream>
 #include <functional>
 
+#include <Eigen/Core>
+
+
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexNeighborhood.h"
 #include "MParT/MultiIndices/MultiIndex.h"
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
+
 
 
 namespace mpart{
@@ -76,6 +80,9 @@ MultiIndexSet set(length, limiter);
                 LimiterType const& limiterIn = MultiIndexLimiter::None(),
                 std::shared_ptr<MultiIndexNeighborhood> neigh = std::make_shared<DefaultNeighborhood>() );
 
+  /** Each row of the input matrix is a multiindex. */
+  MultiIndexSet(Eigen::Ref<const Eigen::MatrixXi> const& multis);
+
   /**
    @brief Converts this multiindex set into the fixed representation provided by the "FixedMultiIndexSet" class.
    @details The FixedMultiIndexSet cannot easily be adapted, but stores the multiindices in a contiguous block of memory 
@@ -85,7 +92,7 @@ MultiIndexSet set(length, limiter);
    @param[in] compress Should the fixed representation be in compressed format?
    @return An instance of the FixedMultiIndexSet class with a snapshot of the current state of this MultiIndexSet.
    */
-  FixedMultiIndexSet Fix(bool compress=true) const;
+  FixedMultiIndexSet<Kokkos::HostSpace> Fix(bool compress=true) const;
 
   /** Set the limiter of this MultiIndexSet.  This function will check to make
       sure that all currently active nodes are still feasible with the new limiter.

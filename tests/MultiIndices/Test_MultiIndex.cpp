@@ -100,6 +100,17 @@ TEST_CASE( "Testing MultiIndex", "[MultiIndex]" ) {
     REQUIRE(multi.Get(3)==0);
 }
 
+TEST_CASE("Multiindex from Eigen", "[MultiIndexFromEigen]")
+{
+    Eigen::VectorXi multi(3);
+    multi << 2,3,4;
+
+    MultiIndex a(multi);
+    CHECK(a.Get(0) == multi(0));
+    CHECK(a.Get(1) == multi(1));
+    CHECK(a.Get(2) == multi(2));
+}
+
 TEST_CASE( "Testing MultiIndex ordering", "[MultiIndexOrder]" ) {
 
     MultiIndex a({0,1,1,2});

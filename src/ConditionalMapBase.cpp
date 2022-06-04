@@ -19,6 +19,25 @@ Eigen::RowMatrixXd ConditionalMapBase::Evaluate(Eigen::RowMatrixXd const& pts)
     return output;
 }
 
+
+Kokkos::View<double*, Kokkos::HostSpace> ConditionalMapBase::LogDeterminant(Kokkos::View<const double**, Kokkos::HostSpace> const& pts)
+{
+    Kokkos::View<double*, Kokkos::HostSpace> output("Log Determinants", pts.extent(1));
+    LogDeterminantImpl(pts, output);
+    return output;
+}
+        
+Eigen::VectorXd ConditionalMapBase::LogDeterminant(Eigen::RowMatrixXd const& pts)
+{
+    Eigen::VectorXd output(pts.cols());
+    Kokkos::View<const double**, Kokkos::HostSpace> ptsView = ConstRowMatToKokkos<double>(pts);
+    Kokkos::View<double*, Kokkos::HostSpace> outView = VecToKokkos<double>(output);
+    LogDeterminantImpl(ptsView, outView);
+    return output;
+}
+
+
+
 Kokkos::View<double**, Kokkos::HostSpace> ConditionalMapBase::Inverse(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
                                                                       Kokkos::View<const double**, Kokkos::HostSpace> const& r)
 {      
