@@ -32,6 +32,7 @@ if(COMPILER_IS_NVCC1 AND COMPILER_IS_NVCC2)
     add_compile_definitions(EIGEN_NO_CUDA)
 endif()
 
+
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -49,7 +50,7 @@ find_package(Kokkos QUIET)
 if(NOT Kokkos_FOUND)
     message(STATUS "Could not find Kokkos.  Using internal build.")
     UpdateGitSubmodule(kokkos)
-    add_subdirectory(external/kokkos)   
+    add_subdirectory(external/kokkos)
 else()
     message(STATUS "Found Kokkos!")
 endif()
@@ -74,45 +75,24 @@ endif()
 # Add the current source directory as an include directory
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-# Add Julia if necessary
-if(MPART_JULIA)
-  
-  # Set the julie executable and look for the location of cxxwrap
-  if(NOT DEFINED JULIA_EXE)
-      set(JULIA_EXE "julia")
-  endif()
-  execute_process(COMMAND ${JULIA_EXE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
-  list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}" )
-  
-  find_package(JlCxx)
-
-  if(NOT JlCxx_FOUND)
-    set(MPART_JULIA OFF)
-    message(WARNING "Request Julia bindings but CMake could not find JlCxx package.  Setting MPART_JULIA=OFF.")
-  else()
-    get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
-    get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
-    get_filename_component(JlCxx_src ${JlCxx_location} DIRECTORY)
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
-    include_directories(${Julia_INCLUDE_DIRS} ${JlCxx_src}/include)
-  endif()
-
-endif()
 
 ##############################################################
 # MParT library
 add_library(mpart "")
+
 add_library (MParT::mpart ALIAS mpart)
 
-target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen)
+# target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen)
 
-target_include_directories(mpart
-                           PUBLIC
-                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-                            $<INSTALL_INTERFACE:include>
-                           )
+# target_include_directories(mpart
+#                            PUBLIC
+#                             $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+#                             $<INSTALL_INTERFACE:include>
+#                            )
 
 add_subdirectory(src)
+target_link_libraries(mpart Kokkos::kokkos Eigen3::Eigen)
+
 
 if(MPART_PYTHON)
     add_subdirectory(bindings/python)
@@ -149,53 +129,15 @@ endif()
 # Define test sources
 add_subdirectory(tests)
 add_executable(RunTests ${TEST_SOURCES})
-target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen)
-
-add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
-target_link_libraries(PrintKokkosInfo Kokkos::kokkos)
+target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2)
 
 ##############################################################
-# Installation 
-install(TARGETS mpart
-        EXPORT MParTTargets
-        DESTINATION lib)
+# Instalaltion 
+install(TARGETS mpart DESTINATION lib)
 
 install(DIRECTORY MParT
-        DESTINATION include
-	    FILES_MATCHING PATTERN "*.h")
-
-include(CMakePackageConfigHelpers)
-
-configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
-  "${CMAKE_CURRENT_BINARY_DIR}/MParTConfig.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake"
-  NO_SET_AND_CHECK_MACRO
-  NO_CHECK_REQUIRED_COMPONENTS_MACRO
-)
-
-write_basic_package_version_file(
-  ${CMAKE_CURRENT_BINARY_DIR}/MParTConfigVersion.cmake
-  VERSION "${PROJECT_VERSION}"
-  COMPATIBILITY SameMajorVersion
-)
-
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/MParTConfig.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/MParTConfigVersion.cmake
-  DESTINATION lib/cmake/MParT
-)
-
-
-export (TARGETS mpart ${KOKKOS_EXPORTS} NAMESPACE MParT:: FILE MParTTargets.cmake)
-export (PACKAGE MParT)
-
-install (EXPORT MParTTargets NAMESPACE MParT:: DESTINATION lib/cmake/MParT)
-
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/MParTConfig.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/MParTConfigVersion.cmake
-         DESTINATION lib/cmake/MParT)
-
-
+        DESTINATION "${CMAKE_INSTALL_PREFIX}/include"
+	      FILES_MATCHING PATTERN "*.h")
 
 ##############################################################
 # Documentation
