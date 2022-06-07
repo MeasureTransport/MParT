@@ -10,8 +10,8 @@ INCLUDE(Submodules)
 # Options 
 
 option(MPART_PYTHON "Build python bindings with pybind11" ON)
-option(MPART_MATLAB "Build matlab bindings" ON)
-option(MPART_JULIA "Build julia bindings with CxxWrap.jl" OFF)
+option(MPART_MATLAB "Build matlab bindings with pybind11" ON)
+option(MPART_JULIA "Build julia bindings with CxxWrap.jl" ON)
 
 ##############################################################
 # Compiler configuration
