@@ -24,6 +24,14 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-Wno-deprecated-gpu-targets" COMPILER_IS_NVCC1)
+check_cxx_compiler_flag("--expt-relaxed-constexpr" COMPILER_IS_NVCC2)
+if(COMPILER_IS_NVCC1 AND COMPILER_IS_NVCC2)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-gpu-targets --expt-relaxed-constexpr")
+    add_compile_definitions(EIGEN_NO_CUDA)
+endif()
+
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -34,9 +42,13 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 # Add Kokkos
 find_package(Kokkos QUIET)
+
 if(NOT Kokkos_FOUND)
+    message(STATUS "Could not find Kokkos.  Using internal build.")
     UpdateGitSubmodule(kokkos)
-    add_subdirectory(external/kokkos)
+    add_subdirectory(external/kokkos)   
+else()
+    message(STATUS "Found Kokkos!")
 endif()
 
 # Add Eigen
@@ -55,8 +67,6 @@ if(MPART_PYTHON)
   endif()
 endif()
 
-# Add the current source directory as an include directory
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 # Add Julia if necessary
 if(MPART_JULIA)
@@ -86,8 +96,17 @@ endif()
 ##############################################################
 # MParT library
 add_library(mpart "")
+add_library (MParT::mpart ALIAS mpart)
+
+target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen)
+
+target_include_directories(mpart
+                           PUBLIC
+                            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                            $<INSTALL_INTERFACE:include>
+                           )
+
 add_subdirectory(src)
-target_link_libraries(mpart Kokkos::kokkos Eigen3::Eigen)
 
 if(MPART_PYTHON)
     add_subdirectory(bindings/python)
@@ -118,15 +137,53 @@ endif()
 # Define test sources
 add_subdirectory(tests)
 add_executable(RunTests ${TEST_SOURCES})
-target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2)
+target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen)
+
+add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
+target_link_libraries(PrintKokkosInfo Kokkos::kokkos)
 
 ##############################################################
-# Instalaltion 
-install(TARGETS mpart DESTINATION lib)
+# Installation 
+install(TARGETS mpart
+        EXPORT MParTTargets
+        DESTINATION lib)
 
 install(DIRECTORY MParT
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/include"
-	      FILES_MATCHING PATTERN "*.h")
+        DESTINATION include
+	    FILES_MATCHING PATTERN "*.h")
+
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/MParTConfig.cmake"
+  INSTALL_DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/cmake"
+  NO_SET_AND_CHECK_MACRO
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+)
+
+write_basic_package_version_file(
+  ${CMAKE_CURRENT_BINARY_DIR}/MParTConfigVersion.cmake
+  VERSION "${PROJECT_VERSION}"
+  COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/MParTConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/MParTConfigVersion.cmake
+  DESTINATION lib/cmake/MParT
+)
+
+
+export (TARGETS mpart ${KOKKOS_EXPORTS} NAMESPACE MParT:: FILE MParTTargets.cmake)
+export (PACKAGE MParT)
+
+install (EXPORT MParTTargets NAMESPACE MParT:: DESTINATION lib/cmake/MParT)
+
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/MParTConfig.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/MParTConfigVersion.cmake
+         DESTINATION lib/cmake/MParT)
+
+
 
 ##############################################################
 # Documentation

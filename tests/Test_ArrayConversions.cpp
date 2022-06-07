@@ -1,6 +1,7 @@
 #include <catch2/catch_all.hpp>
 
 #include "MParT/Utilities/ArrayConversions.h"
+#include "MParT/Utilities/KokkosSpaceMappings.h"
 
 #include "MParT/Utilities/EigenTypes.h"
 using namespace mpart;
@@ -102,6 +103,65 @@ TEST_CASE( "Testing Pointer to Kokkos Conversions in 2D", "[ArrayConversions2D]"
 }
 
 
+#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+
+TEST_CASE( "Testing functions that copy views between host and device", "[ArrayConversionsHostDevice]" ) {
+
+    typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
+
+    unsigned int N1 = 10;
+    unsigned int N2 = 20;
+
+    Kokkos::View<double*, Kokkos::HostSpace> hostVec("host stuff", N1);
+    for(unsigned int i=0; i<N1; ++i)
+        hostVec(i) = i;
+    
+    // Copy to the device 
+    auto deviceVec = ToDevice<DeviceSpace>(hostVec);
+
+    // Copy back to host 
+    auto hostVec2 = ToHost(deviceVec);
+    REQUIRE(hostVec2.extent(0)==N1);
+    for(unsigned int i=0; i<N1; ++i)
+        CHECK( hostVec2(i) ==i );
+
+    // Copy a slice back to host 
+    auto slice1 = ToHost(deviceVec, std::make_pair(1,3));
+    REQUIRE( slice1.extent(0) == 2);
+    CHECK(slice1(0)==1);
+    CHECK(slice1(1)==2);
+}
+
+
+TEST_CASE( "Testing mapping from memory space to valid execution space.", "[KokkosSpaceMapping]" ) {
+
+    typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
+
+    unsigned int N1 = 10;
+
+    Kokkos::View<double*, Kokkos::HostSpace> hostVec("host stuff", N1);
+    Kokkos::parallel_for(Kokkos::RangePolicy<typename MemoryToExecution<Kokkos::HostSpace>::Space>(0,N1), KOKKOS_LAMBDA (const int i) {
+        hostVec(i) = i;
+    });
+    
+    for(unsigned int i=0; i<N1; ++i)
+        CHECK( hostVec(i) ==i );
+
+    // Copy to the device 
+    Kokkos::View<double*,DeviceSpace> deviceVec("device stuff", N1);
+    Kokkos::parallel_for(Kokkos::RangePolicy<typename MemoryToExecution<DeviceSpace>::Space>(0,N1), KOKKOS_LAMBDA (const int i) {
+        deviceVec(i) = i;
+    });
+
+    // Copy the device vector back to host and compare
+    auto hostVec2 = ToHost(deviceVec);
+    REQUIRE(hostVec2.extent(0)==N1);
+    for(unsigned int i=0; i<N1; ++i)
+        CHECK( hostVec2(i) ==i );
+}
+
+
+#endif 
 
 TEST_CASE( "Testing Eigen to Kokkos Conversions in 1D", "[EigenArrayConversions1D]" ) {
 
@@ -254,8 +314,6 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 2D", "[EigenArrayConversions2
         }
     }
 }
-
-
 
 TEST_CASE( "Testing Kokkos to Eigen Conversions in 1D", "[KokkosToEigen1d]" ) {
 
