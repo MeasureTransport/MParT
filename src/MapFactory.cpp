@@ -9,8 +9,8 @@
 
 using namespace mpart;
 
-std::shared_ptr<ConditionalMapBase> mpart::CreateComponent(FixedMultiIndexSet const& mset, 
-                                                          std::unordered_map<std::string,std::string> options)
+std::shared_ptr<ConditionalMapBase> mpart::CreateComponent(FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
+                                                           std::unordered_map<std::string,std::string> options)
 {   
     // Extract the polynomial type
     std::string polyType = GetOption(options,"PolyType", "ProbabilistHermite");
@@ -26,12 +26,12 @@ std::shared_ptr<ConditionalMapBase> mpart::CreateComponent(FixedMultiIndexSet co
         double absTol = stof(GetOption(options,"QuadAbsTol", "1e-6"));
         unsigned int maxSub = stoi(GetOption(options,"QuadAbsTol", "30"));
 
-        AdaptiveSimpson quad(maxSub, absTol, relTol, QuadError::First);
+        AdaptiveSimpson<Kokkos::HostSpace> quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
 
         if((polyType=="ProbabilistHermite")&&(posType=="SoftPlus")){
             
             MultivariateExpansion<ProbabilistHermite> expansion(mset);
-            std::shared_ptr<ConditionalMapBase> output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, AdaptiveSimpson>>(mset, quad);
+            std::shared_ptr<ConditionalMapBase> output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad)>>(mset, quad);
 
             output->Coeffs() = Kokkos::View<double*,Kokkos::HostSpace>("Component Coefficients", mset.Size());
             return output;

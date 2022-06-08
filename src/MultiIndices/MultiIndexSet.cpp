@@ -1,8 +1,7 @@
+#include "MParT/MultiIndices/MultiIndexSet.h"
+
 #include <algorithm>
 #include <sstream>
-#include <stdexcept>
-
-#include "MParT/MultiIndices/MultiIndexSet.h"
 
 using namespace mpart;
 
@@ -118,7 +117,7 @@ MultiIndexSet::MultiIndexSet(const unsigned int lengthIn,
 };
 
 
-FixedMultiIndexSet MultiIndexSet::Fix(bool compress) const
+FixedMultiIndexSet<Kokkos::HostSpace> MultiIndexSet::Fix(bool compress) const
 {
   if(compress){
 
@@ -128,9 +127,9 @@ FixedMultiIndexSet MultiIndexSet::Fix(bool compress) const
       totalNnz += allMultis.at(activeInd).NumNz();
 
 
-    Kokkos::View<unsigned int*> nzStarts("Start of a Multiindex", numTerms+1);
-    Kokkos::View<unsigned int*> nzDims("Index of nz component", totalNnz);
-    Kokkos::View<unsigned int*> nzOrders("Power of nz component", totalNnz);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> nzStarts("Start of a Multiindex", numTerms+1);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> nzDims("Index of nz component", totalNnz);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> nzOrders("Power of nz component", totalNnz);
 
     unsigned int cumNz = 0;
 
@@ -154,7 +153,7 @@ FixedMultiIndexSet MultiIndexSet::Fix(bool compress) const
 
   }else{
 
-    Kokkos::View<unsigned int*> orders("orders", length*Size());
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> orders("orders", length*Size());
     std::vector<unsigned int> multi;
 
     for(unsigned int i=0; i<Size(); ++i){
@@ -165,7 +164,7 @@ FixedMultiIndexSet MultiIndexSet::Fix(bool compress) const
 
     }
 
-    return FixedMultiIndexSet(length, orders);
+    return FixedMultiIndexSet<Kokkos::HostSpace>(length, orders);
   }
 }
 

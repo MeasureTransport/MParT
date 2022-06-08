@@ -1,91 +1,202 @@
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
-#include <algorithm>
-#include <tuple>
-#include <utility>
+#include "MParT/Utilities/ArrayConversions.h"
+#include <stdio.h>
 
 using namespace mpart;
 
 
-FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
-                                       Kokkos::View<unsigned int*> _nzOrders) : dim(_dim),
-                                                                                isCompressed(false),
-                                                                                nzOrders(_nzOrders)
+namespace mpart{
 
+    template<typename MemorySpace>
+    struct StartSetter {
+
+        StartSetter(Kokkos::View<unsigned int*, MemorySpace> nzStarts,
+                   unsigned int dim) : _nzStarts(nzStarts), _dim(dim){};
+
+        KOKKOS_INLINE_FUNCTION void operator()(const size_t i) const{
+            this->_nzStarts(i) = i*_dim;
+        };
+
+        Kokkos::View<unsigned int*, MemorySpace> _nzStarts;
+        const unsigned int _dim;
+    };
+
+    template<typename MemorySpace>
+    struct DimSetter {
+
+        DimSetter(Kokkos::View<unsigned int*, MemorySpace> nzDims,
+                  unsigned int dim) : _nzDims(nzDims), _dim(dim){};
+
+        KOKKOS_INLINE_FUNCTION void operator()(const size_t i) const{
+            this->_nzDims(i) = i%_dim;
+        };
+
+        Kokkos::View<unsigned int*, MemorySpace> _nzDims;
+        const unsigned int _dim;
+    };
+
+    template<typename MemorySpace>
+    struct MaxDegreeSetter {
+
+        MaxDegreeSetter(Kokkos::View<unsigned int*, MemorySpace> maxDegrees,
+                        Kokkos::View<unsigned int*, MemorySpace> nzDims,
+                        Kokkos::View<unsigned int*, MemorySpace> nzOrders,
+                        unsigned int dim) : maxDegrees_(maxDegrees), nzDims_(nzDims), nzOrders_(nzOrders), dim_(dim){};
+
+        KOKKOS_INLINE_FUNCTION void operator()(const size_t i) const{
+            Kokkos::atomic_max(&maxDegrees_(nzDims_(i)), nzOrders_(i));
+        }
+
+        Kokkos::View<unsigned int*, MemorySpace> maxDegrees_;
+        Kokkos::View<unsigned int*, MemorySpace> nzDims_;
+        Kokkos::View<unsigned int*, MemorySpace> nzOrders_;
+        const unsigned int dim_;
+    };
+
+
+    template<typename MemorySpace>
+    struct MaxDegreeInitializer {
+
+        MaxDegreeInitializer(Kokkos::View<unsigned int*, MemorySpace> maxDegrees) : maxDegrees_(maxDegrees){};
+
+        KOKKOS_INLINE_FUNCTION void operator()(const size_t i) const{
+            maxDegrees_(i) = 0;
+        };
+
+        Kokkos::View<unsigned int*, MemorySpace> maxDegrees_;
+    };
+}
+
+
+
+
+template<typename MemorySpace>
+FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int                dim,
+                                       Kokkos::View<unsigned int*, MemorySpace> nzOrders) : dim(dim),
+                                                                                            isCompressed(false),
+                                                                                            nzOrders(nzOrders),
+                                                                                            nzDims("Nonzero dims", nzOrders.extent(0))
 {
+    SetupTerms();
+    CalculateMaxDegrees();
+}
+
+template<typename MemorySpace>
+void FixedMultiIndexSet<MemorySpace>::SetupTerms()
+{
+
     unsigned int numTerms = nzOrders.extent(0) / dim;
 
-    nzStarts = Kokkos::View<unsigned int*>("Start of a Multiindex", numTerms+1);
-    for(unsigned int i=0; i<numTerms+1; ++i)
-        nzStarts(i) = i*dim;
-
-    nzDims = Kokkos::View<unsigned int*>("Index of nz component", numTerms);
-    for(unsigned int i=0; i<numTerms; ++i)
-        nzDims(i) = i%dim;
-
-    maxDegrees = Kokkos::View<unsigned int*>("Maximum degrees", dim);
-    for(unsigned int i=0; i<dim; ++i)
-        maxDegrees(i) = 0;
-    for(unsigned int i=0; i<nzOrders.extent(0); ++i)
-        maxDegrees(nzDims(i)) = std::max(maxDegrees(nzDims(i)), nzOrders(i));
+    nzStarts = Kokkos::View<unsigned int*, MemorySpace>("Start of a Multiindex", numTerms+1);
+    Kokkos::parallel_for(numTerms, StartSetter<MemorySpace>(nzStarts,dim));
+    Kokkos::parallel_for(dim*numTerms, DimSetter<MemorySpace>(nzDims,dim));
 }
-
-FixedMultiIndexSet::FixedMultiIndexSet(unsigned int                _dim,
-                                       Kokkos::View<unsigned int*> _nzStarts,
-                                       Kokkos::View<unsigned int*> _nzDims,
-                                       Kokkos::View<unsigned int*> _nzOrders) : dim(_dim),
-                                                                                isCompressed(true),
-                                                                                nzStarts(_nzStarts),
-                                                                                nzDims(_nzDims),
-                                                                                nzOrders(_nzOrders)
+template<>
+void FixedMultiIndexSet<Kokkos::HostSpace>::SetupTerms()
 {
-    maxDegrees = Kokkos::View<unsigned int*>("Maximum degrees", dim);
-    for(unsigned int i=0; i<dim; ++i)
-        maxDegrees(i) = 0;
 
-    for(unsigned int i=0; i<nzOrders.extent(0); ++i)
-        maxDegrees(nzDims(i)) = std::max(maxDegrees(nzDims(i)), nzOrders(i));
+    unsigned int numTerms = nzOrders.extent(0) / dim;
+
+    nzStarts = Kokkos::View<unsigned int*, Kokkos::HostSpace>("Start of a Multiindex", numTerms+1);
+    {
+    StartSetter<Kokkos::HostSpace> functor(nzStarts,dim);
+    for(unsigned int i=0; i<numTerms; ++i)
+        functor(i);
+    }
+    {
+    DimSetter<Kokkos::HostSpace> functor(nzDims,dim);
+    for(unsigned int i=0; i<dim*numTerms; ++i)
+        functor(i);
+    }
 }
 
-FixedMultiIndexSet::FixedMultiIndexSet(unsigned int _dim,
-                                       unsigned int _maxOrder) : dim(_dim), isCompressed(true)
+
+template<typename MemorySpace>
+void FixedMultiIndexSet<MemorySpace>::CalculateMaxDegrees()
+{
+    maxDegrees = Kokkos::View<unsigned int*, MemorySpace>("Maximum degrees", dim);
+
+    Kokkos::parallel_for(dim, MaxDegreeInitializer<MemorySpace>(maxDegrees));
+    Kokkos::parallel_for(nzOrders.extent(0), MaxDegreeSetter<MemorySpace>(maxDegrees, nzDims, nzOrders, dim));
+}
+
+template<>
+void FixedMultiIndexSet<Kokkos::HostSpace>::CalculateMaxDegrees()
+{
+    maxDegrees = Kokkos::View<unsigned int*, Kokkos::HostSpace>("Maximum degrees", dim);
+
+    {
+    MaxDegreeInitializer<Kokkos::HostSpace> functor(maxDegrees);
+    for(unsigned int i=0; i<dim; ++i)
+        functor(i);
+    }
+
+    {
+    MaxDegreeSetter<Kokkos::HostSpace> functor(maxDegrees, nzDims, nzOrders, dim);
+    for(unsigned int i=0; i<nzOrders.extent(0); ++i)
+        functor(i);
+    }
+}
+
+template<typename MemorySpace>
+FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int                dim,
+                                       Kokkos::View<unsigned int*, MemorySpace> nzStarts,
+                                       Kokkos::View<unsigned int*, MemorySpace> nzDims,
+                                       Kokkos::View<unsigned int*, MemorySpace> nzOrders) : dim(dim),
+                                                                                isCompressed(true),
+                                                                                nzStarts(nzStarts),
+                                                                                nzDims(nzDims),
+                                                                                nzOrders(nzOrders)
+{
+    CalculateMaxDegrees();
+}
+
+template<typename MemorySpace>
+FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int dim,
+                                                    unsigned int maxOrder) : dim(dim), isCompressed(true)
 {
     // Figure out the number of terms in the total order
     unsigned int numTerms, numNz;
-    std::tie(numTerms,numNz) = TotalOrderSize(_maxOrder, 0);
+    std::tie(numTerms,numNz) = TotalOrderSize(maxOrder, 0);
 
     // Allocate space for the multis in compressed form
-    nzStarts = Kokkos::View<unsigned int*>("nzStarts", numTerms+1);
-    nzDims   = Kokkos::View<unsigned int*>("nzDims", numNz);
-    nzOrders = Kokkos::View<unsigned int*>("nzOrders", numNz);
+    nzStarts = Kokkos::View<unsigned int*, MemorySpace>("nzStarts", numTerms+1);
+    nzDims   = Kokkos::View<unsigned int*, MemorySpace>("nzDims", numNz);
+    nzOrders = Kokkos::View<unsigned int*, MemorySpace>("nzOrders", numNz);
 
     // Compute the multis
     std::vector<unsigned int> workspace(dim);
     unsigned int currNz=0;
     unsigned int currTerm=0;
 
-    FillTotalOrder(_maxOrder, workspace, 0, currTerm, currNz);
+    FillTotalOrder(maxOrder, workspace, 0, currTerm, currNz);
 
-    maxDegrees = Kokkos::View<unsigned int*>("Maximum degrees", dim);
-    for(unsigned int i=0; i<dim; ++i)
-        maxDegrees(i) = _maxOrder;
+    CalculateMaxDegrees();
 }
 
 
-
-Kokkos::View<const unsigned int*> FixedMultiIndexSet::MaxDegrees() const
+template<typename MemorySpace>
+Kokkos::View<const unsigned int*, MemorySpace> FixedMultiIndexSet<MemorySpace>::MaxDegrees() const
 {
     return maxDegrees;
 }
 
+template<typename MemorySpace>
+std::vector<unsigned int> FixedMultiIndexSet<MemorySpace>::IndexToMulti(unsigned int index) const
+{
+    assert(false);
+    return std::vector<unsigned int>();
+}
 
-std::vector<unsigned int> FixedMultiIndexSet::IndexToMulti(unsigned int index) const
+template<>
+std::vector<unsigned int> FixedMultiIndexSet<Kokkos::HostSpace>::IndexToMulti(unsigned int index) const
 {
     std::vector<unsigned int> output(dim,0);
-
     if(isCompressed){
-        for(unsigned int i=nzStarts(index); i<nzStarts(index+1); ++i)
+        for(unsigned int i=nzStarts(index); i<nzStarts(index+1); ++i){
             output.at( nzDims(i) ) = nzOrders(i);
+        }
     }else{
         for(unsigned int i=0; i<dim; ++i)
             output.at(i) = nzOrders(i + dim*index);
@@ -93,7 +204,9 @@ std::vector<unsigned int> FixedMultiIndexSet::IndexToMulti(unsigned int index) c
     return output;
 }
 
-int FixedMultiIndexSet::MultiToIndex(std::vector<unsigned int> const& multi) const
+
+template<typename MemorySpace>
+int FixedMultiIndexSet<MemorySpace>::MultiToIndex(std::vector<unsigned int> const& multi) const
 {
     if(isCompressed){
 
@@ -147,8 +260,8 @@ int FixedMultiIndexSet::MultiToIndex(std::vector<unsigned int> const& multi) con
     }
 }
 
-
-void FixedMultiIndexSet::Print() const
+template<typename MemorySpace>
+void FixedMultiIndexSet<MemorySpace>::Print() const
 {
     if(isCompressed){
         std::cout << "Starts:\n";
@@ -180,18 +293,8 @@ void FixedMultiIndexSet::Print() const
 
 }
 
-
-unsigned int FixedMultiIndexSet::Size() const
-{
-    if(isCompressed){
-        return nzStarts.extent(0)-1;
-    }else{
-        return nzOrders.extent(0) / dim;
-    }
-}
-
-
-std::pair<unsigned int, unsigned int> FixedMultiIndexSet::TotalOrderSize(unsigned int maxOrder, unsigned int currDim)
+template<typename MemorySpace>
+std::pair<unsigned int, unsigned int> FixedMultiIndexSet<MemorySpace>::TotalOrderSize(unsigned int maxOrder, unsigned int currDim)
 {
     unsigned int numTerms=0;
     unsigned int numNz=0;
@@ -210,7 +313,8 @@ std::pair<unsigned int, unsigned int> FixedMultiIndexSet::TotalOrderSize(unsigne
     return std::make_pair(numTerms, numNz);
 }
 
-void FixedMultiIndexSet::FillTotalOrder(unsigned int maxOrder,
+template<typename MemorySpace>
+void FixedMultiIndexSet<MemorySpace>::FillTotalOrder(unsigned int maxOrder,
                                         std::vector<unsigned int> &workspace,
                                         unsigned int currDim,
                                         unsigned int &currTerm,
@@ -245,3 +349,28 @@ void FixedMultiIndexSet::FillTotalOrder(unsigned int maxOrder,
     if(currDim==0)
         nzStarts(currTerm) = currNz;
 }
+
+// If a device is being used, compile code to copy the FixedMultiIndexSet to device memory
+#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+
+    template<typename MemorySpace>
+    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> FixedMultiIndexSet<MemorySpace>::ToDevice()
+    {
+        auto deviceStarts = mpart::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(nzStarts);
+        auto deviceDims = mpart::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(nzDims);
+        auto deviceOrders =  mpart::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(nzOrders);
+        FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> output(dim, deviceStarts, deviceDims, deviceOrders);
+        return output;
+    }
+
+#endif
+
+
+// Explicit template instantiation
+#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+    template class mpart::FixedMultiIndexSet<Kokkos::HostSpace>;
+    template class mpart::FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>;
+#else
+    template class mpart::FixedMultiIndexSet<Kokkos::HostSpace>;
+#endif
+

@@ -7,7 +7,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 INCLUDE(Submodules)
 
 ##############################################################
-# Options 
+# Options
 
 option(MPART_PYTHON "Build python bindings with pybind11" ON)
 option(MPART_JULIA "Build julia bindings with CxxWrap.jl" OFF)
@@ -24,6 +24,14 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+include(CheckCXXCompilerFlag)
+check_cxx_compiler_flag("-Wno-deprecated-gpu-targets" COMPILER_IS_NVCC1)
+check_cxx_compiler_flag("--expt-relaxed-constexpr" COMPILER_IS_NVCC2)
+if(COMPILER_IS_NVCC1 AND COMPILER_IS_NVCC2)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-gpu-targets --expt-relaxed-constexpr")
+    add_compile_definitions(EIGEN_NO_CUDA)
+endif()
+
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
@@ -36,6 +44,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 find_package(Kokkos QUIET)
 
 if(NOT Kokkos_FOUND)
+
     message(STATUS "Could not find Kokkos.  Using internal build.")
     UpdateGitSubmodule(kokkos)
 
@@ -55,7 +64,7 @@ if(NOT Eigen3_FOUND)
     add_subdirectory(external/eigen)
 endif()
 
-# Add pybind11 if necessary 
+# Add pybind11 if necessary
 if(MPART_PYTHON)
   find_package(pybind11 CONFIG QUIET)
   if(NOT pybind11_FOUND)
@@ -67,14 +76,14 @@ endif()
 
 # Add Julia if necessary
 if(MPART_JULIA)
-  
+
   # Set the julie executable and look for the location of cxxwrap
   if(NOT DEFINED JULIA_EXE)
       set(JULIA_EXE "julia")
   endif()
   execute_process(COMMAND ${JULIA_EXE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
   list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}" )
-  
+
   find_package(JlCxx)
 
   if(NOT JlCxx_FOUND)
@@ -114,7 +123,7 @@ if(MPART_JULIA)
 endif()
 
 ##############################################################
-# Testing 
+# Testing
 
 # Install Catch2
 find_package(Catch2 3 QUIET)
@@ -126,8 +135,9 @@ if(NOT Catch2_FOUND)
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
         GIT_TAG        v3.0.0-preview3
     )
-  
+
     FetchContent_MakeAvailable(Catch2)
+    message(STATUS "Catch 2 source:${catch2_SOURCE_DIR}")
     list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 endif()
 
@@ -135,6 +145,9 @@ endif()
 add_subdirectory(tests)
 add_executable(RunTests ${TEST_SOURCES})
 target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen)
+
+add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
+target_link_libraries(PrintKokkosInfo Kokkos::kokkos)
 
 ##############################################################
 # Installation 

@@ -1,6 +1,7 @@
 #ifndef ORTHOGONALPOLYNOMIAL_H
 #define ORTHOGONALPOLYNOMIAL_H
 
+#include <Kokkos_Core.hpp>
 #include <cmath>
 
 namespace mpart{
@@ -14,9 +15,9 @@ class OrthogonalPolynomial : public Mixer
 public:
 
     /* Evaluates all polynomials up to a specified order. */
-    void EvaluateAll(double*              output,
-                     unsigned int         maxOrder,
-                     double               x) const
+    KOKKOS_FUNCTION void EvaluateAll(double*              output,
+                                     unsigned int         maxOrder,
+                                     double               x) const
     {
         output[0] = this->phi0(x);
 
@@ -30,7 +31,7 @@ public:
     /** Evaluates the derivative of every polynomial in this family up to degree maxOrder (inclusive).
         The results are stored in the memory pointed to by the derivs pointer.
     */
-    void EvaluateDerivatives(double*      derivs,
+    KOKKOS_FUNCTION void EvaluateDerivatives(double*      derivs,
                              unsigned int maxDegree,
                              double       x) const
     {
@@ -63,7 +64,7 @@ public:
     /** Evaluates the value and derivative of every polynomial in this family up to degree maxOrder (inclusive).
         The results are stored in the memory pointed to by the derivs pointer.
     */
-    void EvaluateDerivatives(double*      vals,
+    KOKKOS_FUNCTION void EvaluateDerivatives(double*      vals,
                            double*      derivs,
                            unsigned int maxOrder,
                            double       x) const
@@ -87,7 +88,7 @@ public:
         }
     }
 
-    void EvaluateSecondDerivatives(double*      vals,
+    KOKKOS_FUNCTION void EvaluateSecondDerivatives(double*      vals,
                                    double*      derivs,
                                    double*      secondDerivs,
                                    unsigned int maxOrder,
@@ -117,7 +118,7 @@ public:
 
 
 
-    double Evaluate(unsigned int const order,
+    KOKKOS_FUNCTION double Evaluate(unsigned int const order,
                     double const x) const
     {
         if(order==0){
@@ -146,7 +147,7 @@ public:
         }
     }
 
-    double Derivative(unsigned int const order,
+    KOKKOS_FUNCTION double Derivative(unsigned int const order,
                       double const x) const
     {
         if(order==0){
@@ -182,7 +183,7 @@ public:
         }
     }
 
-    double SecondDerivative(unsigned int const order,
+    KOKKOS_FUNCTION double SecondDerivative(unsigned int const order,
                       double const x) const
     {
         if(order<=1){
@@ -229,16 +230,16 @@ public:
 class ProbabilistHermiteMixer{
 public:
 
-    double Normalization(unsigned int polyOrder) const {return sqrt(2.0*M_PI) * std::tgamma(polyOrder+1); }
+    KOKKOS_INLINE_FUNCTION double Normalization(unsigned int polyOrder) const {return sqrt(2.0*M_PI) * tgamma(polyOrder+1); }
 
 protected:
 
-    double ak(unsigned int k) const {return 1.0;}
-    double bk(unsigned int k) const {return 0.0;}
-    double ck(unsigned int k) const {return k-1.0;}
-    double phi0(double x) const {return 1.0;}
-    double phi1(double x) const {return x;}
-    double phi1_deriv(double x) const{return 1.0;};
+    KOKKOS_INLINE_FUNCTION double ak(unsigned int) const {return 1.0;}
+    KOKKOS_INLINE_FUNCTION double bk(unsigned int) const {return 0.0;}
+    KOKKOS_INLINE_FUNCTION double ck(unsigned int k) const {return k-1.0;}
+    KOKKOS_INLINE_FUNCTION double phi0(double) const {return 1.0;}
+    KOKKOS_INLINE_FUNCTION double phi1(double x) const {return x;}
+    KOKKOS_INLINE_FUNCTION double phi1_deriv(double) const{return 1.0;};
 };
 
 typedef OrthogonalPolynomial<ProbabilistHermiteMixer> ProbabilistHermite;
@@ -247,16 +248,16 @@ typedef OrthogonalPolynomial<ProbabilistHermiteMixer> ProbabilistHermite;
 class PhysicistHermiteMixer{
 public:
 
-    double Normalization(unsigned int polyOrder) const {return sqrt(M_PI) * pow(2.0, static_cast<double>(polyOrder)) * std::tgamma(polyOrder+1); }
+    KOKKOS_INLINE_FUNCTION double Normalization(unsigned int polyOrder) const {return sqrt(M_PI) * pow(2.0, static_cast<double>(polyOrder)) * tgamma(polyOrder+1); }
 
 protected:
 
-    double ak(unsigned int k) const {return 2.0;}
-    double bk(unsigned int k) const {return 0.0;}
-    double ck(unsigned int k) const {return 2.0*(k-1.0);}
-    double phi0(double x) const {return 1.0;}
-    double phi1(double x) const {return 2.0*x;}
-    double phi1_deriv(double x) const {return 2.0;};
+    KOKKOS_INLINE_FUNCTION double ak(unsigned int) const {return 2.0;}
+    KOKKOS_INLINE_FUNCTION double bk(unsigned int) const {return 0.0;}
+    KOKKOS_INLINE_FUNCTION double ck(unsigned int k) const {return 2.0*(k-1.0);}
+    KOKKOS_INLINE_FUNCTION double phi0(double x) const {return 1.0;}
+    KOKKOS_INLINE_FUNCTION double phi1(double x) const {return 2.0*x;}
+    KOKKOS_INLINE_FUNCTION double phi1_deriv(double x) const {return 2.0;};
 };
 
 typedef OrthogonalPolynomial<PhysicistHermiteMixer> PhysicistHermite;
