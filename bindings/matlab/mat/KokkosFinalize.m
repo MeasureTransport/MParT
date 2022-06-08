@@ -1,3 +1,3 @@
 function KokkosFinalize()
-    KokkosUtilities_('Kokkos_Finalize');
+    MParT_('Kokkos_Finalize');
 end

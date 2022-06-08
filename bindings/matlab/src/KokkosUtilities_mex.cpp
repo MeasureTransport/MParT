@@ -23,5 +23,3 @@ MEX_DEFINE(Kokkos_Finalize) (int nlhs, mxArray* plhs[],
 }
 
 }
-
-MEX_DISPATCH // Don't forget to add this if MEX_DEFINE() is used.

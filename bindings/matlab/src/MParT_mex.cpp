@@ -28,8 +28,9 @@ MEX_DEFINE(newMutliIndexSetEigen) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
-  const auto multis = input.get<Eigen::MatrixXi>(0);
-  output.set(0, Session<MultiIndexSet>::create(new MultiIndexSet(multis)));
+  const auto multisDbl = input.get<Eigen::MatrixXd>(0);
+
+  output.set(0, Session<MultiIndexSet>::create(new MultiIndexSet(multisDbl.cast<int>())));
 }
 
 // Defines MEX API for delete.
@@ -44,7 +45,7 @@ MEX_DEFINE(deleteMultiIndexSet) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(MaxOrders) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
-  OutputArguments output(nlhs, plhs, 0);
+  OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   output.set(0, mset.MaxOrders());
 }

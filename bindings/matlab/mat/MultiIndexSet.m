@@ -31,7 +31,6 @@ methods
   end
 
   function result = MaxOrders(this)
-  %DELETE Destructor.
     result = MParT_('MaxOrders', this.id_);
   end
 
