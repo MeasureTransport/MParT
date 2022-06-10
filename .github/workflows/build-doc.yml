@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dannys4/issue55
 
 jobs:
   build-docs:
@@ -15,12 +16,12 @@ jobs:
           submodules: recursive
 
       - name: Install doxygen and sphinx
-        run: |
-          cd ${{ github.workspace }}/..
-          wget https://www.doxygen.nl/files/doxygen-1.9.2.linux.bin.tar.gz
-          tar -xzvf doxygen-1.9.2.linux.bin.tar.gz
-          cd doxygen-1.9.2
-          sudo make install
+        uses: mattnotmitt/doxygen-action@v1.9.2
+        with:
+            working-directory: 'submodule/'
+            doxyfile-path: 'docs/'
+            enable-latex: true
+
 
       - name: Install sphinx extensions
         run: pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels
