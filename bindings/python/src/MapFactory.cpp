@@ -13,5 +13,14 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
 {
     // CteateComponent
     m.def("CreateComponent", &MapFactory::CreateComponent);
+    // m.def("CreateComponent", [] (FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
+    //                              MapOptions options = MapOptions())
+    // {
+    //     return CustomPtrToSharedPtr(MapFactory::CreateComponent(mset,options));
+    // }
+    
+    
+    
+    ;
 
 }

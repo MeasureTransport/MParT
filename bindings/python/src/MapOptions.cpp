@@ -17,20 +17,17 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     .value("ProbabilistHermite",BasisTypes::ProbabilistHermite)
     .value("PhysicistHermite",BasisTypes::PhysicistHermite)
     .value("HermiteFunctions",BasisTypes::HermiteFunctions);
-    //.export_values();
 
     // PosFuncTypes
     py::enum_<PosFuncTypes>(m, "PosFuncTypes")
     .value("Exp",PosFuncTypes::Exp)
     .value("SoftPlus",PosFuncTypes::SoftPlus);
-    //.export_values();
 
     // QuadTypes
     py::enum_<QuadTypes>(m, "QuadTypes")
     .value("ClenshawCurtis",QuadTypes::ClenshawCurtis)
     .value("AdaptiveSimpson",QuadTypes::AdaptiveSimpson)
     .value("AdaptiveClenshawCurtis",QuadTypes::AdaptiveClenshawCurtis);
-    //.export_values();
 
     // MapOptions
     py::class_<MapOptions, KokkosCustomPointer<MapOptions>>(m, "MapOptions")

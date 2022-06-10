@@ -2,7 +2,7 @@ from mpart import *
 import numpy as np
 
 # note: if you don't assign KokkosInit to a variable, mset.fix below will error. 
-ki = KokkosInit({})  
+#KokkosInit({})  
 
 # print(ki)
 
@@ -21,4 +21,4 @@ opts = MapOptions()
 # opts.quadAbsTol  = 1e-6
 # opts.quadRelTol  = 1e-6
 
-# map = CreateComponent(fixed_mset, opts)
+map = CreateComponent(fixed_mset, opts)

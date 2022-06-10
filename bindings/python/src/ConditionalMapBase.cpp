@@ -22,7 +22,8 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
 {
 
     // ConditionalMapBase
-    py::class_<ConditionalMapBase, KokkosCustomPointer<ConditionalMapBase>>(m, "ConditionalMapBase")
+     py::class_<ConditionalMapBase, KokkosCustomPointer<ConditionalMapBase>>(m, "ConditionalMapBase")
+    //py::class_<ConditionalMapBase, std::shared_ptr<ConditionalMapBase>>(m, "ConditionalMapBase")
         // .def(py::init<unsigned int, unsigned int>())
         // .def("SetCoeffs", &ConditionalMapBase::SetCoeffs)
         // .def("Evaluate", &ConditionalMapBase::Evaluate)
