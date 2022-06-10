@@ -9,4 +9,4 @@ C++ Objects
 
    quadrature/clenshawcurtis
    quadrature/adaptivesimpson 
-   quadrature/adaptiveclenshawcurtis
+   quadrature/recursivequadrature
