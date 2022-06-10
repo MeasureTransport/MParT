@@ -15,22 +15,27 @@ jobs:
           submodules: recursive
 
       - name: Install doxygen and sphinx
-        run: sudo apt-get install -y doxygen
-        
-      - name: Install sphinx extensions 
-        run: pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels
+        run: |
+          cd ${{ github.workspace }}
+          chmod +x .github/install-doxygen.sh
+          .github/install-doxygen.sh 1.9.2
+
+
+      - name: Install sphinx extensions
+        run: |
+          pip3 install -IU pygments==2.7
+          pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels
 
       - name: Run CMake
         run: |
           cd ${{ github.workspace }}
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON ../
 
       - name: Build Docs
         run: cd build; make sphinx
 
-      - name: Push to gh-pages 
+      - name: Push to gh-pages
         uses: peaceiris/actions-gh-pages@v3.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
