@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - dannys4/issue55
 
 jobs:
   build-docs:
