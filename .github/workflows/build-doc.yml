@@ -19,7 +19,7 @@ jobs:
         run: |
           echo ${{ github.workspace }}
           cd ${{ github.workspace }}
-          ls
+          ls -la
           .github/script.sh 1.9.2
 
 
