@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Recursive Adaptive Quadrature &#8212; MParT  documentation</title>
+    <title>Adaptive Clenshaw Curtis Quadrature &#8212; MParT  documentation</title>
 <script>
   document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
   document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
@@ -37,10 +37,9 @@
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Kokkos Array Conversions" href="../utilities/kokkoswrappers.html" />
-    <link rel="prev" title="Adaptive Simpson Integration" href="adaptivesimpson.html" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="docsearch:language" content="en">
   </head>
@@ -95,7 +94,7 @@
  </a>
 </li>
 
-<li class="toctree-l1 current active nav-item">
+<li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../index.html">
   API Reference
  </a>
@@ -149,144 +148,7 @@
   <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
   <div class="bd-toc-item active">
-    <p aria-level="2" class="caption" role="heading">
- <span class="caption-text">
-  API
- </span>
-</p>
-<ul class="current nav bd-sidenav">
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../templateconcepts.html">
-   Template Concepts
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
-  <label for="toctree-checkbox-1">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../concepts/cachedparameterization.html">
-     Cached Parameterization Concept
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
-    <label for="toctree-checkbox-2">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../multivariateexpansion.html">
-       Multivariate Expansion
-      </a>
-     </li>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../tensorproductfunction.html">
-       Tensor Product Function
-      </a>
-     </li>
-    </ul>
-   </li>
-   <li class="toctree-l2 has-children">
-    <a class="reference internal" href="../concepts/parameterizedfunction.html">
-     Parameterized Function Concept
-    </a>
-    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
-    <label for="toctree-checkbox-3">
-     <i class="fas fa-chevron-down">
-     </i>
-    </label>
-    <ul>
-     <li class="toctree-l3">
-      <a class="reference internal" href="../monotonecomponent.html">
-       Monotone Component
-      </a>
-     </li>
-    </ul>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 has-children">
-  <a class="reference internal" href="../multiindex.html">
-   MultiIndices
-  </a>
-  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
-  <label for="toctree-checkbox-4">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../multiindices/multiindex.html">
-     MultiIndex
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../multiindices/multiindexset.html">
-     MultiIndexSet
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../multiindices/fixedmultiindexset.html">
-     FixedMultiIndexSet
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../multiindices/multiindexlimiter.html">
-     MultiIndexLimiter
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../multiindices/multiindexneighborhood.html">
-     MultiIndexNeighborhood
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1 current active has-children">
-  <a class="reference internal" href="../quadrature.html">
-   Quadrature
-  </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
-  <label for="toctree-checkbox-5">
-   <i class="fas fa-chevron-down">
-   </i>
-  </label>
-  <ul class="current">
-   <li class="toctree-l2">
-    <a class="reference internal" href="clenshawcurtis.html">
-     Clenshaw Curtis Quadrature
-    </a>
-   </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="adaptivesimpson.html">
-     Adaptive Simpson Integration
-    </a>
-   </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
-     Recursive Adaptive Quadrature
-    </a>
-   </li>
-  </ul>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../utilities/kokkoswrappers.html">
-   Kokkos Array Conversions
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../monotonecomponent.html">
-   Monotone Component
-  </a>
- </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../multivariateexpansion.html">
-   Multivariate Expansion
-  </a>
- </li>
-</ul>
-
+    
   </div>
 </nav>
   </div>
@@ -323,12 +185,95 @@
               
               <article class="bd-article" role="main">
                 
-  <section id="recursive-adaptive-quadrature">
-<h1>Recursive Adaptive Quadrature<a class="headerlink" href="#recursive-adaptive-quadrature" title="Permalink to this heading">#</a></h1>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>doxygenclass: Cannot find class “mpart::RecursiveQuadrature” in doxygen xml output for project “mpart” from directory: /home/runner/work/MParT/MParT/build/docs/doxygen/xml</p>
+  <section id="adaptive-clenshaw-curtis-quadrature">
+<h1>Adaptive Clenshaw Curtis Quadrature<a class="headerlink" href="#adaptive-clenshaw-curtis-quadrature" title="Permalink to this heading">#</a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN5mpart22AdaptiveClenshawCurtisE">
+<span id="_CPPv3I0EN5mpart22AdaptiveClenshawCurtisE"></span><span id="_CPPv2I0EN5mpart22AdaptiveClenshawCurtisE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_adaptive_clenshaw_curtis"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">AdaptiveClenshawCurtis</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">RecursiveQuadratureBase</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0EN5mpart22AdaptiveClenshawCurtisE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Adaptive quadrature based on applying a Clenshaw-Curtis recursively on subintervals. </p>
+<p>The points in a Clenshaw-Curtis quadrature rule with <span class="math notranslate nohighlight">\(2^{L}+1\)</span> points are a subset of the points in a rule with <span class="math notranslate nohighlight">\(2^{L+1}+1\)</span> points. This “nesting” allows us to approximate the integral at two different levels with minimal additional integrand evaluations. Comparing the integral at these values gives an indication of the error in the integral approximation. If the error is unacceptably large, we can subdivide the integration domain and apply Clenshaw-Curtis rules on each subinterval. This class implements a recursive version of this process. Two nested Clenshaw-Curtis rules are used to estimate the integral, and its error. If the error is too large, then the integration domain is split into two equal halves, where the nested quadrature rules can again be applied. This recursive subdivision repeats until an acceptable error level is reached or until a maximum number of subdivisions has occured. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEjjjddN9QuadError4TypeE">
+<span id="_CPPv3N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEjjjddN9QuadError4TypeE"></span><span id="_CPPv2N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEjjjddN9QuadError4TypeE"></span><span id="mpart::AdaptiveClenshawCurtis::AdaptiveClenshawCurtis__unsigned-i.unsigned-i.unsigned-i.double.double.QuadError::Type"></span><span class="target" id="classmpart_1_1_adaptive_clenshaw_curtis_1ade589534c477b76e600cfe5cf72ddc45"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdaptiveClenshawCurtis</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">level</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxSub</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxDim</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">absTol</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">relTol</span></span>, <span class="n"><span class="pre">QuadError</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">errorMetric</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEjjjddN9QuadError4TypeE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new adaptive quadrature class with specified stopping criteria. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>maxSub</strong> – The maximum number of subintervals allowed. </p></li>
+<li><p><strong>maxDim</strong> – The maximum dimension of the integrand. </p></li>
+<li><p><strong>absTol</strong> – <strong>[in]</strong> An absolute error tolerance used to stop the adaptive integration. </p></li>
+<li><p><strong>relTol</strong> – <strong>[in]</strong> A relative error tolerance used to stop te adaptive integration. </p></li>
+<li><p><strong>errorMetric</strong> – <strong>[in]</strong> A flag specifying the type of error metric to use. </p></li>
+<li><p><strong>level</strong> – <strong>[in]</strong> The nesting level <span class="math notranslate nohighlight">\(L\)</span>. A coarse rule with <span class="math notranslate nohighlight">\(2^{L}+1\)</span> points will be used and a fine rule with <span class="math notranslate nohighlight">\(w^{L+1}+1\)</span> points will be used. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEjjjPdddN9QuadError4TypeE">
+<span id="_CPPv3N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEjjjPdddN9QuadError4TypeE"></span><span id="_CPPv2N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEjjjPdddN9QuadError4TypeE"></span><span id="mpart::AdaptiveClenshawCurtis::AdaptiveClenshawCurtis__unsigned-i.unsigned-i.unsigned-i.doubleP.double.double.QuadError::Type"></span><span class="target" id="classmpart_1_1_adaptive_clenshaw_curtis_1aea1ca4c7af154de9a0c85a4864de1193"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdaptiveClenshawCurtis</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">level</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxSub</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxDim</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">workspace</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">absTol</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">relTol</span></span>, <span class="n"><span class="pre">QuadError</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">errorMetric</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEjjjPdddN9QuadError4TypeE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEjjPdddN9QuadError4TypeE">
+<span id="_CPPv3N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEjjPdddN9QuadError4TypeE"></span><span id="_CPPv2N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEjjPdddN9QuadError4TypeE"></span><span id="mpart::AdaptiveClenshawCurtis::AdaptiveClenshawCurtis__Kokkos::View:doubleP.MemorySpace:.Kokkos::View:doubleP.MemorySpace:.Kokkos::View:doubleP.MemorySpace:.Kokkos::View:doubleP.MemorySpace:.unsigned-i.unsigned-i.doubleP.double.double.QuadError::Type"></span><span class="target" id="classmpart_1_1_adaptive_clenshaw_curtis_1a9869dcbae32a4ab81c8eac6a76a4b961"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdaptiveClenshawCurtis</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart22AdaptiveClenshawCurtisE" title="mpart::AdaptiveClenshawCurtis::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">coarsePts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart22AdaptiveClenshawCurtisE" title="mpart::AdaptiveClenshawCurtis::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">coarseWts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart22AdaptiveClenshawCurtisE" title="mpart::AdaptiveClenshawCurtis::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">finePts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart22AdaptiveClenshawCurtisE" title="mpart::AdaptiveClenshawCurtis::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fineWts</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxSub</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxDim</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">workspace</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">absTol</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">relTol</span></span>, <span class="n"><span class="pre">QuadError</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">errorMetric</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart22AdaptiveClenshawCurtis22AdaptiveClenshawCurtisEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEjjPdddN9QuadError4TypeE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classmpart_1_1_adaptive_clenshaw_curtis_1a5fa7554c5f13b0892642da48b920211b"></span><span class="sig-name descname"><span class="pre">inline</span> <span class="pre">KOKKOS_INLINE_FUNCTION</span> <span class="pre">void</span> <span class="pre">SetDim</span> <span class="pre">(unsigned</span> <span class="pre">int</span> <span class="pre">fdim)</span></span></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK5mpart22AdaptiveClenshawCurtis9IntegrateEvRK12FunctionTypeddPd">
+<span id="_CPPv3I0ENK5mpart22AdaptiveClenshawCurtis9IntegrateERK12FunctionTypeddPd"></span><span id="_CPPv2I0ENK5mpart22AdaptiveClenshawCurtis9IntegrateERK12FunctionTypeddPd"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_adaptive_clenshaw_curtis_1a313453f19ec197ba8e7c44ed73ce43d1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Integrate</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0ENK5mpart22AdaptiveClenshawCurtis9IntegrateEvRK12FunctionTypeddPd" title="mpart::AdaptiveClenshawCurtis::Integrate::FunctionType"><span class="n"><span class="pre">FunctionType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lb</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ub</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">res</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart22AdaptiveClenshawCurtis9IntegrateEvRK12FunctionTypeddPd" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Approximates the integral <span class="math notranslate nohighlight">\(\int_{x_L}^{x_U} f(x) dx\)</span>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> – <strong>[in]</strong> The integrand. Can return any type that overloads multiplication with a double and the += operator. doubles and Eigen::VectorXd are examples. </p></li>
+<li><p><strong>lb</strong> – <strong>[in]</strong> The lower bound <span class="math notranslate nohighlight">\(x_L\)</span> in the integration. </p></li>
+<li><p><strong>lb</strong> – <strong>[in]</strong> The upper bound <span class="math notranslate nohighlight">\(x_U\)</span> in the integration. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>FunctionType</strong> – The type of the integrand. Must have an operator()(double x) function. </p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>An approximation of <span class="math notranslate nohighlight">\(\int_{x_L}^{x_U} f(x) dx\)</span>. The return type will be the same as the type returned by the integrand function. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK5mpart22AdaptiveClenshawCurtis9IntegrateEvPdRK12FunctionTypeddPd">
+<span id="_CPPv3I0ENK5mpart22AdaptiveClenshawCurtis9IntegrateEPdRK12FunctionTypeddPd"></span><span id="_CPPv2I0ENK5mpart22AdaptiveClenshawCurtis9IntegrateEPdRK12FunctionTypeddPd"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FunctionType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_adaptive_clenshaw_curtis_1ad832867053590973071671790b0d4734"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Integrate</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">workspace</span></span>, <a class="reference internal" href="#_CPPv4I0ENK5mpart22AdaptiveClenshawCurtis9IntegrateEvPdRK12FunctionTypeddPd" title="mpart::AdaptiveClenshawCurtis::Integrate::FunctionType"><span class="n"><span class="pre">FunctionType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">f</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lb</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ub</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">res</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart22AdaptiveClenshawCurtis9IntegrateEvPdRK12FunctionTypeddPd" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classmpart_1_1_adaptive_clenshaw_curtis_1a7f4445d0dee45f81975d4d594f402597"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdaptiveClenshawCurtis</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">level</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxSub</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxDim</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">absTol</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">relTol</span></span>, <span class="n"><span class="pre">QuadError</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">errorMetric</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classmpart_1_1_adaptive_clenshaw_curtis_1ac2505c8b6c282b1cdba5e8de2453a22b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdaptiveClenshawCurtis</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">level</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxSub</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxDim</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">workspace</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">absTol</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">relTol</span></span>, <span class="n"><span class="pre">QuadError</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Type</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">errorMetric</span></span><span class="sig-paren">)</span><br /></dt>
+<dd></dd></dl>
+
 </div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart22AdaptiveClenshawCurtis16GetWorkspaceSizeEjj">
+<span id="_CPPv3N5mpart22AdaptiveClenshawCurtis16GetWorkspaceSizeEjj"></span><span id="_CPPv2N5mpart22AdaptiveClenshawCurtis16GetWorkspaceSizeEjj"></span><span id="mpart::AdaptiveClenshawCurtis::GetWorkspaceSize__unsigned-i.unsigned-i"></span><span class="target" id="classmpart_1_1_adaptive_clenshaw_curtis_1a06dda6eadcbc0de277a89fcdc279d481"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetWorkspaceSize</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxSub</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">fdim</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart22AdaptiveClenshawCurtis16GetWorkspaceSizeEjj" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
 </section>
 
 
@@ -339,20 +284,6 @@
               <footer class="bd-footer-article">
                   <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="adaptivesimpson.html" title="previous page">
-      <i class="fas fa-angle-left"></i>
-      <div class="prev-next-info">
-          <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Adaptive Simpson Integration</p>
-      </div>
-  </a>
-  <a class='right-next' id="next-link" href="../utilities/kokkoswrappers.html" title="next page">
-  <div class="prev-next-info">
-      <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Kokkos Array Conversions</p>
-  </div>
-  <i class="fas fa-angle-right"></i>
-  </a>
 </div>
               </footer>
               

@@ -264,11 +264,6 @@
      Adaptive Simpson Integration
     </a>
    </li>
-   <li class="toctree-l2">
-    <a class="reference internal" href="../quadrature/recursivequadrature.html">
-     Recursive Adaptive Quadrature
-    </a>
-   </li>
   </ul>
  </li>
  <li class="toctree-l1">
@@ -365,7 +360,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK5mpart13MultiIndexSet3FixEb">
-<span id="_CPPv3NK5mpart13MultiIndexSet3FixEb"></span><span id="_CPPv2NK5mpart13MultiIndexSet3FixEb"></span><span id="mpart::MultiIndexSet::Fix__bC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a32e6ed613c0b48f966fcbb247a7f6d85"></span><a class="reference internal" href="fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSetE" title="mpart::FixedMultiIndexSet"><span class="n"><span class="pre">FixedMultiIndexSet</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Fix</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">compress</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet3FixEb" title="Permalink to this definition">#</a><br /></dt>
+<span id="_CPPv3NK5mpart13MultiIndexSet3FixEb"></span><span id="_CPPv2NK5mpart13MultiIndexSet3FixEb"></span><span id="mpart::MultiIndexSet::Fix__bC"></span><span class="target" id="classmpart_1_1_multi_index_set_1a4b35dc7f5d52c8ba52a0cbd8ac9e0177"></span><a class="reference internal" href="fixedmultiindexset.html#_CPPv4I0EN5mpart18FixedMultiIndexSetE" title="mpart::FixedMultiIndexSet"><span class="n"><span class="pre">FixedMultiIndexSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Fix</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">compress</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet3FixEb" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Converts this multiindex set into the fixed representation provided by the “FixedMultiIndexSet” class. </p>
 <p>The <a class="reference internal" href="fixedmultiindexset.html#classmpart_1_1_fixed_multi_index_set"><span class="std std-ref">FixedMultiIndexSet</span></a> cannot easily be adapted, but stores the multiindices in a contiguous block of memory in a Kokkos::View that can be more amenable to fast computation. This function creates an instance of the <a class="reference internal" href="fixedmultiindexset.html#classmpart_1_1_fixed_multi_index_set"><span class="std std-ref">FixedMultiIndexSet</span></a> from the current state of *this. Note that memory is deep copied and any subsequent updates to this class will not result in updates to the <a class="reference internal" href="fixedmultiindexset.html#classmpart_1_1_fixed_multi_index_set"><span class="std std-ref">FixedMultiIndexSet</span></a>. </p>
 <dl class="field-list simple">
