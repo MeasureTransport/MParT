@@ -23,7 +23,9 @@ jobs:
 
 
       - name: Install sphinx extensions
-        run: pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels
+        run: |
+          pip3 install -IU pygments==2.7
+          pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels
 
       - name: Run CMake
         run: |
