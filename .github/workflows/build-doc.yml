@@ -18,7 +18,7 @@ jobs:
       - name: Install doxygen and sphinx
         uses: mattnotmitt/doxygen-action@v1.9.2
         with:
-            doxyfile-path: 'docs/'
+            doxyfile-path: '${{ github.workspace }}/docs/'
             enable-latex: true
 
 
