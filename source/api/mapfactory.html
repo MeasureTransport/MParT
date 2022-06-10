@@ -1,0 +1,501 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Map Factory &#8212; MParT  documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Template Concepts" href="templateconcepts.html" />
+    <link rel="prev" title="API Reference" href="index.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
+
+    
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
+
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">MParT  documentation</p>
+  
+</a>
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="fas fa-bars"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_started/index.html">
+  Getting Started
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../development/index.html">
+  Development
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/MeasureTransport/MParT" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
+          
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Map Factory
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="templateconcepts.html">
+   Template Concepts
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="concepts/cachedparameterization.html">
+     Cached Parameterization Concept
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+    <label for="toctree-checkbox-2">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="multivariateexpansion.html">
+       Multivariate Expansion
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="tensorproductfunction.html">
+       Tensor Product Function
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="concepts/parameterizedfunction.html">
+     Parameterized Function Concept
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+    <label for="toctree-checkbox-3">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="monotonecomponent.html">
+       Monotone Component
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="multiindex.html">
+   MultiIndices
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+  <label for="toctree-checkbox-4">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindex.html">
+     MultiIndex
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexset.html">
+     MultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/fixedmultiindexset.html">
+     FixedMultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexlimiter.html">
+     MultiIndexLimiter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexneighborhood.html">
+     MultiIndexNeighborhood
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="quadrature.html">
+   Quadrature
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+  <label for="toctree-checkbox-5">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/clenshawcurtis.html">
+     Clenshaw Curtis Quadrature
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/adaptivesimpson.html">
+     Adaptive Simpson Integration
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/kokkoswrappers.html">
+   Kokkos Array Conversions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="monotonecomponent.html">
+   Monotone Component
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="multivariateexpansion.html">
+   Multivariate Expansion
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
+
+          
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+    
+    <div class="toc-item">
+      
+
+<nav id="bd-toc-nav">
+    
+</nav>
+    </div>
+    
+    <div class="toc-item">
+      
+    </div>
+    
+  
+</div>
+
+
+          
+          
+          <div class="bd-content col-12 col-md-9 col-xl-7">
+              
+              <article class="bd-article" role="main">
+                
+  <section id="map-factory">
+<h1>Map Factory<a class="headerlink" href="#map-factory" title="Permalink to this heading">#</a></h1>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptionsE">
+<span id="_CPPv3N5mpart10MapOptionsE"></span><span id="_CPPv2N5mpart10MapOptionsE"></span><span id="mpart::MapOptions"></span><span class="target" id="structmpart_1_1_map_options"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">MapOptions</span></span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptionsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>struct to hold options used by the MapFactory methods to construct monotone components and triangular maps. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions9basisTypeE">
+<span id="_CPPv3N5mpart10MapOptions9basisTypeE"></span><span id="_CPPv2N5mpart10MapOptions9basisTypeE"></span><span id="mpart::MapOptions::basisType__BasisTypes"></span><span class="target" id="structmpart_1_1_map_options_1a731d5a7dacbb6cfcf9fb5eebd8e82a5a"></span><a class="reference internal" href="#_CPPv4N5mpart10BasisTypesE" title="mpart::BasisTypes"><span class="n"><span class="pre">BasisTypes</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basisType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart10BasisTypesE" title="mpart::BasisTypes"><span class="n"><span class="pre">BasisTypes</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5mpart10BasisTypes18ProbabilistHermiteE" title="mpart::BasisTypes::ProbabilistHermite"><span class="n"><span class="pre">ProbabilistHermite</span></span></a><a class="headerlink" href="#_CPPv4N5mpart10MapOptions9basisTypeE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The type of 1d basis function used to define the multivariate expansion. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions11posFuncTypeE">
+<span id="_CPPv3N5mpart10MapOptions11posFuncTypeE"></span><span id="_CPPv2N5mpart10MapOptions11posFuncTypeE"></span><span id="mpart::MapOptions::posFuncType__PosFuncTypes"></span><span class="target" id="structmpart_1_1_map_options_1ac3407193f63686a250f506af6de22276"></span><a class="reference internal" href="#_CPPv4N5mpart12PosFuncTypesE" title="mpart::PosFuncTypes"><span class="n"><span class="pre">PosFuncTypes</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">posFuncType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart12PosFuncTypesE" title="mpart::PosFuncTypes"><span class="n"><span class="pre">PosFuncTypes</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5mpart12PosFuncTypes8SoftPlusE" title="mpart::PosFuncTypes::SoftPlus"><span class="n"><span class="pre">SoftPlus</span></span></a><a class="headerlink" href="#_CPPv4N5mpart10MapOptions11posFuncTypeE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The type of positive bijector used inside the monotonicity-guaranteeing integral formulation. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions8quadTypeE">
+<span id="_CPPv3N5mpart10MapOptions8quadTypeE"></span><span id="_CPPv2N5mpart10MapOptions8quadTypeE"></span><span id="mpart::MapOptions::quadType__QuadTypes"></span><span class="target" id="structmpart_1_1_map_options_1a75ba9eb53151409f53a3caf2e5f4f7ab"></span><a class="reference internal" href="#_CPPv4N5mpart9QuadTypesE" title="mpart::QuadTypes"><span class="n"><span class="pre">QuadTypes</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart9QuadTypesE" title="mpart::QuadTypes"><span class="n"><span class="pre">QuadTypes</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5mpart9QuadTypes15AdaptiveSimpsonE" title="mpart::QuadTypes::AdaptiveSimpson"><span class="n"><span class="pre">AdaptiveSimpson</span></span></a><a class="headerlink" href="#_CPPv4N5mpart10MapOptions8quadTypeE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The type of quadrature rule to use. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions10quadAbsTolE">
+<span id="_CPPv3N5mpart10MapOptions10quadAbsTolE"></span><span id="_CPPv2N5mpart10MapOptions10quadAbsTolE"></span><span id="mpart::MapOptions::quadAbsTol__double"></span><span class="target" id="structmpart_1_1_map_options_1a3ed7be245b97f480e699ab9d486857fe"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadAbsTol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1e-6</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions10quadAbsTolE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The absolute tolerance used by adaptive quadrature rules like <a class="reference internal" href="quadrature/adaptivesimpson.html#classmpart_1_1_adaptive_simpson"><span class="std std-ref">AdaptiveSimpson</span></a> and <a class="reference internal" href="quadrature/recursivequadrature.html#classmpart_1_1_adaptive_clenshaw_curtis"><span class="std std-ref">AdaptiveClenshawCurtis</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions10quadRelTolE">
+<span id="_CPPv3N5mpart10MapOptions10quadRelTolE"></span><span id="_CPPv2N5mpart10MapOptions10quadRelTolE"></span><span id="mpart::MapOptions::quadRelTol__double"></span><span class="target" id="structmpart_1_1_map_options_1a76f0bbf05f49b41f9fa762442a05df2e"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadRelTol</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1e-6</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions10quadRelTolE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The relative tolerance used by adaptive quadrature rules like <a class="reference internal" href="quadrature/adaptivesimpson.html#classmpart_1_1_adaptive_simpson"><span class="std std-ref">AdaptiveSimpson</span></a> and <a class="reference internal" href="quadrature/recursivequadrature.html#classmpart_1_1_adaptive_clenshaw_curtis"><span class="std std-ref">AdaptiveClenshawCurtis</span></a>. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions10quadMaxSubE">
+<span id="_CPPv3N5mpart10MapOptions10quadMaxSubE"></span><span id="_CPPv2N5mpart10MapOptions10quadMaxSubE"></span><span id="mpart::MapOptions::quadMaxSub__unsigned-i"></span><span class="target" id="structmpart_1_1_map_options_1a7fee0a3fb4508b40c3588fdddd9bc718"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadMaxSub</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">30</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions10quadMaxSubE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The maximum number of subdivisions used in the adaptive quadrature rules. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions7quadPtsE">
+<span id="_CPPv3N5mpart10MapOptions7quadPtsE"></span><span id="_CPPv2N5mpart10MapOptions7quadPtsE"></span><span id="mpart::MapOptions::quadPts__unsigned-i"></span><span class="target" id="structmpart_1_1_map_options_1a7d0f786bfb10bd91a200795c2b5f1bb2"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadPts</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">5</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions7quadPtsE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The number of quadrature points used in fixed rules like the Clenshaw Curtis rule. Also defines the base level used in the adaptive Clenshaw-Curtis rule. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10BasisTypesE">
+<span id="_CPPv3N5mpart10BasisTypesE"></span><span id="_CPPv2N5mpart10BasisTypesE"></span><span class="target" id="_map_options_8h_1ac3f6827bd7359d199d9e9460670a9426"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">BasisTypes</span></span></span><a class="headerlink" href="#_CPPv4N5mpart10BasisTypesE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10BasisTypes18ProbabilistHermiteE">
+<span id="_CPPv3N5mpart10BasisTypes18ProbabilistHermiteE"></span><span id="_CPPv2N5mpart10BasisTypes18ProbabilistHermiteE"></span><span class="target" id="_map_options_8h_1ac3f6827bd7359d199d9e9460670a9426a4a2146718f9b86e829561ea0125d42d4"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ProbabilistHermite</span></span></span><a class="headerlink" href="#_CPPv4N5mpart10BasisTypes18ProbabilistHermiteE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10BasisTypes16PhysicistHermiteE">
+<span id="_CPPv3N5mpart10BasisTypes16PhysicistHermiteE"></span><span id="_CPPv2N5mpart10BasisTypes16PhysicistHermiteE"></span><span class="target" id="_map_options_8h_1ac3f6827bd7359d199d9e9460670a9426a7b10a66a18c7785e81c5cbdbf872d403"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PhysicistHermite</span></span></span><a class="headerlink" href="#_CPPv4N5mpart10BasisTypes16PhysicistHermiteE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10BasisTypes16HermiteFunctionsE">
+<span id="_CPPv3N5mpart10BasisTypes16HermiteFunctionsE"></span><span id="_CPPv2N5mpart10BasisTypes16HermiteFunctionsE"></span><span class="target" id="_map_options_8h_1ac3f6827bd7359d199d9e9460670a9426a2603000be222653b0a899d9b3174acc2"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">HermiteFunctions</span></span></span><a class="headerlink" href="#_CPPv4N5mpart10BasisTypes16HermiteFunctionsE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart12PosFuncTypesE">
+<span id="_CPPv3N5mpart12PosFuncTypesE"></span><span id="_CPPv2N5mpart12PosFuncTypesE"></span><span class="target" id="_map_options_8h_1a18f43b9b2d72b8129be8640d6a59ef1f"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">PosFuncTypes</span></span></span><a class="headerlink" href="#_CPPv4N5mpart12PosFuncTypesE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart12PosFuncTypes3ExpE">
+<span id="_CPPv3N5mpart12PosFuncTypes3ExpE"></span><span id="_CPPv2N5mpart12PosFuncTypes3ExpE"></span><span class="target" id="_map_options_8h_1a18f43b9b2d72b8129be8640d6a59ef1facad39a154bffb61175f674d6eefaf6d0"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Exp</span></span></span><a class="headerlink" href="#_CPPv4N5mpart12PosFuncTypes3ExpE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart12PosFuncTypes8SoftPlusE">
+<span id="_CPPv3N5mpart12PosFuncTypes8SoftPlusE"></span><span id="_CPPv2N5mpart12PosFuncTypes8SoftPlusE"></span><span class="target" id="_map_options_8h_1a18f43b9b2d72b8129be8640d6a59ef1fa28be2ec1c34271f6b669a690b603047e"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SoftPlus</span></span></span><a class="headerlink" href="#_CPPv4N5mpart12PosFuncTypes8SoftPlusE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp enum-class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9QuadTypesE">
+<span id="_CPPv3N5mpart9QuadTypesE"></span><span id="_CPPv2N5mpart9QuadTypesE"></span><span class="target" id="_map_options_8h_1aaef72369a0c3448181c3d02361f63e5b"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">QuadTypes</span></span></span><a class="headerlink" href="#_CPPv4N5mpart9QuadTypesE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9QuadTypes14ClenshawCurtisE">
+<span id="_CPPv3N5mpart9QuadTypes14ClenshawCurtisE"></span><span id="_CPPv2N5mpart9QuadTypes14ClenshawCurtisE"></span><span class="target" id="_map_options_8h_1aaef72369a0c3448181c3d02361f63e5ba1edb8836a160659e99ce325f7f6251f1"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ClenshawCurtis</span></span></span><a class="headerlink" href="#_CPPv4N5mpart9QuadTypes14ClenshawCurtisE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9QuadTypes15AdaptiveSimpsonE">
+<span id="_CPPv3N5mpart9QuadTypes15AdaptiveSimpsonE"></span><span id="_CPPv2N5mpart9QuadTypes15AdaptiveSimpsonE"></span><span class="target" id="_map_options_8h_1aaef72369a0c3448181c3d02361f63e5ba3900dd275ccaf6d50f69f0913ed7cac8"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdaptiveSimpson</span></span></span><a class="headerlink" href="#_CPPv4N5mpart9QuadTypes15AdaptiveSimpsonE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9QuadTypes22AdaptiveClenshawCurtisE">
+<span id="_CPPv3N5mpart9QuadTypes22AdaptiveClenshawCurtisE"></span><span id="_CPPv2N5mpart9QuadTypes22AdaptiveClenshawCurtisE"></span><span class="target" id="_map_options_8h_1aaef72369a0c3448181c3d02361f63e5baeb4f4d25d38c3c900eeb51dddb80c084"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AdaptiveClenshawCurtis</span></span></span><a class="headerlink" href="#_CPPv4N5mpart9QuadTypes22AdaptiveClenshawCurtisE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapFactory15CreateComponentERK18FixedMultiIndexSetIN6Kokkos9HostSpaceEE10MapOptions">
+<span id="_CPPv3N5mpart10MapFactory15CreateComponentERK18FixedMultiIndexSetIN6Kokkos9HostSpaceEE10MapOptions"></span><span id="_CPPv2N5mpart10MapFactory15CreateComponentERK18FixedMultiIndexSetIN6Kokkos9HostSpaceEE10MapOptions"></span><span id="mpart::MapFactory::CreateComponent__FixedMultiIndexSet:Kokkos::HostSpace:CR.MapOptions"></span><span class="target" id="_map_factory_8h_1a3a94cb65994d15d3a2378b561ef0d14d"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">ConditionalMapBase</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MapFactory</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">CreateComponent</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="multiindices/fixedmultiindexset.html#_CPPv4I0EN5mpart18FixedMultiIndexSetE" title="mpart::FixedMultiIndexSet"><span class="n"><span class="pre">FixedMultiIndexSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">mset</span></span>, <a class="reference internal" href="#_CPPv4N5mpart10MapOptionsE" title="mpart::MapOptions"><span class="n"><span class="pre">MapOptions</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">options</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart10MapOptionsE" title="mpart::MapOptions"><span class="n"><span class="pre">MapOptions</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart10MapFactory15CreateComponentERK18FixedMultiIndexSetIN6Kokkos9HostSpaceEE10MapOptions" title="Permalink to this definition">#</a><br /></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mset</strong> – The multiindex set specifying which terms should be used in the multivariate expansion. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+              </article>
+              
+
+              
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">API Reference</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="templateconcepts.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Template Concepts</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+              </footer>
+              
+          </div>
+          
+      </div>
+    </div>
+
+  
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
+    &copy; Copyright 2022, The MParT development team..<br>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.1.<br>
+</p>
+  </div>
+  
+</div>
+</footer>
+  </body>
+</html>
