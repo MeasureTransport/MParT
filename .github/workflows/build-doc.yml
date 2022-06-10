@@ -17,6 +17,8 @@ jobs:
 
       - name: Install doxygen and sphinx
         run: |
+          echo ${{ github.workspace }}
+          cd ${{ github.workspace }}
           chmod +x ".github/script.sh"
           .github/script.sh 1.9.2
 
@@ -27,8 +29,7 @@ jobs:
       - name: Run CMake
         run: |
           cd ${{ github.workspace }}
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON ../
 
       - name: Build Docs
