@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dannys4/issue55
 
 jobs:
   build-docs:
@@ -15,9 +16,14 @@ jobs:
           submodules: recursive
 
       - name: Install doxygen and sphinx
-        run: sudo apt-get install -y doxygen
-        
-      - name: Install sphinx extensions 
+        run: |
+          cd ${{ github.workspace }}/..
+          wget https://www.doxygen.nl/files/doxygen-1.9.2.linux.bin.tar.gz
+          tar -xzvf doxygen-1.9.2.linux.bin.tar.gz
+          cd doxygen-1.9.2
+          sudo make install
+
+      - name: Install sphinx extensions
         run: pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels
 
       - name: Run CMake
@@ -30,7 +36,7 @@ jobs:
       - name: Build Docs
         run: cd build; make sphinx
 
-      - name: Push to gh-pages 
+      - name: Push to gh-pages
         uses: peaceiris/actions-gh-pages@v3.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
