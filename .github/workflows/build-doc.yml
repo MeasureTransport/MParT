@@ -16,10 +16,9 @@ jobs:
           submodules: recursive
 
       - name: Install doxygen and sphinx
-        uses: mattnotmitt/doxygen-action@v1.9.2
-        with:
-            doxyfile-path: 'docs/mpart.doxyfile.in'
-            enable-latex: true
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/.github/script.sh"
+          ${GITHUB_WORKSPACE}/.github/script.sh 1.9.2
 
 
       - name: Install sphinx extensions
