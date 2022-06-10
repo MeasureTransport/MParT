@@ -7,7 +7,7 @@ LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 INCLUDE(Submodules)
 
 ##############################################################
-# Options 
+# Options
 
 option(MPART_PYTHON "Build python bindings with pybind11" ON)
 option(MPART_JULIA "Build julia bindings with CxxWrap.jl" OFF)
@@ -58,7 +58,7 @@ if(NOT Eigen3_FOUND)
     add_subdirectory(external/eigen)
 endif()
 
-# Add pybind11 if necessary 
+# Add pybind11 if necessary
 if(MPART_PYTHON)
   find_package(pybind11 CONFIG QUIET)
   if(NOT pybind11_FOUND)
@@ -70,14 +70,14 @@ endif()
 
 # Add Julia if necessary
 if(MPART_JULIA)
-  
+
   # Set the julie executable and look for the location of cxxwrap
   if(NOT DEFINED JULIA_EXE)
       set(JULIA_EXE "julia")
   endif()
   execute_process(COMMAND ${JULIA_EXE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
   list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}" )
-  
+
   find_package(JlCxx)
 
   if(NOT JlCxx_FOUND)
@@ -117,7 +117,7 @@ if(MPART_JULIA)
 endif()
 
 ##############################################################
-# Testing 
+# Testing
 
 # Install Catch2
 find_package(Catch2 3 QUIET)
@@ -129,8 +129,9 @@ if(NOT Catch2_FOUND)
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
         GIT_TAG        v3.0.0-preview3
     )
-  
+
     FetchContent_MakeAvailable(Catch2)
+    message(STATUS "Catch 2 source:${catch2_SOURCE_DIR}")
     list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 endif()
 
