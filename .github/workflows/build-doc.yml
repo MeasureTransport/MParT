@@ -17,8 +17,9 @@ jobs:
 
       - name: Install doxygen and sphinx
         run: |
-          echo ${{ github.workspace }}/..
-          cd ${{ github.workspace }}/..
+          echo ${{ github.workspace }}
+          cd ${{ github.workspace }}
+          ls
           .github/script.sh 1.9.2
 
 
