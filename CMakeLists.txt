@@ -44,16 +44,10 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 find_package(Kokkos QUIET)
 
 if(NOT Kokkos_FOUND)
-
     message(STATUS "Could not find Kokkos.  Using internal build.")
     UpdateGitSubmodule(kokkos)
-
     add_subdirectory(external/kokkos)   
-    
-    #set(KOKKOS_INTERNAL ON)
-    #set(KOKKOS_EXPORTS kokkoscore kokkosalgorithms )
 else()
-    #set(KOKKOS_INTERNAL OFF)
     message(STATUS "Found Kokkos!")
 endif()
 

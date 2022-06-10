@@ -23,9 +23,6 @@ public:
 
 TEST_CASE( "Testing coefficient functions of conditional map base class", "[ConditionalMapBaseCoeffs]" ) {
 
-   
-
-
     MyIdentityMap map(4);
     CHECK(map.inputDim == 4);
     CHECK(map.outputDim == 4);
@@ -78,7 +75,14 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
         CHECK(map.Coeffs().extent(0) == numCoeffs);
 
         for(unsigned int i=0; i<numCoeffs; ++i)
-            CHECK(map.Coeffs()(i) == coeffs(i));            
+            CHECK(map.Coeffs()(i) == coeffs(i));   
+
+        map.SetCoeffs(coeffs);
+        for(unsigned int i=0; i<numCoeffs; ++i){
+            CHECK(map.Coeffs()(i) == coeffs(i));   
+            coeffs(i)++;
+            CHECK(map.Coeffs()(i) == coeffs(i));   
+        }        
     }
 
 }

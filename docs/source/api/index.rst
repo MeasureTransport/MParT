@@ -7,6 +7,7 @@ API Reference
    :caption: API
    :maxdepth: 2
 
+   mapfactory
    templateconcepts
    multiindex
    quadrature

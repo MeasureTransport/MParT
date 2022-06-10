@@ -20,6 +20,22 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     CHECK(maxDegrees(1)==maxOrder);
 }
 
+TEST_CASE("MultiIndexSet from Eigen", "[MultiIndexSetFromEigen]")
+{
+    Eigen::MatrixXi multis(3,2);
+    multis << 0,0,
+              1,2,
+              3,4;
+
+    MultiIndexSet mset(multis);
+    CHECK(mset.at(0).Get(0) == 0);
+    CHECK(mset.at(0).Get(1) == 0);
+    CHECK(mset.at(1).Get(0) == 1);
+    CHECK(mset.at(1).Get(1) == 2);
+    CHECK(mset.at(2).Get(0) == 3);
+    CHECK(mset.at(2).Get(1) == 4);
+}
+
 TEST_CASE( "Testing the FixedMultiIndexSet class with anisotropic degrees", "[AnisotropicFixedMultiIndexSet]" ) {
 
     const unsigned int dim = 2;

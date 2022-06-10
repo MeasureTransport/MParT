@@ -1,7 +1,6 @@
 #include "MParT/MapFactory.h"
 
 #include "MParT/MonotoneComponent.h"
-#include "MParT/Utilities/Miscellaneous.h"
 #include "MParT/Quadrature.h"
 #include "MParT/OrthogonalPolynomial.h"
 #include "MParT/MultivariateExpansion.h"
@@ -9,30 +8,40 @@
 
 using namespace mpart;
 
-std::shared_ptr<ConditionalMapBase> mpart::CreateComponent(FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
-                                                           std::unordered_map<std::string,std::string> options)
+std::shared_ptr<ConditionalMapBase> mpart::MapFactory::CreateComponent(FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
+                                                           MapOptions                                   opts)
 {   
-    // Extract the polynomial type
-    std::string polyType = GetOption(options,"PolyType", "ProbabilistHermite");
-    
-    // Extract the positive bijector type
-    std::string posType = GetOption(options,"PosType", "SoftPlus");
+    if(opts.quadType==QuadTypes::AdaptiveSimpson){
+        
+        AdaptiveSimpson<Kokkos::HostSpace> quad(opts.quadMaxSub, 1, nullptr, opts.quadAbsTol, opts.quadRelTol, QuadError::First);
 
-    // Extract the quadrature options
-    std::string quadType = GetOption(options, "QuadType", "AdaptiveSimpson");
-   
-    if(quadType=="AdaptiveSimpson"){
-        double relTol = stof(GetOption(options,"QuadRelTol", "1e-6"));
-        double absTol = stof(GetOption(options,"QuadAbsTol", "1e-6"));
-        unsigned int maxSub = stoi(GetOption(options,"QuadAbsTol", "30"));
-
-        AdaptiveSimpson<Kokkos::HostSpace> quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
-
-        if((polyType=="ProbabilistHermite")&&(posType=="SoftPlus")){
+        if(opts.basisType==BasisTypes::ProbabilistHermite){
             
             MultivariateExpansion<ProbabilistHermite> expansion(mset);
-            std::shared_ptr<ConditionalMapBase> output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad)>>(mset, quad);
+            std::shared_ptr<ConditionalMapBase> output;
 
+            switch(opts.posFuncType) {
+                case PosFuncTypes::SoftPlus:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad)>>(mset, quad);
+                case PosFuncTypes::Exp:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad)>>(mset, quad);
+            }
+          
+            output->Coeffs() = Kokkos::View<double*,Kokkos::HostSpace>("Component Coefficients", mset.Size());
+            return output;
+
+        }else if(opts.basisType==BasisTypes::PhysicistHermite){
+            
+            MultivariateExpansion<PhysicistHermite> expansion(mset);
+            std::shared_ptr<ConditionalMapBase> output;
+
+            switch(opts.posFuncType) {
+                case PosFuncTypes::SoftPlus:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad)>>(mset, quad);
+                case PosFuncTypes::Exp:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad)>>(mset, quad);
+            }
+          
             output->Coeffs() = Kokkos::View<double*,Kokkos::HostSpace>("Component Coefficients", mset.Size());
             return output;
         }
@@ -40,7 +49,7 @@ std::shared_ptr<ConditionalMapBase> mpart::CreateComponent(FixedMultiIndexSet<Ko
     
         
     std::stringstream msg;
-    msg << "Could not parse options in CreateComponent.  PolyType=\"" << polyType << "\", PosType=\"" << posType << "\", and QuadType=\"" << quadType << "\"";
+    msg << "Could not parse options in CreateComponent.";
     throw std::runtime_error(msg.str());
 
     return nullptr;
