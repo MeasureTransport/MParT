@@ -18,7 +18,7 @@ jobs:
       - name: Install doxygen and sphinx
         uses: mattnotmitt/doxygen-action@v1.9.2
         with:
-            working-directory: 'submodule/'
+            working-directory: 'build/'
             doxyfile-path: 'docs/'
             enable-latex: true
 
