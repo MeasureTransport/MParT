@@ -17,8 +17,8 @@ jobs:
 
       - name: Install doxygen and sphinx
         run: |
-          chmod +x "${GITHUB_WORKSPACE}/.github/script.sh"
-          ${GITHUB_WORKSPACE}/.github/script.sh 1.9.2
+          chmod +x ".github/script.sh"
+          .github/script.sh 1.9.2
 
 
       - name: Install sphinx extensions
