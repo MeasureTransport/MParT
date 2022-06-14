@@ -49,8 +49,17 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("fix", &MultiIndexSet::Fix)
         .def("__len__", &MultiIndexSet::Length)
         .def("access", &MultiIndexSet::operator[])
+        .def("at", &MultiIndexSet::at)
+        .def("Size", &MultiIndexSet::Size)
         //.def("append", &MultiIndexSet::operator+=)
         .def("union", &MultiIndexSet::Union)
+        .def("SetLimiter",&MultiIndexSet::SetLimiter)
+        //.def("GetLimiter", MultiIndexSet::GetLimiter)
+        .def("IndexToMulti",&MultiIndexSet::IndexToMulti)
+        .def("MultiToIndex", &MultiIndexSet::MultiToIndex)
+        .def("MaxOrders", &MultiIndexSet::MaxOrders)
+        //.def("Activate", &MultiIndexSet::Activate)
+        .def("AddActivate", &MultiIndexSet::AddActive)
         ;
         
 

@@ -12,15 +12,12 @@ using namespace mpart::binding;
 void mpart::binding::MapFactoryWrapper(py::module &m)
 {
     // CteateComponent
-    m.def("CreateComponent", &MapFactory::CreateComponent);
-    // m.def("CreateComponent", [] (FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
-    //                              MapOptions options = MapOptions())
-    // {
-    //     return CustomPtrToSharedPtr(MapFactory::CreateComponent(mset,options));
-    // }
+    //m.def("CreateComponent", &MapFactory::CreateComponent);
+    m.def("CreateComponent", [] (FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
+                                 MapOptions options)
+    {
+        return KokkosCustomPointer(MapFactory::CreateComponent(mset,options));
+    });
     
-    
-    
-    ;
 
 }
