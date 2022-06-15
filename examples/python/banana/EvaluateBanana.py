@@ -1,10 +1,6 @@
 from mpart import *
 import numpy as np
 import matplotlib.pyplot as plt
-# note: if you don't assign KokkosInit to a variable, mset.fix below will error. 
-#KokkosInit({})  
-
-# print(ki)
 
 # Create multi-index set:
 multis = np.array([[0, 1], [2, 0]])
