@@ -3,6 +3,10 @@ set(PYTHON_BINDING_SOURCES
   src/Wrapper.cpp
   src/CommonPybindUtilities.cpp
   src/MultiIndex.cpp
+  src/MapOptions.cpp
+  src/ConditionalMapBase.cpp
+  src/MapFactory.cpp
+  
   ../common/src/CommonUtilities.cpp
 )
 

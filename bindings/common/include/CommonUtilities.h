@@ -26,6 +26,7 @@ namespace binding{
     public:
         KokkosCustomPointer( ) : guard(GetKokkosGuard()) {};
         explicit KokkosCustomPointer(T *p) : guard(GetKokkosGuard()), impl(p) {}
+        explicit KokkosCustomPointer(std::shared_ptr<T> p) : guard(GetKokkosGuard()), impl(p) {}
         T& operator*() const{return *impl;};
 
         T* get() const { return impl.get(); }
