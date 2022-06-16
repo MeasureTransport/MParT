@@ -41,11 +41,8 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
     // ==========================================================================================================
     // MultiIndexSet
     py::class_<MultiIndexSet, KokkosCustomPointer<MultiIndexSet>>(m, "MultiIndexSet")
-
         .def(py::init<const unsigned int>())
         .def(py::init<Eigen::Ref<const Eigen::MatrixXi> const&>())
-
-        //.def(py::init<>(Eigen::Matrix<unsigned int, Eigen::Dynamic, Eigen::Dynamic>))
         .def("fix", &MultiIndexSet::Fix)
         .def("__len__", &MultiIndexSet::Length)
         .def("access", &MultiIndexSet::operator[])
@@ -62,12 +59,6 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("AddActivate", &MultiIndexSet::AddActive)
         ;
         
-
-        // .def(py::init<unsigned int, unsigned int>())
-
-
-
-
 
     //==========================================================================================================
     //FixedMultiIndexSet
