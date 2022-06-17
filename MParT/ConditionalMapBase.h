@@ -48,7 +48,7 @@ namespace mpart {
 
             @param[in] coeffs A view to save internally.
         */
-        virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs){ this->savedCoeffs = coeffs; }
+        virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs);
 
         virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs){ SetCoeffs(VecToKokkos<double>(coeffs)); }
         
