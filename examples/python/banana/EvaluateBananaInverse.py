@@ -28,6 +28,8 @@ print('Coeffs set')
 print(map.CoeffMap())
 print('============')
 
+coeffs_2 = map.CoeffMap()
+
 pts = np.random.randn(2,5)
 print('The points')
 print(pts)
@@ -38,28 +40,10 @@ print('Map of the points')
 print(map_of_pts)
 print('============')
 
-log_det = map.LogDeterminant(pts)
-print('Log det of map at the points')
-print(log_det)
+# For testing inverse
+pts_ = map.Inverse(pts[0], map_of_pts) 
+
+print(pts[0])
+print('Inverse map of the map of points')
+print(pts_)
 print('============')
-
-
-# Ways to change coeffs of map
-coeffs = np.array([2.0, 0.5]) # map does NOT change
-coeffs[:] = np.array([2.0, 0.5]) # map does change (maybe we don't want it to)
-coeffs[0] = 2 # map does change (maybe we don't want it to)
-map.CoeffMap()[:] = np.array([2, 0.5]) # map does change (we want it to)
-
-
-map_of_pts_2 = map.Evaluate(pts)
-print('Map of the points (coeffs changed)')
-print(map_of_pts_2)
-print('============')
-
-coeffs[:] = np.array([4, 0.5])  # changes map, we want this to NOT change the map
-
-map_of_pts = map.Evaluate(pts)
-print('Map of the points (coeffs changed)')
-print(map_of_pts)
-print('============')
-
