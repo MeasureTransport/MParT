@@ -1,4 +1,4 @@
-classdef TestExp < handle
+classdef BasisTypesOpt < handle
 %DATABASE Example usage of the mexplus development kit.
 %
 % This class definition gives an interface to the underlying MEX functions
@@ -16,25 +16,19 @@ classdef TestExp < handle
 %
 
 properties (Access = private)
-  id_ % ID of the session.
+  id_
 end
 
 methods
-  function this = TestExp()
+  function this = BasisTypes(type)
   %DATABASE Create a new database.
-    this.id_ = MParT_('new');
+    this.id_ = MParT_('newBasisTypesOpt',type);
   end
 
   function delete(this)
   %DELETE Destructor.
-    MParT_('delete', this.id_);
+    MParT_('deleteBasisTypesOpt', this.id_);
   end
-
-  function result = Evaluate1d(this, x)
-    result = MParT_('Evaluate1d',this.id_, x);
-  end
-
-end
 
 methods (Static)
   function environment = getEnvironment()

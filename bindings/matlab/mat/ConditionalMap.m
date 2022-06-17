@@ -1,4 +1,4 @@
-classdef TestExp < handle
+classdef ConditionalMap < handle
 %DATABASE Example usage of the mexplus development kit.
 %
 % This class definition gives an interface to the underlying MEX functions
@@ -16,22 +16,39 @@ classdef TestExp < handle
 %
 
 properties (Access = private)
-  id_ % ID of the session.
+  id_
 end
 
 methods
-  function this = TestExp()
+  function this = ConditionalMap(mset,mapOptions)
   %DATABASE Create a new database.
-    this.id_ = MParT_('new');
+    mexOptions = mapOptions.getMexOptions;
+    this.id_ = MParT_('newMap',mset.get_id(),mexOptions{1},mexOptions{2},mexOptions{3},mexOptions{4},mexOptions{5},mexOptions{6},mexOptions{7});
   end
 
   function delete(this)
   %DELETE Destructor.
-    MParT_('delete', this.id_);
+    MParT_('deleteMap', this.id_);
   end
 
-  function result = Evaluate1d(this, x)
-    result = MParT_('Evaluate1d',this.id_, x);
+  function setCoeffs(this,coeffs)
+    MParT_('setCoeffs',this.id_,coeffs(:));
+  end
+
+  function result = Coeffs(this)
+    result = MParT_('Coeffs',this.id_);
+  end
+
+  function result = Evaluate(this,pts)
+    result = MParT_('Evaluate',this.id_,transpose(pts(:)));
+  end
+
+  function result = LogDeterminant(this,pts)
+    result = MParT_('LogDeterminant',this.id_,transpose(pts(:)));
+  end
+
+  function result = Inverse(this,x1,r)
+    result = MParT_('Inverse',this.id_,x1(:),r(:));
   end
 
 end

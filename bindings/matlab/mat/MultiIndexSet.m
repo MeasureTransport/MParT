@@ -22,7 +22,7 @@ end
 methods
   function this = MultiIndexSet(multis)
   %DATABASE Create a new database.
-    this.id_ = MParT_('newMutliIndexSetEigen',this.id_);
+    this.id_ = MParT_('newMutliIndexSetEigen',multis);
   end
 
   function delete(this)
@@ -34,7 +34,7 @@ methods
     result = MParT_('MaxOrders', this.id_);
   end
 
-  function id = get_id(this)
+  function result = get_id(this)
     result = this.id_;
   end
   

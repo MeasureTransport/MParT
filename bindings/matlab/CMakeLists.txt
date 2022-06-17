@@ -5,8 +5,10 @@ include_directories(external)
 
 set(MEX_SOURCE 
     src/KokkosUtilities_mex.cpp
-    src/MParT_mex.cpp 
+    src/ConditionalMap_mex.cpp 
+    # src/MultiIndexSet_mex.cpp
     src/MexArrayConversions.cpp
+    src/MexMapOptionsConversions.cpp
 )
 
 matlab_add_mex(NAME MParT_ SRC ${MEX_SOURCE} LINK_TO mpart Kokkos::kokkos Eigen3::Eigen)

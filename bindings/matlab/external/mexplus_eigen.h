@@ -17,8 +17,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef MPART_MEXPLUS_EIGEN_H
-#define MPART_MEXPLUS_EIGEN_H
+#pragma once
+
+#ifndef MPART_MEXPLUS_EIGEN_HPP
+#define MPART_MEXPLUS_EIGEN_HPP
 
 #include "mexplus/mxarray.h"
 
@@ -37,11 +39,11 @@ namespace mexplus {
  * Todo: Documentation.
  */
 template <>
-mxArray* MxArray::from(const Eigen::MatrixXf& eigen_matrix)
+mxArray* MxArray::from(const Eigen::MatrixXd& eigen_matrix)
 {
     const int num_rows = static_cast<int>(eigen_matrix.rows());
     const int num_cols = static_cast<int>(eigen_matrix.cols());
-    MxArray out_array(MxArray::Numeric<float>(num_rows, num_cols));
+    MxArray out_array(MxArray::Numeric<double>(num_rows, num_cols));
 
     // This might not copy the data but it's evil and probably really dangerous!!!:
     // mxSetData(const_cast<mxArray*>(matrix.get()), (void*)value.data());
@@ -73,13 +75,13 @@ void MxArray::to(const mxArray* in_array, Eigen::MatrixXd* eigen_matrix)
     if (array.dimensionSize() > 2)
     {
         mexErrMsgIdAndTxt(
-            "eos:matlab",
+            "MPART:matlab",
             "Given array has > 2 dimensions. Can only create 2-dimensional matrices (and vectors).");
     }
 
     if (array.dimensionSize() == 1 || array.dimensionSize() == 0)
     {
-        mexErrMsgIdAndTxt("eos:matlab", "Given array has 0 or 1 dimensions but we expected a 2-dimensional "
+        mexErrMsgIdAndTxt("MPART:matlab", "Given array has 0 or 1 dimensions but we expected a 2-dimensional "
                                         "matrix (or row/column vector).");
         // Even when given a single value dimensionSize() is 2, with n=m=1. When does this happen?
     }
@@ -87,7 +89,7 @@ void MxArray::to(const mxArray* in_array, Eigen::MatrixXd* eigen_matrix)
     if (!array.isDouble())
     {
         mexErrMsgIdAndTxt(
-            "eos:matlab",
+            "MPART:matlab",
             "Trying to create an Eigen::MatrixXd in C++, but the given data is not of type double.");
     }
 
@@ -106,53 +108,6 @@ void MxArray::to(const mxArray* in_array, Eigen::MatrixXd* eigen_matrix)
     *eigen_matrix = eigen_map;
 };
 
-/**
- * @brief Define a template specialisation for Eigen::MatrixXd for ... .
- *
- * Todo: Documentation.
- * TODO: Maybe provide this one as MatrixXf as well as MatrixXd? Matlab's default is double?
- */
-template <>
-void MxArray::to(const mxArray* in_array, Eigen::MatrixXi* eigen_matrix)
-{
-    MxArray array(in_array);
-
-    if (array.dimensionSize() > 2)
-    {
-        mexErrMsgIdAndTxt(
-            "eos:matlab",
-            "Given array has > 2 dimensions. Can only create 2-dimensional matrices (and vectors).");
-    }
-
-    if (array.dimensionSize() == 1 || array.dimensionSize() == 0)
-    {
-        mexErrMsgIdAndTxt("eos:matlab", "Given array has 0 or 1 dimensions but we expected a 2-dimensional "
-                                        "matrix (or row/column vector).");
-        // Even when given a single value dimensionSize() is 2, with n=m=1. When does this happen?
-    }
-
-    if (!array.isInt8())
-    {   
-        mexErrMsgIdAndTxt(
-            "eos:matlab",
-            "Trying to create an Eigen::MatrixXi in C++, but the given data is not of type int.");
-    }
-
-    // We can be sure now that the array is 2-dimensional (or 0, but then we're screwed anyway)
-    const auto nrows = array.dimensions()[0]; // or use array.rows()
-    const auto ncols = array.dimensions()[1];
-
-    // I think I can just use Eigen::Matrix, not a Map - the Matrix c'tor that we call creates a Map anyway?
-    Eigen::Map<Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>> eigen_map(
-        array.getData<int>(), nrows, ncols);
-    // Not sure that's alright - who owns the data? I think as it is now, everything points to the data in the
-    // mxArray owned by Matlab, but I'm not 100% sure.
-    // Actually, doesn't eigen_map go out of scope and get destroyed? This might be trouble? But this
-    // assignment should (or might) copy, then it's fine? Check if it invokes the copy c'tor.
-    // 2 May 2018: Yes this copies.
-    *eigen_matrix = eigen_map;
-};
-
 } /* namespace mexplus */
 
-#endif /* MPART_MEXPLUS_EIGEN_H */
+#endif /* MPART_MEXPLUS_EIGEN_HPP */

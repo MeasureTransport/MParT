@@ -20,6 +20,23 @@ Eigen::RowMatrixXd ConditionalMapBase::Evaluate(Eigen::RowMatrixXd const& pts)
 }
 
 
+void ConditionalMapBase::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs){ 
+
+    // If coefficients already exist, make sure the sizes match
+    if(this->savedCoeffs.is_allocated()){
+        if(coeffs.size() != this->savedCoeffs.size()){
+            std::stringstream msg;
+            msg << "Error in ConditionalMapBase::SetCoeffs.  Current coefficient vector has size " << this->savedCoeffs.size() << ", but new coefficients have size " << coeffs.size() << ".";
+            throw std::invalid_argument(msg.str());
+        }
+    }else{
+
+        this->savedCoeffs = Kokkos::View<double*, Kokkos::HostSpace>("ConditionalMapBase Coefficients", coeffs.size());
+    }
+
+    Kokkos::deep_copy(this->savedCoeffs, coeffs); 
+}
+
 Kokkos::View<double*, Kokkos::HostSpace> ConditionalMapBase::LogDeterminant(Kokkos::View<const double**, Kokkos::HostSpace> const& pts)
 {
     Kokkos::View<double*, Kokkos::HostSpace> output("Log Determinants", pts.extent(1));
