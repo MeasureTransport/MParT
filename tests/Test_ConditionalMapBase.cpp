@@ -15,6 +15,12 @@ public:
     virtual void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts, 
                             Kokkos::View<double**, Kokkos::HostSpace>      &output) override{Kokkos::deep_copy(output,pts);};
     
+    virtual void LogDeterminantImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
+                                    Kokkos::View<double*, Kokkos::HostSpace>             &output) override{ 
+        for(unsigned int i=0; i<output.size(); ++i)
+            output(i)=0.0;
+    }
+
     virtual void InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
                             Kokkos::View<const double**, Kokkos::HostSpace> const& r,
                             Kokkos::View<double**, Kokkos::HostSpace>      & output) override{Kokkos::deep_copy(output,r);};
@@ -34,16 +40,14 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
         for(unsigned int i=0; i<numCoeffs; ++i)
             coeffs(i) = i;
         
-        map.Coeffs() = coeffs;
+        map.SetCoeffs(coeffs);
         CHECK(map.Coeffs().extent(0) == numCoeffs);
 
         for(unsigned int i=0; i<numCoeffs; ++i)
             CHECK(map.Coeffs()(i) == coeffs(i));
 
         coeffs(0) = 100;
-        for(unsigned int i=0; i<numCoeffs; ++i)
-            CHECK(map.Coeffs()(i) == coeffs(i));
-
+        CHECK(map.Coeffs()(0) != coeffs(0));
 
         // Now check using a slice of the coefficients
         unsigned int start = 2;
@@ -74,13 +78,24 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
         map.CoeffMap() = coeffs;
         CHECK(map.Coeffs().extent(0) == numCoeffs);
 
-        for(unsigned int i=0; i<numCoeffs; ++i)
-            CHECK(map.Coeffs()(i) == coeffs(i));   
+        for(unsigned int i=0; i<numCoeffs; ++i){
+            CHECK(map.Coeffs()(i) == coeffs(i));
+            coeffs(i)++;
+            CHECK(map.Coeffs()(i) != coeffs(i));
+        }   
 
         map.SetCoeffs(coeffs);
         for(unsigned int i=0; i<numCoeffs; ++i){
             CHECK(map.Coeffs()(i) == coeffs(i));   
             coeffs(i)++;
+            CHECK(map.Coeffs()(i) != coeffs(i));   
+        }  
+
+        map.SetCoeffs(coeffs);
+        for(unsigned int i=0; i<numCoeffs; ++i){
+            CHECK(map.Coeffs()(i) == coeffs(i)); 
+            coeffs(i)++;  
+            map.CoeffMap()(i)++;
             CHECK(map.Coeffs()(i) == coeffs(i));   
         }        
     }
