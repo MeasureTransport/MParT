@@ -7,29 +7,20 @@ import matplotlib.pyplot as plt
 def true_f(x):
     return 2*(x>2).astype('float')
 
-num_points = 100
+num_points = 1000
 x = np.linspace(0,4,num_points)
 
 # note: data might not monotone because of the noise, 
 # but we assume the true underlying function is monotone.
 y = true_f(x) + .4*np.random.randn(num_points)  
 
-
 # Create multi-index set:
 multis = np.array([[0], [1], [2], [3], [4], [5]])
 mset = MultiIndexSet(multis)
-
 fixed_mset = mset.fix(True)
 
 # Set MapOptions and make map
 opts = MapOptions()
-
-# opts.basisType   = BasisTypes.ProbabilistHermite
-# opts.posFuncType = PosFuncTypes.SoftPlus
-# opts.quadType    = QuadTypes.AdaptiveSimpson
-# opts.quadAbsTol  = 1e-6
-# opts.quadRelTol  = 1e-6
-
 map = CreateComponent(fixed_mset, opts)
 
 # Least squares objective
