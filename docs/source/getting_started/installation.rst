@@ -18,9 +18,10 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
    ..
    make install
 
-This will compile the `mpart` library and the python bindings. If you are compiling on a multicore machine, you can use :code:`make -j N_JOBS install`, where :code:`N_JOBS` is the number of processes the computer can compile with in parallel.  This installation should also automatically install and build Kokkos, Eigen, and Catch2, assuming they aren't installed already. If CMake has trouble finding prior installations of these, then you can try using `cmake` as such:
+This will compile the :code:`mpart` library and the python bindings. If you are compiling on a multicore machine, you can use :code:`make -j N_JOBS install`, where :code:`N_JOBS` is the number of processes the computer can compile with in parallel.  This installation should also automatically install and build Kokkos, Eigen, and Catch2, assuming they aren't installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:
 
 .. code-block:: bash
+
     cmake                                        \
      -DCMAKE_INSTALL_PREFIX=<your/install/path>  \
      -DKokkos_ROOT=<your/kokkos/install/root>    \
@@ -32,7 +33,7 @@ This will compile the `mpart` library and the python bindings. If you are compil
 
 Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, and Catch2 with submodules you don't already have using these :code:`X_ROOT` flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version >=3.13. Further, it has been tested with Kokkos 3.6.0, Eigen 3.4.0, Pybind11 2.9.2, and Catch2 3.0.0-preview3 (there are some issues encountered when compiling MParT with Catch2 3.0.1).
 
-The command `make install` will also create a test executable called `RunTests` in the `build` directory.  The tests can be run with:
+The command :code:`make install` will also create a test executable called :code:`RunTests` in the :code:`build` directory.  The tests can be run with:
 
 .. code-block::
 
@@ -73,6 +74,7 @@ Compiling with CUDA Support
 To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides. First, we compile Kokkos with the required options:
 
 .. code-block:: bash
+
     cmake \
         -DCMAKE_INSTALL_PREFIX=</new/kokkos/install/path> \
         -DBUILD_SHARED_LIBS=ON                            \
@@ -88,6 +90,7 @@ To support a GPU at the moment, you need a few special requirements. Due to the 
 Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the compute resource uses that Kokkos supports. Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the `build` directory using the following command:
 
 .. code-block:: bash
+
     cmake \
         -DCMAKE_INSTALL_PREFIX=<your/install/path>                       \
         -DKokkos_ROOT=</new/kokkos/install/path>                         \

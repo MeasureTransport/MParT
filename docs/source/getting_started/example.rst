@@ -1,3 +1,5 @@
+.. _example:
+
 Using MParT
 ----------------------
 
@@ -7,6 +9,7 @@ Linking to MParT is straightforward using CMake.  Let's say you want to compile 
 
 .. code-block:: cpp
     :caption: SmallExample.cpp
+
     #include <Kokkos_Core.hpp>
     #include <MParT/MultiIndices/MultiIndexSet.h>
 
@@ -54,13 +57,11 @@ Building the :code:`Simple` binary involves running :code:`cmake` and then :code
     ./Simple                # Run the executable
 
 .. tip::
-   If CMake throws an error saying it couldn't find `KokkosConfig.cmake`, try manually specifying the path to your MParT (or Kokkos) installations in your cmake call using `X_ROOT`.  For example,
+   If CMake throws an error saying it couldn't find :code:`KokkosConfig.cmake`, try manually specifying the path to your MParT (or Kokkos) installations in your cmake call using :code:`X_ROOT`.  For example,
 
    .. code-block:: bash
+
        cmake -DKokkos_ROOT=<your/install/path>/lib/cmake/Kokkos ..
-
-
-
 
 Python
 ^^^^^^^^^
