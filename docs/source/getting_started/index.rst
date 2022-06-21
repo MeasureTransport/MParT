@@ -14,7 +14,7 @@ Installation
     Install from Conda
     ^^^^^^^^^^^^^^^^^^^
     COMING SOON!
-    
+
 
     ++++++++++++++++++++++
 
@@ -33,20 +33,20 @@ Installation
     .. code-block:: bash
 
         mkdir build
-        cd build 
-        cmake -DCMAKE_INSTALL_PREFIX=<some path> .. 
-        make install 
-        
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=<some path> ..
+        make install
+
     .. link-button:: ./installation.html
         :type: url
         :text: Learn more
         :classes: btn-secondary stretched-link
 
 
-Quick Start 
+Quick Start
 ----------------------
 
-Build a transport map from samples 
+Build a transport map from samples
 
 .. tabbed:: c++
 
@@ -58,24 +58,25 @@ Build a transport map from samples
 .. tabbed:: python
 
     .. code-block:: python
-        
+
         dim = 2
-        maxDegree = 3 
+        maxDegree = 3
 
 .. tabbed:: matlab
 
     .. code-block:: matlab
-        
-        dim = 2
-        maxDegree = 3 
 
-Contents 
+        dim = 2
+        maxDegree = 3
+
+Contents
 ----------------------
 .. toctree::
    :maxdepth: 2
 
    installation
    mathematics
+   example
 
 
 
