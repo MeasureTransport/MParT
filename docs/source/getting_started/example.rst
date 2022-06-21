@@ -61,7 +61,7 @@ Building the :code:`Simple` binary involves running :code:`cmake` and then :code
 
    .. code-block:: bash
 
-       cmake -DKokkos_ROOT=<your/install/path>/lib/cmake/Kokkos ..
+       cmake -DCMAKE_PREFIX_PATH=<your/mpart/install/path> ..
 
 Python
 ^^^^^^^^^
