@@ -127,21 +127,6 @@ if(NOT Catch2_FOUND)
     add_subdirectory(external/catch2)
 endif()
 
-# find_package(Catch2 3 QUIET)
-# if(NOT Catch2_FOUND)
-#     Include(FetchContent)
-
-#     FetchContent_Declare(
-#         Catch2
-#         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-#         GIT_TAG        v3.0.0-preview3
-#     )
-
-#     FetchContent_MakeAvailable(Catch2)
-#     message(STATUS "Catch 2 source:${catch2_SOURCE_DIR}")
-#     list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
-# endif()
-
 # Define test sources
 add_subdirectory(tests)
 add_executable(RunTests ${TEST_SOURCES})
