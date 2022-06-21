@@ -59,13 +59,13 @@ Or, with the additional specification of the number of Kokkos threads to use:
 
 Compiling with Julia Bindings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia `CxxWrap` package is installed.   To install `CxxWrap`, run the following command in your Julia prompt:
+By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia :code:`CxxWrap` package is installed.   To install :code:`CxxWrap`, run the following command in your Julia prompt:
 
 .. code-block:: julia
 
     import Pkg; Pkg.add("CxxWrap")
 
-If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify :code:`JULIA_EXE` variable during configuration.  For example, adding :code:`-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia` will tell CMake to use the Julia executable installed by anaconda in the `mpart` conda environment.
+If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify :code:`JULIA_EXE` variable during configuration.  For example, adding :code:`-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia` will tell CMake to use the Julia executable installed by anaconda in the :code:`mpart` conda environment.
 
 To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set :code:`MPART_JULIA=OFF` during the CMake configuration.
 
@@ -98,6 +98,9 @@ Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the c
     ..
 
 Make sure that :code:`CMAKE_CXX_COMPILER` uses a full path from the root!
+
+.. tip::
+   If you're using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into `CMakeFiles.txt` and add `add_compile_definition(EIGEN_DONT_VECTORIZE)`.
 
 Building Documentation
 ----------------------
