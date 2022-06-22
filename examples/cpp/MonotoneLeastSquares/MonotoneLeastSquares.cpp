@@ -3,6 +3,7 @@ TODO: ADD DESCRIPTION
  */
 
 #include <random>
+#include <fstream>
 
 #define OPTIM_ENABLE_EIGEN_WRAPPERS
 #include "optim.hpp"
@@ -69,6 +70,7 @@ int main(int argc, char* argv[]){
     args->y = y_measured;
     args->num_points = num_points;
 
+    Eigen::RowMatrixXd map_of_x_before = map->Evaluate(x.reshaped(1,num_points));
     double error_before = objective(map->CoeffMap(), nullptr, args);
     std::cout<<"Initial error \t= "<<error_before<<std::endl;
 
@@ -77,8 +79,16 @@ int main(int argc, char* argv[]){
     bool success = optim::nm(initial, objective, args);
     std::cout<<"Optimization successfull? "<<success<<std::endl;
 
+    Eigen::RowMatrixXd map_of_x_after = map->Evaluate(x.reshaped(1,num_points));
     double error_after = objective(map->CoeffMap(), nullptr, args);
     std::cout<<"Final error \t= "<<error_after<<std::endl;
+
+    std::ofstream file("data.dat");
+    if (file.is_open()){
+	for (size_t i = 0; i < num_points; ++i){
+	    file << x[i] <<"\t"<<y_true[i] <<"\t"<<y_measured[i]<<"\t"<<map_of_x_before(i)<<"\t"<<map_of_x_after(i)<<"\n";
+	}
+    }
     }
     Kokkos::finalize();
 	
