@@ -8,6 +8,7 @@ num_points = 1000
 xmin, xmax = 0, 4
 x = np.linspace(xmin, xmax, num_points)[None,:]
 
+
 # measurements
 noisesd = 0.4
 
@@ -27,28 +28,46 @@ opts = MapOptions()
 monotoneMap = CreateComponent(fixed_mset, opts)
 
 # Least squares objective
-def objective(coeffs, monotoneMap, x, y_measured, num_points):
+def objective(coeffs, monotoneMap, x, y_measured):
     monotoneMap.SetCoeffs(coeffs)
     map_of_x = monotoneMap.Evaluate(x)
-    return np.sum((map_of_x - y_measured)**2)/num_points
+    return np.sum((map_of_x - y_measured)**2)/x.shape[1]
 
 # Before optimization
 map_of_x_before = monotoneMap.Evaluate(x)
-error_before = objective(monotoneMap.CoeffMap(), monotoneMap, x, y_measured, num_points)
+error_before = objective(monotoneMap.CoeffMap(), monotoneMap, x, y_measured)
 
 # Optimize
-res = minimize(objective, monotoneMap.CoeffMap(), args=(monotoneMap, x, y_measured, num_points), method="Nelder-Mead")
+res = minimize(objective, monotoneMap.CoeffMap(), args=(monotoneMap, x, y_measured), method="Nelder-Mead")
 
 # After optimization
 map_of_x_after = monotoneMap.Evaluate(x)
-error_after = objective(monotoneMap.CoeffMap(), monotoneMap, x, y_measured, num_points)
+error_after = objective(monotoneMap.CoeffMap(), monotoneMap, x, y_measured)
 
-# Plot data
+# Plot data (before and after together)
 plt.figure()
 plt.title('Starting map error: {:.2E} / Final map error: {:.2E}'.format(error_before, error_after))
 plt.plot(x.flatten(),y_true.flatten(),'*--',label='true data', alpha=0.8)
 plt.plot(x.flatten(),y_measured.flatten(),'*--',label='measured data', alpha=0.4)
 plt.plot(x.flatten(),map_of_x_before.flatten(),'*--',label='initial map output', color="green", alpha=0.8)
+plt.plot(x.flatten(),map_of_x_after.flatten(),'*--',label='final map output', color="red", alpha=0.8)
+plt.legend()
+plt.show()
+
+
+# Plot data (before and after apart)
+plt.figure()
+plt.title('Starting map error: {:.2E}'.format(error_before))
+plt.plot(x.flatten(),y_true.flatten(),'*--',label='true data', alpha=0.8)
+plt.plot(x.flatten(),y_measured.flatten(),'*--',label='measured data', alpha=0.4)
+plt.plot(x.flatten(),map_of_x_before.flatten(),'*--',label='initial map output', color="green", alpha=0.8)
+plt.legend()
+plt.show()
+
+plt.figure()
+plt.title('Final map error: {:.2E}'.format(error_after))
+plt.plot(x.flatten(),y_true.flatten(),'*--',label='true data', alpha=0.8)
+plt.plot(x.flatten(),y_measured.flatten(),'*--',label='measured data', alpha=0.4)
 plt.plot(x.flatten(),map_of_x_after.flatten(),'*--',label='final map output', color="red", alpha=0.8)
 plt.legend()
 plt.show()
