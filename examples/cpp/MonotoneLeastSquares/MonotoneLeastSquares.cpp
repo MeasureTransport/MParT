@@ -21,10 +21,6 @@ struct Args{
     unsigned int num_points;
 };
 
-Eigen::VectorXd true_f(Eigen::VectorXd x){
-    return 2*(x.array() > 2).cast<double>();
-}
-
 inline double objective(Eigen::VectorXd coeffs, Eigen::VectorXd* grad_out, void* opt_data){
     Args* args = (Args*)opt_data;
     std::shared_ptr<ConditionalMapBase> map = args->map;
@@ -34,7 +30,7 @@ inline double objective(Eigen::VectorXd coeffs, Eigen::VectorXd* grad_out, void*
 
     map->SetCoeffs(coeffs);
     Eigen::RowMatrixXd map_of_x = map->Evaluate(x.reshaped(1,num_points));
-    return (map_of_x - y.reshaped(1,num_points)).array().pow(2).sum()/num_points;
+    return (map_of_x - y.reshaped(1,num_points)).array().pow(2).sum()/x.rows();
 }
 
  
@@ -44,19 +40,23 @@ int main(int argc, char* argv[]){
     {
 
     unsigned int num_points = 1000;
+    int xmin = 0;
+    int xmax = 4;
     Eigen::VectorXd x;
-    x.setLinSpaced(num_points, 0, 4);
+    x.setLinSpaced(num_points, xmin, xmax);
 
+    Eigen::VectorXd y_true = 2*(x.array() > 2).cast<double>();
+
+    double noisesd = 0.4;
     std::default_random_engine generator;
-    std::normal_distribution<double> distribution(0, 0.4);
+    std::normal_distribution<double> distribution(0, noisesd);
     auto normal = [&] (int) {return distribution(generator);};
+    Eigen::VectorXd y_noise = Eigen::VectorXd::NullaryExpr(num_points, normal);
 
-    Eigen::VectorXd noise = Eigen::VectorXd::NullaryExpr(num_points, normal);
-    Eigen::VectorXd y = true_f(x) + noise;
+    Eigen::VectorXd y_measured = y_true + y_noise;
 
     Eigen::MatrixXi multis(6,1);
     multis << 0,1,2,3,4,5;
-
     MultiIndexSet mset(multis);
     FixedMultiIndexSet fixed_mset = mset.Fix(true);
 
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]){
     Args* args = new Args;
     args->map = map;
     args->x = x;
-    args->y = y;
+    args->y = y_measured;
     args->num_points = num_points;
 
     double error_before = objective(map->CoeffMap(), nullptr, args);
