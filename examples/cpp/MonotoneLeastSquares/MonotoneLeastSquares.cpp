@@ -30,13 +30,14 @@ int main(int argc, char* argv[]){
 
     Eigen::VectorXd noise = Eigen::VectorXd::NullaryExpr(num_points, normal);
     Eigen::VectorXd y = true_f(points) + noise;
-    std::cout << y << std::endl;
 
-//    Eigen::MatrixXi multis(2,dim);
-//    multis << 0,1,
-//              2,0;
-//
-//    MultiIndexSet mset(multis);
+    Eigen::MatrixXi multis(2,3);
+    multis << 0,1,2,
+              3,4,5;
+
+    MultiIndexSet mset(multis);
+    FixedMultiIndexSet fixed_mset = mset.Fix(true);
+
 //
 //    MapOptions opts;
 //    opts.basisType    = BasisTypes::ProbabilistHermite;
