@@ -4,6 +4,9 @@ TODO: ADD DESCRIPTION
 
 #include <random>
 
+#define OPTIM_ENABLE_EIGEN_WRAPPERS
+#include "optim.hpp"
+
 #include <MParT/ConditionalMapBase.h>
 #include <MParT/MapFactory.h>
 #include <MParT/MultiIndices/MultiIndexSet.h>
@@ -11,11 +14,24 @@ TODO: ADD DESCRIPTION
 
 using namespace mpart; 
 
+struct Args{
+    std::shared_ptr<ConditionalMapBase> map;
+    Eigen::VectorXd x;
+    Eigen::VectorXd y;
+    unsigned int num_points;
+};
+
 Eigen::VectorXd true_f(Eigen::VectorXd x){
     return 2*(x.array() > 2).cast<double>();
 }
 
-double objective(Eigen::Map<Eigen::VectorXd> coeffs, std::shared_ptr<ConditionalMapBase> map, Eigen::VectorXd x, Eigen::VectorXd y, unsigned int num_points){
+inline double objective(Eigen::VectorXd coeffs, Eigen::VectorXd* grad_out, void* opt_data){
+    Args* args = (Args*)opt_data;
+    std::shared_ptr<ConditionalMapBase> map = args->map;
+    Eigen::VectorXd x = args->x;
+    Eigen::VectorXd y = args->y;
+    unsigned int num_points = args->num_points;
+
     map->SetCoeffs(coeffs);
     Eigen::RowMatrixXd map_of_x = map->Evaluate(x.reshaped(1,num_points));
     return (map_of_x - y.reshaped(1,num_points)).array().pow(2).sum()/num_points;
@@ -46,25 +62,23 @@ int main(int argc, char* argv[]){
 
     MapOptions opts;
     std::shared_ptr<ConditionalMapBase> map = MapFactory::CreateComponent(fixed_mset, opts);
-    std::cout<<map->CoeffMap()<<std::endl;
 
-    double tmp = objective(map->CoeffMap(), map, x, y, num_points);
-    std::cout<<tmp<<std::endl;
+    Args* args = new Args;
+    args->map = map;
+    args->x = x;
+    args->y = y;
+    args->num_points = num_points;
 
-//    unsigned int numCoeffs = mset.Size();
-//    Eigen::VectorXd coeffs(numCoeffs);
-//    map->SetCoeffs(coeffs); 
-//
-//    coeffs(0) = 1.0; // Set the linear coefficient 
-//    coeffs(1) = 0.5; // Set the quadratic coefficient
-//
-//
-//    unsigned int numPts = 128;
-//    Eigen::RowMatrixXd pts = Eigen::RowMatrixXd::Random(dim,numPts);
-//    Eigen::RowMatrixXd evals = map->Evaluate(pts);
-//    Eigen::VectorXd logDet = map->LogDeterminant(pts);
-//
-//    std::cout << "Map Evaluations:\n" << evals << std::endl;
+    double error_before = objective(map->CoeffMap(), nullptr, args);
+    std::cout<<"Initial error \t= "<<error_before<<std::endl;
+
+    Eigen::VectorXd initial = map->CoeffMap();
+    
+    bool success = optim::nm(initial, objective, args);
+    std::cout<<"Optimization successfull? "<<success<<std::endl;
+
+    double error_after = objective(map->CoeffMap(), nullptr, args);
+    std::cout<<"Final error \t= "<<error_after<<std::endl;
     }
     Kokkos::finalize();
 	
