@@ -82,6 +82,8 @@ Eigen::RowMatrixXd ConditionalMapBase::Inverse(Eigen::RowMatrixXd const& x1, Eig
     InverseImpl(x1View, rView, outView);
     return output;
 }
+
+
         
 
 Eigen::Map<Eigen::VectorXd> ConditionalMapBase::CoeffMap()

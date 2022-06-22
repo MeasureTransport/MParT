@@ -100,6 +100,8 @@ namespace mpart {
                                  Kokkos::View<const double**, Kokkos::HostSpace> const& r,
                                  Kokkos::View<double**, Kokkos::HostSpace>            & output) = 0;
 
+// PB changes:
+
 
         const unsigned int inputDim; // The total dimension of the input N+M
         const unsigned int outputDim; // The output dimension M

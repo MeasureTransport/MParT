@@ -25,6 +25,9 @@
 #include "mexplus/mxarray.h"
 
 #include "Eigen/Core"
+#include <Kokkos_Core.hpp>
+#include "MParT/Utilities/ArrayConversions.h"
+
 
 #include "mex.h"
 
@@ -60,6 +63,8 @@ mxArray* MxArray::from(const Eigen::MatrixXd& eigen_matrix)
     }
     return out_array.release();
 };
+
+
 
 /**
  * @brief Define a template specialisation for Eigen::MatrixXd for ... .
@@ -106,6 +111,73 @@ void MxArray::to(const mxArray* in_array, Eigen::MatrixXd* eigen_matrix)
     // assignment should (or might) copy, then it's fine? Check if it invokes the copy c'tor.
     // 2 May 2018: Yes this copies.
     *eigen_matrix = eigen_map;
+};
+
+template <>
+void MxArray::to(const mxArray* in_array, Eigen::Map<Eigen::MatrixXd>* eigen_matrix)
+{
+    MxArray array(in_array);
+
+    if (array.dimensionSize() > 2)
+    {
+        mexErrMsgIdAndTxt(
+            "MPART:matlab",
+            "Given array has > 2 dimensions. Can only create 2-dimensional matrices (and vectors).");
+    }
+
+    if (array.dimensionSize() == 1 || array.dimensionSize() == 0)
+    {
+        mexErrMsgIdAndTxt("MPART:matlab", "Given array has 0 or 1 dimensions but we expected a 2-dimensional "
+                                        "matrix (or row/column vector).");
+    }
+
+    if (!array.isDouble())
+    {
+        mexErrMsgIdAndTxt(
+            "MPART:matlab",
+            "Trying to create an Eigen::MatrixXd in C++, but the given data is not of type double.");
+    }
+
+    const auto nrows = array.dimensions()[0]; 
+    const auto ncols = array.dimensions()[1];
+
+    Eigen::Map<Eigen::MatrixXd> eigen_map(
+        array.getData<double>(), nrows, ncols);
+    *eigen_matrix = eigen_map;
+};
+
+
+template <>
+void MxArray::to(const mxArray* in_array, Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace>* kokkos_matrix)
+{
+    MxArray array(in_array);
+
+    if (array.dimensionSize() > 2)
+    {
+        mexErrMsgIdAndTxt(
+            "MPART:matlab",
+            "Given array has > 2 dimensions. Can only create 2-dimensional matrices (and vectors).");
+    }
+
+    if (array.dimensionSize() == 1 || array.dimensionSize() == 0)
+    {
+        mexErrMsgIdAndTxt("MPART:matlab", "Given array has 0 or 1 dimensions but we expected a 2-dimensional "
+                                        "matrix (or row/column vector).");
+        // Even when given a single value dimensionSize() is 2, with n=m=1. When does this happen?
+    }
+
+    if (!array.isDouble())
+    {
+        mexErrMsgIdAndTxt(
+            "MPART:matlab",
+            "Trying to create an Eigen::MatrixXd in C++, but the given data is not of type double.");
+    }
+
+    // We can be sure now that the array is 2-dimensional (or 0, but then we're screwed anyway)
+    unsigned int nrows = array.dimensions()[0]; // or use array.rows()
+    unsigned int ncols = array.dimensions()[1];
+
+    *kokkos_matrix = mpart::ToKokkos<double, Kokkos::LayoutLeft>(array.getData<double>(), nrows, ncols);
 };
 
 } /* namespace mexplus */

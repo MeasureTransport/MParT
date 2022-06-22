@@ -39,16 +39,21 @@ methods
     result = MParT_('Coeffs',this.id_);
   end
 
+  %function result = Evaluate(this,pts)
+  %  result = zeros(1,size(pts,2));
+  %  MParT_('Evaluate',this.id_,pts,result);
+  %end
+
   function result = Evaluate(this,pts)
-    result = MParT_('Evaluate',this.id_,transpose(pts(:)));
+    result = MParT_('Evaluate',this.id_,pts);
   end
 
   function result = LogDeterminant(this,pts)
-    result = MParT_('LogDeterminant',this.id_,transpose(pts(:)));
+    result = MParT_('LogDeterminant',this.id_,pts);
   end
 
   function result = Inverse(this,x1,r)
-    result = MParT_('Inverse',this.id_,x1(:),r(:));
+    result = MParT_('Inverse',this.id_,x1,r);
   end
 
 end

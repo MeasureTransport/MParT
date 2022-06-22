@@ -23,19 +23,6 @@ public:
   }
 }; //end class
 
-// class MapOptionsMex {       // The class
-// public:             
-//   MapOptions opts;
-
-//   MapOptionsMex(std::string basisType, std::string posFuncType, 
-//                                        std::string quadType, double quadAbsTol,
-//                                        double quadRelTol, unsigned int quadMaxSub,
-//                                        unsigned int quadPts)
-//   {
-//     MapOptions opts;
-//   }
-// }; //end class
-
 // Instance manager for ConditionalMap.
 template class mexplus::Session<ConditionalMapMex>;
 
@@ -63,12 +50,7 @@ MEX_DEFINE(setCoeffs) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 0);
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
   auto coeffs = input.get<Eigen::MatrixXd>(1);
-  std::cout << coeffs.transpose();
-  std::cout << '\n';
   condMap.map_ptr->SetCoeffs(coeffs.col(0));
-  auto coeffs_out = KokkosToVec(condMap.map_ptr->Coeffs());
-  std::cout << coeffs_out.transpose();
-  std::cout << '\n';
 }
 
 MEX_DEFINE(Coeffs) (int nlhs, mxArray* plhs[],
@@ -77,17 +59,28 @@ MEX_DEFINE(Coeffs) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 1);
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
   auto coeffs = KokkosToVec(condMap.map_ptr->Coeffs());
-  // std::cout << coeffs.transpose();
-  // std::cout << '\n';
   output.set(0,coeffs);
 }
+
+// MEX_DEFINE(EvaluateImpl) (int nlhs, mxArray* plhs[],
+//                  int nrhs, const mxArray* prhs[]) {
+//   InputArguments input(nrhs, prhs, 3);
+//   OutputArguments output(nlhs, plhs, 0);
+//   ConditionalMapMex& condMap = *Session<ConditionalMapMex>::get(input.get(0));
+//   Kokkos::View<const double**, Kokkos::HostSpace> pts = input.get<Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace>>(1);
+//   Kokkos::View<double**, Kokkos::HostSpace> result = input.get<Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace>>(2);
+//   condMap.map_ptr->EvaluateImpl(pts,result);
+//   // std::cout << evals.transpose();
+//   // std::cout << '\n';
+//   //output.set(0,evals);
+// }
 
 MEX_DEFINE(Evaluate) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  Eigen::MatrixXd pts = input.get<Eigen::MatrixXd>(1);
+  auto pts = input.get<Eigen::MatrixXd>(1);
   Eigen::MatrixXd evals = condMap.map_ptr->Evaluate(pts);
   output.set(0,evals);
 }
@@ -97,21 +90,21 @@ MEX_DEFINE(LogDeterminant) (int nlhs, mxArray* plhs[],
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  Eigen::MatrixXd pts = input.get<Eigen::MatrixXd>(1);
+  Eigen::RowMatrixXd pts = input.get<Eigen::MatrixXd>(1);
   Eigen::MatrixXd logDet = condMap.map_ptr->LogDeterminant(pts);
   output.set(0,logDet);
 }
 
-MEX_DEFINE(Inverse) (int nlhs, mxArray* plhs[],
-                 int nrhs, const mxArray* prhs[]) {
-  InputArguments input(nrhs, prhs, 3);
-  OutputArguments output(nlhs, plhs, 1);
-  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  Eigen::MatrixXd x1 = input.get<Eigen::MatrixXd>(1);
-  Eigen::MatrixXd r = input.get<Eigen::MatrixXd>(2);
-  Eigen::MatrixXd inv = condMap.map_ptr->Inverse(x1,r);
-  output.set(0,inv);
-}
+// MEX_DEFINE(Inverse) (int nlhs, mxArray* plhs[],
+//                  int nrhs, const mxArray* prhs[]) {
+//   InputArguments input(nrhs, prhs, 3);
+//   OutputArguments output(nlhs, plhs, 1);
+//   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+//   Eigen::RowMatrixXd x1 = input.get<Eigen::RowMatrixXd>(1);
+//   Eigen::RowMatrixXd r = input.get<Eigen::RowMatrixXd>(2);
+//   Eigen::RowMatrixXd inv = condMap.map_ptr->Inverse(x1,r);
+//   output.set(0,inv);
+// }
 
 // MEX_DEFINE(CoeffJacobian) (int nlhs, mxArray* plhs[],
 //                  int nrhs, const mxArray* prhs[]) {
