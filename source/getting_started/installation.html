@@ -160,6 +160,11 @@
    Mathematical Background
   </a>
  </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="example.html">
+   Using MParT
+  </a>
+ </li>
 </ul>
 
   </div>
@@ -194,26 +199,9 @@
      Compiling with Julia Bindings
     </a>
    </li>
-  </ul>
- </li>
- <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#using-mpart">
-   Using MParT
-  </a>
-  <ul class="nav section-nav flex-column">
    <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#c">
-     C++
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#python">
-     Python
-    </a>
-   </li>
-   <li class="toc-h3 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#julia">
-     Julia
+    <a class="reference internal nav-link" href="#compiling-with-cuda-support">
+     Compiling with CUDA Support
     </a>
    </li>
   </ul>
@@ -257,7 +245,19 @@ cmake                                         <span class="se">\</span>
 make install
 </pre></div>
 </div>
-<p>This will compile the <cite>mpart</cite> library and the python bindings.  It will also create a test executable called <cite>RunTests</cite>.  The tests can be run with:</p>
+<p>This will compile the <code class="code docutils literal notranslate"><span class="pre">mpart</span></code> library and the python bindings. If you are compiling on a multicore machine, you can use <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">-j</span> <span class="pre">N_JOBS</span> <span class="pre">install</span></code>, where <code class="code docutils literal notranslate"><span class="pre">N_JOBS</span></code> is the number of processes the computer can compile with in parallel.  This installation should also automatically install and build Kokkos, Eigen, and Catch2, assuming they aren’t installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span> cmake                                        <span class="se">\</span>
+  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/install/path&gt;  <span class="se">\</span>
+  -DKokkos_ROOT<span class="o">=</span>&lt;your/kokkos/install/root&gt;    <span class="se">\</span>
+  -DEigen3_ROOT<span class="o">=</span>&lt;your/eigen3/install/root&gt;    <span class="se">\</span>
+  -DCatch2_ROOT<span class="o">=</span>&lt;your/catch2/install/root&gt;    <span class="se">\</span>
+  -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON                  <span class="se">\</span>
+  -DKokkos_ENABLE_SERIAL<span class="o">=</span>ON                   <span class="se">\</span>
+..
+</pre></div>
+</div>
+<p>Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, and Catch2 with submodules you don’t already have using these <code class="code docutils literal notranslate"><span class="pre">X_ROOT</span></code> flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version &gt;=3.13. Further, it has been tested with Kokkos 3.6.0, Eigen 3.4.0, Pybind11 2.9.2, and Catch2 3.0.0-preview3 (there are some issues encountered when compiling MParT with Catch2 3.0.1).</p>
+<p>The command <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code> will also create a test executable called <code class="code docutils literal notranslate"><span class="pre">RunTests</span></code> in the <code class="code docutils literal notranslate"><span class="pre">build</span></code> directory.  The tests can be run with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">RunTests</span>
 </pre></div>
 </div>
@@ -276,127 +276,41 @@ make install
 </div>
 <section id="compiling-with-julia-bindings">
 <h3>Compiling with Julia Bindings<a class="headerlink" href="#compiling-with-julia-bindings" title="Permalink to this heading">#</a></h3>
-<p>By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia <cite>CxxWrap</cite> package is installed.   To install <cite>CxxWrap</cite>, run the following command in your Julia prompt:</p>
+<p>By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code> package is installed.   To install <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code>, run the following command in your Julia prompt:</p>
 <div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="n">Pkg</span><span class="p">;</span> <span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;CxxWrap&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify <code class="code docutils literal notranslate"><span class="pre">JULIA_EXE</span></code> variable during configuration.  For example, adding <code class="code docutils literal notranslate"><span class="pre">-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia</span></code> will tell CMake to use the Julia executable installed by anaconda in the <cite>mpart</cite> conda environment.</p>
+<p>If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify <code class="code docutils literal notranslate"><span class="pre">JULIA_EXE</span></code> variable during configuration.  For example, adding <code class="code docutils literal notranslate"><span class="pre">-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia</span></code> will tell CMake to use the Julia executable installed by anaconda in the <code class="code docutils literal notranslate"><span class="pre">mpart</span></code> conda environment.</p>
 <p>To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=OFF</span></code> during the CMake configuration.</p>
 </section>
-</section>
-<section id="using-mpart">
-<h2>Using MParT<a class="headerlink" href="#using-mpart" title="Permalink to this heading">#</a></h2>
-<section id="c">
-<h3>C++<a class="headerlink" href="#c" title="Permalink to this heading">#</a></h3>
-<p>Linking to MParT is straightforward using CMake.  Let’s say you want to compile the following code, which simply creates a multiindex set.</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">SmallExample.cpp</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;MParT/MultiIndices/MultiIndexSet.h&gt;</span><span class="cp"></span>
-
-<span class="k">using</span> <span class="k">namespace</span> <span class="n">mpart</span><span class="p">;</span>
-
-<span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
-
-    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
-
-    <span class="n">MultiIndexSet</span> <span class="n">mset</span> <span class="o">=</span> <span class="n">MultiIndexSet</span><span class="o">::</span><span class="n">CreateTotalOrder</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
-    <span class="n">mset</span><span class="p">.</span><span class="n">Visualize</span><span class="p">();</span>
-
-    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
-<span class="p">}</span>
+<section id="compiling-with-cuda-support">
+<h3>Compiling with CUDA Support<a class="headerlink" href="#compiling-with-cuda-support" title="Permalink to this heading">#</a></h3>
+<p>To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides. First, we compile Kokkos with the required options:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake <span class="se">\</span>
+    -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;/new/kokkos/install/path&gt; <span class="se">\</span>
+    -DBUILD_SHARED_LIBS<span class="o">=</span>ON                            <span class="se">\</span>
+    -DKokkos_ENABLE_SERIAL<span class="o">=</span>OFF                        <span class="se">\</span>
+    -DKokkos_ENABLE_OPENMP<span class="o">=</span>ON                         <span class="se">\</span>
+    -DKokkos_ENABLE_CUDA<span class="o">=</span>ON                           <span class="se">\</span>
+    -DKokkos_ARCH_VOLTA70<span class="o">=</span>ON                          <span class="se">\</span>
+    -DKokkos_ENABLE_CUDA_LAMBDA<span class="o">=</span>ON                    <span class="se">\</span>
+    -DKokkos_CUDA_DIR<span class="o">=</span>&lt;cuda/install/path&gt;             <span class="se">\</span>
+    -DKokkos_CXX_STANDARD<span class="o">=</span><span class="m">17</span>                          <span class="se">\</span>
+../
 </pre></div>
 </div>
-</div>
-<p>The following <code class="code docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file can be used to configure the executable.</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">CMakeLists.txt</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
-<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span> <span class="p">(</span><span class="s">VERSION</span> <span class="s">3.13</span><span class="p">)</span>
-
-<span class="nb">project</span><span class="p">(</span><span class="s">SimpleExample</span><span class="p">)</span>
-
-<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span> <span class="s">17</span><span class="p">)</span>
-
-<span class="nb">find_package</span><span class="p">(</span><span class="s">MParT</span> <span class="s">REQUIRED</span><span class="p">)</span>
-<span class="nb">message</span><span class="p">(</span><span class="s">STATUS</span> <span class="s2">&quot;MPART_FOUND = ${MParT_FOUND}&quot;</span><span class="p">)</span>
-
-<span class="nb">add_executable</span><span class="p">(</span><span class="s">Simple</span> <span class="s">SimpleExample.cpp</span><span class="p">)</span>
-<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">Simple</span> <span class="s">MParT::mpart</span> <span class="s">Kokkos::kokkos</span> <span class="s">Eigen3::Eigen</span><span class="p">)</span>
+<p>Replace the <code class="code docutils literal notranslate"><span class="pre">Kokkos_ARCH_VOLTA70</span></code> as needed with whatever other arch the compute resource uses that Kokkos supports. Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the <cite>build</cite> directory using the following command:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake <span class="se">\</span>
+    -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/install/path&gt;                       <span class="se">\</span>
+    -DKokkos_ROOT<span class="o">=</span>&lt;/new/kokkos/install/path&gt;                         <span class="se">\</span>
+    -DCMAKE_CXX_COMPILER<span class="o">=</span>&lt;/new/kokkos/install/path&gt;/bin/nvcc_wrapper <span class="se">\</span>
+..
 </pre></div>
 </div>
-</div>
-<p>Building the <code class="code docutils literal notranslate"><span class="pre">Simple</span></code> binary involves running <code class="code docutils literal notranslate"><span class="pre">cmake</span></code> and then <code class="code docutils literal notranslate"><span class="pre">make</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir build<span class="p">;</span> <span class="nb">cd</span> build <span class="c1"># Create a build directory</span>
-cmake ..              <span class="c1"># Run CMake to configure the build</span>
-make                  <span class="c1"># Call make to build the executable</span>
-./Simple              <span class="c1"># Run the executable</span>
-</pre></div>
-</div>
+<p>Make sure that <code class="code docutils literal notranslate"><span class="pre">CMAKE_CXX_COMPILER</span></code> uses a full path from the root!</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>If CMake throws an error saying it couldn’t find <cite>KokkosConfig.cmake</cite>, try manually specifying the path to your MParT (or Kokkos) installations in your cmake call.  For example,</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake -DKokkos_ROOT<span class="o">=</span>~/Installations/MParT/lib/cmake/Kokkos ..
-</pre></div>
-</div>
-</div>
-</section>
-<section id="python">
-<h3>Python<a class="headerlink" href="#python" title="Permalink to this heading">#</a></h3>
-<p>First, make sure the relevant path variables include the installation of MParT:</p>
-<div class="tabbed-set docutils">
-<input checked="checked" id="dadb1c3b-a104-4b06-9817-8de765342e26" name="3f6e4cae-8368-4047-ac35-4b9639fb4bbe" type="radio">
-</input><label class="tabbed-label" for="dadb1c3b-a104-4b06-9817-8de765342e26">
-OSX</label><div class="tabbed-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
-<span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
-</pre></div>
-</div>
-</div>
-<input id="84261e70-d610-4518-932a-f99c631da0c4" name="3f6e4cae-8368-4047-ac35-4b9639fb4bbe" type="radio">
-</input><label class="tabbed-label" for="84261e70-d610-4518-932a-f99c631da0c4">
-Linux</label><div class="tabbed-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
-<span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
-</pre></div>
-</div>
-</div>
-</div>
-<p>You should now be able to run python and import the MParT package!</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mpart</span>
-
-<span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">idx</span> <span class="o">=</span> <span class="n">mpart</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="julia">
-<h3>Julia<a class="headerlink" href="#julia" title="Permalink to this heading">#</a></h3>
-<p>First, make sure your library path includes the installation of MParT:</p>
-<div class="tabbed-set docutils">
-<input checked="checked" id="7f6c7723-4d21-4d1b-9a31-2bbf7fa8975c" name="73c64f00-9b65-4743-bb3c-5ff880284d88" type="radio">
-</input><label class="tabbed-label" for="7f6c7723-4d21-4d1b-9a31-2bbf7fa8975c">
-OSX</label><div class="tabbed-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
-</pre></div>
-</div>
-</div>
-<input id="1b1e8f7f-0dce-4b21-831b-a4010f8a2f12" name="73c64f00-9b65-4743-bb3c-5ff880284d88" type="radio">
-</input><label class="tabbed-label" for="1b1e8f7f-0dce-4b21-831b-a4010f8a2f12">
-Linux</label><div class="tabbed-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
-</pre></div>
-</div>
-</div>
-</div>
-<p>You should now be able to use MParT from Julia by including MParT as a local package.  For example:</p>
-<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">include</span><span class="p">(</span><span class="s">&quot;&lt;your/install/path&gt;/julia/mpart/MParT.jl&quot;</span><span class="p">)</span>
-
-<span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">idx</span> <span class="o">=</span> <span class="n">MParT</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
-<span class="n">print</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-</pre></div>
+<p>If you’re using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into <cite>CMakeFiles.txt</cite> and add <cite>add_compile_definition(EIGEN_DONT_VECTORIZE)</cite>.</p>
 </div>
 </section>
 </section>
