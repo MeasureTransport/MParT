@@ -1,0 +1,63 @@
+name: external-lib-tests
+
+on:
+  push:
+    branches:
+      - dannys4/issue50
+  pull_request: {}
+
+jobs:
+  build-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone Kokkos, Eigen, Catch2
+        run: |
+          cd ${{ github.workspace }}/..
+          git clone git@github.com:kokkos/kokkos.git
+          git clone git@gitlab.com:libeigen/eigen.git
+          git clone git@github.com:catchorg/Catch2.git
+
+      - name: Install Kokkos
+        run: |
+          cd ${{ github.workspace }}/../kokkos
+          mkdir build && cd build
+          cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON ../
+          sudo make install
+
+      - name: Install Eigen
+        run: |
+          cd ${{ github.workspace }}/../eigen
+          mkdir build && cd build
+          cmake ../
+          sudo make install
+
+      - name: Install Catch2
+        run: |
+          cd ${{ github.workspace }}/../Catch2
+          mkdir build && cd build
+          cmake ../
+          sudo make install
+
+      - name: Checkout
+        uses: actions/checkout@v1
+        with:
+          submodules: recursive
+
+      - name: Configure MParT
+        run: |
+          cd ${{ github.workspace }}
+          mkdir build
+          cd build
+          cmake ../
+
+      - name: Build
+        run: cd build; make
+
+      - name: Run Tests
+        run: cd build; ./RunTests --kokkos-cores=2 --reporter junit -o test-results.xml
+
+      # - name: Publish Unit Test Results
+      #   uses: EnricoMi/publish-unit-test-result-action@v1
+      #   if: always()
+      #   with:
+      #     files: build/test-results.xml
