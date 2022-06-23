@@ -36,9 +36,8 @@ jobs:
       - name: Checkout Pybind11
         uses: actions/checkout@v3
         with:
-          repository: git@github.com:pybind/pybind11.git
+          repository: pybind/pybind11.git
           path: pybind11
-          ref: master
 
       - name: Install Kokkos
         run: |
