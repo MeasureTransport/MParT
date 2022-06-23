@@ -26,7 +26,7 @@ jobs:
         with:
           repository: catchorg/Catch2
           path: catch2
-          ref: tags/v3.0.0-preview5
+          ref: tags/
 
       - name: Checkout Eigen
         uses: actions/checkout@v3
@@ -58,6 +58,8 @@ jobs:
       - name: Install Catch2
         run: |
           cd $GITHUB_WORKSPACE/catch2
+          git fetch --all --tags
+          git checkout tags/v3.0.0-preview5
           mkdir build && cd build
           cmake ../
           sudo make install
