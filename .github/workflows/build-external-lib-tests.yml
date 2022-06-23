@@ -17,7 +17,7 @@ jobs:
           python-version: "3.8"
 
       - name: Setup conda
-        run: conda create -n CI -y
+        run: conda create -n CI -y && conda activate CI
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -42,13 +42,13 @@ jobs:
           sudo make install
 
       - name: Install Eigen
-        run: conda install -c conda-forge eigen
+        run: conda install -c conda-forge -y eigen
 
       - name: Install Catch2
-        run: conda install -c conda-forge catch2
+        run: conda install -c conda-forge -y catch2
 
       - name: Install Pybind11
-        run: conda install -c conda-forge pybind11
+        run: conda install -c conda-forge -y pybind11
 
       - name: Configure MParT
         run: |
