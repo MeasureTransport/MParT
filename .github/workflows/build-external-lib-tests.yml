@@ -44,12 +44,14 @@ jobs:
         run: conda install -c conda-forge -y eigen catch2 pybind11
 
       - name: Configure MParT
+        shell: bash -l {0}
         run: |
           cd $GITHUB_WORKSPACE/mpart
           mkdir build && cd build
-          cmake -DCMAKE_PREFIX_PATH=/usr/share/miniconda/envs/test/share ../
+          cmake ../
 
       - name: Build MParT
+        shell: bash -l {0}
         run: cd $GITHUB_WORKSPACE/mpart/build; make
 
       - name: Run Tests
