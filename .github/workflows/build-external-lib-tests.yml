@@ -17,7 +17,7 @@ jobs:
           python-version: "3.8"
           activate-environment: "test"
 
-      - name: Checkout
+      - name: Checkout MParT
         uses: actions/checkout@v3
         with:
           path: mpart
@@ -39,14 +39,9 @@ jobs:
                 ../
           sudo make install
 
-      - name: Install Eigen
-        run: conda install -c conda-forge -y eigen
-
-      - name: Install Catch2
-        run: conda install -c conda-forge -y catch2
-
-      - name: Install Pybind11
-        run: conda install -c conda-forge -y pybind11
+      - name: Install Eigen, Catch2, Pybind11
+        shell: bash -l {0}
+        run: conda install -c conda-forge -y eigen catch2 pybind11
 
       - name: Configure MParT
         run: |
