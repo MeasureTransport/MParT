@@ -46,7 +46,7 @@ find_package(Kokkos QUIET)
 if(NOT Kokkos_FOUND)
     message(STATUS "Could not find Kokkos.  Using internal build.")
     UpdateGitSubmodule(kokkos)
-    add_subdirectory(external/kokkos)   
+    add_subdirectory(external/kokkos)
 else()
     message(STATUS "Found Kokkos!")
 endif()
@@ -120,19 +120,11 @@ endif()
 # Testing
 
 # Install Catch2
-find_package(Catch2 3 QUIET)
+find_package(Catch2 QUIET)
 if(NOT Catch2_FOUND)
-    Include(FetchContent)
-
-    FetchContent_Declare(
-        Catch2
-        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG        v3.0.0-preview3
-    )
-
-    FetchContent_MakeAvailable(Catch2)
-    message(STATUS "Catch 2 source:${catch2_SOURCE_DIR}")
-    list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+    UpdateGitSubmodule(catch2)
+    PinSubmoduleVersion(catch2 v3.0.0-preview3)
+    add_subdirectory(external/catch2)
 endif()
 
 # Define test sources
@@ -144,7 +136,7 @@ add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
 target_link_libraries(PrintKokkosInfo Kokkos::kokkos)
 
 ##############################################################
-# Installation 
+# Installation
 install(TARGETS mpart
         EXPORT MParTTargets
         DESTINATION lib)

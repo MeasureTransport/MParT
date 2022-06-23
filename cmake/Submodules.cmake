@@ -15,3 +15,13 @@ function(UpdateGitSubmodule subfolder)
     endif()
 
 endfunction(UpdateGitSubmodule)
+
+function(PinSubmoduleVersion subfolder version)
+    message(STATUS "Pinning GIT Submodule ${subfolder} to version ${version}")
+
+    find_package(Git QUIET)
+    if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+        message(STATUS "Submodule update")
+        execute_process(COMMAND ${GIT_EXECUTABLE} -C ${CMAKE_CURRENT_SOURCE_DIR}/external/${subfolder} checkout tags/${version})
+    endif()
+endfunction()
