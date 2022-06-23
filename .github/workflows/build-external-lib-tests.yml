@@ -10,12 +10,25 @@ jobs:
   build-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Clone Kokkos, Eigen, Catch2
+      - name: Checkout Kokkos
+        uses: actions/checkout@v1
+        with:
+          repository: kokkos/kokkos
+          path: kokkos
+
+      - name: Checkout Catch2
+        uses: actions/checkout@v1
+        with:
+          repository: catchorg/Catch2
+          path: catch2
+
+      - name: Checkout Eigen
+        uses: actions/checkout@v1
         run: |
-          cd ${{ github.workspace }}/..
-          git clone git@github.com:kokkos/kokkos.git
+          echo ${{ github.workspace }}
+          ls
+          cd ${{ github.workspace }}
           git clone git@gitlab.com:libeigen/eigen.git
-          git clone git@github.com:catchorg/Catch2.git
 
       - name: Install Kokkos
         run: |
@@ -34,6 +47,7 @@ jobs:
       - name: Install Catch2
         run: |
           cd ${{ github.workspace }}/../Catch2
+          git checkout tags/v3.0.0-preview5
           mkdir build && cd build
           cmake ../
           sudo make install
