@@ -38,6 +38,7 @@ jobs:
         with:
           repository: pybind/pybind11.git
           path: pybind11
+          ref: master
 
       - name: Install Kokkos
         run: |
