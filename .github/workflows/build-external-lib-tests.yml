@@ -16,9 +16,6 @@ jobs:
           auto-update-conda: true
           python-version: "3.8"
 
-      - name: Setup conda
-        run: conda create -n CI -y && conda activate CI
-
       - name: Checkout
         uses: actions/checkout@v3
         with:
