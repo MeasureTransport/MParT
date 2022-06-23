@@ -47,7 +47,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/mpart
           mkdir build && cd build
-          cmake -DCMAKE_PREFIX_PATH=/usr/share/miniconda/env/test ../
+          cmake -DCMAKE_PREFIX_PATH=/usr/share/miniconda/envs/test/share ../
 
       - name: Build MParT
         run: cd $GITHUB_WORKSPACE/mpart/build; make
