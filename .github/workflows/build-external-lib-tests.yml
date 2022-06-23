@@ -10,7 +10,10 @@ jobs:
   build-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: main
 
       - name: Checkout Kokkos
         uses: actions/checkout@v3
@@ -25,38 +28,32 @@ jobs:
           path: catch2
 
       - name: Checkout Eigen
-        run: |
-          echo ${{ github.workspace }}
-          ls
-          cd ${{ github.workspace }}
-          git clone git@gitlab.com:libeigen/eigen.git
+        uses: actions/checkout@v3
+        with:
+          repository: live-clones/eigen
+          path: eigen
 
       - name: Install Kokkos
         run: |
-          cd ${{ github.workspace }}/../kokkos
+          cd $GITHUB_WORKSPACE/kokkos
           mkdir build && cd build
           cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON ../
           sudo make install
 
       - name: Install Eigen
         run: |
-          cd ${{ github.workspace }}/../eigen
+          cd $GITHUB_WORKSPACE/eigen
           mkdir build && cd build
           cmake ../
           sudo make install
 
       - name: Install Catch2
         run: |
-          cd ${{ github.workspace }}/../Catch2
+          cd $GITHUB_WORKSPACE/catch2
           git checkout tags/v3.0.0-preview5
           mkdir build && cd build
           cmake ../
           sudo make install
-
-      - name: Checkout
-        uses: actions/checkout@v1
-        with:
-          submodules: recursive
 
       - name: Configure MParT
         run: |
