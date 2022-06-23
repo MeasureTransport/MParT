@@ -10,10 +10,6 @@ jobs:
   build-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Python 3.8
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.8
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -26,43 +22,58 @@ jobs:
           repository: kokkos/kokkos
           path: kokkos
 
-      # - name: Checkout Catch2
-      #   uses: actions/checkout@v3
-      #   with:
-      #     repository: catchorg/Catch2
-      #     path: catch2
+      - name: Checkout Catch2
+        uses: actions/checkout@v3
+        with:
+          repository: catchorg/Catch2
+          path: catch2
 
-      # - name: Checkout Eigen
-      #   uses: actions/checkout@v3
-      #   with:
-      #     repository: live-clones/eigen
-      #     path: eigen
+      - name: Checkout Eigen
+        uses: actions/checkout@v3
+        with:
+          repository: live-clones/eigen
+          path: eigen
 
-      # - name: Checkout Pybind11
-      #   uses: actions/checkout@v3
-      #   with:
-      #     repository: pybind/pybind11.git
-      #     path: pybind11
-      #     ref: master
+      - name: Checkout Pybind11
+        uses: actions/checkout@v3
+        with:
+          repository: pybind/pybind11.git
+          path: pybind11
+          ref: master
 
       - name: Install Kokkos
         run: |
           cd $GITHUB_WORKSPACE/kokkos
           mkdir build && cd build
           cmake -DKokkos_ENABLE_PTHREAD=ON \
+                -DBUILD_SHARED_LIBS=ON     \
                 -DKokkos_ENABLE_SERIAL=ON  \
                 -DKokkos_CXX_STANDARD=17   \
                 ../
           sudo make install
 
       - name: Install Eigen
-        run: $CONDA/bin/conda install -c conda-forge eigen
+        run: |
+          cd $GITHUB_WORKSPACE/eigen
+          mkdir build && cd build
+          cmake ../
+          sudo make install
 
       - name: Install Catch2
-        run: $CONDA/bin/conda install -c conda-forge catch2
+        run: |
+          cd $GITHUB_WORKSPACE/catch2
+          git fetch --all --tags
+          git checkout tags/v3.0.0-preview5
+          mkdir build && cd build
+          cmake ../
+          sudo make install
 
       - name: Install Pybind11
-        run: $CONDA/bin/conda install -c conda-forge pybind11
+        run: |
+          cd $GITHUB_WORKSPACE/pybind11
+          mkdir build && cd build
+          cmake ../
+          sudo make install
 
       - name: Configure MParT
         run: |
