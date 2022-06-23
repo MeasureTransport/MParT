@@ -1,6 +1,6 @@
 .. _api:
 
-API Reference 
+API Reference
 ==============
 
 .. toctree::
@@ -8,6 +8,7 @@ API Reference
    :maxdepth: 2
 
    mapfactory
+   conditionalmapbase
    templateconcepts
    multiindex
    quadrature
