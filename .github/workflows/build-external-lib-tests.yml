@@ -3,13 +3,21 @@ name: external-lib-tests
 on:
   push:
     branches:
-      - main
+      - dannys4/issue50
   pull_request: {}
 
 jobs:
   build-tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Use Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: "3.8"
+
+      - name: Setup conda
+        run: conda create -n CI -y
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -21,25 +29,6 @@ jobs:
         with:
           repository: kokkos/kokkos
           path: kokkos
-
-      - name: Checkout Catch2
-        uses: actions/checkout@v3
-        with:
-          repository: catchorg/Catch2
-          path: catch2
-
-      - name: Checkout Eigen
-        uses: actions/checkout@v3
-        with:
-          repository: live-clones/eigen
-          path: eigen
-
-      - name: Checkout Pybind11
-        uses: actions/checkout@v3
-        with:
-          repository: pybind/pybind11.git
-          path: pybind11
-          ref: master
 
       - name: Install Kokkos
         run: |
@@ -53,27 +42,13 @@ jobs:
           sudo make install
 
       - name: Install Eigen
-        run: |
-          cd $GITHUB_WORKSPACE/eigen
-          mkdir build && cd build
-          cmake ../
-          sudo make install
+        run: conda install -c conda-forge eigen
 
       - name: Install Catch2
-        run: |
-          cd $GITHUB_WORKSPACE/catch2
-          git fetch --all --tags
-          git checkout tags/v3.0.0-preview5
-          mkdir build && cd build
-          cmake ../
-          sudo make install
+        run: conda install -c conda-forge catch2
 
       - name: Install Pybind11
-        run: |
-          cd $GITHUB_WORKSPACE/pybind11
-          mkdir build && cd build
-          cmake ../
-          sudo make install
+        run: conda install -c conda-forge pybind11
 
       - name: Configure MParT
         run: |
