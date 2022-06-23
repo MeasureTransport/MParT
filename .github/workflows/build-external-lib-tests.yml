@@ -44,7 +44,10 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/kokkos
           mkdir build && cd build
-          cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON ../
+          cmake -DKokkos_ENABLE_PTHREAD=ON \
+                -DKokkos_ENABLE_SERIAL=ON  \
+                -DKokkos_CXX_STANDARD=17   \
+                ../
           sudo make install
 
       - name: Install Eigen
@@ -76,7 +79,7 @@ jobs:
           mkdir build && cd build
           cmake ../
 
-      - name: Build
+      - name: Build MParT
         run: cd $GITHUB_WORKSPACE/mpart/build; make
 
       - name: Run Tests
