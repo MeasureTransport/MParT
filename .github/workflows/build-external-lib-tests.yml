@@ -26,7 +26,6 @@ jobs:
         with:
           repository: catchorg/Catch2
           path: catch2
-          ref: tags/
 
       - name: Checkout Eigen
         uses: actions/checkout@v3
