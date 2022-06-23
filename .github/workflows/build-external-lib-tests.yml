@@ -60,6 +60,7 @@ jobs:
           mkdir build && cd build
           cmake ../
           sudo make install
+
       - name: Install Pybind11
         run: |
           cd $GITHUB_WORKSPACE/pybind11
@@ -70,15 +71,14 @@ jobs:
       - name: Configure MParT
         run: |
           cd $GITHUB_WORKSPACE/mpart
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake ../
 
       - name: Build
-        run: cd build; make
+        run: cd $GITHUB_WORKSPACE/mpart/build; make
 
       - name: Run Tests
-        run: cd build; ./RunTests --kokkos-cores=2 --reporter junit -o test-results.xml
+        run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests --kokkos-cores=2 --reporter junit -o test-results.xml
 
       # - name: Publish Unit Test Results
       #   uses: EnricoMi/publish-unit-test-result-action@v1
