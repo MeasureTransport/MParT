@@ -13,7 +13,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          path: main
+          path: mpart
 
       - name: Checkout Kokkos
         uses: actions/checkout@v3
@@ -58,7 +58,7 @@ jobs:
 
       - name: Configure MParT
         run: |
-          cd ${{ github.workspace }}
+          cd $GITHUB_WORKSPACE/mpart
           mkdir build
           cd build
           cmake ../
