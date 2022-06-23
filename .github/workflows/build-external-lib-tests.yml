@@ -15,6 +15,7 @@ jobs:
         with:
           auto-update-conda: true
           python-version: "3.8"
+          activate-environment: "test"
 
       - name: Checkout
         uses: actions/checkout@v3
@@ -51,7 +52,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/mpart
           mkdir build && cd build
-          cmake ../
+          cmake -DCMAKE_PREFIX_PATH=/usr/share/miniconda/env/test ../
 
       - name: Build MParT
         run: cd $GITHUB_WORKSPACE/mpart/build; make
