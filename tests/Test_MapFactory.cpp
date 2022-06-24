@@ -21,6 +21,7 @@ TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
     FixedMultiIndexSet mset(dim,maxDegree);
 
     std::shared_ptr<ConditionalMapBase> map = MapFactory::CreateComponent(mset, options);
+    REQUIRE(map!=nullptr);
 
     unsigned int numPts = 100;
     Kokkos::View<double**,Kokkos::HostSpace> pts("Points", dim, numPts);
@@ -28,5 +29,16 @@ TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
         pts(dim-1,i) = double(i)/double(numPts-1);
 
     Kokkos::View<double**, Kokkos::HostSpace> eval = map->Evaluate(pts);
+}
+
+TEST_CASE( "Testing factory method for triangular map", "[MapFactoryTriangular]" ) {
+
+    MapOptions options;
+    options.basisType = BasisTypes::ProbabilistHermite;
+
+
+    std::shared_ptr<ConditionalMapBase> map = MapFactory::CreateTriangular(4,3,5, options);
+
+    REQUIRE(map != nullptr);
 }
 
