@@ -24,11 +24,14 @@ void ConditionalMapBase::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coef
 
     // If coefficients already exist, make sure the sizes match
     if(this->savedCoeffs.is_allocated()){
-        if(coeffs.size() != this->savedCoeffs.size()){
+        if(coeffs.size() != numCoeffs){
             std::stringstream msg;
-            msg << "Error in ConditionalMapBase::SetCoeffs.  Current coefficient vector has size " << this->savedCoeffs.size() << ", but new coefficients have size " << coeffs.size() << ".";
+            msg << "Error in ConditionalMapBase::SetCoeffs.  Expectd coefficient vector with size " << numCoeffs << ", but new coefficients have size " << coeffs.size() << ".";
             throw std::invalid_argument(msg.str());
         }
+
+        if(this->savedCoeffs.size() != numCoeffs)
+            Kokkos::resize(this->savedCoeffs, numCoeffs);
     }else{
         
         this->savedCoeffs = Kokkos::View<double*, Kokkos::HostSpace>("ConditionalMapBase Coefficients", coeffs.size());

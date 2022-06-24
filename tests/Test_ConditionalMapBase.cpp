@@ -8,7 +8,7 @@ using namespace Catch;
 
  class MyIdentityMap : public ConditionalMapBase{
 public:
-    MyIdentityMap(unsigned int dim) : ConditionalMapBase(dim,dim,0){};
+    MyIdentityMap(unsigned int dim, unsigned int numCoeffs) : ConditionalMapBase(dim,dim,numCoeffs){};
     
     virtual ~MyIdentityMap() = default;
 
@@ -29,13 +29,14 @@ public:
 
 TEST_CASE( "Testing coefficient functions of conditional map base class", "[ConditionalMapBaseCoeffs]" ) {
 
-    MyIdentityMap map(4);
+    unsigned int numCoeffs = 10;
+    MyIdentityMap map(4,numCoeffs);
+    
     CHECK(map.inputDim == 4);
     CHECK(map.outputDim == 4);
 
     SECTION("Using Kokkos"){
     
-        unsigned int numCoeffs = 10;
         Kokkos::View<double*, Kokkos::HostSpace> coeffs("New Coeffs", numCoeffs);
         for(unsigned int i=0; i<numCoeffs; ++i)
             coeffs(i) = i;
@@ -69,7 +70,6 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
 
     SECTION("Using Eigen"){
 
-        unsigned int numCoeffs = 10;
         Eigen::VectorXd coeffs(numCoeffs);
         for(unsigned int i=0; i<numCoeffs; ++i)
             coeffs(i) = i;
@@ -106,7 +106,7 @@ TEST_CASE( "Testing evaluation of an identity conditional map", "[ConditionalMap
 
     unsigned int dim = 4;
     unsigned int numPts = 100;
-    MyIdentityMap map(dim);
+    MyIdentityMap map(dim,0);
     CHECK(map.inputDim == dim);
     CHECK(map.outputDim == dim);
 
@@ -165,7 +165,7 @@ TEST_CASE( "Testing inverse evaluation of an identity conditional map", "[Condit
 
     unsigned int dim = 4;
     unsigned int numPts = 100;
-    MyIdentityMap map(dim);
+    MyIdentityMap map(dim,0);
     CHECK(map.inputDim == dim);
     CHECK(map.outputDim == dim);
 
