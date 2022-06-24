@@ -55,6 +55,7 @@ jobs:
         run: cd $GITHUB_WORKSPACE/mpart/build; make
 
       - name: Run Tests
+        shell: bash -l {0}
         run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests --kokkos-cores=2 --reporter junit -o test-results-external.xml
 
       - name: Publish Unit Test Results
