@@ -7,7 +7,7 @@
 #include "MParT/Utilities/ArrayConversions.h"
 #include <pybind11/stl.h>
 #include <pybind11/eigen.h>
-
+#include <pybind11/iostream.h>
 #include <Kokkos_Core.hpp>
 
 #include <pybind11/pybind11.h>
@@ -20,14 +20,18 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
     // MultiIndex
     py::class_<MultiIndex, KokkosCustomPointer<MultiIndex>>(m, "MultiIndex")
         .def(py::init<>())
+        .def(py::init<unsigned int>())
         .def(py::init<unsigned int, unsigned int>())
         .def(py::init<std::vector<unsigned int> const&>())
-
+        
+        .def("tolist",&MultiIndex::Vector)
         .def("sum", &MultiIndex::Sum)
         .def("max", &MultiIndex::Max)
-        .def("count_nonzero", &MultiIndex::NumNz)
+        
         .def("__setitem__", &MultiIndex::Set)
         .def("__getitem__", &MultiIndex::Get)
+        .def("count_nonzero", &MultiIndex::NumNz)
+
         .def("__str__", &MultiIndex::String)
         .def("__repl__",&MultiIndex::String)
         .def("__len__", &MultiIndex::Length)
@@ -38,14 +42,14 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("__le__", &MultiIndex::operator<=)
         .def("__ge__", &MultiIndex::operator>=);
         
-    // ==========================================================================================================
+    
     // MultiIndexSet
     py::class_<MultiIndexSet, KokkosCustomPointer<MultiIndexSet>>(m, "MultiIndexSet")
         .def(py::init<const unsigned int>())
         .def(py::init<Eigen::Ref<const Eigen::MatrixXi> const&>())
         .def("fix", &MultiIndexSet::Fix)
         .def("__len__", &MultiIndexSet::Length)
-        .def("access", &MultiIndexSet::operator[])
+        .def("__setitem__", &MultiIndexSet::operator[])
         .def("at", &MultiIndexSet::at)
         .def("Size", &MultiIndexSet::Size)
         
@@ -55,10 +59,21 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("IndexToMulti",&MultiIndexSet::IndexToMulti)
         .def("MultiToIndex", &MultiIndexSet::MultiToIndex)
         .def("MaxOrders", &MultiIndexSet::MaxOrders)
-        //.def("Expand", &MultiIndexSet::Expand)
-        //.def("append", &MultiIndexSet::operator+=)
-        //.def("Activate", &MultiIndexSet::Activate)
-        .def("AddActivate", &MultiIndexSet::AddActive)
+        .def("Expand", py::overload_cast<unsigned int>(&MultiIndexSet::Expand))
+        .def("append", py::overload_cast<MultiIndex const&>(&MultiIndexSet::operator+=))
+        .def("Activate", py::overload_cast<MultiIndex const&>(&MultiIndexSet::Activate))
+        .def("AddActive", &MultiIndexSet::AddActive)
+        .def("Frontier", &MultiIndexSet::Frontier)
+        .def("Margin", &MultiIndexSet::Margin)
+        .def("ReducedMargin", &MultiIndexSet::ReducedMargin)
+        .def("StrictFrontier", &MultiIndexSet::StrictFrontier)
+        //.def("BackwardNeighbors", py::overload_cast<unsigned int>(&MultiIndexSet::BackwardNeighbors))
+        //.def("IsAdmissible", &MultiIndexSet::IsAdmissible)
+        .def("IsExpandable", &MultiIndexSet::IsExpandable)
+        //.def("IsActive", &MultiIndexSet::IsActive)
+        .def("NumActiveForward", &MultiIndexSet::NumActiveForward)
+        .def("NumForward", &MultiIndexSet::NumForward)
+        //.def("Visualize", &MultiIndexSet::Visualize)
         ;
 
     //==========================================================================================================
