@@ -67,11 +67,14 @@ jobs:
         run: cd $GITHUB_WORKSPACE/mpart/build; make
 
       - name: Run Tests
-        run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests --kokkos-cores=2 --reporter junit -o test-results-external.xml
+        shell: bash -l {0}
+        run: |
+          cd $GITHUB_WORKSPACE/mpart/build
+          ./RunTests --kokkos-cores=2 --reporter junit -o test-results-external.xml
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
         if: always()
         with:
           check_name: "Test Results with Externally Built Libraries"
-          files: $GITHUB_WORKSPACE/mpart/build/test-results-external.xml
+          files: ${{ github.workspace }}/mpart/build/test-results-external.xml
