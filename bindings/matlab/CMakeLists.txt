@@ -2,6 +2,7 @@
 
 include_directories(include)
 include_directories(external)
+include_directories(external/mexplus)
 
 set(MEX_SOURCE 
     src/KokkosUtilities_mex.cpp
