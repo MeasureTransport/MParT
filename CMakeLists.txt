@@ -54,16 +54,22 @@ endif()
 # Add Eigen
 find_package(Eigen3 QUIET)
 if(NOT Eigen3_FOUND)
+    message(STATUS "Could not find Eigen.  Using internal build.")
     UpdateGitSubmodule(eigen)
     add_subdirectory(external/eigen)
+else()
+  message(STATUS "Found Eigen!")
 endif()
 
 # Add pybind11 if necessary
 if(MPART_PYTHON)
   find_package(pybind11 CONFIG QUIET)
   if(NOT pybind11_FOUND)
+    message(STATUS "Could not find pybind11. Using internal build.")
     UpdateGitSubmodule(pybind11)
     add_subdirectory(external/pybind11)
+  else()
+    message(STATUS "Found pybind11!")
   endif()
 endif()
 
@@ -122,9 +128,12 @@ endif()
 # Install Catch2
 find_package(Catch2 QUIET)
 if(NOT Catch2_FOUND)
+    message(STATUS "Could not find Catch2.  Using internal build.")
     UpdateGitSubmodule(catch2)
     PinSubmoduleVersion(catch2 v3.0.0-preview3)
     add_subdirectory(external/catch2)
+else()
+    message(STATUS "Found Catch2!")
 endif()
 
 # Define test sources
