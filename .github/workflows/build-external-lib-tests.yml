@@ -55,10 +55,11 @@ jobs:
         run: cd $GITHUB_WORKSPACE/mpart/build; make
 
       - name: Run Tests
-        run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests --kokkos-cores=2 --reporter junit -o test-results.xml
+        run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests --kokkos-cores=2 --reporter junit -o test-results-external.xml
 
-      # - name: Publish Unit Test Results
-      #   uses: EnricoMi/publish-unit-test-result-action@v1
-      #   if: always()
-      #   with:
-      #     files: build/test-results.xml
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          check_name: "Test Results with Externally Built Libraries"
+          files: build/test-results-external.xml
