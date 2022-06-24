@@ -8,7 +8,7 @@ using namespace Catch;
 
  class MyIdentityMap : public ConditionalMapBase{
 public:
-    MyIdentityMap(unsigned int dim) : ConditionalMapBase(dim,dim){};
+    MyIdentityMap(unsigned int dim) : ConditionalMapBase(dim,dim,0){};
     
     virtual ~MyIdentityMap() = default;
 

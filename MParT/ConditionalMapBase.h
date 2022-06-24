@@ -32,7 +32,7 @@ namespace mpart {
          @param inDim The dimension \f$N\f$ of the input to this map. 
          @param outDim The dimension \f$M\f$ of the output from this map.
          */
-        ConditionalMapBase(unsigned int inDim, unsigned int outDim) : inputDim(inDim), outputDim(outDim){};
+        ConditionalMapBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs) : inputDim(inDim), outputDim(outDim), numCoeffs(nCoeffs){};
 
         virtual ~ConditionalMapBase() = default;
 
@@ -105,8 +105,9 @@ namespace mpart {
                                  Kokkos::View<double**, Kokkos::HostSpace>            & output) = 0;
 
 
-        const unsigned int inputDim; // The total dimension of the input N+M
-        const unsigned int outputDim; // The output dimension M
+        const unsigned int inputDim; /// The total dimension of the input N+M
+        const unsigned int outputDim; /// The output dimension M
+        const unsigned int numCoeffs; /// The number of coefficients used to parameterize this map.
 
     protected:
 
