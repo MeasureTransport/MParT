@@ -31,15 +31,15 @@ jobs:
           path: $GITHUB_WORKSPACE/KOKKOS_INSTALL
           key: ${{ runner.os }}-${{ env.cache-name }}
 
-      - if: ${{ steps.cache-kokkos.outputs.cache-hit == 'false' }}
-        name: Checkout Kokkos
+      - name: Checkout Kokkos
+        if: steps.cache-kokkos.outputs.cache-hit != 'true'
         uses: actions/checkout@v3
         with:
           repository: kokkos/kokkos
           path: kokkos
 
-      - if: ${{ steps.cache-kokkos.outputs.cache-hit == 'false' }}
-        name: Install Kokkos
+      - name: Install Kokkos
+        if: steps.cache-kokkos.outputs.cache-hit != 'true'
         run: |
           cd $GITHUB_WORKSPACE/kokkos
           mkdir build && cd build
