@@ -6,7 +6,7 @@ using namespace mpart;
 using namespace Catch;
 
 
- class MyIdentityMap : public ConditionalMapBase{
+class MyIdentityMap : public ConditionalMapBase{
 public:
     MyIdentityMap(unsigned int dim, unsigned int numCoeffs) : ConditionalMapBase(dim,dim,numCoeffs){};
     

@@ -68,7 +68,7 @@ Kokkos::View<double**, Kokkos::HostSpace> ConditionalMapBase::Inverse(Kokkos::Vi
         throw std::invalid_argument(msg.str());
     }
     
-    Kokkos::View<double**, Kokkos::HostSpace> output("Map Inverse Evaluations", inputDim, r.extent(1));
+    Kokkos::View<double**, Kokkos::HostSpace> output("Map Inverse Evaluations", outputDim, r.extent(1));
     InverseImpl(x1,r, output);
     return output;
 }

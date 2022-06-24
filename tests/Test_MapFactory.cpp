@@ -14,7 +14,7 @@ using namespace Catch;
 TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
 
     MapOptions options;
-    options.polyType = PolyTypes::ProbabilistHermite;
+    options.basisType = BasisTypes::ProbabilistHermite;
 
     unsigned int dim = 3;
     unsigned int maxDegree = 5;

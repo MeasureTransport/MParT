@@ -12,9 +12,9 @@ TriangularMap::TriangularMap(std::vector<std::shared_ptr<ConditionalMapBase>> co
 
     // Check the sizes of all the inputs 
     for(unsigned int i=0; i<comps_.size(); ++i){
-        if(comps_.at(i)->outputDim < comps_.at(i)->inputDim){
+        if(comps_.at(i)->outputDim > comps_.at(i)->inputDim){
             std::stringstream msg;
-            msg << "In TriangularMap constructor, the output dimension (" << comps_.at(i)->outputDim << ") of component " << i << " is less than the input dimension (" << comps_.at(i)->inputDim << ").";
+            msg << "In TriangularMap constructor, the output dimension (" << comps_.at(i)->outputDim << ") of component " << i << " is greater than the input dimension (" << comps_.at(i)->inputDim << ").";
             throw std::invalid_argument(msg.str());
         }
     }
@@ -81,7 +81,7 @@ void TriangularMap::EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace>
 
         subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
         subOut = Kokkos::subview(output, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
-        comps_.at(i)->EvaluateImpl(subPts, output);
+        comps_.at(i)->EvaluateImpl(subPts, subOut);
 
         startOutDim += comps_.at(i)->outputDim;
     }
