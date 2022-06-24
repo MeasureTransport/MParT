@@ -28,7 +28,7 @@ jobs:
         env:
           cache-name: cache-build-kokkos
         with:
-          path: $GITHUB_WORKSPACE/KOKKOS_INSTALL
+          path: ${{ github.workspace }}/KOKKOS_INSTALL
           key: ${{ runner.os }}-${{ env.cache-name }}
 
       - name: Checkout Kokkos
