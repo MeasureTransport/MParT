@@ -87,6 +87,10 @@ public:
                              Kokkos::View<const double**, Kokkos::HostSpace> const& r,
                              Kokkos::View<double**, Kokkos::HostSpace>            & output) override;
 
+
+    virtual void InverseInplace(Kokkos::View<double**, Kokkos::HostSpace> const& x1, 
+                                Kokkos::View<const double**, Kokkos::HostSpace> const& r);
+
 private:
 
     std::vector<std::shared_ptr<ConditionalMapBase>> comps_;
