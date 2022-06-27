@@ -119,10 +119,9 @@ void TriangularMap<MemorySpace>::InverseInplace(Kokkos::View<double**, MemorySpa
 
     int startOutDim = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
-
         subX = Kokkos::subview(x, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
         subR = Kokkos::subview(r, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
-        subOut = Kokkos::subview(x, std::make_pair(extraInputs + startOutDim,int(extraInputs+startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
+        subOut = Kokkos::subview(x, std::make_pair(int(extraInputs + startOutDim),int(extraInputs+startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
 
         comps_.at(i)->InverseImpl(subX, subR, subOut);
 
