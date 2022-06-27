@@ -13,11 +13,11 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
 {
     // CteateComponent
     //m.def("CreateComponent", &MapFactory::CreateComponent);
-    m.def("CreateComponent", [] (FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
+    m.def("CreateComponent", [] (FixedMultiIndexSet<Kokkos::HostSpace> const& mset,
                                  MapOptions options)
     {
-        return KokkosCustomPointer(MapFactory::CreateComponent(mset,options));
+        return KokkosCustomPointer(MapFactory::CreateComponent<Kokkos::HostSpace>(mset,options));
     });
-    
+
 
 }
