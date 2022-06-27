@@ -130,9 +130,7 @@ void TriangularMap<MemorySpace>::InverseInplace(Kokkos::View<double**, MemorySpa
 }
 
 // Explicit template instantiation
+template class mpart::TriangularMap<Kokkos::HostSpace>;
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
-    template class mpart::TriangularMap<Kokkos::HostSpace>;
     template class mpart::TriangularMap<Kokkos::DefaultExecutionSpace::memory_space>;
-#else
-    template class mpart::TriangularMap<Kokkos::HostSpace>;
 #endif

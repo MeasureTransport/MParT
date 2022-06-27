@@ -1,5 +1,6 @@
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/Utilities/ArrayConversions.h"
+#include "MParT/Utilities/Miscellaneous.h"
 
 using namespace mpart;
 

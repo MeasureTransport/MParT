@@ -2,6 +2,7 @@
 #define MPART_TRIANGULARMAP_H
 
 #include "MParT/ConditionalMapBase.h"
+#include "MParT/Utilities/Miscellaneous.h"
 
 #include <Eigen/Core>
 
