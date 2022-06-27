@@ -41,7 +41,7 @@ class MonotoneComponent : public ConditionalMapBase
 public:
 
     MonotoneComponent(ExpansionType  const& expansion,
-                      QuadratureType const& quad) : ConditionalMapBase(expansion.InputSize(), 1),
+                      QuadratureType const& quad) : ConditionalMapBase(expansion.InputSize(), 1, expansion.NumCoeffs()),
                                                     _expansion(expansion),
                                                     _quad(quad),
                                                     _dim(expansion.InputSize()){};
