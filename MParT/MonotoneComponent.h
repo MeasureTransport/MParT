@@ -69,7 +69,7 @@ public:
                                     Kokkos::View<double*, MemorySpace>             &output) override
     {
         // First, get the diagonal derivative
-        ContinuousDerivative<MemorySpace>(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, output);
+        ContinuousDerivative(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, output);
 
         // Now take the log
         for(unsigned int i=0; i<output.extent(0); ++i){

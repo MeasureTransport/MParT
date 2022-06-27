@@ -24,10 +24,10 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
         FixedMultiIndexSet mset(i+extraInputs+1,maxDegree);
         coeffSize += mset.Size();
 
-        blocks.at(i) = MapFactory::CreateComponent(mset, options);
+        blocks.at(i) = MapFactory::CreateComponent<MemorySpace>(mset, options);
     }
 
-    std::shared_ptr<ConditionalMapBase<MemorySpace>> triMap = std::make_shared<TriangularMap>(blocks);
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> triMap = std::make_shared<TriangularMap<MemorySpace>>(blocks);
 
     CHECK(triMap->outputDim == numBlocks);
     CHECK(triMap->inputDim == numBlocks+extraInputs);

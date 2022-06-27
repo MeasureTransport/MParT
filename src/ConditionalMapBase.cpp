@@ -101,9 +101,7 @@ Eigen::Map<Eigen::VectorXd> ConditionalMapBase<MemorySpace>::CoeffMap()
 // }
 
 // Explicit template instantiation
+template class mpart::ConditionalMapBase<Kokkos::HostSpace>;
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
-    template class mpart::ConditionalMapBase<Kokkos::HostSpace>;
     template class mpart::ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>;
-#else
-    template class mpart::ConditionalMapBase<Kokkos::HostSpace>;
 #endif
