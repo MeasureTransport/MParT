@@ -15,7 +15,7 @@ public:
     virtual void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts, 
                             Kokkos::View<double**, Kokkos::HostSpace>      &output) override{Kokkos::deep_copy(output,pts);};
     
-        virtual void LogDeterminantImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
+    virtual void LogDeterminantImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
                                     Kokkos::View<double*, Kokkos::HostSpace>             &output) override{ 
         for(unsigned int i=0; i<output.size(); ++i)
             output(i)=0.0;
@@ -78,7 +78,7 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
         map.CoeffMap() = coeffs;
         CHECK(map.Coeffs().extent(0) == numCoeffs);
 
-                for(unsigned int i=0; i<numCoeffs; ++i){
+        for(unsigned int i=0; i<numCoeffs; ++i){
             CHECK(map.Coeffs()(i) == coeffs(i));
             coeffs(i)++;
             CHECK(map.Coeffs()(i) != coeffs(i));
@@ -88,6 +88,13 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
         for(unsigned int i=0; i<numCoeffs; ++i){
             CHECK(map.Coeffs()(i) == coeffs(i));   
             coeffs(i)++;
+            CHECK(map.Coeffs()(i) != coeffs(i));   
+        }  
+
+        map.SetCoeffs(coeffs);
+        for(unsigned int i=0; i<numCoeffs; ++i){
+            CHECK(map.Coeffs()(i) == coeffs(i)); 
+            coeffs(i)++;  
             map.CoeffMap()(i)++;
             CHECK(map.Coeffs()(i) == coeffs(i));   
         }        

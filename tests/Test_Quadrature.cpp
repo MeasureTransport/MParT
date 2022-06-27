@@ -12,7 +12,7 @@ using namespace Catch;
 class TestIntegrand {
 public:
 
-    TestIntegrand(double shift=0) : shift_(shift){};
+    KOKKOS_FUNCTION TestIntegrand(double shift=0) : shift_(shift){};
 
     KOKKOS_INLINE_FUNCTION void operator()(double x, double* f) const{
         f[0] = exp(x) + shift_;

@@ -30,7 +30,7 @@ void ConditionalMapBase::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coef
             throw std::invalid_argument(msg.str());
         }
     }else{
-
+             
         this->savedCoeffs = Kokkos::View<double*, Kokkos::HostSpace>("ConditionalMapBase Coefficients", coeffs.size());
     }
 
