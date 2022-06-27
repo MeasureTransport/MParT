@@ -1,6 +1,7 @@
 #include "MParT/MapFactory.h"
 
 #include "MParT/MonotoneComponent.h"
+#include "MParT/TriangularMap.h"
 #include "MParT/Quadrature.h"
 #include "MParT/OrthogonalPolynomial.h"
 #include "MParT/MultivariateExpansion.h"
@@ -54,3 +55,22 @@ std::shared_ptr<ConditionalMapBase> mpart::MapFactory::CreateComponent(FixedMult
 
     return nullptr;
 } 
+
+
+std::shared_ptr<ConditionalMapBase> mpart::MapFactory::CreateTriangular(unsigned int inputDim, 
+                                                                         unsigned int outputDim,
+                                                                         unsigned int totalOrder,
+                                                                         MapOptions options)
+{
+
+    std::vector<std::shared_ptr<ConditionalMapBase>> comps(outputDim);
+
+    unsigned int extraInputs = inputDim - outputDim;
+
+    for(unsigned int i=0; i<outputDim; ++i){
+        FixedMultiIndexSet mset(i+extraInputs+1, totalOrder);
+        comps.at(i) = CreateComponent(mset, options);
+    }
+
+    return std::make_shared<TriangularMap>(comps);
+}

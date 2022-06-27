@@ -8,18 +8,22 @@
 
 namespace mpart {
 
+    class TriangularMap;
+
     /**
-     * @brief Provides an abstract base class for conditional transport maps where the input dimension might be larger than output dimension.
+     @brief Provides an abstract base class for conditional transport maps where the input dimension might be larger than output dimension.
     
      @details 
       This class provides an interface for functions \f$T:\mathbb{R}^{N+M}\rightarrow \mathbb{R}^M\f$, where $N\geq 0$. Let 
       \f$x_1\in \mathbb{R}^N\f$ denote the first block of inputs and \f$x_2\in\mathbb{R}^M\f$ denote the second block of inputs.
-      Let $r\in\mathbb{R}^M\f$ denote the map output, \f$r=T(x_2; x_1)\f$.  The conditional maps implemented by children of this 
+      Let \f$r\in\mathbb{R}^M\f$ denote the map output, \f$r=T(x_2; x_1)\f$.  The conditional maps implemented by children of this 
       class guarantee that for fixed \f$x_1\f$, the conditional mapping from \f$x_1 \rightarrow r\f$ is invertible and the 
-      Jacobian matrix with respect to \f$x_2\f$, \f$\nabla_{x_2} T\f$\, is positive definite.
+      Jacobian matrix with respect to \f$x_2\f$, \f$\nabla_{x_2} T\f$, is positive definite.
      */
     class ConditionalMapBase {
     
+        friend class TriangularMap;
+
     public:
 
         /**
@@ -28,7 +32,7 @@ namespace mpart {
          @param inDim The dimension \f$N\f$ of the input to this map. 
          @param outDim The dimension \f$M\f$ of the output from this map.
          */
-        ConditionalMapBase(unsigned int inDim, unsigned int outDim) : inputDim(inDim), outputDim(outDim){};
+        ConditionalMapBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs) : inputDim(inDim), outputDim(outDim), numCoeffs(nCoeffs){};
 
         virtual ~ConditionalMapBase() = default;
 
@@ -103,8 +107,9 @@ namespace mpart {
 // PB changes:
 
 
-        const unsigned int inputDim; // The total dimension of the input N+M
-        const unsigned int outputDim; // The output dimension M
+        const unsigned int inputDim; /// The total dimension of the input N+M
+        const unsigned int outputDim; /// The output dimension M
+        const unsigned int numCoeffs; /// The number of coefficients used to parameterize this map.
 
     protected:
 
