@@ -1,0 +1,485 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Triangular Map &#8212; MParT  documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Monotone Component" href="monotonecomponent.html" />
+    <link rel="prev" title="Conditional Map Base" href="conditionalmapbase.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
+
+    
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
+
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">MParT  documentation</p>
+  
+</a>
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="fas fa-bars"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_started/index.html">
+  Getting Started
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../tutorials/index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../development/index.html">
+  Development
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/MeasureTransport/MParT" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
+          
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="mapfactory.html">
+   Map Factory
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="conditionalmapbase.html">
+   Conditional Map Base
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Triangular Map
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="monotonecomponent.html">
+   Monotone Component
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="multiindex.html">
+   MultiIndices
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindex.html">
+     MultiIndex
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexset.html">
+     MultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/fixedmultiindexset.html">
+     FixedMultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexlimiter.html">
+     MultiIndexLimiter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="multiindices/multiindexneighborhood.html">
+     MultiIndexNeighborhood
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="quadrature.html">
+   Quadrature
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/clenshawcurtis.html">
+     Clenshaw Curtis Quadrature
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="quadrature/adaptivesimpson.html">
+     Adaptive Simpson Integration
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utilities/kokkoswrappers.html">
+   Kokkos Array Conversions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="multivariateexpansion.html">
+   Multivariate Expansion
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="templateconcepts.html">
+   Template Concepts
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="concepts/cachedparameterization.html">
+     Cached Parameterization Concept
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="multivariateexpansion.html">
+       Multivariate Expansion
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="tensorproductfunction.html">
+       Tensor Product Function
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="concepts/parameterizedfunction.html">
+     Parameterized Function Concept
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="monotonecomponent.html">
+       Monotone Component
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+  </div>
+</nav>
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
+
+          
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+    
+    <div class="toc-item">
+      
+
+<nav id="bd-toc-nav">
+    
+</nav>
+    </div>
+    
+    <div class="toc-item">
+      
+    </div>
+    
+  
+</div>
+
+
+          
+          
+          <div class="bd-content col-12 col-md-9 col-xl-7">
+              
+              <article class="bd-article" role="main">
+                
+  <section id="triangular-map">
+<h1>Triangular Map<a class="headerlink" href="#triangular-map" title="Permalink to this heading">#</a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMapE">
+<span id="_CPPv3N5mpart13TriangularMapE"></span><span id="_CPPv2N5mpart13TriangularMapE"></span><span id="mpart::TriangularMap"></span><span class="target" id="classmpart_1_1_triangular_map"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TriangularMap</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="conditionalmapbase.html#_CPPv4N5mpart18ConditionalMapBaseE" title="mpart::ConditionalMapBase"><span class="n"><span class="pre">ConditionalMapBase</span></span></a><a class="headerlink" href="#_CPPv4N5mpart13TriangularMapE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Provides a definition of block lower triangular transport maps. </p>
+<p>This class defines a map <span class="math notranslate nohighlight">\(T:\mathbb{R}^N\rightarrow \mathbb{R}^M\)</span> with the block triangular structure <div class="math notranslate nohighlight">
+\[\begin{split} T(x) = \left[\begin{array}{l} T_1(x_{1:N_1})\\ \vdots \\ T_k(x_{1:N_2})\\ \vdots T_K(x_{1:N}) \end{array} \right], \end{split}\]</div>
+ where each component <span class="math notranslate nohighlight">\(T_i(x_{1:N_i}):\mathbb{R}^{N_i}\rightarrow \mathbb{R}^{M_i}\)</span> is a function depending on the first <span class="math notranslate nohighlight">\(N_i\)</span> inputs and returning <span class="math notranslate nohighlight">\(M_i\)</span> outputs. Note that this function must be invertible in the last <span class="math notranslate nohighlight">\(M_i\)</span> input arguments. For example, it must be possible to solve <span class="math notranslate nohighlight">\(T_i(x_1:{N_i-M_i}, x_{N_i-M_i:N_i}) = r\)</span> for <span class="math notranslate nohighlight">\(x_{N_i-M_i:N_i}\)</span> given a vector <span class="math notranslate nohighlight">\(r\in\mathbb{R}^{M_i}\)</span> and previous components <span class="math notranslate nohighlight">\(x_1:{N_i-M_i}\)</span>.</p>
+<p>This block triangular form is analogous to a block triangular matrix where each <span class="math notranslate nohighlight">\(M_i\timesM_i\)</span> diagonal block is positive definite. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMap13TriangularMapERKNSt6vectorINSt10shared_ptrI18ConditionalMapBaseEEEE">
+<span id="_CPPv3N5mpart13TriangularMap13TriangularMapERKNSt6vectorINSt10shared_ptrI18ConditionalMapBaseEEEE"></span><span id="_CPPv2N5mpart13TriangularMap13TriangularMapERKNSt6vectorINSt10shared_ptrI18ConditionalMapBaseEEEE"></span><span id="mpart::TriangularMap::TriangularMap__std::vector:std::shared_ptr:ConditionalMapBase::CR"></span><span class="target" id="classmpart_1_1_triangular_map_1a75986a7a7de37548e8fef99da47ce47b"></span><span class="sig-name descname"><span class="n"><span class="pre">TriangularMap</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="conditionalmapbase.html#_CPPv4N5mpart18ConditionalMapBaseE" title="mpart::ConditionalMapBase"><span class="n"><span class="pre">ConditionalMapBase</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">components</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13TriangularMap13TriangularMapERKNSt6vectorINSt10shared_ptrI18ConditionalMapBaseEEEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a block triangular map from a collection of other <a class="reference internal" href="conditionalmapbase.html#classmpart_1_1_conditional_map_base"><span class="std std-ref">ConditionalMapBase</span></a> objects. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>components</strong> – A vector of <a class="reference internal" href="conditionalmapbase.html#classmpart_1_1_conditional_map_base"><span class="std std-ref">ConditionalMapBase</span></a> objects defining each <span class="math notranslate nohighlight">\(T_k\)</span><p>in the block triangular map.</p>
+<p>To maintain the correct block structure, the dimensions of the components must satisfy</p>
+<span class="math notranslate nohighlight">\(N_k = N_{k-1}+M_{k}\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMapD0Ev">
+<span id="_CPPv3N5mpart13TriangularMapD0Ev"></span><span id="_CPPv2N5mpart13TriangularMapD0Ev"></span><span id="mpart::TriangularMap::~TriangularMap"></span><span class="target" id="classmpart_1_1_triangular_map_1a9f9522756898c7e13915810665e0f8fc"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~TriangularMap</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5mpart13TriangularMapD0Ev" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMap9SetCoeffsEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE">
+<span id="_CPPv3N5mpart13TriangularMap9SetCoeffsEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE"></span><span id="_CPPv2N5mpart13TriangularMap9SetCoeffsEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE"></span><span id="mpart::TriangularMap::SetCoeffs__Kokkos::View:doubleP.Kokkos::HostSpace:"></span><span class="target" id="classmpart_1_1_triangular_map_1ae65a67016bf56f0f291c0e7241bc5acd"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCoeffs</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">coeffs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart13TriangularMap9SetCoeffsEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Sets the coefficients for all components of the map. </p>
+<p>This function will copy the provided coeffs vectors into the savedCoeffs object in the <a class="reference internal" href="#classmpart_1_1_triangular_map"><span class="std std-ref">TriangularMap</span></a> class. To avoid duplicating the coefficients, the savedCoeffs member variable for each component will then be set to a subview of this vector. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>coeffs</strong> – A vector containing coefficients for all components. If component <span class="math notranslate nohighlight">\(k\)</span> is defined by <span class="math notranslate nohighlight">\(C_k\)</span> coefficients, then this vector should have length <span class="math notranslate nohighlight">\(\sum_{k=1}^K C_i\)</span> and the coefficients for component <span class="math notranslate nohighlight">\(k\)</span> should start at index <span class="math notranslate nohighlight">\(\sum_{j=1}^{k-1} C_j\)</span>. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMap18LogDeterminantImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE">
+<span id="_CPPv3N5mpart13TriangularMap18LogDeterminantImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE"></span><span id="_CPPv2N5mpart13TriangularMap18LogDeterminantImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE"></span><span id="mpart::TriangularMap::LogDeterminantImpl__Kokkos::View:doubleCPP.Kokkos::HostSpace:CR.Kokkos::View:doubleP.Kokkos::HostSpace:R"></span><span class="target" id="classmpart_1_1_triangular_map_1a6f254e529e486eeac1fae49844461c1c"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LogDeterminantImpl</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart13TriangularMap18LogDeterminantImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Computes the log determinant of the Jacobian matrix of this map. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – The points where the jacobian should be evaluated. Should have <span class="math notranslate nohighlight">\(N\)</span> rows. Each column contains a single point. </p></li>
+<li><p><strong>output</strong> – A vector with length equal to the number of columns in pts containing the log determinant of the Jacobian. This vector should be correctly allocated and sized before calling this function. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMap12EvaluateImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEE">
+<span id="_CPPv3N5mpart13TriangularMap12EvaluateImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEE"></span><span id="_CPPv2N5mpart13TriangularMap12EvaluateImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEE"></span><span id="mpart::TriangularMap::EvaluateImpl__Kokkos::View:doubleCPP.Kokkos::HostSpace:CR.Kokkos::View:doublePP.Kokkos::HostSpace:R"></span><span class="target" id="classmpart_1_1_triangular_map_1aff3d88199fa82b6f033ac25b7048407c"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EvaluateImpl</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart13TriangularMap12EvaluateImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Evaluates the map. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – The points where the map should be evaluated. Should have <span class="math notranslate nohighlight">\(N\)</span> rows. Each column contains a single point. </p></li>
+<li><p><strong>output</strong> – A matrix with <span class="math notranslate nohighlight">\(M\)</span> rows to store the map output. Should have the same number of columns as pts and be allocated before calling this function. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMap11InverseImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEE">
+<span id="_CPPv3N5mpart13TriangularMap11InverseImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEE"></span><span id="_CPPv2N5mpart13TriangularMap11InverseImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEE"></span><span id="mpart::TriangularMap::InverseImpl__Kokkos::View:doubleCPP.Kokkos::HostSpace:CR.Kokkos::View:doubleCPP.Kokkos::HostSpace:CR.Kokkos::View:doublePP.Kokkos::HostSpace:R"></span><span class="target" id="classmpart_1_1_triangular_map_1ad58f7516755eb8bbab3a5f1fcf443a5c"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InverseImpl</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x1</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart13TriangularMap11InverseImplERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEERN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Evaluates the map inverse. </p>
+<p>To understand this function, consider splitting the map input <span class="math notranslate nohighlight">\(x_{1:N}\)</span> into two parts so that <span class="math notranslate nohighlight">\(x_{1:N} = [x_{1:N-M},x_{N-M+1:M}]\)</span>. Note that the second part of this split <span class="math notranslate nohighlight">\(x_{N-M+1:M}\)</span> has the same dimension as the map output. With this split, the map becomes <span class="math notranslate nohighlight">\(T(x_{1:N-M},x_{N-M+1:M})=r_{1:M}\)</span>. Given <span class="math notranslate nohighlight">\(x_{1:N-M}\)</span> and <span class="math notranslate nohighlight">\(r_{1:M}\)</span>, the <code class="docutils literal notranslate"><span class="pre">InverseImpl</span></code> function solves for the value of <span class="math notranslate nohighlight">\(x_{N-M+1:M}\)</span> that satisfies <span class="math notranslate nohighlight">\(T(x_{1:N-M},x_{N-M+1:M})=r_{1:M}\)</span>. Our shorthand for this will be <span class="math notranslate nohighlight">\(x_{N-M+1:M} = T^{-1}(r_{1:M}; x_{1:N-M})\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x1</strong> – The points <span class="math notranslate nohighlight">\(x_{1:N-M}\)</span> where the map inverse should be evaluated. Each column contains a single point. </p></li>
+<li><p><strong>r</strong> – The map output <span class="math notranslate nohighlight">\(r_{1:M}\)</span> to invert. </p></li>
+<li><p><strong>output</strong> – A matrix with <span class="math notranslate nohighlight">\(M\)</span> rows to store the computed map inverse <span class="math notranslate nohighlight">\(x_{N-M+1:M}\)</span>. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMap14InverseInplaceERKN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEE">
+<span id="_CPPv3N5mpart13TriangularMap14InverseInplaceERKN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEE"></span><span id="_CPPv2N5mpart13TriangularMap14InverseInplaceERKN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEE"></span><span id="mpart::TriangularMap::InverseInplace__Kokkos::View:doublePP.Kokkos::HostSpace:CR.Kokkos::View:doubleCPP.Kokkos::HostSpace:CR"></span><span class="target" id="classmpart_1_1_triangular_map_1a462c2b4d797c4f734323b1e677299cce"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InverseInplace</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x1</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart13TriangularMap14InverseInplaceERKN6Kokkos4ViewIPPdN6Kokkos9HostSpaceEEERKN6Kokkos4ViewIPPKdN6Kokkos9HostSpaceEEE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+              </article>
+              
+
+              
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="conditionalmapbase.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Conditional Map Base</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="monotonecomponent.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Monotone Component</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+              </footer>
+              
+          </div>
+          
+      </div>
+    </div>
+
+  
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
+    &copy; Copyright 2022, The MParT development team..<br>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.0.2.<br>
+</p>
+  </div>
+  
+</div>
+</footer>
+  </body>
+</html>

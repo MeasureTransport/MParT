@@ -9,9 +9,10 @@ API Reference
 
    mapfactory
    conditionalmapbase
-   templateconcepts
+   triangularmap
+   monotonecomponent
    multiindex
    quadrature
    utilities/kokkoswrappers
-   monotonecomponent
    multivariateexpansion
+   templateconcepts
