@@ -84,14 +84,19 @@ Eigen::RowMatrixXd ConditionalMapBase::Inverse(Eigen::RowMatrixXd const& x1, Eig
 }
 
 
-        
-
 Eigen::Map<Eigen::VectorXd> ConditionalMapBase::CoeffMap()
 {
     return KokkosToVec(this->savedCoeffs);
 }
 
-// Eigen::Map<const Eigen::VectorXd> ConditionalMapBase::CoeffMap() const
+//What's the syntax for multiple outputs?
+// Kokkos::View<double*, Kokkos::HostSpace> ConditionalMapBase::CoeffJacobian(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
+//                                                                                 Kokkos::View<double*,Kokkos::HostSpace>  const& coeffs)
 // {
-//     return KokkosToVec(this->savedCoeffs);
+//     Kokkos::View<double*, Kokkos::HostSpace> evaluations("Map Evaluations", pts.extent(1));
+//     Kokkos::View<double**, Kokkos::HostSpace> jacobian("Map Jacobian", pts.extent(1));
+//     CoeffJacobian(pts,coeffs,evaluations,jacobian);
+//     return jacobian;
 // }
+
+//MixedJacobian
