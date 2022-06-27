@@ -20,24 +20,24 @@ Eigen::RowMatrixXd ConditionalMapBase::Evaluate(Eigen::RowMatrixXd const& pts)
 }
 
 
-void ConditionalMapBase::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs){ 
+void ConditionalMapBase::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs){
 
     // If coefficients already exist, make sure the sizes match
     if(this->savedCoeffs.is_allocated()){
         if(coeffs.size() != numCoeffs){
             std::stringstream msg;
-            msg << "Error in ConditionalMapBase::SetCoeffs.  Expectd coefficient vector with size " << numCoeffs << ", but new coefficients have size " << coeffs.size() << ".";
+            msg << "Error in ConditionalMapBase::SetCoeffs.  Expected coefficient vector with size " << numCoeffs << ", but new coefficients have size " << coeffs.size() << ".";
             throw std::invalid_argument(msg.str());
         }
 
         if(this->savedCoeffs.size() != numCoeffs)
             Kokkos::resize(this->savedCoeffs, numCoeffs);
     }else{
-        
+
         this->savedCoeffs = Kokkos::View<double*, Kokkos::HostSpace>("ConditionalMapBase Coefficients", coeffs.size());
     }
 
-    Kokkos::deep_copy(this->savedCoeffs, coeffs); 
+    Kokkos::deep_copy(this->savedCoeffs, coeffs);
 }
 
 Kokkos::View<double*, Kokkos::HostSpace> ConditionalMapBase::LogDeterminant(Kokkos::View<const double**, Kokkos::HostSpace> const& pts)
@@ -46,7 +46,7 @@ Kokkos::View<double*, Kokkos::HostSpace> ConditionalMapBase::LogDeterminant(Kokk
     LogDeterminantImpl(pts, output);
     return output;
 }
-        
+
 Eigen::VectorXd ConditionalMapBase::LogDeterminant(Eigen::RowMatrixXd const& pts)
 {
     Eigen::VectorXd output(pts.cols());
@@ -58,16 +58,16 @@ Eigen::VectorXd ConditionalMapBase::LogDeterminant(Eigen::RowMatrixXd const& pts
 
 
 
-Kokkos::View<double**, Kokkos::HostSpace> ConditionalMapBase::Inverse(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
+Kokkos::View<double**, Kokkos::HostSpace> ConditionalMapBase::Inverse(Kokkos::View<const double**, Kokkos::HostSpace> const& x1,
                                                                       Kokkos::View<const double**, Kokkos::HostSpace> const& r)
-{      
+{
     // Throw an error if the inputs don't have the same number of columns
     if(x1.extent(1)!=r.extent(1)){
         std::stringstream msg;
         msg << "x1 and r have different numbers of columns.  x1.extent(1)=" << x1.extent(1) << ", but r.extent(1)=" << r.extent(1);
         throw std::invalid_argument(msg.str());
     }
-    
+
     Kokkos::View<double**, Kokkos::HostSpace> output("Map Inverse Evaluations", outputDim, r.extent(1));
     InverseImpl(x1,r, output);
     return output;
@@ -85,7 +85,7 @@ Eigen::RowMatrixXd ConditionalMapBase::Inverse(Eigen::RowMatrixXd const& x1, Eig
     InverseImpl(x1View, rView, outView);
     return output;
 }
-        
+
 
 Eigen::Map<Eigen::VectorXd> ConditionalMapBase::CoeffMap()
 {
