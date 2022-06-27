@@ -53,7 +53,7 @@ public:
                               Kokkos::View<double**, MemorySpace>      & output) override
     {
         Kokkos::View<double*,MemorySpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        EvaluateImpl<MemorySpace, Kokkos::DefaultHostExecutionSpace>(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, outputSlice);
+        EvaluateImpl<Kokkos::DefaultHostExecutionSpace>(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, outputSlice);
     }
 
     virtual void InverseImpl(Kokkos::View<const double**, MemorySpace> const& x1,
@@ -62,7 +62,7 @@ public:
     {
         Kokkos::View<const double*,MemorySpace> rSlice = Kokkos::subview(r,0,Kokkos::ALL());
         Kokkos::View<double*,MemorySpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        InverseImpl<MemorySpace, Kokkos::DefaultHostExecutionSpace>(x1, rSlice, ConditionalMapBase<MemorySpace>::savedCoeffs, outputSlice);
+        InverseImpl<Kokkos::DefaultHostExecutionSpace>(x1, rSlice, ConditionalMapBase<MemorySpace>::savedCoeffs, outputSlice);
     }
 
     virtual void LogDeterminantImpl(Kokkos::View<const double**, MemorySpace> const& pts,
@@ -153,7 +153,7 @@ public:
         Kokkos::View<const double*,MemorySpace> constYs = ys;
         Kokkos::View<const double*,MemorySpace> constCoeffs = coeffs;
 
-        InverseImpl<MemorySpace, ExecutionSpace>(constXs,constYs,constCoeffs,output,options);
+        InverseImpl<ExecutionSpace>(constXs,constYs,constCoeffs,output,options);
     }
 
     /**
@@ -289,7 +289,7 @@ public:
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> derivs("Monotone Component Derivatives", numPts);
 
-        ContinuousDerivative<MemorySpace,ExecutionSpace>(pts,coeffs, derivs);
+        ContinuousDerivative<ExecutionSpace>(pts,coeffs, derivs);
 
         return derivs;
     }
@@ -299,7 +299,7 @@ public:
     {
         Kokkos::View<const double**, MemorySpace> pts2 = pts;
         Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
-        return ContinuousDerivative<MemorySpace,ExecutionSpace>(pts2,coeffs2);
+        return ContinuousDerivative<ExecutionSpace>(pts2,coeffs2);
     }
 
 
@@ -362,7 +362,7 @@ public:
     {
         Kokkos::View<const double**, MemorySpace> pts2 = pts;
         Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
-        ContinuousDerivative<MemorySpace,ExecutionSpace>(pts2,coeffs2, derivs);
+        ContinuousDerivative<ExecutionSpace>(pts2,coeffs2, derivs);
     }
 
     /**
@@ -382,7 +382,7 @@ public:
         Kokkos::View<double*,MemorySpace> evals("Component Evaluations", numPts);
         Kokkos::View<double*,MemorySpace> derivs("Component Derivatives", numPts);
 
-        DiscreteDerivative<MemorySpace, ExecutionSpace>(pts,coeffs, evals, derivs);
+        DiscreteDerivative<ExecutionSpace>(pts,coeffs, evals, derivs);
 
         return derivs;
     }
@@ -393,7 +393,7 @@ public:
     {
         Kokkos::View<const double**, MemorySpace> pts2 = pts;
         Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
-        return DiscreteDerivative<MemorySpace, ExecutionSpace>(pts2,coeffs2);
+        return DiscreteDerivative<ExecutionSpace>(pts2,coeffs2);
     }
 
 
