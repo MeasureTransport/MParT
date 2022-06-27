@@ -5,11 +5,11 @@
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
 #include <unordered_map>
-#include <string> 
+#include <string>
 
 using namespace mpart;
 using namespace Catch;
-
+using MemorySpace = Kokkos::HostSpace;
 
 TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
 
@@ -20,7 +20,7 @@ TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
     unsigned int maxDegree = 5;
     FixedMultiIndexSet mset(dim,maxDegree);
 
-    std::shared_ptr<ConditionalMapBase> map = MapFactory::CreateComponent(mset, options);
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent(mset, options);
     REQUIRE(map!=nullptr);
 
     unsigned int numPts = 100;
@@ -37,7 +37,7 @@ TEST_CASE( "Testing factory method for triangular map", "[MapFactoryTriangular]"
     options.basisType = BasisTypes::ProbabilistHermite;
 
 
-    std::shared_ptr<ConditionalMapBase> map = MapFactory::CreateTriangular(4,3,5, options);
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateTriangular(4,3,5, options);
 
     REQUIRE(map != nullptr);
 }

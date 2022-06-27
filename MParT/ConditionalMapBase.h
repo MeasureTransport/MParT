@@ -1,5 +1,5 @@
-#ifndef MPART_ConditionalMapBase<MemorySpace>_H
-#define MPART_ConditionalMapBase<MemorySpace>_H
+#ifndef MPART_ConditionalMapBase_H
+#define MPART_ConditionalMapBase_H
 
 #include "MParT/Utilities/EigenTypes.h"
 #include "MParT/Utilities/ArrayConversions.h"
@@ -8,6 +8,7 @@
 
 namespace mpart {
 
+    template<typename MemorySpace>
     class TriangularMap;
 
     /**
@@ -23,7 +24,7 @@ namespace mpart {
     template<typename MemorySpace>
     class ConditionalMapBase {
 
-        friend class TriangularMap;
+        friend class TriangularMap<MemorySpace>;
 
     public:
 

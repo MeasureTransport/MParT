@@ -5,7 +5,7 @@
 
 using namespace mpart;
 using namespace Catch;
-
+using MemorySpace = Kokkos::HostSpace;
 
 TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_MonotoneComponents]" ) {
 
@@ -19,7 +19,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
 
     unsigned int coeffSize = 0;
 
-    std::vector<std::shared_ptr<ConditionalMapBase>> blocks(numBlocks);
+    std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks(numBlocks);
     for(unsigned int i=0;i<numBlocks;++i){
         FixedMultiIndexSet mset(i+extraInputs+1,maxDegree);
         coeffSize += mset.Size();
@@ -27,7 +27,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
         blocks.at(i) = MapFactory::CreateComponent(mset, options);
     }
 
-    std::shared_ptr<ConditionalMapBase> triMap = std::make_shared<TriangularMap>(blocks);
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> triMap = std::make_shared<TriangularMap>(blocks);
 
     CHECK(triMap->outputDim == numBlocks);
     CHECK(triMap->inputDim == numBlocks+extraInputs);
@@ -37,7 +37,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
         Kokkos::View<double*,Kokkos::HostSpace> coeffs("Coefficients", triMap->numCoeffs);
         for(unsigned int i=0; i<triMap->numCoeffs; ++i)
             coeffs(i) = 0.1*(i+1);
-        
+
         // Set the coefficients of the triangular map
         triMap->SetCoeffs(coeffs);
 
@@ -60,12 +60,12 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
         }
     }
     auto out = triMap->Evaluate(in);
-    
+
     SECTION("Evaluation"){
-        
+
         for(unsigned int i=0; i<numBlocks; ++i){
             auto outBlock = blocks.at(i)->Evaluate(Kokkos::subview(in, std::pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
-            
+
             REQUIRE(outBlock.extent(1)==numSamps);
             REQUIRE(outBlock.extent(0)==1);
             for(unsigned int j=0; j<numSamps; ++j)
@@ -75,7 +75,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
 
 
     SECTION("Inverse"){
-        
+
         auto inv = triMap->Inverse(in,out);
 
         for(unsigned int i=0; i<numBlocks; ++i){
@@ -86,13 +86,13 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
 
     SECTION("LogDeterminant"){
         auto logDet = triMap->LogDeterminant(in);
-        
+
         REQUIRE(logDet.extent(0)==numSamps);
         Kokkos::View<double*, Kokkos::HostSpace> truth("True Log Det", numSamps);
 
         for(unsigned int i=0; i<numBlocks; ++i){
             auto blockLogDet = blocks.at(i)->LogDeterminant(Kokkos::subview(in, std::pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
-            
+
             for(unsigned int j=0; j<numSamps; ++j)
                 truth(j) += blockLogDet(j);
         }
