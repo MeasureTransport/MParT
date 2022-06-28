@@ -11,8 +11,8 @@ using namespace mpart::binding;
 
 void mpart::binding::MapFactoryWrapper(py::module &m)
 {
-    // CteateComponent
-    //m.def("CreateComponent", &MapFactory::CreateComponent);
+    // CreateComponent
+
     m.def("CreateComponent", [] (FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
                                  MapOptions options)
     {
