@@ -46,7 +46,7 @@ find_package(Kokkos QUIET)
 if(NOT Kokkos_FOUND)
     message(STATUS "Could not find Kokkos.  Using internal build.")
     UpdateGitSubmodule(kokkos)
-    add_subdirectory(external/kokkos)   
+    add_subdirectory(external/kokkos)
 else()
     message(STATUS "Found Kokkos!")
 endif()
@@ -54,16 +54,22 @@ endif()
 # Add Eigen
 find_package(Eigen3 QUIET)
 if(NOT Eigen3_FOUND)
+    message(STATUS "Could not find Eigen.  Using internal build.")
     UpdateGitSubmodule(eigen)
     add_subdirectory(external/eigen)
+else()
+  message(STATUS "Found Eigen!")
 endif()
 
 # Add pybind11 if necessary
 if(MPART_PYTHON)
   find_package(pybind11 CONFIG QUIET)
   if(NOT pybind11_FOUND)
+    message(STATUS "Could not find pybind11. Using internal build.")
     UpdateGitSubmodule(pybind11)
     add_subdirectory(external/pybind11)
+  else()
+    message(STATUS "Found pybind11!")
   endif()
 endif()
 
@@ -120,19 +126,14 @@ endif()
 # Testing
 
 # Install Catch2
-find_package(Catch2 3 QUIET)
+find_package(Catch2 QUIET)
 if(NOT Catch2_FOUND)
-    Include(FetchContent)
-
-    FetchContent_Declare(
-        Catch2
-        GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG        v3.0.0-preview3
-    )
-
-    FetchContent_MakeAvailable(Catch2)
-    message(STATUS "Catch 2 source:${catch2_SOURCE_DIR}")
-    list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
+    message(STATUS "Could not find Catch2.  Using internal build.")
+    UpdateGitSubmodule(catch2)
+    PinSubmoduleVersion(catch2 v3.0.0-preview3)
+    add_subdirectory(external/catch2)
+else()
+    message(STATUS "Found Catch2!")
 endif()
 
 # Define test sources
@@ -144,7 +145,7 @@ add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
 target_link_libraries(PrintKokkosInfo Kokkos::kokkos)
 
 ##############################################################
-# Installation 
+# Installation
 install(TARGETS mpart
         EXPORT MParTTargets
         DESTINATION lib)
