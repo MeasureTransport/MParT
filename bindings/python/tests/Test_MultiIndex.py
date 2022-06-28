@@ -6,7 +6,7 @@ import unittest
 class TestStringMethods(unittest.TestCase):
 
 
-    def test_1(self):
+    def test_init_with_length(self):
         
         length = 4
         multi = mpart.MultiIndex(length)
@@ -26,7 +26,7 @@ class TestStringMethods(unittest.TestCase):
         assert multi.max() == 4
         assert multi.sum() == 4 + 3
 
-    def test_2(self):
+    def test_init_with_length_and_val(self):
         
         length = 4
         val = 2
@@ -38,7 +38,7 @@ class TestStringMethods(unittest.TestCase):
         assert multi.sum() == length*val
 
 
-    def test_3(self):
+    def test_init_with_list(self):
         
         idx = [2, 3, 0, 0, 100]
         multi = mpart.MultiIndex(idx)
