@@ -5,9 +5,12 @@
 #include "MParT/MultiIndices/MultiIndex.h"
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
 #include "MParT/Utilities/ArrayConversions.h"
+
 #include <pybind11/stl.h>
 #include <pybind11/eigen.h>
 #include <pybind11/iostream.h>
+#include <pybind11/functional.h>
+
 #include <Kokkos_Core.hpp>
 
 #include <pybind11/pybind11.h>
@@ -52,10 +55,13 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("__setitem__", &MultiIndexSet::operator[])
         .def("at", &MultiIndexSet::at)
         .def("Size", &MultiIndexSet::Size)
-        
+
+        .def("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder)
+        .def("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct)
+
         .def("union", &MultiIndexSet::Union)
         .def("SetLimiter",&MultiIndexSet::SetLimiter)
-        //.def("GetLimiter", MultiIndexSet::GetLimiter)   
+        .def("GetLimiter", &MultiIndexSet::GetLimiter)   
         .def("IndexToMulti",&MultiIndexSet::IndexToMulti)
         .def("MultiToIndex", &MultiIndexSet::MultiToIndex)
         .def("MaxOrders", &MultiIndexSet::MaxOrders)
@@ -75,6 +81,61 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("NumForward", &MultiIndexSet::NumForward)
         //.def("Visualize", &MultiIndexSet::Visualize)
         ;
+
+
+    // MultiIndexSetLimiters
+    //TotalOrder
+    py::class_<MultiIndexLimiter::TotalOrder, KokkosCustomPointer<MultiIndexLimiter::TotalOrder>>(m, "TotalOrder")
+        .def(py::init<unsigned int>())
+        .def("__call__", &MultiIndexLimiter::TotalOrder::operator())
+    ;
+
+    
+    //Dimension
+    py::class_<MultiIndexLimiter::Dimension, KokkosCustomPointer<MultiIndexLimiter::Dimension>>(m, "Dimension")
+        .def(py::init<unsigned int, unsigned int>())
+        .def("__call__", &MultiIndexLimiter::Dimension::operator())
+    ;
+
+    
+    //Anisotropic
+    py::class_<MultiIndexLimiter::Anisotropic, KokkosCustomPointer<MultiIndexLimiter::Anisotropic>>(m, "Anisotropic")
+        .def(py::init<std::vector<double> const&, double>())
+        .def("__call__", &MultiIndexLimiter::Anisotropic::operator())
+    ;
+
+    
+    //MaxDegree
+    py::class_<MultiIndexLimiter::MaxDegree, KokkosCustomPointer<MultiIndexLimiter::MaxDegree>>(m, "MaxDegree")
+        .def(py::init<unsigned int, unsigned int>())
+        .def("__call__", &MultiIndexLimiter::MaxDegree::operator())
+    ;
+
+    
+    //None
+    py::class_<MultiIndexLimiter::None, KokkosCustomPointer<MultiIndexLimiter::None>>(m, "NoneLim")
+        .def(py::init<>())
+        .def("__call__", &MultiIndexLimiter::None::operator())
+    ;
+
+    
+    //And
+    py::class_<MultiIndexLimiter::And, KokkosCustomPointer<MultiIndexLimiter::And>>(m, "And")
+        .def(py::init<std::function<bool(MultiIndex const&)>,std::function<bool(MultiIndex const&)>>())
+        .def("__call__", &MultiIndexLimiter::And::operator())
+    ;
+
+    //Or
+    py::class_<MultiIndexLimiter::Or, KokkosCustomPointer<MultiIndexLimiter::Or>>(m, "Or")
+        .def(py::init<std::function<bool(MultiIndex const&)>,std::function<bool(MultiIndex const&)>>())
+        .def("__call__", &MultiIndexLimiter::Or::operator())
+    ;
+
+    //Xor
+    py::class_<MultiIndexLimiter::Xor, KokkosCustomPointer<MultiIndexLimiter::Xor>>(m, "Xor")
+        .def(py::init<std::function<bool(MultiIndex const&)>,std::function<bool(MultiIndex const&)>>())
+        .def("__call__", &MultiIndexLimiter::Xor::operator())
+    ;
 
     //==========================================================================================================
     //FixedMultiIndexSet
