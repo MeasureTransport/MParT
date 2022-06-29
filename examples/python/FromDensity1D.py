@@ -30,28 +30,28 @@ fixed_mset = mset.fix(True)
 
 # Set MapOptions and make map
 opts = MapOptions()
-map = CreateComponent(fixed_mset, opts)
+monotoneMap = CreateComponent(fixed_mset, opts)
 
 # KL divergence objective
 def objective(coeffs):
-    map.SetCoeffs(coeffs)
-    map_of_x = map.Evaluate(x.reshape(1,num_points))
+    monotoneMap.SetCoeffs(coeffs)
+    map_of_x = monotoneMap.Evaluate(x.reshape(1,num_points))
     pi_of_map_of_x = rv.logpdf(map_of_x)
-    log_det = map.LogDeterminant(x.reshape(1,num_points))
+    log_det = monotoneMap.LogDeterminant(x.reshape(1,num_points))
     return -np.sum(pi_of_map_of_x + log_det)/num_points
 
 
 # Optimize
 print('Starting coeffs')
-print(map.CoeffMap())
-print('and error: {:.2E}'.format(objective(map.CoeffMap())))
-res = minimize(objective, map.CoeffMap(), method="Nelder-Mead")
+print(monotoneMap.CoeffMap())
+print('and error: {:.2E}'.format(objective(monotoneMap.CoeffMap())))
+res = minimize(objective, monotoneMap.CoeffMap(), method="Nelder-Mead")
 print('Final coeffs')
-print(map.CoeffMap())
-print('and error: {:.2E}'.format(objective(map.CoeffMap())))
+print(monotoneMap.CoeffMap())
+print('and error: {:.2E}'.format(objective(monotoneMap.CoeffMap())))
 
 # After optimization plot
-map_of_x = map.Evaluate(x.reshape(1,num_points))
+map_of_x = monotoneMap.Evaluate(x.reshape(1,num_points))
 plt.figure()
 plt.hist(map_of_x.reshape(num_points,), num_bins, facecolor='blue', alpha=0.5, density=True, label='Mapped samples')
 plt.plot(t,rho_t,label="Target density")
