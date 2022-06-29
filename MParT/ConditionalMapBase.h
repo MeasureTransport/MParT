@@ -79,7 +79,7 @@ namespace mpart {
         */
         virtual Kokkos::View<double*, MemorySpace> LogDeterminant(Kokkos::View<const double**, MemorySpace> const& pts);
 
-        virtual Eigen::VectorXd LogDeterminant(Eigen::RowMatrixXd const& pts);
+        virtual Eigen::VectorXd LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
         virtual void LogDeterminantImpl(Kokkos::View<const double**, MemorySpace> const& pts,
                                         Kokkos::View<double*, MemorySpace>             &output) = 0;
@@ -87,7 +87,7 @@ namespace mpart {
 
         virtual Kokkos::View<double**, MemorySpace> Evaluate(Kokkos::View<const double**, MemorySpace> const& pts);
 
-        virtual Eigen::RowMatrixXd Evaluate(Eigen::RowMatrixXd const& pts);
+        virtual Eigen::RowMatrixXd Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
         virtual void EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,
                                   Kokkos::View<double**, MemorySpace>            & output) = 0;
@@ -99,7 +99,8 @@ namespace mpart {
         virtual Kokkos::View<double**, MemorySpace> Inverse(Kokkos::View<const double**, MemorySpace> const& x1,
                                                             Kokkos::View<const double**, MemorySpace> const& r);
 
-        virtual Eigen::RowMatrixXd Inverse(Eigen::RowMatrixXd const& x1, Eigen::RowMatrixXd const& r);
+        virtual Eigen::RowMatrixXd Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1, 
+                                           Eigen::Ref<const Eigen::RowMatrixXd> const& r);
 
         virtual void InverseImpl(Kokkos::View<const double**, MemorySpace> const& x1,
                                  Kokkos::View<const double**, MemorySpace> const& r,
