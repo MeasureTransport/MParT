@@ -30,7 +30,7 @@ Kokkos::View<double**, MemorySpace> ConditionalMapBase<MemorySpace>::Evaluate(Ko
 }
 
 template<>
-Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::Evaluate(Eigen::RowMatrixXd const& pts)
+Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
 {
     Eigen::RowMatrixXd output(outputDim, pts.cols());
     Kokkos::View<const double**, Kokkos::HostSpace> ptsView = ConstRowMatToKokkos<double>(pts);
@@ -40,7 +40,7 @@ Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::Evaluate(Eigen::RowMat
 }
 
 template<typename MemorySpace>
-Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::Evaluate(Eigen::RowMatrixXd const& pts)
+Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
 {
     CheckDeviceMismatch("Evaluate(Eigen::RowMatrixXd const& pts)");
 
@@ -89,7 +89,7 @@ Kokkos::View<double*, MemorySpace> ConditionalMapBase<MemorySpace>::LogDetermina
 }
 
 template<>
-Eigen::VectorXd ConditionalMapBase<Kokkos::HostSpace>::LogDeterminant(Eigen::RowMatrixXd const& pts)
+Eigen::VectorXd ConditionalMapBase<Kokkos::HostSpace>::LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
 {   
     CheckDeviceMismatch("LogDeterminant(Eigen::RowMatrixXd const& pts)");
 
@@ -101,7 +101,7 @@ Eigen::VectorXd ConditionalMapBase<Kokkos::HostSpace>::LogDeterminant(Eigen::Row
 }
 
 template<typename MemorySpace>
-Eigen::VectorXd ConditionalMapBase<MemorySpace>::LogDeterminant(Eigen::RowMatrixXd const& pts)
+Eigen::VectorXd ConditionalMapBase<MemorySpace>::LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
 {   
     CheckDeviceMismatch("LogDeterminant(Eigen::RowMatrixXd const& pts)");
 
@@ -126,7 +126,7 @@ Kokkos::View<double**, MemorySpace> ConditionalMapBase<MemorySpace>::Inverse(Kok
 }
 
 template<>
-Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::Inverse(Eigen::RowMatrixXd const& x1, Eigen::RowMatrixXd const& r)
+Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1, Eigen::Ref<const Eigen::RowMatrixXd> const& r)
 {   
     CheckDeviceMismatch("Inverse(Eigen::RowMatrixXd const& x1, Eigen::RowMatrixXd const& r)");
 
@@ -142,7 +142,7 @@ Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::Inverse(Eigen::RowMatr
 
 
 template<typename MemorySpace>
-Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::Inverse(Eigen::RowMatrixXd const& x1, Eigen::RowMatrixXd const& r)
+Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1, Eigen::Ref<const Eigen::RowMatrixXd> const& r)
 {   
     CheckDeviceMismatch("Inverse(Eigen::RowMatrixXd const& x1, Eigen::RowMatrixXd const& r)");
 
