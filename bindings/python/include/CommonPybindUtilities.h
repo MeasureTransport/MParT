@@ -28,6 +28,8 @@ void MapOptionsWrapper(pybind11::module &m);
 
 void ConditionalMapBaseWrapper(pybind11::module &m);
 
+void TriangularMapWrapper(pybind11::module &m);
+
 void MapFactoryWrapper(pybind11::module &m);
 
 } // namespace binding

@@ -1,6 +1,6 @@
 .. _api:
 
-API Reference 
+API Reference
 ==============
 
 .. toctree::
@@ -8,9 +8,11 @@ API Reference
    :maxdepth: 2
 
    mapfactory
-   templateconcepts
+   conditionalmapbase
+   triangularmap
+   monotonecomponent
    multiindex
    quadrature
    utilities/kokkoswrappers
-   monotonecomponent
    multivariateexpansion
+   templateconcepts
