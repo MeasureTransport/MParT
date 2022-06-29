@@ -14,14 +14,14 @@ void mpart::binding::TriangularMapWrapper(py::module &m)
 {
 
     // TriangularMap
-     py::class_<TriangularMap, ConditionalMapBase, KokkosCustomPointer<TriangularMap>>(m, "TriangularMap")
+     py::class_<TriangularMap<Kokkos::HostSpace>, ConditionalMapBase<Kokkos::HostSpace>, KokkosCustomPointer<TriangularMap<Kokkos::HostSpace>>>(m, "TriangularMap")
 
-        .def(py::init( [](std::vector<KokkosCustomPointer<ConditionalMapBase>> const& components)
+        .def(py::init( [](std::vector<KokkosCustomPointer<ConditionalMapBase<Kokkos::HostSpace>>> const& components)
         {
-            std::vector<std::shared_ptr<ConditionalMapBase>> newComponents;
+            std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> newComponents;
             for(auto& ptr : components)
                 newComponents.push_back(ptr.impl);
-            return new TriangularMap(newComponents);
+            return new TriangularMap<Kokkos::HostSpace>(newComponents);
 
         }))
         ;
