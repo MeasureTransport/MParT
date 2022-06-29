@@ -24,6 +24,20 @@ public:
     virtual void InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& x1,
                             Kokkos::View<const double**, Kokkos::HostSpace> const& r,
                             Kokkos::View<double**, Kokkos::HostSpace>      & output) override{Kokkos::deep_copy(output,r);};
+
+    virtual void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
+                               Kokkos::View<const double**, MemorySpace> const& sens,
+                               Kokkos::View<double**, MemorySpace>            & output) override
+    {
+        assert(false);  
+    }
+
+
+    virtual void LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
+                                             Kokkos::View<double**, MemorySpace> &output) override
+    {   
+        assert(false);
+    }
 };
 
 

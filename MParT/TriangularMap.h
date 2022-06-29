@@ -94,6 +94,14 @@ public:
     virtual void InverseInplace(Kokkos::View<double**, MemorySpace> const& x1,
                                 Kokkos::View<const double**, MemorySpace> const& r);
 
+
+    virtual void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
+                               Kokkos::View<const double**, MemorySpace> const& sens,
+                               Kokkos::View<double**, MemorySpace>            & output) override;
+
+
+    virtual void LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
+                                             Kokkos::View<double**, MemorySpace> &output) override;
 private:
 
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;

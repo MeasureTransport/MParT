@@ -129,6 +129,52 @@ void TriangularMap<MemorySpace>::InverseInplace(Kokkos::View<double**, MemorySpa
     }
 }
 
+
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
+                                               Kokkos::View<const double**, MemorySpace> const& sens,
+                                               Kokkos::View<double**, MemorySpace>            & output)
+{
+    // Evaluate the output for each component
+    Kokkos::View<const double**, MemorySpace> subPts;
+    Kokkos::View<const double**, MemorySpace> subSens; 
+    Kokkos::View<double**, MemorySpace> subOut;
+
+    int startOutDim = 0;
+    int startParamDim = 0;
+    for(unsigned int i=0; i<comps_.size(); ++i){
+
+        subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
+        subSens = Kokkos::subview(sens, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
+
+        subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
+        comps_.at(i)->CoeffGradImpl(subPts, subSens, subOut);
+
+        startOutDim += comps_.at(i)->outputDim;
+        startParamDim += comps_.at(i)->numCoeffs;
+    }
+}
+
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
+                                                             Kokkos::View<double**, MemorySpace> &output)
+{
+    // Evaluate the output for each component
+    Kokkos::View<const double**, MemorySpace> subPts;
+    Kokkos::View<double**, MemorySpace> subOut;
+
+    int startParamDim = 0;
+    for(unsigned int i=0; i<comps_.size(); ++i){
+
+        subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
+       
+        subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
+        comps_.at(i)->LogDeterminantCoeffGradImpl(subPts, subOut);
+
+        startParamDim += comps_.at(i)->numCoeffs;
+    }
+}
+
 // Explicit template instantiation
 template class mpart::TriangularMap<Kokkos::HostSpace>;
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)

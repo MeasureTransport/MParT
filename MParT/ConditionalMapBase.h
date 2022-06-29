@@ -107,6 +107,55 @@ namespace mpart {
                                  Kokkos::View<double**, MemorySpace>            & output) = 0;
 
 
+        /** @brief Computes the gradient of the map output with respect to the map coefficients.
+        @details Consider a map \f$T(x; w) : \mathbb{R}^N \rightarrow \mathbb{R}^M\f$ parameterized by coefficients \f$w\in\mathbb{R}^K\f$.
+                 This function computes 
+                 \f[
+                    g_i = s_i^T\nabla_w T(x_i; w),
+                 \f] 
+                 where \f$\nabla_w T(x_i; w)\in\mathbb{R}^{M\times K}\f$ denotes the 
+                 Jacobian of the map  \f$T(x_i; w)\f$ with respect to the coefficients at the single point \f$x_i\f$ and \f$s_i\in \mathbb{R}^M\f$ 
+                 is a vector of sensitivities.  Often the sensititivities \f$s_i\f$ represent the gradient of some objective function with 
+                 respect to the map output, i.e. \f$s_i = \nabla_{y_i} c(y_i)\f$, where \f$c:\mathbb{R}^M\rightarrow \mathbb{R}\f$ is a scalar-valued 
+                 objective function and \f$y_i=T(x_i;w)\f$ is the output of the map.   In this setting, the vector \f$g_i\f$ computed by this 
+                 function represents \f$g_i = \nabla_{w} c(T(x_i; w))\f$; and this function essentially computes a single step in the chain rule. 
+
+        @param pts A collection of points \f$x_i\f$ where we want to compute the Jacobian.  Each column contains a single point.
+        @param sens A collection of sensitivity vectors \f$s_i\f$ for each point.   Each column is a single \f$s_i\f$ vector and 
+                    this view should therefore have the same number of columns as `pts`.  It should also have \f$M\f$ rows.   
+        @return A collection of vectors \f$g_i\f$.  Will have the same number of columns as pts with \f$K\f$ rows.
+        */
+        virtual Kokkos::View<double**, MemorySpace> CoeffGrad(Kokkos::View<const double**, MemorySpace> const& pts, 
+                                                              Kokkos::View<const double**, MemorySpace> const& sens);
+
+        virtual Eigen::RowMatrixXd CoeffGrad(Eigen::Ref<Eigen::RowMatrixXd> const& pts,
+                                             Eigen::Ref<Eigen::RowMatrixXd> const& sens);
+
+        virtual void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
+                                   Kokkos::View<const double**, MemorySpace> const& sens,
+                                   Kokkos::View<double**, MemorySpace> &output) = 0;
+
+        
+
+        /**
+           @brief Computes the gradient of the log determinant with respect to the map coefficients.
+           @details For a map \f$T(x; w) : \mathbb{R}^N \rightarrow \mathbb{R}^M\f$ parameterized by coefficients \f$w\in\mathbb{R}^K\f$,
+           this function computes 
+           \f[
+            \nabla_w \det{\nabla_x T(x_i; w)},
+          \f] 
+           at multiple points \f$x_i\f$.
+           @param pts A collection of points where we want to evaluate the gradient.  Each column corresponds to a point.
+           @return A matrix containing the coefficient gradient at each input point.  The \f$i^{th}\f$ column  contains \f$\nabla_w \det{\nabla_x T(x_i; w)}\f$.
+         */
+        virtual Kokkos::View<double**, MemorySpace> LogDeterminantCoeffGrad(Kokkos::View<const double**, MemorySpace> const& pts);
+
+        virtual Eigen::RowMatrixXd LogDeterminantCoeffGrad(Eigen::Ref<Eigen::RowMatrixXd> const& pts);
+
+        virtual void LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
+                                                 Kokkos::View<double**, MemorySpace> &output) = 0;
+
+        
         const unsigned int inputDim; /// The total dimension of the input N+M
         const unsigned int outputDim; /// The output dimension M
         const unsigned int numCoeffs; /// The number of coefficients used to parameterize this map.
@@ -119,6 +168,9 @@ namespace mpart {
         @param functionName The name of the host-only function (e.g., "Evaluate(Eigen::RowMatrixXd const& pts)")
          */ 
         void CheckDeviceMismatch(std::string functionName) const;
+
+        /** Checks to see if the coefficients have been initialized yet. If not, an exception is thrown. */
+        void CheckCoefficients(std::string const& functionName) const;
 
         Kokkos::View<double*, MemorySpace> savedCoeffs;
 
