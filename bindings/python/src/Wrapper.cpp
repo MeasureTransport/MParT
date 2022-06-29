@@ -9,6 +9,7 @@ PYBIND11_MODULE(pympart, m) {
     MultiIndexWrapper(m);
     MapOptionsWrapper(m);
     ConditionalMapBaseWrapper(m);
+    TriangularMapWrapper(m);
     MapFactoryWrapper(m);
     
 }

@@ -29,6 +29,7 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
         .def("Evaluate", py::overload_cast<Eigen::RowMatrixXd const&>(&ConditionalMapBase::Evaluate))
         .def("LogDeterminant", py::overload_cast<Eigen::RowMatrixXd const&>(&ConditionalMapBase::LogDeterminant))
         .def("Inverse", py::overload_cast<Eigen::RowMatrixXd const&, Eigen::RowMatrixXd const&>(&ConditionalMapBase::Inverse))
+        .def_readonly("numCoeffs", &ConditionalMapBase::numCoeffs)
         ;
 
 }
