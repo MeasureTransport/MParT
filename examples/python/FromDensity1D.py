@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 num_points = 5000
 mu = 2
 sigma = .5
-x = np.random.randn(num_points)
+x = np.random.randn(num_points)[None,:]
 
 # for plotting
 rv = norm(loc=mu,scale=sigma)
@@ -18,7 +18,7 @@ rho_t = rv.pdf(t)
 num_bins = 50
 # Before optimization plot
 plt.figure()
-plt.hist(x, num_bins, facecolor='blue', alpha=0.5, density=True, label='Reference samples')
+plt.hist(x.flatten(), num_bins, facecolor='blue', alpha=0.5, density=True, label='Reference samples')
 plt.plot(t,rho_t,label="Target density")
 plt.legend()
 plt.show()
@@ -35,9 +35,9 @@ monotoneMap = CreateComponent(fixed_mset, opts)
 # KL divergence objective
 def objective(coeffs, monotoneMap, x, num_points):
     monotoneMap.SetCoeffs(coeffs)
-    map_of_x = monotoneMap.Evaluate(x.reshape(1,num_points))
+    map_of_x = monotoneMap.Evaluate(x)
     pi_of_map_of_x = rv.logpdf(map_of_x)
-    log_det = monotoneMap.LogDeterminant(x.reshape(1,num_points))
+    log_det = monotoneMap.LogDeterminant(x)
     return -np.sum(pi_of_map_of_x + log_det)/num_points
 
 # Optimize
@@ -50,9 +50,9 @@ print(monotoneMap.CoeffMap())
 print('and error: {:.2E}'.format(objective(monotoneMap.CoeffMap(), monotoneMap, x, num_points)))
 
 # After optimization plot
-map_of_x = monotoneMap.Evaluate(x.reshape(1,num_points))
+map_of_x = monotoneMap.Evaluate(x)
 plt.figure()
-plt.hist(map_of_x.reshape(num_points,), num_bins, facecolor='blue', alpha=0.5, density=True, label='Mapped samples')
+plt.hist(map_of_x.flatten(), num_bins, facecolor='blue', alpha=0.5, density=True, label='Mapped samples')
 plt.plot(t,rho_t,label="Target density")
 plt.legend()
 plt.show()
