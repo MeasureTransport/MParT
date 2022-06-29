@@ -33,22 +33,21 @@ opts = MapOptions()
 monotoneMap = CreateComponent(fixed_mset, opts)
 
 # KL divergence objective
-def objective(coeffs):
+def objective(coeffs, monotoneMap, x, num_points):
     monotoneMap.SetCoeffs(coeffs)
     map_of_x = monotoneMap.Evaluate(x.reshape(1,num_points))
     pi_of_map_of_x = rv.logpdf(map_of_x)
     log_det = monotoneMap.LogDeterminant(x.reshape(1,num_points))
     return -np.sum(pi_of_map_of_x + log_det)/num_points
 
-
 # Optimize
 print('Starting coeffs')
 print(monotoneMap.CoeffMap())
-print('and error: {:.2E}'.format(objective(monotoneMap.CoeffMap())))
-res = minimize(objective, monotoneMap.CoeffMap(), method="Nelder-Mead")
+print('and error: {:.2E}'.format(objective(monotoneMap.CoeffMap(), monotoneMap, x, num_points)))
+res = minimize(objective, monotoneMap.CoeffMap(), args=(monotoneMap, x, num_points), method="Nelder-Mead")
 print('Final coeffs')
 print(monotoneMap.CoeffMap())
-print('and error: {:.2E}'.format(objective(monotoneMap.CoeffMap())))
+print('and error: {:.2E}'.format(objective(monotoneMap.CoeffMap(), monotoneMap, x, num_points)))
 
 # After optimization plot
 map_of_x = monotoneMap.Evaluate(x.reshape(1,num_points))
