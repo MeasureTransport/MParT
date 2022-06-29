@@ -24,7 +24,8 @@ void mpart::binding::TriangularMapWrapper(py::module &m)
             return new TriangularMap<Kokkos::HostSpace>(newComponents);
 
         }))
-        ;
 
+        .def("InverseInplace", &TriangularMap<Kokkos::HostSpace>::InverseInplace)
+        ;
 
 }

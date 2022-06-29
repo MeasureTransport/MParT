@@ -11,24 +11,31 @@ class TestStringMethods(unittest.TestCase):
         mset = mpart.MultiIndexSet.CreateTotalOrder(1,3, noneLim)
         # Set MapOptions and make map
         opts = mpart.MapOptions()
-        monotoneMap = mpart.CreateComponent(mset.fix(True), opts)
-        assert monotoneMap.numCoeffs == 4
-        assert np.all(monotoneMap.CoeffMap() == [0.,0.,0.,0.])
+        component = mpart.CreateComponent(mset.fix(True), opts)
+        assert component.numCoeffs == 4
+        assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
 
 
 
 
     def test_CreateTriangular(self):
-        multis = np.array([[0, 1], [2, 0]])
-        mset = mpart.MultiIndexSet(multis)
-        assert np.all(mset.MaxOrders() == [2,1])
-        
-        noneLim = mpart.NoneLim()
-        mset = mpart.MultiIndexSet.CreateTensorProduct(3,4,noneLim)
-        assert np.all(mset.MaxOrders() == [4,4,4])
+        opts = mpart.MapOptions()
 
-        mset = mpart.MultiIndexSet.CreateTotal(3,4,noneLim)
-        assert np.all(mset.MaxOrders() == [4,4,4])
+        # multis_1 = np.array([[0],[1]])  # linear
+        # multis_2 = np.array([[0,0],[0,1],[2,0]])  # quadratic in x_1, linear in x_2, matches form of target 
+
+        # mset_1 = mpart.MultiIndexSet(multis_1).fix(True)
+        # mset_2 = mpart.MultiIndexSet(multis_2).fix(True)
+
+        # map_1 = mpart.CreateComponent(mset_1, opts)
+        # map_2 = mpart.CreateComponent(mset_2, opts)
+
+        # triMap = mpart.TriangularMap([map_1,map_2])
+        triangular = mpart.CreateTriangular(2,2,2,opts)
+        assert triangular.numCoeffs == 2 + 7
+        assert triangular.CoeffMap().tolist() == []
+
+        
 
     
 
