@@ -1,9 +1,10 @@
 import math
-from mpart import *
 import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import norm
 import matplotlib.pyplot as plt
+
+from mpart import *
 
 # Make target samples
 num_points = 5000
