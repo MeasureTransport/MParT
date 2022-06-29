@@ -34,9 +34,9 @@ namespace mpart {
          @param inDim The dimension \f$N\f$ of the input to this map.
          @param outDim The dimension \f$M\f$ of the output from this map.
          */
-        ConditionalMapBase<MemorySpace>(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs) : inputDim(inDim), outputDim(outDim), numCoeffs(nCoeffs){};
+        ConditionalMapBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs) : inputDim(inDim), outputDim(outDim), numCoeffs(nCoeffs){};
 
-        virtual ~ConditionalMapBase<MemorySpace>() = default;
+        virtual ~ConditionalMapBase() = default;
 
         /** Returns a view containing the coefficients for this conditional map.  This function returns a reference
             and can therefore be used to to update the coefficients or even set them to be a subview of a larger view.
@@ -98,7 +98,7 @@ namespace mpart {
             than \f$N\f$ rows, but only the first \f$N\f$ will be used in this function.
         */
         virtual Kokkos::View<double**, MemorySpace> Inverse(Kokkos::View<const double**, MemorySpace> const& x1,
-                                                                  Kokkos::View<const double**, MemorySpace> const& r);
+                                                            Kokkos::View<const double**, MemorySpace> const& r);
 
         virtual Eigen::RowMatrixXd Inverse(Eigen::RowMatrixXd const& x1, Eigen::RowMatrixXd const& r);
 
@@ -112,6 +112,13 @@ namespace mpart {
         const unsigned int numCoeffs; /// The number of coefficients used to parameterize this map.
 
     protected:
+        
+        /** Throws an exception if a host-only function was called when the MemorySpace is on the device.
+
+        @details 
+        @param functionName The name of the host-only function (e.g., "Evaluate(Eigen::RowMatrixXd const& pts)")
+         */ 
+        void CheckDeviceMismatch(std::string functionName) const;
 
         Kokkos::View<double*, MemorySpace> savedCoeffs;
 

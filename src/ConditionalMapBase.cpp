@@ -15,6 +15,8 @@ Kokkos::View<double**, MemorySpace> ConditionalMapBase<MemorySpace>::Evaluate(Ko
 template<typename MemorySpace>
 Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::Evaluate(Eigen::RowMatrixXd const& pts)
 {
+    CheckDeviceMismatch("Evaluate(Eigen::RowMatrixXd const& pts)");
+
     Eigen::RowMatrixXd output(outputDim, pts.cols());
     Kokkos::View<const double**, MemorySpace> ptsView = ConstRowMatToKokkos<double>(pts);
     Kokkos::View<double**, MemorySpace> outView = MatToKokkos<double>(output);
@@ -53,7 +55,9 @@ Kokkos::View<double*, MemorySpace> ConditionalMapBase<MemorySpace>::LogDetermina
 
 template<typename MemorySpace>
 Eigen::VectorXd ConditionalMapBase<MemorySpace>::LogDeterminant(Eigen::RowMatrixXd const& pts)
-{
+{   
+    CheckDeviceMismatch("LogDeterminant(Eigen::RowMatrixXd const& pts)");
+
     Eigen::VectorXd output(pts.cols());
     Kokkos::View<const double**, MemorySpace> ptsView = ConstRowMatToKokkos<double>(pts);
     Kokkos::View<double*, MemorySpace> outView = VecToKokkos<double>(output);
@@ -79,7 +83,9 @@ Kokkos::View<double**, MemorySpace> ConditionalMapBase<MemorySpace>::Inverse(Kok
 
 template<typename MemorySpace>
 Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::Inverse(Eigen::RowMatrixXd const& x1, Eigen::RowMatrixXd const& r)
-{
+{   
+    CheckDeviceMismatch("Inverse(Eigen::RowMatrixXd const& x1, Eigen::RowMatrixXd const& r)");
+
     Eigen::RowMatrixXd output(inputDim, r.cols());
 
     Kokkos::View<const double**, MemorySpace> x1View = ConstRowMatToKokkos<double>(x1);
@@ -92,9 +98,27 @@ Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::Inverse(Eigen::RowMatrixXd c
 
 template<typename MemorySpace>
 Eigen::Map<Eigen::VectorXd> ConditionalMapBase<MemorySpace>::CoeffMap()
-{
+{   
+    CheckDeviceMismatch("CoeffMap()");
     return KokkosToVec(this->savedCoeffs);
 }
+
+template<typename MemorySpace>
+void ConditionalMapBase<MemorySpace>::CheckDeviceMismatch(std::string functionName) const
+{   
+    std::stringstream msg;
+    msg << "Error in call to \"" << functionName << "\".  This function is only valid on the host space,";
+    msg << " but called on a DeviceSpace ConditionalMapBase object.   You must manually copy the input";
+    msg << " argument to device space if you want to call this function.";
+    throw std::runtime_error(msg.str());
+}
+
+template<>
+void ConditionalMapBase<Kokkos::HostSpace>::CheckDeviceMismatch(std::string functionName) const
+{   
+}
+
+
 
 // Eigen::Map<const Eigen::VectorXd> ConditionalMapBase<MemorySpace>::CoeffMap() const
 // {
