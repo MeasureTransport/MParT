@@ -15,7 +15,7 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
     m.def("CreateComponent", [] (FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
                                  MapOptions options)
     {
-        return KokkosCustomPointer(MapFactory::CreateComponent(mset,options));
+        return KokkosCustomPointer(MapFactory::CreateComponent<Kokkos::HostSpace>(mset,options));
         //return MapFactory::CreateComponent(mset,options);
     });
 
@@ -25,7 +25,7 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
                                   unsigned int totalOrder, 
                                   MapOptions options)
     {
-        return KokkosCustomPointer(MapFactory::CreateTriangular(inputDim, outputDim, totalOrder, options));
+        return KokkosCustomPointer(MapFactory::CreateTriangular<Kokkos::HostSpace>(inputDim, outputDim, totalOrder, options));
     });
 
 }

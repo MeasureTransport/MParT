@@ -4,24 +4,24 @@
 
 using namespace mpart;
 using namespace Catch;
+using MemorySpace = Kokkos::HostSpace;
 
-
-class MyIdentityMap : public ConditionalMapBase{
+class MyIdentityMap : public ConditionalMapBase<MemorySpace>{
 public:
     MyIdentityMap(unsigned int dim, unsigned int numCoeffs) : ConditionalMapBase(dim,dim,numCoeffs){};
-    
+
     virtual ~MyIdentityMap() = default;
 
-    virtual void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts, 
+    virtual void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
                             Kokkos::View<double**, Kokkos::HostSpace>      &output) override{Kokkos::deep_copy(output,pts);};
-    
+
     virtual void LogDeterminantImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
-                                    Kokkos::View<double*, Kokkos::HostSpace>             &output) override{ 
+                                    Kokkos::View<double*, Kokkos::HostSpace>             &output) override{
         for(unsigned int i=0; i<output.size(); ++i)
             output(i)=0.0;
     }
 
-    virtual void InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
+    virtual void InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& x1,
                             Kokkos::View<const double**, Kokkos::HostSpace> const& r,
                             Kokkos::View<double**, Kokkos::HostSpace>      & output) override{Kokkos::deep_copy(output,r);};
 };
@@ -31,16 +31,16 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
 
     unsigned int numCoeffs = 10;
     MyIdentityMap map(4,numCoeffs);
-    
+
     CHECK(map.inputDim == 4);
     CHECK(map.outputDim == 4);
 
     SECTION("Using Kokkos"){
-    
+
         Kokkos::View<double*, Kokkos::HostSpace> coeffs("New Coeffs", numCoeffs);
         for(unsigned int i=0; i<numCoeffs; ++i)
             coeffs(i) = i;
-        
+
         map.SetCoeffs(coeffs);
         CHECK(map.Coeffs().extent(0) == numCoeffs);
 
@@ -73,7 +73,7 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
         Eigen::VectorXd coeffs(numCoeffs);
         for(unsigned int i=0; i<numCoeffs; ++i)
             coeffs(i) = i;
-        
+
         Kokkos::resize(map.Coeffs(), numCoeffs);
         map.CoeffMap() = coeffs;
         CHECK(map.Coeffs().extent(0) == numCoeffs);
@@ -82,22 +82,22 @@ TEST_CASE( "Testing coefficient functions of conditional map base class", "[Cond
             CHECK(map.Coeffs()(i) == coeffs(i));
             coeffs(i)++;
             CHECK(map.Coeffs()(i) != coeffs(i));
-        }   
+        }
 
         map.SetCoeffs(coeffs);
         for(unsigned int i=0; i<numCoeffs; ++i){
-            CHECK(map.Coeffs()(i) == coeffs(i));   
+            CHECK(map.Coeffs()(i) == coeffs(i));
             coeffs(i)++;
-            CHECK(map.Coeffs()(i) != coeffs(i));   
-        }  
+            CHECK(map.Coeffs()(i) != coeffs(i));
+        }
 
         map.SetCoeffs(coeffs);
         for(unsigned int i=0; i<numCoeffs; ++i){
-            CHECK(map.Coeffs()(i) == coeffs(i)); 
-            coeffs(i)++;  
+            CHECK(map.Coeffs()(i) == coeffs(i));
+            coeffs(i)++;
             map.CoeffMap()(i)++;
-            CHECK(map.Coeffs()(i) == coeffs(i));   
-        }        
+            CHECK(map.Coeffs()(i) == coeffs(i));
+        }
     }
 
 }
@@ -110,7 +110,7 @@ TEST_CASE( "Testing evaluation of an identity conditional map", "[ConditionalMap
     CHECK(map.inputDim == dim);
     CHECK(map.outputDim == dim);
 
-    
+
 
     SECTION("Using Kokkos"){
 
@@ -123,12 +123,12 @@ TEST_CASE( "Testing evaluation of an identity conditional map", "[ConditionalMap
         }
 
         Kokkos::View<const double**, Kokkos::HostSpace> ptsConst = pts;
-        
+
         Kokkos::View<double**, Kokkos::HostSpace> output = map.Evaluate(ptsConst);
 
         REQUIRE(output.extent(0)==dim);
         REQUIRE(output.extent(1)==numPts);
-        
+
         for(unsigned int i=0; i<dim; ++i){
             for(unsigned int j=0; j<numPts; ++j){
                 CHECK(output(i,j) == j);
@@ -150,12 +150,12 @@ TEST_CASE( "Testing evaluation of an identity conditional map", "[ConditionalMap
 
         REQUIRE(output.rows()==dim);
         REQUIRE(output.cols()==numPts);
-        
+
         for(unsigned int i=0; i<dim; ++i){
             for(unsigned int j=0; j<numPts; ++j){
                 CHECK(output(i,j) == j);
             }
-        }        
+        }
     }
 
 }
@@ -169,7 +169,7 @@ TEST_CASE( "Testing inverse evaluation of an identity conditional map", "[Condit
     CHECK(map.inputDim == dim);
     CHECK(map.outputDim == dim);
 
-    
+
 
     SECTION("Using Kokkos"){
 
@@ -185,7 +185,7 @@ TEST_CASE( "Testing inverse evaluation of an identity conditional map", "[Condit
 
         REQUIRE(output.extent(0)==dim);
         REQUIRE(output.extent(1)==numPts);
-        
+
         for(unsigned int i=0; i<dim; ++i){
             for(unsigned int j=0; j<numPts; ++j){
                 CHECK(output(i,j) == j);
@@ -207,12 +207,12 @@ TEST_CASE( "Testing inverse evaluation of an identity conditional map", "[Condit
 
         REQUIRE(output.rows()==dim);
         REQUIRE(output.cols()==numPts);
-        
+
         for(unsigned int i=0; i<dim; ++i){
             for(unsigned int j=0; j<numPts; ++j){
                 CHECK(output(i,j) == j);
             }
-        }        
+        }
     }
 
 }

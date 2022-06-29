@@ -4,13 +4,14 @@
 
 using namespace mpart;
 
-TriangularMap::TriangularMap(std::vector<std::shared_ptr<ConditionalMapBase>> const& components) : ConditionalMapBase(components.back()->inputDim, 
-                                                                                                                      std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase> const& comp){ return sum + comp->outputDim; }),
-                                                                                                                      std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase> const& comp){ return sum + comp->numCoeffs; })),
-                                                                                                   comps_(components)
+template<typename MemorySpace>
+TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components) : ConditionalMapBase<MemorySpace>(components.back()->inputDim,
+                        std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->outputDim; }),
+                        std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
+                        comps_(components)
 {
 
-    // Check the sizes of all the inputs 
+    // Check the sizes of all the inputs
     for(unsigned int i=0; i<comps_.size(); ++i){
         if(comps_.at(i)->outputDim > comps_.at(i)->inputDim){
             std::stringstream msg;
@@ -30,33 +31,34 @@ TriangularMap::TriangularMap(std::vector<std::shared_ptr<ConditionalMapBase>> co
     }
 }
 
-
-void TriangularMap::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
-    ConditionalMapBase::SetCoeffs(coeffs);
+    ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
 
     // Now create subviews for each of the components
     unsigned int cumNumCoeffs = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
-        comps_.at(i)->savedCoeffs = Kokkos::subview(savedCoeffs, std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
+        comps_.at(i)->savedCoeffs = Kokkos::subview(ConditionalMapBase<MemorySpace>::savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
         cumNumCoeffs += comps_.at(i)->numCoeffs;
     }
 }
 
-
-void TriangularMap::LogDeterminantImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
-                                       Kokkos::View<double*, Kokkos::HostSpace>             &output)
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::LogDeterminantImpl(Kokkos::View<const double**, MemorySpace> const& pts,
+                                       Kokkos::View<double*, MemorySpace>             &output)
 {
     // Evaluate the log determinant for the first component
-    Kokkos::View<const double**, Kokkos::HostSpace> subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(0)->inputDim)), Kokkos::ALL());
+    Kokkos::View<const double**, MemorySpace> subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(0)->inputDim)), Kokkos::ALL());
     comps_.at(0)->LogDeterminantImpl(subPts, output);
 
     if(comps_.size()==1)
         return;
-    
+
     // Vector to hold log determinant for a single component
-    Kokkos::View<double*, Kokkos::HostSpace> compDet("Log Determinant", output.extent(0));
+    Kokkos::View<double*, MemorySpace> compDet("Log Determinant", output.extent(0));
 
     for(unsigned int i=1; i<comps_.size(); ++i){
         subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
@@ -68,13 +70,13 @@ void TriangularMap::LogDeterminantImpl(Kokkos::View<const double**, Kokkos::Host
     }
 }
 
-
-void TriangularMap::EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
-                                 Kokkos::View<double**, Kokkos::HostSpace>            & output)
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,
+                                 Kokkos::View<double**, MemorySpace>            & output)
 {
     // Evaluate the output for each component
-    Kokkos::View<const double**, Kokkos::HostSpace> subPts;
-    Kokkos::View<double**, Kokkos::HostSpace> subOut;
+    Kokkos::View<const double**, MemorySpace> subPts;
+    Kokkos::View<double**, MemorySpace> subOut;
 
     int startOutDim = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
@@ -87,38 +89,48 @@ void TriangularMap::EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace>
     }
 }
 
-
-void TriangularMap::InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& x1, 
-                                Kokkos::View<const double**, Kokkos::HostSpace> const& r,
-                                Kokkos::View<double**, Kokkos::HostSpace>            & output)
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::InverseImpl(Kokkos::View<const double**, MemorySpace> const& x1,
+                                Kokkos::View<const double**, MemorySpace> const& r,
+                                Kokkos::View<double**, MemorySpace>            & output)
 {
-    Kokkos::View<double**, Kokkos::HostSpace> fullOut("Full Output", inputDim, x1.extent(1));
+    unsigned int ipdim = ConditionalMapBase<MemorySpace>::inputDim;
+    unsigned int opdim = ConditionalMapBase<MemorySpace>::outputDim;
+    Kokkos::View<double**, MemorySpace> fullOut("Full Output", ipdim, x1.extent(1));
     Kokkos::deep_copy(Kokkos::subview(fullOut, std::make_pair(0,int(x1.extent(0))), Kokkos::ALL()), x1);
 
     InverseInplace(fullOut, r);
 
-    Kokkos::deep_copy(output, Kokkos::subview(fullOut, std::make_pair(inputDim-outputDim,inputDim), Kokkos::ALL()));
+    Kokkos::deep_copy(output, Kokkos::subview(fullOut, std::make_pair(ipdim-opdim,ipdim), Kokkos::ALL()));
 }
 
-void TriangularMap::InverseInplace(Kokkos::View<double**, Kokkos::HostSpace> const& x, 
-                                   Kokkos::View<const double**, Kokkos::HostSpace> const& r)
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::InverseInplace(Kokkos::View<double**, MemorySpace> const& x,
+                                   Kokkos::View<const double**, MemorySpace> const& r)
 {
     // Evaluate the output for each component
-    Kokkos::View<const double**, Kokkos::HostSpace> subR;
-    Kokkos::View<const double**, Kokkos::HostSpace> subX;
-    Kokkos::View<double**, Kokkos::HostSpace> subOut;
-    
-    int extraInputs = inputDim - outputDim;
+    Kokkos::View<const double**, MemorySpace> subR;
+    Kokkos::View<const double**, MemorySpace> subX;
+    Kokkos::View<double**, MemorySpace> subOut;
+
+    unsigned int ipdim = ConditionalMapBase<MemorySpace>::inputDim;
+    unsigned int opdim = ConditionalMapBase<MemorySpace>::outputDim;
+    unsigned int extraInputs = ipdim - opdim;
 
     int startOutDim = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
-
         subX = Kokkos::subview(x, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
         subR = Kokkos::subview(r, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
-        subOut = Kokkos::subview(x, std::make_pair(extraInputs + startOutDim,int(extraInputs+startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
+        subOut = Kokkos::subview(x, std::make_pair(int(extraInputs + startOutDim),int(extraInputs+startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
 
         comps_.at(i)->InverseImpl(subX, subR, subOut);
 
         startOutDim += comps_.at(i)->outputDim;
     }
 }
+
+// Explicit template instantiation
+template class mpart::TriangularMap<Kokkos::HostSpace>;
+#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+    template class mpart::TriangularMap<Kokkos::DefaultExecutionSpace::memory_space>;
+#endif
