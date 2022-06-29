@@ -1,4 +1,4 @@
-classdef ConditionalMap < handle
+classdef TriangularMap < handle
 %DATABASE Example usage of the mexplus development kit.
 %
 % This class definition gives an interface to the underlying MEX functions
@@ -20,13 +20,12 @@ properties (Access = private)
 end
 
 methods
-  function this = ConditionalMap(mset,mapOptions)
+  function this = TriangularMap(list_id)
   %DATABASE Create a new database.
-    mexOptions = mapOptions.getMexOptions;
-    this.id_ = MParT_('newMap',mset.get_id(),mexOptions{1},mexOptions{2},mexOptions{3},mexOptions{4},mexOptions{5},mexOptions{6},mexOptions{7});
+    this.id_ = MParT_('newTriMap',list_id);
   end
 
-  function delete(this)
+ function delete(this)
   %DELETE Destructor.
     MParT_('deleteMap', this.id_);
   end
@@ -63,7 +62,6 @@ methods
   function result = get_id(this)
     result = this.id_;
   end
-
 end
 
 methods (Static)

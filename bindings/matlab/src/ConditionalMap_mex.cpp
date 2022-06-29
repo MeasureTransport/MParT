@@ -6,6 +6,7 @@
 #include "MParT/MapOptions.h"
 #include "MParT/MapFactory.h"
 #include "MParT/ConditionalMapBase.h"
+#include "MParT/TriangularMap.h"
 #include <Eigen/Dense>
 #include "mexplus_eigen.h"
 
@@ -21,12 +22,51 @@ public:
                                                           MapOptions opts){
     map_ptr = MapFactory::CreateComponent(mset,opts);
   }
+
+  ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase>> blocks){
+    map_ptr = std::make_shared<TriangularMap>(blocks);
+  }
 }; //end class
+
+// class TriangularMapMex {       // The class
+// public:             
+//   TriangularMap triMap;
+
+//   TriangularMapMex(std::vector<ConditionalMapMex> blocks){
+//     map_ptr = MapFactory::CreateComponent(mset,opts);
+//   }
+// }; //end class
+
+// class ListConditionalMaps {       // The class
+// public:             
+//   std::vector<std::shared_ptr<ConditionalMapBaseMex>> blocks;
+
+//   TriangularMapMex(std::vector<>){
+//     const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0))
+//     map_ptr = MapFactory::CreateComponent(mset,opts);
+//   }
+// }; //end class
 
 // Instance manager for ConditionalMap.
 template class mexplus::Session<ConditionalMapMex>;
 
 namespace {
+
+
+MEX_DEFINE(newTriMap) (int nlhs, mxArray* plhs[],
+                 int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  std::vector<intptr_t> list_id = input.get<std::vector<intptr_t>>(0);
+  unsigned int numBlocks = list_id.size();
+  std::vector<std::shared_ptr<ConditionalMapBase>> blocks(numBlocks);
+  for(unsigned int i=0;i<numBlocks;++i){
+      const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(list_id.at(i)); 
+      blocks.at(i) = condMap.map_ptr;
+    }
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(blocks)));
+}
+
 MEX_DEFINE(newMap) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 8);
@@ -44,7 +84,7 @@ MEX_DEFINE(deleteMap) (int nlhs, mxArray* plhs[],
   Session<ConditionalMapMex>::destroy(input.get(0));
 }
 
-MEX_DEFINE(setCoeffs) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(SetCoeffs) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 0);
@@ -60,6 +100,15 @@ MEX_DEFINE(Coeffs) (int nlhs, mxArray* plhs[],
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
   auto coeffs = KokkosToVec(condMap.map_ptr->Coeffs());
   output.set(0,coeffs);
+}
+
+MEX_DEFINE(numCoeffs) (int nlhs, mxArray* plhs[],
+                 int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+  auto numcoeffs = condMap.map_ptr->numCoeffs;
+  output.set(0,numcoeffs);
 }
 
 // MEX_DEFINE(EvaluateImpl) (int nlhs, mxArray* plhs[],

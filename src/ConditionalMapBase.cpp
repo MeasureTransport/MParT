@@ -90,15 +90,3 @@ Eigen::Map<Eigen::VectorXd> ConditionalMapBase::CoeffMap()
 {
     return KokkosToVec(this->savedCoeffs);
 }
-
-//What's the syntax for multiple outputs?
-// Kokkos::View<double*, Kokkos::HostSpace> ConditionalMapBase::CoeffJacobian(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
-//                                                                                 Kokkos::View<double*,Kokkos::HostSpace>  const& coeffs)
-// {
-//     Kokkos::View<double*, Kokkos::HostSpace> evaluations("Map Evaluations", pts.extent(1));
-//     Kokkos::View<double**, Kokkos::HostSpace> jacobian("Map Jacobian", pts.extent(1));
-//     CoeffJacobian(pts,coeffs,evaluations,jacobian);
-//     return jacobian;
-// }
-
-//MixedJacobian
