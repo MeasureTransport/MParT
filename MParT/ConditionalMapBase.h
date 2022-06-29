@@ -55,8 +55,7 @@ namespace mpart {
             @param[in] coeffs A view to save internally.
         */
         virtual void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs);
-
-        virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs){ SetCoeffs(VecToKokkos<double>(coeffs)); }
+        virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs);
 
         /** Returns an eigen map wrapping around the coefficient vector, which is stored in a Kokkos::View.  Updating the
             components of this map should also update the view.

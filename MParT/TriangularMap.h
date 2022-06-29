@@ -49,6 +49,7 @@ public:
                   then this vector should have length \f$\sum_{k=1}^K C_i\f$ and the coefficients for component \f$k\f$ should
                   start at index \f$\sum_{j=1}^{k-1} C_j\f$.
     */
+    using ConditionalMapBase<MemorySpace>::SetCoeffs;
     virtual void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
 
     /** @brief Computes the log determinant of the Jacobian matrix of this map.

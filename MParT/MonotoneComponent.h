@@ -53,7 +53,7 @@ public:
                               Kokkos::View<double**, MemorySpace>      & output) override
     {
         Kokkos::View<double*,MemorySpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        EvaluateImpl<Kokkos::DefaultHostExecutionSpace>(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, outputSlice);
+        EvaluateImpl(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, outputSlice);
     }
 
     virtual void InverseImpl(Kokkos::View<const double**, MemorySpace> const& x1,
@@ -62,7 +62,7 @@ public:
     {
         Kokkos::View<const double*,MemorySpace> rSlice = Kokkos::subview(r,0,Kokkos::ALL());
         Kokkos::View<double*,MemorySpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        InverseImpl<Kokkos::DefaultHostExecutionSpace>(x1, rSlice, ConditionalMapBase<MemorySpace>::savedCoeffs, outputSlice);
+        InverseImpl(x1, rSlice, ConditionalMapBase<MemorySpace>::savedCoeffs, outputSlice);
     }
 
     virtual void LogDeterminantImpl(Kokkos::View<const double**, MemorySpace> const& pts,

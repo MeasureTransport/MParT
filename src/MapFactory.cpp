@@ -19,7 +19,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
         if(opts.basisType==BasisTypes::ProbabilistHermite){
 
-            MultivariateExpansion<ProbabilistHermite> expansion(mset);
+            MultivariateExpansion<ProbabilistHermite,MemorySpace> expansion(mset);
             std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
             switch(opts.posFuncType) {
@@ -34,7 +34,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
         }else if(opts.basisType==BasisTypes::PhysicistHermite){
 
-            MultivariateExpansion<PhysicistHermite> expansion(mset);
+            MultivariateExpansion<PhysicistHermite, MemorySpace> expansion(mset);
             std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
             switch(opts.posFuncType) {
@@ -69,8 +69,8 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriang
     unsigned int extraInputs = inputDim - outputDim;
 
     for(unsigned int i=0; i<outputDim; ++i){
-        FixedMultiIndexSet mset(i+extraInputs+1, totalOrder);
-        comps.at(i) = CreateComponent(mset, options);
+        FixedMultiIndexSet<MemorySpace> mset(i+extraInputs+1, totalOrder);
+        comps.at(i) = CreateComponent<MemorySpace>(mset, options);
     }
 
     return std::make_shared<TriangularMap<MemorySpace>>(comps);
@@ -80,6 +80,6 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriang
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateComponent<Kokkos::HostSpace>(FixedMultiIndexSet<Kokkos::HostSpace> const&, MapOptions);
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateTriangular<Kokkos::HostSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
-    template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateComponent<Kokkos::DefaultExecutionSpace::memory_space>(FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> const&, MapOptions);
-    template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateTriangular<Kokkos::DefaultExecutionSpace::memory_space>(unsigned int, unsigned int, unsigned int, MapOptions);
+    template std::shared_ptr<ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>> mpart::MapFactory::CreateComponent<Kokkos::DefaultExecutionSpace::memory_space>(FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> const&, MapOptions);
+    template std::shared_ptr<ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>> mpart::MapFactory::CreateTriangular<Kokkos::DefaultExecutionSpace::memory_space>(unsigned int, unsigned int, unsigned int, MapOptions);
 #endif

@@ -797,7 +797,7 @@ TEST_CASE( "Testing MonotoneComponent::EvaluateSingle on Device", "[MonotoneComp
     // Run the fill cache funciton, using a parallel_for loop to ensure it's run on the device
     Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
         dexpansion.FillCache1(dcache.data(), dpt, DerivativeFlags::None);
-        dres(0) = MonotoneComponent<decltype(dexpansion),Exp, decltype(quad)>::EvaluateSingle(dcache.data(), workspace.data(), dpt, dpt(dim-1), dcoeffs, quad, dexpansion);
+        dres(0) = MonotoneComponent<decltype(dexpansion),Exp, decltype(quad), DeviceSpace>::EvaluateSingle(dcache.data(), workspace.data(), dpt, dpt(dim-1), dcoeffs, quad, dexpansion);
     });
 
     Kokkos::fence();
@@ -848,10 +848,10 @@ TEST_CASE( "Testing 1d monotone component evaluation on device", "[MonotoneCompo
         double absTol = 1e-6;
         AdaptiveSimpson<DeviceSpace> quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
 
-        MonotoneComponent<decltype(expansion),Exp, decltype(quad)> comp(expansion, quad);
+        MonotoneComponent<decltype(expansion),Exp, decltype(quad),DeviceSpace> comp(expansion, quad);
 
         Kokkos::View<double*,DeviceSpace> doutput("dout", numPts);
-        comp.EvaluateImpl<DeviceSpace,Kokkos::Cuda>(devalPts, dcoeffs, doutput);
+        comp.EvaluateImpl(devalPts, dcoeffs, doutput);
         auto houtput = ToHost(doutput);
 
         for(unsigned int i=0; i<numPts; ++i){
@@ -885,10 +885,10 @@ TEST_CASE( "Testing 1d monotone component evaluation on device", "[MonotoneCompo
         double absTol = 1e-6;
         AdaptiveSimpson<DeviceSpace> quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
 
-        MonotoneComponent<decltype(expansion), Exp, decltype(quad)> comp(expansion, quad);
+        MonotoneComponent<decltype(expansion), Exp, decltype(quad), DeviceSpace> comp(expansion, quad);
 
         Kokkos::View<double*,DeviceSpace> doutput("dout",numPts);
-        comp.EvaluateImpl<DeviceSpace,Kokkos::Cuda>(devalPts, dcoeffs, doutput);
+        comp.EvaluateImpl(devalPts, dcoeffs, doutput);
         auto houtput = ToHost(doutput);
 
         for(unsigned int i=0; i<numPts; ++i){
