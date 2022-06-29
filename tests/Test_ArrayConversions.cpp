@@ -110,7 +110,6 @@ TEST_CASE( "Testing functions that copy views between host and device", "[ArrayC
     typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
 
     unsigned int N1 = 10;
-    unsigned int N2 = 20;
 
     Kokkos::View<double*, Kokkos::HostSpace> hostVec("host stuff", N1);
     for(unsigned int i=0; i<N1; ++i)
