@@ -22,7 +22,7 @@ namespace binding{
     template <typename T>
     class KokkosCustomPointer {
         std::shared_ptr<KokkosGuard> guard;
-        std::shared_ptr<T> impl;
+        
     public:
         KokkosCustomPointer( ) : guard(GetKokkosGuard()) {};
         explicit KokkosCustomPointer(T *p) : guard(GetKokkosGuard()), impl(p) {}
@@ -30,6 +30,7 @@ namespace binding{
         T& operator*() const{return *impl;};
 
         T* get() const { return impl.get(); }
+        std::shared_ptr<T> impl;
     };
 
     /** KokkosRuntime is used to control when Kokkos::finalize is called.  It also provides a mechanism

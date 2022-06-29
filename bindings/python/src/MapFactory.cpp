@@ -11,13 +11,21 @@ using namespace mpart::binding;
 
 void mpart::binding::MapFactoryWrapper(py::module &m)
 {
-    // CteateComponent
-    //m.def("CreateComponent", &MapFactory::CreateComponent);
-    m.def("CreateComponent", [] (FixedMultiIndexSet<Kokkos::HostSpace> const& mset,
+    // CreateComponent
+    m.def("CreateComponent", [] (FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
                                  MapOptions options)
     {
         return KokkosCustomPointer(MapFactory::CreateComponent<Kokkos::HostSpace>(mset,options));
+        //return MapFactory::CreateComponent(mset,options);
     });
 
+    // CreateTriangular
+    m.def("CreateTriangular", [] (unsigned int inputDim, 
+                                  unsigned int outputDim,
+                                  unsigned int totalOrder, 
+                                  MapOptions options)
+    {
+        return KokkosCustomPointer(MapFactory::CreateTriangular<Kokkos::HostSpace>(inputDim, outputDim, totalOrder, options));
+    });
 
 }

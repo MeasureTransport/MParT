@@ -38,24 +38,10 @@ print('Map of the points')
 print(map_of_pts)
 print('============')
 
-log_det = map.LogDeterminant(pts)
-print('Log det of map at the points')
-print(log_det)
+# For testing inverse
+pts_ = map.Inverse(pts, map_of_pts) 
+
+# print(pts[0])
+print('Inverse map of the map of points')
+print(pts_)
 print('============')
-
-
-# Ways to change coeffs of map
-# coeffs = np.array([2.0, 0.5]) # map does NOT change
-# coeffs[:] = np.array([2.0, 0.5]) # map does change (maybe we don't want it to)
-# coeffs[0] = 2 # map does change (maybe we don't want it to)
-# map.CoeffMap()[:] = np.array([2, 0.5]) # map does change (we want it to)
-
-coeffs[:] = np.array([4, 0.5])  # changes map, we want this to NOT change the map
-
-map_of_pts = map.Evaluate(pts)
-print('Map of the points (coeffs changed)')
-print(map_of_pts)
-print('============')
-
-
-
