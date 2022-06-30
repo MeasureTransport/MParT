@@ -87,7 +87,12 @@ To support a GPU at the moment, you need a few special requirements. Due to the 
         -DKokkos_CXX_STANDARD=17                          \
     ../
 
-Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the compute resource uses that Kokkos supports. Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the `build` directory using the following command:
+Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the compute resource uses that Kokkos supports. If you aren't sure, try omitting this as Kokkos has some machinery to detect such architecture.
+
+.. tip::
+    If you're getting an error about C++ standards, try using a new version of your compiler; :code:`g++`, for example, does not support the flag :code:`--std=c++17` below version 8, where :code:`nvcc` only supports such syntax. For more details, see `this issue <https://github.com/kokkos/kokkos/issues/5157>`_ in Kokkos.
+
+Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the :code:`build` directory using the following command:
 
 .. code-block:: bash
 
@@ -100,7 +105,7 @@ Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the c
 Make sure that :code:`CMAKE_CXX_COMPILER` uses a full path from the root!
 
 .. tip::
-   If you're using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into `CMakeFiles.txt` and add `add_compile_definition(EIGEN_DONT_VECTORIZE)`.
+   If you're using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into :code:`CMakeFiles.txt` and add :code:`add_compile_definition(EIGEN_DONT_VECTORIZE)`.
 
 Building Documentation
 ----------------------

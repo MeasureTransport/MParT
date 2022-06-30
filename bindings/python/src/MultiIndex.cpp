@@ -26,11 +26,11 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def(py::init<unsigned int>())
         .def(py::init<unsigned int, unsigned int>())
         .def(py::init<std::vector<unsigned int> const&>())
-        
+
         .def("tolist",&MultiIndex::Vector)
         .def("sum", &MultiIndex::Sum)
         .def("max", &MultiIndex::Max)
-        
+
         .def("__setitem__", &MultiIndex::Set)
         .def("__getitem__", &MultiIndex::Get)
         .def("count_nonzero", &MultiIndex::NumNz)
@@ -44,8 +44,8 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("__gt__", &MultiIndex::operator>)
         .def("__le__", &MultiIndex::operator<=)
         .def("__ge__", &MultiIndex::operator>=);
-        
-    
+
+
     // MultiIndexSet
     py::class_<MultiIndexSet, KokkosCustomPointer<MultiIndexSet>>(m, "MultiIndexSet")
         .def(py::init<const unsigned int>())
@@ -61,7 +61,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
 
         .def("union", &MultiIndexSet::Union)
         .def("SetLimiter",&MultiIndexSet::SetLimiter)
-        .def("GetLimiter", &MultiIndexSet::GetLimiter)   
+        .def("GetLimiter", &MultiIndexSet::GetLimiter)
         .def("IndexToMulti",&MultiIndexSet::IndexToMulti)
         .def("MultiToIndex", &MultiIndexSet::MultiToIndex)
         .def("MaxOrders", &MultiIndexSet::MaxOrders)
@@ -90,35 +90,35 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("__call__", &MultiIndexLimiter::TotalOrder::operator())
     ;
 
-    
+
     //Dimension
     py::class_<MultiIndexLimiter::Dimension, KokkosCustomPointer<MultiIndexLimiter::Dimension>>(m, "Dimension")
         .def(py::init<unsigned int, unsigned int>())
         .def("__call__", &MultiIndexLimiter::Dimension::operator())
     ;
 
-    
+
     //Anisotropic
     py::class_<MultiIndexLimiter::Anisotropic, KokkosCustomPointer<MultiIndexLimiter::Anisotropic>>(m, "Anisotropic")
         .def(py::init<std::vector<double> const&, double>())
         .def("__call__", &MultiIndexLimiter::Anisotropic::operator())
     ;
 
-    
+
     //MaxDegree
     py::class_<MultiIndexLimiter::MaxDegree, KokkosCustomPointer<MultiIndexLimiter::MaxDegree>>(m, "MaxDegree")
         .def(py::init<unsigned int, unsigned int>())
         .def("__call__", &MultiIndexLimiter::MaxDegree::operator())
     ;
 
-    
+
     //None
     py::class_<MultiIndexLimiter::None, KokkosCustomPointer<MultiIndexLimiter::None>>(m, "NoneLim")
         .def(py::init<>())
         .def("__call__", &MultiIndexLimiter::None::operator())
     ;
 
-    
+
     //And
     py::class_<MultiIndexLimiter::And, KokkosCustomPointer<MultiIndexLimiter::And>>(m, "And")
         .def(py::init<std::function<bool(MultiIndex const&)>,std::function<bool(MultiIndex const&)>>())
@@ -142,20 +142,20 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
 
     py::class_<FixedMultiIndexSet<Kokkos::HostSpace>, KokkosCustomPointer<FixedMultiIndexSet<Kokkos::HostSpace>>>(m, "FixedMultiIndexSet")
 
-        .def(py::init( [](unsigned int dim, 
+        .def(py::init( [](unsigned int dim,
                           Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &orders)
         {
             return new FixedMultiIndexSet<Kokkos::HostSpace>(dim, VecToKokkos<unsigned int>(orders));
         }))
 
-        .def(py::init( [](unsigned int dim, 
+        .def(py::init( [](unsigned int dim,
                           Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &nzStarts,
                           Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &nzDims,
                           Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &nzOrders)
         {
-            return new FixedMultiIndexSet<Kokkos::HostSpace>(dim, 
-                                          VecToKokkos<unsigned int>(nzStarts), 
-                                          VecToKokkos<unsigned int>(nzDims), 
+            return new FixedMultiIndexSet<Kokkos::HostSpace>(dim,
+                                          VecToKokkos<unsigned int>(nzStarts),
+                                          VecToKokkos<unsigned int>(nzDims),
                                           VecToKokkos<unsigned int>(nzOrders));
         }))
 
@@ -165,7 +165,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         {
             auto maxDegrees = set.MaxDegrees(); // auto finds the type, but harder to read (because you don't tell reader the type)
             Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> maxDegreesEigen(maxDegrees.extent(0));
-            for (int i = 0; i < maxDegrees.extent(0); i++)
+            for (unsigned int i = 0; i < maxDegrees.extent(0); i++)
             {
                 maxDegreesEigen(i) = maxDegrees(i);
             }

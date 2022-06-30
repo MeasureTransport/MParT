@@ -362,38 +362,39 @@ protected:
                                        double      & tol) const
     {
         double relRefVal;
-        if(errorMetric_==QuadError::First){
-            error = fabs(fineVal[0]-coarseVal[0]);
-            relRefVal = fabs(coarseVal[0]);
-        }else if(errorMetric_==QuadError::NormInf){
-            error = 0;
-            relRefVal = 0;
-            for(unsigned int i=0; i<this->fdim_; ++i){
-                error = fmax(error, fabs(fineVal[i]-coarseVal[i]));
-                relRefVal = fmax(relRefVal, fabs(coarseVal[i]));
-            }
-
-        }else if(errorMetric_==QuadError::Norm2){
-
-            error = 0;
-            relRefVal = 0;
-            for(unsigned int i=0; i<this->fdim_; ++i){
-                error += (fineVal[i]-coarseVal[i])*(fineVal[i]-coarseVal[i]);
-                relRefVal += coarseVal[i]*coarseVal[i];
-            }
-            error = sqrt(error);
-            relRefVal = sqrt(relRefVal);
-
-        }else if(errorMetric_==QuadError::Norm1){
-
-            error = 0;
-            relRefVal = 0;
-            for(unsigned int i=0; i<this->fdim_; ++i){
-                error += fabs(fineVal[i]-coarseVal[i]);
-                relRefVal += fabs(coarseVal[i]);
-            }
-
+        switch(errorMetric_){
+            case QuadError::First:
+                error = fabs(fineVal[0]-coarseVal[0]);
+                relRefVal = fabs(coarseVal[0]);
+                break;
+            case QuadError::NormInf:
+                error = 0;
+                relRefVal = 0;
+                for(unsigned int i=0; i<this->fdim_; ++i){
+                    error = fmax(error, fabs(fineVal[i]-coarseVal[i]));
+                    relRefVal = fmax(relRefVal, fabs(coarseVal[i]));
+                }
+                break;
+            case QuadError::Norm2:
+                error = 0;
+                relRefVal = 0;
+                for(unsigned int i=0; i<this->fdim_; ++i){
+                    error += (fineVal[i]-coarseVal[i])*(fineVal[i]-coarseVal[i]);
+                    relRefVal += coarseVal[i]*coarseVal[i];
+                }
+                error = sqrt(error);
+                relRefVal = sqrt(relRefVal);
+                break;
+            default: // Norm1 is default
+                error = 0;
+                relRefVal = 0;
+                for(unsigned int i=0; i<this->fdim_; ++i){
+                    error += fabs(fineVal[i]-coarseVal[i]);
+                    relRefVal += fabs(coarseVal[i]);
+                }
+                break;
         }
+
         tol = std::fmax( relTol_*relRefVal, absTol_);
     }
 
