@@ -24,9 +24,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
             switch(opts.posFuncType) {
                 case PosFuncTypes::SoftPlus:
-                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad);
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv);
                 case PosFuncTypes::Exp:
-                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad);
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv);
             }
 
             output->Coeffs() = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
@@ -44,7 +44,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
                     output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad);
             }
 
-            output->Coeffs() = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
+            output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
             return output;
         }
     }
@@ -73,7 +73,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriang
         comps.at(i) = CreateComponent<MemorySpace>(mset, options);
     }
 
-    return std::make_shared<TriangularMap<MemorySpace>>(comps);
+    auto output = std::make_shared<TriangularMap<MemorySpace>>(comps);
+    output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
+    return output;
 }
 
 

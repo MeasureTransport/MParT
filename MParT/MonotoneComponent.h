@@ -40,12 +40,19 @@ class MonotoneComponent : public ConditionalMapBase<MemorySpace>
 
 public:
 
+    /** @brief Construct a monotone component with a specific expansion and quadrature type.
+        @details
+        @param expansion The expansion used to define the function \f$f\f$.
+        @param quad The quadrature rule used to approximate \f$\int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt\f$
+        @param useCondDeriv A flag to specify whether the analytic derivative of \f$T(x_1, x_2, ..., x_D)\f$ should be used by default, or if the derivative of the discretized integral should be used.  If "true", the analytic or "continuous" derivative will be used.  If "false", the derivative of the numerically approximated integral will be used.  See :ref:`diag_deriv_section` for more details.
+    */
     MonotoneComponent(ExpansionType  const& expansion,
-                      QuadratureType const& quad) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs()),
+                      QuadratureType const& quad,
+                      bool useContDeriv=true) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs()),
                                                     _expansion(expansion),
                                                     _quad(quad),
                                                     _dim(expansion.InputSize()),
-                                                    _useContDeriv(true){};
+                                                    _useContDeriv(useContDeriv){};
 
 
 
