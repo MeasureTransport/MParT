@@ -51,6 +51,8 @@ Computationally, we approximate the integral in the definition of :math:`T_d(\ma
 
 where the :math:`x_d` term outside the summation comes from a change of integration domains from :math:`[0,1]` to :math:`[0,x_d]`. 
 
+.. _diag_deriv_section:
+
 Diagonal Derivatives
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 

@@ -186,8 +186,8 @@ Kokkos::View<double**, MemorySpace> ConditionalMapBase<MemorySpace>::CoeffGrad(K
 }
 
 template<>
-Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::CoeffGrad(Eigen::Ref<Eigen::RowMatrixXd> const& pts, 
-                                                                    Eigen::Ref<Eigen::RowMatrixXd> const& sens)
+Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::CoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts, 
+                                                                    Eigen::Ref<const Eigen::RowMatrixXd> const& sens)
 {
     CheckCoefficients("CoeffGrad");
     Eigen::RowMatrixXd output(numCoeffs, pts.cols());
@@ -202,8 +202,8 @@ Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::CoeffGrad(Eigen::Ref<E
 }
 
 template<typename MemorySpace>
-Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::CoeffGrad(Eigen::Ref<Eigen::RowMatrixXd> const& pts, 
-                                                              Eigen::Ref<Eigen::RowMatrixXd> const& sens)
+Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::CoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts, 
+                                                              Eigen::Ref<const Eigen::RowMatrixXd> const& sens)
 {   
     CheckDeviceMismatch("CoeffGrad(Eigen::Ref<Eigen::RowMatrixXd> const& pts, Eigen::Ref<Eigen::RowMatrixXd> const& sens)");
     Eigen::RowMatrixXd output;
@@ -221,7 +221,7 @@ Kokkos::View<double**, MemorySpace> ConditionalMapBase<MemorySpace>::LogDetermin
 }
 
 template<>
-Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantCoeffGrad(Eigen::Ref<Eigen::RowMatrixXd> const& pts)
+Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
 {
     CheckCoefficients("LogDeterminantCoeffGrad");
     Eigen::RowMatrixXd output(numCoeffs, pts.cols());
@@ -235,7 +235,7 @@ Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantCoeffGra
 }
 
 template<typename MemorySpace>
-Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad(Eigen::Ref<Eigen::RowMatrixXd> const& pts)
+Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
 {   
     CheckDeviceMismatch("LogDeterminantCoeffGrad(Eigen::Ref<Eigen::RowMatrixXd> const& pts)");
     Eigen::RowMatrixXd output;

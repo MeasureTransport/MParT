@@ -128,8 +128,8 @@ namespace mpart {
         virtual Kokkos::View<double**, MemorySpace> CoeffGrad(Kokkos::View<const double**, MemorySpace> const& pts, 
                                                               Kokkos::View<const double**, MemorySpace> const& sens);
 
-        virtual Eigen::RowMatrixXd CoeffGrad(Eigen::Ref<Eigen::RowMatrixXd> const& pts,
-                                             Eigen::Ref<Eigen::RowMatrixXd> const& sens);
+        virtual Eigen::RowMatrixXd CoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts,
+                                             Eigen::Ref<const Eigen::RowMatrixXd> const& sens);
 
         virtual void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
                                    Kokkos::View<const double**, MemorySpace> const& sens,
@@ -150,7 +150,7 @@ namespace mpart {
          */
         virtual Kokkos::View<double**, MemorySpace> LogDeterminantCoeffGrad(Kokkos::View<const double**, MemorySpace> const& pts);
 
-        virtual Eigen::RowMatrixXd LogDeterminantCoeffGrad(Eigen::Ref<Eigen::RowMatrixXd> const& pts);
+        virtual Eigen::RowMatrixXd LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
         virtual void LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
                                                  Kokkos::View<double**, MemorySpace> &output) = 0;
