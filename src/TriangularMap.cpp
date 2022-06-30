@@ -40,7 +40,9 @@ void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> co
     // Now create subviews for each of the components
     unsigned int cumNumCoeffs = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
-        comps_.at(i)->savedCoeffs = Kokkos::subview(ConditionalMapBase<MemorySpace>::savedCoeffs,
+        assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
+
+        comps_.at(i)->savedCoeffs = Kokkos::subview(this->savedCoeffs,
             std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
         cumNumCoeffs += comps_.at(i)->numCoeffs;
     }
@@ -80,7 +82,6 @@ void TriangularMap<MemorySpace>::EvaluateImpl(Kokkos::View<const double**, Memor
 
     int startOutDim = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
-
         subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
         subOut = Kokkos::subview(output, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
         comps_.at(i)->EvaluateImpl(subPts, subOut);

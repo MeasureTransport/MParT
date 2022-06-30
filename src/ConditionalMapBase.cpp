@@ -245,6 +245,9 @@ Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad(Eige
 template<typename MemorySpace>
 void ConditionalMapBase<MemorySpace>::CheckCoefficients(std::string const& functionName) const
 {
+    if(this->numCoeffs==0)
+        return;
+
     bool good = true;
 
     if(!this->savedCoeffs.is_allocated()){

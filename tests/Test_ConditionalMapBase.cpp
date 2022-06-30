@@ -13,7 +13,7 @@ public:
     virtual ~MyIdentityMap() = default;
 
     virtual void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
-                            Kokkos::View<double**, Kokkos::HostSpace>      &output) override{Kokkos::deep_copy(output,pts);};
+                              Kokkos::View<double**, Kokkos::HostSpace>      &output) override{Kokkos::deep_copy(output,pts);};
 
     virtual void LogDeterminantImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
                                     Kokkos::View<double*, Kokkos::HostSpace>             &output) override{
