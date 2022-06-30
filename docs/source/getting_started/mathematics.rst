@@ -3,7 +3,6 @@
 Mathematical Background
 =========================
 
-
 Tensor Product Expansions 
 --------------------------
 
