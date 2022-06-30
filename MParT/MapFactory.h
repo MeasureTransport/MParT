@@ -16,7 +16,7 @@ namespace mpart{
         */
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponent(FixedMultiIndexSet<MemorySpace> const& mset,
-                                                            MapOptions options = MapOptions());
+                                                                         MapOptions options = MapOptions());
 
         /**
             @brief Constructs a triangular map with MonotoneComponents for each block.  A total order multiindex
@@ -34,9 +34,9 @@ namespace mpart{
          */
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateTriangular(unsigned int inputDim,
-                                                             unsigned int outputDim,
-                                                             unsigned int totalOrder,
-                                                             MapOptions options = MapOptions());
+                                                                          unsigned int outputDim,
+                                                                          unsigned int totalOrder,
+                                                                          MapOptions options = MapOptions());
     }
 }
 

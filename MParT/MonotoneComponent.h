@@ -40,11 +40,22 @@ class MonotoneComponent : public ConditionalMapBase<MemorySpace>
 
 public:
 
+    /** @brief Construct a monotone component with a specific expansion and quadrature type.
+        @details
+        @param expansion The expansion used to define the function \f$f\f$.
+        @param quad The quadrature rule used to approximate \f$\int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt\f$
+        @param useCondDeriv A flag to specify whether the analytic derivative of \f$T(x_1, x_2, ..., x_D)\f$ should be used by default, or if the derivative of the discretized integral should be used.  If "true", the analytic or "continuous" derivative will be used.  If "false", the derivative of the numerically approximated integral will be used.
+        @verbatim embed:rst 
+          See the :ref:`diag_deriv_section` mathematical background for more details.
+        @endverbatim 
+    */
     MonotoneComponent(ExpansionType  const& expansion,
-                      QuadratureType const& quad) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs()),
+                      QuadratureType const& quad,
+                      bool useContDeriv=true) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs()),
                                                     _expansion(expansion),
                                                     _quad(quad),
-                                                    _dim(expansion.InputSize()){};
+                                                    _dim(expansion.InputSize()),
+                                                    _useContDeriv(useContDeriv){};
 
 
 
@@ -69,18 +80,66 @@ public:
                                     Kokkos::View<double*, MemorySpace>             &output) override
     {
         // First, get the diagonal derivative
-        ContinuousDerivative(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, output);
+        if(_useContDeriv){
+            ContinuousDerivative(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, output);
+        }else{
+            Kokkos::View<double*,MemorySpace> evals("Evaluations", pts.extent(1));
+            DiscreteDerivative(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, evals, output);
+        }
 
         // Now take the log
-        for(unsigned int i=0; i<output.extent(0); ++i){
+        Kokkos::parallel_for(output.extent(0), KOKKOS_CLASS_LAMBDA (auto i) {
             if(output(i)<=0){
                 output(i) = -std::numeric_limits<double>::infinity();
             }else{
                 output(i) = std::log(output(i));
             }
-        }
+        });
     }
 
+    virtual void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
+                               Kokkos::View<const double**, MemorySpace> const& sens,
+                               Kokkos::View<double**, MemorySpace>            & output) override
+    {
+        assert(sens.extent(0)==this->outputDim);
+        assert(sens.extent(1)==pts.extent(1));
+        assert(pts.extent(0)==this->inputDim);
+        assert(output.extent(0)==this->numCoeffs);
+        assert(output.extent(1)==pts.extent(1));
+
+        Kokkos::View<double*,MemorySpace> evals("Map output", pts.extent(1));
+
+        CoeffJacobian(pts, this->savedCoeffs, evals, output);
+
+        // Scale each column by the sensitivity
+        Kokkos::parallel_for(pts.extent(1), KOKKOS_CLASS_LAMBDA (auto ptInd) {
+            for(unsigned int i=0; i<this->numCoeffs; ++i)
+                output(i,ptInd) *= sens(0,ptInd);
+        });
+    }
+
+
+    virtual void LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
+                                             Kokkos::View<double**, MemorySpace> &output) override
+    {   
+        Kokkos::View<double*,MemorySpace> derivs("Diagonal Derivative", pts.extent(1));
+
+        // First, get the diagonal derivative
+        if(_useContDeriv){
+            ContinuousMixedJacobian(pts,ConditionalMapBase<MemorySpace>::savedCoeffs, output);
+            ContinuousDerivative(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, derivs);
+        }else{
+            Kokkos::View<double*,MemorySpace> evals("Evaluations", pts.extent(1));
+            DiscreteMixedJacobian(pts,ConditionalMapBase<MemorySpace>::savedCoeffs, output);
+            DiscreteDerivative(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, evals, derivs);
+        }
+
+        // Now take the log
+        Kokkos::parallel_for(pts.extent(1), KOKKOS_CLASS_LAMBDA (auto ptInd) {
+            for(unsigned int i=0; i<this->numCoeffs; ++i)
+                output(i,ptInd) *= 1.0/derivs(ptInd);
+        });
+    }
 
     /**
      * @brief Support calling EvaluateImpl with non-const views.
@@ -297,6 +356,7 @@ public:
         Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
         return ContinuousDerivative<ExecutionSpace>(pts2,coeffs2);
     }
+    
 
 
     /**
@@ -478,21 +538,21 @@ public:
         @param[in] pts A \f$D\times N\f$ matrix containing the points \f$x^{(1)},\ldots,x^{(N)}\f$.  Each column is a point.
         @param[in] coeffs A vector of coefficients defining the function \f$f(\mathbf{x}; \mathbf{w})\f$.
         @param[out] evaluations A vector containing the \f$N\f$ predictions \f$y_d^{(i)}\f$.  The vector must be preallocated and have \f$N\f$ components when passed to this function.  An assertion will be thrown in this vector is not the correct size.
-        @param[out] jacobian A matrix containing the \f$N\times M\f$ Jacobian matrix, where \f$M\f$ is the length of the parameter vector \f$\mathbf{w}\f$.  This matrix must be sized correctly or an assertion will be thrown.
+        @param[out] jacobian A matrix containing the \f$M\times N\f$ Jacobian matrix, where \f$M\f$ is the length of the parameter vector \f$\mathbf{w}\f$.  This matrix must be sized correctly or an assertion will be thrown.
 
         @see CoeffGradient
     */
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void CoeffJacobian(Kokkos::View<double**,MemorySpace> const& pts,
-                       Kokkos::View<double*,MemorySpace>  const& coeffs,
+    void CoeffJacobian(Kokkos::View<const double**,MemorySpace> const& pts,
+                       Kokkos::View<const double*,MemorySpace>  const& coeffs,
                        Kokkos::View<double*,MemorySpace>       & evaluations,
                        Kokkos::View<double**,MemorySpace>      & jacobian)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
 
-        assert(jacobian.extent(0)==numPts);
-        assert(jacobian.extent(1)==numTerms);
+        assert(jacobian.extent(1)==numPts);
+        assert(jacobian.extent(0)==numTerms);
         assert(evaluations.extent(0)==numPts);
 
         // Ask the expansion how much memory it would like for it's one-point cache
@@ -512,7 +572,7 @@ public:
 
             // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
-            auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
+            auto jacView = Kokkos::subview(jacobian, Kokkos::ALL(), ptInd);
 
             // Get a pointer to the shared memory that Kokkos has set up for the cache
             Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
@@ -541,13 +601,16 @@ public:
     }
 
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void ContinuousMixedJacobian(Kokkos::View<double**,MemorySpace> const& pts,
-                                 Kokkos::View<double*,MemorySpace>  const& coeffs,
+    void ContinuousMixedJacobian(Kokkos::View<const double**,MemorySpace> const& pts,
+                                 Kokkos::View<const double*,MemorySpace>  const& coeffs,
                                  Kokkos::View<double**,MemorySpace>      & jacobian)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
+
+        assert(jacobian.extent(1)==numPts);
+        assert(jacobian.extent(0)==numTerms);
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = _expansion.CacheSize();
@@ -564,7 +627,7 @@ public:
 
             // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
-            auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
+            auto jacView = Kokkos::subview(jacobian, Kokkos::ALL(), ptInd);
 
             // Evaluate the orthgonal polynomials in each direction (except the last) for all possible orders
             Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
@@ -587,15 +650,15 @@ public:
     }
 
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void DiscreteMixedJacobian(Kokkos::View<double**,MemorySpace> const& pts,
-                               Kokkos::View<double*,MemorySpace>  const& coeffs,
+    void DiscreteMixedJacobian(Kokkos::View<const double**,MemorySpace> const& pts,
+                               Kokkos::View<const double*,MemorySpace>  const& coeffs,
                                Kokkos::View<double**,MemorySpace>      & jacobian)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
 
-        assert(jacobian.extent(0)==numPts);
-        assert(jacobian.extent(1)==numTerms);
+        assert(jacobian.extent(1)==numPts);
+        assert(jacobian.extent(0)==numTerms);
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = _expansion.CacheSize();
@@ -614,7 +677,7 @@ public:
 
             // Create a subview containing only the current point
             auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
-            auto jacView = Kokkos::subview(jacobian, ptInd, Kokkos::ALL());
+            auto jacView = Kokkos::subview(jacobian, Kokkos::ALL(), ptInd);
 
             // Get a pointer to the shared memory that Kokkos has set up for the cache
             Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
@@ -803,6 +866,7 @@ private:
     ExpansionType _expansion;
     QuadratureType _quad;
     const unsigned int _dim;
+    bool _useContDeriv;
 };
 
 } // namespace mpart
