@@ -51,15 +51,15 @@ class TestStringMethods(unittest.TestCase):
         assert component.numCoeffs == 4
         assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
 
-        opts.quadType = mpart.QuadTypes.AdaptiveClenshawCurtis
-        component = mpart.CreateComponent(mset.fix(True), opts)
-        assert component.numCoeffs == 4
-        assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
-        
-        opts.quadType = mpart.QuadTypes.ClenshawCurtis
-        component = mpart.CreateComponent(mset.fix(True), opts)
-        assert component.numCoeffs == 4
-        assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
+        # opts.quadType = mpart.QuadTypes.ClenshawCurtis
+        # component = mpart.CreateComponent(mset.fix(True), opts)
+        # assert component.numCoeffs == 4
+        # assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
+
+        # opts.quadType = mpart.QuadTypes.AdaptiveClenshawCurtis
+        # component = mpart.CreateComponent(mset.fix(True), opts)
+        # assert component.numCoeffs == 4
+        # assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
 
 
     def test_CreateTriangular(self):

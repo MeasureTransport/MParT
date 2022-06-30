@@ -29,26 +29,23 @@ class TestStringMethods(unittest.TestCase):
 
 
     def test_CoeffsMap(self):
-        assert self.triangular.CoeffMap().tolist() == []
         self.triangular.SetCoeffs(np.zeros(self.triangular.numCoeffs))
         assert self.triangular.CoeffMap().tolist() == [0,0,0,0,0]
 
 
-    def test_Evaluate(self):    
-        assert np.all(np.abs(self.triangular.Evaluate(self.x) - self.x) < 1E-6)
+    def test_Evaluate(self):
+        assert self.triangular.Evaluate(self.x).shape == (2,self.num_samples)
 
 
     def test_LogDeterminant(self):
-        assert np.all(self.triangular.LogDeterminant(self.x) == np.zeros(self.num_samples))
-        self.triangular.SetCoeffs(np.array([0., 3.3, 0., 0., 0.]))
-        assert np.all(self.triangular.LogDeterminant(self.x) == 3.3*np.ones(self.num_samples))
-
-
-    def test_Inverse(self):    
-        self.triangular.SetCoeffs(np.array([0.,1.,0.,0.,0.]))
+        assert self.triangular.LogDeterminant(self.x).shape == (self.num_samples,)
+        
+    def test_Inverse(self):
+        coeffs = np.random.randn(self.triangular.numCoeffs)
+        self.triangular.SetCoeffs(coeffs)
         y = self.triangular.Evaluate(self.x)
         x_ = self.triangular.Inverse(np.zeros((0,self.num_samples)),y)
-        assert np.all(np.abs(x_ - self.x) < 1E-6)
+        assert np.allclose(x_, self.x, atol=1E-3)
 
         
 
