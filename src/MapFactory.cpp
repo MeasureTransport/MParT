@@ -4,6 +4,7 @@
 #include "MParT/TriangularMap.h"
 #include "MParT/Quadrature.h"
 #include "MParT/OrthogonalPolynomial.h"
+#include "MParT/HermiteFunction.h"
 #include "MParT/MultivariateExpansion.h"
 #include "MParT/PositiveBijectors.h"
 
@@ -42,6 +43,21 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
                     output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad); break;
                 case PosFuncTypes::Exp:
                     output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad); break;
+            }
+
+            output->Coeffs() = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
+            return output;
+
+        }else if(opts.basisType==BasisTypes::HermiteFunctions){
+
+            MultivariateExpansion<HermiteFunction, MemorySpace> expansion(mset);
+            std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
+
+            switch(opts.posFuncType) {
+                case PosFuncTypes::SoftPlus:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad);
+                case PosFuncTypes::Exp:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad);
             }
 
             output->Coeffs() = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
