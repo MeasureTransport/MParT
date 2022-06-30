@@ -299,7 +299,12 @@ make install
 ../
 </pre></div>
 </div>
-<p>Replace the <code class="code docutils literal notranslate"><span class="pre">Kokkos_ARCH_VOLTA70</span></code> as needed with whatever other arch the compute resource uses that Kokkos supports. Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the <cite>build</cite> directory using the following command:</p>
+<p>Replace the <code class="code docutils literal notranslate"><span class="pre">Kokkos_ARCH_VOLTA70</span></code> as needed with whatever other arch the compute resource uses that Kokkos supports. If you aren’t sure, try omitting this as Kokkos has some machinery to detect such architecture.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you’re getting an error about C++ standards, try using a new version of your compiler; <code class="code docutils literal notranslate"><span class="pre">g++</span></code>, for example, does not support the flag <code class="code docutils literal notranslate"><span class="pre">--std=c++17</span></code> below version 8, where <code class="code docutils literal notranslate"><span class="pre">nvcc</span></code> only supports such syntax. For more details, see <a class="reference external" href="https://github.com/kokkos/kokkos/issues/5157">this issue</a> in Kokkos.</p>
+</div>
+<p>Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the <code class="code docutils literal notranslate"><span class="pre">build</span></code> directory using the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake <span class="se">\</span>
     -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/install/path&gt;                       <span class="se">\</span>
     -DKokkos_ROOT<span class="o">=</span>&lt;/new/kokkos/install/path&gt;                         <span class="se">\</span>
@@ -310,7 +315,7 @@ make install
 <p>Make sure that <code class="code docutils literal notranslate"><span class="pre">CMAKE_CXX_COMPILER</span></code> uses a full path from the root!</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>If you’re using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into <cite>CMakeFiles.txt</cite> and add <cite>add_compile_definition(EIGEN_DONT_VECTORIZE)</cite>.</p>
+<p>If you’re using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into <code class="code docutils literal notranslate"><span class="pre">CMakeFiles.txt</span></code> and add <code class="code docutils literal notranslate"><span class="pre">add_compile_definition(EIGEN_DONT_VECTORIZE)</span></code>.</p>
 </div>
 </section>
 </section>
