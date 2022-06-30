@@ -50,11 +50,11 @@ void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder,
     for(unsigned int i=0; i<currDim; ++i)
         currOrder += base.at(i);
 
-    const int length = base.size();
+    const unsigned int length = base.size();
 
     if(currDim==length-1)
     {
-        for(int i=0; i<=maxOrder-currOrder; ++i)
+        for(unsigned int i=0; i<=maxOrder-currOrder; ++i)
         {
             base.at(length-1) = i;
             MultiIndex newTerm(base);
@@ -63,7 +63,7 @@ void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder,
         }
 
     }else{
-        for(int i=0; i<=maxOrder-currOrder; ++i)
+        for(unsigned int i=0; i<=maxOrder-currOrder; ++i)
         {
             for(unsigned int k=currDim+1; k<length; ++k)
                 base.at(k) = 0;
@@ -81,11 +81,11 @@ void MultiIndexSet::RecursiveTensorFill(unsigned int   maxDegree,
                                         std::vector<unsigned int> &base,
                                         LimiterType const& limiter)
 {
-    const int length = base.size();
+    const unsigned int length = base.size();
 
     if(currDim==length-1)
     {
-        for(int i=0; i<=maxDegree; ++i)
+        for(unsigned int i=0; i<=maxDegree; ++i)
         {
             base.at(length-1) = i;
             MultiIndex newTerm(base);
@@ -94,7 +94,7 @@ void MultiIndexSet::RecursiveTensorFill(unsigned int   maxDegree,
         }
 
     }else{
-        for(int i=0; i<=maxDegree; ++i)
+        for(unsigned int i=0; i<=maxDegree; ++i)
         {
             for(unsigned int k=currDim+1; k<length; ++k)
                 base.at(k) = 0;
@@ -109,15 +109,18 @@ void MultiIndexSet::RecursiveTensorFill(unsigned int   maxDegree,
 
 MultiIndexSet::MultiIndexSet(const unsigned int lengthIn,
                              LimiterType const& limiterIn,
-                             std::shared_ptr<MultiIndexNeighborhood> neigh) : maxOrders(lengthIn,0),
+                             std::shared_ptr<MultiIndexNeighborhood> neigh) : limiter(limiterIn),
                                                                               length(lengthIn),
-                                                                              limiter(limiterIn),
+                                                                              maxOrders(lengthIn,0),
                                                                               neighborhood(neigh)
 {
 };
 
 
-MultiIndexSet::MultiIndexSet(Eigen::Ref<const Eigen::MatrixXi> const& multis) : maxOrders(multis.cols(),0), length(multis.cols()), limiter(MultiIndexLimiter::None()), neighborhood(std::make_shared<DefaultNeighborhood>()){
+MultiIndexSet::MultiIndexSet(Eigen::Ref<const Eigen::MatrixXi> const& multis) :
+          limiter(MultiIndexLimiter::None()), length(multis.cols()),
+          maxOrders(multis.cols(),0),
+          neighborhood(std::make_shared<DefaultNeighborhood>()) {
 
     for(unsigned int i=0; i<multis.rows(); ++i){
         (*this) += MultiIndex(multis.row(i));
@@ -183,7 +186,7 @@ void MultiIndexSet::SetLimiter(LimiterType const& newLimiter){
 
   //  make sure no active terms in the set currently obey the new limiter.
   //  If a term is inactive, remove all edges tied to it
-  for(int globalInd=0; globalInd<allMultis.size(); ++globalInd)
+  for(unsigned int globalInd=0; globalInd<allMultis.size(); ++globalInd)
   {
     if(IsActive(globalInd)){
       if(!newLimiter(allMultis.at(globalInd))){
@@ -299,7 +302,7 @@ bool MultiIndexSet::IsAdmissible(unsigned int globalIndex) const
     return true;
 
   // count the number of input edges that are coming from active indices
-  int numAdmiss = 0;
+  unsigned int numAdmiss = 0;
   for(int inNode : inEdges.at(globalIndex)){
     if(IsActive(inNode))
       numAdmiss++;
@@ -398,8 +401,9 @@ void MultiIndexSet::AddForwardNeighbors(unsigned int globalIndex, bool addInacti
 
 void MultiIndexSet::Visualize(std::ostream &out) const
 {
-
-  for(int i=maxOrders.at(1)+1; i>=0; --i){
+  unsigned int max_ord = maxOrders.at(1) + 1;
+  for(unsigned int order = 0; order <= maxOrders.at(1) + 1; order++) {
+    unsigned int i=max_ord - order;
 
     if(i<10)
       out << " ";
@@ -704,7 +708,7 @@ unsigned int MultiIndexSet::Union(const MultiIndexSet& rhs)
 {
   int oldTerms = Size();
 
-  for(int i = 0; i < rhs.allMultis.size(); ++i) {
+  for(unsigned int i = 0; i < rhs.allMultis.size(); ++i) {
 
     auto newMulti = rhs.allMultis.at(i);
     if(limiter(newMulti)){

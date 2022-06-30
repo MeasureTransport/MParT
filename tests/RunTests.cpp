@@ -23,7 +23,7 @@ int main( int argc, char* argv[] ) {
   if( returnCode != 0 ) // Indicates a command line error
       return returnCode;
 
-  int result = session.run();
+  session.run();
 
   Kokkos::finalize();
 }
