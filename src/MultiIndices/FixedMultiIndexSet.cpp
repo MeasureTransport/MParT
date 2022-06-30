@@ -72,11 +72,11 @@ namespace mpart{
 
 
 template<typename MemorySpace>
-FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int                dim,
-                                       Kokkos::View<unsigned int*, MemorySpace> nzOrders) : dim(dim),
+FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int                dimen,
+                                       Kokkos::View<unsigned int*, MemorySpace> nonzeroOrders) : dim(dimen),
                                                                                             isCompressed(false),
-                                                                                            nzOrders(nzOrders),
-                                                                                            nzDims("Nonzero dims", nzOrders.extent(0))
+                                                                                            nzDims("Nonzero dims", nonzeroOrders.extent(0)),
+                                                                                            nzOrders(nonzeroOrders)
 {
     SetupTerms();
     CalculateMaxDegrees();
@@ -265,17 +265,17 @@ void FixedMultiIndexSet<MemorySpace>::Print() const
 {
     if(isCompressed){
         std::cout << "Starts:\n";
-        for(int i=0; i<nzStarts.extent(0); ++i)
+        for(unsigned int i=0; i<nzStarts.extent(0); ++i)
             std::cout << nzStarts(i) << "  ";
         std::cout << std::endl;
 
         std::cout << "\nDims:\n";
-        for(int i=0; i<nzDims.extent(0); ++i)
+        for(unsigned int i=0; i<nzDims.extent(0); ++i)
             std::cout << nzDims(i) << "  ";
         std::cout << std::endl;
 
         std::cout << "\nOrders:\n";
-        for(int i=0; i<nzOrders.extent(0); ++i)
+        for(unsigned int i=0; i<nzOrders.extent(0); ++i)
             std::cout << nzOrders(i) << "  ";
         std::cout << std::endl;
     }
@@ -333,7 +333,7 @@ void FixedMultiIndexSet<MemorySpace>::FillTotalOrder(unsigned int maxOrder,
 
             // Copy the multiindex into the compressed format
             nzStarts(currTerm) = currNz;
-            for(int i=0; i<dim; ++i){
+            for(unsigned int i=0; i<dim; ++i){
                 if(workspace[i]>0){
                     nzDims(currNz) = i;
                     nzOrders(currNz) = workspace[i];
