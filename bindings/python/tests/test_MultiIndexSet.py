@@ -12,5 +12,5 @@ def test_max_degrees():
     mset = mpart.MultiIndexSet.CreateTensorProduct(3,4,noneLim)
     assert np.all(mset.MaxOrders() == [4,4,4])
 
-    mset = mpart.MultiIndexSet.CreateTotal(3,4,noneLim)
+    mset = mpart.MultiIndexSet.CreateTotalOrder(3,4,noneLim)
     assert np.all(mset.MaxOrders() == [4,4,4])
