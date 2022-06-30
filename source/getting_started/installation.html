@@ -274,6 +274,19 @@ make install
 </div>
 <p>This often results when due to conda environment mismatches, but can typically be circumvented by explicitly setting the path to your python executable.  When calling cmake, add <code class="code docutils literal notranslate"><span class="pre">-DPYTHON_EXECUTABLE=`which</span> <span class="pre">python`</span></code>.</p>
 </div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>On OSX, using MParT with the system version of python might result in an error with something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">ImportError</span><span class="p">:</span> <span class="n">dlopen</span><span class="p">(</span><span class="n">pympart</span><span class="o">.</span><span class="n">so</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span> <span class="n">no</span> <span class="n">suitable</span> <span class="n">image</span> <span class="n">found</span><span class="o">.</span>  <span class="n">Did</span> <span class="n">find</span><span class="p">:</span>
+    <span class="n">MParT</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">mpart</span><span class="o">/</span><span class="n">pympart</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="n">mach</span><span class="o">-</span><span class="n">o</span><span class="p">,</span> <span class="n">but</span> <span class="n">wrong</span> <span class="n">architecture</span>
+    <span class="n">MParT</span><span class="o">/</span><span class="n">python</span><span class="o">/</span><span class="n">mpart</span><span class="o">/</span><span class="n">pympart</span><span class="o">.</span><span class="n">so</span><span class="p">:</span> <span class="n">mach</span><span class="o">-</span><span class="n">o</span><span class="p">,</span> <span class="n">but</span> <span class="n">wrong</span> <span class="n">architecture</span>
+</pre></div>
+</div>
+<p>You can sometimes force OSX to use the x86_64 version of python using the <code class="code docutils literal notranslate"><span class="pre">arch</span></code> executable.   For example, to run a script <code class="code docutils literal notranslate"><span class="pre">test.py</span></code>, you can use</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">arch</span> <span class="o">-</span><span class="n">x86_64</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">python</span> <span class="n">test</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</div>
 <section id="compiling-with-julia-bindings">
 <h3>Compiling with Julia Bindings<a class="headerlink" href="#compiling-with-julia-bindings" title="Permalink to this heading">#</a></h3>
 <p>By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code> package is installed.   To install <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code>, run the following command in your Julia prompt:</p>
