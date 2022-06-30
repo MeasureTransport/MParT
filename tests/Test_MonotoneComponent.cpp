@@ -493,7 +493,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
     SECTION("Coefficient Jacobian"){
 
         Kokkos::View<double*, HostSpace> evals2("FD Evals", numPts);
-        Kokkos::View<double**, HostSpace> jac("Jacobian", numPts, numTerms);
+        Kokkos::View<double**, HostSpace> jac("Jacobian", numTerms, numPts);
 
         comp.CoeffJacobian(evalPts, coeffs, evals2, jac);
 
@@ -507,7 +507,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
             comp.EvaluateImpl(evalPts, coeffs, evals2);
 
             for(unsigned int i=0; i<numPts; ++i)
-                CHECK(jac(i,j) == Approx((evals2(i)-evals(i))/fdStep).epsilon(5e-4).margin(1e-4));
+                CHECK(jac(j,i) == Approx((evals2(i)-evals(i))/fdStep).epsilon(5e-4).margin(1e-4));
 
             coeffs(j) -= fdStep;
         }
@@ -521,7 +521,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
         Kokkos::View<double*, HostSpace> derivs("Derivatives", numPts);
         Kokkos::View<double*, HostSpace> derivs2("Derivatives2", numPts);
 
-        Kokkos::View<double**, HostSpace> jac("Jacobian", numPts, numTerms);
+        Kokkos::View<double**, HostSpace> jac("Jacobian", numTerms,numPts);
 
         comp.DiscreteMixedJacobian(evalPts, coeffs, jac);
         derivs = comp.DiscreteDerivative(evalPts, coeffs);
@@ -535,7 +535,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
             derivs2 = comp.DiscreteDerivative(evalPts, coeffs2);
 
             for(unsigned int i=0; i<derivs2.extent(0); ++i){
-                CHECK(jac(i,j)==Approx((derivs2(i) - derivs(i))/fdStep).epsilon(1e-4).margin(1e-3));
+                CHECK(jac(j,i)==Approx((derivs2(i) - derivs(i))/fdStep).epsilon(1e-4).margin(1e-3));
             }
 
             coeffs2(j) = coeffs(j);
@@ -550,7 +550,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
         Kokkos::View<double*, HostSpace> derivs("Derivatives", numPts);
         Kokkos::View<double*, HostSpace> derivs2("Derivatives2", numPts);
 
-        Kokkos::View<double**, HostSpace> jac("Jacobian", numPts, numTerms);
+        Kokkos::View<double**, HostSpace> jac("Jacobian", numTerms,numPts);
 
         comp.ContinuousMixedJacobian(evalPts, coeffs, jac);
         derivs = comp.ContinuousDerivative(evalPts, coeffs);
@@ -564,7 +564,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
             derivs2 = comp.ContinuousDerivative(evalPts, coeffs2);
 
             for(unsigned int i=0; i<derivs2.extent(0); ++i){
-                CHECK(jac(i,j)==Approx((derivs2(i) - derivs(i))/fdStep).epsilon(1e-4).margin(1e-3));
+                CHECK(jac(j,i)==Approx((derivs2(i) - derivs(i))/fdStep).epsilon(1e-4).margin(1e-3));
             }
 
             coeffs2(j) = coeffs(j);
@@ -600,13 +600,13 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
 
     unsigned int numTerms = mset.Size();
     Kokkos::View<double*,HostSpace> coeffs("Coefficients", numTerms);
-    Kokkos::View<double**,HostSpace> jac("Gradient", numPts, numTerms);
+    Kokkos::View<double**,HostSpace> jac("Gradient", numTerms,numPts);
     Kokkos::View<double*,HostSpace> preds("Predictions", numPts);
 
 
     double objective;
 
-    Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor>> jacMat(&jac(0,0), numPts, numTerms);
+    Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic,Eigen::Dynamic, Eigen::RowMajor>> jacMat(&jac(0,0), numTerms,numPts);
 
     Eigen::Map<Eigen::VectorXd> predVec(&preds(0), numPts);
     Eigen::Map<Eigen::VectorXd> obsVec(&fvals(0), numPts);
@@ -621,13 +621,93 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
         objGrad = predVec-obsVec;
 
         objective = 0.5*objGrad.squaredNorm();
-        coeffVec -= jacMat.colPivHouseholderQr().solve(objGrad);
+        coeffVec -= jacMat.transpose().colPivHouseholderQr().solve(objGrad);
     }
 
     CHECK(objective<1e-3);
 
 }
 
+
+TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[MonotoneComponent_CoeffGrad]")
+{
+    const double testTol = 1e-4;
+    unsigned int dim = 2;
+ 
+    // Create points evently spaced on [lb,ub]
+    unsigned int numPts = 20;
+    double lb = -0.5;
+    double ub = 0.5;
+
+    Kokkos::View<double**, HostSpace> evalPts("Evaluate Points", dim, numPts);
+    for(unsigned int i=0; i<numPts; ++i){
+        evalPts(0,i) = 0.3;
+        evalPts(1,i) = 0.5;
+    }
+
+    unsigned int maxDegree = 3;
+    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+    MultivariateExpansion<ProbabilistHermite> expansion(mset);
+
+    unsigned int maxSub = 20;
+    double relTol = 1e-7;
+    double absTol = 1e-7;
+    AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
+
+    MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+
+    Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
+    for(unsigned int i=0; i<coeffs.extent(0); ++i)
+        coeffs(i) = 0.1*std::cos( 0.01*i );
+    
+    comp.SetCoeffs(coeffs);
+
+    SECTION("CoeffGrad"){
+        
+        Kokkos::View<double**, HostSpace> sens("Sensitivity", 1, numPts);
+        for(unsigned int i=0; i<numPts; ++i)
+            sens(0,i) = 0.25*(i+1);
+
+        Kokkos::View<double**, HostSpace> grads = comp.CoeffGrad(evalPts, sens);
+        REQUIRE(grads.extent(0)==comp.numCoeffs);
+        REQUIRE(grads.extent(1)==numPts);
+
+        for(unsigned int j=1; j<numPts; ++j){
+            for(unsigned int i=0; i<comp.numCoeffs; ++i){
+                CHECK(grads(i,j) == (j+1.0)*grads(i,0));
+            }
+        }
+    }
+
+    SECTION("LogDeterminantCoeffGrad"){
+
+        for(unsigned int i=0; i<numPts; ++i){
+            evalPts(0,i) = 0.03*i;
+            evalPts(1,i) = -0.05*i;
+        }
+
+        Kokkos::View<double*, HostSpace> logDets = comp.LogDeterminant(evalPts);
+        Kokkos::View<double*, HostSpace> logDets2;
+        Kokkos::View<double**, HostSpace> grads = comp.LogDeterminantCoeffGrad(evalPts);
+        REQUIRE(grads.extent(0)==comp.numCoeffs);
+        REQUIRE(grads.extent(1)==numPts);
+
+        // Compare with finite difference derivatives
+        const double fdstep = 1e-4;
+
+        for(unsigned int i=0; i<coeffs.extent(0); ++i){
+            coeffs(i) += fdstep;
+
+            comp.SetCoeffs(coeffs);
+            logDets2 = comp.LogDeterminant(evalPts);
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+                CHECK( grads(i,ptInd) == Approx((logDets2(ptInd)-logDets(ptInd))/fdstep).epsilon(1e-5));
+            
+            coeffs(i) -= fdstep;
+        }
+
+    }
+}
 
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
 

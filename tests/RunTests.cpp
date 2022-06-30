@@ -13,7 +13,7 @@ int main( int argc, char* argv[] ) {
   // Build a new parser on top of Catch2's
   using namespace Catch::Clara;
   auto cli
-    = session.cli() | Opt( cores, "kokkos-cores" ) ["--kokkos-cores"]("Number of cores to use with Kokkos.");
+    = session.cli() | Opt( cores, "kokkos-thread" ) ["--kokkos-threads"]("Number of cores to use with Kokkos.");
 
   // Now pass the new composite back to Catch2 so it uses that
   session.cli( cli );
