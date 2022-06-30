@@ -98,7 +98,7 @@ namespace MultiIndexLimiter{
    */
  class None{
   public:
-    bool operator()(MultiIndex const& multi) const {return true;};
+    bool operator()(MultiIndex const&) const {return true;};
   };
 
   /** @class And

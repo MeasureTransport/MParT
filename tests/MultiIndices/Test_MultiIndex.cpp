@@ -47,7 +47,7 @@ TEST_CASE( "Testing MultiIndex", "[MultiIndex]" ) {
     REQUIRE( multi.Sum() == 1);
 
     dense = multi.Vector();
-    for(int i=0; i<dense.size(); ++i){
+    for(unsigned int i=0; i<dense.size(); ++i){
         if(i!=2){
             REQUIRE( dense[i] == 0);
         }else{
@@ -102,7 +102,7 @@ TEST_CASE( "Testing MultiIndex", "[MultiIndex]" ) {
 
 TEST_CASE("Multiindex from Eigen", "[MultiIndexFromEigen]")
 {
-    Eigen::VectorXi multi(3);
+    Eigen::Matrix<unsigned int,3,1> multi;
     multi << 2,3,4;
 
     MultiIndex a(multi);

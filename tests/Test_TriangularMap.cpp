@@ -138,7 +138,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-4)); 
+                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
             }
             coeffs(i) -= fdstep;
         }

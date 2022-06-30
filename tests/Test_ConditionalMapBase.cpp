@@ -15,13 +15,13 @@ public:
     virtual void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
                               Kokkos::View<double**, Kokkos::HostSpace>      &output) override{Kokkos::deep_copy(output,pts);};
 
-    virtual void LogDeterminantImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
+    virtual void LogDeterminantImpl(Kokkos::View<const double**, Kokkos::HostSpace> const&,
                                     Kokkos::View<double*, Kokkos::HostSpace>             &output) override{
         for(unsigned int i=0; i<output.size(); ++i)
             output(i)=0.0;
     }
 
-    virtual void InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& x1,
+    virtual void InverseImpl(Kokkos::View<const double**, Kokkos::HostSpace> const&,
                             Kokkos::View<const double**, Kokkos::HostSpace> const& r,
                             Kokkos::View<double**, Kokkos::HostSpace>      & output) override{Kokkos::deep_copy(output,r);};
 

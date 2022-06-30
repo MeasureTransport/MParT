@@ -165,7 +165,6 @@ public:
                       Kokkos::View<double*,MemorySpace>       & output)
     {
         const unsigned int numPts = pts.extent(1);
-        const unsigned int numTerms = coeffs.extent(0);
 
         assert(output.extent(0)==numPts);
 
@@ -283,9 +282,6 @@ public:
         const unsigned int numPts = ys.extent(0);
         const unsigned int numXs = xs.extent(1); // The number of input points
 
-        const unsigned int numTerms = coeffs.extent(0);
-        const unsigned int dim = xs.extent(0);
-
         // Check to make sure the output and and input have the right sizes.
         if((numXs!=1)&&(numXs!=numPts)){
             std::stringstream msg;
@@ -376,7 +372,6 @@ public:
                               Kokkos::View<double*,MemorySpace>       & derivs)
     {
         const unsigned int numPts = pts.extent(1);
-        const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
 
         // Ask the expansion how much memory it would like for it's one-point cache
@@ -472,7 +467,6 @@ public:
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
-        const unsigned int dim = pts.extent(0);
 
         assert(coeffs.extent(0)==numTerms);
 
@@ -553,7 +547,6 @@ public:
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
-        const unsigned int dim = pts.extent(0);
 
         assert(jacobian.extent(1)==numPts);
         assert(jacobian.extent(0)==numTerms);
@@ -660,7 +653,6 @@ public:
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
-        const unsigned int dim = pts.extent(0);
 
         assert(jacobian.extent(1)==numPts);
         assert(jacobian.extent(0)==numTerms);

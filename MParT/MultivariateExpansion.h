@@ -16,8 +16,7 @@ struct MultivariateExpansionMaxDegreeFunctor {
 
     MultivariateExpansionMaxDegreeFunctor(unsigned int dim, Kokkos::View<unsigned int*, MemorySpace> startPos, Kokkos::View<const unsigned int*, MemorySpace> maxDegrees) : dim(dim), startPos(startPos), maxDegrees(maxDegrees) {};
 
-    KOKKOS_FUNCTION void operator()(const int i, unsigned int& update, const bool final) const{
-        const unsigned int val_i = startPos(i);
+    KOKKOS_FUNCTION void operator()(const unsigned int i, unsigned int& update, const bool final) const{
         if(final)
             startPos(i) = update;
 
@@ -38,7 +37,7 @@ struct CacheSizeFunctor{
 
     CacheSizeFunctor(Kokkos::View<unsigned int*, MemorySpace> startPosIn, Kokkos::View<unsigned int*, MemorySpace> cacheSizeIn) : startPos_(startPosIn), cacheSize_(cacheSizeIn){};
 
-    KOKKOS_INLINE_FUNCTION void operator()(const int i) const{cacheSize_(0) = startPos_(startPos_.extent(0)-1);};
+    KOKKOS_INLINE_FUNCTION void operator()(const int) const{cacheSize_(0) = startPos_(startPos_.extent(0)-1);};
 
     Kokkos::View<unsigned int*, MemorySpace> startPos_;
     Kokkos::View<unsigned int*, MemorySpace> cacheSize_;
@@ -129,7 +128,7 @@ public:
     template<typename PointType>
     KOKKOS_FUNCTION void FillCache1(double*          polyCache,
                                     PointType const& pt,
-                                    DerivativeFlags::DerivativeType   derivType) const
+                                    DerivativeFlags::DerivativeType) const
     {
         // Evaluate all degrees of all 1d polynomials except the last dimension, which will be evaluated inside the integrand
         for(unsigned int d=0; d<dim_-1; ++d)
@@ -150,7 +149,7 @@ public:
 
     template<typename PointType>
     KOKKOS_FUNCTION void FillCache2(double*          polyCache,
-                                    PointType const& pt,
+                                    PointType const&,
                                     double           xd,
                                     DerivativeFlags::DerivativeType derivType) const
     {
