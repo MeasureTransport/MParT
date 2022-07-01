@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-data = np.loadtxt("data.dat")
+data = np.loadtxt("data.dat", skiprows=1)
 x = data[:,0]
 y_true = data[:,1]
 y_measured = data[:,2]
