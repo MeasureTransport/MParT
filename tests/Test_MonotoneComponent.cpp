@@ -21,9 +21,9 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
 
     unsigned int dim = 1;
     unsigned int maxDegree = 1;
-    FixedMultiIndexSet mset(dim, maxDegree); // Create a total order limited fixed multindex set
+    FixedMultiIndexSet<HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
-    MultivariateExpansion<ProbabilistHermite> expansion(mset);
+    MultivariateExpansion<ProbabilistHermite, HostSpace> expansion(mset);
 
     // // Make room for the cache
     std::vector<double> cache(expansion.CacheSize());
@@ -111,7 +111,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
 
     unsigned int dim = 2;
     unsigned int maxDegree = 3;
-    FixedMultiIndexSet mset(dim, maxDegree); // Create a total order limited fixed multindex set
+    FixedMultiIndexSet<HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
     unsigned int numTerms = mset.Size();
 

@@ -18,7 +18,7 @@ TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
 
     unsigned int dim = 3;
     unsigned int maxDegree = 5;
-    FixedMultiIndexSet mset(dim,maxDegree);
+    FixedMultiIndexSet<MemorySpace> mset(dim,maxDegree);
 
     std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
     REQUIRE(map!=nullptr);
