@@ -333,11 +333,13 @@ public:
                             unsigned int workspaceSize,
                             double absTol,
                             double relTol,
-                            QuadError::Type errorMetric) :  QuadratureBase<MemorySpace>(maxDim, workspaceSize),
+                            QuadError::Type errorMetric,
+                            unsigned int minSub=0) :  QuadratureBase<MemorySpace>(maxDim, workspaceSize),
                                                             maxSub_(maxSub),
                                                             absTol_(absTol),
                                                             relTol_(relTol),
-                                                            errorMetric_(errorMetric)
+                                                            errorMetric_(errorMetric),
+                                                            minSub_(minSub)
     {}
 
     KOKKOS_FUNCTION RecursiveQuadratureBase(unsigned int maxSub,
@@ -346,11 +348,13 @@ public:
                                             double*      workspace,
                                             double       absTol,
                                             double       relTol,
-                                            QuadError::Type errorMetric) :  QuadratureBase<MemorySpace>(maxDim, workspaceSize, workspace),
+                                            QuadError::Type errorMetric,
+                                            unsigned int    minSub=0) :  QuadratureBase<MemorySpace>(maxDim, workspaceSize, workspace),
                                                                             maxSub_(maxSub),
                                                                             absTol_(absTol),
                                                                             relTol_(relTol),
-                                                                            errorMetric_(errorMetric)
+                                                                            errorMetric_(errorMetric),
+                                                                            minSub_(minSub)
     {}
 
 
@@ -399,6 +403,7 @@ protected:
     }
 
     const unsigned int maxSub_;
+    const unsigned int minSub_;
     const double absTol_;
     const double relTol_;
 
@@ -419,14 +424,16 @@ public:
                     unsigned int fdim,
                     double absTol,
                     double relTol,
-                    QuadError::Type errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, fdim, GetWorkspaceSize(maxSub,fdim), absTol, relTol, errorMetric){};
+                    QuadError::Type errorMetric,
+                    unsigned int minSub=0) : RecursiveQuadratureBase<MemorySpace>(maxSub, fdim, GetWorkspaceSize(maxSub,fdim), absTol, relTol, errorMetric,minSub){};
 
     KOKKOS_FUNCTION AdaptiveSimpson(unsigned int maxSub,
                                     unsigned int fdim,
                                     double* workspace,
                                     double absTol,
                                     double relTol,
-                                    QuadError::Type errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, fdim, GetWorkspaceSize(maxSub,fdim), workspace, absTol, relTol, errorMetric){};
+                                    QuadError::Type errorMetric, 
+                                    unsigned int minSub=0) : RecursiveQuadratureBase<MemorySpace>(maxSub, fdim, GetWorkspaceSize(maxSub,fdim), workspace, absTol, relTol, errorMetric, minSub){};
 
 
     KOKKOS_FUNCTION static unsigned int GetWorkspaceSize(unsigned int maxSub, unsigned int fdim){return (2*maxSub+5)*fdim + 2*maxSub;};
@@ -538,7 +545,7 @@ public:
             this->EstimateError(intCoarse, intFine, error, errorTol);
 
             // Checking for convergence or other termination criteria
-            if((error<errorTol)||(currLevel==this->maxSub_-1)||(std::abs(ub-lb)<1e-14)){
+            if((((error<errorTol)||(currLevel==this->maxSub_-1))&&(currLevel>=this->minSub_))||(std::abs(ub-lb)<1e-14)){
 
                 for(unsigned int i=0; i<this->fdim_; ++i){
                     res[i] += intFine[i];
@@ -638,7 +645,8 @@ public:
                           unsigned int      maxDim,
                           double            absTol,
                           double            relTol,
-                          QuadError::Type   errorMetric);
+                          QuadError::Type   errorMetric,
+                          unsigned int      minSub=0);
 
     inline AdaptiveClenshawCurtis(unsigned int      level,
                            unsigned int      maxSub,
@@ -646,7 +654,8 @@ public:
                            double*           workspace,
                            double            absTol,
                            double            relTol,
-                           QuadError::Type   errorMetric);
+                           QuadError::Type   errorMetric,
+                           unsigned int      minSub=0);
 
     KOKKOS_FUNCTION AdaptiveClenshawCurtis(Kokkos::View<double*,MemorySpace> coarsePts,
                                            Kokkos::View<double*,MemorySpace> coarseWts,
@@ -657,7 +666,8 @@ public:
                                            double*           workspace,
                                            double            absTol,
                                            double            relTol,
-                                           QuadError::Type   errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), workspace, absTol, relTol, errorMetric),
+                                           QuadError::Type   errorMetric,
+                                           unsigned int      minSub=0) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), workspace, absTol, relTol, errorMetric, minSub),
                                                                                 coarsePts_(coarsePts),
                                                                                 coarseWts_(coarseWts),
                                                                                 finePts_(finePts),
@@ -804,7 +814,7 @@ public:
             this->EstimateError(intCoarse, intFine, error, errorTol);
 
             // Checking for convergence or other termination criteria
-            if((error<errorTol)||(currLevel==this->maxSub_-1)||(std::abs(ub-lb)<1e-14)){
+            if((((error<errorTol)||(currLevel==this->maxSub_-1))&&(currLevel>=this->minSub_))||(std::abs(ub-lb)<1e-14)){
 
                 for(unsigned int i=0; i<this->fdim_; ++i){
                     res[i] += intFine[i];
@@ -886,7 +896,8 @@ inline AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int 
                           unsigned int      maxDim,
                           double            absTol,
                           double            relTol,
-                          QuadError::Type   errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), absTol, relTol, errorMetric),
+                          QuadError::Type   errorMetric,
+                          unsigned int      minSub) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), absTol, relTol, errorMetric, minSub),
                                                             coarsePts_("Coarse Pts", std::pow(2,level)+1),
                                                             coarseWts_("Coarse Wts", std::pow(2,level)+1),
                                                             finePts_("Fine Pts", std::pow(2,level+1)+1),
@@ -904,7 +915,8 @@ inline AdaptiveClenshawCurtis<Kokkos::HostSpace>::AdaptiveClenshawCurtis(unsigne
                           unsigned int      maxDim,
                           double            absTol,
                           double            relTol,
-                          QuadError::Type   errorMetric) : RecursiveQuadratureBase<Kokkos::HostSpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), absTol, relTol, errorMetric),
+                          QuadError::Type   errorMetric,
+                          unsigned int      minSub) : RecursiveQuadratureBase<Kokkos::HostSpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), absTol, relTol, errorMetric,minSub),
                                                             coarsePts_("Coarse Pts", std::pow(2,level)+1),
                                                             coarseWts_("Coarse Wts", std::pow(2,level)+1),
                                                             finePts_("Fine Pts", std::pow(2,level+1)+1),
@@ -924,7 +936,8 @@ inline AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int 
                           double*           workspace,
                           double            absTol,
                           double            relTol,
-                          QuadError::Type   errorMetric) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), workspace, absTol, relTol, errorMetric),
+                          QuadError::Type   errorMetric,
+                          unsigned int      minSub) : RecursiveQuadratureBase<MemorySpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), workspace, absTol, relTol, errorMetric, minSub),
                                                             coarsePts_("Coarse Pts", std::pow(2,level)+1),
                                                             coarseWts_("Coarse Wts", std::pow(2,level)+1),
                                                             finePts_("Fine Pts", std::pow(2,level+1)+1),
@@ -943,7 +956,8 @@ inline AdaptiveClenshawCurtis<Kokkos::HostSpace>::AdaptiveClenshawCurtis(unsigne
                           double*           workspace,
                           double            absTol,
                           double            relTol,
-                          QuadError::Type   errorMetric) : RecursiveQuadratureBase<Kokkos::HostSpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), workspace, absTol, relTol, errorMetric),
+                          QuadError::Type   errorMetric,
+                          unsigned int      minSub) : RecursiveQuadratureBase<Kokkos::HostSpace>(maxSub, maxDim, GetWorkspaceSize(maxSub, maxDim), workspace, absTol, relTol, errorMetric,minSub),
                                                             coarsePts_("Coarse Pts", std::pow(2,level)+1),
                                                             coarseWts_("Coarse Wts", std::pow(2,level)+1),
                                                             finePts_("Fine Pts", std::pow(2,level+1)+1),
