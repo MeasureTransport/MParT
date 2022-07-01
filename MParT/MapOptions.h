@@ -66,6 +66,10 @@ namespace mpart{
         /** The maximum number of subdivisions used in the adaptive quadrature rules. */
         unsigned int quadMaxSub = 30;
 
+        /** The minimum number of subdivisions used in the adaptive quadrature rules. */
+        unsigned int quadMinSub = 0;
+
+
         /** The number of quadrature points used in fixed rules like the Clenshaw Curtis rule.
             Also defines the base level used in the adaptive Clenshaw-Curtis rule. 
         */
