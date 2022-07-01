@@ -22,7 +22,6 @@ std::vector<MultiIndex> DefaultNeighborhood::BackwardNeighbors(MultiIndex const&
     std::vector<MultiIndex> output;
     std::vector<unsigned int> vec = multi.Vector();
 
-    bool isZero;
     for(unsigned int i=0; i<vec.size(); ++i){
         if(vec.at(i)!=0){
             vec.at(i)--;

@@ -21,7 +21,7 @@ def sinharcsinh(z,loc,scale,skew,tail):
 
 
 # Make target samples
-num_points = 5000
+num_points = 1000
 z = np.random.randn(num_points)
 x = sinharcsinh(z, loc=-1, scale=1, skew=.5, tail=1)
 # x = -2 + .5*z  # For Gaussian test case
@@ -46,6 +46,8 @@ fixed_mset = mset.fix(True)
 
 # Set MapOptions and make map
 opts = MapOptions()
+opts.basisType = BasisTypes.HermiteFunctions
+#opts.basisType = BasisTypes.PhysicistHermite
 map = CreateComponent(fixed_mset, opts)
 
 # KL divergence objective

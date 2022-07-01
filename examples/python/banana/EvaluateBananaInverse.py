@@ -28,8 +28,6 @@ print('Coeffs set')
 print(map.CoeffMap())
 print('============')
 
-coeffs_2 = map.CoeffMap()
-
 pts = np.random.randn(2,5)
 print('The points')
 print(pts)
@@ -41,9 +39,9 @@ print(map_of_pts)
 print('============')
 
 # For testing inverse
-pts_ = map.Inverse(pts[0], map_of_pts) 
+pts_ = map.Inverse(pts, map_of_pts) 
 
-print(pts[0])
+# print(pts[0])
 print('Inverse map of the map of points')
 print(pts_)
 print('============')

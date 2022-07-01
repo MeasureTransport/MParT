@@ -28,7 +28,7 @@ Anisotropic::Anisotropic(std::vector<double> const& weightsIn,
                                                                  epsilon(epsilonIn)
 {
     // validate weight vector
-  for(int i = 0; i < weights.size(); ++i){
+  for(unsigned int i = 0; i < weights.size(); ++i){
     if((weights.at(i) > 1.0) || (weights.at(i) < 0.0))
       throw std::invalid_argument("AnisotropicLimiter requires all weights have to be in [0,1]. Got weight " + std::to_string(weights[i]));
   }

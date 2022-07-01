@@ -9,5 +9,6 @@ target_sources(mpart
     Utilities/Miscellaneous.cpp
 
     ConditionalMapBase.cpp
+    TriangularMap.cpp
     MapFactory.cpp
 )

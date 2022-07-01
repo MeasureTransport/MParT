@@ -54,7 +54,6 @@ plt.plot(x.flatten(),map_of_x_after.flatten(),'*--',label='final map output', co
 plt.legend()
 plt.show()
 
-
 # Plot data (before and after apart)
 plt.figure()
 plt.title('Starting map error: {:.2E}'.format(error_before))
