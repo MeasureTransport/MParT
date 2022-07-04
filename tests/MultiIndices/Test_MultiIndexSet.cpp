@@ -10,7 +10,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     const unsigned int dim = 2;
     const unsigned int maxOrder = 5;
 
-    FixedMultiIndexSet mset(dim,maxOrder);
+    FixedMultiIndexSet<Kokkos::HostSpace> mset(dim,maxOrder);
 
     CHECK( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
 
@@ -49,7 +49,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class with anisotropic degrees", "[An
     degrees(4) = 4;
     degrees(5) = 3;
 
-    FixedMultiIndexSet mset(dim,degrees);
+    FixedMultiIndexSet<Kokkos::HostSpace> mset(dim,degrees);
 
     CHECK( mset.Size()==3);
 
@@ -82,7 +82,7 @@ TEST_CASE("Conversions between MultiIndexSet types", "[MultiIndexSet Conversions
     unsigned int maxDegree = 3;
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
-    FixedMultiIndexSet fixedSet = mset.Fix();
+    FixedMultiIndexSet<Kokkos::HostSpace> fixedSet = mset.Fix();
 
     REQUIRE(mset.Size() == fixedSet.Size() );
 

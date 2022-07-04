@@ -21,9 +21,9 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
 
     unsigned int dim = 1;
     unsigned int maxDegree = 1;
-    FixedMultiIndexSet mset(dim, maxDegree); // Create a total order limited fixed multindex set
+    FixedMultiIndexSet<HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
-    MultivariateExpansion<ProbabilistHermite> expansion(mset);
+    MultivariateExpansion<ProbabilistHermite, HostSpace> expansion(mset);
 
     // // Make room for the cache
     std::vector<double> cache(expansion.CacheSize());
@@ -111,7 +111,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
 
     unsigned int dim = 2;
     unsigned int maxDegree = 3;
-    FixedMultiIndexSet mset(dim, maxDegree); // Create a total order limited fixed multindex set
+    FixedMultiIndexSet<HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
     unsigned int numTerms = mset.Size();
 
@@ -257,7 +257,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         unsigned int maxDegree = 1;
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
-        MultivariateExpansion<ProbabilistHermite> expansion(mset);
+        MultivariateExpansion<ProbabilistHermite,HostSpace> expansion(mset);
 
         Kokkos::View<double*,HostSpace> coeffs("Expansion coefficients", mset.Size());
         coeffs(0) = 1.0; // Constant term
@@ -268,7 +268,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         double absTol = 1e-7;
         AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
 
-        MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+        MonotoneComponent<decltype(expansion), Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
 
         Kokkos::View<double*,HostSpace> output("output", numPts);
         comp.EvaluateImpl(evalPts, coeffs, output);
@@ -288,7 +288,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         unsigned int maxDegree = 2;
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
-        MultivariateExpansion<ProbabilistHermite> expansion(mset);
+        MultivariateExpansion<ProbabilistHermite,HostSpace> expansion(mset);
 
         Kokkos::View<double*,HostSpace> coeffs("Expansion coefficients", mset.Size());
         coeffs(1) = 1.0; // Linear term = x ^1
@@ -300,7 +300,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         double absTol = 1e-7;
         AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol,QuadError::First);
 
-        MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+        MonotoneComponent<decltype(expansion), Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
 
         Kokkos::View<double*,HostSpace> output("Output", numPts);
         comp.EvaluateImpl(evalPts, coeffs, output);
@@ -312,7 +312,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         // Test the log determinant
         Kokkos::View<double*, HostSpace> logDet("Log Determinant", numPts);
         comp.Coeffs() = coeffs;
-        comp.LogDeterminantImpl(evalPts,logDet);
+        //comp.LogDeterminantImpl(evalPts,logDet);
 
     }
 }
@@ -340,7 +340,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         unsigned int maxDegree = 1;
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
-        MultivariateExpansion<ProbabilistHermite> expansion(mset);
+        MultivariateExpansion<ProbabilistHermite,HostSpace> expansion(mset);
 
         Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
         coeffs(0) = 1.0; // Constant term
@@ -351,7 +351,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         double absTol = 1e-7;
         AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
 
-        MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+        MonotoneComponent<decltype(expansion), Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
 
         Kokkos::View<double*, HostSpace> ys("ys", numPts);
         comp.EvaluateImpl(evalPts, coeffs, ys);
@@ -374,7 +374,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         unsigned int maxDegree = 2;
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
-        MultivariateExpansion<ProbabilistHermite> expansion(mset);
+        MultivariateExpansion<ProbabilistHermite,HostSpace> expansion(mset);
 
         Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
         coeffs(1) = 1.0; // Linear term = x ^1
@@ -386,7 +386,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         double absTol = 1e-7;
         AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol,QuadError::First);
 
-        MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+        MonotoneComponent<decltype(expansion), Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
 
         Kokkos::View<double*, HostSpace> ys("ys",numPts);
         comp.EvaluateImpl(evalPts, coeffs,ys);
@@ -407,7 +407,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
 
         unsigned int maxDegree = 2;
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
-        MultivariateExpansion<ProbabilistHermite> expansion(mset);
+        MultivariateExpansion<ProbabilistHermite,HostSpace> expansion(mset);
 
         Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
         coeffs(1) = 1.0; // Linear term = x ^1
@@ -419,7 +419,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         double absTol = 1e-7;
         AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol,QuadError::First);
 
-        MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+        MonotoneComponent<decltype(expansion), Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
 
         Kokkos::View<double*, HostSpace> ys("ys", numPts);
         comp.EvaluateImpl(evalPts, coeffs, ys);
@@ -460,7 +460,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
 
     unsigned int maxDegree = 2;
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
-    MultivariateExpansion<ProbabilistHermite> expansion(mset);
+    MultivariateExpansion<ProbabilistHermite,HostSpace> expansion(mset);
 
 
     unsigned int numTerms = mset.Size();
@@ -470,7 +470,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
     double absTol = 1e-7;
     AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol,QuadError::First);
 
-    MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+    MonotoneComponent<decltype(expansion), Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
 
     // Create some arbitrary coefficients
     Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
@@ -589,14 +589,14 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
 
 
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(1, 6);
-    MultivariateExpansion<ProbabilistHermite> expansion(mset);
+    MultivariateExpansion<ProbabilistHermite,HostSpace> expansion(mset);
 
     unsigned int maxSub = 30;
     double relTol = 1e-3;
     double absTol = 1e-3;
     AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
 
-    MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, SoftPlus, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+    MonotoneComponent<decltype(expansion), SoftPlus, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
 
     unsigned int numTerms = mset.Size();
     Kokkos::View<double*,HostSpace> coeffs("Coefficients", numTerms);
@@ -647,14 +647,14 @@ TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[M
 
     unsigned int maxDegree = 3;
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
-    MultivariateExpansion<ProbabilistHermite> expansion(mset);
+    MultivariateExpansion<ProbabilistHermite,HostSpace> expansion(mset);
 
     unsigned int maxSub = 20;
     double relTol = 1e-7;
     double absTol = 1e-7;
     AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
 
-    MonotoneComponent<MultivariateExpansion<ProbabilistHermite>, Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+    MonotoneComponent<decltype(expansion), Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
 
     Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
     for(unsigned int i=0; i<coeffs.extent(0); ++i)
