@@ -1,9 +1,9 @@
-from mpart import *
 import numpy as np
 from scipy.optimize import minimize
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 
+from mpart import *
 
 # sinh-arcsinh function
 def sinharcsinh(z,loc,scale,skew,tail):
@@ -19,12 +19,12 @@ def sinharcsinh(z,loc,scale,skew,tail):
     x = loc + scale*f
     return x
 
-
 # Make target samples
 num_points = 1000
 z = np.random.randn(num_points)
-x = sinharcsinh(z, loc=-1, scale=1, skew=.5, tail=1)
+x = sinharcsinh(z, loc=-1, scale=1, skew=.5, tail=1)[None,:]
 # x = -2 + .5*z  # For Gaussian test case
+
 # For plotting and computing reference density 
 rv = norm()
 t = np.linspace(-3,3,100)
@@ -33,7 +33,7 @@ rho_t = rv.pdf(t)
 # Before optimization
 num_bins = 50
 plt.figure()
-plt.hist(x, num_bins, facecolor='blue', alpha=0.5, density=True, label='Target samples')
+plt.hist(x.flatten(), num_bins, facecolor='blue', alpha=0.5, density=True, label='Target samples')
 plt.plot(t,rho_t,label="Reference density")
 plt.legend()
 plt.show()
@@ -48,29 +48,29 @@ fixed_mset = mset.fix(True)
 opts = MapOptions()
 opts.basisType = BasisTypes.HermiteFunctions
 #opts.basisType = BasisTypes.PhysicistHermite
-map = CreateComponent(fixed_mset, opts)
+monotoneMap = CreateComponent(fixed_mset, opts)
 
 # KL divergence objective
-def objective(coeffs):
-    map.SetCoeffs(coeffs)
-    map_of_x = map.Evaluate(x.reshape(1,num_points))
-    rho_of_map_of_x = rv.logpdf(map_of_x)
-    log_det = map.LogDeterminant(x.reshape(1,num_points))
-    return -np.sum(rho_of_map_of_x + log_det)/num_points
+def objective(coeffs, monotoneMap, x, num_points):
+    monotoneMap.SetCoeffs(coeffs)
+    map_of_x = monotoneMap.Evaluate(x)
+    pi_of_map_of_x = rv.logpdf(map_of_x)
+    log_det = monotoneMap.LogDeterminant(x)
+    return -np.sum(pi_of_map_of_x + log_det)/num_points
 
 # Optimize
 print('Starting coeffs')
-print(map.CoeffMap())
-print('and error: {:.2E}'.format(objective(map.CoeffMap())))
-res = minimize(objective, map.CoeffMap(), method="Nelder-Mead")
+print(monotoneMap.CoeffMap())
+print('and error: {:.2E}'.format(objective(monotoneMap.CoeffMap(), monotoneMap, x, num_points)))
+res = minimize(objective, monotoneMap.CoeffMap(), args=(monotoneMap, x, num_points), method="Nelder-Mead")
 print('Final coeffs')
-print(map.CoeffMap())
-print('and error: {:.2E}'.format(objective(map.CoeffMap())))
+print(monotoneMap.CoeffMap())
+print('and error: {:.2E}'.format(objective(monotoneMap.CoeffMap(), monotoneMap, x, num_points)))
 
 # After optimization plot
-map_of_x = map.Evaluate(x.reshape(1,num_points))
+map_of_x = monotoneMap.Evaluate(x)
 plt.figure()
-plt.hist(map_of_x.reshape(num_points,), num_bins, facecolor='blue', alpha=0.5, density=True, label='Normalized samples')
+plt.hist(map_of_x.flatten(), num_bins, facecolor='blue', alpha=0.5, density=True, label='Normalized samples')
 plt.plot(t,rho_t,label="Reference density")
 plt.legend()
 plt.show()
