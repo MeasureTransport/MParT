@@ -90,6 +90,14 @@ int main(int argc, char* argv[]){
     Kokkos::initialize(argc,argv);
     {
 
+    if (argc < 3) {
+        std::cerr << "usage: MonotoneLeastSquares NOISESTD MAXDEGREE\n";
+        return EXIT_FAILURE;
+    }
+
+    double noise_std = atof(argv[1]);
+    unsigned int maxDegree = atof(argv[2]);
+
     // Generate noisy data
     unsigned int num_points = 1000;
     int xmin = 0;
@@ -99,7 +107,6 @@ int main(int argc, char* argv[]){
 
     Eigen::VectorXd y_true = 2*(x.row(0).array() > 2).cast<double>();
 
-    double noise_std = 0.4;
     std::default_random_engine generator;
     std::normal_distribution<double> distribution(0, noise_std);
     auto normal = [&] (int) {return distribution(generator);};
@@ -108,7 +115,6 @@ int main(int argc, char* argv[]){
     Eigen::VectorXd y_measured = y_true + y_noise;
 
     // Create the map
-    unsigned int maxDegree = 7;
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(x.rows(), maxDegree);
 
     MapOptions opts;
