@@ -54,9 +54,9 @@ monotoneMap = CreateComponent(fixed_mset, opts)
 def objective(coeffs, monotoneMap, x, num_points):
     monotoneMap.SetCoeffs(coeffs)
     map_of_x = monotoneMap.Evaluate(x)
-    pi_of_map_of_x = rv.logpdf(map_of_x)
+    ref_logpdf_of_map_of_x = rv.logpdf(map_of_x)
     log_det = monotoneMap.LogDeterminant(x)
-    return -np.sum(pi_of_map_of_x + log_det)/num_points
+    return -np.sum(ref_logpdf_of_map_of_x + log_det)/num_points
 
 # Optimize
 print('Starting coeffs')
