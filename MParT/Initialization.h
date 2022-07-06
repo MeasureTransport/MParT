@@ -2,7 +2,7 @@
 #define MPART_INITIALIZATION_H
 
 
-#include <Kokkos_core.hpp>
+#include <Kokkos_Core.hpp>
 #include <cstdlib>
 #include <string>
 #include <iostream>
@@ -11,7 +11,17 @@
 
 namespace mpart{
 
-    /** @defgroup InitializationHelpers 
+    /** @defgroup InitializationHelpers
+
+    @code{.cpp}
+#include "MParT/Initialization.h"
+
+int main( int argc, char* argv[] ) {
+  mpart::Initialize(argc,argv);
+
+  return 0;
+}
+    @endcode 
     */
 
     /**
