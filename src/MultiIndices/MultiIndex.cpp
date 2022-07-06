@@ -190,7 +190,7 @@ bool MultiIndex::operator<(const MultiIndex &b) const{
     return false;
   }else{
 
-    for(int i=0; i<std::min<unsigned int>(length, b.length); ++i){
+    for(unsigned int i=0; i<std::min<unsigned int>(length, b.length); ++i){
       if(Get(i)<b.Get(i)){
         return true;
       }else if(Get(i)>b.Get(i)){
@@ -215,7 +215,7 @@ bool MultiIndex::operator<=(const MultiIndex &b) const{
 
 std::string MultiIndex::String() const {
   std::string out;
-  for(int i=0; i<Length(); ++i){
+  for(unsigned int i=0; i<Length(); ++i){
     if (i > 0)
       out += " ";
     out += std::to_string(Get(i));

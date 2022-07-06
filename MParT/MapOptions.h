@@ -45,23 +45,43 @@ namespace mpart{
         /** The type of 1d basis function used to define the multivariate expansion. */
         BasisTypes basisType = BasisTypes::ProbabilistHermite;
 
-        /** The type of positive bijector used inside the monotonicity-guaranteeing integral formulation. */
+        /** The type of positive bijector used inside the monotonicity-guaranteeing integral 
+            formulation. 
+        */
         PosFuncTypes posFuncType = PosFuncTypes::SoftPlus;
 
         /** The type of quadrature rule to use. */
         QuadTypes quadType = QuadTypes::AdaptiveSimpson;
 
-        /** The absolute tolerance used by adaptive quadrature rules like AdaptiveSimpson and AdaptiveClenshawCurtis. */
+        /** The absolute tolerance used by adaptive quadrature rules like AdaptiveSimpson and 
+            AdaptiveClenshawCurtis. 
+        */
         double quadAbsTol = 1e-6;
 
-        /** The relative tolerance used by adaptive quadrature rules like AdaptiveSimpson and AdaptiveClenshawCurtis. */
+        /** The relative tolerance used by adaptive quadrature rules like AdaptiveSimpson 
+            and AdaptiveClenshawCurtis. 
+        */
         double quadRelTol = 1e-6;
 
         /** The maximum number of subdivisions used in the adaptive quadrature rules. */
         unsigned int quadMaxSub = 30;
 
-        /** The number of quadrature points used in fixed rules like the Clenshaw Curtis rule.  Also defines the base level used in the adaptive Clenshaw-Curtis rule. */
+        /** The minimum number of subdivisions used in the adaptive quadrature rules. */
+        unsigned int quadMinSub = 0;
+
+
+        /** The number of quadrature points used in fixed rules like the Clenshaw Curtis rule.
+            Also defines the base level used in the adaptive Clenshaw-Curtis rule. 
+        */
         unsigned int quadPts = 5;
+
+        /** Specifies whether the derivative of the integral defining a monotone component 
+            is used or if the derivative of the quadrature-based approximation of the integral
+            is used.  See :ref:`diag_deriv_section` for more details.  If true, the integral
+            is differentiated directly.  If false, the numerical approximation to the integral
+            is differentiated. 
+        */
+        bool contDeriv = true;
     }; 
 };
 

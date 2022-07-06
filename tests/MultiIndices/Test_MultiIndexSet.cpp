@@ -10,7 +10,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     const unsigned int dim = 2;
     const unsigned int maxOrder = 5;
 
-    FixedMultiIndexSet mset(dim,maxOrder);
+    FixedMultiIndexSet<Kokkos::HostSpace> mset(dim,maxOrder);
 
     CHECK( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
 
@@ -39,7 +39,6 @@ TEST_CASE("MultiIndexSet from Eigen", "[MultiIndexSetFromEigen]")
 TEST_CASE( "Testing the FixedMultiIndexSet class with anisotropic degrees", "[AnisotropicFixedMultiIndexSet]" ) {
 
     const unsigned int dim = 2;
-    const unsigned int maxOrder = 5;
 
     // Set multiindices to [0,1], [5,2], [4,3]
     Kokkos::View<unsigned int*, Kokkos::HostSpace> degrees("Degrees", 3*dim);
@@ -50,7 +49,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class with anisotropic degrees", "[An
     degrees(4) = 4;
     degrees(5) = 3;
 
-    FixedMultiIndexSet mset(dim,degrees);
+    FixedMultiIndexSet<Kokkos::HostSpace> mset(dim,degrees);
 
     CHECK( mset.Size()==3);
 
@@ -73,7 +72,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class copy to device", "[FixedMultiIn
     FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> deviceSet = mset.ToDevice();
 
 }
-#endif 
+#endif
 
 
 
@@ -83,7 +82,7 @@ TEST_CASE("Conversions between MultiIndexSet types", "[MultiIndexSet Conversions
     unsigned int maxDegree = 3;
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
-    FixedMultiIndexSet fixedSet = mset.Fix();
+    FixedMultiIndexSet<Kokkos::HostSpace> fixedSet = mset.Fix();
 
     REQUIRE(mset.Size() == fixedSet.Size() );
 
@@ -141,7 +140,7 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
         bool isAdmiss = indexFamily.IsAdmissible(multi);
         // Check the result of IsAdmissable().
-        REQUIRE( indexFamily.IsAdmissible(multi) );
+        REQUIRE( isAdmiss );
     }
 
     SECTION("Visualize")
@@ -357,12 +356,12 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         // Add forward admissible neighbor to index (1,1) using ForciblyExpand.
         MultiIndex newIndex{1,0};
 
-        int oldSize = indexFamily.Size();
+        unsigned int oldSize = indexFamily.Size();
         REQUIRE(oldSize==4);
 
         int activeIndex = indexFamily.MultiToIndex(newIndex);
         REQUIRE(activeIndex>=0);
-        
+
         indexFamily.Expand(activeIndex);
         REQUIRE( (oldSize+1) == indexFamily.Size());
 
@@ -374,37 +373,37 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
     }
 
     /*
-        We start with a multiindex set that looks like 
+        We start with a multiindex set that looks like
         4 | 0
-        3 | x                   
-        2 | x                 
-        1 | x   x               
-        0 | x   x   x   x   0     
-            -----------------    
-            0   1   2   3   4    
+        3 | x
+        2 | x
+        1 | x   x
+        0 | x   x   x   x   0
+            -----------------
+            0   1   2   3   4
 
        The only admissible inactive extensions are [4,0] and [0,4] because we construct this set by
-        "limiting" a total order multiindex so that the largest mixed term is [1,1].  Then we 
-        remove the limiter to end up with a set that looks like 
+        "limiting" a total order multiindex so that the largest mixed term is [1,1].  Then we
+        remove the limiter to end up with a set that looks like
 
-        4 | o  
-        3 | x   o  
-        2 | x   o  
-        1 | x   x   o   o  
-        0 | x   x   x   x   o  
+        4 | o
+        3 | x   o
+        2 | x   o
+        1 | x   x   o   o
+        0 | x   x   x   x   o
            ------------------
             0   1   2   3   4
 
-        The active indices are the same, but the "Frontier" of expandable multiindices is now much larger.  
+        The active indices are the same, but the "Frontier" of expandable multiindices is now much larger.
     */
     SECTION("Frontier")
-    {   
+    {
         auto limiter = [](MultiIndex const& multi){ return ( (multi.Get(0)==0)||(multi.Get(1)==0)||((multi.Get(0)<2)&&(multi.Get(1)<2)));};
 
         REQUIRE(limiter(MultiIndex{2,0}) );
-        
+
         MultiIndexSet set = MultiIndexSet::CreateTotalOrder(2, 3, limiter);
-        
+
         std::vector<unsigned int> inds = set.Frontier();
         REQUIRE( inds.size()==2);
         REQUIRE( set.at(inds.at(0)) == MultiIndex{0,3} );
@@ -414,12 +413,12 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         REQUIRE( inds.size()==2);
         REQUIRE( set.at(inds.at(0)) == MultiIndex{0,3} );
         REQUIRE( set.at(inds.at(1)) == MultiIndex{3,0} );
-        
-        // Now remove the limiter, which should allow more multiindices in the 
+
+        // Now remove the limiter, which should allow more multiindices in the
         set.SetLimiter( MultiIndexLimiter::None() );
-        
+
         inds = set.Frontier();
-        
+
         REQUIRE( inds.size() == 5);
         REQUIRE( set.at(inds.at(0)) == MultiIndex{0,2} );
         REQUIRE( set.at(inds.at(1)) == MultiIndex{0,3} );

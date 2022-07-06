@@ -38,7 +38,9 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     .def_readwrite("quadAbsTol", &MapOptions::quadAbsTol)
     .def_readwrite("quadRelTol", &MapOptions::quadRelTol)
     .def_readwrite("quadMaxSub", &MapOptions::quadMaxSub)
-    .def_readwrite("quadPts", &MapOptions::quadPts);
+    .def_readwrite("quadMinSub", &MapOptions::quadMinSub)
+    .def_readwrite("quadPts", &MapOptions::quadPts)
+    .def_readwrite("contDeriv", &MapOptions::contDeriv);
     
         
 

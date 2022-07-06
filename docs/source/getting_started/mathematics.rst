@@ -3,7 +3,6 @@
 Mathematical Background
 =========================
 
-
 Tensor Product Expansions 
 --------------------------
 
@@ -50,6 +49,8 @@ Computationally, we approximate the integral in the definition of :math:`T_d(\ma
     \tilde{T}_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + x_d \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ),
 
 where the :math:`x_d` term outside the summation comes from a change of integration domains from :math:`[0,1]` to :math:`[0,x_d]`. 
+
+.. _diag_deriv_section:
 
 Diagonal Derivatives
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

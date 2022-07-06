@@ -56,6 +56,20 @@ Or, with the additional specification of the number of Kokkos threads to use:
 
    This often results when due to conda environment mismatches, but can typically be circumvented by explicitly setting the path to your python executable.  When calling cmake, add :code:`-DPYTHON_EXECUTABLE=`which python``.
 
+.. tip:: 
+  On OSX, using MParT with the system version of python might result in an error with something like:
+  
+  .. code-block::
+
+    ImportError: dlopen(pympart.so, 2): no suitable image found.  Did find:
+        MParT/python/mpart/pympart.so: mach-o, but wrong architecture
+        MParT/python/mpart/pympart.so: mach-o, but wrong architecture
+
+  You can sometimes force OSX to use the x86_64 version of python using the :code:`arch` executable.   For example, to run a script :code:`test.py`, you can use 
+
+  .. code-block::
+
+    arch -x86_64 /usr/bin/python test.py
 
 Compiling with Julia Bindings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -87,7 +101,12 @@ To support a GPU at the moment, you need a few special requirements. Due to the 
         -DKokkos_CXX_STANDARD=17                          \
     ../
 
-Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the compute resource uses that Kokkos supports. Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the `build` directory using the following command:
+Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the compute resource uses that Kokkos supports. If you aren't sure, try omitting this as Kokkos has some machinery to detect such architecture.
+
+.. tip::
+    If you're getting an error about C++ standards, try using a new version of your compiler; :code:`g++`, for example, does not support the flag :code:`--std=c++17` below version 8, where :code:`nvcc` only supports such syntax. For more details, see `this issue <https://github.com/kokkos/kokkos/issues/5157>`_ in Kokkos.
+
+Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the :code:`build` directory using the following command:
 
 .. code-block:: bash
 
@@ -100,7 +119,7 @@ Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the c
 Make sure that :code:`CMAKE_CXX_COMPILER` uses a full path from the root!
 
 .. tip::
-   If you're using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into `CMakeFiles.txt` and add `add_compile_definition(EIGEN_DONT_VECTORIZE)`.
+   If you're using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into :code:`CMakeFiles.txt` and add :code:`add_compile_definition(EIGEN_DONT_VECTORIZE)`.
 
 Building Documentation
 ----------------------
