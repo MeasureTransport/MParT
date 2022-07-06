@@ -161,9 +161,6 @@ Eigen::Map<Eigen::VectorXd> ConditionalMapBase<Kokkos::HostSpace>::CoeffMap()
 {   
     CheckCoefficients("CoeffMap");
     return KokkosToVec(this->savedCoeffs);
-<<<<<<< HEAD
-}
-=======
 }
 
 template<typename MemorySpace>
@@ -275,4 +272,3 @@ template class mpart::ConditionalMapBase<Kokkos::HostSpace>;
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
     template class mpart::ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>;
 #endif
->>>>>>> rpath-issues
