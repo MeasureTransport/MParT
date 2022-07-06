@@ -21,7 +21,7 @@ using namespace mpart::binding;
 void mpart::binding::MultiIndexWrapper(py::module &m)
 {
     // MultiIndex
-    py::class_<MultiIndex, KokkosCustomPointer<MultiIndex>>(m, "MultiIndex")
+    py::class_<MultiIndex, std::shared_ptr<MultiIndex>>(m, "MultiIndex")
         .def(py::init<>())
         .def(py::init<unsigned int>())
         .def(py::init<unsigned int, unsigned int>())
@@ -47,7 +47,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
 
 
     // MultiIndexSet
-    py::class_<MultiIndexSet, KokkosCustomPointer<MultiIndexSet>>(m, "MultiIndexSet")
+    py::class_<MultiIndexSet, std::shared_ptr<MultiIndexSet>>(m, "MultiIndexSet")
         .def(py::init<const unsigned int>())
         .def(py::init<Eigen::Ref<const Eigen::MatrixXi> const&>())
         .def("fix", &MultiIndexSet::Fix)
@@ -85,54 +85,54 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
 
     // MultiIndexSetLimiters
     //TotalOrder
-    py::class_<MultiIndexLimiter::TotalOrder, KokkosCustomPointer<MultiIndexLimiter::TotalOrder>>(m, "TotalOrder")
+    py::class_<MultiIndexLimiter::TotalOrder, std::shared_ptr<MultiIndexLimiter::TotalOrder>>(m, "TotalOrder")
         .def(py::init<unsigned int>())
         .def("__call__", &MultiIndexLimiter::TotalOrder::operator())
     ;
 
 
     //Dimension
-    py::class_<MultiIndexLimiter::Dimension, KokkosCustomPointer<MultiIndexLimiter::Dimension>>(m, "Dimension")
+    py::class_<MultiIndexLimiter::Dimension, std::shared_ptr<MultiIndexLimiter::Dimension>>(m, "Dimension")
         .def(py::init<unsigned int, unsigned int>())
         .def("__call__", &MultiIndexLimiter::Dimension::operator())
     ;
 
 
     //Anisotropic
-    py::class_<MultiIndexLimiter::Anisotropic, KokkosCustomPointer<MultiIndexLimiter::Anisotropic>>(m, "Anisotropic")
+    py::class_<MultiIndexLimiter::Anisotropic, std::shared_ptr<MultiIndexLimiter::Anisotropic>>(m, "Anisotropic")
         .def(py::init<std::vector<double> const&, double>())
         .def("__call__", &MultiIndexLimiter::Anisotropic::operator())
     ;
 
 
     //MaxDegree
-    py::class_<MultiIndexLimiter::MaxDegree, KokkosCustomPointer<MultiIndexLimiter::MaxDegree>>(m, "MaxDegree")
+    py::class_<MultiIndexLimiter::MaxDegree, std::shared_ptr<MultiIndexLimiter::MaxDegree>>(m, "MaxDegree")
         .def(py::init<unsigned int, unsigned int>())
         .def("__call__", &MultiIndexLimiter::MaxDegree::operator())
     ;
 
 
     //None
-    py::class_<MultiIndexLimiter::None, KokkosCustomPointer<MultiIndexLimiter::None>>(m, "NoneLim")
+    py::class_<MultiIndexLimiter::None, std::shared_ptr<MultiIndexLimiter::None>>(m, "NoneLim")
         .def(py::init<>())
         .def("__call__", &MultiIndexLimiter::None::operator())
     ;
 
 
     //And
-    py::class_<MultiIndexLimiter::And, KokkosCustomPointer<MultiIndexLimiter::And>>(m, "And")
+    py::class_<MultiIndexLimiter::And, std::shared_ptr<MultiIndexLimiter::And>>(m, "And")
         .def(py::init<std::function<bool(MultiIndex const&)>,std::function<bool(MultiIndex const&)>>())
         .def("__call__", &MultiIndexLimiter::And::operator())
     ;
 
     //Or
-    py::class_<MultiIndexLimiter::Or, KokkosCustomPointer<MultiIndexLimiter::Or>>(m, "Or")
+    py::class_<MultiIndexLimiter::Or, std::shared_ptr<MultiIndexLimiter::Or>>(m, "Or")
         .def(py::init<std::function<bool(MultiIndex const&)>,std::function<bool(MultiIndex const&)>>())
         .def("__call__", &MultiIndexLimiter::Or::operator())
     ;
 
     //Xor
-    py::class_<MultiIndexLimiter::Xor, KokkosCustomPointer<MultiIndexLimiter::Xor>>(m, "Xor")
+    py::class_<MultiIndexLimiter::Xor, std::shared_ptr<MultiIndexLimiter::Xor>>(m, "Xor")
         .def(py::init<std::function<bool(MultiIndex const&)>,std::function<bool(MultiIndex const&)>>())
         .def("__call__", &MultiIndexLimiter::Xor::operator())
     ;
@@ -140,7 +140,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
     //==========================================================================================================
     //FixedMultiIndexSet
 
-    py::class_<FixedMultiIndexSet<Kokkos::HostSpace>, KokkosCustomPointer<FixedMultiIndexSet<Kokkos::HostSpace>>>(m, "FixedMultiIndexSet")
+    py::class_<FixedMultiIndexSet<Kokkos::HostSpace>, std::shared_ptr<FixedMultiIndexSet<Kokkos::HostSpace>>>(m, "FixedMultiIndexSet")
 
         .def(py::init( [](unsigned int dim,
                           Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &orders)
