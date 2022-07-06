@@ -88,7 +88,8 @@ public:
         }
 
         // Now take the log
-        Kokkos::parallel_for(output.extent(0), KOKKOS_CLASS_LAMBDA (auto i) {
+        auto policy = Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space>(0,output.extent(0));
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (unsigned int i) {
             if(output(i)<=0){
                 output(i) = -std::numeric_limits<double>::infinity();
             }else{
@@ -112,7 +113,8 @@ public:
         CoeffJacobian(pts, this->savedCoeffs, evals, output);
 
         // Scale each column by the sensitivity
-        Kokkos::parallel_for(pts.extent(1), KOKKOS_CLASS_LAMBDA (auto ptInd) {
+        auto policy = Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space>(0,pts.extent(1));
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (unsigned int ptInd) {
             for(unsigned int i=0; i<this->numCoeffs; ++i)
                 output(i,ptInd) *= sens(0,ptInd);
         });
@@ -126,16 +128,17 @@ public:
 
         // First, get the diagonal derivative
         if(_useContDeriv){
-            ContinuousMixedJacobian(pts,ConditionalMapBase<MemorySpace>::savedCoeffs, output);
-            ContinuousDerivative(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, derivs);
+            ContinuousMixedJacobian(pts,this->savedCoeffs, output);
+            ContinuousDerivative(pts, this->savedCoeffs, derivs);
         }else{
             Kokkos::View<double*,MemorySpace> evals("Evaluations", pts.extent(1));
-            DiscreteMixedJacobian(pts,ConditionalMapBase<MemorySpace>::savedCoeffs, output);
-            DiscreteDerivative(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, evals, derivs);
+            DiscreteMixedJacobian(pts,this->savedCoeffs, output);
+            DiscreteDerivative(pts, this->savedCoeffs, evals, derivs);
         }
 
         // Now take the log
-        Kokkos::parallel_for(pts.extent(1), KOKKOS_CLASS_LAMBDA (auto ptInd) {
+        auto policy = Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space>(0,pts.extent(1));
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (unsigned int ptInd) {
             for(unsigned int i=0; i<this->numCoeffs; ++i)
                 output(i,ptInd) *= 1.0/derivs(ptInd);
         });
@@ -503,7 +506,7 @@ public:
             _expansion.FillCache1(cache.data(), pt, DerivativeFlags::None);
 
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-            MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt), decltype(coeffs)> integrand(cache.data(), _expansion, pt, coeffs, DerivativeFlags::Diagonal);
+            MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), _expansion, pt, coeffs, DerivativeFlags::Diagonal);
 
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt
             _quad.Integrate(workspace.data(), integrand, 0, 1, both.data());
@@ -583,7 +586,7 @@ public:
             _expansion.FillCache1(cache.data(), pt, DerivativeFlags::None);
 
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-            MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs)> integrand(cache.data(), _expansion, pt, coeffs, DerivativeFlags::Parameters);
+            MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs), MemorySpace> integrand(cache.data(), _expansion, pt, coeffs, DerivativeFlags::Parameters);
 
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
             _quad.Integrate(workspace.data(), integrand, 0, 1, integral.data());
@@ -689,7 +692,7 @@ public:
 
             // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
             Kokkos::View<double*,MemorySpace> integrandWork(team_member.thread_scratch(1), numTerms);
-            MonotoneIntegrand<ExpansionType, PosFuncType,  decltype(pt), decltype(coeffs)> integrand(cache.data(), _expansion, pt, coeffs, DerivativeFlags::Mixed, integrandWork);
+            MonotoneIntegrand<ExpansionType, PosFuncType,  decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), _expansion, pt, coeffs, DerivativeFlags::Mixed, integrandWork);
 
             // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
             _quad.Integrate(workspace.data(), integrand, 0, 1, integral.data());
@@ -722,7 +725,7 @@ public:
     {
         double output = 0.0;
         // Compute the integral \int_0^1 g( \partial_D f(x_1,...,x_{D-1},t*x_d)) dt
-        MonotoneIntegrand<ExpansionType, PosFuncType, PointType, CoeffsType> integrand(cache,
+        MonotoneIntegrand<ExpansionType, PosFuncType, PointType, CoeffsType, MemorySpace> integrand(cache,
                                                                                        expansion,
                                                                                        pt,
                                                                                        xd,

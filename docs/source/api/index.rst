@@ -16,3 +16,4 @@ API Reference
    utilities/kokkoswrappers
    multivariateexpansion
    templateconcepts
+   utilities/initialization

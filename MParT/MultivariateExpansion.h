@@ -1,6 +1,8 @@
 #ifndef MPART_MULTIVARIATEEXPANSION_H
 #define MPART_MULTIVARIATEEXPANSION_H
 
+#include <Kokkos_Core.hpp>
+
 #include "MParT/DerivativeFlags.h"
 
 #include "MParT/MultiIndices/MultiIndexSet.h"

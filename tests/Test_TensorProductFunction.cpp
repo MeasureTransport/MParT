@@ -16,12 +16,12 @@ TEST_CASE( "Testing tensor product function", "[TensorProductFunction]") {
     unsigned int dim = dim1+dim2;
 
     unsigned int maxDegree = 3; 
-    FixedMultiIndexSet mset1(dim1, maxDegree); // Create a total order limited fixed multindex set
-    FixedMultiIndexSet mset2(dim2, maxDegree); // Create a total order limited fixed multindex set
+    FixedMultiIndexSet<Kokkos::HostSpace> mset1(dim1, maxDegree); // Create a total order limited fixed multindex set
+    FixedMultiIndexSet<Kokkos::HostSpace> mset2(dim2, maxDegree); // Create a total order limited fixed multindex set
 
     ProbabilistHermite poly1d;
-    MultivariateExpansion<ProbabilistHermite> f1(mset1);
-    MultivariateExpansion<ProbabilistHermite> f2(mset2);
+    MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace> f1(mset1);
+    MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace> f2(mset2);
 
     TensorProductFunction<decltype(f1), decltype(f2)> f(f1,f2);
 

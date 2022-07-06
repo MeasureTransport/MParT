@@ -159,7 +159,7 @@ FixedMultiIndexSet<Kokkos::HostSpace> MultiIndexSet::Fix(bool compress) const
     }
     nzStarts(numTerms) = totalNnz;
 
-    return FixedMultiIndexSet(length, nzStarts, nzDims, nzOrders);
+    return FixedMultiIndexSet<Kokkos::HostSpace>(length, nzStarts, nzDims, nzOrders);
 
   }else{
 

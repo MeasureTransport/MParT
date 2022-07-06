@@ -16,7 +16,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 {
     if(opts.quadType==QuadTypes::AdaptiveSimpson){
 
-        AdaptiveSimpson<MemorySpace> quad(opts.quadMaxSub, 1, nullptr, opts.quadAbsTol, opts.quadRelTol, QuadError::First);
+        AdaptiveSimpson<MemorySpace> quad(opts.quadMaxSub, 1, nullptr, opts.quadAbsTol, opts.quadRelTol, QuadError::First, opts.quadMinSub);
 
         if(opts.basisType==BasisTypes::ProbabilistHermite){
 
@@ -40,9 +40,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
             switch(opts.posFuncType) {
                 case PosFuncTypes::SoftPlus:
-                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad); break;
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv); break;
                 case PosFuncTypes::Exp:
-                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad); break;
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv); break;
             }
 
             output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
@@ -55,9 +55,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
             switch(opts.posFuncType) {
                 case PosFuncTypes::SoftPlus:
-                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad);
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv);
                 case PosFuncTypes::Exp:
-                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad);
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv);
             }
 
             output->Coeffs() = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
