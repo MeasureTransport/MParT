@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>MultiIndexLimiter &#8212; MParT  documentation</title>
+    <title>Initialization Helpers &#8212; MParT  documentation</title>
 <script>
   document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
   document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
@@ -37,11 +37,10 @@
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="MultiIndexNeighborhood" href="multiindexneighborhood.html" />
-    <link rel="prev" title="FixedMultiIndexSet" href="fixedmultiindexset.html" />
+    <link rel="next" title="Development" href="../../development/index.html" />
+    <link rel="prev" title="Parameterized Function Concept" href="../concepts/parameterizedfunction.html" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="docsearch:language" content="en">
   </head>
@@ -176,38 +175,38 @@
    Monotone Component
   </a>
  </li>
- <li class="toctree-l1 current active has-children">
+ <li class="toctree-l1 has-children">
   <a class="reference internal" href="../multiindex.html">
    MultiIndices
   </a>
-  <input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
   <label for="toctree-checkbox-1">
    <i class="fas fa-chevron-down">
    </i>
   </label>
-  <ul class="current">
+  <ul>
    <li class="toctree-l2">
-    <a class="reference internal" href="multiindex.html">
+    <a class="reference internal" href="../multiindices/multiindex.html">
      MultiIndex
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="multiindexset.html">
+    <a class="reference internal" href="../multiindices/multiindexset.html">
      MultiIndexSet
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="fixedmultiindexset.html">
+    <a class="reference internal" href="../multiindices/fixedmultiindexset.html">
      FixedMultiIndexSet
     </a>
    </li>
-   <li class="toctree-l2 current active">
-    <a class="current reference internal" href="#">
+   <li class="toctree-l2">
+    <a class="reference internal" href="../multiindices/multiindexlimiter.html">
      MultiIndexLimiter
     </a>
    </li>
    <li class="toctree-l2">
-    <a class="reference internal" href="multiindexneighborhood.html">
+    <a class="reference internal" href="../multiindices/multiindexneighborhood.html">
      MultiIndexNeighborhood
     </a>
    </li>
@@ -236,7 +235,7 @@
   </ul>
  </li>
  <li class="toctree-l1">
-  <a class="reference internal" href="../utilities/kokkoswrappers.html">
+  <a class="reference internal" href="kokkoswrappers.html">
    Kokkos Array Conversions
   </a>
  </li>
@@ -296,8 +295,8 @@
    </li>
   </ul>
  </li>
- <li class="toctree-l1">
-  <a class="reference internal" href="../utilities/initialization.html">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
    Initialization Helpers
   </a>
  </li>
@@ -339,82 +338,48 @@
               
               <article class="bd-article" role="main">
                 
-  <section id="multiindexlimiter">
-<h1>MultiIndexLimiter<a class="headerlink" href="#multiindexlimiter" title="Permalink to this heading">#</a></h1>
-<dl class="cpp type">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiterE">
-<span id="_CPPv3N5mpart17MultiIndexLimiterE"></span><span id="_CPPv2N5mpart17MultiIndexLimiterE"></span><span id="mpart::MultiIndexLimiter"></span><span class="target" id="namespacempart_1_1_multi_index_limiter"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultiIndexLimiter</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiterE" title="Permalink to this definition">#</a><br /></dt>
-<dd><dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter3AndE">
-<span id="_CPPv3N5mpart17MultiIndexLimiter3AndE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter3AndE"></span><span id="mpart::MultiIndexLimiter::And"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_and"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">And</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter3AndE" title="Permalink to this definition">#</a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;MultiIndexLimiter.h&gt;</em></div>
-<p>Combines two limiters through an AND operation. </p>
-<p>This class will return true if both limiters given to the constructor return true. </p>
+  <section id="initialization-helpers">
+<h1>Initialization Helpers<a class="headerlink" href="#initialization-helpers" title="Permalink to this heading">#</a></h1>
+<dl>
+<dt class="sig sig-object cpp">
+<span class="target" id="group___initialization_helpers"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">InitializationHelpers</span></span></dt>
+<dd><p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;MParT/Initialization.h&quot;</span><span class="cp"></span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span> <span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[]</span> <span class="p">)</span> <span class="p">{</span>
+  <span class="n">mpart</span><span class="o">::</span><span class="n">Initialize</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="n">argv</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+ </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv48Finalizev">
+<span id="_CPPv38Finalizev"></span><span id="_CPPv28Finalizev"></span><span id="Finalize"></span><span class="target" id="group___initialization_helpers_1ga109f7da58db68815962f0e79e302e015"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Finalize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48Finalizev" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Call Kokkos::Finalize. </p>
+<p>the mpart::Initialize function will set add this function to the <code class="docutils literal notranslate"><span class="pre">atexit</span></code> list so that it is called at program termination. </p>
 </dd></dl>
 
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter11AnisotropicE">
-<span id="_CPPv3N5mpart17MultiIndexLimiter11AnisotropicE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter11AnisotropicE"></span><span id="mpart::MultiIndexLimiter::Anisotropic"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_anisotropic"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Anisotropic</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter11AnisotropicE" title="Permalink to this definition">#</a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;MultiIndexLimiter.h&gt;</em></div>
-<p>Declares multiindices as feasible if their entries for less important dimensions are not too high. </p>
-<p>Given a weight vector <span class="math notranslate nohighlight">\( w = (w_i)_{i=1}^d \)</span> with <span class="math notranslate nohighlight">\( w_i \in [0,1] \)</span> and a cutoff threshold <span class="math notranslate nohighlight">\( \epsilon \in (0,1)\)</span>, this limiter declares a multiindex <span class="math notranslate nohighlight">\( \nu = (\nu_i)_{i=1}^d \)</span> as feasible if <span class="math notranslate nohighlight">\( w^\nu := \prod_{i=1}^d w_i^{\nu_i} &gt; \epsilon \)</span>. It thus implements the multiindex selection criterion for the construction of a priori anisotropic sparse grids as described in Algorithm 2 in <ul class="simple">
-<li><p>Zech, Jakob. <em>Sparse-grid approximation of high-dimensional parametric PDEs.</em> ETH Zurich, 2018. </p></li>
-</ul>
-</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpE10InitializevDp9Arguments">
+<span id="_CPPv3IDpE10InitializeDp9Arguments"></span><span id="_CPPv2IDpE10InitializeDp9Arguments"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Arguments</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="group___initialization_helpers_1ga346631d24ca0ca050a1a27a55dee8f19"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Initialize</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4IDpE10InitializevDp9Arguments" title="Initialize::Arguments"><span class="n"><span class="pre">Arguments</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpE10InitializevDp9Arguments" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Calls Kokkos::initialize if it hasn’t been called yet. </p>
+<p>This function provides a thin wrapper around the Kokkos::initialize function that can be called multiple times without error. This function also adds Kokkos::finalize to <code class="docutils literal notranslate"><span class="pre">atexit</span></code> so that manually calling Kokkos::finalize is not necessary. </p>
+<p>Note that Kokkos::initialize can only be called once and this function will print a warning message if called multiple times. The warning indicates that any changes to Kokkos parameters, like <code class="docutils literal notranslate"><span class="pre">--kokkos-threads</span></code> in subsequent calls will have no impact. Only the parameters passed the to the first mpart::Initialize call will be used.</p>
+<p>The warning messages can be silenced by setting the <code class="docutils literal notranslate"><span class="pre">MPART_WARNINGS</span></code> environment variable to <code class="docutils literal notranslate"><span class="pre">OFF</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Arguments</strong> – </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>args</strong> – Parameters to be passed on to Kokkos::initialize. </p>
+</dd>
+</dl>
 </dd></dl>
 
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter9DimensionE">
-<span id="_CPPv3N5mpart17MultiIndexLimiter9DimensionE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter9DimensionE"></span><span id="mpart::MultiIndexLimiter::Dimension"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_dimension"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Dimension</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter9DimensionE" title="Permalink to this definition">#</a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;MultiIndexLimiter.h&gt;</em></div>
-<p>Provides bounds on what dimensions are allowed to have nonzero values. </p>
-<p>This limiter only allows terms that satisfy <span class="math notranslate nohighlight">\(\mathbf{j}_d = 0 \)</span> for <span class="math notranslate nohighlight">\(d&lt;D_L\)</span> or <span class="math notranslate nohighlight">\(d&gt;=D_L+M\)</span> for a lower bound <span class="math notranslate nohighlight">\(D_L\)</span> and length <span class="math notranslate nohighlight">\(M\)</span>. </p>
-</dd></dl>
-
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter9MaxDegreeE">
-<span id="_CPPv3N5mpart17MultiIndexLimiter9MaxDegreeE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter9MaxDegreeE"></span><span id="mpart::MultiIndexLimiter::MaxDegree"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_max_degree"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MaxDegree</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter9MaxDegreeE" title="Permalink to this definition">#</a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;MultiIndexLimiter.h&gt;</em></div>
-<p>Provides a cap on the maximum value of each component the multiindex. </p>
-<p>This limter only allows terms that satisfy <span class="math notranslate nohighlight">\(\mathbf{j}_i\leq p_i\)</span> for <span class="math notranslate nohighlight">\(i\in \{1,2,\ldots,D\}\)</span>, where <span class="math notranslate nohighlight">\(p\)</span> is a vector of upper bounds. </p>
-</dd></dl>
-
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter4NoneE">
-<span id="_CPPv3N5mpart17MultiIndexLimiter4NoneE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter4NoneE"></span><span id="mpart::MultiIndexLimiter::None"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_none"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">None</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter4NoneE" title="Permalink to this definition">#</a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;MultiIndexLimiter.h&gt;</em></div>
-<p>Returns true for any multiindex. </p>
-<p>This class is used as a default in many places where a limiter is not always needed. IsFeasible will return true for any multiindex. </p>
-</dd></dl>
-
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter2OrE">
-<span id="_CPPv3N5mpart17MultiIndexLimiter2OrE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter2OrE"></span><span id="mpart::MultiIndexLimiter::Or"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_or"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Or</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter2OrE" title="Permalink to this definition">#</a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;MultiIndexLimiter.h&gt;</em></div>
-<p>Combines two limiters through an OR operation. </p>
-<p>This class will return true if either of the limiters given to the constructor return true. </p>
-</dd></dl>
-
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter10TotalOrderE">
-<span id="_CPPv3N5mpart17MultiIndexLimiter10TotalOrderE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter10TotalOrderE"></span><span id="mpart::MultiIndexLimiter::TotalOrder"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_total_order"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TotalOrder</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter10TotalOrderE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter3XorE">
-<span id="_CPPv3N5mpart17MultiIndexLimiter3XorE"></span><span id="_CPPv2N5mpart17MultiIndexLimiter3XorE"></span><span id="mpart::MultiIndexLimiter::Xor"></span><span class="target" id="classmpart_1_1_multi_index_limiter_1_1_xor"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Xor</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter3XorE" title="Permalink to this definition">#</a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;MultiIndexLimiter.h&gt;</em></div>
-<p>Combines two limiters through an XOR operation. </p>
-<p>This class will return true if exactly one of the limiters given to the constructor returns true. </p>
-</dd></dl>
-
+</div>
 </dd></dl>
 
 </section>
@@ -427,17 +392,17 @@
               <footer class="bd-footer-article">
                   <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="fixedmultiindexset.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="../concepts/parameterizedfunction.html" title="previous page">
       <i class="fas fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">FixedMultiIndexSet</p>
+          <p class="prev-next-title">Parameterized Function Concept</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="multiindexneighborhood.html" title="next page">
+  <a class='right-next' id="next-link" href="../../development/index.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">MultiIndexNeighborhood</p>
+      <p class="prev-next-title">Development</p>
   </div>
   <i class="fas fa-angle-right"></i>
   </a>
