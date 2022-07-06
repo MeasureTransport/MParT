@@ -88,7 +88,7 @@ if(MPART_JULIA)
 
   if(NOT JlCxx_FOUND)
     set(MPART_JULIA OFF)
-    message(WARNING "Request Julia bindings but CMake could not find JlCxx package.  Setting MPART_JULIA=OFF.")
+    message(WARNING "Request Julia bindings but CMake could not find CxxWrap package.  Setting MPART_JULIA=OFF.")
   else()
     get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
     get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
