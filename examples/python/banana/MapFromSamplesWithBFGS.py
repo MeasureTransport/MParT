@@ -30,6 +30,8 @@ rho_t = rho.pdf(np.dstack(grid))
 
 # Set-up map and initize map coefficients
 opts = MapOptions()
+# opts.basisType = BasisTypes.HermiteFunctions
+# opts.basisType = BasisTypes.PhysicistHermite
 tri_map = CreateTriangular(2,2,2,opts)
 coeffs = np.zeros(tri_map.numCoeffs)
 tri_map.SetCoeffs(coeffs)

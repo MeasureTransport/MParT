@@ -11,5 +11,5 @@ PYBIND11_MODULE(pympart, m) {
     ConditionalMapBaseWrapper(m);
     TriangularMapWrapper(m);
     MapFactoryWrapper(m);
-    
+    MultivariateExpansionWrapper(m);
 }
