@@ -16,15 +16,15 @@ using namespace mexplus;
 
 class ConditionalMapMex {       // The class
 public:             
-  std::shared_ptr<ConditionalMapBase> map_ptr;
+  std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map_ptr;
 
   ConditionalMapMex(FixedMultiIndexSet<Kokkos::HostSpace> const& mset, 
                                                           MapOptions opts){
     map_ptr = MapFactory::CreateComponent(mset,opts);
   }
 
-  ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase>> blocks){
-    map_ptr = std::make_shared<TriangularMap>(blocks);
+  ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> blocks){
+    map_ptr = std::make_shared<TriangularMap<Kokkos::HostSpace>>(blocks);
   }
 }; //end class
 
@@ -59,7 +59,7 @@ MEX_DEFINE(newTriMap) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 1);
   std::vector<intptr_t> list_id = input.get<std::vector<intptr_t>>(0);
   unsigned int numBlocks = list_id.size();
-  std::vector<std::shared_ptr<ConditionalMapBase>> blocks(numBlocks);
+  std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> blocks(numBlocks);
   for(unsigned int i=0;i<numBlocks;++i){
       const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(list_id.at(i)); 
       blocks.at(i) = condMap.map_ptr;
