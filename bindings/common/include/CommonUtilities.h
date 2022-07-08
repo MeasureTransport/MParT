@@ -1,5 +1,6 @@
 
 #include <vector>
+#include <string>
 
 namespace mpart{
 namespace binding{
