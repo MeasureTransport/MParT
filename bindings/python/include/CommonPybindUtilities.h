@@ -8,13 +8,12 @@
 #include <chrono>
 
 #include "../../common/include/CommonUtilities.h"
-// Note that this macro must be called in the top level namespace, which is why there are two separate namespace blocks in this file
-PYBIND11_DECLARE_HOLDER_TYPE(T, mpart::binding::KokkosCustomPointer<T>);
 
 namespace mpart{
 namespace binding{
+
 /** Define a wrapper around Kokkos::Initialize that accepts a python dictionary instead of argc and argv. */
-KokkosRuntime KokkosInit(pybind11::dict opts);
+void Initialize(pybind11::dict opts);
 
 /**
    @brief Adds the pybind11 bindings to the existing module pybind11 module m. 
@@ -27,6 +26,8 @@ void MultiIndexWrapper(pybind11::module &m);
 void MapOptionsWrapper(pybind11::module &m);
 
 void ConditionalMapBaseWrapper(pybind11::module &m);
+
+void TriangularMapWrapper(pybind11::module &m);
 
 void MapFactoryWrapper(pybind11::module &m);
 

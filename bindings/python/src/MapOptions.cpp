@@ -30,7 +30,7 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     .value("AdaptiveClenshawCurtis",QuadTypes::AdaptiveClenshawCurtis);
 
     // MapOptions
-    py::class_<MapOptions, KokkosCustomPointer<MapOptions>>(m, "MapOptions")
+    py::class_<MapOptions, std::shared_ptr<MapOptions>>(m, "MapOptions")
     .def(py::init<>())
     .def_readwrite("basisType", &MapOptions::basisType)
     .def_readwrite("posFuncType", &MapOptions::posFuncType)
@@ -38,7 +38,9 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     .def_readwrite("quadAbsTol", &MapOptions::quadAbsTol)
     .def_readwrite("quadRelTol", &MapOptions::quadRelTol)
     .def_readwrite("quadMaxSub", &MapOptions::quadMaxSub)
-    .def_readwrite("quadPts", &MapOptions::quadPts);
+    .def_readwrite("quadMinSub", &MapOptions::quadMinSub)
+    .def_readwrite("quadPts", &MapOptions::quadPts)
+    .def_readwrite("contDeriv", &MapOptions::contDeriv);
     
         
 

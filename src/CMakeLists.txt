@@ -11,5 +11,6 @@ target_sources(mpart
     ConditionalMapBase.cpp
     TriangularMap.cpp
     MapFactory.cpp
-    IdentityMap.cpp
+
+    Initialization.cpp
 )

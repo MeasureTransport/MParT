@@ -26,7 +26,7 @@ jobs:
         run: cd build; make
 
       - name: Run Tests
-        run: cd build; ./RunTests --kokkos-cores=2 --reporter junit -o test-results.xml
+        run: cd build; ./RunTests --kokkos-threads=2 --reporter junit -o test-results.xml
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1

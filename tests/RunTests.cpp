@@ -1,10 +1,9 @@
 #include <catch2/catch_session.hpp>
 
-#include <Kokkos_Core.hpp>
-
+#include "MParT/Initialization.h"
 
 int main( int argc, char* argv[] ) {
-  Kokkos::initialize(argc,argv);
+  mpart::Initialize(argc,argv);
 
   Catch::Session session; // There must be exactly one instance
 
@@ -13,7 +12,7 @@ int main( int argc, char* argv[] ) {
   // Build a new parser on top of Catch2's
   using namespace Catch::Clara;
   auto cli
-    = session.cli() | Opt( cores, "kokkos-cores" ) ["--kokkos-cores"]("Number of cores to use with Kokkos.");
+    = session.cli() | Opt( cores, "kokkos-thread" ) ["--kokkos-threads"]("Number of cores to use with Kokkos.");
 
   // Now pass the new composite back to Catch2 so it uses that
   session.cli( cli );
@@ -23,7 +22,6 @@ int main( int argc, char* argv[] ) {
   if( returnCode != 0 ) // Indicates a command line error
       return returnCode;
 
-  int result = session.run();
+  session.run();
 
-  Kokkos::finalize();
 }
