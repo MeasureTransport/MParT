@@ -18,7 +18,10 @@ void mpart::binding::MultivariateExpansionWrapper(py::module &m)
         // MultivariateExpansion
         .def(py::init<MultiIndexSet const&>())
         .def("NumCoeffs", &MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace>::NumCoeffs)
+        .def("CacheSize", &MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace>::CacheSize)
+        .def("InputSize", &MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace>::InputSize)
         //.def("Evaluate", &MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace>::Evaluate)
+ 
         ;
 
 }
