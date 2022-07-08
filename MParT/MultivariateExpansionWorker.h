@@ -1,5 +1,5 @@
-#ifndef MPART_MULTIVARIATEEXPANSION_H
-#define MPART_MULTIVARIATEEXPANSION_H
+#ifndef MPART_MultivariateExpansionWorker_H
+#define MPART_MultivariateExpansionWorker_H
 
 #include <Kokkos_Core.hpp>
 
@@ -74,14 +74,14 @@ struct CacheSizeFunctor{
  @tparam BasisEvaluatorType The family of 1d basis functions to employ.
  */
 template<class BasisEvaluatorType, typename MemorySpace=Kokkos::HostSpace>
-class MultivariateExpansion
+class MultivariateExpansionWorker
 {
 public:
 
-    MultivariateExpansion(MultiIndexSet const& multiSet,
-                          BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : MultivariateExpansion(multiSet.Fix(), basis1d){};
+    MultivariateExpansionWorker(MultiIndexSet const& multiSet,
+                          BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : MultivariateExpansionWorker(multiSet.Fix(), basis1d){};
 
-    MultivariateExpansion(FixedMultiIndexSet<MemorySpace> const& multiSet,
+    MultivariateExpansionWorker(FixedMultiIndexSet<MemorySpace> const& multiSet,
                           BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : dim_(multiSet.dim),
                                                                                       multiSet_(multiSet),
                                                                                       basis1d_(basis1d),

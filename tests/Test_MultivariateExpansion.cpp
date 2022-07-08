@@ -1,6 +1,6 @@
 #include <catch2/catch_all.hpp>
 
-#include "MParT/MultivariateExpansion.h"
+#include "MParT/MultivariateExpansionWorker.h"
 #include "MParT/OrthogonalPolynomial.h"
 
 #include "MParT/Utilities/ArrayConversions.h"
@@ -10,14 +10,14 @@
 using namespace mpart;
 using namespace Catch;
 
-TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
+TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]") {
 
     unsigned int dim = 3;
     unsigned int maxDegree = 3; 
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
     ProbabilistHermite poly1d;
-    MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace> expansion(mset);
+    MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> expansion(mset);
 
     unsigned int cacheSize = expansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(dim+2));
@@ -108,7 +108,7 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
 
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
 
-TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionDevice]") {
+TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWorkerDevice]") {
 
     typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
 
@@ -117,8 +117,8 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionDe
     FixedMultiIndexSet<Kokkos::HostSpace> hset(dim,maxDegree);
     FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice(); // Create a total order limited fixed multindex set
 
-    MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace> hexpansion(hset);
-    MultivariateExpansion<ProbabilistHermite,DeviceSpace> dexpansion(dset);
+    MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> hexpansion(hset);
+    MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> dexpansion(dset);
 
     unsigned int cacheSize = hexpansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(dim+2));
