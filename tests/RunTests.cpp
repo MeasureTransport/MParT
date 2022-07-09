@@ -1,10 +1,9 @@
 #include <catch2/catch_session.hpp>
 
-#include <Kokkos_Core.hpp>
-
+#include "MParT/Initialization.h"
 
 int main( int argc, char* argv[] ) {
-  Kokkos::initialize(argc,argv);
+  mpart::Initialize(argc,argv);
 
   Catch::Session session; // There must be exactly one instance
 
@@ -25,5 +24,4 @@ int main( int argc, char* argv[] ) {
 
   session.run();
 
-  Kokkos::finalize();
 }

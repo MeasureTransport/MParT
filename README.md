@@ -1,7 +1,7 @@
 ![](https://github.com/MeasureTransport/MParT/actions/workflows/build-doc.yml/badge.svg)
 ![](https://github.com/MeasureTransport/MParT/actions/workflows/build-tests.yml/badge.svg)
 
-# MParT: A Monotone Parameterization Toolbox
+# MParT: A Monotone Parameterization Toolkit
 A CPU/GPU performance-portable library for parameterizing and constructing monotone functions in the context of measure transport and regression.
 
 ## Documentation

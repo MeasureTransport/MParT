@@ -22,7 +22,7 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
 {
 
     // ConditionalMapBase
-     py::class_<ConditionalMapBase<Kokkos::HostSpace>, KokkosCustomPointer<ConditionalMapBase<Kokkos::HostSpace>>>(m, "ConditionalMapBase")
+     py::class_<ConditionalMapBase<Kokkos::HostSpace>, std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>>(m, "ConditionalMapBase")
 
         .def("CoeffMap", &ConditionalMapBase<Kokkos::HostSpace>::CoeffMap)
         .def("SetCoeffs", py::overload_cast<Eigen::Ref<Eigen::VectorXd>>(&ConditionalMapBase<Kokkos::HostSpace>::SetCoeffs))

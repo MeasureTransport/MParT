@@ -6,16 +6,11 @@
 
 #include "../../common/include/CommonUtilities.h"
 
-// Note that this macro must be called in the jlcxx namespace, which is why there are two separate namespace blocks in this file
-namespace jlcxx{
-  template<typename T> struct IsSmartPointerType<mpart::binding::KokkosCustomPointer<T>> : std::true_type { };
-  template<typename T> struct ConstructorPointerType<mpart::binding::KokkosCustomPointer<T>> { typedef mpart::binding::KokkosCustomPointer<T> type; };
-}
-
 namespace mpart{
 namespace binding{
+    
 /** Define a wrapper around Kokkos::Initialize that accepts a sequence of Cstrings. */
-KokkosRuntime KokkosInit(jlcxx::ArrayRef<char*>);
+void Initialize(jlcxx::ArrayRef<char*>);
 
 /**
    @brief Adds the Kokkos bindings to the existing module m. 
