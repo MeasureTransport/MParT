@@ -8,6 +8,7 @@ target_sources(mpart
 
     Utilities/Miscellaneous.cpp
 
+    ParameterizedFunctionBase.cpp
     ConditionalMapBase.cpp
     TriangularMap.cpp
     MapFactory.cpp

@@ -11,6 +11,7 @@
 #include "MParT/Utilities/Miscellaneous.h"
 
 #include "MParT/Utilities/KokkosSpaceMappings.h"
+#include "MParT/MultivariateExpansion.h"
 
 #include <Eigen/Core>
 
@@ -58,6 +59,7 @@ public:
                                                     _useContDeriv(useContDeriv){};
 
 
+    virtual std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> GetBaseFunction() override{return std::make_shared<MultivariateExpansion<typename ExpansionType::BasisType, typename ExpansionType::KokkosSpace>>(1,_expansion);};
 
     /** Override the ConditionalMapBase Evaluate function. */
     virtual void EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,

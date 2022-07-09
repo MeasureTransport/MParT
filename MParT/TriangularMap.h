@@ -52,6 +52,8 @@ public:
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
     virtual void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
 
+    virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}
+
     /** @brief Computes the log determinant of the Jacobian matrix of this map.
 
     @details
