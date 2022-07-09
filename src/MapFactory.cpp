@@ -5,7 +5,7 @@
 #include "MParT/Quadrature.h"
 #include "MParT/OrthogonalPolynomial.h"
 #include "MParT/HermiteFunction.h"
-#include "MParT/MultivariateExpansion.h"
+#include "MParT/MultivariateExpansionWorker.h"
 #include "MParT/PositiveBijectors.h"
 
 using namespace mpart;
@@ -20,7 +20,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
         if(opts.basisType==BasisTypes::ProbabilistHermite){
 
-            MultivariateExpansion<ProbabilistHermite,MemorySpace> expansion(mset);
+            MultivariateExpansionWorker<ProbabilistHermite,MemorySpace> expansion(mset);
             std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
             switch(opts.posFuncType) {
@@ -35,7 +35,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
         }else if(opts.basisType==BasisTypes::PhysicistHermite){
 
-            MultivariateExpansion<PhysicistHermite, MemorySpace> expansion(mset);
+            MultivariateExpansionWorker<PhysicistHermite, MemorySpace> expansion(mset);
             std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
             switch(opts.posFuncType) {
@@ -50,7 +50,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
         }else if(opts.basisType==BasisTypes::HermiteFunctions){
 
-            MultivariateExpansion<HermiteFunction, MemorySpace> expansion(mset);
+            MultivariateExpansionWorker<HermiteFunction, MemorySpace> expansion(mset);
             std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
             switch(opts.posFuncType) {

@@ -17,6 +17,7 @@ void mpart::binding::TriangularMapWrapper(py::module &m)
      py::class_<TriangularMap<Kokkos::HostSpace>, ConditionalMapBase<Kokkos::HostSpace>, std::shared_ptr<TriangularMap<Kokkos::HostSpace>>>(m, "TriangularMap")
         .def(py::init<std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>>>())
         .def("InverseInplace", &TriangularMap<Kokkos::HostSpace>::InverseInplace)
+        .def("GetComponent", &TriangularMap<Kokkos::HostSpace>::GetComponent)
         ;
 
 }

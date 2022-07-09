@@ -48,6 +48,10 @@ public:
 
     void Print() const;
 
+    KOKKOS_INLINE_FUNCTION unsigned int Length() const{
+        return dim;
+    }
+
     KOKKOS_INLINE_FUNCTION unsigned int Size() const
     {
         if(isCompressed){
@@ -56,10 +60,6 @@ public:
             return nzOrders.extent(0) / dim;
         }
     }
-
-    const unsigned int dim;
-
-    const bool isCompressed;
 
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
 
@@ -75,6 +75,9 @@ public:
     Kokkos::View<unsigned int*, MemorySpace> maxDegrees; // The maximum multiindex value (i.e., degree) in each dimension
 
 private:
+
+    unsigned int dim;
+    bool isCompressed;
 
     void SetupTerms();
 
