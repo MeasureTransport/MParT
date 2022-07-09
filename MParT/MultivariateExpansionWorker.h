@@ -77,15 +77,17 @@ template<class BasisEvaluatorType, typename MemorySpace=Kokkos::HostSpace>
 class MultivariateExpansionWorker
 {
 public:
+    
+    MultivariateExpansionWorker() : dim_(0), multiSet_(FixedMultiIndexSet<MemorySpace>(1,0)){};
 
     MultivariateExpansionWorker(MultiIndexSet const& multiSet,
-                          BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : MultivariateExpansionWorker(multiSet.Fix(), basis1d){};
+                                BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : MultivariateExpansionWorker(multiSet.Fix(), basis1d){};
 
     MultivariateExpansionWorker(FixedMultiIndexSet<MemorySpace> const& multiSet,
-                          BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : dim_(multiSet.dim),
+                                BasisEvaluatorType const& basis1d = BasisEvaluatorType()) : dim_(multiSet.Length()),
                                                                                       multiSet_(multiSet),
                                                                                       basis1d_(basis1d),
-                                                                                      startPos_("Indices for start of 1d basis evaluations", multiSet.dim+3),
+                                                                                      startPos_("Indices for start of 1d basis evaluations", multiSet.Length()+3),
                                                                                       maxDegrees_(multiSet_.MaxDegrees())
     {
         Kokkos::parallel_scan(Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space>(0,dim_+3), MultivariateExpansionMaxDegreeFunctor<MemorySpace>(dim_,startPos_, maxDegrees_));
@@ -115,7 +117,7 @@ public:
     @brief Returns the dimension of inputs to this multivariate expansion.
     @return unsigned int The dimension of an input point.
     */
-    KOKKOS_INLINE_FUNCTION unsigned int InputSize() const {return multiSet_.dim;};
+    KOKKOS_INLINE_FUNCTION unsigned int InputSize() const {return multiSet_.Length();};
 
     /**
      @brief Precomputes parts of the cache using all but the last component of the point, i.e., using only \f$x_1,x_2,\ldots,x_{d-1}\f$, not \f$x_d\f$.
@@ -156,7 +158,7 @@ public:
                                     DerivativeFlags::DerivativeType derivType) const
     {
 
-        if(derivType==DerivativeFlags::None){
+        if((derivType==DerivativeFlags::None)||(derivType==DerivativeFlags::Parameters)){
             basis1d_.EvaluateAll(&polyCache[startPos_(dim_-1)],
                                   maxDegrees_(dim_-1),
                                   xd);
@@ -265,7 +267,7 @@ public:
             double termVal = 1.0;
             for(unsigned int i=multiSet_.nzStarts(termInd); i<multiSet_.nzStarts(termInd+1); ++i)
                     termVal *= polyCache[startPos_(multiSet_.nzDims(i)) + multiSet_.nzOrders(i)];
-
+                    
             f += termVal*coeffs(termInd);
             grad(termInd) = termVal;
         }
@@ -317,7 +319,7 @@ public:
 
 private:
 
-    const unsigned int dim_;
+    unsigned int dim_;
 
     FixedMultiIndexSet<MemorySpace> multiSet_;
     BasisEvaluatorType basis1d_;
