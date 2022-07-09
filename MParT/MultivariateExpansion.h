@@ -31,6 +31,14 @@ namespace mpart{
         {
             workers.push_back( MultivariateExpansionWorker<BasisEvaluatorType, MemorySpace>(mset, basis1d) );
         };
+
+        template<typename ExpansionType>
+        MultivariateExpansion(unsigned int  outDim, 
+                              ExpansionType expansion) : ParameterizedFunctionBase<MemorySpace>(expansion.InputSize(), outDim, expansion.NumCoeffs()*outDim)
+        {
+            workers.push_back( expansion );
+        };
+
         // template<typename SetType>
         // MultivariateExpansion(std::vector<SetType> const& msets, 
         //                       BasisEvaluatorType   const& basis1d) : ParameterizedFunctionBase<MemorySpace>(msets.at(0).Length(),  // input dimension
@@ -244,7 +252,7 @@ namespace mpart{
 
                 // Paralel loop over each point computing T(x_1,...,x_D) for that point
                 Kokkos::parallel_for(policy, functor1);
-                
+
             }else{
                 const unsigned int threadsPerTeam = std::min<unsigned int>(numPts, policy.team_size_recommended(functor2, Kokkos::ParallelForTag()));
                 const unsigned int numTeams = std::ceil( double(numPts) / threadsPerTeam );

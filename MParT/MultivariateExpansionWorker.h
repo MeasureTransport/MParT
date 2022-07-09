@@ -77,7 +77,9 @@ template<class BasisEvaluatorType, typename MemorySpace=Kokkos::HostSpace>
 class MultivariateExpansionWorker
 {
 public:
-    
+    using BasisType = BasisEvaluatorType;
+    using KokkosSpace = MemorySpace;
+
     MultivariateExpansionWorker() : dim_(0), multiSet_(FixedMultiIndexSet<MemorySpace>(1,0)){};
 
     MultivariateExpansionWorker(MultiIndexSet const& multiSet,

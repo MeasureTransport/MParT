@@ -39,6 +39,11 @@ namespace mpart {
         ConditionalMapBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs) : ParameterizedFunctionBase<MemorySpace>(inDim, outDim, nCoeffs){};
 
         virtual ~ConditionalMapBase() = default;
+        
+        /** For Monotone parameterizations that are based on a non-monotone base function, this function will return the base function.  If the monotone parameterization is 
+            not constructed from a non-monotone base, then this function will return a nullptr.
+        */
+        virtual std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> GetBaseFunction(){return nullptr;};
 
         /** @brief Computes the log determinant of the map Jacobian.
 
