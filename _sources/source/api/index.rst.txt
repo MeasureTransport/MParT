@@ -14,6 +14,6 @@ API Reference
    multiindex
    quadrature
    utilities/kokkoswrappers
-   multivariateexpansion
+   multivariateexpansionworker
    templateconcepts
    utilities/initialization
