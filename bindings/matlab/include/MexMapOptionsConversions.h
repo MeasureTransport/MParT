@@ -11,8 +11,9 @@ namespace mpart{
     */
     MapOptions  MapOptionsFromMatlab(std::string basisType, std::string posFuncType, 
                                         std::string quadType, double quadAbsTol,
-                                        double quadRelTol, unsigned int quadMaxSub,
-                                        unsigned int quadPts);
+                                        double quadRelTol, unsigned int quadMaxSub, 
+                                        unsigned int quadMinSub,unsigned int quadPts, 
+                                        bool contDeriv);
 }
 
 

@@ -1,6 +1,7 @@
 
 #include <Kokkos_Core.hpp>
 #include <mexplus.h>
+#include <MParT/Initialization.h>
 
 using namespace std;
 using namespace mexplus;
@@ -14,12 +15,7 @@ MEX_DEFINE(Kokkos_Initialize) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 0);
   Kokkos::InitArguments args;
   args.num_threads = input.get<int>(0);
-  Kokkos::initialize(args);
-}
-
-MEX_DEFINE(Kokkos_Finalize) (int nlhs, mxArray* plhs[],
-                               int nrhs, const mxArray* prhs[]) {
-  Kokkos::finalize();
+  mpart::Initialize(args);
 }
 
 }
