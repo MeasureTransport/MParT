@@ -7,7 +7,8 @@ set(PYTHON_BINDING_SOURCES
   src/ConditionalMapBase.cpp
   src/TriangularMap.cpp
   src/MapFactory.cpp
-  src/MultivariateExpansion.cpp
+  src/ParameterizedFunctionBase.cpp
+  
   ../common/src/CommonUtilities.cpp
 )
 

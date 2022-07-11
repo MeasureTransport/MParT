@@ -2,6 +2,6 @@
 Multivariate Expansion
 ==============================
 
-.. doxygenclass:: mpart::MultivariateExpansion
+.. doxygenclass:: mpart::MultivariateExpansionWorker
     :members:
     :undoc-members:
