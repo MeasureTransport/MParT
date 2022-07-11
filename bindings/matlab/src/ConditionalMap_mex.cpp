@@ -32,25 +32,6 @@ public:
   }
 }; //end class
 
-// class TriangularMapMex {       // The class
-// public:             
-//   TriangularMap triMap;
-
-//   TriangularMapMex(std::vector<ConditionalMapMex> blocks){
-//     map_ptr = MapFactory::CreateComponent(mset,opts);
-//   }
-// }; //end class
-
-// class ListConditionalMaps {       // The class
-// public:             
-//   std::vector<std::shared_ptr<ConditionalMapBaseMex>> blocks;
-
-//   TriangularMapMex(std::vector<>){
-//     const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0))
-//     map_ptr = MapFactory::CreateComponent(mset,opts);
-//   }
-// }; //end class
-
 // Instance manager for ConditionalMap.
 template class mexplus::Session<ConditionalMapMex>;
 
@@ -163,32 +144,42 @@ MEX_DEFINE(LogDeterminant) (int nlhs, mxArray* plhs[],
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  Eigen::RowMatrixXd pts = input.get<Eigen::MatrixXd>(1);
+  Eigen::MatrixXd pts = input.get<Eigen::MatrixXd>(1);
   Eigen::MatrixXd logDet = condMap.map_ptr->LogDeterminant(pts);
   output.set(0,logDet);
 }
 
-// MEX_DEFINE(Inverse) (int nlhs, mxArray* plhs[],
-//                  int nrhs, const mxArray* prhs[]) {
-//   InputArguments input(nrhs, prhs, 3);
-//   OutputArguments output(nlhs, plhs, 1);
-//   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-//   Eigen::RowMatrixXd x1 = input.get<Eigen::RowMatrixXd>(1);
-//   Eigen::RowMatrixXd r = input.get<Eigen::RowMatrixXd>(2);
-//   Eigen::RowMatrixXd inv = condMap.map_ptr->Inverse(x1,r);
-//   output.set(0,inv);
-// }
+MEX_DEFINE(Inverse) (int nlhs, mxArray* plhs[],
+                 int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 3);
+  OutputArguments output(nlhs, plhs, 1);
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+  Eigen::MatrixXd x1 = input.get<Eigen::MatrixXd>(1);
+  Eigen::MatrixXd r = input.get<Eigen::MatrixXd>(2);
+  Eigen::MatrixXd inv = condMap.map_ptr->Inverse(x1,r);
+  output.set(0,inv);
+}
 
-// MEX_DEFINE(CoeffJacobian) (int nlhs, mxArray* plhs[],
-//                  int nrhs, const mxArray* prhs[]) {
-//   InputArguments input(nrhs, prhs, 3);
-//   OutputArguments output(nlhs, plhs, 1);
-//   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-//   Eigen::MatrixXd x1 = input.get<Eigen::MatrixXd>(1);
-//   Eigen::MatrixXd r = input.get<Eigen::MatrixXd>(2);
-//   Eigen::MatrixXd inv = condMap.map_ptr->CoeffJacobian(x1,r);
-//   output.set(0,inv);
-// }
+MEX_DEFINE(CoeffGrad) (int nlhs, mxArray* plhs[],
+                 int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 3);
+  OutputArguments output(nlhs, plhs, 1);
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+  Eigen::MatrixXd pts = input.get<Eigen::MatrixXd>(1);
+  Eigen::MatrixXd sens = input.get<Eigen::MatrixXd>(2);
+  Eigen::MatrixXd out = condMap.map_ptr->CoeffGrad(pts,sens);
+  output.set(0,out);
+}
+
+MEX_DEFINE(LogDeterminantCoeffGrad) (int nlhs, mxArray* plhs[],
+                 int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+  Eigen::MatrixXd pts = input.get<Eigen::MatrixXd>(1);
+  Eigen::MatrixXd out = condMap.map_ptr->LogDeterminantCoeffGrad(pts);
+  output.set(0,out);
+}
 
 // MultiIndexSet
 MEX_DEFINE(newMutliIndexSetEigen) (int nlhs, mxArray* plhs[],

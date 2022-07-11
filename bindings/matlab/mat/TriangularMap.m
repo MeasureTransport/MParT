@@ -59,6 +59,14 @@ methods
     result = MParT_('Inverse',this.id_,x1,r);
   end
 
+  function result = CoeffGrad(this,pts,sens)
+    result = MParT_('CoeffGrad',this.id_,pts,sens);
+  end
+
+  function result = LogDeterminantCoeffGrad(this,pts)
+    result = MParT_('LogDeterminantCoeffGrad',this.id_,pts);
+  end
+
   function result = get_id(this)
     result = this.id_;
   end
