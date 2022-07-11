@@ -44,4 +44,5 @@ void mpart::binding::Initialize(py::dict opts) {
 void mpart::binding::CommonUtilitiesWrapper(py::module &m)
 {   
     m.def("Initialize", py::overload_cast<py::dict>( &mpart::binding::Initialize ));
+    m.def("Concurrency", &Kokkos::DefaultExecutionSpace::concurrency);
 }
