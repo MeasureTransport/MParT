@@ -149,21 +149,27 @@ endif()
 ##############################################################
 # Testing
 
-# Install Catch2
-find_package(Catch2 QUIET)
-if(NOT Catch2_FOUND)
-    message(STATUS "Could not find Catch2.  Using internal build.")
-    UpdateGitSubmodule(catch2)
-    PinSubmoduleVersion(catch2 v3.0.0-preview3)
-    add_subdirectory(external/catch2)
-else()
-    message(STATUS "Found Catch2!")
-endif()
+option(MPART_BUILD_TESTS "If ON, unit tests will be built." ON)
 
-# Define test sources
-add_subdirectory(tests)
-add_executable(RunTests ${TEST_SOURCES})
-target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen)
+if(MPART_BUILD_TESTS)
+
+    # Install Catch2
+    find_package(Catch2 QUIET)
+    if(NOT Catch2_FOUND)
+        message(STATUS "Could not find Catch2.  Using internal build.")
+        UpdateGitSubmodule(catch2)
+        PinSubmoduleVersion(catch2 v3.0.0-preview3)
+        add_subdirectory(external/catch2)
+    else()
+        message(STATUS "Found Catch2!")
+    endif()
+
+    # Define test sources
+    add_subdirectory(tests)
+    add_executable(RunTests ${TEST_SOURCES})
+    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen)
+
+endif()
 
 add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
 target_link_libraries(PrintKokkosInfo Kokkos::kokkos)
