@@ -45,13 +45,13 @@ TEST_CASE( "Testing Hermite functions", "[HermiteFunction]" ) {
         
 
         truth = std::pow(3.0, -0.5) * std::pow(M_PI, -0.25) * (2.0*x*x*x-3.0*x) * std::exp(-0.5*x*x);
-        CHECK( poly.Evaluate(4, x) == Approx(truth).epsilon(floatTol) ); 
-        CHECK( allvals[4] == Approx(truth).epsilon(floatTol));
+        CHECK( poly.Evaluate(5, x) == Approx(truth).epsilon(floatTol) ); 
+        CHECK( allvals[5] == Approx(truth).epsilon(floatTol));
         
 
         truth = std::pow(24.0, -0.5) * std::pow(M_PI, -0.25) * (4.0*x*x*x*x - 12*x*x + 3.0) * std::exp(-0.5*x*x);
-        CHECK( poly.Evaluate(5, x) == Approx(truth).epsilon(floatTol) ); 
-        CHECK( allvals[5] == Approx(truth).epsilon(floatTol));
+        CHECK( poly.Evaluate(6, x) == Approx(truth).epsilon(floatTol) ); 
+        CHECK( allvals[6] == Approx(truth).epsilon(floatTol));
 
 
         poly.EvaluateDerivatives(&allvals[0], &allderivs[0], 6, x);
