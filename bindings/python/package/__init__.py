@@ -1,7 +1,5 @@
 import sys
 from .pympart import *
-import multiprocessing
 
-ncpus = multiprocessing.cpu_count()
-kokkos_init = Initialize({"kokkos-threads": ncpus})
+kokkos_init = Initialize(dict())
 sys.modules[__name__] = sys.modules['mpart']
