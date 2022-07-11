@@ -26,7 +26,7 @@ public:
                 output[2] = std::pow(M_PI, -0.25) * std::exp(-0.5*x*x);
 
                 if(maxOrder>2){
-                    output[3] = std::sqrt(2.0) * x * output[0];
+                    output[3] = std::sqrt(2.0) * x * output[2];
                     for(unsigned int i=2; i<=maxOrder-2; ++i)
                         output[i+2] = (x*output[i+1]  - std::sqrt(0.5*(i-1))*output[i])/std::sqrt(0.5*i);
                 }
@@ -43,7 +43,7 @@ public:
         derivs[0] = 0.0;
 
         if(maxOrder>0){
-            vals[0] = x;
+            vals[1] = x;
             derivs[1] = 1.0;
 
             if(maxOrder>1){
