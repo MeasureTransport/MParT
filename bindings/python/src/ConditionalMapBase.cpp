@@ -10,28 +10,16 @@ namespace py = pybind11;
 using namespace mpart::binding;
 
 
-// class PyConditionalMapBase : public ConditionalMapBase
-// {
-// public:
-
-//     using ConditionalMapBase::ConditionalMapBase;
-
-// };
-
 void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
 {
 
     // ConditionalMapBase
-     py::class_<ConditionalMapBase<Kokkos::HostSpace>, std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>>(m, "ConditionalMapBase")
+     py::class_<ConditionalMapBase<Kokkos::HostSpace>, ParameterizedFunctionBase<Kokkos::HostSpace>, std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>>(m, "ConditionalMapBase")
 
-        .def("CoeffMap", &ConditionalMapBase<Kokkos::HostSpace>::CoeffMap)
-        .def("SetCoeffs", py::overload_cast<Eigen::Ref<Eigen::VectorXd>>(&ConditionalMapBase<Kokkos::HostSpace>::SetCoeffs))
-        .def("Evaluate", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<Kokkos::HostSpace>::Evaluate))
         .def("LogDeterminant", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<Kokkos::HostSpace>::LogDeterminant))
         .def("Inverse", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<Kokkos::HostSpace>::Inverse))
-        .def("CoeffGrad", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<Kokkos::HostSpace>::CoeffGrad))
         .def("LogDeterminantCoeffGrad", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantCoeffGrad))
-        .def_readonly("numCoeffs", &ConditionalMapBase<Kokkos::HostSpace>::numCoeffs)
+        .def("GetBaseFunction", &ConditionalMapBase<Kokkos::HostSpace>::GetBaseFunction)
         ;
 
 }
