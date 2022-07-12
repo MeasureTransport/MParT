@@ -8,15 +8,21 @@
 
 namespace mpart{
 namespace binding{
-    
+
 /** Define a wrapper around Kokkos::Initialize that accepts a sequence of Cstrings. */
 void Initialize(jlcxx::ArrayRef<char*>);
 
 /**
-   @brief Adds the Kokkos bindings to the existing module m. 
-   @param m CxxWrap.jl module
+   @brief Adds the Kokkos bindings to the existing module m.
+   @param mod CxxWrap.jl module
  */
 void CommonUtilitiesWrapper(jlcxx::Module&);
+
+/**
+ * @brief Adds the MultiIndex bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void MultiIndexWrapper(jlcxx::Module&);
 
 } // namespace mpart
 } // namespace binding

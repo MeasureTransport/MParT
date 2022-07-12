@@ -21,11 +21,11 @@ namespace mpart{
 }
 
 
-void initKokkosRuntime(jlcxx::ArrayRef<char*> opts) {
+void Initialize(jlcxx::ArrayRef<char*> opts) {
     mpart::binding::Initialize(makeInitArguments(opts));
 }
 
-void mpart::binding::CommonUtilitiesWrapper(jlcxx::Module &m)
+void mpart::binding::CommonUtilitiesWrapper(jlcxx::Module &mod)
 {
-    m.method("Initialize", &initKokkosRuntime);
+    m.method("Initialize", &Initialize);
 }
