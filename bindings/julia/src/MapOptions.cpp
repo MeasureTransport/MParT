@@ -1,39 +1,28 @@
-#include "CommonJuliaUtilities.h"
-#include "MParT/MapOptions.h"
-
+#include <MParT/MapOptions.h>
 #include <Kokkos_Core.hpp>
 
-namespace py = pybind11;
+#include "CommonJuliaUtilities.h"
+
 using namespace mpart::binding;
 
-JLCXX_MODULE mpart::binding::MapOptionsWrapper(jlcxx::Module& types)
-{
-
+void mpart::binding::MapOptionsWrapper(jlcxx::module &m) {
     // BasisTypes
-    types.add_bits<BasisTypes>("BasisTypes", jlcxx::julia_type("CppEnum"));
-    types.set_const("ProbabilistHermite", BasisTypes::ProbabilistHermite);
-    types.set_const("PhysicistHermite",   BasisTypes::PhysicistHermite);
-    types.set_const("HermiteFunctions",   BasisTypes::HermiteFunctions);
+    m.add_bits<BasisTypes>("BasisTypes", jlcxx::julia_type("CppEnum"));
+    m.value("ProbabilistHermite", BasisTypes::ProbabilistHermite);
+    m.value("PhysicistHermite", BasisTypes::PhysicistHermite);
+    m.value("HermiteFunctions", BasisTypes::HermiteFunctions);
 
     // PosFuncTypes
-    types.add_bits<PosFuncTypes>("PosFuncTypes", jlcxx::julia_type("CppEnum"));
-    types.set_const("Exp", PosFuncTypes::Exp);
-    types.set_const("SoftPlus", PosFuncTypes::SoftPlus);
+    m.add_bits<PosFuncTypes>("PosFuncTypes", jlcxx::julia_type("CppEnum"));
+    m.value("Exp", PosFuncTypes::Exp);
+    m.value("SoftPlus", PosFuncTypes::SoftPlus);
 
     // QuadTypes
-    types.add_bits<QuadTypes>("QuadTypes", jlcxx::julia_type("CppEnum"));
-    types.set_const("ClenshawCurtis", QuadTypes::ClenshawCurtis);
-    types.set_const("AdaptiveSimpson", QuadTypes::AdaptiveSimpson);
-    types.set_const("AdaptiveClenshawCurtis", QuadTypes::AdaptiveClenshawCurtis);
+    m.add_bits<QuadTypes>("QuadTypes", jlcxx::julia_type("CppEnum"));
+    m.value("ClenshawCurtis", QuadTypes::ClenshawCurtis);
+    m.value("AdaptiveSimpson", QuadTypes::AdaptiveSimpson);
+    m.value("AdaptiveClenshawCurtis", QuadTypes::AdaptiveClenshawCurtis);
 
     // MapOptions
-    py::class_<MapOptions, KokkosCustomPointer<MapOptions>>(m, "MapOptions")
-    .def(py::init<>())
-    .def_readwrite("basisType", &MapOptions::basisType)
-    .def_readwrite("posFuncType", &MapOptions::posFuncType)
-    .def_readwrite("quadType", &MapOptions::quadType)
-    .def_readwrite("quadAbsTol", &MapOptions::quadAbsTol)
-    .def_readwrite("quadRelTol", &MapOptions::quadRelTol)
-    .def_readwrite("quadMaxSub", &MapOptions::quadMaxSub)
-    .def_readwrite("quadPts", &MapOptions::quadPts);
+    m.add_type<MapOptions>("MapOptions").constructor<>();
 }
