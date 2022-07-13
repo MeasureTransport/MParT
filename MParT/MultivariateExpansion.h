@@ -37,9 +37,7 @@ namespace mpart{
         {
         };
 
-        virtual ~MultivariateExpansion(){
-            std::cout << "End of destructor..." << std::endl;
-        };
+        virtual ~MultivariateExpansion() = default;
 
 
         virtual void EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,

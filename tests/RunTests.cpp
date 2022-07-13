@@ -5,8 +5,6 @@
 int main( int argc, char* argv[] ) {
   mpart::Initialize(argc,argv);
 
-  std::cout << "Kokkos Concurrency = " << Kokkos::DefaultExecutionSpace::concurrency() << std::endl;
-
   Catch::Session session; // There must be exactly one instance
 
   int cores = 0; // Some user variable you want to be able to set
@@ -25,5 +23,4 @@ int main( int argc, char* argv[] ) {
       return returnCode;
 
   session.run();
-  std::cout << "Done running session..." << std::endl;
 }
