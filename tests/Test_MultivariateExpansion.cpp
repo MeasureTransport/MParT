@@ -21,43 +21,43 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
 
     ProbabilistHermite basis;
     MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace> func(outDim, mset, basis);
-    CHECK(func.numCoeffs == mset.Size()*outDim);
+    CHECK(func.numCoeffs == (mset.Size()*outDim));
 
-    Kokkos::View<double*,Kokkos::HostSpace> coeffs("coefficients", func.numCoeffs);
-    for(unsigned int i=0; i<func.numCoeffs; ++i)
-        coeffs(i) = 0.01;
+    // Kokkos::View<double*,Kokkos::HostSpace> coeffs("coefficients", func.numCoeffs);
+    // for(unsigned int i=0; i<func.numCoeffs; ++i)
+    //     coeffs(i) = 0.01;
         
-    func.SetCoeffs(coeffs);
+    // func.SetCoeffs(coeffs);
 
     
-    Kokkos::View<double**,Kokkos::HostSpace> pts("Points",inDim,numPts);
-    for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
-        for(unsigned int d=0; d<inDim; ++d){
-            pts(d,ptInd) = d+1 + double(ptInd+1)/numPts;
-        }
-    }
+    // Kokkos::View<double**,Kokkos::HostSpace> pts("Points",inDim,numPts);
+    // for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
+    //     for(unsigned int d=0; d<inDim; ++d){
+    //         pts(d,ptInd) = d+1 + double(ptInd+1)/numPts;
+    //     }
+    // }
 
-    SECTION("Evaluate"){
-        Kokkos::View<double**,Kokkos::HostSpace> evals = func.Evaluate(pts);
+    // SECTION("Evaluate"){
+    //     Kokkos::View<double**,Kokkos::HostSpace> evals = func.Evaluate(pts);
         
-        for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
-            for(unsigned int d=0; d<outDim; ++d){
+    //     for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
+    //         for(unsigned int d=0; d<outDim; ++d){
 
-                double val = 0; 
-                for(unsigned int term=0; term<mset.Size(); ++term){
-                    auto multi = mset.IndexToMulti(term);
-                    double termVal = 1.0;
+    //             double val = 0; 
+    //             for(unsigned int term=0; term<mset.Size(); ++term){
+    //                 auto multi = mset.IndexToMulti(term);
+    //                 double termVal = 1.0;
 
-                    for(unsigned int i=0; i<inDim; ++i)
-                        termVal *= basis.Evaluate(multi.at(i), pts(i,ptInd));
+    //                 for(unsigned int i=0; i<inDim; ++i)
+    //                     termVal *= basis.Evaluate(multi.at(i), pts(i,ptInd));
 
-                    val += coeffs(term + d*mset.Size()) * termVal;
-                }
+    //                 val += coeffs(term + d*mset.Size()) * termVal;
+    //             }
                 
-                CHECK(evals(d,ptInd) == Approx(val).epsilon(1e-12));
-            }
-        }
-    }
+    //             CHECK(evals(d,ptInd) == Approx(val).epsilon(1e-12));
+    //         }
+    //     }
+    // }
 
     // SECTION("Coefficent Gradient"){
     //     Kokkos::View<double**,Kokkos::HostSpace> sens("Sensitivity", outDim, numPts);
