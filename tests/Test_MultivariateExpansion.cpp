@@ -21,6 +21,7 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
 
     ProbabilistHermite basis;
     MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace> func(outDim, mset, basis);
+    std::cout << "Done constructing..." << std::endl;
     //CHECK(func.numCoeffs == (mset.Size()*outDim));
 
     // Kokkos::View<double*,Kokkos::HostSpace> coeffs("coefficients", func.numCoeffs);

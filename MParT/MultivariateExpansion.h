@@ -50,7 +50,7 @@ namespace mpart{
         //         workers.push_back( MultivariateExpansionWorker<BasisEvaluatorType, MemorySpace>(msets.at(i), basis1d) );
         // }
 
-        virtual ~MultivariateExpansion() = default;
+        virtual ~MultivariateExpansion(){std::cout << "In destructor..." << std::endl;};
 
 
         virtual void EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,
