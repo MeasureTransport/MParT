@@ -59,41 +59,41 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
         }
     }
 
-    SECTION("Coefficent Gradient"){
-        Kokkos::View<double**,Kokkos::HostSpace> sens("Sensitivity", outDim, numPts);
-        Kokkos::View<double**,Kokkos::HostSpace> grads;
+    // SECTION("Coefficent Gradient"){
+    //     Kokkos::View<double**,Kokkos::HostSpace> sens("Sensitivity", outDim, numPts);
+    //     Kokkos::View<double**,Kokkos::HostSpace> grads;
 
-        for(unsigned int d=0; d<outDim; ++d){
+    //     for(unsigned int d=0; d<outDim; ++d){
             
-            // Set the sensitivity wrt this output to 1
-            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
-                sens(d,ptInd) = 1.0;
+    //         // Set the sensitivity wrt this output to 1
+    //         for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+    //             sens(d,ptInd) = 1.0;
 
-            // Evaluate the gradient
-            grads = func.CoeffGrad(pts,sens);
+    //         // Evaluate the gradient
+    //         grads = func.CoeffGrad(pts,sens);
 
-            REQUIRE(grads.extent(0)==func.numCoeffs);
-            REQUIRE(grads.extent(1)==numPts);
+    //         REQUIRE(grads.extent(0)==func.numCoeffs);
+    //         REQUIRE(grads.extent(1)==numPts);
 
-            // Check the solution
-            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
+    //         // Check the solution
+    //         for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
 
-                for(unsigned int term=0; term<mset.Size(); ++term){
-                    auto multi = mset.IndexToMulti(term);
-                    double termVal = 1.0;
+    //             for(unsigned int term=0; term<mset.Size(); ++term){
+    //                 auto multi = mset.IndexToMulti(term);
+    //                 double termVal = 1.0;
 
-                    for(unsigned int i=0; i<inDim; ++i)
-                        termVal *= basis.Evaluate(multi.at(i), pts(i,ptInd));
+    //                 for(unsigned int i=0; i<inDim; ++i)
+    //                     termVal *= basis.Evaluate(multi.at(i), pts(i,ptInd));
         
-                    CHECK(grads(term+d*mset.Size(),ptInd) == Approx(termVal).epsilon(1e-12));
-                }
-            }
+    //                 CHECK(grads(term+d*mset.Size(),ptInd) == Approx(termVal).epsilon(1e-12));
+    //             }
+    //         }
             
-            // Reset this row to 0
-            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
-                sens(d,ptInd) = 0.0;
+    //         // Reset this row to 0
+    //         for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+    //             sens(d,ptInd) = 0.0;
 
-        }
+    //     }
         
-    }
+    // }
 }
