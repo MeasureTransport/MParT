@@ -59,7 +59,7 @@ jobs:
         shell: bash -l {0}
         run: |
           cd $GITHUB_WORKSPACE/mpart/build
-          ./RunTests --kokkos-threads=2 --reporter junit -o test-results-external.xml
+          ./RunTests
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
