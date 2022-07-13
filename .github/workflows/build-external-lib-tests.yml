@@ -57,7 +57,7 @@ jobs:
 
       - name: Run Tests
         shell: bash -l {0}
-        run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests "*"
+        run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests "[MultivariateExpansion]"
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
