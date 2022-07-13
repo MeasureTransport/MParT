@@ -6,6 +6,16 @@
 #include <Eigen/Core>
 #include "jlcxx/jlcxx.hpp"
 #include "jlcxx/functions.hpp"
+"
 
+template<typename ScalarType>
+inline Kokkos::View<ScalarType*, Kokkos::HostSpace> VecToKokkos(jlcxx::ArrayRef<ScalarType> arr) {
+    return mpart::ToKokkos(&arr[0], arr.size());
+}
+
+template<typename ScalarType>
+inline jlcxx::ArrayRef<ScalarType> VecToJulia(Kokkos::View<ScalarType*, Kokkos::HostSpace> view) {
+    return jlcxx::ArrayRef<ScalarType>(view.data(), view.extent(0));
+}
 
 #endif // JLARRAYCONVERSIONS_H

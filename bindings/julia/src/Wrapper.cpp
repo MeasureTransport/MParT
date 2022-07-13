@@ -12,8 +12,7 @@
 
 #include "CommonJuliaUtilities.h"
 
-namespace jlcxx
-{
+namespace jlcxx {
   template<> struct IsMirroredType<mpart::MultiIndexLimiter::None> : std::false_type { };
 }
 
@@ -34,7 +33,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .constructor<std::vector<unsigned int> const&>()
         .method("NumNz", &MultiIndex::NumNz)
         .method("count_nonzero", &MultiIndex::NumNz);
-
+    
+    jlcxx::stl::apply_stl<MultiIndex>(mod);
+    
     mod.add_type<Kokkos::HostSpace>("HostSpace");
 
     // FixedMultiIndexSet
@@ -45,11 +46,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         wrapped.method("MaxDegreesExtent", [] (const WrappedT &set) { return set.MaxDegrees().extent(0); });
     });
 
-    jlcxx::stl::apply_stl<MultiIndex>(mod);
-
     mod.add_type<MultiIndexSet>("MultiIndexSet")
         .constructor<const unsigned int>()
-        // .constructor<Eigen::Ref<const Eigen::MatrixXi> const&>()
+        .constructor<jlcxx::ConstArray<unsigned int,2> const&>()
         .method("fix", &MultiIndexSet::Fix)
         // .method("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder)
         // .method("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct)
@@ -72,6 +71,11 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .method("NumActiveForward", &MultiIndexSet::NumActiveForward)
         .method("NumForward", &MultiIndexSet::NumForward)
     ;
+
+    mod.method("MultiIndexSetConstruct", [](jlcxx::ConstArray<int,2> const& idxs) {
+        auto sz = idxs.size();
+        return MultiIndexSet(Eigen::Map<const Eigen::MatrixXi>(idxs.ptr(), std::get<0>(sz)*std::get<1>(sz)));
+    });
 
     // MultiIndexSetLimiters
     // TotalOrder
