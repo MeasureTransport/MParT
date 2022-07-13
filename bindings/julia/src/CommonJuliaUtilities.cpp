@@ -21,11 +21,11 @@ namespace mpart{
 }
 
 
-void Initialize(jlcxx::ArrayRef<char*> opts) {
-    mpart::binding::Initialize(makeInitArguments(opts));
-}
+// void Initialize(jlcxx::ArrayRef<char*> opts) {
+//     mpart::binding::Initialize(makeInitArguments(opts));
+// }
 
 void mpart::binding::CommonUtilitiesWrapper(jlcxx::Module &mod)
 {
-    m.method("Initialize", &Initialize);
+    mod.method("Initialize", [](jlcxx::ArrayRef<char*> opts){mpart::binding::Initialize(opts);});
 }

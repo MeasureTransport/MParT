@@ -3,6 +3,7 @@
 
 #include "jlcxx/jlcxx.hpp"
 #include "jlcxx/functions.hpp"
+#include "jlcxx/stl.hpp"
 
 #include "../../common/include/CommonUtilities.h"
 
@@ -13,16 +14,22 @@ namespace binding{
 void Initialize(jlcxx::ArrayRef<char*>);
 
 /**
-   @brief Adds the Kokkos bindings to the existing module m.
+   @brief Adds Kokkos bindings to the existing module m.
    @param mod CxxWrap.jl module
  */
 void CommonUtilitiesWrapper(jlcxx::Module&);
 
 /**
- * @brief Adds the MultiIndex bindings to the existing module m.
+ * @brief Adds MultiIndex bindings to the existing module m.
  * @param mod CxxWrap.jl module
  */
 void MultiIndexWrapper(jlcxx::Module&);
+
+/**
+ * @brief Adds MapOptions bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void MapOptionsWrapper(jlcxx::Module&);
 
 } // namespace mpart
 } // namespace binding

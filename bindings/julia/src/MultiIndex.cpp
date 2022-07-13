@@ -18,7 +18,7 @@ void mpart::binding::MultiIndexWrapper(jlcxx::module &mod) {
 
     mod.add_type<MultiIndexSet>("MultiIndexSet")
         .constructor<const unsigned int>()
-        .constructor<Eigen::Ref<const Eigen::MatrixXi> const&>()
+        .constructor<Eigen::Ref<const Eigen::MatrixXi> const&>(false)
         .method("fix", &MultiIndexSet::Fix)
         .method("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder)
         .method("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct)
