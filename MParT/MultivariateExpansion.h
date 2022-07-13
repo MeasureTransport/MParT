@@ -28,8 +28,9 @@ namespace mpart{
         MultivariateExpansion(unsigned int              outDim, 
                               SetType            const& mset, 
                               BasisEvaluatorType const& basis1d) : ParameterizedFunctionBase<MemorySpace>(mset.Length(), outDim, mset.Size()*outDim)
-        {
+        {   std::cout << "Here 0..." << std::endl;
             workers.push_back( MultivariateExpansionWorker<BasisEvaluatorType, MemorySpace>(mset, basis1d) );
+            std::cout << "Here 1..." << std::endl;
         };
 
         template<typename ExpansionType>
@@ -150,6 +151,8 @@ namespace mpart{
                 // Paralel loop over each point computing T(x_1,...,x_D) for that point
                 Kokkos::parallel_for(policy, functor2);
             }
+
+            Kokkos::fence();
         }
 
         void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
@@ -262,6 +265,8 @@ namespace mpart{
                 // Paralel loop over each point computing T(x_1,...,x_D) for that point
                 Kokkos::parallel_for(policy, functor2);
             }
+
+            Kokkos::fence();
         }
 
     private:
