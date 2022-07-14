@@ -1,7 +1,7 @@
 #ifndef MPART_IDENTITYMAP_H
 #define MPART_IDENTITYMAP_H
 
-#include "MParT/ConditionalMapBase.h"
+#include "MParT/ParameterizedFunctionBase.h"
 
 #include <Eigen/Core>
 
@@ -13,19 +13,21 @@ namespace mpart{
 /**
  @brief Provides a definition of the identity map.
  @details 
-This class defines the identity map \f$I:\mathbb{R}^N\rightarrow \mathbb{R}^N\f$ such that \f$I(x) = x\f$ 
+This class defines the identity map \f$I:\mathbb{R}^N\rightarrow \mathbb{R}^M\f$, i.e., a map such that \f$I(x_{1:N-M},x_{N-M:N}) = x_{N-M:N}\f$ 
 
 
  */
-class IdentityMap : public ConditionalMapBase
+template<typename MemorySpace>
+class IdentityMap : public ConditionalMapBase<MemorySpace>
 {
 public:
 
-    /** @brief Construct a block triangular map from a collection of other ConditionalMapBase objects.
+    /** @brief Construct an map that acts as the identify.
 
-    @param dim The dimension of the map \f$N\f$
+         @param inDim The dimension \f$N\f$ of the input to this map.
+         @param outDim The dimension \f$M\f$ of the output from this map.
     */
-    IdentityMap(unsigned int dim);
+    IdentityMap(unsigned int inDim, unsigned int outDim);
 
     // /** @brief Computes the log determinant of the Jacobian matrix of this map.
 
@@ -38,15 +40,15 @@ public:
     //                                 Kokkos::View<double*, Kokkos::HostSpace>             &output) override;
 
 
-    // /** @brief Evaluates the map.
+    /** @brief Evaluates the map.
 
-    // @details
-    // @param pts The points where the map should be evaluated.  Should have \f$N\f$ rows.  Each column contains a single point.
-    // @param output A matrix with \f$M\f$ rows to store the map output.  Should have the same number of columns as pts and be 
-    //               allocated before calling this function.
-    // */
-    // void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
-    //                   Kokkos::View<double**, Kokkos::HostSpace>            & output) override;
+    @details
+    @param pts The points where the map should be evaluated.  Should have \f$N\f$ rows.  Each column contains a single point.
+    @param output A matrix with \f$M\f$ rows to store the map output.  Should have the same number of columns as pts and be 
+                  allocated before calling this function.
+    */
+    void EvaluateImpl(Kokkos::View<const double**, Kokkos::HostSpace> const& pts,
+                      Kokkos::View<double**, Kokkos::HostSpace>            & output);
 
 
     // /** @brief Evaluates the map inverse.
