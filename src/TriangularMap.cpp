@@ -49,8 +49,8 @@ void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> co
 }
 
 template<typename MemorySpace>
-void TriangularMap<MemorySpace>::LogDeterminantImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                                       Kokkos::View<double*, MemorySpace>             &output)
+void TriangularMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                                    Kokkos::View<double*, MemorySpace>              output)
 {
     // Evaluate the log determinant for the first component
     Kokkos::View<const double**, MemorySpace> subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(0)->inputDim)), Kokkos::ALL());
@@ -73,8 +73,8 @@ void TriangularMap<MemorySpace>::LogDeterminantImpl(Kokkos::View<const double**,
 }
 
 template<typename MemorySpace>
-void TriangularMap<MemorySpace>::EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                                 Kokkos::View<double**, MemorySpace>            & output)
+void TriangularMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                              StridedMatrix<double, MemorySpace>              output)
 {
     // Evaluate the output for each component
     Kokkos::View<const double**, MemorySpace> subPts;
@@ -91,9 +91,9 @@ void TriangularMap<MemorySpace>::EvaluateImpl(Kokkos::View<const double**, Memor
 }
 
 template<typename MemorySpace>
-void TriangularMap<MemorySpace>::InverseImpl(Kokkos::View<const double**, MemorySpace> const& x1,
-                                Kokkos::View<const double**, MemorySpace> const& r,
-                                Kokkos::View<double**, MemorySpace>            & output)
+void TriangularMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+                                             StridedMatrix<const double, MemorySpace> const& r,
+                                             StridedMatrix<double, MemorySpace>              output)
 {
     unsigned int ipdim = ConditionalMapBase<MemorySpace>::inputDim;
     unsigned int opdim = ConditionalMapBase<MemorySpace>::outputDim;
@@ -106,8 +106,8 @@ void TriangularMap<MemorySpace>::InverseImpl(Kokkos::View<const double**, Memory
 }
 
 template<typename MemorySpace>
-void TriangularMap<MemorySpace>::InverseInplace(Kokkos::View<double**, MemorySpace> const& x,
-                                   Kokkos::View<const double**, MemorySpace> const& r)
+void TriangularMap<MemorySpace>::InverseInplace(StridedMatrix<double, MemorySpace> x,
+                                                StridedMatrix<const double, MemorySpace> const& r)
 {
     // Evaluate the output for each component
     Kokkos::View<const double**, MemorySpace> subR;
@@ -132,9 +132,9 @@ void TriangularMap<MemorySpace>::InverseInplace(Kokkos::View<double**, MemorySpa
 
 
 template<typename MemorySpace>
-void TriangularMap<MemorySpace>::CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
-                                               Kokkos::View<const double**, MemorySpace> const& sens,
-                                               Kokkos::View<double**, MemorySpace>            & output)
+void TriangularMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                                               StridedMatrix<const double, MemorySpace> const& sens,
+                                               StridedMatrix<double, MemorySpace>              output)
 {
     // Evaluate the output for each component
     Kokkos::View<const double**, MemorySpace> subPts;
@@ -157,8 +157,8 @@ void TriangularMap<MemorySpace>::CoeffGradImpl(Kokkos::View<const double**, Memo
 }
 
 template<typename MemorySpace>
-void TriangularMap<MemorySpace>::LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
-                                                             Kokkos::View<double**, MemorySpace> &output)
+void TriangularMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                                             StridedMatrix<double, MemorySpace>              output)
 {
     // Evaluate the output for each component
     Kokkos::View<const double**, MemorySpace> subPts;

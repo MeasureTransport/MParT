@@ -61,8 +61,8 @@ public:
     @param output A vector with length equal to the number of columns in pts containing the log determinant of the Jacobian.  This
                   vector should be correctly allocated and sized before calling this function.
     */
-    virtual void LogDeterminantImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                                    Kokkos::View<double*, MemorySpace>             &output) override;
+    virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                    Kokkos::View<double*, MemorySpace>              output) override;
 
 
     /** @brief Evaluates the map.
@@ -72,8 +72,8 @@ public:
     @param output A matrix with \f$M\f$ rows to store the map output.  Should have the same number of columns as pts and be
                   allocated before calling this function.
     */
-    void EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                      Kokkos::View<double**, MemorySpace>            & output) override;
+    void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                      StridedMatrix<double, MemorySpace>              output) override;
 
 
     /** @brief Evaluates the map inverse.
@@ -88,22 +88,22 @@ public:
     @param r The map output \f$r_{1:M}\f$ to invert.
     @param output A matrix with \f$M\f$ rows to store the computed map inverse \f$x_{N-M+1:M}\f$.
     */
-    virtual void InverseImpl(Kokkos::View<const double**, MemorySpace> const& x1,
-                             Kokkos::View<const double**, MemorySpace> const& r,
-                             Kokkos::View<double**, MemorySpace>            & output) override;
+    virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+                             StridedMatrix<const double, MemorySpace> const& r,
+                             StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void InverseInplace(Kokkos::View<double**, MemorySpace> const& x1,
-                                Kokkos::View<const double**, MemorySpace> const& r);
+    virtual void InverseInplace(StridedMatrix<double, MemorySpace>              x1,
+                                StridedMatrix<const double, MemorySpace> const& r);
 
 
-    virtual void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
-                               Kokkos::View<const double**, MemorySpace> const& sens,
-                               Kokkos::View<double**, MemorySpace>            & output) override;
+    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                               StridedMatrix<const double, MemorySpace> const& sens,
+                               StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
-                                             Kokkos::View<double**, MemorySpace> &output) override;
+    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                             StridedMatrix<double, MemorySpace>              output) override;
 private:
 
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;
