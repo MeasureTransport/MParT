@@ -54,12 +54,3 @@ make install
 #### Kokkos Options:
 MParT is built on Kokkos, which provides a single interface to many different multithreading capabilities like pthreads, OpenMP, CUDA, and OpenCL.   A list of available backends can be found on the [Kokkos wiki](https://github.com/kokkos/kokkos/blob/master/BUILD.md#device-backends).   The `Kokkos_ENABLE_PTHREAD` option in the CMake configuration above can be changed to reflect different choices in device backends.   The OSX-provided clang compiler does not support OpenMP, so `PTHREAD` is a natural choice for CPU-based multithreading on OSX.   However, you may find that OpenMP has slightly better performance with other compilers and operating systems.
 
-
-## Example Usage
-Provide a short introductory example to hook users...
-
-## Citing
-How should users cite this package?
-
-## Contributing
-How do we want people contribute to MPart?   Fork and pull request?
