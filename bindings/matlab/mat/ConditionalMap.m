@@ -78,11 +78,6 @@ methods
     result = MParT_('ConditionalMap_numCoeffs',this.id_);
   end
 
-  %function result = Evaluate(this,pts)
-  %  result = zeros(1,size(pts,2));
-  %  MParT_('ConditionalMap_Evaluate',this.id_,pts,result);
-  %end
-
   function result = Evaluate(this,pts)
     result = MParT_('ConditionalMap_Evaluate',this.id_,pts);
   end
@@ -107,18 +102,6 @@ methods
     result = this.id_;
   end
 
-end
-
-methods (Static)
-  function environment = getEnvironment()
-  %GETENVIRONMENT Get environment info.
-    environment = mexmpart('getEnvironment');
-  end
-
-  function setEnvironment(environment)
-  %SETENVIRONMENT Set environment info.
-    mexmpart('setEnvironment', environment);
-  end
 end
 
 end
