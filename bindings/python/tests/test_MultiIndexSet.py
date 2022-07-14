@@ -19,16 +19,16 @@ def test_max_degrees():
 
 def test_at():
 
-    assert np.all(msetFromArray.at(0).tolist() == [0,1])
-    assert np.all(msetFromArray.at(1).tolist() == [2,0])
+    assert np.all(msetFromArray[0].tolist() == [0,1])
+    assert np.all(msetFromArray[1].tolist() == [2,0])
 
-    assert np.all(msetTensorProduct.at(0).tolist() == [0,0,0])
-    assert np.all(msetTensorProduct.at(1).tolist() == [0,0,1])
+    assert np.all(msetTensorProduct[0].tolist() == [0,0,0])
+    assert np.all(msetTensorProduct[1].tolist() == [0,0,1])
     last_idx = msetTensorProduct.Size()-1
-    assert np.all(msetTensorProduct.at(last_idx).tolist() == [4,4,4])
+    assert np.all(msetTensorProduct[last_idx].tolist() == [4,4,4])
 
-    assert np.all(msetTotalOrder.at(0).tolist() == [0,0,0])
-    assert np.all(msetTotalOrder.at(1).tolist() == [0,0,1])
+    assert np.all(msetTotalOrder[0].tolist() == [0,0,0])
+    assert np.all(msetTotalOrder[1].tolist() == [0,0,1])
     last_idx = msetTotalOrder.Size()-1
-    assert np.all(msetTotalOrder.at(last_idx).tolist() == [4,0,0])
+    assert np.all(msetTotalOrder[last_idx].tolist() == [4,0,0])
 
