@@ -5,5 +5,6 @@ module MParT
 
     function __init__()
         @initcxx
+        Initialize()
     end
 end

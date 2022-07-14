@@ -9,6 +9,7 @@
 
 #include <MParT/MapOptions.h>
 #include <Kokkos_Core.hpp>
+#include <tuple>
 
 #include "CommonJuliaUtilities.h"
 
@@ -24,7 +25,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     // MultiIndexWrapper(mod);
     // MapOptionsWrapper(mod);
 
-    mod.method("Initialize", [](jlcxx::ArrayRef<char*> opts){mpart::binding::Initialize(opts);});
+    mod.method("Initialize", [](){mpart::binding::Initialize(std::vector<std::string> {});});
 
     mod.add_type<MultiIndex>("MultiIndex")
         .constructor()
@@ -33,9 +34,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .constructor<std::vector<unsigned int> const&>()
         .method("NumNz", &MultiIndex::NumNz)
         .method("count_nonzero", &MultiIndex::NumNz);
-    
+
     jlcxx::stl::apply_stl<MultiIndex>(mod);
-    
+
     mod.add_type<Kokkos::HostSpace>("HostSpace");
 
     // FixedMultiIndexSet
@@ -48,7 +49,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
 
     mod.add_type<MultiIndexSet>("MultiIndexSet")
         .constructor<const unsigned int>()
-        .constructor<jlcxx::ConstArray<unsigned int,2> const&>()
         .method("fix", &MultiIndexSet::Fix)
         // .method("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder)
         // .method("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct)
@@ -72,9 +72,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .method("NumForward", &MultiIndexSet::NumForward)
     ;
 
-    mod.method("MultiIndexSetConstruct", [](jlcxx::ConstArray<int,2> const& idxs) {
-        auto sz = idxs.size();
-        return MultiIndexSet(Eigen::Map<const Eigen::MatrixXi>(idxs.ptr(), std::get<0>(sz)*std::get<1>(sz)));
+    mod.method("MultiIndexSet", [](std::vector<int>& idxs, unsigned int sz0, unsigned int sz1) {
+        auto ptr = idxs.data();
+        return MultiIndexSet(Eigen::Map<const Eigen::Matrix<int,Eigen::Dynamic,1>, 0, Eigen::OuterStride<>>(ptr, sz0, sz1, Eigen::OuterStride<>(std::max(sz0, sz1))));
     });
 
     // MultiIndexSetLimiters
