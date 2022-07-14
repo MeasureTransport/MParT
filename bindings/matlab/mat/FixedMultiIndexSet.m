@@ -4,7 +4,6 @@ properties (Access = private)
   id_
 end
 
-
 methods
   function this = FixedMultiIndexSet(varargin)
     if(nargin==1)

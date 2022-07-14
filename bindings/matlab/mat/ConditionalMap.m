@@ -20,58 +20,87 @@ properties (Access = private)
 end
 
 methods
-  function this = ConditionalMap(mset,mapOptions)
-  %DATABASE Create a new database.
-    mexOptions = mapOptions.getMexOptions;
-    input_str=['MParT_(',char(39),'newMap',char(39),',mset.get_id()'];
-    for o=1:length(mexOptions)
-      input_o=[',mexOptions{',num2str(o),'}'];
-      input_str=[input_str,input_o];
+
+  function this = ConditionalMap(varargin)
+
+    if(nargin==2)
+        mset = varargin{1};
+        mapOptions = varargin{2};
+        mexOptions = mapOptions.getMexOptions;
+
+        input_str=['MParT_(',char(39),'ConditionalMap_newMap',char(39),',mset.get_id()'];
+        for o=1:length(mexOptions)
+            input_o=[',mexOptions{',num2str(o),'}'];
+            input_str=[input_str,input_o];
+        end
+        input_str=[input_str,')'];
+        
+        this.id_ = eval(input_str);
+
+    elseif(nargin==4)
+      inputDim = varargin{1};
+      outputDim = varargin{2};
+      totalOrder = varargin{3};
+      opts = varargin{4};
+      
+      mexOptions = opts.getMexOptions;
+
+      input_str=['MParT_(',char(39),'ConditionalMap_newTotalTriMap',char(39),',inputDim,outputDim,totalOrder'];
+      for o=1:length(mexOptions)
+        input_o=[',mexOptions{',num2str(o),'}'];
+        input_str=[input_str,input_o];
+      end
+      input_str=[input_str,')'];
+      this.id_ = eval(input_str);
+
+    elseif(nargin==1)
+         MParT_('ConditionalMap_newTriMap', varargin{1});
+
+    else
+        error('Invalid number of inputs') 
     end
-    input_str=[input_str,')'];
-    this.id_ = eval(input_str);
   end
 
   function delete(this)
   %DELETE Destructor.
-    MParT_('deleteMap', this.id_);
+    MParT_('ConditionalMap_deleteMap', this.id_);
   end
 
   function SetCoeffs(this,coeffs)
-    MParT_('SetCoeffs',this.id_,coeffs(:));
+    MParT_('ConditionalMap_SetCoeffs',this.id_,coeffs(:));
   end
 
   function result = Coeffs(this)
-    result = MParT_('Coeffs',this.id_);
+    result = MParT_('ConditionalMap_Coeffs',this.id_);
   end
 
   function result = numCoeffs(this)
-    result = MParT_('numCoeffs',this.id_);
+    result = MParT_('ConditionalMap_numCoeffs',this.id_);
   end
 
   %function result = Evaluate(this,pts)
   %  result = zeros(1,size(pts,2));
-  %  MParT_('Evaluate',this.id_,pts,result);
+  %  MParT_('ConditionalMap_Evaluate',this.id_,pts,result);
   %end
 
   function result = Evaluate(this,pts)
-    result = MParT_('Evaluate',this.id_,pts);
+    result = MParT_('ConditionalMap_Evaluate',this.id_,pts);
   end
 
   function result = LogDeterminant(this,pts)
-    result = MParT_('LogDeterminant',this.id_,pts);
+    result = MParT_('ConditionalMap_LogDeterminant',this.id_,pts);
   end
 
   function result = Inverse(this,x1,r)
-    result = MParT_('Inverse',this.id_,x1,r);
+    result = MParT_('ConditionalMap_Inverse',this.id_,x1,r);
   end
 
   function result = CoeffGrad(this,pts,sens)
-    result = MParT_('CoeffGrad',this.id_,pts,sens);
+    result = MParT_('ConditionalMap_CoeffGrad',this.id_,pts,sens);
   end
 
   function result = LogDeterminantCoeffGrad(this,pts)
-    result = MParT_('LogDeterminantCoeffGrad',this.id_,pts);
+    result = MParT_('ConditionalMap_LogDeterminantCoeffGrad',this.id_,pts);
   end
 
   function result = get_id(this)

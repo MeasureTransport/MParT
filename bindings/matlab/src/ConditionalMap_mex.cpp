@@ -20,7 +20,7 @@ public:
   std::shared_ptr<ConditionalMapBase<MemorySpace>> map_ptr;
 
   ConditionalMapMex(FixedMultiIndexSet<MemorySpace> const& mset, 
-                                                          MapOptions opts){
+                    MapOptions                             opts){
     map_ptr = MapFactory::CreateComponent<MemorySpace>(mset,opts);
   }
 
@@ -38,12 +38,15 @@ template class mexplus::Session<ConditionalMapMex>;
 namespace {
 
 
-MEX_DEFINE(newTriMap) (int nlhs, mxArray* plhs[],
-                 int nrhs, const mxArray* prhs[]) {
+MEX_DEFINE(ConditionalMap_newTriMap) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
+
   std::vector<intptr_t> list_id = input.get<std::vector<intptr_t>>(0);
   unsigned int numBlocks = list_id.size();
+  
   std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> blocks(numBlocks);
   for(unsigned int i=0;i<numBlocks;++i){
       const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(list_id.at(i)); 
@@ -52,8 +55,9 @@ MEX_DEFINE(newTriMap) (int nlhs, mxArray* plhs[],
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(blocks)));
 }
 
-MEX_DEFINE(newTotalTriMap) (int nlhs, mxArray* plhs[],
-                 int nrhs, const mxArray* prhs[]) {
+MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
+                                           int nrhs, const mxArray* prhs[]) {
+
   InputArguments input(nrhs, prhs, 12);
   OutputArguments output(nlhs, plhs, 1);
   unsigned int inputDim = input.get<unsigned int>(0);
@@ -65,11 +69,13 @@ MEX_DEFINE(newTotalTriMap) (int nlhs, mxArray* plhs[],
                                          input.get<double>(7),input.get<unsigned int>(8),
                                          input.get<unsigned int>(9),input.get<unsigned int>(10),
                                          input.get<bool>(11));
+
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(inputDim,outputDim,totalOrder,opts)));
 }
 
-MEX_DEFINE(newMap) (int nlhs, mxArray* plhs[],
-                 int nrhs, const mxArray* prhs[]) {
+MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+
   InputArguments input(nrhs, prhs, 10);
   OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
@@ -78,18 +84,19 @@ MEX_DEFINE(newMap) (int nlhs, mxArray* plhs[],
                                          input.get<double>(5),input.get<unsigned int>(6),
                                          input.get<unsigned int>(7),input.get<unsigned int>(8),
                                          input.get<bool>(9));
+
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(mset.Fix(),opts)));
 }
 
 // Defines MEX API for delete.
-MEX_DEFINE(deleteMap) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_deleteMap) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 0);
   Session<ConditionalMapMex>::destroy(input.get(0));
 }
 
-MEX_DEFINE(SetCoeffs) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_SetCoeffs) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 0);
@@ -98,7 +105,7 @@ MEX_DEFINE(SetCoeffs) (int nlhs, mxArray* plhs[],
   condMap.map_ptr->SetCoeffs(coeffs.col(0));
 }
 
-MEX_DEFINE(Coeffs) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_Coeffs) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
@@ -107,7 +114,7 @@ MEX_DEFINE(Coeffs) (int nlhs, mxArray* plhs[],
   output.set(0,coeffs);
 }
 
-MEX_DEFINE(numCoeffs) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_numCoeffs) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
@@ -129,7 +136,7 @@ MEX_DEFINE(numCoeffs) (int nlhs, mxArray* plhs[],
 //   //output.set(0,evals);
 // }
 
-MEX_DEFINE(Evaluate) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_Evaluate) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
@@ -139,7 +146,7 @@ MEX_DEFINE(Evaluate) (int nlhs, mxArray* plhs[],
   output.set(0,evals);
 }
 
-MEX_DEFINE(LogDeterminant) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_LogDeterminant) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
@@ -149,7 +156,7 @@ MEX_DEFINE(LogDeterminant) (int nlhs, mxArray* plhs[],
   output.set(0,logDet);
 }
 
-MEX_DEFINE(Inverse) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_Inverse) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 3);
   OutputArguments output(nlhs, plhs, 1);
@@ -160,7 +167,7 @@ MEX_DEFINE(Inverse) (int nlhs, mxArray* plhs[],
   output.set(0,inv);
 }
 
-MEX_DEFINE(CoeffGrad) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_CoeffGrad) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 3);
   OutputArguments output(nlhs, plhs, 1);
@@ -171,7 +178,7 @@ MEX_DEFINE(CoeffGrad) (int nlhs, mxArray* plhs[],
   output.set(0,out);
 }
 
-MEX_DEFINE(LogDeterminantCoeffGrad) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_LogDeterminantCoeffGrad) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
@@ -179,32 +186,6 @@ MEX_DEFINE(LogDeterminantCoeffGrad) (int nlhs, mxArray* plhs[],
   Eigen::MatrixXd pts = input.get<Eigen::MatrixXd>(1);
   Eigen::MatrixXd out = condMap.map_ptr->LogDeterminantCoeffGrad(pts);
   output.set(0,out);
-}
-
-// MultiIndexSet
-MEX_DEFINE(newMutliIndexSetEigen) (int nlhs, mxArray* plhs[],
-                 int nrhs, const mxArray* prhs[]) {
-  InputArguments input(nrhs, prhs, 1);
-  OutputArguments output(nlhs, plhs, 1);
-  Eigen::MatrixXd multis = input.get<Eigen::MatrixXd>(0);
-  output.set(0, Session<MultiIndexSet>::create(new MultiIndexSet(multis.cast<int>())));
-}
-
-// Defines MEX API for delete.
-MEX_DEFINE(deleteMultiIndexSet) (int nlhs, mxArray* plhs[],
-                    int nrhs, const mxArray* prhs[]) {
-  InputArguments input(nrhs, prhs, 1);
-  OutputArguments output(nlhs, plhs, 0);
-  Session<MultiIndexSet>::destroy(input.get(0));
-}
-
-// Defines MEX API for delete.
-MEX_DEFINE(MaxOrders) (int nlhs, mxArray* plhs[],
-                    int nrhs, const mxArray* prhs[]) {
-  InputArguments input(nrhs, prhs, 1);
-  OutputArguments output(nlhs, plhs, 1);
-  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
-  output.set(0, mset.MaxOrders());
 }
 
 } // namespace
