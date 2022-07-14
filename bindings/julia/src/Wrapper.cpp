@@ -28,6 +28,19 @@ namespace mpart {
         ConditionalMapBaseHost(ConditionalMapBase<Kokkos::HostSpace> const& map): mmap(map) {}
         ConditionalMapBase<Kokkos::HostSpace> const& mmap;
     };
+
+    auto sampleFcn(ConditionalMapBase<Kokkos::HostSpace> &map, std::vector<double> pts) {
+        auto sz = pts.size();
+        int n_inp = map.inputDim;
+        int n_pts = sz / n_inp;
+        auto view = ToConstKokkos(pts.data(), n_pts, n_inp);
+        // Kokkos::deep_copy(view2, view);
+        auto view2 = view;
+        Kokkos::View<double*, Kokkos::HostSpace> out_view("Log Determinants", view.extent(1));
+        // map.LogDeterminantImpl(view, out_view);
+        // auto out_view = map.LogDeterminant(view);
+        return view2; //std::vector<double>(out_view.data(), out_view.data() + out_view.extent(0));
+    }
 }
 
 using namespace mpart;
@@ -53,9 +66,81 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     mod.add_type<Kokkos::HostSpace>("HostSpace");
 
     // FixedMultiIndexSet
-    mod.add_type<FixedMultiIndexSetHost>("FixedMultiIndexSet")
-        .method("MaxDegreesExtent", [] (const FixedMultiIndexSetHost &set) { return set.mset.MaxDegrees().extent(0); })
-    ;
+    mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("FixedMultiIndexSet")
+        .apply<FixedMultiIndexSet<Kokkos::HostSpace>>([](auto wrapped) {
+            typedef typename decltype(wrapped)::type WrappedT;
+            wrapped.method("MaxDegreesExtent", [] (const WrappedT &set) { return set.MaxDegrees().extent(0); });
+    });
+
+    // ParameterizedFunctionBase
+    mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("ParameterizedFunctionBase")
+        .apply<ParameterizedFunctionBase<Kokkos::HostSpace>>([](auto wrapped) {
+            typedef typename decltype(wrapped)::type WrappedT;
+            wrapped.method("CoeffMap", [](WrappedT& pfb) {
+                auto view = pfb.Coeffs();
+                return jlcxx::make_julia_array(view.data(), view.extent(0));
+            });
+            wrapped.method("SetCoeffs", [](WrappedT& pfb, std::vector<double> coeffs) {
+                auto view = ToKokkos(coeffs.data(), coeffs.size());
+                pfb.SetCoeffs(view);
+            });
+            // wrapped.method("Evaluate", [](WrappedT& pfb, std::vector<double> pts) {
+            //     auto sz = pts.size();
+            //     int n_inp = pfb.inputDim;
+            //     int n_pts = sz / n_inp;
+            //     Kokkos::View<const double**, Kokkos::HostSpace> view = ToConstKokkos(pts.data(), n_pts, n_inp);
+            //     typedef typename decltype(view)::fake_value fake_value;
+            //     auto output = pfb.Evaluate(view);
+            //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
+            // });
+            // wrapped.method("CoeffGrad", [](WrappedT& pfb, std::vector<double> pts, std::vector<double> sens) {
+            //     auto sz = pts.size();
+            //     int n_inp = pfb.inputDim;
+            //     int n_pts = sz / n_inp;
+            //     Kokkos::View<const double**, Kokkos::HostSpace> view_pts = ToKokkos(pts.data(), n_pts, n_inp);
+            //     Kokkos::View<const double**, Kokkos::HostSpace> view_sens = ToKokkos(sens.data(), n_pts, n_inp);
+            //     auto output = pfb.CoeffGrad(view_pts, view_sens);
+            //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
+            // });
+            wrapped.method("numCoeffs", [](WrappedT& pfb) { return pfb.numCoeffs; });
+            wrapped.method("inputDim", [](WrappedT& pfb) { return pfb.inputDim; });
+            wrapped.method("outputDim", [](WrappedT& pfb) { return pfb.outputDim; });
+        });
+
+    // ConditionalMapBase
+    mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("ConditionalMapBase")
+        .apply<ConditionalMapBase<Kokkos::HostSpace>>([](auto wrapped) {
+            typedef typename decltype(wrapped)::type WrappedT;
+            wrapped.method("LogDeterminant", &sampleFcn);
+            // wrapped.method("LogDeterminant", [](WrappedT &map, std::vector<double> pts) {
+            //     auto sz = pts.size();
+            //     int n_inp = map.inputDim;
+            //     int n_pts = sz / n_inp;
+            //     auto view = ToConstKokkos(pts.data(), n_pts, n_inp);
+            //     typedef typename decltype(view)::fake_value fake_value;
+            //     Kokkos::View<double*, Kokkos::HostSpace> out_view = map.LogDeterminant(view);
+            //     return std::vector<double>(out_view.data(), out_view.data() + out_view.extent(0));
+            // });
+            // wrapped.method("Inverse", [](WrappedT &map, std::vector<double> x1, std::vector<double> r) {
+            //     auto x1_sz = x1.size();
+            //     int n_inp = map.inputDim;
+            //     int n_pts = x1_sz / n_inp;
+            //     auto view_x1 = ToKokkos(x1.data(), n_pts, n_inp);
+            //     auto view_r = ToKokkos(r.data(), n_pts, n_inp);
+            //     auto output = map.Inverse(view_x1, view_r);
+            //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
+            // });
+            // wrapped.method("LogDeterminantCoeffGrad", [](WrappedT &map, std::vector<double> pts) {
+            //     auto sz = pts.size();
+            //     int n_inp = map.inputDim;
+            //     int n_pts = sz / n_inp;
+            //     auto view = ToKokkos(pts.data(), n_pts, n_inp);
+            //     auto output = map.LogDeterminantCoeffGrad(view);
+            //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
+            // });
+            wrapped.method("GetBaseFunction", &WrappedT::GetBaseFunction);
+    });
+
 
     mod.add_type<MultiIndexSet>("MultiIndexSet")
         .constructor<const unsigned int>()
@@ -174,9 +259,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     // MapOptions
     mod.add_type<MapOptions>("MapOptions").constructor<>();
 
-    // ConditionalMapBase
-    mod.add_type<ConditionalMapBaseHost>("ConditionalMapBase")
-
     // CreateComponent
-    mod.method("CreateComponent", [](FixedMultiIndexSetHost const& mset, MapOptions opts) { return MapFactory::CreateComponent(mset.mset, opts); });
+    mod.method("CreateComponent", [](FixedMultiIndexSet<Kokkos::HostSpace> const & mset, MapOptions opts) {
+        return MapFactory::CreateComponent(mset, opts);
+    });
 }

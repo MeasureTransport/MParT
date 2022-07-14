@@ -6,10 +6,10 @@
 #include <Eigen/Core>
 #include "jlcxx/jlcxx.hpp"
 #include "jlcxx/functions.hpp"
-"
+
 
 template<typename ScalarType>
-inline Kokkos::View<ScalarType*, Kokkos::HostSpace> VecToKokkos(jlcxx::ArrayRef<ScalarType> arr) {
+inline Kokkos::View<ScalarType*, Kokkos::HostSpace> VecToKokkos(std::vector<double> const& v) {
     return mpart::ToKokkos(&arr[0], arr.size());
 }
 

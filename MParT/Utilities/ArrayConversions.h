@@ -39,6 +39,12 @@ namespace mpart{
         return Kokkos::View<ScalarType*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, dim);
     }
 
+    template<typename ScalarType>
+    inline Kokkos::View<const ScalarType*,Kokkos::HostSpace> ToConstKokkos(ScalarType* ptr, unsigned int dim)
+    {
+        return Kokkos::View<const ScalarType*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, dim);
+    }
+
     /** @brief Converts a pointer to a 2d unmanaged Kokkos view.  
         @ingroup ArrayUtilities
         @details Creates a Kokkos unmanaged view around a preallocated block of memory. 
@@ -79,6 +85,12 @@ namespace mpart{
     inline Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace> ToKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
     {   
         return Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
+    }
+    
+    template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft>
+    inline Kokkos::View<const ScalarType**, LayoutType, Kokkos::HostSpace> ToConstKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
+    {   
+        return Kokkos::View<const ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 
     /**
