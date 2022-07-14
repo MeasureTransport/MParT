@@ -56,7 +56,7 @@ Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::Inverse(Eigen::Ref<con
 {       
     this->CheckCoefficients("Inverse");
     
-    Eigen::RowMatrixXd output(inputDim, r.cols());
+    Eigen::RowMatrixXd output(outputDim, r.cols());
 
     Kokkos::View<const double**, Kokkos::HostSpace> x1View = ConstRowMatToKokkos<double>(x1);
     Kokkos::View<const double**, Kokkos::HostSpace> rView = ConstRowMatToKokkos<double>(r);
