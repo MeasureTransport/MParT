@@ -3,6 +3,8 @@
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/MapOptions.h"
+#include "MParT/ConditionalMapBase.h"
+#include "MParT/MapFactory.h"
 
 #include "CommonJuliaUtilities.h"
 #include "CommonUtilities.h"
@@ -15,6 +17,17 @@
 
 namespace jlcxx {
   template<> struct IsMirroredType<mpart::MultiIndexLimiter::None> : std::false_type { };
+}
+namespace mpart {
+    struct FixedMultiIndexSetHost {
+        FixedMultiIndexSetHost(FixedMultiIndexSet<Kokkos::HostSpace> const& set): mset(set) {}
+        FixedMultiIndexSet<Kokkos::HostSpace> const& mset;
+    };
+
+    struct ConditionalMapBaseHost {
+        ConditionalMapBaseHost(ConditionalMapBase<Kokkos::HostSpace> const& map): mmap(map) {}
+        ConditionalMapBase<Kokkos::HostSpace> const& mmap;
+    };
 }
 
 using namespace mpart;
@@ -40,16 +53,13 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     mod.add_type<Kokkos::HostSpace>("HostSpace");
 
     // FixedMultiIndexSet
-    mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("FixedMultiIndexSet")
-        .apply<FixedMultiIndexSet<Kokkos::HostSpace>>([](auto wrapped) {
-        typedef typename decltype(wrapped)::type WrappedT;
-        wrapped.template constructor<unsigned int, unsigned int>();
-        wrapped.method("MaxDegreesExtent", [] (const WrappedT &set) { return set.MaxDegrees().extent(0); });
-    });
+    mod.add_type<FixedMultiIndexSetHost>("FixedMultiIndexSet")
+        .method("MaxDegreesExtent", [] (const FixedMultiIndexSetHost &set) { return set.mset.MaxDegrees().extent(0); })
+    ;
 
     mod.add_type<MultiIndexSet>("MultiIndexSet")
         .constructor<const unsigned int>()
-        .method("fix", &MultiIndexSet::Fix)
+        .method("fix", [](MultiIndexSet mset) {return FixedMultiIndexSetHost(mset.Fix()); })
         // .method("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder)
         // .method("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct)
         .method("union", &MultiIndexSet::Union)
@@ -163,4 +173,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
 
     // MapOptions
     mod.add_type<MapOptions>("MapOptions").constructor<>();
+
+    // ConditionalMapBase
+    mod.add_type<ConditionalMapBaseHost>("ConditionalMapBase")
+
+    // CreateComponent
+    mod.method("CreateComponent", [](FixedMultiIndexSetHost const& mset, MapOptions opts) { return MapFactory::CreateComponent(mset.mset, opts); });
 }
