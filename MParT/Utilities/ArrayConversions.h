@@ -81,6 +81,22 @@ namespace mpart{
         return Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 
+
+    /**
+     * @brief Returns a copy of a one dimensional Kokkos::View in the form of a std::vector.
+     * 
+     * @tparam ScalarType 
+     * @param view 
+     * @return std::vector<std::remove_const<ScalarType>::type> 
+     */
+    template<typename ScalarType, class... ViewTraits>
+    std::vector<typename std::remove_const<ScalarType>::type> KokkosToStd(Kokkos::View<ScalarType*,ViewTraits...> const& view)
+    {
+        std::vector<typename std::remove_const<ScalarType>::type> output(view.extent(0));
+        for(unsigned int i=0; i<view.extent(0); ++i)
+            output[i] = view(i);
+        return output;
+    }
     /**
     @brief Copies a Kokkos array from device memory to host memory
     @details
