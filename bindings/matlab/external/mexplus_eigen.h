@@ -42,7 +42,7 @@ namespace mexplus {
  * Todo: Documentation.
  */
 template <>
-mxArray* MxArray::from(const Eigen::MatrixXd& eigen_matrix)
+inline mxArray* MxArray::from(const Eigen::MatrixXd& eigen_matrix)
 {
     const int num_rows = static_cast<int>(eigen_matrix.rows());
     const int num_cols = static_cast<int>(eigen_matrix.cols());
@@ -73,7 +73,7 @@ mxArray* MxArray::from(const Eigen::MatrixXd& eigen_matrix)
  * TODO: Maybe provide this one as MatrixXf as well as MatrixXd? Matlab's default is double?
  */
 template <>
-void MxArray::to(const mxArray* in_array, Eigen::MatrixXd* eigen_matrix)
+inline void MxArray::to(const mxArray* in_array, Eigen::MatrixXd* eigen_matrix)
 {
     MxArray array(in_array);
 
@@ -114,7 +114,7 @@ void MxArray::to(const mxArray* in_array, Eigen::MatrixXd* eigen_matrix)
 };
 
 template <>
-void MxArray::to(const mxArray* in_array, Eigen::Map<Eigen::MatrixXd>* eigen_matrix)
+inline void MxArray::to(const mxArray* in_array, Eigen::Map<Eigen::MatrixXd>* eigen_matrix)
 {
     MxArray array(in_array);
 
@@ -148,7 +148,7 @@ void MxArray::to(const mxArray* in_array, Eigen::Map<Eigen::MatrixXd>* eigen_mat
 
 
 template <>
-void MxArray::to(const mxArray* in_array, Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace>* kokkos_matrix)
+inline void MxArray::to(const mxArray* in_array, Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace>* kokkos_matrix)
 {
     MxArray array(in_array);
 
