@@ -12,12 +12,13 @@
 #include <MParT/MapOptions.h>
 #include <Kokkos_Core.hpp>
 #include <tuple>
+#include <iostream>
 
 #include "CommonJuliaUtilities.h"
 
 namespace jlcxx {
   template<> struct IsMirroredType<mpart::MultiIndexLimiter::None> : std::false_type { };
-//   template<> struct SuperType<mpart::ConditionalMapBase<Kokkos::HostSpace>> {typedef ParameterizedFunctionBase<Kokkos::HostSpace> type;};
+  template<> struct SuperType<mpart::ConditionalMapBase<Kokkos::HostSpace>> {typedef mpart::ParameterizedFunctionBase<Kokkos::HostSpace> type;};
 }
 namespace mpart {
     struct FixedMultiIndexSetHost {
@@ -30,14 +31,14 @@ namespace mpart {
         ConditionalMapBase<Kokkos::HostSpace> const& mmap;
     };
 
-    auto sampleFcn(ConditionalMapBase<Kokkos::HostSpace> &map, std::vector<double> pts) {
+    std::vector<double> logDetFcn(ConditionalMapBase<Kokkos::HostSpace> &map, std::vector<double> pts) {
         auto sz = pts.size();
         int n_inp = map.inputDim;
         int n_pts = sz / n_inp;
-        auto view = ToConstKokkos(pts.data(), n_pts, n_inp);
+        auto view = ToConstKokkos(pts.data(), n_inp, n_pts);
+        // typedef typename decltype(view)::fake_value fake_value;
         Kokkos::View<double*, Kokkos::HostSpace> out_view("Log Determinants", view.extent(1));
         map.LogDeterminantImpl(view, out_view);
-        // auto out_view = map.LogDeterminant(view);
         return std::vector<double>(out_view.data(), out_view.data() + out_view.extent(0));
     }
 }
@@ -63,7 +64,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     jlcxx::stl::apply_stl<MultiIndex>(mod);
 
     mod.add_type<Kokkos::HostSpace>("HostSpace");
-
     // FixedMultiIndexSet
     mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("FixedMultiIndexSet")
         .apply<FixedMultiIndexSet<Kokkos::HostSpace>>([](auto wrapped) {
@@ -110,14 +110,16 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("ConditionalMapBase")
         .apply<ConditionalMapBase<Kokkos::HostSpace>>([](auto wrapped) {
             typedef typename decltype(wrapped)::type WrappedT;
-            wrapped.method("LogDeterminant", &sampleFcn);
+            // typedef typename WrappedT::fake_value fake_value;
+            // wrapped.method("LogDeterminant", &logDetFcn);
             // wrapped.method("LogDeterminant", [](WrappedT &map, std::vector<double> pts) {
             //     auto sz = pts.size();
             //     int n_inp = map.inputDim;
             //     int n_pts = sz / n_inp;
-            //     auto view = ToConstKokkos(pts.data(), n_pts, n_inp);
-            //     typedef typename decltype(view)::fake_value fake_value;
-            //     Kokkos::View<double*, Kokkos::HostSpace> out_view = map.LogDeterminant(view);
+            //     auto view = ToConstKokkos(pts.data(), n_inp, n_pts);
+            //     // typedef typename decltype(view)::fake_value fake_value;
+            //     Kokkos::View<double*, Kokkos::HostSpace> out_view("Log Determinants", view.extent(1));
+            //     map.LogDeterminantImpl(view, out_view);
             //     return std::vector<double>(out_view.data(), out_view.data() + out_view.extent(0));
             // });
             // wrapped.method("Inverse", [](WrappedT &map, std::vector<double> x1, std::vector<double> r) {
@@ -139,7 +141,6 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
             // });
             wrapped.method("GetBaseFunction", &WrappedT::GetBaseFunction);
     });
-
 
     mod.add_type<MultiIndexSet>("MultiIndexSet")
         .constructor<const unsigned int>()
