@@ -53,6 +53,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("fix", &MultiIndexSet::Fix)
         .def("__len__", &MultiIndexSet::Length)
         .def("__getitem__", &MultiIndexSet::at)
+        .def("at", &MultiIndexSet::at)
         .def("Size", &MultiIndexSet::Size)
 
         .def("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder)
