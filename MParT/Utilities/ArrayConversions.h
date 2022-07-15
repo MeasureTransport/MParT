@@ -13,7 +13,10 @@ namespace mpart{
     
     /** Alias declaration for strided Kokkos matrix type. */
     template<typename ScalarType, typename MemorySpace>
-    using StridedMatrix = Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace>;
+    using StridedMatrix = Kokkos::View<ScalarType**, Kokkos::LayoutStride, MemorySpace>;
+
+    template<typename ScalarType, typename MemorySpace>
+    using StridedVector = Kokkos::View<ScalarType*, Kokkos::LayoutStride, MemorySpace>;
 
     /** @brief Converts a pointer to a 1d unmanaged Kokkos view.  
         @ingroup ArrayUtilities

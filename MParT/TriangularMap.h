@@ -62,7 +62,7 @@ public:
                   vector should be correctly allocated and sized before calling this function.
     */
     virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                    Kokkos::View<double*, MemorySpace>              output) override;
+                                    StridedVector<double, MemorySpace>              output) override;
 
 
     /** @brief Evaluates the map.

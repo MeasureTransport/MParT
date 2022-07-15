@@ -16,7 +16,7 @@ public:
                               StridedMatrix<double, MemorySpace>              output) override{Kokkos::deep_copy(output,pts);};
 
     virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const&,
-                                    Kokkos::View<double*, Kokkos::HostSpace>        output) override{
+                                    StridedVector<double, MemorySpace>        output) override{
         for(unsigned int i=0; i<output.size(); ++i)
             output(i)=0.0;
     }

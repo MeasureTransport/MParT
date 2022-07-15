@@ -62,7 +62,7 @@ namespace mpart {
         virtual Eigen::VectorXd LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
         virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                        Kokkos::View<double*, MemorySpace>              output) = 0;
+                                        StridedVector<double, MemorySpace>              output) = 0;
 
 
         /** Returns the value of \f$x_2\f$ given \f$x_1\f$ and \f$r\f$.   Note that the \f$x1\f$ view may contain more
