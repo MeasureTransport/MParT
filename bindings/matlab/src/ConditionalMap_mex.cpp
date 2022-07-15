@@ -11,6 +11,9 @@
 #include "mexplus_eigen.h"
 
 
+#include <chrono>
+
+
 using namespace mpart;
 using namespace mexplus;
 using MemorySpace = Kokkos::HostSpace;
@@ -101,8 +104,8 @@ MEX_DEFINE(ConditionalMap_SetCoeffs) (int nlhs, mxArray* plhs[],
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 0);
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  auto coeffs = input.get<Eigen::MatrixXd>(1);
-  condMap.map_ptr->SetCoeffs(coeffs.col(0));
+  auto coeffs = MexToKokkos1d(prhs[1]);
+  condMap.map_ptr->SetCoeffs(coeffs);
 }
 
 MEX_DEFINE(ConditionalMap_Coeffs) (int nlhs, mxArray* plhs[],
@@ -123,69 +126,90 @@ MEX_DEFINE(ConditionalMap_numCoeffs) (int nlhs, mxArray* plhs[],
   output.set(0,numcoeffs);
 }
 
-// MEX_DEFINE(EvaluateImpl) (int nlhs, mxArray* plhs[],
-//                  int nrhs, const mxArray* prhs[]) {
-//   InputArguments input(nrhs, prhs, 3);
-//   OutputArguments output(nlhs, plhs, 0);
-//   ConditionalMapMex& condMap = *Session<ConditionalMapMex>::get(input.get(0));
-//   Kokkos::View<const double**, Kokkos::HostSpace> pts = input.get<Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace>>(1);
-//   Kokkos::View<double**, Kokkos::HostSpace> result = input.get<Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace>>(2);
-//   condMap.map_ptr->EvaluateImpl(pts,result);
-//   // std::cout << evals.transpose();
-//   // std::cout << '\n';
-//   //output.set(0,evals);
-// }
-
-MEX_DEFINE(ConditionalMap_Evaluate) (int nlhs, mxArray* plhs[],
-                 int nrhs, const mxArray* prhs[]) {
-  InputArguments input(nrhs, prhs, 2);
+MEX_DEFINE(ConditionalMap_outputDim) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  auto pts = input.get<Eigen::MatrixXd>(1);
-  Eigen::MatrixXd evals = condMap.map_ptr->Evaluate(pts);
-  output.set(0,evals);
+  unsigned int outDim = condMap.map_ptr->outputDim;
+  output.set(0, outDim);
+}
+
+MEX_DEFINE(ConditionalMap_inputDim) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+  unsigned int inDim = condMap.map_ptr->inputDim;
+  output.set(0, inDim);
+}
+
+MEX_DEFINE(ConditionalMap_Evaluate) (int nlhs, mxArray* plhs[],
+                                     int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 3);
+  OutputArguments output(nlhs, plhs, 0);
+
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+  StridedMatrix<const double, Kokkos::HostSpace> pts = MexToKokkos2d(prhs[1]);
+  StridedMatrix<double, Kokkos::HostSpace> out = MexToKokkos2d(prhs[2]); 
+  condMap.map_ptr->EvaluateImpl(pts, out);
 }
 
 MEX_DEFINE(ConditionalMap_LogDeterminant) (int nlhs, mxArray* plhs[],
-                 int nrhs, const mxArray* prhs[]) {
-  InputArguments input(nrhs, prhs, 2);
-  OutputArguments output(nlhs, plhs, 1);
+                                           int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 3);
+  OutputArguments output(nlhs, plhs, 0);
+
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  Eigen::MatrixXd pts = input.get<Eigen::MatrixXd>(1);
-  Eigen::MatrixXd logDet = condMap.map_ptr->LogDeterminant(pts);
-  output.set(0,logDet);
-}
+  
+  Kokkos::View<double*, Kokkos::HostSpace> out = MexToKokkos1d(prhs[2]);  
+  StridedMatrix<const double, Kokkos::HostSpace> pts = MexToKokkos2d(prhs[1]);
+
+  condMap.map_ptr->LogDeterminantImpl(pts, out);
+ }
 
 MEX_DEFINE(ConditionalMap_Inverse) (int nlhs, mxArray* plhs[],
-                 int nrhs, const mxArray* prhs[]) {
-  InputArguments input(nrhs, prhs, 3);
-  OutputArguments output(nlhs, plhs, 1);
+                                    int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 4);
+  OutputArguments output(nlhs, plhs, 0);
+
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  Eigen::MatrixXd x1 = input.get<Eigen::MatrixXd>(1);
-  Eigen::MatrixXd r = input.get<Eigen::MatrixXd>(2);
-  Eigen::MatrixXd inv = condMap.map_ptr->Inverse(x1,r);
-  output.set(0,inv);
+  
+  auto x1 = MexToKokkos2d(prhs[1]);
+  auto r = MexToKokkos2d(prhs[2]);
+  auto inv = MexToKokkos2d(prhs[3]);
+
+  condMap.map_ptr->InverseImpl(x1,r, inv);
 }
 
 MEX_DEFINE(ConditionalMap_CoeffGrad) (int nlhs, mxArray* plhs[],
-                 int nrhs, const mxArray* prhs[]) {
-  InputArguments input(nrhs, prhs, 3);
-  OutputArguments output(nlhs, plhs, 1);
+                                      int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 4);
+  OutputArguments output(nlhs, plhs, 0);
+
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  Eigen::MatrixXd pts = input.get<Eigen::MatrixXd>(1);
-  Eigen::MatrixXd sens = input.get<Eigen::MatrixXd>(2);
-  Eigen::MatrixXd out = condMap.map_ptr->CoeffGrad(pts,sens);
-  output.set(0,out);
+
+  auto pts = MexToKokkos2d(prhs[1]);
+  auto sens = MexToKokkos2d(prhs[2]);
+  auto out = MexToKokkos2d(prhs[3]);
+  
+  condMap.map_ptr->CoeffGradImpl(pts,sens,out);
 }
 
 MEX_DEFINE(ConditionalMap_LogDeterminantCoeffGrad) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
-  InputArguments input(nrhs, prhs, 2);
-  OutputArguments output(nlhs, plhs, 1);
+  InputArguments input(nrhs, prhs, 3);
+  OutputArguments output(nlhs, plhs, 0);
+
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  Eigen::MatrixXd pts = input.get<Eigen::MatrixXd>(1);
-  Eigen::MatrixXd out = condMap.map_ptr->LogDeterminantCoeffGrad(pts);
-  output.set(0,out);
+
+  auto pts = MexToKokkos2d(prhs[1]);
+  auto out = MexToKokkos2d(prhs[2]);
+  
+  condMap.map_ptr->LogDeterminantCoeffGradImpl(pts,out);
 }
 
 } // namespace

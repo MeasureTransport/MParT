@@ -11,6 +11,13 @@ namespace mpart{
         @brief Code for converting between different array types.  Often used in bindings to other languages.
     */
     
+    /** Alias declaration for strided Kokkos matrix type. */
+    template<typename ScalarType, typename MemorySpace>
+    using StridedMatrix = Kokkos::View<ScalarType**, Kokkos::LayoutStride, MemorySpace>;
+
+    template<typename ScalarType, typename MemorySpace>
+    using StridedVector = Kokkos::View<ScalarType*, Kokkos::LayoutStride, MemorySpace>;
+
     /** @brief Converts a pointer to a 1d unmanaged Kokkos view.  
         @ingroup ArrayUtilities
         @details Creates a Kokkos unmanaged view around a preallocated block of memory.  
@@ -221,7 +228,7 @@ namespace mpart{
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
     template<typename ScalarType>
-    inline Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
+    inline StridedMatrix<ScalarType, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
     {   
         Kokkos::LayoutStride strides(ref.rows(), ref.innerStride(), ref.cols(), ref.outerStride());
 
@@ -263,7 +270,7 @@ namespace mpart{
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
     template<typename ScalarType>
-    inline Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
+    inline StridedMatrix<ScalarType, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
     {   
         Kokkos::LayoutStride strides(ref.rows(), ref.outerStride(), ref.cols(), ref.innerStride());
 

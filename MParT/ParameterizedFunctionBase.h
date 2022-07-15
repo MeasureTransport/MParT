@@ -53,12 +53,12 @@ namespace mpart {
 
         
 
-        virtual Kokkos::View<double**, MemorySpace> Evaluate(Kokkos::View<const double**, MemorySpace> const& pts);
+        virtual StridedMatrix<double, MemorySpace> Evaluate(StridedMatrix<const double, MemorySpace> const& pts);
 
         virtual Eigen::RowMatrixXd Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual void EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                                  Kokkos::View<double**, MemorySpace>            & output) = 0;
+        virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                  StridedMatrix<double, MemorySpace>              output) = 0;
 
 
         /** @brief Computes the gradient of the map output with respect to the map coefficients.
@@ -79,15 +79,15 @@ namespace mpart {
                     this view should therefore have the same number of columns as `pts`.  It should also have \f$M\f$ rows.   
         @return A collection of vectors \f$g_i\f$.  Will have the same number of columns as pts with \f$K\f$ rows.
         */
-        virtual Kokkos::View<double**, MemorySpace> CoeffGrad(Kokkos::View<const double**, MemorySpace> const& pts, 
-                                                              Kokkos::View<const double**, MemorySpace> const& sens);
+        virtual StridedMatrix<double, MemorySpace> CoeffGrad(StridedMatrix<const double, MemorySpace> const& pts, 
+                                                             StridedMatrix<const double, MemorySpace> const& sens);
 
         virtual Eigen::RowMatrixXd CoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts,
                                              Eigen::Ref<const Eigen::RowMatrixXd> const& sens);
 
-        virtual void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
-                                   Kokkos::View<const double**, MemorySpace> const& sens,
-                                   Kokkos::View<double**, MemorySpace> &output) = 0;
+        virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                                   StridedMatrix<const double, MemorySpace> const& sens,
+                                   StridedMatrix<double, MemorySpace>              output) = 0;
 
         
         const unsigned int inputDim; /// The total dimension of the input N+M

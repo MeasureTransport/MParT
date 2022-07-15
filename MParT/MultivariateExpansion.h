@@ -40,8 +40,8 @@ namespace mpart{
         virtual ~MultivariateExpansion() = default;
 
 
-        virtual void EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                                  Kokkos::View<double**, MemorySpace>            & output) override
+        virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                  StridedMatrix<double, MemorySpace>              output) override
         {
             using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
             
@@ -97,9 +97,9 @@ namespace mpart{
             Kokkos::fence();
         }
 
-        void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
-                           Kokkos::View<const double**, MemorySpace> const& sens,
-                           Kokkos::View<double**, MemorySpace>            & output) override
+        void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                           StridedMatrix<const double, MemorySpace> const& sens,
+                           StridedMatrix<double, MemorySpace>              output) override
         {
             using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
             

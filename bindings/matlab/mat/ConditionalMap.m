@@ -79,28 +79,41 @@ methods
   end
 
   function result = Evaluate(this,pts)
-    result = MParT_('ConditionalMap_Evaluate',this.id_,pts);
+    result = zeros(this.outputDim, size(pts,2));
+    MParT_('ConditionalMap_Evaluate',this.id_,pts,result);
   end
 
   function result = LogDeterminant(this,pts)
-    result = MParT_('ConditionalMap_LogDeterminant',this.id_,pts);
+    result = zeros(size(pts,2),1);
+    MParT_('ConditionalMap_LogDeterminant',this.id_,pts,result);
   end
 
   function result = Inverse(this,x1,r)
-    result = MParT_('ConditionalMap_Inverse',this.id_,x1,r);
+    result = zeros(this.outputDim, size(r,2));
+    MParT_('ConditionalMap_Inverse',this.id_,x1,r,result);
   end
 
   function result = CoeffGrad(this,pts,sens)
-    result = MParT_('ConditionalMap_CoeffGrad',this.id_,pts,sens);
+    result = zeros(this.numCoeffs, size(pts,2));
+    MParT_('ConditionalMap_CoeffGrad',this.id_,pts,sens,result);
   end
 
   function result = LogDeterminantCoeffGrad(this,pts)
-    result = MParT_('ConditionalMap_LogDeterminantCoeffGrad',this.id_,pts);
+    result = zeros(this.numCoeffs, size(pts,2));
+    MParT_('ConditionalMap_LogDeterminantCoeffGrad',this.id_,pts,result);
   end
 
   function result = get_id(this)
     result = this.id_;
   end
+
+  function result = outputDim(this)
+    result = MParT_('ConditionalMap_outputDim',this.id_);
+  end 
+
+  function result = inputDim(this)
+    result = MParT_('ConditionalMap_inputDim',this.id_);
+  end 
 
 end
 
