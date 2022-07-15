@@ -36,8 +36,8 @@ Kokkos::View<double*, Kokkos::HostSpace>  mpart::MexToKokkos1d(const mxArray *mx
 
 Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace>  mpart::MexToKokkos2d(const mxArray *mx)
 {   
-    size_t rows = mxGetN(mx);
-    size_t cols = mxGetM(mx);
+    size_t cols = mxGetN(mx);
+    size_t rows = mxGetM(mx);
 
     if(mxIsComplex(mx)){
         std::stringstream msg;
