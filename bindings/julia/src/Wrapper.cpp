@@ -17,6 +17,7 @@
 
 namespace jlcxx {
   template<> struct IsMirroredType<mpart::MultiIndexLimiter::None> : std::false_type { };
+//   template<> struct SuperType<mpart::ConditionalMapBase<Kokkos::HostSpace>> {typedef ParameterizedFunctionBase<Kokkos::HostSpace> type;};
 }
 namespace mpart {
     struct FixedMultiIndexSetHost {
@@ -34,12 +35,10 @@ namespace mpart {
         int n_inp = map.inputDim;
         int n_pts = sz / n_inp;
         auto view = ToConstKokkos(pts.data(), n_pts, n_inp);
-        // Kokkos::deep_copy(view2, view);
-        auto view2 = view;
         Kokkos::View<double*, Kokkos::HostSpace> out_view("Log Determinants", view.extent(1));
-        // map.LogDeterminantImpl(view, out_view);
+        map.LogDeterminantImpl(view, out_view);
         // auto out_view = map.LogDeterminant(view);
-        return view2; //std::vector<double>(out_view.data(), out_view.data() + out_view.extent(0));
+        return std::vector<double>(out_view.data(), out_view.data() + out_view.extent(0));
     }
 }
 
