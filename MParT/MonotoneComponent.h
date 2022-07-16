@@ -62,31 +62,31 @@ public:
     virtual std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> GetBaseFunction() override{return std::make_shared<MultivariateExpansion<typename ExpansionType::BasisType, typename ExpansionType::KokkosSpace>>(1,_expansion);};
 
     /** Override the ConditionalMapBase Evaluate function. */
-    virtual void EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                              Kokkos::View<double**, MemorySpace>      & output) override
+    virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                              StridedMatrix<double, MemorySpace>              output) override
     {
-        Kokkos::View<double*,MemorySpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        EvaluateImpl(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, outputSlice);
+        StridedVector<double,MemorySpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
+        EvaluateImpl(pts, this->savedCoeffs, outputSlice);
     }
 
-    virtual void InverseImpl(Kokkos::View<const double**, MemorySpace> const& x1,
-                             Kokkos::View<const double**, MemorySpace> const& r,
-                             Kokkos::View<double**, MemorySpace>      & output) override
+    virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+                             StridedMatrix<const double, MemorySpace> const& r,
+                             StridedMatrix<double, MemorySpace>              output) override
     {
-        Kokkos::View<const double*,MemorySpace> rSlice = Kokkos::subview(r,0,Kokkos::ALL());
-        Kokkos::View<double*,MemorySpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        InverseImpl(x1, rSlice, ConditionalMapBase<MemorySpace>::savedCoeffs, outputSlice);
+        auto rSlice = Kokkos::subview(r,0,Kokkos::ALL());
+        auto outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
+        InverseImpl(x1, rSlice, this->savedCoeffs, outputSlice);
     }
 
-    virtual void LogDeterminantImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                                    Kokkos::View<double*, MemorySpace>             &output) override
+    virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                    StridedVector<double,MemorySpace>               output) override
     {
         // First, get the diagonal derivative
         if(_useContDeriv){
-            ContinuousDerivative(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, output);
+            ContinuousDerivative(pts, this->savedCoeffs, output);
         }else{
             Kokkos::View<double*,MemorySpace> evals("Evaluations", pts.extent(1));
-            DiscreteDerivative(pts, ConditionalMapBase<MemorySpace>::savedCoeffs, evals, output);
+            DiscreteDerivative(pts, this->savedCoeffs, evals, output);
         }
 
         // Now take the log
@@ -100,9 +100,9 @@ public:
         });
     }
 
-    virtual void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
-                               Kokkos::View<const double**, MemorySpace> const& sens,
-                               Kokkos::View<double**, MemorySpace>            & output) override
+    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                               StridedMatrix<const double, MemorySpace> const& sens,
+                               StridedMatrix<double, MemorySpace>              output) override
     {
         assert(sens.extent(0)==this->outputDim);
         assert(sens.extent(1)==pts.extent(1));
@@ -123,8 +123,8 @@ public:
     }
 
 
-    virtual void LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
-                                             Kokkos::View<double**, MemorySpace> &output) override
+    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                             StridedMatrix<double, MemorySpace>              output) override
     {   
         Kokkos::View<double*,MemorySpace> derivs("Diagonal Derivative", pts.extent(1));
 
@@ -150,12 +150,12 @@ public:
      * @brief Support calling EvaluateImpl with non-const views.
      */
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, class... OtherTraits>
-    void EvaluateImpl(Kokkos::View<double**, OtherTraits...> const& pts,
-                      Kokkos::View<double*,MemorySpace>  const& coeffs,
-                      Kokkos::View<double*,MemorySpace>       & output)
+    void EvaluateImpl(Kokkos::View<double**, OtherTraits...>  const& pts,
+                      StridedVector<double,MemorySpace> const& coeffs,
+                      StridedVector<double,MemorySpace>              output)
     {
         Kokkos::View<const double**, OtherTraits...> constPts = pts;
-        Kokkos::View<const double*,MemorySpace> constCoeffs = coeffs;
+        StridedVector<const double, MemorySpace> constCoeffs = coeffs;
 
         EvaluateImpl<ExecutionSpace,OtherTraits...>(constPts,constCoeffs,output);
     }
@@ -168,9 +168,9 @@ public:
      * @param[out] output Kokkos::View<double*> An array containing the evaluattions \f$T(x^{(i)}_1,\ldots,x^{(i)}_D)\f$ for each \f$i\in\{0,\ldots,N\}\f$.
      */
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space, class... OtherTraits>
-    void EvaluateImpl(Kokkos::View<const double**, OtherTraits...> const& pts,
-                      Kokkos::View<const double*,MemorySpace>  const& coeffs,
-                      Kokkos::View<double*,MemorySpace>       & output)
+    void EvaluateImpl(Kokkos::View<const double**, OtherTraits...>   const& pts,
+                      StridedVector<const double,MemorySpace>        const& coeffs,
+                      StridedVector<double,MemorySpace>                     output)
     {
         const unsigned int numPts = pts.extent(1);
 
@@ -205,19 +205,19 @@ public:
     }
 
 
-    template< typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void InverseImpl(Kokkos::View<double**,MemorySpace>       const& xs,
-                     Kokkos::View<double*,MemorySpace>        const& ys,
-                     Kokkos::View<double*,MemorySpace>        const& coeffs,
-                     Kokkos::View<double*,MemorySpace>             & output,
-                     std::map<std::string, std::string>              options=std::map<std::string,std::string>())
-    {
-        Kokkos::View<const double**,MemorySpace> constXs = xs;
-        Kokkos::View<const double*,MemorySpace> constYs = ys;
-        Kokkos::View<const double*,MemorySpace> constCoeffs = coeffs;
+    // template< typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    // void InverseImpl(StridedMatrix<double, MemorySpace> const& xs,
+    //                  StridedVector<double, MemorySpace> const& ys,
+    //                  StridedVector<double, MemorySpace> const& coeffs,
+    //                  StridedVector<double, MemorySpace>        output,
+    //                  std::map<std::string, std::string>        options=std::map<std::string,std::string>())
+    // {
+    //     StridedMatrix<const double, MemorySpace> constXs = xs;
+    //     StridedVector<const double, MemorySpace> constYs = ys;
+    //     StridedVector<const double, MemorySpace> constCoeffs = coeffs;
 
-        InverseImpl<ExecutionSpace>(constXs,constYs,constCoeffs,output,options);
-    }
+    //     InverseImpl<ExecutionSpace>(constXs,constYs,constCoeffs,output,options);
+    // }
 
     /**
      @brief Evaluates the inverse of the diagonal of the monotone component.
@@ -234,11 +234,11 @@ public:
      @param options A map containing options for the method (e.g., converge criteria, step sizes).   Available options are "Method" (must be "Bracket"), "xtol" (any nonnegative float), and "ytol" (any nonnegative float).
      */
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void InverseImpl(Kokkos::View<const double**,MemorySpace>       const& xs,
-                 Kokkos::View<const double*,MemorySpace>        const& ys,
-                 Kokkos::View<const double*,MemorySpace>        const& coeffs,
-                 Kokkos::View<double*,MemorySpace>             & output,
-                 std::map<std::string, std::string>              options=std::map<std::string,std::string>())
+    void InverseImpl(StridedMatrix<const double, MemorySpace> const& xs,
+                     StridedVector<const double, MemorySpace> const& ys,
+                     StridedVector<const double, MemorySpace> const& coeffs,
+                     StridedVector<double, MemorySpace>              output,
+                 std::map<std::string, std::string>                  options=std::map<std::string,std::string>())
     {
         // Extract the method from the options map
         std::string method;
@@ -343,8 +343,8 @@ public:
         @see DiscreteDerivative
      */
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(Kokkos::View<const double**,MemorySpace> const& pts,
-                                                            Kokkos::View<const double*,MemorySpace>  const& coeffs)
+    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(StridedMatrix<const double, MemorySpace> const& pts,
+                                                            StridedVector<const double, MemorySpace> const& coeffs)
     {
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> derivs("Monotone Component Derivatives", numPts);
@@ -353,14 +353,14 @@ public:
 
         return derivs;
     }
-    template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    Kokkos::View<double*,MemorySpace>  ContinuousDerivative(Kokkos::View<double**,MemorySpace> const& pts,
-                                                            Kokkos::View<double*,MemorySpace>  const& coeffs)
-    {
-        Kokkos::View<const double**, MemorySpace> pts2 = pts;
-        Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
-        return ContinuousDerivative<ExecutionSpace>(pts2,coeffs2);
-    }
+    // template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    // Kokkos::View<double*,MemorySpace>  ContinuousDerivative(StridedMatrix<double, MemorySpace> const& pts,
+    //                                                         StridedVector<double, MemorySpace> const& coeffs)
+    // {
+    //     StridedMatrix<const double, MemorySpace> pts2 = pts;
+    //     StridedVector<const double, MemorySpace> coeffs2 = coeffs;
+    //     return ContinuousDerivative<ExecutionSpace>(pts2,coeffs2);
+    // }
     
 
 
@@ -375,9 +375,9 @@ public:
         @see DiscreteDerivative
      */
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void ContinuousDerivative(Kokkos::View<const double**,MemorySpace> const& pts,
-                              Kokkos::View<const double*,MemorySpace>  const& coeffs,
-                              Kokkos::View<double*,MemorySpace>       & derivs)
+    void ContinuousDerivative(StridedMatrix<const double, MemorySpace> const& pts,
+                              StridedVector<const double, MemorySpace> const& coeffs,
+                              StridedVector<double, MemorySpace>              derivs)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int dim = pts.extent(0);
@@ -415,15 +415,15 @@ public:
         });
     }
 
-    template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void ContinuousDerivative(Kokkos::View<double**,MemorySpace> const& pts,
-                              Kokkos::View<double*,MemorySpace>  const& coeffs,
-                              Kokkos::View<double*,MemorySpace>       & derivs)
-    {
-        Kokkos::View<const double**, MemorySpace> pts2 = pts;
-        Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
-        ContinuousDerivative<ExecutionSpace>(pts2,coeffs2, derivs);
-    }
+    // template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    // void ContinuousDerivative(StridedMatrix<double, MemorySpace> const& pts,
+    //                           StridedVector<double, MemorySpace> const& coeffs,
+    //                           StridedVector<double, MemorySpace>        derivs)
+    // {
+    //     StridedMatrix<const double, MemorySpace> pts2 = pts;
+    //     StridedVector<const double, MemorySpace> coeffs2 = coeffs;
+    //     ContinuousDerivative<ExecutionSpace>(pts2,coeffs2, derivs);
+    // }
 
     /**
     @brief Approximates the "discrete derivative" of the quadrature-based approximation \f$\tilde{T}\f$.
@@ -435,8 +435,8 @@ public:
         @see ContinuousDerivative
     */
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(Kokkos::View<const double**,MemorySpace> const& pts,
-                                                           Kokkos::View<const double*,MemorySpace>  const& coeffs)
+    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(StridedMatrix<const double, MemorySpace> const& pts,
+                                                           StridedVector<const double, MemorySpace> const& coeffs)
     {
         const unsigned int numPts = pts.extent(1);
         Kokkos::View<double*,MemorySpace> evals("Component Evaluations", numPts);
@@ -447,14 +447,14 @@ public:
         return derivs;
     }
 
-    template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    Kokkos::View<double*, MemorySpace>  DiscreteDerivative(Kokkos::View<double**,MemorySpace> const& pts,
-                                                           Kokkos::View<double*,MemorySpace>  const& coeffs)
-    {
-        Kokkos::View<const double**, MemorySpace> pts2 = pts;
-        Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
-        return DiscreteDerivative<ExecutionSpace>(pts2,coeffs2);
-    }
+    // template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    // Kokkos::View<double*, MemorySpace>  DiscreteDerivative(StridedMatrix<double, MemorySpace> const& pts,
+    //                                                        StridedVector<double, MemorySpace>  const& coeffs)
+    // {
+    //     StridedMatrix<const double, MemorySpace> pts2 = pts;
+    //     StridedVector<const double, MemorySpace> coeffs2 = coeffs;
+    //     return DiscreteDerivative<ExecutionSpace>(pts2,coeffs2);
+    // }
 
 
     /**
@@ -468,10 +468,10 @@ public:
         @see ContinuousDerivative
      */
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void  DiscreteDerivative(Kokkos::View<const double**,MemorySpace> const& pts,
-                             Kokkos::View<const double*,MemorySpace>  const& coeffs,
-                             Kokkos::View<double*,MemorySpace>       & evals,
-                             Kokkos::View<double*,MemorySpace>       & derivs)
+    void  DiscreteDerivative(StridedMatrix<const double, MemorySpace> const& pts,
+                             StridedVector<const double, MemorySpace> const& coeffs,
+                             StridedVector<double, MemorySpace>              evals,
+                             StridedVector<double, MemorySpace>              derivs)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
@@ -522,16 +522,16 @@ public:
         });
     }
 
-    template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void  DiscreteDerivative(Kokkos::View<double**,MemorySpace> const& pts,
-                             Kokkos::View<double*,MemorySpace>  const& coeffs,
-                             Kokkos::View<double*,MemorySpace>       & evals,
-                             Kokkos::View<double*,MemorySpace>       & derivs)
-    {
-        Kokkos::View<const double**, MemorySpace> pts2 = pts;
-        Kokkos::View<const double*, MemorySpace> coeffs2 = coeffs;
-        DiscreteDerivative(pts2, coeffs2, evals, derivs);
-    }
+    // template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    // void  DiscreteDerivative(StridedMatrix<double, MemorySpace> const& pts,
+    //                          StridedVector<double, MemorySpace> const& coeffs,
+    //                          StridedVector<double, MemorySpace>        evals,
+    //                          StridedVector<double, MemorySpace>        derivs)
+    // {
+    //     StridedMatrix<const double, MemorySpace> pts2 = pts;
+    //     StridedVector<const double, MemorySpace> coeffs2 = coeffs;
+    //     DiscreteDerivative(pts2, coeffs2, evals, derivs);
+    // }
 
     /** @brief Returns the gradient of the map with respect to the parameters \f$\mathbf{w}\f$ at multiple points.
 
@@ -548,10 +548,10 @@ public:
         @see CoeffGradient
     */
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void CoeffJacobian(Kokkos::View<const double**,MemorySpace> const& pts,
-                       Kokkos::View<const double*,MemorySpace>  const& coeffs,
-                       Kokkos::View<double*,MemorySpace>       & evaluations,
-                       Kokkos::View<double**,MemorySpace>      & jacobian)
+    void CoeffJacobian(StridedMatrix<const double, MemorySpace>  const& pts,
+                       StridedVector<const double, MemorySpace>  const& coeffs,
+                       StridedVector<double, MemorySpace>               evaluations,
+                       StridedMatrix<double, MemorySpace>               jacobian)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
@@ -606,9 +606,9 @@ public:
     }
 
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void ContinuousMixedJacobian(Kokkos::View<const double**,MemorySpace> const& pts,
-                                 Kokkos::View<const double*,MemorySpace>  const& coeffs,
-                                 Kokkos::View<double**,MemorySpace>      & jacobian)
+    void ContinuousMixedJacobian(StridedMatrix<const double, MemorySpace> const& pts,
+                                 StridedVector<const double, MemorySpace> const& coeffs,
+                                 StridedMatrix<double, MemorySpace>              jacobian)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
@@ -655,9 +655,9 @@ public:
     }
 
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
-    void DiscreteMixedJacobian(Kokkos::View<const double**,MemorySpace> const& pts,
-                               Kokkos::View<const double*,MemorySpace>  const& coeffs,
-                               Kokkos::View<double**,MemorySpace>      & jacobian)
+    void DiscreteMixedJacobian(StridedMatrix<const double, MemorySpace> const& pts,
+                               StridedVector<const double, MemorySpace> const& coeffs,
+                               StridedMatrix<double, MemorySpace>              jacobian)
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);

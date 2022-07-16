@@ -216,7 +216,7 @@ TEST_CASE( "Testing constant Eigen to Kokkos Conversions in 2D", "[ConstEigenArr
     unsigned int rows = 64;
     unsigned int cols = 32;
 
-    SECTION("Row Major"){
+    SECTION("Column Major"){
         Eigen::MatrixXd x(rows,cols);
         for(unsigned int j=0; j<cols; ++j){
             for(unsigned int i=0; i<rows; ++i){
@@ -233,7 +233,7 @@ TEST_CASE( "Testing constant Eigen to Kokkos Conversions in 2D", "[ConstEigenArr
         }
     }
 
-    SECTION("Column Major"){
+    SECTION("Row Major"){
         Eigen::RowMatrixXd x(rows,cols);
         for(unsigned int j=0; j<cols; ++j){
             for(unsigned int i=0; i<rows; ++i){
@@ -304,11 +304,20 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 2D", "[EigenArrayConversions2
             }
         }
         
-        auto x_view = MatToKokkos<double>(x2);
+        Kokkos::View<double**,Kokkos::LayoutStride,Kokkos::HostSpace> x_view = MatToKokkos<double>(x2);
         for(unsigned int i=0; i<10; ++i){
             for(unsigned int j=0; j<10; ++j){
                 CHECK(x_view(i,j)==x2(i,j));   
                 CHECK(&x_view(i,j) == &x2(i,j));
+            }
+        }
+
+        // Test conversion from strided type to layoutright
+        Kokkos::View<double**,Kokkos::LayoutRight,Kokkos::HostSpace> x_right = x_view;
+        for(unsigned int i=0; i<10; ++i){
+            for(unsigned int j=0; j<10; ++j){
+                CHECK(x_right(i,j)==x2(i,j));   
+                CHECK(&x_right(i,j) == &x2(i,j));
             }
         }
     }

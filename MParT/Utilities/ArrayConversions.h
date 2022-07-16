@@ -11,6 +11,13 @@ namespace mpart{
         @brief Code for converting between different array types.  Often used in bindings to other languages.
     */
     
+    /** Alias declaration for strided Kokkos matrix type. */
+    template<typename ScalarType, typename MemorySpace>
+    using StridedMatrix = Kokkos::View<ScalarType**, Kokkos::LayoutStride, MemorySpace>;
+
+    template<typename ScalarType, typename MemorySpace>
+    using StridedVector = Kokkos::View<ScalarType*, Kokkos::LayoutStride, MemorySpace>;
+
     /** @brief Converts a pointer to a 1d unmanaged Kokkos view.  
         @ingroup ArrayUtilities
         @details Creates a Kokkos unmanaged view around a preallocated block of memory.  
@@ -93,6 +100,22 @@ namespace mpart{
         return Kokkos::View<const ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 
+
+    /**
+     * @brief Returns a copy of a one dimensional Kokkos::View in the form of a std::vector.
+     * 
+     * @tparam ScalarType 
+     * @param view 
+     * @return std::vector<std::remove_const<ScalarType>::type> 
+     */
+    template<typename ScalarType, class... ViewTraits>
+    std::vector<typename std::remove_const<ScalarType>::type> KokkosToStd(Kokkos::View<ScalarType*,ViewTraits...> const& view)
+    {
+        std::vector<typename std::remove_const<ScalarType>::type> output(view.extent(0));
+        for(unsigned int i=0; i<view.extent(0); ++i)
+            output[i] = view(i);
+        return output;
+    }
     /**
     @brief Copies a Kokkos array from device memory to host memory
     @details
@@ -217,7 +240,7 @@ namespace mpart{
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
     template<typename ScalarType>
-    inline Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
+    inline StridedMatrix<ScalarType, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
     {   
         Kokkos::LayoutStride strides(ref.rows(), ref.innerStride(), ref.cols(), ref.outerStride());
 
@@ -259,7 +282,7 @@ namespace mpart{
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
     template<typename ScalarType>
-    inline Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
+    inline StridedMatrix<ScalarType, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
     {   
         Kokkos::LayoutStride strides(ref.rows(), ref.outerStride(), ref.cols(), ref.innerStride());
 

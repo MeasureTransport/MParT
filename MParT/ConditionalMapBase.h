@@ -57,26 +57,26 @@ namespace mpart {
 
         @param pts The points where we want to evaluate the log determinant.
         */
-        virtual Kokkos::View<double*, MemorySpace> LogDeterminant(Kokkos::View<const double**, MemorySpace> const& pts);
+        virtual Kokkos::View<double*, MemorySpace> LogDeterminant(StridedMatrix<const double, MemorySpace> const& pts);
 
         virtual Eigen::VectorXd LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual void LogDeterminantImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                                        Kokkos::View<double*, MemorySpace>             &output) = 0;
+        virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                        StridedVector<double, MemorySpace>              output) = 0;
 
 
         /** Returns the value of \f$x_2\f$ given \f$x_1\f$ and \f$r\f$.   Note that the \f$x1\f$ view may contain more
             than \f$N\f$ rows, but only the first \f$N\f$ will be used in this function.
         */
-        virtual Kokkos::View<double**, MemorySpace> Inverse(Kokkos::View<const double**, MemorySpace> const& x1,
-                                                            Kokkos::View<const double**, MemorySpace> const& r);
+        virtual StridedMatrix<double, MemorySpace> Inverse(StridedMatrix<const double, MemorySpace> const& x1,
+                                                           StridedMatrix<const double, MemorySpace> const& r);
 
         virtual Eigen::RowMatrixXd Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1, 
                                            Eigen::Ref<const Eigen::RowMatrixXd> const& r);
 
-        virtual void InverseImpl(Kokkos::View<const double**, MemorySpace> const& x1,
-                                 Kokkos::View<const double**, MemorySpace> const& r,
-                                 Kokkos::View<double**, MemorySpace>            & output) = 0;
+        virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+                                 StridedMatrix<const double, MemorySpace> const& r,
+                                 StridedMatrix<double, MemorySpace>              output) = 0;
         /**
            @brief Computes the gradient of the log determinant with respect to the map coefficients.
            @details For a map \f$T(x; w) : \mathbb{R}^N \rightarrow \mathbb{R}^M\f$ parameterized by coefficients \f$w\in\mathbb{R}^K\f$,
@@ -88,12 +88,12 @@ namespace mpart {
            @param pts A collection of points where we want to evaluate the gradient.  Each column corresponds to a point.
            @return A matrix containing the coefficient gradient at each input point.  The \f$i^{th}\f$ column  contains \f$\nabla_w \det{\nabla_x T(x_i; w)}\f$.
          */
-        virtual Kokkos::View<double**, MemorySpace> LogDeterminantCoeffGrad(Kokkos::View<const double**, MemorySpace> const& pts);
+        virtual StridedMatrix<double, MemorySpace> LogDeterminantCoeffGrad(StridedMatrix<const double, MemorySpace> const& pts);
 
         virtual Eigen::RowMatrixXd LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual void LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
-                                                 Kokkos::View<double**, MemorySpace> &output) = 0;
+        virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                                 StridedMatrix<double, MemorySpace>              output) = 0;
 
 
     }; // class ConditionalMapBase<MemorySpace>
