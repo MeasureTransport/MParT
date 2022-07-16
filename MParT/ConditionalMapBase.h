@@ -39,8 +39,8 @@ namespace mpart {
         ConditionalMapBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs) : ParameterizedFunctionBase<MemorySpace>(inDim, outDim, nCoeffs){};
 
         virtual ~ConditionalMapBase() = default;
-        
-        /** For Monotone parameterizations that are based on a non-monotone base function, this function will return the base function.  If the monotone parameterization is 
+
+        /** For Monotone parameterizations that are based on a non-monotone base function, this function will return the base function.  If the monotone parameterization is
             not constructed from a non-monotone base, then this function will return a nullptr.
         */
         virtual std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> GetBaseFunction(){return nullptr;};
@@ -57,7 +57,7 @@ namespace mpart {
 
         @param pts The points where we want to evaluate the log determinant.
         */
-        virtual Kokkos::View<double*, MemorySpace> LogDeterminant(StridedMatrix<const double, MemorySpace> const& pts);
+        virtual StridedVector<double, MemorySpace> LogDeterminant(StridedMatrix<const double, MemorySpace> const& pts);
 
         virtual Eigen::VectorXd LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
@@ -71,7 +71,7 @@ namespace mpart {
         virtual StridedMatrix<double, MemorySpace> Inverse(StridedMatrix<const double, MemorySpace> const& x1,
                                                            StridedMatrix<const double, MemorySpace> const& r);
 
-        virtual Eigen::RowMatrixXd Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1, 
+        virtual Eigen::RowMatrixXd Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1,
                                            Eigen::Ref<const Eigen::RowMatrixXd> const& r);
 
         virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
@@ -80,10 +80,10 @@ namespace mpart {
         /**
            @brief Computes the gradient of the log determinant with respect to the map coefficients.
            @details For a map \f$T(x; w) : \mathbb{R}^N \rightarrow \mathbb{R}^M\f$ parameterized by coefficients \f$w\in\mathbb{R}^K\f$,
-           this function computes 
+           this function computes
            \f[
             \nabla_w \det{\nabla_x T(x_i; w)},
-          \f] 
+          \f]
            at multiple points \f$x_i\f$.
            @param pts A collection of points where we want to evaluate the gradient.  Each column corresponds to a point.
            @return A matrix containing the coefficient gradient at each input point.  The \f$i^{th}\f$ column  contains \f$\nabla_w \det{\nabla_x T(x_i; w)}\f$.
@@ -92,7 +92,7 @@ namespace mpart {
 
         virtual Eigen::RowMatrixXd LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+        virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                  StridedMatrix<double, MemorySpace>              output) = 0;
 
 

@@ -13,6 +13,7 @@
 #include <Kokkos_Core.hpp>
 #include <tuple>
 #include <iostream>
+#include <memory>
 
 #include "CommonJuliaUtilities.h"
 
@@ -21,25 +22,17 @@ namespace jlcxx {
   template<> struct SuperType<mpart::ConditionalMapBase<Kokkos::HostSpace>> {typedef mpart::ParameterizedFunctionBase<Kokkos::HostSpace> type;};
 }
 namespace mpart {
-    struct FixedMultiIndexSetHost {
-        FixedMultiIndexSetHost(FixedMultiIndexSet<Kokkos::HostSpace> const& set): mset(set) {}
-        FixedMultiIndexSet<Kokkos::HostSpace> const& mset;
-    };
+    // StridedVector<double, Kokkos::HostSpace> logDetFcn(ConditionalMapBase<Kokkos::HostSpace> &map, StridedMatrix<double, Kokkos::HostSpace> &pts) {
+    //     auto out_vec = map.LogDeterminant(pts_mat);
+    //     return jlcxx::make_julia_array(out_vec.data(), out_vec.size());
+    // }
 
-    struct ConditionalMapBaseHost {
-        ConditionalMapBaseHost(ConditionalMapBase<Kokkos::HostSpace> const& map): mmap(map) {}
-        ConditionalMapBase<Kokkos::HostSpace> const& mmap;
-    };
-
-    std::vector<double> logDetFcn(ConditionalMapBase<Kokkos::HostSpace> &map, std::vector<double> pts) {
+    jlcxx::ArrayRef<double> evaluateFcn(ParameterizedFunctionBase<Kokkos::HostSpace> &pfb, StridedMatrix<double, Kokkos::HostSpace> &pts) {
         auto sz = pts.size();
-        int n_inp = map.inputDim;
+        int n_inp = pfb.inputDim;
         int n_pts = sz / n_inp;
-        auto view = ToConstKokkos(pts.data(), n_inp, n_pts);
-        // typedef typename decltype(view)::fake_value fake_value;
-        Kokkos::View<double*, Kokkos::HostSpace> out_view("Log Determinants", view.extent(1));
-        map.LogDeterminantImpl(view, out_view);
-        return std::vector<double>(out_view.data(), out_view.data() + out_view.extent(0));
+        auto out_vec = pfb.Evaluate(pts);
+        return jlcxx::make_julia_array(out_vec.data(), out_vec.size());
     }
 }
 
@@ -53,6 +46,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
 
     mod.method("Initialize", [](){mpart::binding::Initialize(std::vector<std::string> {});});
 
+
     mod.add_type<MultiIndex>("MultiIndex")
         .constructor()
         .constructor<unsigned int, unsigned int>()
@@ -64,6 +58,23 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     jlcxx::stl::apply_stl<MultiIndex>(mod);
 
     mod.add_type<Kokkos::HostSpace>("HostSpace");
+    mod.add_type<Kokkos::LayoutStride>("LayoutStride");
+
+    mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>,jlcxx::TypeVar<2>>>("View")
+        .apply<StridedVector<double, Kokkos::HostSpace>>([](auto wrapped) {
+            typedef typename decltype(wrapped)::type WrappedT;
+            wrapped.method("VecToMParT", &VecToKokkos<double,Kokkos::HostSpace>);
+        }).apply<StridedMatrix<double, Kokkos::HostSpace>>([](auto wrapped) {
+            typedef typename decltype(wrapped)::type WrappedT;
+            wrapped.method("MatToMParT", &MatToKokkos<double,Kokkos::HostSpace>);
+        }).apply<StridedVector<const double, Kokkos::HostSpace>>([](auto wrapped) {
+            typedef typename decltype(wrapped)::type WrappedT;
+            wrapped.method("VecToConstMParT", &VecToConstKokkos<double,Kokkos::HostSpace>);
+        }).apply<StridedMatrix<const double, Kokkos::HostSpace>>([](auto wrapped) {
+            typedef typename decltype(wrapped)::type WrappedT;
+            wrapped.method("MatToConstMParT", &MatToConstKokkos<double,Kokkos::HostSpace>);
+        });
+
     // FixedMultiIndexSet
     mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("FixedMultiIndexSet")
         .apply<FixedMultiIndexSet<Kokkos::HostSpace>>([](auto wrapped) {
@@ -75,23 +86,10 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("ParameterizedFunctionBase")
         .apply<ParameterizedFunctionBase<Kokkos::HostSpace>>([](auto wrapped) {
             typedef typename decltype(wrapped)::type WrappedT;
-            wrapped.method("CoeffMap", [](WrappedT& pfb) {
-                auto view = pfb.Coeffs();
-                return jlcxx::make_julia_array(view.data(), view.extent(0));
-            });
-            wrapped.method("SetCoeffs", [](WrappedT& pfb, std::vector<double> coeffs) {
-                auto view = ToKokkos(coeffs.data(), coeffs.size());
-                pfb.SetCoeffs(view);
-            });
-            // wrapped.method("Evaluate", [](WrappedT& pfb, std::vector<double> pts) {
-            //     auto sz = pts.size();
-            //     int n_inp = pfb.inputDim;
-            //     int n_pts = sz / n_inp;
-            //     Kokkos::View<const double**, Kokkos::HostSpace> view = ToConstKokkos(pts.data(), n_pts, n_inp);
-            //     typedef typename decltype(view)::fake_value fake_value;
-            //     auto output = pfb.Evaluate(view);
-            //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
-            // });
+            // typedef typename WrappedT::fake_val fake_val;
+            wrapped.method("Coeffs", [](WrappedT &w){ return w.Coeffs(); });
+            wrapped.method("SetCoeffs", [](WrappedT &w, Kokkos::View<double*, Kokkos::HostSpace> &v){ w.SetCoeffs(v); });
+            wrapped.method("Evaluate", [](WrappedT &w, Kokkos::View<const double**, Kokkos::HostSpace> const& pts){ return w.Evaluate(pts); });
             // wrapped.method("CoeffGrad", [](WrappedT& pfb, std::vector<double> pts, std::vector<double> sens) {
             //     auto sz = pts.size();
             //     int n_inp = pfb.inputDim;
@@ -111,17 +109,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .apply<ConditionalMapBase<Kokkos::HostSpace>>([](auto wrapped) {
             typedef typename decltype(wrapped)::type WrappedT;
             // typedef typename WrappedT::fake_value fake_value;
-            // wrapped.method("LogDeterminant", &logDetFcn);
-            // wrapped.method("LogDeterminant", [](WrappedT &map, std::vector<double> pts) {
-            //     auto sz = pts.size();
-            //     int n_inp = map.inputDim;
-            //     int n_pts = sz / n_inp;
-            //     auto view = ToConstKokkos(pts.data(), n_inp, n_pts);
-            //     // typedef typename decltype(view)::fake_value fake_value;
-            //     Kokkos::View<double*, Kokkos::HostSpace> out_view("Log Determinants", view.extent(1));
-            //     map.LogDeterminantImpl(view, out_view);
-            //     return std::vector<double>(out_view.data(), out_view.data() + out_view.extent(0));
-            // });
+            // wrapped.method("LogDeterminant", [](WrappedT& cmb, Kokkos::View<double**, Kokkos::HostSpace> &pts){ return cmb.LogDeterminant(pts); });
+            wrapped.method("to_base", [] (std::shared_ptr<WrappedT> w) { return std::static_pointer_cast<ParameterizedFunctionBase<Kokkos::HostSpace>>(w); });
             // wrapped.method("Inverse", [](WrappedT &map, std::vector<double> x1, std::vector<double> r) {
             //     auto x1_sz = x1.size();
             //     int n_inp = map.inputDim;
@@ -144,19 +133,11 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
 
     mod.add_type<MultiIndexSet>("MultiIndexSet")
         .constructor<const unsigned int>()
-        .method("fix", [](MultiIndexSet mset) {return FixedMultiIndexSetHost(mset.Fix()); })
-        // .method("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder)
-        // .method("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct)
-        .method("union", &MultiIndexSet::Union)
-        // .method("SetLimiter", &MultiIndexSet::SetLimiter)
-        // .method("GetLimiter", &MultiIndexSet::GetLimiter)
+        .method("Fix", &MultiIndexSet::Fix)
+        .method("Union", &MultiIndexSet::Union)
         .method("IndexToMulti", &MultiIndexSet::IndexToMulti)
         .method("MultiToIndex", &MultiIndexSet::MultiToIndex)
         .method("MaxOrders", &MultiIndexSet::MaxOrders)
-
-        // .method("Expand", &MultiIndexSet::Expand)
-        // .method("Activate", &MultiIndexSet::Activate)
-
         .method("AddActive", &MultiIndexSet::AddActive)
         .method("Frontier", &MultiIndexSet::Frontier)
         .method("Margin", &MultiIndexSet::Margin)
@@ -167,59 +148,13 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .method("NumForward", &MultiIndexSet::NumForward)
     ;
 
-    mod.method("MultiIndexSet", [](std::vector<int>& idxs, unsigned int sz0, unsigned int sz1) {
-        auto ptr = idxs.data();
+    mod.method("MultiIndexSet", [](std::vector<int> &idxs, int n_idxs) {
+        int sz = idxs.size();
+        int sz0 = n_idxs;
+        int sz1 = sz / sz0;
+        auto ptr = &idxs[0];
         return MultiIndexSet(Eigen::Map<const Eigen::Matrix<int,Eigen::Dynamic,1>, 0, Eigen::OuterStride<>>(ptr, sz0, sz1, Eigen::OuterStride<>(std::max(sz0, sz1))));
     });
-
-    // MultiIndexSetLimiters
-    // TotalOrder
-    mod.add_type<MultiIndexLimiter::TotalOrder>("TotalOrder")
-        .constructor<unsigned int>()
-        .method(&MultiIndexLimiter::TotalOrder::operator())
-    ;
-
-    // Dimension
-    mod.add_type<MultiIndexLimiter::Dimension>("Dimension")
-        .constructor<unsigned int, unsigned int>()
-        .method(&MultiIndexLimiter::Dimension::operator())
-    ;
-
-    // Anisotropic
-    mod.add_type<MultiIndexLimiter::Anisotropic>("Anisotropic")
-        .constructor<std::vector<double> const&, double>()
-        .method(&MultiIndexLimiter::Anisotropic::operator())
-    ;
-
-    // MaxDegree
-    mod.add_type<MultiIndexLimiter::MaxDegree>("MaxDegree")
-        .constructor<unsigned int, unsigned int>()
-        .method(&MultiIndexLimiter::MaxDegree::operator())
-    ;
-
-    // None
-    mod.add_type<MultiIndexLimiter::None>("NoneLim")
-        .constructor<>()
-        .method(&MultiIndexLimiter::None::operator())
-    ;
-
-    // And
-    // mod.add_type<MultiIndexLimiter::And>("And")
-    //     .constructor<std::function<bool(MultiIndex const&)>,std::function<bool(MultiIndex const&)>>()
-    //     .method(&MultiIndexLimiter::And::operator())
-    // ;
-
-    // Or
-    // mod.add_type<MultiIndexLimiter::Or>("Or")
-    //     .constructor<std::function<bool(MultiIndex const&)>,std::function<bool(MultiIndex const&)>>()
-    //     .method(&MultiIndexLimiter::Or::operator())
-    // ;
-
-    // Xor
-    // mod.add_type<MultiIndexLimiter::Xor>("Xor")
-    //     .constructor<std::function<bool(MultiIndex const&)>,std::function<bool(MultiIndex const&)>>()
-    //     .method(&MultiIndexLimiter::Xor::operator())
-    // ;
 
     mod.set_override_module(jl_base_module);
     mod.method("sum", [](MultiIndex const& idx){ return idx.Sum(); });

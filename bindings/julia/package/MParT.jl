@@ -7,4 +7,8 @@ module MParT
         @initcxx
         Initialize()
     end
+
+    export SetCoeffs, MapOptions, MultiIndexSet,
+           Fix, CoeffMap, LogDeterminant, CreateComponent,
+           Evaluate, to_base
 end
