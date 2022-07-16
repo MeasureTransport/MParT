@@ -8,7 +8,6 @@
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/TriangularMap.h"
 #include <Eigen/Dense>
-#include "mexplus_eigen.h"
 
 
 #include <chrono>
