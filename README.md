@@ -42,9 +42,7 @@ cd build
 cmake                                        \
   -DCMAKE_INSTALL_PREFIX=<your/install/path> \
   -DPYTHON_EXECUTABLE=`which python`         \
-  -DCMAKE_BUILD_TYPE=Release                 \
   -DCMAKE_OSX_ARCHITECTURES=x86_64           \
-  -DMatlab_MEX_EXTENSION="mexmaci64"         \
   -DKokkos_ENABLE_PTHREAD=ON                 \
   -DKokkos_ENABLE_SERIAL=ON                  \
 ..

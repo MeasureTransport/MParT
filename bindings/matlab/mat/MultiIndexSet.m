@@ -43,6 +43,53 @@ methods
     result = MParT_('MultiIndexSet_MaxOrders', this.id_);
   end
 
+  function result = Size(this)
+    result = MParT_('MultiIndexSet_Size', this.id_);
+  end  
+
+  function result = Expand(this,activeInd)
+    %-1 to keep consitent with matlab ordering
+    result = MParT_('MultiIndexSet_Expand',this.id_,activeInd-1); 
+  end  
+
+  function result = ForciblyExpand(this,activeInd)
+    %-1 to keep consitent with matlab ordering
+    result = MParT_('MultiIndexSet_ForciblyExpand',this.id_,activeInd-1);
+  end  
+
+  function result = Frontier(this)
+    result = MParT_('MultiIndexSet_Frontier',this.id_);
+  end  
+
+  function result = StrictFrontier(this)
+    result = MParT_('MultiIndexSet_StrictFrontier',this.id_);
+  end  
+
+  function result = BackwardNeighbors(this,activeIndex)
+    %-1 to keep consitent with matlab ordering
+    result = MParT_('MultiIndexSet_BackwardNeighbors',this.id_,activeIndex-1);
+  end  
+
+  function result = IsExpandable(this,activeIndex)
+    %-1 to keep consitent with matlab ordering
+    result = MParT_('MultiIndexSet_IsExpandable',this.id_,activeIndex-1);
+  end  
+
+  function result = NumActiveForward(this,activeIndex)
+    %-1 to keep consitent with matlab ordering
+    result = MParT_('MultiIndexSet_NumActiveForward',this.id_,activeIndex-1);
+  end  
+
+  function result = NumForward(this,activeIndex)
+    %-1 to keep consitent with matlab ordering
+    result = MParT_('MultiIndexSet_NumForward',this.id_,activeIndex-1);
+  end  
+
+  function Visualize(this)
+    MParT_('MultiIndexSet_Visualize',this.id_);
+  end  
+
+
   function result = get_id(this)
     result = this.id_;
   end
