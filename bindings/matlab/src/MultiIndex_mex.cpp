@@ -33,8 +33,8 @@ MEX_DEFINE(MultiIndex_newEigen) (int nlhs, mxArray* plhs[],
 
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
-  const auto multi = input.get<Eigen::MatrixXd>(0);
-  output.set(0, Session<MultiIndex>::create(new MultiIndex(multi.cast<int>())));
+  const auto mult = input.get<Eigen::MatrixXd>(0);
+  output.set(0, Session<MultiIndex>::create(new MultiIndex(mult.cast<int>())));
 }
 
 // Defines MEX API for delete.
@@ -45,12 +45,47 @@ MEX_DEFINE(MultiIndex_delete) (int nlhs, mxArray* plhs[],
   Session<MultiIndex>::destroy(input.get(0));
 }
 
+MEX_DEFINE(MultiIndex_Vector) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  output.set(0, multi.Vector());
+}
+
+MEX_DEFINE(MultiIndex_Sum) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  output.set(0, multi.Sum());
+}
+
+MEX_DEFINE(MultiIndex_Max) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  output.set(0, multi.Max());
+}
+
+MEX_DEFINE(MultiIndex_Set) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 3);
+  OutputArguments output(nlhs, plhs, 1);
+  MultiIndex *multi = Session<MultiIndex>::get(input.get(0));
+  unsigned int ind = input.get<unsigned int>(1);
+  unsigned int val = input.get<unsigned int>(2);
+  output.set(0, multi->Set(ind,val));
+}
+
+
 MEX_DEFINE(MultiIndex_String) (int nlhs, mxArray* plhs[],
                                   int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
-  const MultiIndex& mset = Session<MultiIndex>::getConst(input.get(0));
-  output.set(0, mset.String());
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  output.set(0, multi.String());
 }
 
 

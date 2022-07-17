@@ -37,6 +37,22 @@ methods
     MParT_('MultiIndex_delete', this.id_);
   end
 
+  function result = Vector(this)
+    result = MParT_('MultiIndex_Vector', this.id_);
+  end
+
+  function result = Sum(this)
+    result = MParT_('MultiIndex_Sum', this.id_);
+  end
+
+  function result = Max(this)
+    result = MParT_('MultiIndex_Max', this.id_);
+  end
+
+  function result = Set(this,ind,val)
+    result = MParT_('MultiIndex_Set', this.id_,ind-1,val);
+  end
+
   function result = String(this)
     result = MParT_('MultiIndex_String', this.id_);
   end
