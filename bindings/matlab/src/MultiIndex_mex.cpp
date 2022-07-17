@@ -121,6 +121,50 @@ MEX_DEFINE(MultiIndex_Eq) (int nlhs, mxArray* plhs[],
   output.set(0, multi==multi2);
 }
 
+MEX_DEFINE(MultiIndex_Ne) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  const MultiIndex& multi2 = Session<MultiIndex>::getConst(input.get(1));
+  output.set(0, multi!=multi2);
+}
+
+MEX_DEFINE(MultiIndex_Lt) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  const MultiIndex& multi2 = Session<MultiIndex>::getConst(input.get(1));
+  output.set(0, multi<multi2);
+}
+
+MEX_DEFINE(MultiIndex_Gt) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  const MultiIndex& multi2 = Session<MultiIndex>::getConst(input.get(1));
+  output.set(0, multi>multi2);
+}
+
+MEX_DEFINE(MultiIndex_Ge) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  const MultiIndex& multi2 = Session<MultiIndex>::getConst(input.get(1));
+  output.set(0, multi>=multi2);
+}
+
+MEX_DEFINE(MultiIndex_Le) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  const MultiIndex& multi2 = Session<MultiIndex>::getConst(input.get(1));
+  output.set(0, multi<=multi2);
+}
 
 
 

@@ -69,8 +69,34 @@ methods
     result = MParT_('MultiIndex_Length', this.id_);
   end
 
-  function result = compare(this,multi)
+ % == operator
+  function result = eq(this,multi)
     result = MParT_('MultiIndex_Eq',this.id_,multi.get_id());
+  end
+
+  % ~= operator
+  function result = ne(this,multi)
+    result = MParT_('MultiIndex_Ne',this.id_,multi.get_id());
+  end
+
+  % < operator
+  function result = lt(this,multi)
+    result = MParT_('MultiIndex_Lt',this.id_,multi.get_id());
+  end
+
+  % > operator
+  function result = gt(this,multi)
+    result = MParT_('MultiIndex_Gt',this.id_,multi.get_id());
+  end
+
+  % >= operator
+  function result = Ge(this,multi)
+    result = MParT_('MultiIndex_Ge',this.id_,multi.get_id());
+  end
+
+  % <= operator
+  function result = Le(this,multi)
+    result = MParT_('MultiIndex_Le',this.id_,multi.get_id());
   end
 
   function result = get_id(this)
