@@ -79,6 +79,22 @@ MEX_DEFINE(MultiIndex_Set) (int nlhs, mxArray* plhs[],
   output.set(0, multi->Set(ind,val));
 }
 
+MEX_DEFINE(MultiIndex_Get) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  unsigned int ind = input.get<unsigned int>(1);
+  output.set(0, multi.Get(ind));
+}
+
+MEX_DEFINE(MultiIndex_NumNz) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  output.set(0, multi.NumNz());
+}
 
 MEX_DEFINE(MultiIndex_String) (int nlhs, mxArray* plhs[],
                                   int nrhs, const mxArray* prhs[]) {
@@ -87,6 +103,25 @@ MEX_DEFINE(MultiIndex_String) (int nlhs, mxArray* plhs[],
   const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
   output.set(0, multi.String());
 }
+
+MEX_DEFINE(MultiIndex_Length) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  output.set(0, multi.Length());
+}
+
+MEX_DEFINE(MultiIndex_Eq) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  const MultiIndex& multi2 = Session<MultiIndex>::getConst(input.get(1));
+  output.set(0, multi==multi2);
+}
+
+
 
 
 } // namespace

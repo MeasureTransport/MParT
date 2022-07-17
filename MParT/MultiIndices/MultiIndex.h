@@ -85,7 +85,7 @@ public:
     */
     bool Set(unsigned int ind, unsigned int val);
 
-    /** Obtain the a particular component of the multiindex.  Notice that this function can be slow for multiindices with many nonzero components.  The worst case performance requires \f$O(|\mathbf{j}|_0)\f$ integer comparisons, where \f$|\mathbf{j}|_0\f$ denotes the number of nonzero entries in the multiindex.
+    /** Obtain a particular component of the multiindex.  Notice that this function can be slow for multiindices with many nonzero components.  The worst case performance requires \f$O(|\mathbf{j}|_0)\f$ integer comparisons, where \f$|\mathbf{j}|_0\f$ denotes the number of nonzero entries in the multiindex.
     @param[in] ind The component to return.
     @return The integer stored in component dim of the multiindex.
     */

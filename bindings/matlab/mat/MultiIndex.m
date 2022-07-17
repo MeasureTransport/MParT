@@ -53,8 +53,28 @@ methods
     result = MParT_('MultiIndex_Set', this.id_,ind-1,val);
   end
 
+  function result = Get(this,ind)
+    result = MParT_('MultiIndex_Get', this.id_,ind-1);
+  end
+
+  function result = NumNz(this)
+    result = MParT_('MultiIndex_NumNz', this.id_);
+  end
+
   function result = String(this)
     result = MParT_('MultiIndex_String', this.id_);
+  end
+
+  function result = Length(this)
+    result = MParT_('MultiIndex_Length', this.id_);
+  end
+
+  function result = compare(this,multi)
+    result = MParT_('MultiIndex_Eq',this.id_,multi.get_id());
+  end
+
+  function result = get_id(this)
+    result = this.id_;
   end
 
   
