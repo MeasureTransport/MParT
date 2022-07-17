@@ -15,5 +15,7 @@ MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0))
 output.set(0, mset->ForciblyExpand(activeIndex))
 ```
 
+# MapOption
+
 
 # id_
