@@ -105,14 +105,33 @@ methods
     result = MParT_('MultiIndexSet_AddActive',this.id_,multi.get_id()); 
   end
 
-  function result = Expand(this,activeInd)
-    %-1 to keep consitent with matlab ordering
-    result = MParT_('MultiIndexSet_Expand',this.id_,activeInd-1); 
+  function result = Expand(this,varargin)
+    if(nargin == 2)
+      %-1 to keep consitent with matlab ordering
+      result = MParT_('MultiIndexSet_Expand',this.id_,varargin{1}-1);
+    elseif(nargin == 1)
+      result = MParT_('MultiIndexSet_ExpandAny',this.id_);
+    else
+      error('Wrong number of inputs') 
+    end
   end  
 
   function result = ForciblyExpand(this,activeInd)
     %-1 to keep consitent with matlab ordering
     result = MParT_('MultiIndexSet_ForciblyExpand',this.id_,activeInd-1);
+  end
+
+  function result = ForciblyActivate(this,multi)
+    result = MParT_('MultiIndexSet_ForciblyActivate',this.id_,multi.get_id());
+  end  
+
+  function listMultis = AdmissibleForwardNeighbors(this,activeInd)
+    %-1 to keep consistent with matlab ordering
+    multi_ids = MParT_('MultiIndexSet_AdmissibleFowardNeighbors',this.id_,activeInd-1);
+    listMultis = [];
+    for i = 1:length(multi_ids)
+      listMultis=[listMultis,MultiIndex(multi_ids(i),'id')];
+    end
   end  
 
   function result = Frontier(this)

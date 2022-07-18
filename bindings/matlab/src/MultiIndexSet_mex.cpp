@@ -147,7 +147,7 @@ MEX_DEFINE(MultiIndexSet_AddActive) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 1);
   MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
   const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(1));
-  mset->AddActive(multi);
+  output.set(0,mset->AddActive(multi));
 }
 
 MEX_DEFINE(MultiIndexSet_Expand) (int nlhs, mxArray* plhs[],
@@ -159,6 +159,14 @@ MEX_DEFINE(MultiIndexSet_Expand) (int nlhs, mxArray* plhs[],
   output.set(0, mset->Expand(activeInd));
 }
 
+// MEX_DEFINE(MultiIndexSet_ExpandAny) (int nlhs, mxArray* plhs[],
+//                     int nrhs, const mxArray* prhs[]) {
+//   InputArguments input(nrhs, prhs, 1);
+//   OutputArguments output(nlhs, plhs, 0);
+//   MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+//   output.set(0, mset->Expand());
+// }
+
 MEX_DEFINE(MultiIndexSet_ForciblyExpand) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
@@ -167,6 +175,31 @@ MEX_DEFINE(MultiIndexSet_ForciblyExpand) (int nlhs, mxArray* plhs[],
   const unsigned int activeIndex = input.get<unsigned int>(1);
   output.set(0, mset->ForciblyExpand(activeIndex));
 }
+
+MEX_DEFINE(MultiIndexSet_ForciblyActivate) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(1));
+  output.set(0,mset->ForciblyActivate(multi));
+}
+
+MEX_DEFINE(MultiIndexSet_AdmissibleFowardNeighbors) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  unsigned int activeIndex = input.get<unsigned int>(1);
+  std::vector<MultiIndex> vecMultiIndex = mset->AdmissibleForwardNeighbors(activeIndex);
+  OutputArguments output(nlhs, plhs, 1);
+  std::vector<intptr_t> multi_ids(vecMultiIndex.size());
+  for (int i=0; i<vecMultiIndex.size();i++){
+    multi_ids[i] =  Session<MultiIndex>::create(new MultiIndex(vecMultiIndex[i]));
+  }
+  output.set(0,multi_ids);
+
+}
+
 
 MEX_DEFINE(MultiIndexSet_Frontier) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
