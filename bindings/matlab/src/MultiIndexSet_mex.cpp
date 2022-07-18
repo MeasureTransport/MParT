@@ -197,9 +197,7 @@ MEX_DEFINE(MultiIndexSet_AdmissibleFowardNeighbors) (int nlhs, mxArray* plhs[],
     multi_ids[i] =  Session<MultiIndex>::create(new MultiIndex(vecMultiIndex[i]));
   }
   output.set(0,multi_ids);
-
 }
-
 
 MEX_DEFINE(MultiIndexSet_Frontier) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
@@ -207,6 +205,32 @@ MEX_DEFINE(MultiIndexSet_Frontier) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   output.set(0, mset.Frontier());
+}
+
+MEX_DEFINE(MultiIndexSet_Margin) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  std::vector<MultiIndex> vecMultiIndex = mset->Margin();
+  std::vector<intptr_t> multi_ids(vecMultiIndex.size());
+  for (int i=0; i<vecMultiIndex.size();i++){
+    multi_ids[i] =  Session<MultiIndex>::create(new MultiIndex(vecMultiIndex[i]));
+  }
+  output.set(0,multi_ids);
+}
+
+MEX_DEFINE(MultiIndexSet_ReducedMargin) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  std::vector<MultiIndex> vecMultiIndex = mset->ReducedMargin();
+  std::vector<intptr_t> multi_ids(vecMultiIndex.size());
+  for (int i=0; i<vecMultiIndex.size();i++){
+    multi_ids[i] =  Session<MultiIndex>::create(new MultiIndex(vecMultiIndex[i]));
+  }
+  output.set(0,multi_ids);
 }
 
 MEX_DEFINE(MultiIndexSet_StrictFrontier) (int nlhs, mxArray* plhs[],
@@ -226,6 +250,15 @@ MEX_DEFINE(MultiIndexSet_BackwardNeighbors) (int nlhs, mxArray* plhs[],
   output.set(0, mset.BackwardNeighbors(activeIndex));
 }
 
+MEX_DEFINE(MultiIndexSet_IsAdmissible) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(1));
+  output.set(0, mset.IsAdmissible(multi));
+}
+
 MEX_DEFINE(MultiIndexSet_IsExpandable) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
@@ -233,6 +266,15 @@ MEX_DEFINE(MultiIndexSet_IsExpandable) (int nlhs, mxArray* plhs[],
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   unsigned int activeIndex = input.get<unsigned int>(1);
   output.set(0, mset.IsExpandable(activeIndex));
+}
+
+MEX_DEFINE(MultiIndexSet_IsActive) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(1));
+  output.set(0, mset.IsActive(multi));
 }
 
 MEX_DEFINE(MultiIndexSet_NumActiveForward) (int nlhs, mxArray* plhs[],

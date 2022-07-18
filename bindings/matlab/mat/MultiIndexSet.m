@@ -136,6 +136,24 @@ methods
 
   function result = Frontier(this)
     result = MParT_('MultiIndexSet_Frontier',this.id_);
+  end
+
+  function listMultis = Margin(this)
+    %-1 to keep consistent with matlab ordering
+    multi_ids = MParT_('MultiIndexSet_Margin',this.id_);
+    listMultis = [];
+    for i = 1:length(multi_ids)
+      listMultis=[listMultis,MultiIndex(multi_ids(i),'id')];
+    end
+  end
+
+  function listMultis = ReducedMargin(this)
+    %-1 to keep consistent with matlab ordering
+    multi_ids = MParT_('MultiIndexSet_ReducedMargin',this.id_);
+    listMultis = [];
+    for i = 1:length(multi_ids)
+      listMultis=[listMultis,MultiIndex(multi_ids(i),'id')];
+    end
   end  
 
   function result = StrictFrontier(this)
@@ -145,12 +163,20 @@ methods
   function result = BackwardNeighbors(this,activeIndex)
     %-1 to keep consitent with matlab ordering
     result = MParT_('MultiIndexSet_BackwardNeighbors',this.id_,activeIndex-1);
-  end  
+  end
+
+  function result = IsAdmissible(this,multi)
+    result = MParT_('MultiIndexSet_IsAdmissible',this.id_,multi.get_id());
+  end    
 
   function result = IsExpandable(this,activeIndex)
     %-1 to keep consitent with matlab ordering
     result = MParT_('MultiIndexSet_IsExpandable',this.id_,activeIndex-1);
-  end  
+  end
+
+  function result = IsActive(this,multi)
+    result = MParT_('MultiIndexSet_IsActive',this.id_,multi.get_id());
+  end    
 
   function result = NumActiveForward(this,activeIndex)
     %-1 to keep consitent with matlab ordering
