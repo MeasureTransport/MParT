@@ -19,13 +19,30 @@
 #include "CommonJuliaUtilities.h"
 
 namespace jlcxx {
-  template<> struct IsMirroredType<mpart::MultiIndexLimiter::None> : std::false_type { };
-  template<> struct SuperType<mpart::ConditionalMapBase<Kokkos::HostSpace>> {typedef mpart::ParameterizedFunctionBase<Kokkos::HostSpace> type;};
+    template<> struct IsMirroredType<mpart::MultiIndexLimiter::None> : std::false_type { };
+    // template<> struct SuperType<mpart::ConditionalMapBase<Kokkos::HostSpace>> {typedef mpart::ParameterizedFunctionBase<Kokkos::HostSpace> type;};
+    
+    
 }
+
 namespace mpart {
-    // StridedVector<double, Kokkos::HostSpace> logDetFcn(ConditionalMapBase<Kokkos::HostSpace> &map, StridedMatrix<double, Kokkos::HostSpace> &pts) {
-    //     auto out_vec = map.LogDeterminant(pts_mat);
-    //     return jlcxx::make_julia_array(out_vec.data(), out_vec.size());
+    // struct ParameterizedFunctionBaseHost {
+    //     pfb::ParameterizedFunctionBase<Kokkos::HostSpace>;
+    // };
+
+    // struct ConditionalMapBaseHost {
+    //     cmb::ConditionalMapBase<Kokkos::HostSpace>;
+    // };
+
+    // using PFBH = ParameterizedFunctionBase<Kokkos::HostSpace>;
+    // using CMBH = ConditionalMapBase<Kokkos::HostSpace>;
+
+    // struct PFBH {
+    //     ParameterizedFunctionBase<Kokkos::HostSpace> pfb;
+    // };
+
+    // struct CMBH {
+    //     ConditionalMapBase<Kokkos::HostSpace> cmb;
     // }
 
     jlcxx::ArrayRef<double> evaluateFcn(ParameterizedFunctionBase<Kokkos::HostSpace> &pfb, StridedMatrix<double, Kokkos::HostSpace> &pts) {
@@ -84,53 +101,94 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
     });
 
     // ParameterizedFunctionBase
-    mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("ParameterizedFunctionBase")
-        .apply<ParameterizedFunctionBase<Kokkos::HostSpace>>([](auto wrapped) {
-            typedef typename decltype(wrapped)::type WrappedT;
-            // typedef typename WrappedT::fake_val fake_val;
-            wrapped.method("CoeffMap", [](WrappedT &w){ return KokkosToJulia(w.Coeffs()); });
-            wrapped.method("SetCoeffs", [](WrappedT &w, jlcxx::ArrayRef<double> &v){ w.SetCoeffs(JuliaToKokkos(v)); });
-            wrapped.method("Evaluate", [](WrappedT &w, jlcxx::ArrayRef<double,2> &pts){ return KokkosToJulia(w.Evaluate(JuliaToKokkos(pts))); });
-            // wrapped.method("CoeffGrad", [](WrappedT& pfb, std::vector<double> pts, std::vector<double> sens) {
-            //     auto sz = pts.size();
-            //     int n_inp = pfb.inputDim;
-            //     int n_pts = sz / n_inp;
-            //     Kokkos::View<const double**, Kokkos::HostSpace> view_pts = ToKokkos(pts.data(), n_pts, n_inp);
-            //     Kokkos::View<const double**, Kokkos::HostSpace> view_sens = ToKokkos(sens.data(), n_pts, n_inp);
-            //     auto output = pfb.CoeffGrad(view_pts, view_sens);
-            //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
-            // });
-            wrapped.method("numCoeffs", [](WrappedT& pfb) { return pfb.numCoeffs; });
-            wrapped.method("inputDim", [](WrappedT& pfb) { return pfb.inputDim; });
-            wrapped.method("outputDim", [](WrappedT& pfb) { return pfb.outputDim; });
-        });
+    // mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("ParameterizedFunctionBase")
+    //     .apply<ParameterizedFunctionBase<Kokkos::HostSpace>>([](auto wrapped) {
+    //         typedef typename decltype(wrapped)::type WrappedT;
+    //         // typedef typename WrappedT::fake_val fake_val;
+    //         wrapped.method("CoeffMap", [](WrappedT &w){ return KokkosToJulia(w.Coeffs()); });
+    //         wrapped.method("SetCoeffs", [](WrappedT &w, jlcxx::ArrayRef<double> &v){ w.SetCoeffs(JuliaToKokkos(v)); });
+    //         wrapped.method("Evaluate", [](WrappedT &w, jlcxx::ArrayRef<double,2> &pts){ return KokkosToJulia(w.Evaluate(JuliaToKokkos(pts))); });
+    //         // wrapped.method("CoeffGrad", [](WrappedT& pfb, std::vector<double> pts, std::vector<double> sens) {
+    //         //     auto sz = pts.size();
+    //         //     int n_inp = pfb.inputDim;
+    //         //     int n_pts = sz / n_inp;
+    //         //     Kokkos::View<const double**, Kokkos::HostSpace> view_pts = ToKokkos(pts.data(), n_pts, n_inp);
+    //         //     Kokkos::View<const double**, Kokkos::HostSpace> view_sens = ToKokkos(sens.data(), n_pts, n_inp);
+    //         //     auto output = pfb.CoeffGrad(view_pts, view_sens);
+    //         //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
+    //         // });
+    //         wrapped.method("numCoeffs", [](WrappedT& pfb) { return pfb.numCoeffs; });
+    //         wrapped.method("inputDim", [](WrappedT& pfb) { return pfb.inputDim; });
+    //         wrapped.method("outputDim", [](WrappedT& pfb) { return pfb.outputDim; });
+    //     });
 
+    // When CMBH and PFBH are just `using` statements
+    // mod.add_type<PFBH>("ParameterizedFunctionBase")
+    //     .method("CoeffMap", [](PFBH &f){ return KokkosToJulia(f.Coeffs()); })
+    //     .method("SetCoeffs", [](PFBH &f, jlcxx::ArrayRef<double> &v){ f.SetCoeffs(JuliaToKokkos(v)); })
+    //     .method("Evaluate", [](PFBH &f, jlcxx::ArrayRef<double,2> &pts){ return KokkosToJulia(f.Evaluate(JuliaToKokkos(pts))); })
+    // ;
+    // mod.add_type<CMBH>("ConditionalMapBase")
+    //     .method("LogDeterminant", [](CMBH &map, jlcxx::ArrayRef<double,2> &pts){ return KokkosToJulia(map.LogDeterminant(JuliaToKokkos(pts))); })
+    //     .method("to_base", [](std::shared_ptr<CMBH> &ptr){ return std::static_pointer_cast<ParameterizedFunctionBase<Kokkos::HostSpace>>(ptr); })
+    // ;
+
+    // ParameterizedFunctionBase
+    mod.add_type<ParameterizedFunctionBase<Kokkos::HostSpace>>("ParameterizedFunctionBase")
+        .method("CoeffMap", [](ParameterizedFunctionBase<Kokkos::HostSpace> &w){ return KokkosToJulia(w.Coeffs()); })
+        .method("SetCoeffs", [](ParameterizedFunctionBase<Kokkos::HostSpace> &w, jlcxx::ArrayRef<double> v){ w.SetCoeffs(JuliaToKokkos(v)); })
+        .method("Evaluate", [](ParameterizedFunctionBase<Kokkos::HostSpace> &w, jlcxx::ArrayRef<double,2> pts){ return KokkosToJulia(w.Evaluate(JuliaToKokkos(pts))); })
+        .method("numCoeffs", [](ParameterizedFunctionBase<Kokkos::HostSpace>& pfb) { return pfb.numCoeffs; })
+        .method("inputDim", [](ParameterizedFunctionBase<Kokkos::HostSpace>& pfb) { return pfb.inputDim; })
+        .method("outputDim", [](ParameterizedFunctionBase<Kokkos::HostSpace>& pfb) { return pfb.outputDim; });
+
+    mod.add_type<ConditionalMapBase<Kokkos::HostSpace>>("ConditionalMapBase")
+        .method("CoeffMap", [](ConditionalMapBase<Kokkos::HostSpace> &w){ return KokkosToJulia(w.Coeffs()); })
+        .method("SetCoeffs", [](ConditionalMapBase<Kokkos::HostSpace> &w, jlcxx::ArrayRef<double> v){ w.SetCoeffs(JuliaToKokkos(v)); })
+        .method("Evaluate", [](ConditionalMapBase<Kokkos::HostSpace> &map, jlcxx::ArrayRef<double,2> pts){
+            unsigned int numPts = size(pts,1);
+            unsigned int outDim = map.outputDim;
+            jlcxx::ArrayRef<double,2> output = jlMalloc<double>(outDim, numPts);
+            map.EvaluateImpl(JuliaToKokkos(pts), JuliaToKokkos(output));
+            return output;
+        })
+        .method("LogDeterminant", [](ConditionalMapBase<Kokkos::HostSpace>& map, jlcxx::ArrayRef<double,2> pts){
+            unsigned int numPts = size(pts,1);
+            jlcxx::ArrayRef<double> output = jlMalloc<double>(numPts);
+            map.LogDeterminantImpl(JuliaToKokkos(pts), JuliaToKokkos(output));
+            return output;
+        })
+        .method("GetBaseFunction", &ConditionalMapBase<Kokkos::HostSpace>::GetBaseFunction)
+        .method("numCoeffs", [](ConditionalMapBase<Kokkos::HostSpace>& pfb) { return pfb.numCoeffs; })
+        .method("inputDim", [](ConditionalMapBase<Kokkos::HostSpace>& pfb) { return pfb.inputDim; })
+        .method("outputDim", [](ConditionalMapBase<Kokkos::HostSpace>& pfb) { return pfb.outputDim; });
+    
     // ConditionalMapBase
-    mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("ConditionalMapBase")
-        .apply<ConditionalMapBase<Kokkos::HostSpace>>([](auto wrapped) {
-            typedef typename decltype(wrapped)::type WrappedT;
-            // typedef typename WrappedT::fake_value fake_value;
-            wrapped.method("LogDeterminant", [](WrappedT& cmb, jlcxx::ArrayRef<double,2> &pts){ return KokkosToJulia(cmb.LogDeterminant(JuliaToKokkos(pts))); });
-            wrapped.method("to_base", [] (std::shared_ptr<WrappedT> w) { return std::static_pointer_cast<ParameterizedFunctionBase<Kokkos::HostSpace>>(w); });
-            // wrapped.method("Inverse", [](WrappedT &map, std::vector<double> x1, std::vector<double> r) {
-            //     auto x1_sz = x1.size();
-            //     int n_inp = map.inputDim;
-            //     int n_pts = x1_sz / n_inp;
-            //     auto view_x1 = ToKokkos(x1.data(), n_pts, n_inp);
-            //     auto view_r = ToKokkos(r.data(), n_pts, n_inp);
-            //     auto output = map.Inverse(view_x1, view_r);
-            //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
-            // });
-            // wrapped.method("LogDeterminantCoeffGrad", [](WrappedT &map, std::vector<double> pts) {
-            //     auto sz = pts.size();
-            //     int n_inp = map.inputDim;
-            //     int n_pts = sz / n_inp;
-            //     auto view = ToKokkos(pts.data(), n_pts, n_inp);
-            //     auto output = map.LogDeterminantCoeffGrad(view);
-            //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
-            // });
-            wrapped.method("GetBaseFunction", &WrappedT::GetBaseFunction);
-    });
+    // mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("ConditionalMapBase")
+    //     .apply<ConditionalMapBase<Kokkos::HostSpace>>([](auto wrapped) {
+    //         typedef typename decltype(wrapped)::type WrappedT;
+    //         // typedef typename WrappedT::fake_value fake_value;
+    //         wrapped.method("LogDeterminant", [](WrappedT& cmb, jlcxx::ArrayRef<double,2> &pts){ return KokkosToJulia(cmb.LogDeterminant(JuliaToKokkos(pts))); });
+    //         wrapped.method("to_base", [] (std::shared_ptr<WrappedT> w) { return std::static_pointer_cast<ParameterizedFunctionBase<Kokkos::HostSpace>>(w); });
+    //         // wrapped.method("Inverse", [](WrappedT &map, std::vector<double> x1, std::vector<double> r) {
+    //         //     auto x1_sz = x1.size();
+    //         //     int n_inp = map.inputDim;
+    //         //     int n_pts = x1_sz / n_inp;
+    //         //     auto view_x1 = ToKokkos(x1.data(), n_pts, n_inp);
+    //         //     auto view_r = ToKokkos(r.data(), n_pts, n_inp);
+    //         //     auto output = map.Inverse(view_x1, view_r);
+    //         //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
+    //         // });
+    //         // wrapped.method("LogDeterminantCoeffGrad", [](WrappedT &map, std::vector<double> pts) {
+    //         //     auto sz = pts.size();
+    //         //     int n_inp = map.inputDim;
+    //         //     int n_pts = sz / n_inp;
+    //         //     auto view = ToKokkos(pts.data(), n_pts, n_inp);
+    //         //     auto output = map.LogDeterminantCoeffGrad(view);
+    //         //     return jlcxx::make_julia_array(output.data(), output.extent(0), output.extent(1));
+    //         // });
+    //         wrapped.method("GetBaseFunction", &WrappedT::GetBaseFunction);
+    // });
 
     mod.add_type<MultiIndexSet>("MultiIndexSet")
         .constructor<const unsigned int>()
