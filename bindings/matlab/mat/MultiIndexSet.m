@@ -83,6 +83,21 @@ methods
     result = MParT_('MultiIndexSet_Size', this.id_);
   end  
 
+  function result = plus(this,toAdd)
+    if strcmp(class(toAdd),'MultiIndexSet')
+      MParT_('MultiIndexSet_addMultiIndexSet',this.id_,toAdd.get_id());
+    elseif strcmp(class(toAdd),'MultiIndex')
+      MParT_('MultiIndexSet_addMultiIndex',this.id_,toAdd.get_id());
+    else
+      error('Unrecognized type to add to MultiIndexSet')
+    end
+  end  
+
+  function result = Union(this,mset)
+    %-1 to keep consitent with matlab ordering
+    result = MParT_('MultiIndexSet_Union',this.id_,mset.get_id()); 
+  end  
+
   function result = Expand(this,activeInd)
     %-1 to keep consitent with matlab ordering
     result = MParT_('MultiIndexSet_Expand',this.id_,activeInd-1); 

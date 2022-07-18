@@ -105,6 +105,34 @@ MEX_DEFINE(MultiIndexSet_Size) (int nlhs, mxArray* plhs[],
   output.set(0, mset.Size());
 }
 
+MEX_DEFINE(MultiIndexSet_addMultiIndexSet) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 0);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  const MultiIndexSet& msetToAdd = Session<MultiIndexSet>::getConst(input.get(1));
+  (*mset)+=msetToAdd;
+}
+
+MEX_DEFINE(MultiIndexSet_addMultiIndex) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 0);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  const MultiIndex& multiToAdd = Session<MultiIndex>::getConst(input.get(1));
+  (*mset)+=multiToAdd;
+}
+
+MEX_DEFINE(MultiIndexSet_Union) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  const MultiIndexSet& rhs = Session<MultiIndexSet>::getConst(input.get(1));
+  output.set(0, mset->Union(rhs));
+}
+
+
 MEX_DEFINE(MultiIndexSet_Expand) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);

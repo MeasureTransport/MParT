@@ -170,7 +170,7 @@ MultiIndexSet set(length, limiter);
             already in the set and if the input function is unique, it is
             added to the set.
     @param[in] rhs The MultiIndex we want to add to the set.
-    @return A reference to this MultiIndex set, which may now contain the new
+    @return A reference to this MultiIndex, which may now contain the new
             MultiIndex in rhs.
     */
   MultiIndexSet& operator+=(MultiIndex const& rhs);
