@@ -132,6 +132,23 @@ MEX_DEFINE(MultiIndexSet_Union) (int nlhs, mxArray* plhs[],
   output.set(0, mset->Union(rhs));
 }
 
+MEX_DEFINE(MultiIndexSet_Activate) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 0);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(1));
+  mset->Activate(multi);
+}
+
+MEX_DEFINE(MultiIndexSet_AddActive) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(1));
+  mset->AddActive(multi);
+}
 
 MEX_DEFINE(MultiIndexSet_Expand) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {

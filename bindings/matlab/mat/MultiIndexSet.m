@@ -94,9 +94,16 @@ methods
   end  
 
   function result = Union(this,mset)
-    %-1 to keep consitent with matlab ordering
     result = MParT_('MultiIndexSet_Union',this.id_,mset.get_id()); 
-  end  
+  end
+
+  function Activate(this,multi)
+    MParT_('MultiIndexSet_Activate',this.id_,multi.get_id()); 
+  end
+
+  function result = AddActive(this,multi)
+    result = MParT_('MultiIndexSet_AddActive',this.id_,multi.get_id()); 
+  end
 
   function result = Expand(this,activeInd)
     %-1 to keep consitent with matlab ordering
