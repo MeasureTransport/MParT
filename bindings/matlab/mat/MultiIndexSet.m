@@ -39,8 +39,44 @@ methods
     MParT_('MultiIndexSet_delete', this.id_);
   end
 
+  function multi = IndexToMulti(this,activeIndex)
+    multi_id = MParT_('MultiIndexSet_IndexToMulti',this.id_,activeIndex-1);
+    multi = MultiIndex(multi_id,'id');
+  end
+
+  function result = MultiToIndex(this,multi)
+    result= MParT_('MultiIndexSet_MultiToIndex',this.id_,multi.get_id());
+    result = result + 1;
+  end
+
+  function result = Length(this)
+    result = MParT_('MultiIndexSet_Length', this.id_);
+  end
+
   function result = MaxOrders(this)
     result = MParT_('MultiIndexSet_MaxOrders', this.id_);
+  end
+
+  function multi = at(this,activeIndex)
+    multi_id = MParT_('MultiIndexSet_at', this.id_,activeIndex-1);
+    multi = MultiIndex(multi_id,'id');
+  end
+
+  function varargout = subsref(this,s) %seems dangerous
+        switch s(1).type
+        case '.'
+            % Keep built-in functionality for '.'
+            [varargout{1:nargout}] = builtin('subsref', this, s);
+        case '()'
+            % Keep built-in functionality for '()'
+            [varargout{1:nargout}] = builtin('subsref', this, s);
+        case '{}'
+            activeIndex = s(1).subs{1};
+            multi_id = MParT_('MultiIndexSet_subsref',this.id_,activeIndex-1);
+            [varargout{1:nargout}] = MultiIndex(multi_id,'id');
+        otherwise
+            error('Indexing expression invalid.')
+        end
   end
 
   function result = Size(this)
@@ -89,7 +125,6 @@ methods
     MParT_('MultiIndexSet_Visualize',this.id_);
   end  
 
-
   function result = get_id(this)
     result = this.id_;
   end
@@ -97,6 +132,8 @@ methods
   function fixed_mset = Fix(this)
     fixed_mset = FixedMultiIndexSet(this);
   end
+
+
   
 end
 

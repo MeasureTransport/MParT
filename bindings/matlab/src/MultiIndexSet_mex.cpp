@@ -45,12 +45,56 @@ MEX_DEFINE(MultiIndexSet_delete) (int nlhs, mxArray* plhs[],
   Session<MultiIndexSet>::destroy(input.get(0));
 }
 
+MEX_DEFINE(MultiIndexSet_IndexToMulti) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
+  unsigned int activeIndex = input.get<unsigned int>(1);
+  output.set(0, Session<MultiIndex>::create(new MultiIndex(mset.IndexToMulti(activeIndex))));
+}
+
+MEX_DEFINE(MultiIndexSet_MultiToIndex) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(1));
+  output.set(0,mset.MultiToIndex(multi));
+}
+
+MEX_DEFINE(MultiIndexSet_Length) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
+  output.set(0, mset.Length());
+}
+
 MEX_DEFINE(MultiIndexSet_MaxOrders) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   output.set(0, mset.MaxOrders());
+}
+
+MEX_DEFINE(MultiIndexSet_at) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
+  int activeIndex = input.get<int>(1);
+  output.set(0, Session<MultiIndex>::create(new MultiIndex(mset.at(activeIndex))));
+}
+
+MEX_DEFINE(MultiIndexSet_subsref) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
+  int activeIndex = input.get<int>(1);
+  output.set(0, Session<MultiIndex>::create(new MultiIndex(mset[activeIndex])));
 }
 
 MEX_DEFINE(MultiIndexSet_Size) (int nlhs, mxArray* plhs[],
@@ -138,6 +182,9 @@ MEX_DEFINE(MultiIndexSet_Visualize) (int nlhs, mxArray* plhs[],
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   mset.Visualize();
 }
+
+
+
 
 
 } // namespace

@@ -21,14 +21,14 @@ end
 
 methods
   function this = MultiIndex(varargin)
-    if(nargin==2)
-      this.id_ = MParT_('MultiIndex_newDefault', varargin{1},varargin{2});
-    else
-      if length(varargin{1})==1
-        this.id_ = MParT_('MultiIndex_newDefault', varargin{1},0);
+    if(nargin==2) 
+      if(varargin{2}=='id')
+        this.id_ = varargin{1};
       else
-        this.id_ = MParT_('MultiIndex_newEigen',varargin{1});
+        this.id_ = MParT_('MultiIndex_newDefault', varargin{1},varargin{2});
       end
+    else
+        this.id_ = MParT_('MultiIndex_newEigen',varargin{1});
     end
   end
 

@@ -19,3 +19,5 @@ output.set(0, mset->ForciblyExpand(activeIndex))
 
 
 # id_
+
+# How to pass MParT object as argument of other object methods
