@@ -5,8 +5,8 @@ module MParT
 
     function __init__()
         @initcxx
-        Initialize()
     end
+    Initialize()
 
     # macro __hasHead(x)
         
