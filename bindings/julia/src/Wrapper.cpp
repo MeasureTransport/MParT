@@ -15,6 +15,7 @@
 #include <iostream>
 #include <memory>
 
+#include "JlArrayConversions.h"
 #include "CommonJuliaUtilities.h"
 
 namespace jlcxx {
@@ -87,9 +88,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .apply<ParameterizedFunctionBase<Kokkos::HostSpace>>([](auto wrapped) {
             typedef typename decltype(wrapped)::type WrappedT;
             // typedef typename WrappedT::fake_val fake_val;
-            wrapped.method("Coeffs", [](WrappedT &w){ return w.Coeffs(); });
-            wrapped.method("SetCoeffs", [](WrappedT &w, Kokkos::View<double*, Kokkos::HostSpace> &v){ w.SetCoeffs(v); });
-            wrapped.method("Evaluate", [](WrappedT &w, Kokkos::View<const double**, Kokkos::HostSpace> const& pts){ return w.Evaluate(pts); });
+            wrapped.method("CoeffMap", [](WrappedT &w){ return KokkosToJulia(w.Coeffs()); });
+            wrapped.method("SetCoeffs", [](WrappedT &w, jlcxx::ArrayRef<double> &v){ w.SetCoeffs(JuliaToKokkos(v)); });
+            wrapped.method("Evaluate", [](WrappedT &w, jlcxx::ArrayRef<double,2> &pts){ return KokkosToJulia(w.Evaluate(JuliaToKokkos(pts))); });
             // wrapped.method("CoeffGrad", [](WrappedT& pfb, std::vector<double> pts, std::vector<double> sens) {
             //     auto sz = pts.size();
             //     int n_inp = pfb.inputDim;
@@ -109,7 +110,7 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .apply<ConditionalMapBase<Kokkos::HostSpace>>([](auto wrapped) {
             typedef typename decltype(wrapped)::type WrappedT;
             // typedef typename WrappedT::fake_value fake_value;
-            // wrapped.method("LogDeterminant", [](WrappedT& cmb, Kokkos::View<double**, Kokkos::HostSpace> &pts){ return cmb.LogDeterminant(pts); });
+            wrapped.method("LogDeterminant", [](WrappedT& cmb, jlcxx::ArrayRef<double,2> &pts){ return KokkosToJulia(cmb.LogDeterminant(JuliaToKokkos(pts))); });
             wrapped.method("to_base", [] (std::shared_ptr<WrappedT> w) { return std::static_pointer_cast<ParameterizedFunctionBase<Kokkos::HostSpace>>(w); });
             // wrapped.method("Inverse", [](WrappedT &map, std::vector<double> x1, std::vector<double> r) {
             //     auto x1_sz = x1.size();
@@ -148,12 +149,8 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
         .method("NumForward", &MultiIndexSet::NumForward)
     ;
 
-    mod.method("MultiIndexSet", [](std::vector<int> &idxs, int n_idxs) {
-        int sz = idxs.size();
-        int sz0 = n_idxs;
-        int sz1 = sz / sz0;
-        auto ptr = &idxs[0];
-        return MultiIndexSet(Eigen::Map<const Eigen::Matrix<int,Eigen::Dynamic,1>, 0, Eigen::OuterStride<>>(ptr, sz0, sz1, Eigen::OuterStride<>(std::max(sz0, sz1))));
+    mod.method("MultiIndexSet", [](jlcxx::ArrayRef<int,2> idxs) {
+        return MultiIndexSet(JuliaToEigen(idxs));
     });
 
     mod.set_override_module(jl_base_module);

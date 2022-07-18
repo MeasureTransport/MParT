@@ -8,6 +8,18 @@ module MParT
         Initialize()
     end
 
+    # macro __hasHead(x)
+        
+    # macro __CondMaptoBaseFcn(fcn,args...)
+    #     argstup = Tuple(args)
+    #     pass_argstup = Tuple([arg.head == Symbol("::") ? arg.args[1] : arg])
+    #     quote
+    #         $(esc(fcn))(map::Union{CxxRef{<:ConditionalMapBase},
+    #             CxxWrap.CxxWrapCore.SmartPointer{<:ConditionalMapBase}},
+    #             $(map(esc, argstup)...))
+    #             return $(esc(fcn))(to_base(map))
+    
+
     export SetCoeffs, MapOptions, MultiIndexSet,
            Fix, CoeffMap, LogDeterminant, CreateComponent,
            Evaluate, to_base
