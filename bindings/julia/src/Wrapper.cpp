@@ -20,38 +20,26 @@
 
 namespace jlcxx {
     template<> struct IsMirroredType<mpart::MultiIndexLimiter::None> : std::false_type { };
-    // template<> struct SuperType<mpart::ConditionalMapBase<Kokkos::HostSpace>> {typedef mpart::ParameterizedFunctionBase<Kokkos::HostSpace> type;};
+    template<> struct SuperType<mpart::ConditionalMapBase<Kokkos::HostSpace>> {typedef mpart::ParameterizedFunctionBase<Kokkos::HostSpace> type;};
+    template<> struct SuperType<mpart::TriangularMap<Kokkos::HostSpace>> {typedef mpart::ConditionalMapBase<Kokkos::HostSpace> type;};
     
     
 }
 
 namespace mpart {
-    // struct ParameterizedFunctionBaseHost {
-    //     pfb::ParameterizedFunctionBase<Kokkos::HostSpace>;
-    // };
-
-    // struct ConditionalMapBaseHost {
-    //     cmb::ConditionalMapBase<Kokkos::HostSpace>;
-    // };
-
-    // using PFBH = ParameterizedFunctionBase<Kokkos::HostSpace>;
-    // using CMBH = ConditionalMapBase<Kokkos::HostSpace>;
-
-    // struct PFBH {
-    //     ParameterizedFunctionBase<Kokkos::HostSpace> pfb;
-    // };
-
-    // struct CMBH {
-    //     ConditionalMapBase<Kokkos::HostSpace> cmb;
-    // }
-
-    jlcxx::ArrayRef<double> evaluateFcn(ParameterizedFunctionBase<Kokkos::HostSpace> &pfb, StridedMatrix<double, Kokkos::HostSpace> &pts) {
-        auto sz = pts.size();
-        int n_inp = pfb.inputDim;
-        int n_pts = sz / n_inp;
-        auto out_vec = pfb.Evaluate(pts);
-        return jlcxx::make_julia_array(out_vec.data(), out_vec.size());
+    jlcxx::ArrayRef<double> EvaluateJulia(ParameterizedFunctionBase<Kokkos::HostSpace> &pfb, jlcxx::ArrayRef<double,2> pts) {
+        unsigned int numPts = size(pts,1);
+        unsigned int outDim = map.outputDim;
+        jlcxx::ArrayRef<double,2> output = jlMalloc<double>(outDim, numPts);
+        map.EvaluateImpl(JuliaToKokkos(pts), JuliaToKokkos(output));
+        return output;
     }
+
+    jlcxx::Array<double> CoeffMapJulia(ParameterizedFunctionBase<Kokkos::HostSpace> &pfb){ return KokkosToJulia(pfb.Coeffs()); }
+    void SetCoeffsJulia(ParameterizedFunctionBase<Kokkos::HostSpace> &pfb, jlcxx::ArrayRef<double> v){ pfb.SetCoeffs(JuliaToKokkos(v)); }
+    unsigned int numCoeffsJulia(ParameterizedFunctionBase<Kokkos::HostSpace>& pfb) { return pfb.numCoeffs; }
+    unsigned int inputDimJulia(ParameterizedFunctionBase<Kokkos::HostSpace>& pfb) { return pfb.inputDim; }
+    unsigned int outputDimJulia(ParameterizedFunctionBase<Kokkos::HostSpace>& pfb) { return pfb.outputDim; }
 }
 
 using namespace mpart;
@@ -87,25 +75,19 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
 
     // ParameterizedFunctionBase
     mod.add_type<ParameterizedFunctionBase<Kokkos::HostSpace>>("ParameterizedFunctionBase")
-        .method("CoeffMap", [](ParameterizedFunctionBase<Kokkos::HostSpace> &w){ return KokkosToJulia(w.Coeffs()); })
-        .method("SetCoeffs", [](ParameterizedFunctionBase<Kokkos::HostSpace> &w, jlcxx::ArrayRef<double> v){ w.SetCoeffs(JuliaToKokkos(v)); })
-        .method("Evaluate", [](ParameterizedFunctionBase<Kokkos::HostSpace> &w, jlcxx::ArrayRef<double,2> pts){ return KokkosToJulia(w.Evaluate(JuliaToKokkos(pts))); })
-        .method("numCoeffs", [](ParameterizedFunctionBase<Kokkos::HostSpace>& pfb) { return pfb.numCoeffs; })
-        .method("inputDim", [](ParameterizedFunctionBase<Kokkos::HostSpace>& pfb) { return pfb.inputDim; })
-        .method("outputDim", [](ParameterizedFunctionBase<Kokkos::HostSpace>& pfb) { return pfb.outputDim; })
+        .method("CoeffMap" , &CoeffMapJulia)
+        .method("SetCoeffs", &SetCoeffsJulia)
+        .method("Evaluate" , &EvaluateJulia)
+        .method("numCoeffs", &numCoeffsJulia)
+        .method("inputDim" , &inputDimJulia)
+        .method("outputDim", &outputDimJulia)
     ;
 
     // ConditionalMapBase
     mod.add_type<ConditionalMapBase<Kokkos::HostSpace>>("ConditionalMapBase")
-        .method("CoeffMap", [](ConditionalMapBase<Kokkos::HostSpace> &w){ return KokkosToJulia(w.Coeffs()); })
-        .method("SetCoeffs", [](ConditionalMapBase<Kokkos::HostSpace> &w, jlcxx::ArrayRef<double> v){ w.SetCoeffs(JuliaToKokkos(v)); })
-        .method("Evaluate", [](ConditionalMapBase<Kokkos::HostSpace> &map, jlcxx::ArrayRef<double,2> pts){
-            unsigned int numPts = size(pts,1);
-            unsigned int outDim = map.outputDim;
-            jlcxx::ArrayRef<double,2> output = jlMalloc<double>(outDim, numPts);
-            map.EvaluateImpl(JuliaToKokkos(pts), JuliaToKokkos(output));
-            return output;
-        })
+        .method("CoeffMap", &CoeffMapJulia)
+        .method("SetCoeffs", &SetCoeffsJulia)
+        .method("Evaluate", &EvaluateJulia)
         .method("LogDeterminant", [](ConditionalMapBase<Kokkos::HostSpace>& map, jlcxx::ArrayRef<double,2> pts){
             unsigned int numPts = size(pts,1);
             jlcxx::ArrayRef<double> output = jlMalloc<double>(numPts);
@@ -113,9 +95,9 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
             return output;
         })
         .method("GetBaseFunction", &ConditionalMapBase<Kokkos::HostSpace>::GetBaseFunction)
-        .method("numCoeffs", [](ConditionalMapBase<Kokkos::HostSpace>& cmb) { return cmb.numCoeffs; })
-        .method("inputDim", [](ConditionalMapBase<Kokkos::HostSpace>& cmb) { return cmb.inputDim; })
-        .method("outputDim", [](ConditionalMapBase<Kokkos::HostSpace>& cmb) { return cmb.outputDim; })
+        .method("numCoeffs", &numCoeffsJulia)
+        .method("inputDim" , &inputDimJulia)
+        .method("outputDim", &outputDimJulia)
         // .method("Inverse", [](WrappedT &map, std::vector<double> x1, std::vector<double> r) {
         //             auto x1_sz = x1.size();
         //             int n_inp = map.inputDim;
@@ -204,6 +186,13 @@ JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
        .method("ContDeriv!", [](MapOptions &opts, bool deriv){ opts.contDeriv = deriv; })
        ;
 
+    mod.add_type<TriangularMap<Kokkos::HostSpace>>("TriangularMap")
+       .constructor<std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>>()
+       .method("InverseInplace", [](TriangularMap<Kokkos::HostSpace> &map, jlcxx::Array<double,2> x, jlcxx::Array<double,2> r){
+            map.InverseInplace(JuliaToKokkos(x), JuliaToKokkos(r));
+       })
+       .method("GetComponent", &TriangularMap<Kokkos::HostSpace>::GetComponent)
+    ;
     // CreateComponent
     mod.method("CreateComponent", [](FixedMultiIndexSet<Kokkos::HostSpace> const & mset, MapOptions opts) {
         return MapFactory::CreateComponent(mset, opts);
