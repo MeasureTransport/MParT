@@ -39,8 +39,23 @@ public:
   }
 }; //end class
 
+class ParameterizedFunctionMex {       // The class
+public:             
+  std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> fun_ptr;
+
+  ParameterizedFunctionMex(unsigned int outputDim, FixedMultiIndexSet<MemorySpace> const& mset, 
+                    MapOptions opts){
+    fun_ptr = MapFactory::CreateExpansion<MemorySpace>(outputDim,mset,opts);
+  }
+
+  ParameterizedFunctionMex(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> init_ptr){
+    fun_ptr = init_ptr;
+  }
+}; //end class
+
 // Instance manager for ConditionalMap.
 template class mexplus::Session<ConditionalMapMex>;
+template class mexplus::Session<ParameterizedFunctionMex>;
 
 namespace {
 
@@ -128,12 +143,31 @@ MEX_DEFINE(ConditionalMap_GetComponent) (int nlhs, mxArray* plhs[],
   }
 }
 
+MEX_DEFINE(ConditionalMap_GetBaseFunction) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
+  std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func_ptr = condMap->map_ptr->GetBaseFunction();
+  output.set(0, Session<ParameterizedFunctionMex>::create(new ParameterizedFunctionMex(func_ptr)));
+}
+
 MEX_DEFINE(ConditionalMap_Coeffs) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
   auto coeffs = KokkosToVec(condMap.map_ptr->Coeffs());
+  output.set(0,coeffs);
+}
+
+MEX_DEFINE(ConditionalMap_CoeffMap) (int nlhs, mxArray* plhs[],
+                 int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+  auto coeffs = condMap.map_ptr->CoeffMap();
   output.set(0,coeffs);
 }
 

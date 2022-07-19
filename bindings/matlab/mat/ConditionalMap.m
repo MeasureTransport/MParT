@@ -73,12 +73,21 @@ methods
     condMap = ConditionalMap(condMap_id,"id");
   end
 
+  function parFunc = GetBaseFunction(this)
+    parFunc_id=MParT_('ConditionalMap_GetBaseFunction',this.id_);
+    parFunc = ParameterizedFunction(parFunc_id,"id");
+  end
+
   function SetCoeffs(this,coeffs)
     MParT_('ConditionalMap_SetCoeffs',this.id_,coeffs(:));
   end
 
   function result = Coeffs(this)
     result = MParT_('ConditionalMap_Coeffs',this.id_);
+  end
+
+  function result = CoeffMap(this)
+    result = MParT_('ConditionalMap_CoeffMap',this.id_);
   end
 
   function result = numCoeffs(this)

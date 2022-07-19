@@ -39,6 +39,23 @@ inline mxArray* MxArray::from(const Eigen::MatrixXd& eigen_matrix)
     return out_array.release();
 };
 
+/**
+ * @brief Define a template specialisation for Eigen::VectorXd
+ */
+template <>
+inline mxArray* MxArray::from(const Eigen::VectorXd& eigen_vector)
+{
+    const int num_elems = static_cast<int>(eigen_vector.size());
+     //Choose (1,n) or (n,1) ?
+    MxArray out_array(MxArray::Numeric<double>(1,num_elems));
+
+    for (int c = 0; c < num_elems; ++c)
+    {  
+        out_array.set(1, c, eigen_vector(c));
+    }
+    return out_array.release();
+};
+
 
 
 /**
