@@ -1,5 +1,9 @@
+#include "MParT/ParameterizedFunctionBase.h"
 
-void mpart::binding::ParameterizedFunctionBaseWrapper(jlcxx::module &m) {
+#include "CommonJuliaUtilities.h"
+#include "JlArrayConversions.h"
+
+void mpart::binding::ParameterizedFunctionBaseWrapper(jlcxx::Module &mod) {
     // ParameterizedFunctionBase
     mod.add_type<ParameterizedFunctionBase<Kokkos::HostSpace>>("ParameterizedFunctionBase")
         .method("CoeffMap" , [](ParameterizedFunctionBase<Kokkos::HostSpace> &pfb){ return KokkosToJulia(pfb.Coeffs()); })

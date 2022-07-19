@@ -1,6 +1,13 @@
 set(JULIA_BINDING_SOURCES
-  src/Wrapper.cpp
   src/CommonJuliaUtilities.cpp
+  src/ConditionalMapBase.cpp
+  src/JlArrayConversions.cpp
+  src/MapFactory.cpp
+  src/MapOptions.cpp
+  src/MultiIndex.cpp
+  src/ParameterizedFunctionBase.cpp
+  src/TriangularMap.cpp
+  src/Wrapper.cpp
   ../common/src/CommonUtilities.cpp
 )
 

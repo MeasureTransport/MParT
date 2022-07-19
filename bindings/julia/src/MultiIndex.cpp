@@ -1,6 +1,7 @@
 #include "MParT/MultiIndices/MultiIndex.h"
+#include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
-#include "CommonUtilities.h"
+#include "JlArrayConversions.h"
 #include "CommonJuliaUtilities.h"
 
 namespace jlcxx {
@@ -10,7 +11,7 @@ namespace jlcxx {
 
 using namespace mpart::binding;
 
-void mpart::binding::MultiIndexWrapper(jlcxx::module &mod) {
+void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
     mod.add_type<MultiIndex>("MultiIndex")
         .constructor()
         .constructor<unsigned int, unsigned int>()

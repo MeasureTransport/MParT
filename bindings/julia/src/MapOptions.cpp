@@ -5,7 +5,7 @@
 
 using namespace mpart::binding;
 
-void mpart::binding::MapOptionsWrapper(jlcxx::module &m) {
+void mpart::binding::MapOptionsWrapper(jlcxx::Module &mod) {
     // BasisTypes
     mod.add_bits<BasisTypes>("BasisTypes", jlcxx::julia_type("CppEnum"));
     mod.set_const("ProbabilistHermite", BasisTypes::ProbabilistHermite);

@@ -8,6 +8,8 @@ module MParT
         Initialize()
     end
 
+    MultiIndexSet(A::AbstractMatrix{<:Integer}) = MultiIndexSet(Cint.(collect(A)))
+
     export SetCoeffs, MapOptions, MultiIndexSet,
            Fix, CoeffMap, LogDeterminant, CreateComponent,
            Evaluate, to_base, numCoeffs, CoeffGrad, LogDeterminantCoeffGrad,
