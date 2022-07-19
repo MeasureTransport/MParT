@@ -25,8 +25,8 @@
     href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
 
   <!-- Pre-loaded scripts that we'll load fully later -->
@@ -85,14 +85,26 @@
       <div class="navbar-center-item">
         <ul id="navbar-main-elements" class="navbar-nav">
     <li class="toctree-l1 nav-item">
- <a class="reference internal nav-link" href="../getting_started/index.html">
-  Getting Started
+ <a class="reference internal nav-link" href="../installation.html">
+  Installation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_started.html">
+  Using MParT
  </a>
 </li>
 
 <li class="toctree-l1 nav-item">
  <a class="reference internal nav-link" href="../tutorials/index.html">
   Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../mathematics.html">
+  Mathematical Background
  </a>
 </li>
 
@@ -367,7 +379,7 @@
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>expansion</strong> – The expansion used to define the function <span class="math notranslate nohighlight">\(f\)</span>. </p></li>
 <li><p><strong>quad</strong> – The quadrature rule used to approximate <span class="math notranslate nohighlight">\(\int_0^{x_D} g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt\)</span> </p></li>
-<li><p><strong>useCondDeriv</strong> – A flag to specify whether the analytic derivative of <span class="math notranslate nohighlight">\(T(x_1, x_2, ..., x_D)\)</span> should be used by default, or if the derivative of the discretized integral should be used. If “true”, the analytic or “continuous” derivative will be used. If “false”, the derivative of the numerically approximated integral will be used. <p><p>See the <a class="reference internal" href="../getting_started/mathematics.html#diag-deriv-section"><span class="std std-ref">Diagonal Derivatives</span></a> mathematical background for more details.</p>
+<li><p><strong>useCondDeriv</strong> – A flag to specify whether the analytic derivative of <span class="math notranslate nohighlight">\(T(x_1, x_2, ..., x_D)\)</span> should be used by default, or if the derivative of the discretized integral should be used. If “true”, the analytic or “continuous” derivative will be used. If “false”, the derivative of the numerically approximated integral will be used. <p><p>See the <a class="reference internal" href="../mathematics.html#diag-deriv-section"><span class="std std-ref">Diagonal Derivatives</span></a> mathematical background for more details.</p>
 </p>
  </p></li>
 </ul>
