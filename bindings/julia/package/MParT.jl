@@ -6,4 +6,10 @@ module MParT
     function __init__()
         @initcxx
     end
+    Initialize()
+
+    export SetCoeffs, MapOptions, MultiIndexSet,
+           Fix, CoeffMap, LogDeterminant, CreateComponent,
+           Evaluate, to_base, numCoeffs, CoeffGrad, LogDeterminantCoeffGrad,
+           CreateTriangular, BasisType!
 end

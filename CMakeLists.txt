@@ -107,7 +107,7 @@ if(MPART_JULIA)
       set(JULIA_EXE "julia")
   endif()
   execute_process(COMMAND ${JULIA_EXE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
-  list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}" )
+  list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}/lib/cmake/JlCxx/" )
 
   find_package(JlCxx)
 
