@@ -21,9 +21,9 @@ namespace mpart{
 }
 
 
-// void Initialize(jlcxx::ArrayRef<char*> opts) {
-//     mpart::binding::Initialize(makeInitArguments(opts));
-// }
+void mpart::binding::Initialize(jlcxx::ArrayRef<char*> opts) {
+    mpart::binding::Initialize(makeInitArguments(opts));
+}
 
 void mpart::binding::CommonUtilitiesWrapper(jlcxx::Module &mod)
 {
