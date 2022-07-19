@@ -13,15 +13,15 @@
 #include "CommonJuliaUtilities.h"
 #include "JlArrayConversions.h"
 
-using namespace mpart::binding;
+using namespace mpart;
 
-JLCXX_MODULE define_julia_module(jlcxx::Module& mod)
+JLCXX_MODULE MParT_julia_module(jlcxx::Module& mod)
 {
-    CommonUtilitiesWrapper(mod);
-    MultiIndexWrapper(mod);
-    MapOptionsWrapper(mod);
-    ParameterizedFunctionBaseWrapper(mod);
-    ConditionalMapBaseWrapper(mod);
-    TriangularMapWrapper(mod);
-    MapFactoryWrapper(mod);
+    binding::CommonUtilitiesWrapper(mod);
+    binding::MultiIndexWrapper(mod);
+    binding::MapOptionsWrapper(mod);
+    binding::ParameterizedFunctionBaseWrapper(mod);
+    binding::ConditionalMapBaseWrapper(mod);
+    binding::TriangularMapWrapper(mod);
+    binding::MapFactoryWrapper(mod);
 }
