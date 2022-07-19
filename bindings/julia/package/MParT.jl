@@ -5,8 +5,8 @@ module MParT
 
     function __init__()
         @initcxx
+        Initialize()
     end
-    Initialize()
 
     export SetCoeffs, MapOptions, MultiIndexSet,
            Fix, CoeffMap, LogDeterminant, CreateComponent,
