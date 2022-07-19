@@ -33,6 +33,7 @@ public:
   ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks){
     map_ptr = std::make_shared<TriangularMap<MemorySpace>>(blocks);
   }
+  
   ConditionalMapMex(unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder, MapOptions opts){
     map_ptr = MapFactory::CreateTriangular<MemorySpace>(inputDim,outputDim,totalOrder,opts);
   }

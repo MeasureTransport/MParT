@@ -1,8 +1,5 @@
 #include <mexplus.h>
-#include "MParT/MultiIndices/MultiIndexSet.h"
-#include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/ParameterizedFunctionBase.h"
-
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MexArrayConversions.h"
 #include "mexplus_eigen.h"
