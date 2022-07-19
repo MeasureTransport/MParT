@@ -70,7 +70,7 @@ methods
 
   function condMap = GetComponent(this,i)
     condMap_id = MParT_('ConditionalMap_GetComponent',this.id_,i-1);
-    condMap = ConditionalMap(condMap_id,"id")
+    condMap = ConditionalMap(condMap_id,"id");
   end
 
   function SetCoeffs(this,coeffs)

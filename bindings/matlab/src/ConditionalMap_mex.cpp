@@ -26,6 +26,10 @@ public:
     map_ptr = MapFactory::CreateComponent<MemorySpace>(mset,opts);
   }
 
+  ConditionalMapMex(std::shared_ptr<ConditionalMapBase<MemorySpace>> init_ptr){
+    map_ptr = init_ptr;
+  }
+
   ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks){
     map_ptr = std::make_shared<TriangularMap<MemorySpace>>(blocks);
   }
@@ -112,9 +116,15 @@ MEX_DEFINE(ConditionalMap_GetComponent) (int nlhs, mxArray* plhs[],
 
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
-  TriangularMap<MemorySpace> *triMap = Session<TriangularMap<MemorySpace>>::get(input.get(0));
   unsigned int i = input.get<unsigned int>(1);
-  output.set(0, Session<std::shared_ptr<ConditionalMapBase<MemorySpace>>>::create(new std::shared_ptr<ConditionalMapBase<MemorySpace>>(triMap->GetComponent(i))));
+  ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
+  std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
+  std::shared_ptr<TriangularMap<MemorySpace>> tri_ptr = std::dynamic_pointer_cast<TriangularMap<MemorySpace>>(condMap_ptr);
+  if(tri_ptr==nullptr){
+    throw std::runtime_error("Tried to access GetComponent with a type other than TriangularMap");
+  }else{
+    output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(tri_ptr->GetComponent(i))));
+  }
 }
 
 MEX_DEFINE(ConditionalMap_Coeffs) (int nlhs, mxArray* plhs[],
