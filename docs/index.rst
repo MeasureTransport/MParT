@@ -15,10 +15,12 @@ Contents
 -------------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   source/getting_started/index
+   source/installation
+   source/getting_started
    source/tutorials/index
+   source/mathematics
    source/api/index
    source/development/index
 

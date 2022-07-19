@@ -1,10 +1,31 @@
+Installation
+------------
+
+Install from Conda
+==================
+
+.. panels::
+    :container: container-lg pb-3
+    :column: col-lg-12 p-2
+
+    ^^^^^^^^^^^^^^^^^^^
+    COMING SOON!
+
+
+    ++++++++++++++++++++++
+
+    .. code-block:: bash
+
+        conda install -c conda-forge mpart
+
+    ---
+    :column: col-lg-12 p-2
+
 .. _installation:
 
-Manual Installation
-===================
 
 Compiling from Source
----------------------
+=====================
 MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:
 
 .. code-block:: bash
@@ -121,28 +142,4 @@ Make sure that :code:`CMAKE_CXX_COMPILER` uses a full path from the root!
 .. tip::
    If you're using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into :code:`CMakeFiles.txt` and add :code:`add_compile_definition(EIGEN_DONT_VECTORIZE)`.
 
-Building Documentation
-----------------------
 
-1. Make sure doxygen, sphinx, breathe, and the pydata-sphinx-theme are installed.  This is easily done with anaconda:
-
-.. code-block::
-
-   conda install -c conda-forge doxygen sphinx breathe pydata-sphinx-theme
-   pip install sphinx-panels
-
-2. If working in a conda environment, add dependency paths to conf.py
-
-3. Build the :code:`sphinx` target:
-
-.. code-block::
-
-    cd build
-    cmake ..
-    make sphinx
-
-4. Open the sphinx output
-
-.. code-block::
-
-    open docs/sphinx/index.html
