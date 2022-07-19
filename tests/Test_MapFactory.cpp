@@ -31,6 +31,31 @@ TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
     Kokkos::View<double**, MemorySpace> eval = map->Evaluate(pts);
 }
 
+
+TEST_CASE( "Testing multivariate expansion factory", "[MapFactoryExpansion]" ) {
+
+    MapOptions options;
+    options.basisType = BasisTypes::ProbabilistHermite;
+
+    unsigned int outDim = 5;
+    unsigned int inDim = 3;
+    unsigned int maxDegree = 5;
+    FixedMultiIndexSet<MemorySpace> mset(inDim,maxDegree);
+
+    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func = MapFactory::CreateExpansion<MemorySpace>(outDim, mset, options);
+    REQUIRE(func!=nullptr);
+
+    unsigned int numPts = 100;
+    Kokkos::View<double**,MemorySpace> pts("Points", inDim, numPts);
+    for(unsigned int i=0; i<numPts; ++i)
+        pts(inDim-1,i) = double(i)/double(numPts-1);
+
+    Kokkos::View<double**, MemorySpace> eval = func->Evaluate(pts);
+    CHECK(eval.extent(0)==outDim);
+    CHECK(eval.extent(1)==numPts);
+}
+
+
 TEST_CASE( "Testing factory method for triangular map", "[MapFactoryTriangular]" ) {
 
     MapOptions options;
