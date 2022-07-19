@@ -107,6 +107,16 @@ MEX_DEFINE(ConditionalMap_SetCoeffs) (int nlhs, mxArray* plhs[],
   condMap.map_ptr->SetCoeffs(coeffs);
 }
 
+MEX_DEFINE(ConditionalMap_GetComponent) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  TriangularMap<MemorySpace> *triMap = Session<TriangularMap<MemorySpace>>::get(input.get(0));
+  unsigned int i = input.get<unsigned int>(1);
+  output.set(0, Session<std::shared_ptr<ConditionalMapBase<MemorySpace>>>::create(new std::shared_ptr<ConditionalMapBase<MemorySpace>>(triMap->GetComponent(i))));
+}
+
 MEX_DEFINE(ConditionalMap_Coeffs) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);

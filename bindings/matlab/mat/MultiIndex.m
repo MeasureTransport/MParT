@@ -22,8 +22,10 @@ end
 methods
   function this = MultiIndex(varargin)
     if(nargin==2) 
-      if(varargin{2}=='id')
-        this.id_ = varargin{1};
+      if(isstring(varargin{2})) 
+        if(varargin{2}=="id")
+          this.id_ = varargin{1};
+        end
       else
         this.id_ = MParT_('MultiIndex_newDefault', varargin{1},varargin{2});
       end
