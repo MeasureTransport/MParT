@@ -104,6 +104,21 @@ If you have Julia installed, but CMake was not able to find it during MParT conf
 
 To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set :code:`MPART_JULIA=OFF` during the CMake configuration.
 
+Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :code:`<your MParT install path>/julia/`, you can easily use :code:`mpart` in Julia by first adding the path to your library path
+
+.. tabbed:: MacOS
+
+    .. code-block:: bash
+        $ export DYLD_LIBRARY_PATH=<your MParT install path>/julia/mpart/:$DYLD_LIBRARY_PATH
+        $ export JULIA_LOAD_PATH="<your MParT install path>/julia/mpart/:$JULIA_LOAD_PATH"
+
+.. tabbed:: Linux
+
+    .. code-block:: bash
+
+        $ export LD_LIBRARY_PATH=<your MParT install path>/julia/mpart/:$LD_LIBRARY_PATH
+        $ export JULIA_LOAD_PATH="<your MParT install path>/julia/mpart/:$JULIA_LOAD_PATH"
+
 Compiling with CUDA Support
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides. First, we compile Kokkos with the required options:

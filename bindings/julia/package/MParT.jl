@@ -1,12 +1,12 @@
 # Wrapping code to make the Julia module usable
 module MParT
     using CxxWrap
-    @wrapmodule(joinpath(".","libmpartjl"))
+    @wrapmodule("libmpartjl")
 
     function __init__()
         @initcxx
+        Initialize()
     end
-    Initialize()
 
     export SetCoeffs, MapOptions, MultiIndexSet,
            Fix, CoeffMap, LogDeterminant, CreateComponent,
