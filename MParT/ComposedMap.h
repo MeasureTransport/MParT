@@ -1,5 +1,5 @@
-#ifndef MPART_TRIANGULARMAP_H
-#define MPART_TRIANGULARMAP_H
+#ifndef MPART_COMPOSEDMAP_H
+#define MPART_COMPOSEDMAP_H
 
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/Utilities/Miscellaneous.h"
@@ -28,7 +28,7 @@ is positive definite.
 
  */
 template<typename MemorySpace>
-class TriangularMap : public ConditionalMapBase<MemorySpace>
+class ComposedMap : public ConditionalMapBase<MemorySpace>
 {
 public:
 
@@ -37,13 +37,13 @@ public:
     @param components A vector of ConditionalMapBase objects defining each \f$T_k\f$ in the block triangular map.
                       To maintain the correct block structure, the dimensions of the components must satisfy \f$N_k = N_{k-1}+M_{k}\f$.
     */
-    TriangularMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components);
+    ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components);
 
-    virtual ~TriangularMap() = default;
+    virtual ~ComposedMap() = default;
 
     /** @brief Sets the coefficients for all components of the map.
 
-    @details This function will copy the provided coeffs vectors into the savedCoeffs object in the TriangularMap class.   To avoid
+    @details This function will copy the provided coeffs vectors into the savedCoeffs object in the ComposedMap class.   To avoid
     duplicating the coefficients, the savedCoeffs member variable for each component will then be set to a subview of this vector.
     @param coeffs A vector containing coefficients for all components.  If component \f$k\f$ is defined by \f$C_k\f$ coefficients,
                   then this vector should have length \f$\sum_{k=1}^K C_i\f$ and the coefficients for component \f$k\f$ should
@@ -61,8 +61,8 @@ public:
     @param output A vector with length equal to the number of columns in pts containing the log determinant of the Jacobian.  This
                   vector should be correctly allocated and sized before calling this function.
     */
-    virtual void LogDeterminantImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                                    Kokkos::View<double*, MemorySpace>             &output) override;
+    virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                    StridedVector<double, MemorySpace>              output) override;
 
 
     /** @brief Evaluates the map.
@@ -72,8 +72,8 @@ public:
     @param output A matrix with \f$M\f$ rows to store the map output.  Should have the same number of columns as pts and be
                   allocated before calling this function.
     */
-    void EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                      Kokkos::View<double**, MemorySpace>            & output) override;
+    void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                      StridedMatrix<double, MemorySpace>              output) override;
 
 
     /** @brief Evaluates the map inverse.
@@ -88,28 +88,28 @@ public:
     @param r The map output \f$r_{1:M}\f$ to invert.
     @param output A matrix with \f$M\f$ rows to store the computed map inverse \f$x_{N-M+1:M}\f$.
     */
-    virtual void InverseImpl(Kokkos::View<const double**, MemorySpace> const& x1,
-                             Kokkos::View<const double**, MemorySpace> const& r,
-                             Kokkos::View<double**, MemorySpace>            & output) override;
+    virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+                             StridedMatrix<const double, MemorySpace> const& r,
+                             StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void InverseInplace(Kokkos::View<double**, MemorySpace> const& x1,
-                                Kokkos::View<const double**, MemorySpace> const& r);
+    virtual void InverseInplace(StridedMatrix<double, MemorySpace>              x1,
+                                StridedMatrix<const double, MemorySpace> const& r);
 
 
-    virtual void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
-                               Kokkos::View<const double**, MemorySpace> const& sens,
-                               Kokkos::View<double**, MemorySpace>            & output) override;
+    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                               StridedMatrix<const double, MemorySpace> const& sens,
+                               StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
-                                             Kokkos::View<double**, MemorySpace> &output) override;
+    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                             StridedMatrix<double, MemorySpace>              output) override;
 private:
 
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;
 
 
-}; // class TriangularMap
+}; // class ComposedMap
 
 }
 

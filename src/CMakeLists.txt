@@ -13,4 +13,5 @@ target_sources(mpart
     TriangularMap.cpp
     MapFactory.cpp
     Initialization.cpp
+    ComposedMap.cpp
 )
