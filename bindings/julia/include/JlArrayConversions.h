@@ -10,6 +10,8 @@
 #include "jlcxx/jlcxx.hpp"
 #include "jlcxx/functions.hpp"
 
+namespace mpart {
+namespace binding {
 /**
  * @brief Retrieve the size of an N-dimensional Julia array.
  *
@@ -30,12 +32,7 @@ unsigned int size(jlcxx::ArrayRef<ScalarType, N> arr, unsigned int j) {
  * @param vec Julia vector to take view of
  * @return mpart::StridedVector<double, Kokkos::HostSpace> Same memory, but now a Kokkos View
  */
-mpart::StridedVector<double, Kokkos::HostSpace> JuliaToKokkos(jlcxx::ArrayRef<double,1> &vec)
-{
-    double* vptr = vec.data();
-    unsigned int vsize = vec.size();
-    return mpart::ToKokkos(vptr, vsize);
-}
+mpart::StridedVector<double, Kokkos::HostSpace> JuliaToKokkos(jlcxx::ArrayRef<double,1> &vec);
 
 /**
  * @brief Wrap a Julia matrix in a Kokkos View
@@ -43,29 +40,16 @@ mpart::StridedVector<double, Kokkos::HostSpace> JuliaToKokkos(jlcxx::ArrayRef<do
  * @param mat Julia matrix to take view of
  * @return mpart::StridedMatrix<double, Kokkos::HostSpace> Same memory, but now a Kokkos View
  */
-mpart::StridedMatrix<double, Kokkos::HostSpace> JuliaToKokkos(jlcxx::ArrayRef<double,2> &mat)
-{
-    double* mptr = mat.data();
-    unsigned int rows = size(mat,0);
-    unsigned int cols = size(mat,1);
-
-    return mpart::ToKokkos<double,Kokkos::LayoutLeft>(mptr, rows, cols);
-}
+mpart::StridedMatrix<double, Kokkos::HostSpace> JuliaToKokkos(jlcxx::ArrayRef<double,2> &mat);
 
 /**
- * @brief Wrap a Julia matrix in an Eigen Map
+ * @brief Wrap a Julia matrix of int in an Eigen Map
  *
- * @tparam ScalarType type of elements in the matrix
  * @param mat Reference to the Julia matrix to wrap
  * @return auto an Eigen Map to the same memory as the Julia matrix
  */
-template<typename ScalarType>
-auto JuliaToEigen(jlcxx::ArrayRef<ScalarType,2> mat) {
-    ScalarType* mptr = mat.data();
-    unsigned int rows = size(mat,0);
-    unsigned int cols = size(mat,1);
-    return Eigen::Map<const Eigen::Matrix<ScalarType,Eigen::Dynamic,1>,0,Eigen::OuterStride<>>(mptr, rows, cols, Eigen::OuterStride<>(std::max(rows,cols)));
-}
+Eigen::Map<const Eigen::Matrix<int,Eigen::Dynamic,1>,0,Eigen::OuterStride<>> JuliaToEigen(jlcxx::ArrayRef<int,2> mat);
+
 /**
  * @brief Allocate array that Julia is responsible for
  *
@@ -90,11 +74,7 @@ jlcxx::ArrayRef<T, sizeof...(Sizes)> jlMalloc(Sizes... dims) {
  * @param view View to access in Julia
  * @return jlcxx::ArrayRef<double> Same memory, but now a Julia array
  */
-jlcxx::ArrayRef<double> KokkosToJulia(mpart::StridedVector<double, Kokkos::HostSpace> view) {
-    double* vptr = view.data();
-    unsigned int sz = view.extent(0);
-    return jlcxx::make_julia_array(vptr, sz);
-}
+jlcxx::ArrayRef<double> KokkosToJulia(mpart::StridedVector<double, Kokkos::HostSpace> view);
 
 /**
  * @brief Wrap a 2D Kokkos View in a Julia matrix
@@ -102,11 +82,8 @@ jlcxx::ArrayRef<double> KokkosToJulia(mpart::StridedVector<double, Kokkos::HostS
  * @param view View to access in Julia
  * @return jlcxx::ArrayRef<double,2> Same memory, but now a Julia array
  */
-jlcxx::ArrayRef<double,2> KokkosToJulia(mpart::StridedMatrix<double, Kokkos::HostSpace> view) {
-    double* vptr = view.data();
-    unsigned int rows = view.extent(0);
-    unsigned int cols = view.extent(1);
-    return jlcxx::make_julia_array(vptr, rows, cols);
-}
+jlcxx::ArrayRef<double,2> KokkosToJulia(mpart::StridedMatrix<double, Kokkos::HostSpace> view);
+} // namespace binding
+} // namespace mpart
 
 #endif // JLARRAYCONVERSIONS_H

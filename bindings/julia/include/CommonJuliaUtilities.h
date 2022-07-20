@@ -32,8 +32,32 @@ void MultiIndexWrapper(jlcxx::Module&);
  */
 void MapOptionsWrapper(jlcxx::Module&);
 
-} // namespace mpart
+/**
+ * @brief Adds ParameterizedFunctionBase bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void ParameterizedFunctionBaseWrapper(jlcxx::Module&);
+
+/**
+ * @brief Adds ConditionalMapBase bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void ConditionalMapBaseWrapper(jlcxx::Module&);
+
+/**
+ * @brief Adds TriangularMap bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void TriangularMapWrapper(jlcxx::Module&);
+
+/**
+ * @brief Adds MapFactory bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void MapFactoryWrapper(jlcxx::Module&);
+
 } // namespace binding
+} // namespace mpart
 
 
 
