@@ -10,7 +10,8 @@ INCLUDE(Submodules)
 # Options
 
 option(MPART_PYTHON "Build python bindings with pybind11" ON)
-option(MPART_JULIA "Build julia bindings with CxxWrap.jl" OFF)
+option(MPART_MATLAB "Build matlab bindings with pybind11" ON)
+option(MPART_JULIA "Build julia bindings with CxxWrap.jl" ON)
 
 ##############################################################
 # Compiler configuration
@@ -106,13 +107,13 @@ if(MPART_JULIA)
       set(JULIA_EXE "julia")
   endif()
   execute_process(COMMAND ${JULIA_EXE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
-  list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}" )
+  list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}/lib/cmake/JlCxx/" )
 
   find_package(JlCxx)
 
   if(NOT JlCxx_FOUND)
     set(MPART_JULIA OFF)
-    message(WARNING "Request Julia bindings but CMake could not find CxxWrap package.  Setting MPART_JULIA=OFF.")
+    message(WARNING "Requested Julia bindings but CMake could not find JlCxx package.  Setting MPART_JULIA=OFF.")
   else()
     get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
     get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
@@ -144,6 +145,16 @@ endif()
 
 if(MPART_JULIA)
     add_subdirectory(bindings/julia)
+endif()
+
+# Add matlab if necessary
+if(MPART_MATLAB)
+    find_package(Matlab)
+    if(Matlab_FOUND)
+        add_subdirectory(bindings/matlab)
+    else()
+        message(STATUS "Could not find matlab.  Matlab bindings will not be built.")
+    endif()
 endif()
 
 ##############################################################

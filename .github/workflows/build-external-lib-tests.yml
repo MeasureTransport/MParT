@@ -22,24 +22,13 @@ jobs:
         with:
           path: mpart
 
-      - name: Cache Kokkos
-        id: cache-kokkos 
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-build-kokkos
-        with:
-          path: ${{ github.workspace }}/KOKKOS_INSTALL
-          key: ${{ runner.os }}-${{ env.cache-name }}
-
       - name: Checkout Kokkos
-        if: steps.cache-kokkos.outputs.cache-hit != 'true'
         uses: actions/checkout@v3
         with:
           repository: kokkos/kokkos
           path: kokkos
 
       - name: Install Kokkos
-        if: steps.cache-kokkos.outputs.cache-hit != 'true'
         run: |
           cd $GITHUB_WORKSPACE/kokkos
           mkdir build && cd build
@@ -68,9 +57,7 @@ jobs:
 
       - name: Run Tests
         shell: bash -l {0}
-        run: |
-          cd $GITHUB_WORKSPACE/mpart/build
-          ./RunTests --kokkos-threads=2 --reporter junit -o test-results-external.xml
+        run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests --kokkos-threads=2 --reporter junit -o test-results-external.xml
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1

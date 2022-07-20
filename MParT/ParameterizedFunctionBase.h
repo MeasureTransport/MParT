@@ -16,7 +16,6 @@ namespace mpart {
 
         /**
          @brief Construct a new parameterized function object
-
          @param inDim The dimension \f$N\f$ of the input to this map.
          @param outDim The dimension \f$M\f$ of the output from this map.
          @param nCoeffs The number of coefficients in the parameterization.
@@ -37,7 +36,6 @@ namespace mpart {
             @detail Performs a shallow copy of the input coefficients to the internally stored coefficients.
             If values in the view passed to this function are changed, the values will also change in the
             internally stored view.
-
             @param[in] coeffs A view to save internally.
         */
         virtual void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs);
@@ -53,12 +51,12 @@ namespace mpart {
 
         
 
-        virtual Kokkos::View<double**, MemorySpace> Evaluate(Kokkos::View<const double**, MemorySpace> const& pts);
+        virtual StridedMatrix<double, MemorySpace> Evaluate(StridedMatrix<const double, MemorySpace> const& pts);
 
         virtual Eigen::RowMatrixXd Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual void EvaluateImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                                  Kokkos::View<double**, MemorySpace>            & output) = 0;
+        virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                  StridedMatrix<double, MemorySpace>              output) = 0;
 
 
         /** @brief Computes the gradient of the map output with respect to the map coefficients.
@@ -73,21 +71,20 @@ namespace mpart {
                  respect to the map output, i.e. \f$s_i = \nabla_{y_i} c(y_i)\f$, where \f$c:\mathbb{R}^M\rightarrow \mathbb{R}\f$ is a scalar-valued 
                  objective function and \f$y_i=T(x_i;w)\f$ is the output of the map.   In this setting, the vector \f$g_i\f$ computed by this 
                  function represents \f$g_i = \nabla_{w} c(T(x_i; w))\f$; and this function essentially computes a single step in the chain rule. 
-
         @param pts A collection of points \f$x_i\f$ where we want to compute the Jacobian.  Each column contains a single point.
         @param sens A collection of sensitivity vectors \f$s_i\f$ for each point.   Each column is a single \f$s_i\f$ vector and 
                     this view should therefore have the same number of columns as `pts`.  It should also have \f$M\f$ rows.   
         @return A collection of vectors \f$g_i\f$.  Will have the same number of columns as pts with \f$K\f$ rows.
         */
-        virtual Kokkos::View<double**, MemorySpace> CoeffGrad(Kokkos::View<const double**, MemorySpace> const& pts, 
-                                                              Kokkos::View<const double**, MemorySpace> const& sens);
+        virtual StridedMatrix<double, MemorySpace> CoeffGrad(StridedMatrix<const double, MemorySpace> const& pts, 
+                                                             StridedMatrix<const double, MemorySpace> const& sens);
 
         virtual Eigen::RowMatrixXd CoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts,
                                              Eigen::Ref<const Eigen::RowMatrixXd> const& sens);
 
-        virtual void CoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts,  
-                                   Kokkos::View<const double**, MemorySpace> const& sens,
-                                   Kokkos::View<double**, MemorySpace> &output) = 0;
+        virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                                   StridedMatrix<const double, MemorySpace> const& sens,
+                                   StridedMatrix<double, MemorySpace>              output) = 0;
 
         
         const unsigned int inputDim; /// The total dimension of the input N+M
@@ -97,7 +94,6 @@ namespace mpart {
     protected:
         
         /** Throws an exception if a host-only function was called when the MemorySpace is on the device.
-
         @details 
         @param functionName The name of the host-only function (e.g., "Evaluate(Eigen::RowMatrixXd const& pts)")
          */ 

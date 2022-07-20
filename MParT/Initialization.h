@@ -60,13 +60,13 @@ int main( int argc, char* argv[] ) {
      @tparam Arguments 
      @param args Parameters to be passed on to Kokkos::initialize.
      */
-    template<typename... Arguments>
-    void Initialize(Arguments... args)
+    template<typename FirstArgType, typename... Arguments>
+    void Initialize(FirstArgType& arg1, Arguments... args)
     {
         if(!GetInitializeStatusObject().Get()){
         
             // Initialize kokkos
-            Kokkos::initialize(args...);
+            Kokkos::initialize(arg1, args...);
 
             // Make sure Kokkos::finalize() is called at program exit.
             std::atexit(&mpart::Finalize);
