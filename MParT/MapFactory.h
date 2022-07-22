@@ -37,6 +37,18 @@ namespace mpart{
                                                                           unsigned int outputDim,
                                                                           unsigned int totalOrder,
                                                                           MapOptions options = MapOptions());
+
+        /**
+        @brief Constructs a (generally) non-monotone multivariate expansion.
+        @param outputDim The output dimension of the expansion.  Each output will be defined by the same multiindex set but will have different coefficients.
+        @param mset The multiindex set specifying which terms should be used in the multivariate expansion.
+        @param options Options specifying the 1d basis functions used in the parameterization.
+        */
+        template<typename MemorySpace>
+        std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> CreateExpansion(unsigned int outputDim,
+                                                                                FixedMultiIndexSet<MemorySpace> const& mset,
+                                                                                MapOptions options = MapOptions());
+
     }
 }
 

@@ -8,7 +8,9 @@ set(MEX_SOURCE
     src/KokkosUtilities_mex.cpp
     src/ConditionalMap_mex.cpp 
     src/MultiIndexSet_mex.cpp
+    src/MultiIndex_mex.cpp
     src/FixedMultiIndexSet_mex.cpp
+    src/ParameterizedFunctionBase_mex.cpp
     src/MexArrayConversions.cpp
     src/MexMapOptionsConversions.cpp
 )

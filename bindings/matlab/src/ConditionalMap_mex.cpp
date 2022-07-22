@@ -8,7 +8,6 @@
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/TriangularMap.h"
 #include <Eigen/Dense>
-#include "mexplus_eigen.h"
 
 
 #include <chrono>
@@ -27,16 +26,36 @@ public:
     map_ptr = MapFactory::CreateComponent<MemorySpace>(mset,opts);
   }
 
+  ConditionalMapMex(std::shared_ptr<ConditionalMapBase<MemorySpace>> init_ptr){
+    map_ptr = init_ptr;
+  }
+
   ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks){
     map_ptr = std::make_shared<TriangularMap<MemorySpace>>(blocks);
   }
+  
   ConditionalMapMex(unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder, MapOptions opts){
     map_ptr = MapFactory::CreateTriangular<MemorySpace>(inputDim,outputDim,totalOrder,opts);
   }
 }; //end class
 
+class ParameterizedFunctionMex {       // The class
+public:             
+  std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> fun_ptr;
+
+  ParameterizedFunctionMex(unsigned int outputDim, FixedMultiIndexSet<MemorySpace> const& mset, 
+                    MapOptions opts){
+    fun_ptr = MapFactory::CreateExpansion<MemorySpace>(outputDim,mset,opts);
+  }
+
+  ParameterizedFunctionMex(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> init_ptr){
+    fun_ptr = init_ptr;
+  }
+}; //end class
+
 // Instance manager for ConditionalMap.
 template class mexplus::Session<ConditionalMapMex>;
+template class mexplus::Session<ParameterizedFunctionMex>;
 
 namespace {
 
@@ -108,12 +127,47 @@ MEX_DEFINE(ConditionalMap_SetCoeffs) (int nlhs, mxArray* plhs[],
   condMap.map_ptr->SetCoeffs(coeffs);
 }
 
+MEX_DEFINE(ConditionalMap_GetComponent) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  unsigned int i = input.get<unsigned int>(1);
+  ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
+  std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
+  std::shared_ptr<TriangularMap<MemorySpace>> tri_ptr = std::dynamic_pointer_cast<TriangularMap<MemorySpace>>(condMap_ptr);
+  if(tri_ptr==nullptr){
+    throw std::runtime_error("Tried to access GetComponent with a type other than TriangularMap");
+  }else{
+    output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(tri_ptr->GetComponent(i))));
+  }
+}
+
+MEX_DEFINE(ConditionalMap_GetBaseFunction) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
+  std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func_ptr = condMap->map_ptr->GetBaseFunction();
+  output.set(0, Session<ParameterizedFunctionMex>::create(new ParameterizedFunctionMex(func_ptr)));
+}
+
 MEX_DEFINE(ConditionalMap_Coeffs) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
   auto coeffs = KokkosToVec(condMap.map_ptr->Coeffs());
+  output.set(0,coeffs);
+}
+
+MEX_DEFINE(ConditionalMap_CoeffMap) (int nlhs, mxArray* plhs[],
+                 int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+  auto coeffs = condMap.map_ptr->CoeffMap();
   output.set(0,coeffs);
 }
 

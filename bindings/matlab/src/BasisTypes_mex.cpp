@@ -163,4 +163,4 @@ MEX_DEFINE(deleteBasisTypesOpt) (int nlhs, mxArray* plhs[],
 
 } // namespace
 
-MEX_DISPATCH // Don't forget to add this if MEX_DEFINE() is used.
+//MEX_DISPATCH // Don't forget to add this if MEX_DEFINE() is used.

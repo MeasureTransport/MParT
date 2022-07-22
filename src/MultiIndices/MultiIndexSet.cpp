@@ -645,6 +645,18 @@ std::vector<unsigned int> MultiIndexSet::Expand(unsigned int activeIndex)
   return newIndices;
 }
 
+
+std::vector<unsigned int> MultiIndexSet::Expand()
+{
+  std::vector<unsigned int> frontier = Frontier();
+  std::vector<unsigned int> newInds, allNewInds;
+  for(auto& ind : frontier){
+    newInds = Expand(ind);
+    allNewInds.insert(allNewInds.end(), newInds.begin(), newInds.end());
+  }
+  return allNewInds;
+}
+
 std::vector<unsigned int> MultiIndexSet::ForciblyExpand(unsigned int const activeIndex)
 {
   assert(activeIndex<active2global.size());
