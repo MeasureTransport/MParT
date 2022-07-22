@@ -61,7 +61,7 @@ public:
         }
     }
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
 
     /** @brief Copy this FixedMultiIndexSet to device memory.
         @return A fixed multiindexset with arrays that live in device memory.

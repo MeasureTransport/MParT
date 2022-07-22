@@ -351,7 +351,7 @@ void FixedMultiIndexSet<MemorySpace>::FillTotalOrder(unsigned int maxOrder,
 }
 
 // If a device is being used, compile code to copy the FixedMultiIndexSet to device memory
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
 
     template<typename MemorySpace>
     FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> FixedMultiIndexSet<MemorySpace>::ToDevice()
@@ -367,7 +367,7 @@ void FixedMultiIndexSet<MemorySpace>::FillTotalOrder(unsigned int maxOrder,
 
 
 // Explicit template instantiation
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
     template class mpart::FixedMultiIndexSet<Kokkos::HostSpace>;
     template class mpart::FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>;
 #else

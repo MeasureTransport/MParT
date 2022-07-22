@@ -24,19 +24,17 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
 
 }
 
-#ifdef MPART_ENABLE_GPU
-typedef double::false_type false_type;
-template<typename MemorySpace>
+#if defined(MPART_ENABLE_GPU)
+
 void mpart::binding::ConditionalMapBaseDeviceWrapper(py::module &m)
 {
-    typedef double::false_type false_type;
     // ConditionalMapBaseDevice
-     py::class_<ConditionalMapBase<MemorySpace>, ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<ConditionalMapBase<MemorySpace>>>(m, "ConditionalMapBaseDevice")
+     py::class_<ConditionalMapBase<DeviceSpace>, ParameterizedFunctionBase<DeviceSpace>, std::shared_ptr<ConditionalMapBase<DeviceSpace>>>(m, "ConditionalMapBaseDevice")
 
-        .def("LogDeterminant", [](ConditionalMapBase<MemorySpace> &map, DeviceMatrix<const double> &pts){ return DeviceMatrix(map.LogDeterminant(pts.data)); })
-        .def("Inverse", [](ConditionalMapBase<MemorySpace> &map, DeviceMatrix<const double> const &x1, DeviceMatrix<const double> const &r){ return DeviceMatrix(map.Inverse(x1.data, r.data)); }
-        .def("LogDeterminantCoeffGrad", [](ConditionalMapBase<MemorySpace> &map, DeviceMatrix<const double> const pts){ return DeviceMatrix(map.LogDeterminantCoeffGrad(pts)); }
-        .def("GetBaseFunction", &ConditionalMapBase<MemorySpace>::GetBaseFunction)
+        .def("LogDeterminant", [](ConditionalMapBase<DeviceSpace> &map, DeviceMatrix<const double> &pts){ return DeviceMatrix(map.LogDeterminant(pts.data)); })
+        .def("Inverse", [](ConditionalMapBase<DeviceSpace> &map, DeviceMatrix<const double> const &x1, DeviceMatrix<const double> const &r){ return DeviceMatrix(map.Inverse(x1.data, r.data)); })
+        .def("LogDeterminantCoeffGrad", [](ConditionalMapBase<DeviceSpace> &map, DeviceMatrix<const double> const pts){ return DeviceMatrix(map.LogDeterminantCoeffGrad(pts)); })
+        .def("GetBaseFunction", &ConditionalMapBase<DeviceSpace>::GetBaseFunction)
         ;
 }
 #endif

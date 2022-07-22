@@ -100,6 +100,32 @@ Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantCoeffGra
     return output;
 }
 
+#if defined(MPART_ENABLE_GPU)
+template<>
+Eigen::VectorXd ConditionalMapBase<Kokkos::default_execution_space::MemorySpace>::LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
+{
+
+    Eigen::VectorXd output;
+    return output;
+}
+
+template<>
+Eigen::RowMatrixXd ConditionalMapBase<Kokkos::default_execution_space::MemorySpace>::Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1, Eigen::Ref<const Eigen::RowMatrixXd> const& r)
+{
+
+    Eigen::RowMatrixXd output;
+    return output;
+}
+
+template<>
+Eigen::RowMatrixXd ConditionalMapBase<Kokkos::default_execution_space::MemorySpace>::LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
+{
+
+    return output;
+}
+
+#endif
+
 template<typename MemorySpace>
 Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
 {
@@ -111,6 +137,6 @@ Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad(Eige
 
 // Explicit template instantiation
 template class mpart::ConditionalMapBase<Kokkos::HostSpace>;
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
     template class mpart::ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>;
 #endif

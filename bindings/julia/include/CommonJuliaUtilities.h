@@ -56,6 +56,11 @@ void TriangularMapWrapper(jlcxx::Module&);
  */
 void MapFactoryWrapper(jlcxx::Module&);
 
+#if defined(MPART_ENABLE_GPU)
+using DeviceSpace = Kokkos::DefaultExecutionSpace::memory_space;
+void ConditionalMapBaseDeviceWrapper(jlcxx::Module&);
+#endif
+
 } // namespace binding
 } // namespace mpart
 
