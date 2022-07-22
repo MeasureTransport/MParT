@@ -434,3 +434,48 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
     }
 }
+
+
+TEST_CASE("MultiIndexSet Visualization Test", "[MultiIndexSet_Viz]")
+{
+    SECTION("Floating"){
+        Eigen::MatrixXi multis(1,2);
+        multis << 3,3;
+        MultiIndexSet mset = MultiIndexSet(multis);
+
+        std::stringstream sstream;
+        mset.Visualize(sstream);
+
+        std::stringstream expected;
+        expected << " 4 |          m     \n"     
+                << " 3 |       m  a  m  \n"
+                << " 2 |          m     \n"
+                << " 1 |                \n"
+                << " 0 |                \n"
+                << "    ----------------\n"
+                << "     0  1  2  3  4  \n";
+
+        CHECK(expected.str() == sstream.str());
+    }
+
+    SECTION("Fixed"){
+        Eigen::MatrixXi multis(2,2);
+        multis << 1,3,
+                  3,3;
+        MultiIndexSet mset = MultiIndexSet(multis);
+
+        std::stringstream sstream;
+        mset.Visualize(sstream);
+
+        std::stringstream expected;
+        expected <<" 4 |    m     m     \n"     
+                << " 3 | m  a  m  a  m  \n"
+                << " 2 |    m     m     \n"
+                << " 1 |                \n"
+                << " 0 |                \n"
+                << "    ----------------\n"
+                << "     0  1  2  3  4  \n";
+
+        CHECK(expected.str() == sstream.str());
+    }
+}
