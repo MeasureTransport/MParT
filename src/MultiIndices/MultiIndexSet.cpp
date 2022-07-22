@@ -400,7 +400,8 @@ void MultiIndexSet::AddForwardNeighbors(unsigned int globalIndex, bool addInacti
 
 
 void MultiIndexSet::Visualize(std::ostream &out) const
-{
+{ 
+  
   unsigned int max_ord = maxOrders.at(1) + 1;
   for(unsigned int order = 0; order <= maxOrders.at(1) + 1; order++) {
     unsigned int i=max_ord - order;
@@ -421,8 +422,10 @@ void MultiIndexSet::Visualize(std::ostream &out) const
       }
 
       if(!found){
+        bool found2 = false;
         for(auto& multi : allMultis){
           if((multi.Get(0)==j)&&(multi.Get(1)==i)){
+            found2 = true;
             if(IsAdmissible(multi)){
               out << "r  ";
             }else{
@@ -430,6 +433,9 @@ void MultiIndexSet::Visualize(std::ostream &out) const
             }
           }
         }
+
+        if(!found2)
+            out << "   ";
       }
     }
     out << std::endl;
