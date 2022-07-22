@@ -28,7 +28,10 @@ endif()
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-Wno-deprecated-gpu-targets" COMPILER_IS_NVCC1)
 check_cxx_compiler_flag("--expt-relaxed-constexpr" COMPILER_IS_NVCC2)
+set(MPART_ENABLE_GPU OFF)
 if(COMPILER_IS_NVCC1 AND COMPILER_IS_NVCC2)
+    message(STATUS "GPU support detected")
+    set(MPART_ENABLE_GPU ON)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-gpu-targets --expt-relaxed-constexpr")
     add_compile_definitions(EIGEN_NO_CUDA)
 endif()
@@ -39,7 +42,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 ##############################################################
-# RPATH settings 
+# RPATH settings
 
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH FALSE)

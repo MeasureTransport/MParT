@@ -13,5 +13,8 @@ PYBIND11_MODULE(pympart, m) {
     ConditionalMapBaseWrapper(m);
     TriangularMapWrapper(m);
     MapFactoryWrapper(m);
-    
+
+#ifdef MPART_ENABLE_GPU
+    ConditionalMapBaseDeviceWrapper(m);
+#endif
 }
