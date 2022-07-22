@@ -177,10 +177,10 @@ private:
     std::vector<unsigned int> nzVals;
     
     /// The maximum index over all nzInds pairs.
-    unsigned maxValue;
+    unsigned int maxValue;
 
     // the total order of the multiindex (i.e. the sum of the indices)
-    unsigned totalOrder;
+    unsigned int totalOrder;
 
 }; // class MultiIndex
 

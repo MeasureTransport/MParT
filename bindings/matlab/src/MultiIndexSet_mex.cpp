@@ -14,6 +14,7 @@ using namespace mexplus;
 
 // Instance manager for MultiIndexSet
 // To do: bind functions using MultiIndex objects
+//template class mexplus::Session<MultiIndex>;
 template class mexplus::Session<MultiIndexSet>;
 template class mexplus::Session<FixedMultiIndexSet<Kokkos::HostSpace>>;
 
@@ -51,6 +52,7 @@ MEX_DEFINE(MultiIndexSet_IndexToMulti) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   unsigned int activeIndex = input.get<unsigned int>(1);
+  
   output.set(0, Session<MultiIndex>::create(new MultiIndex(mset.IndexToMulti(activeIndex))));
 }
 
@@ -159,13 +161,13 @@ MEX_DEFINE(MultiIndexSet_Expand) (int nlhs, mxArray* plhs[],
   output.set(0, mset->Expand(activeInd));
 }
 
-// MEX_DEFINE(MultiIndexSet_ExpandAny) (int nlhs, mxArray* plhs[],
-//                     int nrhs, const mxArray* prhs[]) {
-//   InputArguments input(nrhs, prhs, 1);
-//   OutputArguments output(nlhs, plhs, 0);
-//   MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
-//   output.set(0, mset->Expand());
-// }
+MEX_DEFINE(MultiIndexSet_ExpandAny) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  output.set(0, mset->Expand());
+}
 
 MEX_DEFINE(MultiIndexSet_ForciblyExpand) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {

@@ -1,6 +1,4 @@
 clear;
-addpath(genpath('~/Installations/MParT/matlab/'))
-
 addpath(genpath('.'));
 
 KokkosInitialize(8);

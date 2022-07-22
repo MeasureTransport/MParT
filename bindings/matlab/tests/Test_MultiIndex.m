@@ -1,6 +1,4 @@
 clear;
-addpath(genpath('~/Installations/MParT/matlab/'))
-
 addpath(genpath('.'));
 
 KokkosInitialize(8);
@@ -12,7 +10,7 @@ multi.String()
 multi2=MultiIndex(6,1);
 multi2.String()
 
-%multi3=MultiIndex(6); %Not sure we want to keep this
+multi3=MultiIndex([0,1,2,3]); %Not sure we want to keep this
 multi3.String()
 
 multi3.Set(1,9);

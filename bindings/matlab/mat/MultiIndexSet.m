@@ -40,8 +40,8 @@ methods
   end
 
   function multi = IndexToMulti(this,activeIndex)
-    multi_id = MParT_('MultiIndexSet_IndexToMulti',this.id_,activeIndex-1);
-    multi = MultiIndex(multi_id,'id');
+    multi_id = MParT_('MultiIndexSet_IndexToMulti', this.id_, activeIndex-1);
+    multi = MultiIndex(multi_id,"id");
   end
 
   function result = MultiToIndex(this,multi)
@@ -59,7 +59,7 @@ methods
 
   function multi = at(this,activeIndex)
     multi_id = MParT_('MultiIndexSet_at', this.id_,activeIndex-1);
-    multi = MultiIndex(multi_id,'id');
+    multi = MultiIndex(multi_id,"id");
   end
 
   function varargout = subsref(this,s) %seems dangerous
@@ -73,7 +73,7 @@ methods
         case '{}'
             activeIndex = s(1).subs{1};
             multi_id = MParT_('MultiIndexSet_subsref',this.id_,activeIndex-1);
-            [varargout{1:nargout}] = MultiIndex(multi_id,'id');
+            [varargout{1:nargout}] = MultiIndex(multi_id,"id");
         otherwise
             error('Indexing expression invalid.')
         end
@@ -130,7 +130,7 @@ methods
     multi_ids = MParT_('MultiIndexSet_AdmissibleFowardNeighbors',this.id_,activeInd-1);
     listMultis = [];
     for i = 1:length(multi_ids)
-      listMultis=[listMultis,MultiIndex(multi_ids(i),'id')];
+      listMultis=[listMultis,MultiIndex(multi_ids(i),"id")];
     end
   end  
 
@@ -143,7 +143,7 @@ methods
     multi_ids = MParT_('MultiIndexSet_Margin',this.id_);
     listMultis = [];
     for i = 1:length(multi_ids)
-      listMultis=[listMultis,MultiIndex(multi_ids(i),'id')];
+      listMultis=[listMultis,MultiIndex(multi_ids(i),"id")];
     end
   end
 
@@ -152,7 +152,7 @@ methods
     multi_ids = MParT_('MultiIndexSet_ReducedMargin',this.id_);
     listMultis = [];
     for i = 1:length(multi_ids)
-      listMultis=[listMultis,MultiIndex(multi_ids(i),'id')];
+      listMultis=[listMultis,MultiIndex(multi_ids(i),"id")];
     end
   end  
 
