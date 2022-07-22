@@ -5,6 +5,8 @@
 #include <Kokkos_Layout.hpp>
 #include <Eigen/Core>
 
+#include "GPUtils.h"
+
 namespace mpart{
 
     /** @defgroup ArrayUtilities
@@ -247,14 +249,6 @@ namespace mpart{
         return outview;
     }
 
-    template<typename DeviceMemoryType, typename ScalarType>
-    Kokkos::View<ScalarType**, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, OtherTraits...>const& inview){
-
-        Kokkos::View<ScalarType**, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
-        Kokkos::deep_copy(outview, inview);
-        return outview;
-    }
-
     template<typename DeviceMemoryType,typename ScalarType>
     Kokkos::View<ScalarType*, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType*, DeviceMemoryType> const& inview){
         return inview;
@@ -299,8 +293,8 @@ namespace mpart{
         @return A 2D Kokkos unmanaged view wrapping the same memory as the eigen ref and using the same strides as the eigen object.
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
-    template<typename ScalarType>
-    inline StridedMatrix<ScalarType, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
+    template<typename ScalarType, typename MemorySpace = Kokkos::HostSpace>
+    inline StridedMatrix<ScalarType, MemorySpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
     {
         Kokkos::LayoutStride strides(ref.rows(), ref.innerStride(), ref.cols(), ref.outerStride());
 
@@ -341,27 +335,26 @@ namespace mpart{
         @return A 2D Kokkos unmanaged view wrapping the same memory as the eigen ref and using the same strides as the eigen object.
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
-    template<typename ScalarType>
-    inline StridedMatrix<ScalarType, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
+    template<typename ScalarType, typename MemorySpace = Kokkos::HostSpace>
+    inline StridedMatrix<ScalarType, MemorySpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
     {
         Kokkos::LayoutStride strides(ref.rows(), ref.outerStride(), ref.cols(), ref.innerStride());
 
-        return Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
+        return Kokkos::View<ScalarType**, Kokkos::LayoutStride, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
     }
 
-    template<typename ScalarType>
-    inline Kokkos::View<const ScalarType**, Kokkos::LayoutRight, Kokkos::HostSpace> ConstRowMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
+    template<typename ScalarType, typename MemorySpace = Kokkos::HostSpace>
+    inline Kokkos::View<const ScalarType**, Kokkos::LayoutRight, MemorySpace> ConstRowMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
     {
         Kokkos::LayoutStride strides(ref.rows(), ref.innerStride(), ref.cols(), ref.outerStride());
-        return Kokkos::View<const ScalarType**, Kokkos::LayoutRight, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), ref.rows(), ref.cols());
+        return Kokkos::View<const ScalarType**, Kokkos::LayoutRight, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), ref.rows(), ref.cols());
     }
 
-    template<typename ScalarType>
-    inline Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, Kokkos::HostSpace> ConstColMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
+    template<typename ScalarType, typename MemorySpace = Kokkos::HostSpace>
+    inline Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, MemorySpace> ConstColMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
     {
-        return Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), ref.rows(), ref.cols());
+        return Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), ref.rows(), ref.cols());
     }
-
 
     /** @brief Converts a 1d Eigen::Ref of a vector to an unmanaged Kokkos view.
         @ingroup ArrayUtilities
@@ -389,12 +382,41 @@ namespace mpart{
         @return A 1d Kokkos unmanaged view wrapping the same memory as the eigen ref and using the same stride as the eigen object.
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
-    template<typename ScalarType>
-    inline Kokkos::View<ScalarType*, Kokkos::LayoutStride, Kokkos::HostSpace> VecToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<Eigen::Dynamic>> ref)
+    template<typename ScalarType, typename MemorySpace = Kokkos::HostSpace>
+    inline Kokkos::View<ScalarType*, Kokkos::LayoutStride, MemorySpace> VecToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<Eigen::Dynamic>> ref)
     {
         Kokkos::LayoutStride strides(ref.rows(), ref.innerStride());
-        return Kokkos::View<ScalarType*, Kokkos::LayoutStride, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
+        return Kokkos::View<ScalarType*, Kokkos::LayoutStride, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
     }
+
+    #if defined(MPART_ENABLE_GPU)
+        template<typename ScalarType>
+        StridedMatrix<ScalarType, DeviceSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
+        {
+            auto host = MatToKokkos<ScalarType>(ref);
+            return ToDevice(host);
+        }
+
+        template<typename ScalarType>
+        inline Kokkos::View<const ScalarType**, Kokkos::LayoutRight, DeviceSpace> ConstRowMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
+        {
+            auto host = ConstRowMatToKokkos<ScalarType,DeviceSpace>(ref);
+            return ToDevice(host);
+        }
+
+        template<typename ScalarType>
+        inline Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, DeviceSpace> ConstColMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
+        {
+            auto host = ConstColMatToKokkos<ScalarType,DeviceSpace>(ref);
+            return ToDevice(host);
+        }
+
+        template<typename ScalarType>
+        inline Kokkos::View<ScalarType*, Kokkos::LayoutStride, DeviceSpace> VecToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<Eigen::Dynamic>> ref) {
+            auto host = VecToKokkos<ScalarType,DeviceSpace>(ref);
+            return ToDevice(host);
+        }
+    #endif
 
     /**
        @brief Converts a 1d Kokkos view with **contiguous** memory to an Eigen::Map
