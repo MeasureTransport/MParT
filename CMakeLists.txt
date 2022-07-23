@@ -88,6 +88,7 @@ endif()
 
 # Add pybind11 if necessary
 if(MPART_PYTHON)
+  find_package(Python COMPONENTS Interpreter Development)
   find_package(pybind11 CONFIG QUIET)
   if(NOT pybind11_FOUND)
     message(STATUS "Could not find pybind11. Using internal build.")
