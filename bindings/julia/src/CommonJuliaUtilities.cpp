@@ -21,11 +21,13 @@ namespace mpart{
 }
 
 
-void initKokkosRuntime(jlcxx::ArrayRef<char*> opts) {
+void mpart::binding::Initialize(jlcxx::ArrayRef<char*> opts) {
     mpart::binding::Initialize(makeInitArguments(opts));
 }
 
-void mpart::binding::CommonUtilitiesWrapper(jlcxx::Module &m)
+void mpart::binding::CommonUtilitiesWrapper(jlcxx::Module &mod)
 {
-    m.method("Initialize", &initKokkosRuntime);
+    mod.method("Initialize", [](){mpart::binding::Initialize(std::vector<std::string> {});});
+    mod.add_type<Kokkos::HostSpace>("HostSpace");
+    mod.add_type<Kokkos::LayoutStride>("LayoutStride");
 }

@@ -15,7 +15,6 @@ namespace mpart {
 
     /**
      @brief Provides an abstract base class for conditional transport maps where the input dimension might be larger than output dimension.
-
      @details
       This class provides an interface for functions \f$T:\mathbb{R}^{N+M}\rightarrow \mathbb{R}^M\f$, where $N\geq 0$. Let
       \f$x_1\in \mathbb{R}^N\f$ denote the first block of inputs and \f$x_2\in\mathbb{R}^M\f$ denote the second block of inputs.
@@ -32,7 +31,6 @@ namespace mpart {
 
         /**
          @brief Construct a new Conditional Map Base object
-
          @param inDim The dimension \f$N\f$ of the input to this map.
          @param outDim The dimension \f$M\f$ of the output from this map.
          */
@@ -46,7 +44,6 @@ namespace mpart {
         virtual std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> GetBaseFunction(){return nullptr;};
 
         /** @brief Computes the log determinant of the map Jacobian.
-
         For a map \f$T:\mathbb{R}^N\rightarrow \mathbb{R}^M\f$ with \f$M\leq N\f$ and components \f$T_i(x_{1:N-M+i})\f$, this
         function computes the determinant of the Jacobian of \f$T\f$ with respect to \f$x_{N-M:N}\f$.  While the map is rectangular,
         the Jacobian with respect to these inputs will be square.  The fact that the map is lower triangular will then imply that
@@ -54,29 +51,28 @@ namespace mpart {
         \f[
             \det{\nabla_{x_{N-M:N}} T} = \prod_{i=1}^M \frac{\partial T_i}{\partial x_{N-M+i}}.
         \f]
-
         @param pts The points where we want to evaluate the log determinant.
         */
-        virtual Kokkos::View<double*, MemorySpace> LogDeterminant(Kokkos::View<const double**, MemorySpace> const& pts);
+        virtual Kokkos::View<double*, MemorySpace> LogDeterminant(StridedMatrix<const double, MemorySpace> const& pts);
 
         virtual Eigen::VectorXd LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual void LogDeterminantImpl(Kokkos::View<const double**, MemorySpace> const& pts,
-                                        Kokkos::View<double*, MemorySpace>             &output) = 0;
+        virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                        StridedVector<double, MemorySpace>              output) = 0;
 
 
         /** Returns the value of \f$x_2\f$ given \f$x_1\f$ and \f$r\f$.   Note that the \f$x1\f$ view may contain more
             than \f$N\f$ rows, but only the first \f$N\f$ will be used in this function.
         */
-        virtual Kokkos::View<double**, MemorySpace> Inverse(Kokkos::View<const double**, MemorySpace> const& x1,
-                                                            Kokkos::View<const double**, MemorySpace> const& r);
+        virtual StridedMatrix<double, MemorySpace> Inverse(StridedMatrix<const double, MemorySpace> const& x1,
+                                                           StridedMatrix<const double, MemorySpace> const& r);
 
         virtual Eigen::RowMatrixXd Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1, 
                                            Eigen::Ref<const Eigen::RowMatrixXd> const& r);
 
-        virtual void InverseImpl(Kokkos::View<const double**, MemorySpace> const& x1,
-                                 Kokkos::View<const double**, MemorySpace> const& r,
-                                 Kokkos::View<double**, MemorySpace>            & output) = 0;
+        virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+                                 StridedMatrix<const double, MemorySpace> const& r,
+                                 StridedMatrix<double, MemorySpace>              output) = 0;
         /**
            @brief Computes the gradient of the log determinant with respect to the map coefficients.
            @details For a map \f$T(x; w) : \mathbb{R}^N \rightarrow \mathbb{R}^M\f$ parameterized by coefficients \f$w\in\mathbb{R}^K\f$,
@@ -88,12 +84,12 @@ namespace mpart {
            @param pts A collection of points where we want to evaluate the gradient.  Each column corresponds to a point.
            @return A matrix containing the coefficient gradient at each input point.  The \f$i^{th}\f$ column  contains \f$\nabla_w \det{\nabla_x T(x_i; w)}\f$.
          */
-        virtual Kokkos::View<double**, MemorySpace> LogDeterminantCoeffGrad(Kokkos::View<const double**, MemorySpace> const& pts);
+        virtual StridedMatrix<double, MemorySpace> LogDeterminantCoeffGrad(StridedMatrix<const double, MemorySpace> const& pts);
 
         virtual Eigen::RowMatrixXd LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual void LogDeterminantCoeffGradImpl(Kokkos::View<const double**, MemorySpace> const& pts, 
-                                                 Kokkos::View<double**, MemorySpace> &output) = 0;
+        virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                                 StridedMatrix<double, MemorySpace>              output) = 0;
 
 
     }; // class ConditionalMapBase<MemorySpace>

@@ -15,7 +15,7 @@ Tutorials
 
     Construct a transport map using samples of a distribution.
 
-    .. link-button:: ./fromsamples.html
+    .. link-button:: https://github.com/MeasureTransport/SIAMannual22/blob/main/tutorial_code_AN22.ipynb
         :type: url
         :text: Learn more
         :classes: btn-secondary stretched-link
@@ -28,7 +28,7 @@ Tutorials
 
     Construct a transport map using density evaluations.
 
-    .. link-button:: ./fromdensity.html
+    .. link-button:: https://github.com/MeasureTransport/SIAMannual22/blob/main/tutorial_code_AN22.ipynb
         :type: url
         :text: Learn more
         :classes: btn-secondary stretched-link
@@ -41,7 +41,7 @@ Tutorials
 
     Fit data with a monotone function.
 
-    .. link-button:: ./regression.html
+    .. link-button:: https://github.com/MeasureTransport/SIAMannual22/blob/main/tutorial_code_AN22.ipynb
         :type: url
         :text: Learn more
         :classes: btn-secondary stretched-link

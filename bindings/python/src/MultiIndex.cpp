@@ -52,7 +52,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def(py::init<Eigen::Ref<const Eigen::MatrixXi> const&>())
         .def("fix", &MultiIndexSet::Fix)
         .def("__len__", &MultiIndexSet::Length)
-        .def("__getitem__", &MultiIndexSet::operator[])
+        .def("__getitem__", &MultiIndexSet::at)
         .def("at", &MultiIndexSet::at)
         .def("Size", &MultiIndexSet::Size)
 

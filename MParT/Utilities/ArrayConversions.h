@@ -10,13 +10,20 @@ namespace mpart{
     /** @defgroup ArrayUtilities
         @brief Code for converting between different array types.  Often used in bindings to other languages.
     */
-    
-    /** @brief Converts a pointer to a 1d unmanaged Kokkos view.  
+
+    /** Alias declaration for strided Kokkos matrix type. */
+    template<typename ScalarType, typename MemorySpace>
+    using StridedMatrix = Kokkos::View<ScalarType**, Kokkos::LayoutStride, MemorySpace>;
+
+    template<typename ScalarType, typename MemorySpace>
+    using StridedVector = Kokkos::View<ScalarType*, Kokkos::LayoutStride, MemorySpace>;
+
+    /** @brief Converts a pointer to a 1d unmanaged Kokkos view.
         @ingroup ArrayUtilities
-        @details Creates a Kokkos unmanaged view around a preallocated block of memory.  
-                 The unmanaged view will not free the memory so all allocations and deallocations 
+        @details Creates a Kokkos unmanaged view around a preallocated block of memory.
+                 The unmanaged view will not free the memory so all allocations and deallocations
                  need to be handled manually (or via another object like an Eigen::Matrix).  Currently
-                 only works for memory on the Host device.  
+                 only works for memory on the Host device.
 
         <h3>Usage Examples </h3>
 
@@ -28,7 +35,7 @@ namespace mpart{
         Kokkos::View<double*> view = ToKokkos<double>(&array[0], array.size());
         @endcode
 
-        @param[in] ptr A pointer to a block of memory defining the array.  Note 
+        @param[in] ptr A pointer to a block of memory defining the array.  Note
         @param[in] dim The length of the array.
         @return A Kokkos view wrapping around the memory pointed to by ptr.
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
@@ -39,12 +46,18 @@ namespace mpart{
         return Kokkos::View<ScalarType*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, dim);
     }
 
-    /** @brief Converts a pointer to a 2d unmanaged Kokkos view.  
+    template<typename ScalarType>
+    inline Kokkos::View<const ScalarType*,Kokkos::HostSpace> ToConstKokkos(ScalarType* ptr, unsigned int dim)
+    {
+        return Kokkos::View<const ScalarType*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, dim);
+    }
+
+    /** @brief Converts a pointer to a 2d unmanaged Kokkos view.
         @ingroup ArrayUtilities
-        @details Creates a Kokkos unmanaged view around a preallocated block of memory. 
-                 The unmanaged view will not free the memory so all allocations and deallocations 
+        @details Creates a Kokkos unmanaged view around a preallocated block of memory.
+                 The unmanaged view will not free the memory so all allocations and deallocations
                  need to be handled manually (or via another object like an Eigen::Matrix).  Currently
-                 only works for memory on the Host device.  
+                 only works for memory on the Host device.
 
         <h3>Usage Examples </h3>
 
@@ -77,9 +90,83 @@ namespace mpart{
     */
     template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft>
     inline Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace> ToKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
-    {   
+    {
         return Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
+
+    template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft>
+    inline Kokkos::View<const ScalarType**, LayoutType, Kokkos::HostSpace> ToConstKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
+    {
+        return Kokkos::View<const ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
+    }
+
+
+    /**
+     * @brief Returns a copy of a one dimensional Kokkos::View in the form of a std::vector.
+     *
+     * @tparam ScalarType
+     * @param view
+     * @return std::vector<std::remove_const<ScalarType>::type>
+     */
+    template<typename ScalarType, class... ViewTraits>
+    std::vector<typename std::remove_const<ScalarType>::type> KokkosToStd(Kokkos::View<ScalarType*,ViewTraits...> const& view)
+    {
+        std::vector<typename std::remove_const<ScalarType>::type> output(view.extent(0));
+        for(unsigned int i=0; i<view.extent(0); ++i)
+            output[i] = view(i);
+        return output;
+    }
+
+    /**
+     * @brief Wraps a std::vector in a StridedVector
+     *
+     * @tparam ScalarType
+     * @tparam MemorySpace
+     * @param vec
+     * @return StridedVector<ScalarType*, MemorySpace>
+     */
+    template<typename ScalarType, class MemorySpace>
+    StridedVector<ScalarType, Kokkos::HostSpace> VecToKokkos(std::vector<ScalarType> &vec)
+    {
+        return Kokkos::View<ScalarType*, MemorySpace>(vec.data(), vec.size());
+    }
+
+    /**
+     * @brief Wraps a std::vector in a StridedMatrix
+     *
+     * @tparam ScalarType
+     * @tparam MemorySpace
+     * @param vec
+     * @return Kokkos::View<ScalarType*, MemorySpace>
+     */
+    template<typename ScalarType, class MemorySpace>
+    StridedMatrix<ScalarType, Kokkos::HostSpace> MatToKokkos(std::vector<ScalarType> &vec, int cols)
+    {
+        auto rows = vec.size()/cols;
+        return Kokkos::View<ScalarType**, MemorySpace>(vec.data(), rows, cols);
+    }
+
+    template<typename ScalarType, class MemorySpace>
+    StridedVector<const ScalarType, MemorySpace> VecToConstKokkos(std::vector<ScalarType> &vec)
+    {
+        return Kokkos::View<const ScalarType*, MemorySpace>(vec.data(), vec.size());
+    }
+
+    /**
+     * @brief Wraps a std::vector in a StridedMatrix
+     *
+     * @tparam ScalarType
+     * @tparam MemorySpace
+     * @param vec
+     * @return Kokkos::View<ScalarType*, MemorySpace>
+     */
+    template<typename ScalarType, class MemorySpace>
+    StridedMatrix<const ScalarType, Kokkos::HostSpace> MatToConstKokkos(std::vector<ScalarType> &vec, int cols)
+    {
+        auto rows = vec.size()/cols;
+        return Kokkos::View<const ScalarType**, MemorySpace>(vec.data(), rows, cols);
+    }
+
 
     /**
     @brief Copies a Kokkos array from device memory to host memory
@@ -117,7 +204,7 @@ namespace mpart{
     Kokkos::View<double**,Kokkos::CudaSpace> deviceView("Some stuff on the device", N1, N2);
     Kokkos::View<double*,Kokkos::HostSpace> hostView = ToHost(deviceView, 2, Kokkos::All() ); // Similar to python notation: deviceView[2,:]
     @endcode
-    
+
     @param[in] inview A kokkos array in device memory.
     @param[in] sliceParams One or more parameters defining a Kokkos::subview.  See the [Kokkos Subview documentation](https://github.com/kokkos/kokkos/wiki/Subviews#112-how-to-take-a-subview) for more details.
     @return A kokkos array in host memory.  Note that the layout (row-major or col-major) might be different than the default on the Host.  The layout will match the device's default layout.
@@ -140,8 +227,8 @@ namespace mpart{
     /**
     @brief Copies a 1d Kokkos array from host memory to device memory.
     @details
-    @param[in] inview A kokkos array in host memory. 
-    @return A kokkos array in device memory. 
+    @param[in] inview A kokkos array in host memory.
+    @return A kokkos array in device memory.
     */
     template<typename DeviceMemoryType,typename ScalarType>
     Kokkos::View<ScalarType*, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType*, Kokkos::HostSpace> const& inview){
@@ -172,16 +259,16 @@ namespace mpart{
 
 
 #endif
-    
-    /** @brief Converts a column major 2d Eigen::Ref of a matrix to an unmanaged Kokkos view.  
+
+    /** @brief Converts a column major 2d Eigen::Ref of a matrix to an unmanaged Kokkos view.
         @ingroup ArrayUtilities
-        @details Creates a Kokkos unmanaged view around an existing Eigen object. 
+        @details Creates a Kokkos unmanaged view around an existing Eigen object.
                  Currently only works with objects on the Host.
 
-                Note that this function returns a Kokkos::View with strided layout.  This is different than the typical 
-                Kokkos::LayoutLeft and Kokkos::LayoutRight layouts typically used by default.   A list of admissable 
+                Note that this function returns a Kokkos::View with strided layout.  This is different than the typical
+                Kokkos::LayoutLeft and Kokkos::LayoutRight layouts typically used by default.   A list of admissable
                 conversions between layout types can be found in [the Kokkos documentation](https://github.com/kokkos/kokkos/wiki/View#655-conversion-rules-and-function-specialization).
-        
+
         <h4>Usage examples:</h4>
         @code{.cpp}
         Eigen::MatrixXd A;
@@ -189,7 +276,7 @@ namespace mpart{
 
         // Create a 2d view to the matrix
         auto view = MatToKokkos<double>(A);
-        @endcode 
+        @endcode
 
         @code{.cpp}
         Eigen::MatrxXd A;
@@ -197,7 +284,7 @@ namespace mpart{
 
         // Create a 2d view to a 10x10 block of the matrix
         auto view = MatToKokkos<double>( A.block(1,2,10,10) );
-        @endcode 
+        @endcode
 
 
         @param[in] ref The reference to the eigen reference.
@@ -205,16 +292,16 @@ namespace mpart{
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
     template<typename ScalarType>
-    inline Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
-    {   
+    inline StridedMatrix<ScalarType, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
+    {
         Kokkos::LayoutStride strides(ref.rows(), ref.innerStride(), ref.cols(), ref.outerStride());
 
         return Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
     }
 
-    /** @brief Converts a row major 2d Eigen::Ref of a matrix to an unmanaged Kokkos view.  
+    /** @brief Converts a row major 2d Eigen::Ref of a matrix to an unmanaged Kokkos view.
         @ingroup ArrayUtilities
-        @details Creates a Kokkos unmanaged view around an existing Eigen object. 
+        @details Creates a Kokkos unmanaged view around an existing Eigen object.
                  Currently only works with objects on the Host.
 
         <h3>Usage examples:</h3>
@@ -224,7 +311,7 @@ namespace mpart{
 
         // Create a 2d view to the matrix
         auto view = MatToKokkos<double>(A);
-        @endcode 
+        @endcode
 
         @code{cpp}
         Eigen::Matrix<double,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor> A;
@@ -232,7 +319,7 @@ namespace mpart{
 
         // Create a 2d view to a 10x10 block of the matrix
         auto view = MatToKokkos<double>( A.block(1,2,10,10) );
-        @endcode 
+        @endcode
 
         @code{cpp}
         Eigen::MatrixXd A;
@@ -240,15 +327,15 @@ namespace mpart{
 
         // Create a 2d view to the transpose of the matrix
         auto view = MatToKokkos<double>( A.transpose() );
-        @endcode 
+        @endcode
 
         @param[in] ref The reference to the eigen reference.
         @return A 2D Kokkos unmanaged view wrapping the same memory as the eigen ref and using the same strides as the eigen object.
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
     template<typename ScalarType>
-    inline Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
-    {   
+    inline StridedMatrix<ScalarType, Kokkos::HostSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
+    {
         Kokkos::LayoutStride strides(ref.rows(), ref.outerStride(), ref.cols(), ref.innerStride());
 
         return Kokkos::View<ScalarType**, Kokkos::LayoutStride, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
@@ -256,21 +343,21 @@ namespace mpart{
 
     template<typename ScalarType>
     inline Kokkos::View<const ScalarType**, Kokkos::LayoutRight, Kokkos::HostSpace> ConstRowMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
-    {   
+    {
         Kokkos::LayoutStride strides(ref.rows(), ref.innerStride(), ref.cols(), ref.outerStride());
         return Kokkos::View<const ScalarType**, Kokkos::LayoutRight, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), ref.rows(), ref.cols());
     }
 
     template<typename ScalarType>
     inline Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, Kokkos::HostSpace> ConstColMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
-    {   
+    {
         return Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), ref.rows(), ref.cols());
     }
 
 
-    /** @brief Converts a 1d Eigen::Ref of a vector to an unmanaged Kokkos view.  
+    /** @brief Converts a 1d Eigen::Ref of a vector to an unmanaged Kokkos view.
         @ingroup ArrayUtilities
-        @details Creates a Kokkos unmanaged view around an existing Eigen object. 
+        @details Creates a Kokkos unmanaged view around an existing Eigen object.
                  Currently only works with objects on the Host.
 
         <h4>Usage examples:</h4>
@@ -280,7 +367,7 @@ namespace mpart{
 
         // Create a 1d view to the vector
         auto view = VecToKokkos<double>(x);
-        @endcode 
+        @endcode
 
         @code{.cpp}
         Eigen::MatrxXd A;
@@ -288,7 +375,7 @@ namespace mpart{
 
         // Create a 1d view to the first row of the matrix
         auto view = VecToKokkos<double>(A.row(0));
-        @endcode 
+        @endcode
 
         @param[in] ref The reference to the eigen reference.
         @return A 1d Kokkos unmanaged view wrapping the same memory as the eigen ref and using the same stride as the eigen object.
@@ -296,7 +383,7 @@ namespace mpart{
     */
     template<typename ScalarType>
     inline Kokkos::View<ScalarType*, Kokkos::LayoutStride, Kokkos::HostSpace> VecToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<Eigen::Dynamic>> ref)
-    {   
+    {
         Kokkos::LayoutStride strides(ref.rows(), ref.innerStride());
         return Kokkos::View<ScalarType*, Kokkos::LayoutStride, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
     }
@@ -325,7 +412,7 @@ namespace mpart{
     */
     template<typename ScalarType, typename... OtherTraits>
     inline Eigen::Map<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<>> KokkosToVec(Kokkos::View<ScalarType*, Kokkos::LayoutStride, OtherTraits...> view){
-        
+
         size_t stride;
         view.stride(&stride);
         return Eigen::Map<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<>>(view.data(), view.extent(0), Eigen::InnerStride<>(stride));
@@ -345,7 +432,7 @@ namespace mpart{
         return KokkosToVec(view);
     }
 
-    
+
     // Template metaprogram for getting the Eigen layout type (e.g., ColMajor or RowMajor) that corresponds to the Kokkos layouttype (e.g., LayoutLeft or LayoutRight)
     template<typename KokkosLayoutType>
     struct LayoutToEigen{
@@ -372,7 +459,7 @@ namespace mpart{
 
     /**
      @brief Creates an Eigen::Map around existing memory in a 2D Kokkos::View with either LayoutLeft or LayoutRight layouts.
-      
+
      @tparam ScalarType The scalar type stored in the Kokkos::View (e.g., double, unsigned int)
      @tparam OtherTraits Other properties of the Kokkos::View
      @param view The Kokkos matrix we wish wrap with an Eigen view.
@@ -380,7 +467,7 @@ namespace mpart{
      */
     template<typename ScalarType, typename... OtherTraits>
     inline Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**,OtherTraits...>>::Type, 0, Eigen::OuterStride<>> KokkosToMat(Kokkos::View<ScalarType**,OtherTraits...> view)
-    {      
+    {
         size_t strides[2];
         view.stride(strides);
         assert((strides[0]==1)||(strides[1]==1));
@@ -389,13 +476,13 @@ namespace mpart{
 
     /**
      @brief Creates an Eigen::Map around existing memory in a 2D Kokkos::View with the general LayoutStride layouts.
-     
+
      @details
-      Note that no memory is copied here, the Eigen::Map simply wraps around the memory used by the Kokkos::View.  If you 
-      change a value of the map, it will therefore change a value in the view.  If this isn't what you want, you can 
+      Note that no memory is copied here, the Eigen::Map simply wraps around the memory used by the Kokkos::View.  If you
+      change a value of the map, it will therefore change a value in the view.  If this isn't what you want, you can
       perform a deep copy of the view using the mpart::CopyKokkosToMat function, which has the same arguments.
 
-     <h3>Typical usage</h3> 
+     <h3>Typical usage</h3>
      @code{cpp}
      Kokkos::View<double**, Kokkos::HostSpace> view("View", N, M);
      auto map = KokkosToMat(view);
@@ -411,7 +498,7 @@ namespace mpart{
      */
     template<typename ScalarType, typename... OtherTraits>
     inline Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**, OtherTraits...>>::Type, 0, Eigen::Stride<Eigen::Dynamic,Eigen::Dynamic>> KokkosToMat(Kokkos::View<ScalarType**, Kokkos::LayoutStride, OtherTraits...> view){
-        
+
         size_t strides[2];
         view.stride(strides);
         return Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**, Kokkos::LayoutStride, OtherTraits...>>::Type, 0, Eigen::Stride<Eigen::Dynamic,Eigen::Dynamic>>(view.data(), view.extent(0), view.extent(1), Eigen::Stride<Eigen::Dynamic,Eigen::Dynamic>(strides[0],strides[1]));
@@ -419,12 +506,12 @@ namespace mpart{
 
     /**
      @brief Copies the contents of a Kokkos view into an Eigen matrix with the same memory layout (row major or column major).
-     
+
      @details
-      If you do not need to copy the memory, the mpart::KokkosToMat function, which returns an Eigen::Map, will likely be more 
+      If you do not need to copy the memory, the mpart::KokkosToMat function, which returns an Eigen::Map, will likely be more
       efficient because it does not copy anything.
 
-     <h3>Typical usage</h3> 
+     <h3>Typical usage</h3>
      For a column-major view:
      @code{cpp}
      Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> view("View", N, M);

@@ -111,7 +111,7 @@ MultiIndexSet set(length, limiter);
       @param[in] activeIndex Linear index of interest.
       @return A constant reference to the MultiIndex.
   */
-  MultiIndex const& IndexToMulti(unsigned int activeIndex) const{return allMultis.at(active2global.at(activeIndex));};
+  MultiIndex IndexToMulti(unsigned int activeIndex) const{return allMultis.at(active2global.at(activeIndex));};
 
   /** Given a multiindex, return the linear index where it is located.
       @param[in] input An instance of the MultiIndex class.
@@ -138,7 +138,7 @@ MultiIndexSet set(length, limiter);
     @param[in] activeIndex The index of the active MultiIndex to return.
     @return A pointer to the MultiIndex at index outputIndex.
     */
-  MultiIndex const& at(int activeIndex) const{return IndexToMulti(activeIndex);}
+  MultiIndex at(int activeIndex) const{return IndexToMulti(activeIndex);}
 
   /**
     * This function provides access to each of the MultiIndices without any bounds checking on the vector.
@@ -170,7 +170,7 @@ MultiIndexSet set(length, limiter);
             already in the set and if the input function is unique, it is
             added to the set.
     @param[in] rhs The MultiIndex we want to add to the set.
-    @return A reference to this MultiIndex set, which may now contain the new
+    @return A reference to this MultiIndex, which may now contain the new
             MultiIndex in rhs.
     */
   MultiIndexSet& operator+=(MultiIndex const& rhs);
