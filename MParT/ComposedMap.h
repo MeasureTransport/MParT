@@ -93,10 +93,6 @@ public:
                              StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void InverseInplace(StridedMatrix<double, MemorySpace>              x1,
-                                StridedMatrix<const double, MemorySpace> const& r);
-
-
     virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override;

@@ -6,7 +6,7 @@ using namespace mpart;
 
 template<typename MemorySpace>
 ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components) : ConditionalMapBase<MemorySpace>(components.front()->inputDim,
-                                                                                                                                                         components.back()->output,
+                                                                                                                                                         components.back()->outputDim,
                         std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
                         comps_(components)
 {
@@ -44,24 +44,24 @@ void ComposedMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, Me
 {
 
 
-    // LogDet of first component
-    comps_.at(0)->LogDeterminantImpl(pts, output);
+    // // LogDet of first component
+    // comps_.at(0)->LogDeterminantImpl(pts, output);
 
-    //
-    if(comps_.size()==1)
-        return;
+    // //
+    // if(comps_.size()==1)
+    //     return;
 
-    // intermediate points and variable to hold logdet increments 
-    StridedMatrix<const double, MemorySpace> intermediatePts;
-    Kokkos::deep_copy(intermediatePts, pts);
+    // // intermediate points and variable to hold logdet increments 
+    // StridedMatrix<const double, MemorySpace> intermediatePts;
+    // Kokkos::deep_copy(intermediatePts, pts);
 
-    Kokkos::View<double*, MemorySpace> compDetIncrement("Log Determinant", output.extent(0));
-    for(unsigned int i=1; i<comps_.size(); ++i){
+    // Kokkos::View<double*, MemorySpace> compDetIncrement("Log Determinant", output.extent(0));
+    // for(unsigned int i=1; i<comps_.size(); ++i){
         
-        comps_.at(i)->EvaluateImpl(intermediatePts, intermediatePts);
-        comps_.at(i)->LogDeterminantImpl(intermediatePts, compDetIncrement);
-        output += compDetIncrement;
-    }
+    //     comps_.at(i)->EvaluateImpl(intermediatePts, intermediatePts);
+    //     comps_.at(i)->LogDeterminantImpl(intermediatePts, compDetIncrement);
+    //     output += compDetIncrement;
+    // }
 
 }
 
@@ -143,10 +143,9 @@ void ComposedMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const d
 }
 
 
-// I don't know what this does and why it break make step
 
-// // Explicit template instantiation
-// template class mpart::ComposedMap<Kokkos::HostSpace>;
-// #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
-//     template class mpart::ComposedMap<Kokkos::DefaultExecutionSpace::memory_space>;
-// #endif
+// Explicit template instantiation
+template class mpart::ComposedMap<Kokkos::HostSpace>;
+#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+    template class mpart::ComposedMap<Kokkos::DefaultExecutionSpace::memory_space>;
+#endif
