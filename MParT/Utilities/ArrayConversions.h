@@ -391,29 +391,29 @@ namespace mpart{
 
     #if defined(MPART_ENABLE_GPU)
         template<typename ScalarType>
-        StridedMatrix<ScalarType, DeviceSpace> MatToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
+        StridedMatrix<ScalarType, DeviceSpace> MatToKokkos<ScalarType, DeviceSpace>(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)
         {
-            auto host = MatToKokkos<ScalarType>(ref);
+            auto host = MatToKokkos<ScalarType,Kokkos::HostSpace>(ref);
             return ToDevice(host);
         }
 
         template<typename ScalarType>
-        inline Kokkos::View<const ScalarType**, Kokkos::LayoutRight, DeviceSpace> ConstRowMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
+        inline Kokkos::View<const ScalarType**, Kokkos::LayoutRight, DeviceSpace> ConstRowMatToKokkos<ScalarType,DeviceSpace>(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
         {
-            auto host = ConstRowMatToKokkos<ScalarType,DeviceSpace>(ref);
+            auto host = ConstRowMatToKokkos<ScalarType,Kokkos::HostSpace>(ref);
             return ToDevice(host);
         }
 
         template<typename ScalarType>
-        inline Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, DeviceSpace> ConstColMatToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
+        inline Kokkos::View<const ScalarType**, Kokkos::LayoutLeft, DeviceSpace> ConstColMatToKokkos<ScalarType,DeviceSpace>(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::ColMajor>, 0, Eigen::Stride<Eigen::Dynamic, 1>> const& ref)
         {
-            auto host = ConstColMatToKokkos<ScalarType,DeviceSpace>(ref);
+            auto host = ConstColMatToKokkos<ScalarType,Kokkos::HostSpace>(ref);
             return ToDevice(host);
         }
 
         template<typename ScalarType>
-        inline Kokkos::View<ScalarType*, Kokkos::LayoutStride, DeviceSpace> VecToKokkos(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<Eigen::Dynamic>> ref) {
-            auto host = VecToKokkos<ScalarType,DeviceSpace>(ref);
+        inline Kokkos::View<ScalarType*, Kokkos::LayoutStride, DeviceSpace> VecToKokkos<ScalarType,DeviceSpace>(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<Eigen::Dynamic>> ref) {
+            auto host = VecToKokkos<ScalarType,Kokkos::HostSpace>(ref);
             return ToDevice(host);
         }
     #endif

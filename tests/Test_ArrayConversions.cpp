@@ -170,7 +170,7 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 1D", "[EigenArrayConversions1
         x(i) = i;
 
     SECTION("contiguous"){
-        auto x_view = VecToKokkos<double>(x);
+        StridedVector<ScalarType, Kokkos::HostSpace> x_view = VecToKokkos<double>(x);
         for(unsigned int i=0; i<size; ++i){
             CHECK(x_view(i)==x(i));   
             CHECK(&x_view(i) == &x(i));
