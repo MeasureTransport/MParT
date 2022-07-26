@@ -77,20 +77,22 @@ Or, with the additional specification of the number of Kokkos threads to use:
 
    This often results when due to conda environment mismatches, but can typically be circumvented by explicitly setting the path to your python executable.  When calling cmake, add :code:`-DPYTHON_EXECUTABLE=`which python``.
 
-.. tip:: 
+.. tip::
   On OSX, using MParT with the system version of python might result in an error with something like:
-  
+
   .. code-block::
 
     ImportError: dlopen(pympart.so, 2): no suitable image found.  Did find:
         MParT/python/mpart/pympart.so: mach-o, but wrong architecture
         MParT/python/mpart/pympart.so: mach-o, but wrong architecture
 
-  You can sometimes force OSX to use the x86_64 version of python using the :code:`arch` executable.   For example, to run a script :code:`test.py`, you can use 
+  You can sometimes force OSX to use the x86_64 version of python using the :code:`arch` executable.   For example, to run a script :code:`test.py`, you can use
 
   .. code-block::
 
     arch -x86_64 /usr/bin/python test.py
+
+.. _compiling_julia:
 
 Compiling with Julia Bindings
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -109,6 +111,7 @@ Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :
 .. tabbed:: MacOS
 
     .. code-block:: bash
+
         $ export DYLD_LIBRARY_PATH=<your MParT install path>/julia/mpart/:$DYLD_LIBRARY_PATH
         $ export JULIA_LOAD_PATH="<your MParT install path>/julia/mpart/:$JULIA_LOAD_PATH"
 
