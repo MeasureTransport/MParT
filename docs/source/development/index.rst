@@ -1,22 +1,22 @@
 .. _development:
 
-Development 
+Development
 =============
 
 We're always looking to grow the MParT development team.   Below is information on how you can help make MParT better.
 
 
-Reporting a Bug 
+Reporting a Bug
 ----------------
 
-Requesting a Feature 
+Requesting a Feature
 ---------------------
 
 Contributing
 --------------
 
 Building the Documentation
-----------------------
+---------------------------
 
 1. Make sure doxygen, sphinx, breathe, and the pydata-sphinx-theme are installed.  This is easily done with anaconda:
 
