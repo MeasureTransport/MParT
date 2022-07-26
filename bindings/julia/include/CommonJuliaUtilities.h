@@ -11,9 +11,6 @@
 namespace mpart{
 namespace binding{
 
-/** Define a wrapper around Kokkos::Initialize that accepts a sequence of Cstrings. */
-void Initialize(jlcxx::ArrayRef<char*>);
-
 /**
    @brief Adds Kokkos bindings to the existing module m.
    @param mod CxxWrap.jl module

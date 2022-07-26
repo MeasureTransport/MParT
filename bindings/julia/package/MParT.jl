@@ -5,11 +5,14 @@ module MParT
 
     function __init__()
         @initcxx
-        Initialize()
+        threads = get(ENV, "KOKKOS_NUM_THREADS", nothing)
+        opts = isnothing(threads) ? [] : ["kokkos_num_threads", threads]
+        length(opts) > 0 && @info "Using MParT options: "*string(string.(opts))
+        Initialize(StdVector(StdString.(opts)))
     end
 
     module BasisTypes
-        using CxxWrap    
+        using CxxWrap
         @wrapmodule("libmpartjl", :BasisType_julia_module)
         function __init__()
             @initcxx
