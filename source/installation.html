@@ -310,7 +310,7 @@ make install
 </div>
 </div>
 <section id="compiling-with-julia-bindings">
-<h3>Compiling with Julia Bindings<a class="headerlink" href="#compiling-with-julia-bindings" title="Permalink to this heading">#</a></h3>
+<span id="compiling-julia"></span><h3>Compiling with Julia Bindings<a class="headerlink" href="#compiling-with-julia-bindings" title="Permalink to this heading">#</a></h3>
 <p>By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code> package is installed.   To install <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code>, run the following command in your Julia prompt:</p>
 <div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="n">Pkg</span><span class="p">;</span> <span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;CxxWrap&quot;</span><span class="p">)</span>
 </pre></div>
@@ -319,12 +319,16 @@ make install
 <p>To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=OFF</span></code> during the CMake configuration.</p>
 <p>Once MParT is installed with Julia bindings (i.e. <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=ON</span></code>) into <code class="code docutils literal notranslate"><span class="pre">&lt;your</span> <span class="pre">MParT</span> <span class="pre">install</span> <span class="pre">path&gt;/julia/</span></code>, you can easily use <code class="code docutils literal notranslate"><span class="pre">mpart</span></code> in Julia by first adding the path to your library path</p>
 <div class="tabbed-set docutils">
-<input checked="checked" id="e7a5a8ee-1caf-4ddb-95b4-9098c99d07b3" name="f2f8b7cb-9ffd-42bb-8a8f-1b0a225f386e" type="radio">
-</input><label class="tabbed-label" for="e7a5a8ee-1caf-4ddb-95b4-9098c99d07b3">
+<input checked="checked" id="3a600e8e-f8a1-434a-9e78-03002b6a3801" name="df62fed2-fa1f-47d0-9770-0e12249bb1e7" type="radio">
+</input><label class="tabbed-label" for="3a600e8e-f8a1-434a-9e78-03002b6a3801">
 MacOS</label><div class="tabbed-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>&lt;your MParT install path&gt;/julia/mpart/:<span class="nv">$DYLD_LIBRARY_PATH</span>
+$ <span class="nb">export</span> <span class="nv">JULIA_LOAD_PATH</span><span class="o">=</span><span class="s2">&quot;&lt;your MParT install path&gt;/julia/mpart/:</span><span class="nv">$JULIA_LOAD_PATH</span><span class="s2">&quot;</span>
+</pre></div>
 </div>
-<input id="d2ba91ce-73b7-4d31-8f97-c4d3b56a539a" name="f2f8b7cb-9ffd-42bb-8a8f-1b0a225f386e" type="radio">
-</input><label class="tabbed-label" for="d2ba91ce-73b7-4d31-8f97-c4d3b56a539a">
+</div>
+<input id="133fb267-15df-4d54-a383-eca52999ec5d" name="df62fed2-fa1f-47d0-9770-0e12249bb1e7" type="radio">
+</input><label class="tabbed-label" for="133fb267-15df-4d54-a383-eca52999ec5d">
 Linux</label><div class="tabbed-content docutils">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>&lt;your MParT install path&gt;/julia/mpart/:<span class="nv">$LD_LIBRARY_PATH</span>
 $ <span class="nb">export</span> <span class="nv">JULIA_LOAD_PATH</span><span class="o">=</span><span class="s2">&quot;&lt;your MParT install path&gt;/julia/mpart/:</span><span class="nv">$JULIA_LOAD_PATH</span><span class="s2">&quot;</span>
