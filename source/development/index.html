@@ -198,6 +198,11 @@
    Contributing
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#building-the-documentation">
+   Building the Documentation
+  </a>
+ </li>
 </ul>
 
 </nav>
@@ -228,6 +233,31 @@
 </section>
 <section id="contributing">
 <h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">#</a></h2>
+</section>
+<section id="building-the-documentation">
+<h2>Building the Documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this heading">#</a></h2>
+<ol class="arabic simple">
+<li><p>Make sure doxygen, sphinx, breathe, and the pydata-sphinx-theme are installed.  This is easily done with anaconda:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">doxygen</span> <span class="n">sphinx</span> <span class="n">breathe</span> <span class="n">pydata</span><span class="o">-</span><span class="n">sphinx</span><span class="o">-</span><span class="n">theme</span>
+<span class="n">pip</span> <span class="n">install</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">panels</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>If working in a conda environment, add dependency paths to conf.py</p></li>
+<li><p>Build the <code class="code docutils literal notranslate"><span class="pre">sphinx</span></code> target:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">build</span>
+<span class="n">cmake</span> <span class="o">..</span>
+<span class="n">make</span> <span class="n">sphinx</span>
+</pre></div>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Open the sphinx output</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nb">open</span> <span class="n">docs</span><span class="o">/</span><span class="n">sphinx</span><span class="o">/</span><span class="n">index</span><span class="o">.</span><span class="n">html</span>
+</pre></div>
+</div>
 </section>
 </section>
 
