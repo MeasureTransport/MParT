@@ -94,7 +94,7 @@ You should now be able to run python and import the MParT package!
 
 Julia
 ^^^^^^^^^^
-See the section :ref:`compiling-julia` for information on how to set up the Julia environment manually. After this setup, you should now be able to use MParT from Julia by including MParT as a local package.  For example:
+See the section :ref:`compiling_julia` for information on how to set up the Julia environment manually. After this setup, you should now be able to use MParT from Julia by including MParT as a local package.  For example:
 
 .. code-block:: julia
 
