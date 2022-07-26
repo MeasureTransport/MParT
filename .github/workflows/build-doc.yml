@@ -19,12 +19,16 @@ jobs:
           cd ${{ github.workspace }}
           chmod +x .github/install-doxygen.sh
           .github/install-doxygen.sh 1.9.2
-
+        
+      - name: Fetch examples from MparT-examples
+        run: |
+          cd docs/sources/tutorials
+          wget https://github.com/MeasureTransport/MParT-examples/blob/main/examples/python/FromDensity1D.py
 
       - name: Install sphinx extensions
         run: |
           pip3 install -IU pygments==2.7
-          pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels
+          pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels nbsphinx
 
       - name: Run CMake
         run: |
