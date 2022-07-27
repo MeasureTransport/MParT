@@ -4,7 +4,7 @@ project(MParT VERSION 0.0.1)
 
 # Add the cmake folder as a search path and include files
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
-INCLUDE(Submodules)
+Include(FetchContent)
 
 ##############################################################
 # Options
@@ -69,9 +69,15 @@ endif("${isSystemDir}" STREQUAL "-1")
 find_package(Kokkos QUIET)
 
 if(NOT Kokkos_FOUND)
-    message(STATUS "Could not find Kokkos.  Using internal build.")
-    UpdateGitSubmodule(kokkos)
-    add_subdirectory(external/kokkos)
+    message(STATUS "Could not find Kokkos.  Fetching source.")
+    
+    FetchContent_Declare(
+        kokkos
+        GIT_REPOSITORY https://github.com/kokkos/kokkos
+        GIT_TAG 3.6.01
+    )
+    FetchContent_MakeAvailable(kokkos)
+
 else()
     message(STATUS "Found Kokkos!")
 endif()
@@ -79,9 +85,15 @@ endif()
 # Add Eigen
 find_package(Eigen3 QUIET)
 if(NOT Eigen3_FOUND)
-    message(STATUS "Could not find Eigen.  Using internal build.")
-    UpdateGitSubmodule(eigen)
-    add_subdirectory(external/eigen)
+    message(STATUS "Could not find Eigen. Fetching source.")
+
+    FetchContent_Declare(
+        eigen3 
+        GIT_REPOSITORY https://gitlab.com/libeigen/eigen
+        GIT_TAG 3.4.0
+    )
+    FetchContent_MakeAvailable(eigen3)
+
 else()
   message(STATUS "Found Eigen!")
 endif()
@@ -90,9 +102,15 @@ endif()
 if(MPART_PYTHON)
   find_package(pybind11 CONFIG QUIET)
   if(NOT pybind11_FOUND)
-    message(STATUS "Could not find pybind11. Using internal build.")
-    UpdateGitSubmodule(pybind11)
-    add_subdirectory(external/pybind11)
+    message(STATUS "Could not find pybind11. Fetching source.")
+    
+    FetchContent_Declare(
+        pybind11
+        GIT_REPOSITORY https://github.com/pybind/pybind11
+        GIT_TAG        v2.10.0
+    )
+    FetchContent_MakeAvailable(pybind11)
+
   else()
     message(STATUS "Found pybind11!")
   endif()
@@ -167,10 +185,16 @@ if(MPART_BUILD_TESTS)
     # Install Catch2
     find_package(Catch2 QUIET)
     if(NOT Catch2_FOUND)
-        message(STATUS "Could not find Catch2.  Using internal build.")
-        UpdateGitSubmodule(catch2)
-        PinSubmoduleVersion(catch2 v3.0.0-preview3)
-        add_subdirectory(external/catch2)
+        message(STATUS "Could not find Catch2.  Fetching Catch2 source.")
+        
+        FetchContent_Declare(
+            Catch2
+            GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+            GIT_TAG        v3.0.0-preview3 
+        )
+
+        FetchContent_MakeAvailable(Catch2)
+
     else()
         message(STATUS "Found Catch2!")
     endif()
