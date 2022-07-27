@@ -1,5 +1,6 @@
 ![](https://github.com/MeasureTransport/MParT/actions/workflows/build-doc.yml/badge.svg)
 ![](https://github.com/MeasureTransport/MParT/actions/workflows/build-tests.yml/badge.svg)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MeasureTransport/MParT-examples/HEAD)
 
 # MParT: A Monotone Parameterization Toolkit
 A CPU/GPU performance-portable library for parameterizing and constructing monotone functions in the context of measure transport and regression.
@@ -42,9 +43,7 @@ cd build
 cmake                                        \
   -DCMAKE_INSTALL_PREFIX=<your/install/path> \
   -DPYTHON_EXECUTABLE=`which python`         \
-  -DCMAKE_BUILD_TYPE=Release                 \
   -DCMAKE_OSX_ARCHITECTURES=x86_64           \
-  -DMatlab_MEX_EXTENSION="mexmaci64"         \
   -DKokkos_ENABLE_PTHREAD=ON                 \
   -DKokkos_ENABLE_SERIAL=ON                  \
 ..

@@ -17,4 +17,3 @@ target_link_libraries(mpartjl PRIVATE mpart JlCxx::cxxwrap_julia JlCxx::cxxwrap_
 
 # Add an installation target for the julia bindings
 install(TARGETS mpartjl DESTINATION julia/mpart)
-install(DIRECTORY package/ DESTINATION julia/mpart)
