@@ -32,7 +32,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/kokkos
           mkdir build && cd build
-          cmake -DKokkos_ENABLE_PTHREAD=ON \
+          cmake -DKokkos_ENABLE_OPENMP=ON \
                 -DBUILD_SHARED_LIBS=ON     \
                 -DKokkos_ENABLE_SERIAL=ON  \
                 -DKokkos_CXX_STANDARD=17   \
