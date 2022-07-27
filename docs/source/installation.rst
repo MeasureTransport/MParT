@@ -1,27 +1,17 @@
 Installation
 ------------
 
-Install from Conda
-==================
+.. _installation:
 
-.. panels::
-    :container: container-lg pb-3
-    :column: col-lg-12 p-2
+.. card:: Install with Conda
 
-    ^^^^^^^^^^^^^^^^^^^
     COMING SOON!
-
-
-    ++++++++++++++++++++++
 
     .. code-block:: bash
 
         conda install -c conda-forge mpart
 
-    ---
-    :column: col-lg-12 p-2
 
-.. _installation:
 
 
 Compiling from Source

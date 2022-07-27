@@ -32,7 +32,7 @@ extensions = [ 'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax', 
-    'sphinx_panels',
+    'sphinx_design',
     'breathe',
     'nbsphinx']
 
