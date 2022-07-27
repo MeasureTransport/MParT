@@ -38,6 +38,8 @@ extensions = [ 'sphinx.ext.autodoc',
 
 breathe_default_project = "mpart"
 
+nbsphinx_allow_errors = True
+
 html_theme_options = {
     "icon_links": [
         {
