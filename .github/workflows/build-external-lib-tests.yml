@@ -49,7 +49,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/mpart
           mkdir build && cd build
-          cmake -DKokkos_DIR=$GITHUB_WORKSPACE/KOKKOS_INSTALL/lib/cmake/Kokkos ../
+          cmake -DKokkos_DIR=$GITHUB_WORKSPACE/KOKKOS_INSTALL/lib/cmake/Kokkos -DMPART_FETCH_DEPS=OFF ../
 
       - name: Build MParT
         shell: bash -l {0}
