@@ -20,7 +20,7 @@ jobs:
           cd ${{ github.workspace }}
           mkdir build
           cd build
-          cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON ../
+          cmake -DKokkos_ENABLE_THREADS=ON -DKokkos_ENABLE_SERIAL=ON ../
 
       - name: Build
         run: cd build; make
