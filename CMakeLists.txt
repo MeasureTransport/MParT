@@ -246,11 +246,6 @@ if(Sphinx_FOUND AND Doxygen_FOUND)
     # Copy the docs folder to the working folder so we can add to it
     file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/docs DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/docs)
 
-    if(MPART_EXAMPLES_DIR)  
-        message(STATUS "Copying examples from ${MPART_EXAMPLES_DIR}.")
-        file(COPY ${MPART_EXAMPLES_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/docs/docs/source/tutorials)
-    endif()
-
     add_custom_target(sphinx
                   COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile
                   COMMAND ${SPHINX_EXECUTABLE} -b html

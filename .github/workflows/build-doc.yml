@@ -14,12 +14,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install doxygen and sphinx
-        run: |
-          cd ${{ github.workspace }}
-          chmod +x .github/install-doxygen.sh
-          .github/install-doxygen.sh 1.9.2
-
       - uses: shrink/actions-docker-extract@v1
         id: extract
         with:
@@ -30,18 +24,22 @@ jobs:
         run: cp ${{ steps.extract.outputs.destination }}/* ${{ github.workspace }}/docs/source/tutorials/.
         
       - name: Install sphinx extensions
-        run: |
-          pip3 install -IU pygments==2.7
-          pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels nbsphinx pandoc nbconvert
-
+        shell: bash -l {0}
+        run: conda install -c conda-forge python doxygen pygments sphinx sphinx-design breathe pydata-sphinx-theme nbsphinx jupytext pandoc ipykernel nbconvert
+         
       - name: Run CMake
+        shell: bash -l {0}
         run: |
           cd ${{ github.workspace }}
           mkdir build && cd build
-          cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON ../
+          which python
+          cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON -DPYTHON_EXECUTABLE=`which python` ../
 
       - name: Build Docs
-        run: cd build; make sphinx
+        shell: bash -l {0}
+        run: |
+           cd ${{ github.workspace }} && cd build
+           make sphinx
 
       #- name: Push to gh-pages
       #  uses: peaceiris/actions-gh-pages@v3.6.1
