@@ -104,3 +104,21 @@ See the section :ref:`compiling_julia` for information on how to set up the Juli
     value = 1
     idx = MultiIndex(dim,value)
     print(idx)
+
+Matlab
+^^^^^^^^^^
+First path to the matlab bindings needs to be set:
+.. code-block:: matlab
+    addpath(genpath('<your/install/path>'))
+
+Also use :code:'KokkosInitialize(ncpus)' to be able to use :code:'Kokkos' with :code:'ncpus' threads.
+An examples of use is:
+
+.. code-block:: matlab
+    addpath(genpath('<your/install/path>'))
+    KokkosInitialize(ncpus)
+
+    dim = 3
+    value = 1
+    idx = MultiIndex(dim,value)
+    disp(idx)
