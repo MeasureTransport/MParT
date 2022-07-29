@@ -119,7 +119,7 @@ if(MPART_PYTHON)
         )
         FetchContent_MakeAvailable(pybind11)
     else()
-        message(FATAL_ERROR "Could not find Eigen3 library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install Eigen3 itself." )
+        message(FATAL_ERROR "Could not find pybind11 library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install pybind11 itself." )
     endif()
 
   else()
