@@ -317,25 +317,12 @@ make install
 </div>
 <p>If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify <code class="code docutils literal notranslate"><span class="pre">JULIA_EXE</span></code> variable during configuration.  For example, adding <code class="code docutils literal notranslate"><span class="pre">-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia</span></code> will tell CMake to use the Julia executable installed by anaconda in the <code class="code docutils literal notranslate"><span class="pre">mpart</span></code> conda environment.</p>
 <p>To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=OFF</span></code> during the CMake configuration.</p>
-<p>Once MParT is installed with Julia bindings (i.e. <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=ON</span></code>) into <code class="code docutils literal notranslate"><span class="pre">&lt;your</span> <span class="pre">MParT</span> <span class="pre">install</span> <span class="pre">path&gt;/julia/</span></code>, you can easily use <code class="code docutils literal notranslate"><span class="pre">mpart</span></code> in Julia by first adding the path to your library path</p>
-<div class="tabbed-set docutils">
-<input checked="checked" id="1677ba1b-6d27-4fd2-8bc5-e873c5e905e3" name="696ed6d4-20d6-42dd-99d6-d1095ad8dd5a" type="radio">
-</input><label class="tabbed-label" for="1677ba1b-6d27-4fd2-8bc5-e873c5e905e3">
-MacOS</label><div class="tabbed-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span>&lt;your MParT install path&gt;/julia/mpart/:<span class="nv">$DYLD_LIBRARY_PATH</span>
-$ <span class="nb">export</span> <span class="nv">JULIA_LOAD_PATH</span><span class="o">=</span><span class="s2">&quot;&lt;your MParT install path&gt;/julia/mpart/:</span><span class="nv">$JULIA_LOAD_PATH</span><span class="s2">&quot;</span>
+<p>Once MParT is installed with Julia bindings (i.e. <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=ON</span></code>) into <code class="code docutils literal notranslate"><span class="pre">your/MParT/install/path</span></code>, you can using MParT in Julia with a few last steps. First, add <code class="code docutils literal notranslate"><span class="pre">MParT.jl</span></code>, which holds the Julia interface for MParT, via <code class="code docutils literal notranslate"><span class="pre">]add</span> <span class="pre">https://github.com/MeasureTransport/MParT.jl</span></code> in the Julia REPL. Then, create a file <code class="code docutils literal notranslate"><span class="pre">~/.julia/artifacts/Override.toml</span></code> with the following lines</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bee5971c-294f-5168-9fcd-9fb3c811d495]</span>
+<span class="n">MParT</span> <span class="o">=</span> <span class="s">&quot;your/MParT/install/path&quot;</span>
 </pre></div>
 </div>
-</div>
-<input id="a355fd0e-df78-45a7-b9bd-3c70aeaeb8be" name="696ed6d4-20d6-42dd-99d6-d1095ad8dd5a" type="radio">
-</input><label class="tabbed-label" for="a355fd0e-df78-45a7-b9bd-3c70aeaeb8be">
-Linux</label><div class="tabbed-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span>&lt;your MParT install path&gt;/julia/mpart/:<span class="nv">$LD_LIBRARY_PATH</span>
-$ <span class="nb">export</span> <span class="nv">JULIA_LOAD_PATH</span><span class="o">=</span><span class="s2">&quot;&lt;your MParT install path&gt;/julia/mpart/:</span><span class="nv">$JULIA_LOAD_PATH</span><span class="s2">&quot;</span>
-</pre></div>
-</div>
-</div>
-</div>
+<p>At this point, you should be able to open up a REPL and type <code class="code docutils literal notranslate"><span class="pre">using</span> <span class="pre">MParT</span></code> and get going with any of the provided examples!</p>
 </section>
 <section id="compiling-with-cuda-support">
 <h3>Compiling with CUDA Support<a class="headerlink" href="#compiling-with-cuda-support" title="Permalink to this heading">#</a></h3>
