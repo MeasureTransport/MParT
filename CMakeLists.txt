@@ -39,7 +39,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 ##############################################################
-# RPATH settings 
+# RPATH settings
 
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -108,7 +108,6 @@ if(MPART_JULIA)
   endif()
   execute_process(COMMAND ${JULIA_EXE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
   list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}/lib/cmake/JlCxx/" )
-
   find_package(JlCxx)
 
   if(NOT JlCxx_FOUND)
@@ -119,7 +118,7 @@ if(MPART_JULIA)
     get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
     get_filename_component(JlCxx_src ${JlCxx_location} DIRECTORY)
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
-    include_directories(${Julia_INCLUDE_DIRS} ${JlCxx_src}/include)
+    include_directories(${JlCxx_src}/include)
   endif()
 
 endif()
