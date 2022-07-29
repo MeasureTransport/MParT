@@ -106,21 +106,14 @@ If you have Julia installed, but CMake was not able to find it during MParT conf
 
 To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set :code:`MPART_JULIA=OFF` during the CMake configuration.
 
-Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :code:`<your MParT install path>/julia/`, you can easily use :code:`mpart` in Julia by first adding the path to your library path
+Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :code:`your/MParT/install/path`, you can using MParT in Julia with a few last steps. First, add :code:`MParT.jl`, which holds the Julia interface for MParT, via :code:`]add https://github.com/MeasureTransport/MParT.jl` in the Julia REPL. Then, create a file :code:`~/.julia/artifacts/Override.toml` with the following lines
 
-.. tabbed:: MacOS
+.. code-block:: toml
 
-    .. code-block:: bash
+    [bee5971c-294f-5168-9fcd-9fb3c811d495]
+    MParT = "your/MParT/install/path"
 
-        $ export DYLD_LIBRARY_PATH=<your MParT install path>/julia/mpart/:$DYLD_LIBRARY_PATH
-        $ export JULIA_LOAD_PATH="<your MParT install path>/julia/mpart/:$JULIA_LOAD_PATH"
-
-.. tabbed:: Linux
-
-    .. code-block:: bash
-
-        $ export LD_LIBRARY_PATH=<your MParT install path>/julia/mpart/:$LD_LIBRARY_PATH
-        $ export JULIA_LOAD_PATH="<your MParT install path>/julia/mpart/:$JULIA_LOAD_PATH"
+At this point, you should be able to open up a REPL and type :code:`using MParT` and get going with any of the provided examples!
 
 Compiling with CUDA Support
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
