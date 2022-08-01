@@ -87,13 +87,20 @@ void ComposedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpa
                                              StridedMatrix<const double, MemorySpace> const& r,
                                              StridedMatrix<double, MemorySpace>              output)
 {
+    // intermediate r
+    Kokkos::View<double**, MemorySpace> intR("intermediate r", r.extent(0), r.extent(1));
+
+    // intermediate x1
+    Kokkos::View<double**, MemorySpace> intX1("intermediate x1", x1.extent(0), x1.extent(1));
 
     // Evaluate the output for each component
-    Kokkos::deep_copy(output, x1);
-    
-    for(unsigned int i = comps_.size() - 1; i>=0; i--){
+    Kokkos::deep_copy(intX1, x1);
+    Kokkos::deep_copy(intR, r);
+    for(int i = comps_.size() - 1; i>=0; --i){
         
-        comps_.at(i)->InverseImpl(output, r, output);
+        comps_.at(i)->InverseImpl(intX1, intR, output);
+        Kokkos::deep_copy(intR, output);
+        //Kokkos::deep_copy(intX1, output);
 
     }
 
