@@ -69,12 +69,15 @@ template<typename MemorySpace>
 void ComposedMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                               StridedMatrix<double, MemorySpace>              output)
 {
-    // Evaluate the output for each component
+    // intermediate output
+    Kokkos::View<double**, MemorySpace> intOutput("intermediate output", output.extent(0), output.extent(1));
+    
+    // Copy points to output, then output = map(output) looped over each component
     Kokkos::deep_copy(output, pts);
     for(unsigned int i=0; i<comps_.size(); ++i){
         
-        comps_.at(i)->EvaluateImpl(output, output);
-
+        comps_.at(i)->EvaluateImpl(output, intOutput);
+        Kokkos::deep_copy(output,intOutput);
     }
 
 }
