@@ -44,24 +44,32 @@ void ComposedMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, Me
 {
 
 
-    // // LogDet of first component
-    // comps_.at(0)->LogDeterminantImpl(pts, output);
+    // logdet of first component
+    comps_.at(0)->LogDeterminantImpl(pts, output);
+    if(comps_.size()==1)
+        return;
 
-    // //
-    // if(comps_.size()==1)
-    //     return;
+    // intermediate points and variable to hold logdet increments 
+    Kokkos::View<double**, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
+    Kokkos::View<double**, MemorySpace>  intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
+    Kokkos::deep_copy(intPts1, pts);
 
-    // // intermediate points and variable to hold logdet increments 
-    // StridedMatrix<const double, MemorySpace> intermediatePts;
-    // Kokkos::deep_copy(intermediatePts, pts);
-
-    // Kokkos::View<double*, MemorySpace> compDetIncrement("Log Determinant", output.extent(0));
-    // for(unsigned int i=1; i<comps_.size(); ++i){
+    Kokkos::View<double*, MemorySpace> compDetIncrement("Log Determinant", output.extent(0));
+    for(unsigned int i=1; i<comps_.size(); ++i){
         
-    //     comps_.at(i)->EvaluateImpl(intermediatePts, intermediatePts);
-    //     comps_.at(i)->LogDeterminantImpl(intermediatePts, compDetIncrement);
-    //     output += compDetIncrement;
-    // }
+        // Compute x_i = T_{i-1}(x_{i-1})
+        comps_.at(i-1)->EvaluateImpl(intPts1, intPts2);
+
+        // Compute logdet for T_{i}(x_i)
+        comps_.at(i)->LogDeterminantImpl(intPts2, compDetIncrement);
+
+        // Add to logdet of full map
+        for(unsigned int j=0; j<output.size(); ++j)
+            output(j) += compDetIncrement(j);
+
+        // update current x_{i-1} <-- x_{i}
+        Kokkos::deep_copy(intPts1, intPts2);
+    }
 
 }
 
@@ -100,7 +108,7 @@ void ComposedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpa
         
         comps_.at(i)->InverseImpl(intX1, intR, output);
         Kokkos::deep_copy(intR, output);
-        //Kokkos::deep_copy(intX1, output);
+        //Kokkos::deep_copy(intX1, output);  // TODO: What should x1 change to? should it be constant?
 
     }
 
