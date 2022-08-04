@@ -1,0 +1,221 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "c86b76b7",
+   "metadata": {},
+   "source": [
+    "# Monotone least squares"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "acf9a455",
+   "metadata": {
+    "lines_to_next_cell": 2
+   },
+   "outputs": [],
+   "source": [
+    "from mpart import *\n",
+    "import numpy as np\n",
+    "from scipy.optimize import minimize\n",
+    "import matplotlib.pyplot as plt"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a6763034",
+   "metadata": {
+    "lines_to_next_cell": 2
+   },
+   "outputs": [],
+   "source": [
+    "# geometry\n",
+    "num_points = 1000\n",
+    "xmin, xmax = 0, 4\n",
+    "x = np.linspace(xmin, xmax, num_points)[None,:]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e10b87fb",
+   "metadata": {
+    "lines_to_next_cell": 2
+   },
+   "outputs": [],
+   "source": [
+    "# Take measurements of step function, note: data might \n",
+    "# not monotone because of the noise, but we assume the \n",
+    "# true underlying function is monotone.\n",
+    "noisesd = 0.4\n",
+    "y_true = 2*(x>2)\n",
+    "y_noise = noisesd*np.random.randn(num_points) \n",
+    "y_measured = y_true + y_noise"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "77fd66e5",
+   "metadata": {
+    "lines_to_next_cell": 2
+   },
+   "outputs": [],
+   "source": [
+    "# Create multi-index set:\n",
+    "multis = np.array([[0], [1], [2], [3], [4], [5]])\n",
+    "mset = MultiIndexSet(multis)\n",
+    "fixed_mset = mset.fix(True)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "26e9b41c",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Set options and make regression function\n",
+    "opts = MapOptions()\n",
+    "monotone_map = CreateComponent(fixed_mset, opts)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8538fff4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Least squares objective\n",
+    "def objective(coeffs, monotone_map, x, y_measured):\n",
+    "    monotone_map.SetCoeffs(coeffs)\n",
+    "    map_of_x = monotone_map.Evaluate(x)\n",
+    "    return np.sum((map_of_x - y_measured)**2)/x.shape[1]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0e6314f8",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# gradient of objective\n",
+    "def grad_objective(coeffs, monotone_map, x, y_measured):\n",
+    "    monotone_map.SetCoeffs(coeffs)\n",
+    "    map_of_x = monotone_map.Evaluate(x)\n",
+    "    return 2*np.sum(monotone_map.CoeffGrad(x, map_of_x - y_measured),1)/x.shape[1]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "4a31e658",
+   "metadata": {
+    "lines_to_next_cell": 2
+   },
+   "outputs": [],
+   "source": [
+    "# Before optimization\n",
+    "map_of_x_before = monotone_map.Evaluate(x)\n",
+    "error_before = objective(monotone_map.CoeffMap(), monotone_map, x, y_measured)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8bab78e0",
+   "metadata": {
+    "lines_to_next_cell": 2
+   },
+   "outputs": [],
+   "source": [
+    "# Optimize\n",
+    "optimizer_options={'gtol': 1e-4, 'disp': True}\n",
+    "res = minimize(objective, monotone_map.CoeffMap(), args=(monotone_map, x, y_measured), jac=grad_objective, method='BFGS', options=optimizer_options)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8efd147c",
+   "metadata": {
+    "lines_to_next_cell": 2
+   },
+   "outputs": [],
+   "source": [
+    "# After optimization\n",
+    "map_of_x_after = monotone_map.Evaluate(x)\n",
+    "error_after = objective(monotone_map.CoeffMap(), monotone_map, x, y_measured)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "44d0a055",
+   "metadata": {
+    "lines_to_next_cell": 2
+   },
+   "outputs": [],
+   "source": [
+    "# Plot data (before and after together)\n",
+    "plt.figure()\n",
+    "plt.title('Starting map error: {:.2E} / Final map error: {:.2E}'.format(error_before, error_after))\n",
+    "plt.plot(x.flatten(),y_true.flatten(),'*--',label='true data', alpha=0.8)\n",
+    "plt.plot(x.flatten(),y_measured.flatten(),'*--',label='measured data', alpha=0.4)\n",
+    "plt.plot(x.flatten(),map_of_x_before.flatten(),'*--',label='initial map output', color=\"green\", alpha=0.8)\n",
+    "plt.plot(x.flatten(),map_of_x_after.flatten(),'*--',label='final map output', color=\"red\", alpha=0.8)\n",
+    "plt.legend()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "994898c6",
+   "metadata": {
+    "lines_to_next_cell": 2
+   },
+   "outputs": [],
+   "source": [
+    "# Plot data (before and after apart)\n",
+    "plt.figure()\n",
+    "plt.title('Starting map error: {:.2E}'.format(error_before))\n",
+    "plt.plot(x.flatten(),y_true.flatten(),'*--',label='true data', alpha=0.8)\n",
+    "plt.plot(x.flatten(),y_measured.flatten(),'*--',label='measured data', alpha=0.4)\n",
+    "plt.plot(x.flatten(),map_of_x_before.flatten(),'*--',label='initial map output', color=\"green\", alpha=0.8)\n",
+    "plt.legend()\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "5ac75ae0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "plt.figure()\n",
+    "plt.title('Final map error: {:.2E}'.format(error_after))\n",
+    "plt.plot(x.flatten(),y_true.flatten(),'*--',label='true data', alpha=0.8)\n",
+    "plt.plot(x.flatten(),y_measured.flatten(),'*--',label='measured data', alpha=0.4)\n",
+    "plt.plot(x.flatten(),map_of_x_after.flatten(),'*--',label='final map output', color=\"red\", alpha=0.8)\n",
+    "plt.legend()\n",
+    "plt.show()"
+   ]
+  }
+ ],
+ "metadata": {
+  "jupytext": {
+   "cell_metadata_filter": "-all",
+   "formats": "ipynb,py",
+   "main_language": "python"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
