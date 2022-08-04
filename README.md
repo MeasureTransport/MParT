@@ -11,10 +11,7 @@ See [measuretransport.github.io/MParT/](https://measuretransport.github.io/MParT
 ## Installation
 
 ### Dependencies
-MParT uses Kokkos and eigen. Clone external repositories using:
-```
-git submodule update --init --recursive
-```
+MParT uses Kokkos and Eigen directly as dependencies, Catch2 as a test dependency, and Pybind11 as a dependency for building Python bindings. The first three dependencies will be downloaded and built using CMake if CMake cannot find any libraries to use, and the last one will be downloaded and built using CMake assuming the Python bindings are being built. You can force CMake to use local dependencies via the option `MPART_FETCH_DEPS=OFF`.
 
 ### Compiling from source
 MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:

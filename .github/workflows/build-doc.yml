@@ -18,8 +18,6 @@ jobs:
           
       - name: Checkout MParT
         uses: actions/checkout@v1
-        with:
-          submodules: recursive
 
       - uses: shrink/actions-docker-extract@v1
         id: extract
