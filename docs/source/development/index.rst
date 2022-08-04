@@ -18,7 +18,7 @@ Contributing
 Building the Documentation
 ---------------------------
 
-Make sure doxygen, sphinx, breathe, nbsphinx, and the pydata-sphinx-theme are installed.  This is easily done with anaconda and pip:
+Make sure doxygen, sphinx, breathe, nbsphinx, and the pydata-sphinx-theme are installed.  This is easily done with conda and pip:
 
 .. code-block:: bash
 
@@ -43,4 +43,4 @@ Open the sphinx output
 
 
 .. tip::
-    If you're sure all the dependencies are installed but you still see errors complaining that a package cannot be found, you might need to manually specify paths in the `conf.py` sphinx configuration file.
+    If you're sure all the dependencies are installed but you still see errors complaining that a package cannot be found, you might need to manually specify paths in the :code:`conf.py` sphinx configuration file.
