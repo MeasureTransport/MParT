@@ -18,34 +18,26 @@ Contributing
 Building the Documentation
 ---------------------------
 
-1. Make sure doxygen, sphinx, breathe, nbsphinx, and the pydata-sphinx-theme are installed.  This is easily done with anaconda and pip:
+Make sure doxygen, sphinx, breathe, nbsphinx, and the pydata-sphinx-theme are installed.  This is easily done with anaconda and pip:
 
-.. code-block::
+.. code-block:: bash
 
    conda install -c conda-forge doxygen sphinx breathe pydata-sphinx-theme nbsphinx
    pip install sphinx-design
 
-1. The MParT documentation relies on python examples in the `MParT-examples <https://github.com/MeasureTransport/MParT-examples>`_ repository, so you need to clone this repository and then tell the main MParT cmake script where the examples can be found. Assuming you need to clone both MParT and MParT-examples.  You'll also need to build MParT with python support so that `nbsphinx` can run the examples and render output cells in the example notebooks. The entire process might look like 
-   
-.. code-block::
-    
-    git clone https://github.com/MeasureTransport/MParT-examples.git
+Then, after configuring MParT with CMake, you build the documentation with :code:`make sphinx`. The entire process might look like
+
+.. code-block:: bash
+
     git clone https://github.com/MeasureTransport/MParT.git
-    cd MParT && mkdir build && cd build 
-    cmake -DMPART_EXAMPLES_DIR=../../MParT-examples -DCMAKE_INSTALL_PREFIX=~/Installations/MParT -DMPART_PYTHON=ON ..
-    make install 
-    export PYTHONPATH=$PYTHONPATH:~/Installations/MParT/python
-
-
-3. After configuring with CMake, you can build the :code:`sphinx` target to generate the html documentation:
-
-.. code-block::
-
+    mkdir MParT/build && cd MParT/build
+    cmake -DCMAKE_INSTALL_PREFIX=~/Installations/MParT -DMPART_PYTHON=ON ..
     make sphinx
+    make install
 
-4. Open the sphinx output
+Open the sphinx output
 
-.. code-block::
+.. code-block:: bash
 
     open docs/sphinx/index.html
 
