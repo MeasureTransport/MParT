@@ -25,7 +25,9 @@
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
 
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
@@ -35,8 +37,6 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/design-tabs.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Tutorials" href="tutorials/index.html" />
@@ -225,42 +225,42 @@
 <p>Linking to MParT is straightforward using CMake.  Let’s say you want to compile the following code, which simply creates a multiindex set.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">SmallExample.cpp</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
-<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Kokkos_Core.hpp&gt;</span><span class="cp"></span>
-<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;MParT/MultiIndices/MultiIndexSet.h&gt;</span><span class="cp"></span>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&lt;Kokkos_Core.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span> <span class="cpf">&lt;MParT/MultiIndices/MultiIndexSet.h&gt;</span><span class="cp"></span>
 
-<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">mpart</span><span class="p">;</span><span class="w"></span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">mpart</span><span class="p">;</span>
 
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(){</span><span class="w"></span>
-<span class="w">    </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">initialize</span><span class="p">();</span><span class="w"></span>
-<span class="w">    </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="n">Kokkos</span><span class="o">::</span><span class="n">initialize</span><span class="p">();</span>
+    <span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">dim</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
 
-<span class="w">    </span><span class="n">MultiIndexSet</span><span class="w"> </span><span class="n">mset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MultiIndexSet</span><span class="o">::</span><span class="n">CreateTotalOrder</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="n">mset</span><span class="p">.</span><span class="n">Visualize</span><span class="p">();</span><span class="w"></span>
+    <span class="n">MultiIndexSet</span> <span class="n">mset</span> <span class="o">=</span> <span class="n">MultiIndexSet</span><span class="o">::</span><span class="n">CreateTotalOrder</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>
+    <span class="n">mset</span><span class="p">.</span><span class="n">Visualize</span><span class="p">();</span>
 
-<span class="w">    </span><span class="p">}</span><span class="w"></span>
-<span class="w">    </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span><span class="w"></span>
-<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
-<span class="p">}</span><span class="w"></span>
+    <span class="p">}</span>
+    <span class="n">Kokkos</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
 </pre></div>
 </div>
 </div>
 <p>The following <code class="code docutils literal notranslate"><span class="pre">CMakeLists.txt</span></code> file can be used to configure the executable.</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">CMakeLists.txt</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
-<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span> <span class="p">(</span><span class="s">VERSION</span><span class="w"> </span><span class="s">3.13</span><span class="p">)</span>
+<div class="highlight-cmake notranslate"><div class="highlight"><pre><span></span><span class="nb">cmake_minimum_required</span> <span class="p">(</span><span class="s">VERSION</span> <span class="s">3.13</span><span class="p">)</span>
 
 <span class="nb">project</span><span class="p">(</span><span class="s">SimpleExample</span><span class="p">)</span>
 
-<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span><span class="w"> </span><span class="s">17</span><span class="p">)</span>
+<span class="nb">set</span><span class="p">(</span><span class="s">CMAKE_CXX_STANDARD</span> <span class="s">17</span><span class="p">)</span>
 
-<span class="nb">find_package</span><span class="p">(</span><span class="s">Kokkos</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
-<span class="nb">find_package</span><span class="p">(</span><span class="s">MParT</span><span class="w"> </span><span class="s">REQUIRED</span><span class="p">)</span>
-<span class="nb">message</span><span class="p">(</span><span class="s">STATUS</span><span class="w"> </span><span class="s2">&quot;KOKKOS_FOUND = ${Kokkos_FOUND}&quot;</span><span class="p">)</span>
-<span class="nb">message</span><span class="p">(</span><span class="s">STATUS</span><span class="w"> </span><span class="s2">&quot;MPART_FOUND = ${MParT_FOUND}&quot;</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">Kokkos</span> <span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">find_package</span><span class="p">(</span><span class="s">MParT</span> <span class="s">REQUIRED</span><span class="p">)</span>
+<span class="nb">message</span><span class="p">(</span><span class="s">STATUS</span> <span class="s2">&quot;KOKKOS_FOUND = ${Kokkos_FOUND}&quot;</span><span class="p">)</span>
+<span class="nb">message</span><span class="p">(</span><span class="s">STATUS</span> <span class="s2">&quot;MPART_FOUND = ${MParT_FOUND}&quot;</span><span class="p">)</span>
 
-<span class="nb">add_executable</span><span class="p">(</span><span class="s">Simple</span><span class="w"> </span><span class="s">SimpleExample.cpp</span><span class="p">)</span>
-<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">Simple</span><span class="w"> </span><span class="s">MParT::mpart</span><span class="w"> </span><span class="s">Kokkos::kokkos</span><span class="w"> </span><span class="s">Eigen3::Eigen</span><span class="p">)</span>
+<span class="nb">add_executable</span><span class="p">(</span><span class="s">Simple</span> <span class="s">SimpleExample.cpp</span><span class="p">)</span>
+<span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">Simple</span> <span class="s">MParT::mpart</span> <span class="s">Kokkos::kokkos</span> <span class="s">Eigen3::Eigen</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -282,6 +282,24 @@ make                    <span class="c1"># Call make to build the executable</sp
 <section id="python">
 <h2>Python<a class="headerlink" href="#python" title="Permalink to this heading">#</a></h2>
 <p>First, make sure the relevant path variables include the installation of MParT:</p>
+<div class="tabbed-set docutils">
+<input checked="checked" id="e07099b8-74bd-4f31-8042-b2841769b15e" name="e290637f-e8a1-44d9-a3b2-0070a9b77d8c" type="radio">
+</input><label class="tabbed-label" for="e07099b8-74bd-4f31-8042-b2841769b15e">
+OSX</label><div class="tabbed-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
+<span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
+</pre></div>
+</div>
+</div>
+<input id="47110c9a-76db-400c-b862-76e348035b2e" name="e290637f-e8a1-44d9-a3b2-0070a9b77d8c" type="radio">
+</input><label class="tabbed-label" for="47110c9a-76db-400c-b862-76e348035b2e">
+Linux</label><div class="tabbed-content docutils">
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
+<span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
+</pre></div>
+</div>
+</div>
+</div>
 <p>You should now be able to run python and import the MParT package!</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mpart</span>
 
@@ -295,12 +313,12 @@ make                    <span class="c1"># Call make to build the executable</sp
 <section id="julia">
 <h2>Julia<a class="headerlink" href="#julia" title="Permalink to this heading">#</a></h2>
 <p>See the section <a class="reference internal" href="installation.html#compiling-julia"><span class="std std-ref">Compiling with Julia Bindings</span></a> for information on how to set up the Julia environment manually. After this setup, you should now be able to use MParT from Julia by including MParT as a local package.  For example:</p>
-<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">MParT</span><span class="w"></span>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span> <span class="n">MParT</span>
 
-<span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w"></span>
-<span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
-<span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MultiIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">value</span><span class="p">)</span><span class="w"></span>
-<span class="n">print</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"></span>
+<span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">idx</span> <span class="o">=</span> <span class="n">MultiIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+<span class="n">print</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>

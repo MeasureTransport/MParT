@@ -25,7 +25,9 @@
     href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-bootstrap.5fd3999ee7762ccc51105388f4a9d115.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
 
   <!-- Pre-loaded scripts that we'll load fully later -->
   <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
@@ -35,8 +37,6 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
-    <script src="../_static/design-tabs.js"></script>
-    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Using MParT" href="getting_started.html" />
@@ -185,6 +185,11 @@
 <nav id="bd-toc-nav">
     <ul class="visible nav section-nav flex-column">
  <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#install-from-conda">
+   Install from Conda
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#compiling-from-source">
    Compiling from Source
   </a>
@@ -222,18 +227,35 @@
                 
   <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h1>
-<div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils" id="id1">
-<div class="sd-card-body docutils">
-<div class="sd-card-title sd-font-weight-bold docutils">
-Install with Conda</div>
-<p class="sd-card-text">COMING SOON!</p>
+<section id="install-from-conda">
+<h2>Install from Conda<a class="headerlink" href="#install-from-conda" title="Permalink to this heading">#</a></h2>
+<div class="sphinx-bs container-lg pb-3 docutils">
+<div class="row docutils">
+<div class="d-flex col-lg-12 p-2 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-header docutils">
+</div>
+<div class="card-body docutils">
+<p class="card-text">COMING SOON!</p>
+</div>
+<div class="card-footer docutils">
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge mpart
 </pre></div>
 </div>
 </div>
 </div>
+</div>
+<div class="d-flex col-lg-12 p-2 docutils">
+<div class="card w-100 shadow docutils">
+<div class="card-body docutils">
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
 <section id="compiling-from-source">
-<h2>Compiling from Source<a class="headerlink" href="#compiling-from-source" title="Permalink to this heading">#</a></h2>
+<span id="id1"></span><h2>Compiling from Source<a class="headerlink" href="#compiling-from-source" title="Permalink to this heading">#</a></h2>
 <p>MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir build
 <span class="nb">cd</span> build
@@ -256,7 +278,7 @@ make install
 ..
 </pre></div>
 </div>
-<p>Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, and Catch2 with submodules you don’t already have using these <code class="code docutils literal notranslate"><span class="pre">X_ROOT</span></code> flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version &gt;=3.13. Further, it has been tested with Kokkos 3.6.0, Eigen 3.4.0, Pybind11 2.9.2, and Catch2 3.0.0-preview3 (there are some issues encountered when compiling MParT with Catch2 3.0.1).</p>
+<p>Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, and Catch2 with libraries you don’t already have using these <code class="code docutils literal notranslate"><span class="pre">X_ROOT</span></code> flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version &gt;=3.13. Further, it has been tested with Kokkos 3.6.0, Eigen 3.4.0, Pybind11 2.9.2, and Catch2 3.0.0-preview3 (there are some issues encountered when compiling MParT with Catch2 3.0.1).</p>
 <p>The command <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code> will also create a test executable called <code class="code docutils literal notranslate"><span class="pre">RunTests</span></code> in the <code class="code docutils literal notranslate"><span class="pre">build</span></code> directory.  The tests can be run with:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">./</span><span class="n">RunTests</span>
 </pre></div>
@@ -290,14 +312,14 @@ make install
 <section id="compiling-with-julia-bindings">
 <span id="compiling-julia"></span><h3>Compiling with Julia Bindings<a class="headerlink" href="#compiling-with-julia-bindings" title="Permalink to this heading">#</a></h3>
 <p>By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code> package is installed.   To install <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code>, run the following command in your Julia prompt:</p>
-<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="n">Pkg</span><span class="p">;</span><span class="w"> </span><span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;CxxWrap&quot;</span><span class="p">)</span><span class="w"></span>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">import</span> <span class="n">Pkg</span><span class="p">;</span> <span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;CxxWrap&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify <code class="code docutils literal notranslate"><span class="pre">JULIA_EXE</span></code> variable during configuration.  For example, adding <code class="code docutils literal notranslate"><span class="pre">-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia</span></code> will tell CMake to use the Julia executable installed by anaconda in the <code class="code docutils literal notranslate"><span class="pre">mpart</span></code> conda environment.</p>
 <p>To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=OFF</span></code> during the CMake configuration.</p>
 <p>Once MParT is installed with Julia bindings (i.e. <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=ON</span></code>) into <code class="code docutils literal notranslate"><span class="pre">your/MParT/install/path</span></code>, you can using MParT in Julia with a few last steps. First, add <code class="code docutils literal notranslate"><span class="pre">MParT.jl</span></code>, which holds the Julia interface for MParT, via <code class="code docutils literal notranslate"><span class="pre">]add</span> <span class="pre">https://github.com/MeasureTransport/MParT.jl</span></code> in the Julia REPL. Then, create a file <code class="code docutils literal notranslate"><span class="pre">~/.julia/artifacts/Override.toml</span></code> with the following lines</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bee5971c-294f-5168-9fcd-9fb3c811d495]</span><span class="w"></span>
-<span class="n">MParT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;your/MParT/install/path&quot;</span><span class="w"></span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bee5971c-294f-5168-9fcd-9fb3c811d495]</span>
+<span class="n">MParT</span> <span class="o">=</span> <span class="s">&quot;your/MParT/install/path&quot;</span>
 </pre></div>
 </div>
 <p>At this point, you should be able to open up a REPL and type <code class="code docutils literal notranslate"><span class="pre">using</span> <span class="pre">MParT</span></code> and get going with any of the provided examples!</p>
