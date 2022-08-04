@@ -3,7 +3,7 @@ name: docs
 on:
   push:
     branches:
-      - main
+      - 147-render-notebooks-into-sphinx-documentation
 
 jobs:
   build-docs:
@@ -19,16 +19,20 @@ jobs:
           cd ${{ github.workspace }}
           chmod +x .github/install-doxygen.sh
           .github/install-doxygen.sh 1.9.2
-        
-      - name: Fetch examples from MparT-examples
-        run: |
-          cd docs/sources/tutorials
-          wget https://github.com/MeasureTransport/MParT-examples/blob/main/examples/python/FromDensity1D.py
 
+      - uses: shrink/actions-docker-extract@v1
+        id: extract
+        with:
+          image: quay.io/hbonart/mpart:latest
+          path: /home/jovyan/examples/python/.
+      
+      - name: Move notebooks into documentation
+        run: cp ${{ steps.extract.outputs.destination }}/* ${{ github.workspace }}/docs/source/tutorials/.
+        
       - name: Install sphinx extensions
         run: |
           pip3 install -IU pygments==2.7
-          pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels nbsphinx
+          pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels nbsphinx pandoc nbconvert
 
       - name: Run CMake
         run: |
@@ -39,9 +43,9 @@ jobs:
       - name: Build Docs
         run: cd build; make sphinx
 
-      - name: Push to gh-pages
-        uses: peaceiris/actions-gh-pages@v3.6.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/docs/sphinx/
+      #- name: Push to gh-pages
+      #  uses: peaceiris/actions-gh-pages@v3.6.1
+      #  with:
+      #    github_token: ${{ secrets.GITHUB_TOKEN }}
+      #    publish_dir: build/docs/sphinx/
 
