@@ -28,7 +28,7 @@ jobs:
           path: /home/jovyan/examples/python/.
       
       - name: Move notebooks into documentation
-        run: cp ${{ steps.extract.outputs.destination }}/* ${{ github.workspace }}/docs/source/tutorials/.
+        run: cp ${{ steps.extract.outputs.destination }}/*.nbconvert.ipynb ${{ github.workspace }}/docs/source/tutorials/.
         
       - name: Install sphinx extensions
         shell: bash -l {0}
