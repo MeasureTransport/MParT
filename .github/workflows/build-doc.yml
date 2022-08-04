@@ -3,7 +3,7 @@ name: docs
 on:
   push:
     branches:
-      - 147-render-notebooks-into-sphinx-documentation
+      - main
 
 jobs:
   build-docs:
