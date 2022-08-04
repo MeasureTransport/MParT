@@ -9,33 +9,44 @@ jobs:
   build-docs:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Use Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: "3.8"
+          activate-environment: "test"
+          
+      - name: Checkout MParT
         uses: actions/checkout@v1
 
-      - name: Install doxygen and sphinx
-        run: |
-          cd ${{ github.workspace }}
-          chmod +x .github/install-doxygen.sh
-          .github/install-doxygen.sh 1.9.2
-
-
+      - uses: shrink/actions-docker-extract@v1
+        id: extract
+        with:
+          image: quay.io/hbonart/mpart:latest
+          path: /home/jovyan/examples/python/.
+      
+      - name: Move notebooks into documentation
+        run: cp ${{ steps.extract.outputs.destination }}/*.nbconvert.ipynb ${{ github.workspace }}/docs/source/tutorials/.
+        
       - name: Install sphinx extensions
-        run: |
-          pip3 install -IU pygments==2.7
-          pip3 install -U sphinx breathe pydata-sphinx-theme jinja2 sphinx_panels
-
+        shell: bash -l {0}
+        run: conda install -c conda-forge doxygen pygments sphinx sphinx-design breathe pydata-sphinx-theme nbsphinx jupytext pandoc ipykernel nbconvert
+         
       - name: Run CMake
+        shell: bash -l {0}
         run: |
           cd ${{ github.workspace }}
           mkdir build && cd build
-          cmake -DKokkos_ENABLE_OPENMP=ON -DKokkos_ENABLE_SERIAL=ON ../
+          cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON -DPYTHON_EXECUTABLE=`which python` ../
 
       - name: Build Docs
-        run: cd build; make sphinx
+        shell: bash -l {0}
+        run: |
+           cd ${{ github.workspace }} && cd build
+           make sphinx
 
       - name: Push to gh-pages
         uses: peaceiris/actions-gh-pages@v3.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: build/docs/sphinx/
-

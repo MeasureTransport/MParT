@@ -32,10 +32,14 @@ extensions = [ 'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax', 
-    'sphinx_panels',
-    'breathe' ]
+    'sphinx_design',
+    'breathe',
+    'nbsphinx']
 
 breathe_default_project = "mpart"
+
+nbsphinx_allow_errors = True
+nbsphinx_execute = "never"
 
 html_theme_options = {
     "icon_links": [

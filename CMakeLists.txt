@@ -278,11 +278,15 @@ find_package(Sphinx)
 if(Sphinx_FOUND AND Doxygen_FOUND)
 
     message("SPHINX Executable = ${SPHINX_EXECUTABLE}")
-    set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/docs)
+    set(SPHINX_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/docs/docs)
     set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
 
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/mpart.doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile @ONLY)
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs)
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/src)
+
+    # Copy the docs folder to the working folder so we can add to it
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/docs DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/docs)
 
     add_custom_target(sphinx
                   COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile
