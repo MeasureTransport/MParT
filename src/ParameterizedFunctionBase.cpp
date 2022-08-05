@@ -75,11 +75,6 @@ Eigen::Map<Eigen::VectorXd> ParameterizedFunctionBase<Kokkos::HostSpace>::CoeffM
     return KokkosToVec(this->savedCoeffs);
 }
 
-template<>
-Eigen::Map<Eigen::VectorXd> ParameterizedFunctionBase<DeviceSpace>::CoeffMap()
-{
-    return KokkosToVec(ToHost(this->savedCoeffs));
-}
 
 template<typename MemorySpace>
 StridedMatrix<double, MemorySpace> ParameterizedFunctionBase<MemorySpace>::CoeffGrad(StridedMatrix<const double, MemorySpace> const& pts,
@@ -129,5 +124,12 @@ void ParameterizedFunctionBase<MemorySpace>::CheckCoefficients(std::string const
 // Explicit template instantiation
 template class mpart::ParameterizedFunctionBase<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)
+
+    template<>
+    Eigen::Map<Eigen::VectorXd> ParameterizedFunctionBase<DeviceSpace>::CoeffMap()
+    {
+        return KokkosToVec(ToHost(this->savedCoeffs));
+    }
+
     template class mpart::ParameterizedFunctionBase<DeviceSpace>;
 #endif
