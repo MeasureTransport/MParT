@@ -176,7 +176,7 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 1D", "[EigenArrayConversions1
             CHECK(&x_view(i) == &x(i));
         }
     }
-    // static_assert(std::is_same<DeviceSpace,Kokkos::HostSpace>::value);
+
     SECTION("strided"){
         Eigen::Map<Eigen::VectorXd, 0, Eigen::InnerStride<2>> xslice(x.data(), size/2);
         auto x_view = VecToKokkos<double,Kokkos::HostSpace>(xslice);
