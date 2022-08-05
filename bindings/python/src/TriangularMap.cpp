@@ -14,7 +14,7 @@ template<typename MemorySpace>
 void mpart::binding::TriangularMapWrapper(py::module &m)
 {
     std::string tName = "TriangularMap";
-    constexpr if(std::is_same<MemorySpace,DeviceSpace>::value) tName = "TriangularMapDevice";
+    if(std::is_same<MemorySpace,DeviceSpace>::value) tName += "Device";
 
     // TriangularMap
     py::class_<TriangularMap<MemorySpace>, ConditionalMapBase<MemorySpace>, std::shared_ptr<TriangularMap<MemorySpace>>>(m, tName)

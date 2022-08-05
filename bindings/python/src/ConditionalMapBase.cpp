@@ -13,7 +13,7 @@ template<typename MemorySpace>
 void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
 {
     std::string tName = "ConditionalMapBase";
-    constexpr if(std::is_same<MemorySpace,DeviceSpace>::value) tName = "ConditionalMapBaseDevice";
+    if(std::is_same<MemorySpace,DeviceSpace>::value) tName += "Device";
 
     // ConditionalMapBase
     py::class_<ConditionalMapBase<MemorySpace>, ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<ConditionalMapBase<MemorySpace>>>(m, tName)
