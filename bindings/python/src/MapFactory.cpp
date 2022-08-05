@@ -22,5 +22,5 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
 
 template void mpart::binding::MapFactoryWrapper<Kokkos::HostSpace>(py::module&);
 #if defined(MPART_ENABLE_GPU)
-template void mpart::binding::MapFactoryWrapper<DeviceSpace>(py::module&);
+template void mpart::binding::MapFactoryWrapper<mpart::DeviceSpace>(py::module&);
 #endif // MPART_ENABLE_GPU
