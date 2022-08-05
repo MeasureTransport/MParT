@@ -9,19 +9,25 @@
 namespace py = pybind11;
 using namespace mpart::binding;
 
-
+template<typename MemorySpace>
 void mpart::binding::ParameterizedFunctionBaseWrapper(py::module &m)
 {
-    
+    std::string tName = "ParameterizedFunctionBase";
+    constexpr if(std::is_same<MemorySpace,DeviceSpace>::value) tName += "Device";
     // ParameterizedFunctionBase
-     py::class_<ParameterizedFunctionBase<Kokkos::HostSpace>, std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>>>(m, "ParameterizedFunctionBase")
-        .def("CoeffMap", &ParameterizedFunctionBase<Kokkos::HostSpace>::CoeffMap)
-        .def("SetCoeffs", py::overload_cast<Eigen::Ref<Eigen::VectorXd>>(&ParameterizedFunctionBase<Kokkos::HostSpace>::SetCoeffs))
-        .def("Evaluate", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ParameterizedFunctionBase<Kokkos::HostSpace>::Evaluate))
-        .def("CoeffGrad", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ParameterizedFunctionBase<Kokkos::HostSpace>::CoeffGrad))
-        .def_readonly("numCoeffs", &ParameterizedFunctionBase<Kokkos::HostSpace>::numCoeffs)
-        .def_readonly("inputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::inputDim)
-        .def_readonly("outputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::outputDim)
+    py::class_<ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<ParameterizedFunctionBase<MemorySpace>>>(m, tName)
+        .def("CoeffMap", &ParameterizedFunctionBase<MemorySpace>::CoeffMap)
+        .def("SetCoeffs", py::overload_cast<Eigen::Ref<Eigen::VectorXd>>(&ParameterizedFunctionBase<MemorySpace>::SetCoeffs))
+        .def("Evaluate", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ParameterizedFunctionBase<MemorySpace>::Evaluate))
+        .def("CoeffGrad", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ParameterizedFunctionBase<MemorySpace>::CoeffGrad))
+        .def_readonly("numCoeffs", &ParameterizedFunctionBase<MemorySpace>::numCoeffs)
+        .def_readonly("inputDim", &ParameterizedFunctionBase<MemorySpace>::inputDim)
+        .def_readonly("outputDim", &ParameterizedFunctionBase<MemorySpace>::outputDim)
         ;
 
 }
+
+template void mpart::binding::ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(py::module&);
+#if defined(MPART_ENABLE_GPU)
+template void mpart::binding::ParameterizedFunctionBaseWrapper<DeviceSpace>(py::module&);
+#endif // MPART_ENABLE_GPU

@@ -10,14 +10,22 @@
 namespace py = pybind11;
 using namespace mpart::binding;
 
+template<typename MemorySpace>
 void mpart::binding::TriangularMapWrapper(py::module &m)
 {
+    std::string tName = "TriangularMap";
+    constexpr if(std::is_same<MemorySpace,DeviceSpace>) tName += "Device";
 
     // TriangularMap
-     py::class_<TriangularMap<Kokkos::HostSpace>, ConditionalMapBase<Kokkos::HostSpace>, std::shared_ptr<TriangularMap<Kokkos::HostSpace>>>(m, "TriangularMap")
-        .def(py::init<std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>>>())
-        .def("InverseInplace", &TriangularMap<Kokkos::HostSpace>::InverseInplace)
-        .def("GetComponent", &TriangularMap<Kokkos::HostSpace>::GetComponent)
+    py::class_<TriangularMap<MemorySpace>, ConditionalMapBase<MemorySpace>, std::shared_ptr<TriangularMap<MemorySpace>>>(m, tName)
+        .def(py::init<std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>>())
+        .def("InverseInplace", &TriangularMap<MemorySpace>::InverseInplace)
+        .def("GetComponent", &TriangularMap<MemorySpace>::GetComponent)
         ;
 
 }
+
+template void mpart::binding::TriangularMapWrapper<Kokkos::HostSpace>(py::module&);
+#if defined(MPART_ENABLE_GPU)
+template void mpart::binding::TriangularMapWrapper<DeviceSpace>(py::module&);
+#endif // MPART_ENABLE_GPU

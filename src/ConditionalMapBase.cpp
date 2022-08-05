@@ -76,5 +76,5 @@ Eigen::RowMatrixXd ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad(Eige
 // Explicit template instantiation
 template class mpart::ConditionalMapBase<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)
-    template class mpart::ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>;
+    template class mpart::ConditionalMapBase<DeviceSpace>;
 #endif

@@ -9,12 +9,15 @@ PYBIND11_MODULE(pympart, m) {
     MultiIndexWrapper(m);
     MapOptionsWrapper(m);
 
-    ParameterizedFunctionBaseWrapper(m);
-    ConditionalMapBaseWrapper(m);
-    TriangularMapWrapper(m);
-    MapFactoryWrapper(m);
+    ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(m);
+    ConditionalMapBaseWrapper<Kokkos::HostSpace>(m);
+    TriangularMapWrapper<Kokkos::HostSpace>(m);
+    MapFactoryWrapper<Kokkos::HostSpace>(m);
 
 #ifdef MPART_ENABLE_GPU
-    ConditionalMapBaseDeviceWrapper(m);
+    ParameterizedFunctionBaseWrapper<DeviceSpace>(m);
+    ConditionalMapBaseWrapper<DeviceSpace>(m);
+    TriangularMapWrapper<DeviceSpace>(m);
+    MapFactoryWrapper<DeviceSpace>(m);
 #endif
 }

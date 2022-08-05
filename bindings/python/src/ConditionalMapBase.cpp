@@ -9,33 +9,24 @@
 namespace py = pybind11;
 using namespace mpart::binding;
 
-
+template<typename MemorySpace>
 void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
 {
+    std::string tName = "ConditionalMapBase";
+    constexpr if(std::is_same<MemorySpace,DeviceSpace>) tName += "Device";
 
     // ConditionalMapBase
-    py::class_<ConditionalMapBase<Kokkos::HostSpace>, ParameterizedFunctionBase<Kokkos::HostSpace>, std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>>(m, "ConditionalMapBase")
+    py::class_<ConditionalMapBase<MemorySpace>, ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<ConditionalMapBase<MemorySpace>>>(m, tName)
 
-        .def("LogDeterminant", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<Kokkos::HostSpace>::LogDeterminant))
-        .def("Inverse", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<Kokkos::HostSpace>::Inverse))
-        .def("LogDeterminantCoeffGrad", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantCoeffGrad))
-        .def("GetBaseFunction", &ConditionalMapBase<Kokkos::HostSpace>::GetBaseFunction)
+        .def("LogDeterminant", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<MemorySpace>::LogDeterminant))
+        .def("Inverse", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<MemorySpace>::Inverse))
+        .def("LogDeterminantCoeffGrad", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad))
+        .def("GetBaseFunction", &ConditionalMapBase<MemorySpace>::GetBaseFunction)
         ;
 
 }
 
+template void mpart::binding::ConditionalMapBaseWrapper<Kokkos::HostSpace>(py::module&);
 #if defined(MPART_ENABLE_GPU)
-
-void mpart::binding::ConditionalMapBaseDeviceWrapper(py::module &m)
-{
-    // ConditionalMapBaseDevice
-     py::class_<ConditionalMapBase<DeviceSpace>, ParameterizedFunctionBase<DeviceSpace>, std::shared_ptr<ConditionalMapBase<DeviceSpace>>>(m, "ConditionalMapBaseDevice")
-
-
-        .def("LogDeterminant", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<DeviceSpace>::LogDeterminant))
-        .def("Inverse", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<DeviceSpace>::Inverse))
-        .def("LogDeterminantCoeffGrad", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<DeviceSpace>::LogDeterminantCoeffGrad))
-        .def("GetBaseFunction", &ConditionalMapBase<DeviceSpace>::GetBaseFunction)
-        ;
-}
-#endif
+template void mpart::binding::ConditionalMapBaseWrapper<DeviceSpace>(py::module&);
+#endif // MPART_ENABLE_GPU
