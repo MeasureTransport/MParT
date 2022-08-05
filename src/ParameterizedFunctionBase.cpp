@@ -1,6 +1,7 @@
 #include "MParT/ParameterizedFunctionBase.h"
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Utilities/Miscellaneous.h"
+#include "MParT/Utilities/GPUtils.h"
 
 using namespace mpart;
 
