@@ -16,7 +16,7 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
     if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName += "Device";
 
     // ConditionalMapBase
-    py::class_<ConditionalMapBase<MemorySpace>, ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<ConditionalMapBase<MemorySpace>>>(m, tName)
+    py::class_<ConditionalMapBase<MemorySpace>, ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<ConditionalMapBase<MemorySpace>>>(m, tName.c_str())
 
         .def("LogDeterminant", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<MemorySpace>::LogDeterminant))
         .def("Inverse", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<MemorySpace>::Inverse))

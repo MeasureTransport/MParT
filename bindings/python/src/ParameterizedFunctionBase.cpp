@@ -16,7 +16,7 @@ void mpart::binding::ParameterizedFunctionBaseWrapper(py::module &m)
     if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName += "Device";
 
     // ParameterizedFunctionBase
-    py::class_<ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<ParameterizedFunctionBase<MemorySpace>>>(m, tName)
+    py::class_<ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<ParameterizedFunctionBase<MemorySpace>>>(m, tName.c_str())
         .def("CoeffMap", &ParameterizedFunctionBase<MemorySpace>::CoeffMap)
         .def("SetCoeffs", py::overload_cast<Eigen::Ref<Eigen::VectorXd>>(&ParameterizedFunctionBase<MemorySpace>::SetCoeffs))
         .def("Evaluate", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ParameterizedFunctionBase<MemorySpace>::Evaluate))
