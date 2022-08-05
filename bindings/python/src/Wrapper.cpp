@@ -1,4 +1,5 @@
 #include "CommonPybindUtilities.h"
+#include <MParT/Utilities/GPUtils.h>
 
 using namespace mpart::binding;
 

@@ -8,7 +8,6 @@
 #include <chrono>
 
 #include "../../common/include/CommonUtilities.h"
-#include <MParT/Utilities/GPUtils.h>
 
 namespace mpart{
 namespace binding{
