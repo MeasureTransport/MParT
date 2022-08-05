@@ -13,7 +13,7 @@ template<typename MemorySpace>
 void mpart::binding::ParameterizedFunctionBaseWrapper(py::module &m)
 {
     std::string tName = "ParameterizedFunctionBase";
-    constexpr if(std::is_same<MemorySpace,DeviceSpace>::value) tName += "Device";
+    constexpr if(std::is_same<MemorySpace,DeviceSpace>::value) tName = "ParameterizedFunctionBaseDevice";
     // ParameterizedFunctionBase
     py::class_<ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<ParameterizedFunctionBase<MemorySpace>>>(m, tName)
         .def("CoeffMap", &ParameterizedFunctionBase<MemorySpace>::CoeffMap)
