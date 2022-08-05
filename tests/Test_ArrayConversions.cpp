@@ -224,7 +224,7 @@ TEST_CASE( "Testing constant Eigen to Kokkos Conversions in 2D", "[ConstEigenArr
             }
         }
 
-        Kokkos::View<const double**, Kokkos::LayoutLeft,Kokkos::HostSpace> x_view = ConstColMatToKokkos<double>(x);
+        auto x_view = ConstColMatToKokkos<double,Kokkos::HostSpace>(x);
         for(unsigned int j=0; j<cols; ++j){
             for(unsigned int i=0; i<rows; ++i){
                 CHECK(x_view(i,j)==x(i,j));
@@ -241,7 +241,7 @@ TEST_CASE( "Testing constant Eigen to Kokkos Conversions in 2D", "[ConstEigenArr
             }
         }
 
-        Kokkos::View<const double**, Kokkos::LayoutRight,Kokkos::HostSpace> x_view = ConstRowMatToKokkos<double>(x);
+        auto x_view = ConstRowMatToKokkos<double,Kokkos::HostSpace>(x);
         for(unsigned int j=0; j<cols; ++j){
             for(unsigned int i=0; i<rows; ++i){
                 CHECK(x_view(i,j)==x(i,j));
@@ -264,7 +264,7 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 2D", "[EigenArrayConversions2
     }
 
     SECTION("contiguous"){
-        Kokkos::View<double**, Kokkos::LayoutLeft,Kokkos::HostSpace> x_view = MatToKokkos<double>(x);
+        auto x_view = MatToKokkos<double,Kokkos::HostSpace>(x);
         for(unsigned int j=0; j<cols; ++j){
             for(unsigned int i=0; i<rows; ++i){
                 CHECK(x_view(i,j)==x(i,j));
@@ -275,7 +275,7 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 2D", "[EigenArrayConversions2
 
 
     SECTION("block"){
-        Kokkos::View<double**, Kokkos::LayoutStride,Kokkos::HostSpace> x_view = MatToKokkos<double>(x.block(2,3,10,10));
+        auto x_view = MatToKokkos<double,Kokkos::HostSpace>(x.block(2,3,10,10));
         for(unsigned int i=0; i<10; ++i){
             for(unsigned int j=0; j<10; ++j){
                 CHECK(x_view(i,j)==x(2+i,3+j));
@@ -286,7 +286,7 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 2D", "[EigenArrayConversions2
 
     SECTION("transpose"){
 
-        auto x_view = MatToKokkos<double>(x.transpose());
+        auto x_view = MatToKokkos<double,Kokkos::HostSpace>(x.transpose());
         for(unsigned int i=0; i<10; ++i){
             for(unsigned int j=0; j<10; ++j){
                 CHECK(x_view(i,j)==x(j,i));
@@ -304,7 +304,7 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 2D", "[EigenArrayConversions2
             }
         }
 
-        Kokkos::View<double**,Kokkos::LayoutStride,Kokkos::HostSpace> x_view = MatToKokkos<double>(x2);
+        auto x_view = MatToKokkos<double,Kokkos::HostSpace>(x2);
         for(unsigned int i=0; i<10; ++i){
             for(unsigned int j=0; j<10; ++j){
                 CHECK(x_view(i,j)==x2(i,j));
