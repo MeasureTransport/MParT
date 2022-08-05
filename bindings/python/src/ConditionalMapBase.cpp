@@ -28,5 +28,5 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
 
 template void mpart::binding::ConditionalMapBaseWrapper<Kokkos::HostSpace>(py::module&);
 #if defined(MPART_ENABLE_GPU)
-template void mpart::binding::ConditionalMapBaseWrapper<DeviceSpace>(py::module&);
+template void mpart::binding::ConditionalMapBaseWrapper<mpart::DeviceSpace>(py::module&);
 #endif // MPART_ENABLE_GPU

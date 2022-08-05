@@ -27,5 +27,5 @@ void mpart::binding::TriangularMapWrapper(py::module &m)
 
 template void mpart::binding::TriangularMapWrapper<Kokkos::HostSpace>(py::module&);
 #if defined(MPART_ENABLE_GPU)
-template void mpart::binding::TriangularMapWrapper<DeviceSpace>(py::module&);
+template void mpart::binding::TriangularMapWrapper<mpart::DeviceSpace>(py::module&);
 #endif // MPART_ENABLE_GPU
