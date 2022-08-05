@@ -15,7 +15,7 @@ PYBIND11_MODULE(pympart, m) {
     TriangularMapWrapper<Kokkos::HostSpace>(m);
     MapFactoryWrapper<Kokkos::HostSpace>(m);
 
-#ifdef MPART_ENABLE_GPU
+#if defined(MPART_ENABLE_GPU)
     ParameterizedFunctionBaseWrapper<DeviceSpace>(m);
     ConditionalMapBaseWrapper<DeviceSpace>(m);
     TriangularMapWrapper<DeviceSpace>(m);
