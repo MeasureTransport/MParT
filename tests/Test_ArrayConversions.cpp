@@ -179,7 +179,7 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 1D", "[EigenArrayConversions1
 
     SECTION("strided"){
         Eigen::Map<Eigen::VectorXd, 0, Eigen::InnerStride<2>> xslice(x.data(), size/2);
-        auto x_view = VecToKokkos<double>(xslice);
+        auto x_view = VecToKokkos<double,Kokkos::HostSpace>(xslice);
         for(unsigned int i=0; i<size/2; ++i){
             CHECK(x_view(i)==x(2*i));
             CHECK(&x_view(i) == &x(2*i));
@@ -195,13 +195,13 @@ TEST_CASE( "Testing Eigen to Kokkos Conversions in 1D", "[EigenArrayConversions1
             }
         }
 
-        auto row_view  = VecToKokkos<double>(x2.row(10));
+        auto row_view  = VecToKokkos<double,Kokkos::HostSpace>(x2.row(10));
         for(unsigned int i=0; i<size; ++i){
             CHECK(row_view(i)==x2(10,i));
             CHECK(&row_view(i)==&x2(10,i));
         }
 
-        auto col_view  = VecToKokkos<double>(x2.col(10));
+        auto col_view  = VecToKokkos<double,Kokkos::HostSpace>(x2.col(10));
         for(unsigned int i=0; i<size; ++i){
             CHECK(col_view(i)==x2(i,10));
             CHECK(&col_view(i)==&x2(i,10));
