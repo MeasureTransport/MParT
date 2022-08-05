@@ -14,7 +14,7 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
 {
 
     // ConditionalMapBase
-     py::class_<ConditionalMapBase<Kokkos::HostSpace>, ParameterizedFunctionBase<Kokkos::HostSpace>, std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>>(m, "ConditionalMapBase")
+    py::class_<ConditionalMapBase<Kokkos::HostSpace>, ParameterizedFunctionBase<Kokkos::HostSpace>, std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>>(m, "ConditionalMapBase")
 
         .def("LogDeterminant", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<Kokkos::HostSpace>::LogDeterminant))
         .def("Inverse", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<Kokkos::HostSpace>::Inverse))
@@ -31,9 +31,10 @@ void mpart::binding::ConditionalMapBaseDeviceWrapper(py::module &m)
     // ConditionalMapBaseDevice
      py::class_<ConditionalMapBase<DeviceSpace>, ParameterizedFunctionBase<DeviceSpace>, std::shared_ptr<ConditionalMapBase<DeviceSpace>>>(m, "ConditionalMapBaseDevice")
 
-        .def("LogDeterminant", [](ConditionalMapBase<DeviceSpace> &map, DeviceMatrix<const double> &pts){ return DeviceMatrix(map.LogDeterminant(pts.data)); })
-        .def("Inverse", [](ConditionalMapBase<DeviceSpace> &map, DeviceMatrix<const double> const &x1, DeviceMatrix<const double> const &r){ return DeviceMatrix(map.Inverse(x1.data, r.data)); })
-        .def("LogDeterminantCoeffGrad", [](ConditionalMapBase<DeviceSpace> &map, DeviceMatrix<const double> const pts){ return DeviceMatrix(map.LogDeterminantCoeffGrad(pts)); })
+
+        .def("LogDeterminant", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<DeviceSpace>::LogDeterminant))
+        .def("Inverse", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<DeviceSpace>::Inverse))
+        .def("LogDeterminantCoeffGrad", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<DeviceSpace>::LogDeterminantCoeffGrad))
         .def("GetBaseFunction", &ConditionalMapBase<DeviceSpace>::GetBaseFunction)
         ;
 }
