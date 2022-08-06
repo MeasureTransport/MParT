@@ -67,19 +67,21 @@ Python
 ^^^^^^^^^
 First, make sure the relevant path variables include the installation of MParT:
 
-.. tabbed:: OSX
+.. tabs::
 
-    .. code-block:: bash
+    .. tab:: MacOS
 
-        export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
-        export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
+        .. code-block:: bash
 
-.. tabbed:: Linux
+            export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
+            export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
 
-    .. code-block:: bash
+    .. tab:: Linux
 
-         export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
-         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
+        .. code-block:: bash
+
+            export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
+            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
 
 You should now be able to run python and import the MParT package!
 
