@@ -32,7 +32,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/kokkos
           mkdir build && cd build
-          cmake -DKokkos_ENABLE_PTHREAD=ON \
+          cmake -DKokkos_ENABLE_THREADS=ON \
                 -DBUILD_SHARED_LIBS=ON     \
                 -DKokkos_ENABLE_SERIAL=ON  \
                 -DKokkos_CXX_STANDARD=17   \
@@ -49,7 +49,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/mpart
           mkdir build && cd build
-          cmake -DKokkos_DIR=$GITHUB_WORKSPACE/KOKKOS_INSTALL/lib/cmake/Kokkos ../
+          cmake -DKokkos_DIR=$GITHUB_WORKSPACE/KOKKOS_INSTALL/lib/cmake/Kokkos -DMPART_FETCH_DEPS=OFF ../
 
       - name: Build MParT
         shell: bash -l {0}
