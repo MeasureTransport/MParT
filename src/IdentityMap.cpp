@@ -17,6 +17,9 @@ void IdentityMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, Me
                                                     StridedVector<double, MemorySpace>              output)
 {
 
+    // Add to logdet of full map
+    for(unsigned int j=0; j<output.size(); ++j)
+        output(j) = 0.0;
 
 
 }
@@ -25,7 +28,10 @@ template<typename MemorySpace>
 void IdentityMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                               StridedMatrix<double, MemorySpace>              output)
 {
-
+    // Copy x_{N-M+1:N}
+    StridedMatrix<const double, MemorySpace> tailPts = Kokkos::subview(
+        pts, std::make_pair(int(this->inputDim - this->outputDim), int(this->inputDim)), Kokkos::ALL());
+    Kokkos::deep_copy(output, tailPts);
 
 }
 
@@ -34,6 +40,10 @@ void IdentityMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpa
                                              StridedMatrix<const double, MemorySpace> const& r,
                                              StridedMatrix<double, MemorySpace>              output)
 {
+
+    StridedMatrix<const double, MemorySpace> tailR = Kokkos::subview(
+        r, std::make_pair(int(this->inputDim - this->outputDim), int(this->inputDim)), Kokkos::ALL());
+    Kokkos::deep_copy(output, tailR);
 
 }
 
