@@ -1,0 +1,1758 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Stochastic volatility &#8212; MParT  documentation</title>
+<script>
+  document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+  document.documentElement.dataset.theme = localStorage.getItem("theme") || "light"
+</script>
+
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=92025949c220c2e29695" rel="stylesheet">
+
+
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Mathematical Background" href="../mathematics.html" />
+    <link rel="prev" title="Monotone least squares" href="MonotoneLeastSquares.nbconvert.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+    <div class="bd-header-announcement container-fluid" id="banner">
+      
+
+    </div>
+
+    
+    <nav class="bd-header navbar navbar-light navbar-expand-lg bg-light fixed-top bd-navbar" id="navbar-main"><div class="bd-header__inner container-xl">
+
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../index.html">
+  
+  
+  
+  
+  
+    <p class="title logo__title">MParT  documentation</p>
+  
+</a>
+    
+  </div>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-collapsible" aria-controls="navbar-collapsible" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="fas fa-bars"></span>
+  </button>
+
+  
+  <div id="navbar-collapsible" class="col-lg-9 collapse navbar-collapse">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <ul id="navbar-main-elements" class="navbar-nav">
+    <li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../installation.html">
+  Installation
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../getting_started.html">
+  Using MParT
+ </a>
+</li>
+
+<li class="toctree-l1 current active nav-item">
+ <a class="reference internal nav-link" href="index.html">
+  Tutorials
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../mathematics.html">
+  Mathematical Background
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../api/index.html">
+  API Reference
+ </a>
+</li>
+
+<li class="toctree-l1 nav-item">
+ <a class="reference internal nav-link" href="../development/index.html">
+  Development
+ </a>
+</li>
+
+    
+</ul>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+      <div class="navbar-end-item">
+        <span id="theme-switch" class="btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          <a class="nav-link" href="https://github.com/MeasureTransport/MParT" rel="noopener" target="_blank" title="GitHub"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+</div>
+    </nav>
+    
+
+    <div class="bd-container container-xl">
+      <div class="bd-container__inner row">
+          
+
+<!-- Only show if we have sidebars configured, else just a small margin  -->
+<div class="bd-sidebar-primary col-12 col-md-3 bd-sidebar">
+  <div class="sidebar-start-items"><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+  <div class="bd-toc-item active">
+    <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="MonotoneLeastSquares.nbconvert.html">
+   Monotone least squares
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Stochastic volatility
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+  </div>
+  <div class="sidebar-end-items">
+  </div>
+</div>
+
+
+          
+
+
+<div class="bd-sidebar-secondary d-none d-xl-block col-xl-2 bd-toc">
+  
+    
+    <div class="toc-item">
+      
+
+<nav id="bd-toc-nav">
+    
+</nav>
+    </div>
+    
+    <div class="toc-item">
+      
+    </div>
+    
+  
+</div>
+
+
+          
+          
+          <div class="bd-content col-12 col-md-9 col-xl-7">
+              
+              <article class="bd-article" role="main">
+                
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Stochastic-volatility">
+<h1>Stochastic volatility<a class="headerlink" href="#Stochastic-volatility" title="Permalink to this heading">#</a></h1>
+<p>At first we import a few common packages</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_normal</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">MultiIndex</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
+</div>
+</div>
+<p>Now we set the number of threads to be used by <code class="docutils literal notranslate"><span class="pre">Kokkos</span></code> and import <code class="docutils literal notranslate"><span class="pre">MParT</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;KOKKOS_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;8&#39;</span>
+<span class="kn">from</span> <span class="nn">mpart</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Kokkos is using&#39;</span><span class="p">,</span> <span class="n">Concurrency</span><span class="p">(),</span> <span class="s1">&#39;threads&#39;</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Kokkos is usingKokkos::OpenMP::initialize WARNING: OMP_PROC_BIND environment variable not set
+  In general, for best performance with OpenMP 4.0 or better set OMP_PROC_BIND=spread and OMP_PLACES=threads
+  For best performance with OpenMP 3.1 set OMP_PROC_BIND=true
+  For unit testing set OMP_PROC_BIND=false
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+  process threads available :   2,  requested thread :   8
+ 8 threads
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 2 cores per node.
+                                    Detected: 1 MPI_ranks per node.
+                                    Requested: 8 threads per process.
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">T</span> <span class="o">=</span> <span class="mi">40</span> <span class="c1">#number of time steps</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">T</span><span class="o">+</span><span class="mi">2</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">opts</span> <span class="o">=</span> <span class="n">MapOptions</span><span class="p">()</span>
+<span class="n">opts</span><span class="o">.</span><span class="n">basisType</span> <span class="o">=</span> <span class="n">BasisTypes</span><span class="o">.</span><span class="n">HermiteFunctions</span>
+</pre></div>
+</div>
+</div>
+<p>Let’s generate some training and test samples and calculate the true log-pdf.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">generate_SV_samples</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">N</span><span class="p">):</span>
+    <span class="c1"># Sample hyper-parameters</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.25</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">phis</span> <span class="o">=</span> <span class="mi">3</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">phis</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">phis</span><span class="p">))</span><span class="o">-</span><span class="mi">1</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">mu</span><span class="p">,</span><span class="n">phi</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># Sample Z0</span>
+        <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">phi</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span><span class="p">)</span> <span class="o">+</span> <span class="n">mu</span>
+
+        <span class="c1"># Sample auto-regressively</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="mi">3</span><span class="p">):</span>
+            <span class="n">Zi</span> <span class="o">=</span> <span class="n">mu</span> <span class="o">+</span> <span class="n">phi</span> <span class="o">*</span> <span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span><span class="o">+</span><span class="n">sigma</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">N</span><span class="p">)</span>
+            <span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">Z</span><span class="p">,</span><span class="n">Zi</span><span class="p">))</span>
+
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span><span class="n">Z</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">X</span>
+
+<span class="k">def</span> <span class="nf">SV_log_pdf</span><span class="p">(</span><span class="n">X</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="nf">normpdf</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">mu</span><span class="p">,</span><span class="n">sigma</span><span class="p">):</span>
+        <span class="k">return</span>  <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">mu</span><span class="p">)</span><span class="o">/</span><span class="n">sigma</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">);</span>
+
+    <span class="n">sigma</span> <span class="o">=</span> <span class="mf">0.25</span>
+
+    <span class="c1"># Extract variables mu, phi and states</span>
+    <span class="n">mu</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>
+    <span class="n">Z</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="mi">2</span><span class="p">:,:]</span>
+
+    <span class="c1"># Compute density for mu</span>
+    <span class="n">piMu</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">logPdfMu</span> <span class="o">=</span> <span class="n">piMu</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+    <span class="c1"># Compute density for phi</span>
+    <span class="n">phiRef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="n">phi</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">phi</span><span class="p">))</span>
+    <span class="n">dphiRef</span> <span class="o">=</span> <span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">phi</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">piPhi</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">logPdfPhi</span> <span class="o">=</span> <span class="n">piPhi</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">phiRef</span><span class="p">)</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">dphiRef</span><span class="p">)</span>
+    <span class="c1"># Add piMu, piPhi to density</span>
+    <span class="n">logPdf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">logPdfMu</span><span class="p">,</span><span class="n">logPdfPhi</span><span class="p">))</span>
+
+    <span class="c1"># Number of time steps</span>
+    <span class="n">dz</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">dz</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1"># Conditonal density for Z_0</span>
+        <span class="n">muZ0</span> <span class="o">=</span> <span class="n">mu</span>
+        <span class="n">stdZ0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">phi</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">logPdfZ0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">normpdf</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span><span class="n">muZ0</span><span class="p">,</span><span class="n">stdZ0</span><span class="p">))</span>
+        <span class="n">logPdf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">logPdf</span><span class="p">,</span><span class="n">logPdfZ0</span><span class="p">))</span>
+
+        <span class="c1"># Compute auto-regressive conditional densities for Z_i|Z_{1:i-1}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">dz</span><span class="p">):</span>
+            <span class="n">meanZi</span> <span class="o">=</span> <span class="n">mu</span> <span class="o">+</span> <span class="n">phi</span> <span class="o">*</span> <span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span><span class="o">-</span><span class="n">mu</span><span class="p">)</span>
+            <span class="n">stdZi</span> <span class="o">=</span> <span class="n">sigma</span>
+            <span class="n">logPdfZi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">normpdf</span><span class="p">(</span><span class="n">Z</span><span class="p">[</span><span class="n">i</span><span class="p">,:],</span><span class="n">meanZi</span><span class="p">,</span><span class="n">stdZi</span><span class="p">))</span>
+            <span class="n">logPdf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">logPdf</span><span class="p">,</span><span class="n">logPdfZi</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">logPdf</span>
+
+<span class="n">N</span> <span class="o">=</span> <span class="mi">2000</span> <span class="c1">#Number of training samples</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">generate_SV_samples</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+
+<span class="n">Ntest</span> <span class="o">=</span> <span class="mi">2000</span> <span class="c1"># Number of testing samples</span>
+<span class="n">Xtest</span> <span class="o">=</span> <span class="n">generate_SV_samples</span><span class="p">(</span><span class="n">d</span><span class="p">,</span><span class="n">Ntest</span><span class="p">)</span>
+<span class="n">logPdfSV</span> <span class="o">=</span> <span class="n">SV_log_pdf</span><span class="p">(</span><span class="n">Xtest</span><span class="p">)</span> <span class="c1"># true log-pdf</span>
+</pre></div>
+</div>
+</div>
+<p>That’s how a few realizations of the process look like</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">X</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">]);</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Days (d)&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_StochasticVolatility.nbconvert_10_0.png" src="../../_images/source_tutorials_StochasticVolatility.nbconvert_10_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">### Negative log likelihood objective</span>
+<span class="k">def</span> <span class="nf">obj</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">tri_map</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Evaluates the log-likelihood of the samples using the map-induced density. &quot;&quot;&quot;</span>
+    <span class="n">num_points</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">tri_map</span><span class="o">.</span><span class="n">SetCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+
+    <span class="c1"># Compute the map-induced density at each point</span>
+    <span class="n">map_of_x</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">tri_map</span><span class="o">.</span><span class="n">outputDim</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">tri_map</span><span class="o">.</span><span class="n">outputDim</span><span class="p">))</span>
+    <span class="n">rho_of_map_of_x</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">map_of_x</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">log_det</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">LogDeterminant</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># Return the negative log-likelihood of the entire dataset</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rho_of_map_of_x</span> <span class="o">+</span> <span class="n">log_det</span><span class="p">)</span><span class="o">/</span><span class="n">num_points</span>
+
+<span class="k">def</span> <span class="nf">grad_obj</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">tri_map</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the gradient of the log-likelihood objective wrt the map parameters. &quot;&quot;&quot;</span>
+    <span class="n">num_points</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">tri_map</span><span class="o">.</span><span class="n">SetCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+
+    <span class="c1"># Evaluate the map</span>
+    <span class="n">map_of_x</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># Now compute the inner product of the map jacobian (\nabla_w S) and the gradient (which is just -S(x) here)</span>
+    <span class="n">grad_rho_of_map_of_x</span> <span class="o">=</span> <span class="o">-</span><span class="n">tri_map</span><span class="o">.</span><span class="n">CoeffGrad</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">map_of_x</span><span class="p">)</span>
+
+    <span class="c1"># Get the gradient of the log determinant with respect to the map coefficients</span>
+    <span class="n">grad_log_det</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">LogDeterminantCoeffGrad</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad_rho_of_map_of_x</span> <span class="o">+</span> <span class="n">grad_log_det</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">num_points</span>
+
+
+<span class="k">def</span> <span class="nf">log_cond_pullback_pdf</span><span class="p">(</span><span class="n">triMap</span><span class="p">,</span><span class="n">rho</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">triMap</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">log_pdf</span> <span class="o">=</span> <span class="n">rho</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">+</span><span class="n">triMap</span><span class="o">.</span><span class="n">LogDeterminant</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">log_pdf</span>
+
+<span class="k">def</span> <span class="nf">compute_joint_KL</span><span class="p">(</span><span class="n">logPdfSV</span><span class="p">,</span><span class="n">logPdfTM</span><span class="p">):</span>
+    <span class="n">KL</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">logPdfSV</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],))</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">KL</span><span class="p">[</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">logPdfSV</span><span class="p">[:</span><span class="n">k</span><span class="p">,:],</span><span class="mi">0</span><span class="p">)</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">logPdfTM</span><span class="p">[:</span><span class="n">k</span><span class="p">,:],</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">KL</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Total order 1 approximation</span>
+<span class="n">totalOrder</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="n">logPdfTM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Ntest</span><span class="p">,))</span>
+<span class="n">ListCoeffs_to1</span><span class="o">=</span><span class="p">[];</span>
+<span class="k">for</span> <span class="n">dk</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">fixed_mset</span><span class="o">=</span> <span class="n">FixedMultiIndexSet</span><span class="p">(</span><span class="n">dk</span><span class="p">,</span><span class="n">totalOrder</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixed_mset</span><span class="p">,</span><span class="n">opts</span><span class="p">)</span>
+    <span class="n">Xtrain</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="n">dk</span><span class="p">,:]</span>
+    <span class="n">Xtestk</span> <span class="o">=</span> <span class="n">Xtest</span><span class="p">[:</span><span class="n">dk</span><span class="p">,:]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of coefficients: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">numCoeffs</span><span class="p">))</span>
+    <span class="n">ListCoeffs_to1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">numCoeffs</span><span class="p">)</span>
+
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gtol&#39;</span><span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">CoeffMap</span><span class="p">(),</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">Xtrain</span><span class="p">),</span> <span class="n">jac</span><span class="o">=</span><span class="n">grad_obj</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BFGS&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">outputDim</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">outputDim</span><span class="p">))</span>
+    <span class="n">logPdfTM</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">logPdfTM</span><span class="p">,</span><span class="n">log_cond_pullback_pdf</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="n">rho</span><span class="p">,</span><span class="n">Xtestk</span><span class="p">)))</span>
+    <span class="n">xplot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.5</span><span class="p">,</span><span class="mi">200</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">logPdfTM_to1</span><span class="o">=</span><span class="n">logPdfTM</span><span class="p">[</span><span class="mi">1</span><span class="p">:,:]</span>
+
+<span class="c1"># Compute joint KL divergence</span>
+<span class="n">KL_to1</span> <span class="o">=</span> <span class="n">compute_joint_KL</span><span class="p">(</span><span class="n">logPdfSV</span><span class="p">,</span><span class="n">logPdfTM_to1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Number of coefficients: 2
+Optimization terminated successfully.
+         Current function value: 1.436173
+         Iterations: 2
+         Function evaluations: 4
+         Gradient evaluations: 4
+Number of coefficients: 3
+Optimization terminated successfully.
+         Current function value: -0.549036
+         Iterations: 13
+         Function evaluations: 16
+         Gradient evaluations: 16
+Number of coefficients: 4
+Optimization terminated successfully.
+         Current function value: 2.522632
+         Iterations: 13
+         Function evaluations: 14
+         Gradient evaluations: 14
+Number of coefficients: 5
+Optimization terminated successfully.
+         Current function value: 0.346527
+         Iterations: 20
+         Function evaluations: 24
+         Gradient evaluations: 24
+Number of coefficients: 6
+Optimization terminated successfully.
+         Current function value: 0.173576
+         Iterations: 21
+         Function evaluations: 25
+         Gradient evaluations: 25
+Number of coefficients: 7
+Optimization terminated successfully.
+         Current function value: 0.113909
+         Iterations: 21
+         Function evaluations: 25
+         Gradient evaluations: 25
+Number of coefficients: 8
+Optimization terminated successfully.
+         Current function value: 0.115712
+         Iterations: 27
+         Function evaluations: 30
+         Gradient evaluations: 30
+Number of coefficients: 9
+Optimization terminated successfully.
+         Current function value: 0.092495
+         Iterations: 26
+         Function evaluations: 29
+         Gradient evaluations: 29
+Number of coefficients: 10
+Optimization terminated successfully.
+         Current function value: 0.084205
+         Iterations: 28
+         Function evaluations: 31
+         Gradient evaluations: 31
+Number of coefficients: 11
+Optimization terminated successfully.
+         Current function value: 0.073158
+         Iterations: 29
+         Function evaluations: 33
+         Gradient evaluations: 33
+Number of coefficients: 12
+Optimization terminated successfully.
+         Current function value: 0.063809
+         Iterations: 40
+         Function evaluations: 44
+         Gradient evaluations: 44
+Number of coefficients: 13
+Optimization terminated successfully.
+         Current function value: 0.100989
+         Iterations: 30
+         Function evaluations: 33
+         Gradient evaluations: 33
+Number of coefficients: 14
+Optimization terminated successfully.
+         Current function value: 0.064844
+         Iterations: 36
+         Function evaluations: 39
+         Gradient evaluations: 39
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.082957
+         Iterations: 32
+         Function evaluations: 36
+         Gradient evaluations: 36
+Number of coefficients: 16
+Optimization terminated successfully.
+         Current function value: 0.042223
+         Iterations: 38
+         Function evaluations: 42
+         Gradient evaluations: 42
+Number of coefficients: 17
+Optimization terminated successfully.
+         Current function value: 0.068882
+         Iterations: 37
+         Function evaluations: 41
+         Gradient evaluations: 41
+Number of coefficients: 18
+Optimization terminated successfully.
+         Current function value: 0.068788
+         Iterations: 36
+         Function evaluations: 40
+         Gradient evaluations: 40
+Number of coefficients: 19
+Optimization terminated successfully.
+         Current function value: 0.047042
+         Iterations: 34
+         Function evaluations: 38
+         Gradient evaluations: 38
+Number of coefficients: 20
+Optimization terminated successfully.
+         Current function value: 0.074162
+         Iterations: 36
+         Function evaluations: 39
+         Gradient evaluations: 39
+Number of coefficients: 21
+Optimization terminated successfully.
+         Current function value: 0.077913
+         Iterations: 30
+         Function evaluations: 35
+         Gradient evaluations: 35
+Number of coefficients: 22
+Optimization terminated successfully.
+         Current function value: 0.073314
+         Iterations: 38
+         Function evaluations: 43
+         Gradient evaluations: 43
+Number of coefficients: 23
+Optimization terminated successfully.
+         Current function value: 0.062831
+         Iterations: 39
+         Function evaluations: 44
+         Gradient evaluations: 44
+Number of coefficients: 24
+Optimization terminated successfully.
+         Current function value: 0.060808
+         Iterations: 36
+         Function evaluations: 40
+         Gradient evaluations: 40
+Number of coefficients: 25
+Optimization terminated successfully.
+         Current function value: 0.062645
+         Iterations: 45
+         Function evaluations: 50
+         Gradient evaluations: 50
+Number of coefficients: 26
+Optimization terminated successfully.
+         Current function value: 0.065624
+         Iterations: 45
+         Function evaluations: 51
+         Gradient evaluations: 51
+Number of coefficients: 27
+Optimization terminated successfully.
+         Current function value: 0.049678
+         Iterations: 34
+         Function evaluations: 39
+         Gradient evaluations: 39
+Number of coefficients: 28
+Optimization terminated successfully.
+         Current function value: 0.061399
+         Iterations: 36
+         Function evaluations: 39
+         Gradient evaluations: 39
+Number of coefficients: 29
+Optimization terminated successfully.
+         Current function value: 0.050430
+         Iterations: 36
+         Function evaluations: 41
+         Gradient evaluations: 41
+Number of coefficients: 30
+Optimization terminated successfully.
+         Current function value: 0.059076
+         Iterations: 36
+         Function evaluations: 40
+         Gradient evaluations: 40
+Number of coefficients: 31
+Optimization terminated successfully.
+         Current function value: 0.060728
+         Iterations: 37
+         Function evaluations: 42
+         Gradient evaluations: 42
+Number of coefficients: 32
+Optimization terminated successfully.
+         Current function value: 0.058593
+         Iterations: 35
+         Function evaluations: 38
+         Gradient evaluations: 38
+Number of coefficients: 33
+Optimization terminated successfully.
+         Current function value: 0.038336
+         Iterations: 40
+         Function evaluations: 43
+         Gradient evaluations: 43
+Number of coefficients: 34
+Optimization terminated successfully.
+         Current function value: 0.063380
+         Iterations: 39
+         Function evaluations: 42
+         Gradient evaluations: 42
+Number of coefficients: 35
+Optimization terminated successfully.
+         Current function value: 0.026967
+         Iterations: 34
+         Function evaluations: 38
+         Gradient evaluations: 38
+Number of coefficients: 36
+Optimization terminated successfully.
+         Current function value: 0.061027
+         Iterations: 38
+         Function evaluations: 43
+         Gradient evaluations: 43
+Number of coefficients: 37
+Optimization terminated successfully.
+         Current function value: 0.045047
+         Iterations: 33
+         Function evaluations: 39
+         Gradient evaluations: 39
+Number of coefficients: 38
+Optimization terminated successfully.
+         Current function value: 0.025428
+         Iterations: 35
+         Function evaluations: 39
+         Gradient evaluations: 39
+Number of coefficients: 39
+Optimization terminated successfully.
+         Current function value: 0.027442
+         Iterations: 36
+         Function evaluations: 40
+         Gradient evaluations: 40
+Number of coefficients: 40
+Optimization terminated successfully.
+         Current function value: 0.062991
+         Iterations: 39
+         Function evaluations: 43
+         Gradient evaluations: 43
+Number of coefficients: 41
+Optimization terminated successfully.
+         Current function value: 0.028752
+         Iterations: 39
+         Function evaluations: 43
+         Gradient evaluations: 43
+Number of coefficients: 42
+Optimization terminated successfully.
+         Current function value: 0.046060
+         Iterations: 39
+         Function evaluations: 43
+         Gradient evaluations: 43
+Number of coefficients: 43
+Optimization terminated successfully.
+         Current function value: 0.042362
+         Iterations: 40
+         Function evaluations: 44
+         Gradient evaluations: 44
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Total order 2 approximation</span>
+<span class="n">totalOrder</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="n">logPdfTM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Ntest</span><span class="p">,))</span>
+<span class="n">ListCoeffs_to2</span><span class="o">=</span><span class="p">[];</span>
+<span class="k">for</span> <span class="n">dk</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">dk</span><span class="p">)</span>
+    <span class="n">fixed_mset</span><span class="o">=</span> <span class="n">FixedMultiIndexSet</span><span class="p">(</span><span class="n">dk</span><span class="p">,</span><span class="n">totalOrder</span><span class="p">)</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixed_mset</span><span class="p">,</span><span class="n">opts</span><span class="p">)</span>
+    <span class="n">Xtrain</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="n">dk</span><span class="p">,:]</span>
+    <span class="n">Xtestk</span> <span class="o">=</span> <span class="n">Xtest</span><span class="p">[:</span><span class="n">dk</span><span class="p">,:]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of coefficients: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">numCoeffs</span><span class="p">))</span>
+    <span class="n">ListCoeffs_to2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">numCoeffs</span><span class="p">)</span>
+
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gtol&#39;</span><span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">CoeffMap</span><span class="p">(),</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">Xtrain</span><span class="p">),</span> <span class="n">jac</span><span class="o">=</span><span class="n">grad_obj</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BFGS&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">outputDim</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">outputDim</span><span class="p">))</span>
+    <span class="n">logPdfTM</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">logPdfTM</span><span class="p">,</span><span class="n">log_cond_pullback_pdf</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="n">rho</span><span class="p">,</span><span class="n">Xtestk</span><span class="p">)))</span>
+<span class="n">logPdfTM_to2</span><span class="o">=</span><span class="n">logPdfTM</span><span class="p">[</span><span class="mi">1</span><span class="p">:,:]</span>
+
+<span class="c1"># Compute joint KL divergence</span>
+<span class="n">KL_to2</span> <span class="o">=</span> <span class="n">compute_joint_KL</span><span class="p">(</span><span class="n">logPdfSV</span><span class="p">,</span><span class="n">logPdfTM_to2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1
+Number of coefficients: 3
+Optimization terminated successfully.
+         Current function value: 1.436067
+         Iterations: 4
+         Function evaluations: 6
+         Gradient evaluations: 6
+2
+Number of coefficients: 6
+Optimization terminated successfully.
+         Current function value: -0.788495
+         Iterations: 37
+         Function evaluations: 43
+         Gradient evaluations: 43
+3
+Number of coefficients: 10
+Optimization terminated successfully.
+         Current function value: 2.418943
+         Iterations: 31
+         Function evaluations: 33
+         Gradient evaluations: 33
+4
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.049576
+         Iterations: 57
+         Function evaluations: 63
+         Gradient evaluations: 63
+5
+Number of coefficients: 21
+Warning: Desired error not necessarily achieved due to precision loss.
+         Current function value: 0.034689
+         Iterations: 80
+         Function evaluations: 146
+         Gradient evaluations: 139
+6
+Number of coefficients: 28
+Optimization terminated successfully.
+         Current function value: 0.015763
+         Iterations: 122
+         Function evaluations: 133
+         Gradient evaluations: 133
+7
+Number of coefficients: 36
+Optimization terminated successfully.
+         Current function value: 0.032975
+         Iterations: 92
+         Function evaluations: 100
+         Gradient evaluations: 100
+8
+Number of coefficients: 45
+Optimization terminated successfully.
+         Current function value: 0.017566
+         Iterations: 128
+         Function evaluations: 136
+         Gradient evaluations: 136
+9
+Number of coefficients: 55
+Optimization terminated successfully.
+         Current function value: 0.026652
+         Iterations: 215
+         Function evaluations: 226
+         Gradient evaluations: 226
+10
+Number of coefficients: 66
+Optimization terminated successfully.
+         Current function value: -0.001082
+         Iterations: 191
+         Function evaluations: 202
+         Gradient evaluations: 202
+11
+Number of coefficients: 78
+Optimization terminated successfully.
+         Current function value: -0.004215
+         Iterations: 171
+         Function evaluations: 183
+         Gradient evaluations: 183
+12
+Number of coefficients: 91
+Optimization terminated successfully.
+         Current function value: 0.027663
+         Iterations: 210
+         Function evaluations: 220
+         Gradient evaluations: 220
+13
+Number of coefficients: 105
+Optimization terminated successfully.
+         Current function value: 0.000488
+         Iterations: 184
+         Function evaluations: 195
+         Gradient evaluations: 195
+14
+Number of coefficients: 120
+Optimization terminated successfully.
+         Current function value: 0.018235
+         Iterations: 228
+         Function evaluations: 238
+         Gradient evaluations: 238
+15
+Number of coefficients: 136
+Optimization terminated successfully.
+         Current function value: -0.039329
+         Iterations: 197
+         Function evaluations: 210
+         Gradient evaluations: 210
+16
+Number of coefficients: 153
+Optimization terminated successfully.
+         Current function value: -0.016465
+         Iterations: 186
+         Function evaluations: 199
+         Gradient evaluations: 199
+17
+Number of coefficients: 171
+Optimization terminated successfully.
+         Current function value: 0.006092
+         Iterations: 180
+         Function evaluations: 193
+         Gradient evaluations: 193
+18
+Number of coefficients: 190
+Optimization terminated successfully.
+         Current function value: -0.023627
+         Iterations: 217
+         Function evaluations: 233
+         Gradient evaluations: 233
+19
+Number of coefficients: 210
+Optimization terminated successfully.
+         Current function value: 0.002739
+         Iterations: 367
+         Function evaluations: 377
+         Gradient evaluations: 377
+20
+Number of coefficients: 231
+Optimization terminated successfully.
+         Current function value: -0.016569
+         Iterations: 267
+         Function evaluations: 276
+         Gradient evaluations: 276
+21
+Number of coefficients: 253
+Optimization terminated successfully.
+         Current function value: -0.035032
+         Iterations: 245
+         Function evaluations: 260
+         Gradient evaluations: 260
+22
+Number of coefficients: 276
+Optimization terminated successfully.
+         Current function value: -0.027566
+         Iterations: 215
+         Function evaluations: 228
+         Gradient evaluations: 228
+23
+Number of coefficients: 300
+Optimization terminated successfully.
+         Current function value: -0.043116
+         Iterations: 430
+         Function evaluations: 443
+         Gradient evaluations: 443
+24
+Number of coefficients: 325
+Optimization terminated successfully.
+         Current function value: -0.043446
+         Iterations: 242
+         Function evaluations: 254
+         Gradient evaluations: 254
+25
+Number of coefficients: 351
+Optimization terminated successfully.
+         Current function value: -0.046371
+         Iterations: 285
+         Function evaluations: 299
+         Gradient evaluations: 299
+26
+Number of coefficients: 378
+Optimization terminated successfully.
+         Current function value: -0.072508
+         Iterations: 281
+         Function evaluations: 292
+         Gradient evaluations: 292
+27
+Number of coefficients: 406
+Optimization terminated successfully.
+         Current function value: -0.059196
+         Iterations: 253
+         Function evaluations: 265
+         Gradient evaluations: 265
+28
+Number of coefficients: 435
+Optimization terminated successfully.
+         Current function value: -0.086694
+         Iterations: 300
+         Function evaluations: 310
+         Gradient evaluations: 310
+29
+Number of coefficients: 465
+Optimization terminated successfully.
+         Current function value: -0.101747
+         Iterations: 341
+         Function evaluations: 350
+         Gradient evaluations: 350
+30
+Number of coefficients: 496
+Warning: Desired error not necessarily achieved due to precision loss.
+         Current function value: -0.099282
+         Iterations: 255
+         Function evaluations: 325
+         Gradient evaluations: 318
+31
+Number of coefficients: 528
+Optimization terminated successfully.
+         Current function value: -0.104110
+         Iterations: 307
+         Function evaluations: 316
+         Gradient evaluations: 316
+32
+Number of coefficients: 561
+Optimization terminated successfully.
+         Current function value: -0.169257
+         Iterations: 325
+         Function evaluations: 338
+         Gradient evaluations: 338
+33
+Number of coefficients: 595
+Optimization terminated successfully.
+         Current function value: -0.112315
+         Iterations: 278
+         Function evaluations: 288
+         Gradient evaluations: 288
+34
+Number of coefficients: 630
+Optimization terminated successfully.
+         Current function value: -0.191692
+         Iterations: 308
+         Function evaluations: 315
+         Gradient evaluations: 315
+35
+Number of coefficients: 666
+Optimization terminated successfully.
+         Current function value: -0.166241
+         Iterations: 360
+         Function evaluations: 369
+         Gradient evaluations: 369
+36
+Number of coefficients: 703
+Optimization terminated successfully.
+         Current function value: -0.168727
+         Iterations: 333
+         Function evaluations: 345
+         Gradient evaluations: 345
+37
+Number of coefficients: 741
+Optimization terminated successfully.
+         Current function value: -0.208135
+         Iterations: 333
+         Function evaluations: 342
+         Gradient evaluations: 342
+38
+Number of coefficients: 780
+Optimization terminated successfully.
+         Current function value: -0.235977
+         Iterations: 387
+         Function evaluations: 395
+         Gradient evaluations: 395
+39
+Number of coefficients: 820
+Optimization terminated successfully.
+         Current function value: -0.228581
+         Iterations: 356
+         Function evaluations: 366
+         Gradient evaluations: 366
+40
+Number of coefficients: 861
+Optimization terminated successfully.
+         Current function value: -0.267180
+         Iterations: 429
+         Function evaluations: 439
+         Gradient evaluations: 439
+41
+Number of coefficients: 903
+Optimization terminated successfully.
+         Current function value: -0.254031
+         Iterations: 366
+         Function evaluations: 373
+         Gradient evaluations: 373
+42
+Number of coefficients: 946
+Optimization terminated successfully.
+         Current function value: -0.292557
+         Iterations: 429
+         Function evaluations: 440
+         Gradient evaluations: 440
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Problem specifc MultiIndexSet:</span>
+<span class="c1">#   - First and last 2 variables of each component (for component 1 and 3 that&#39;s for all variables) are represented by a total order 2 MultiIndexSet</span>
+<span class="c1">#   - Second component is computed with high order polynomial w.r.t second variable</span>
+
+<span class="n">totalOrder</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span>
+<span class="n">logPdfTM</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">Ntest</span><span class="p">,))</span>
+<span class="n">ListCoeffs_sa</span><span class="o">=</span><span class="p">[];</span>
+<span class="n">mset_to</span><span class="o">=</span> <span class="n">MultiIndexSet</span><span class="o">.</span><span class="n">CreateTotalOrder</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="n">totalOrder</span><span class="p">,</span><span class="n">NoneLim</span><span class="p">())</span>
+
+<span class="n">maxOrder</span><span class="o">=</span><span class="mi">9</span>
+<span class="k">for</span> <span class="n">dk</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">dk</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">dk</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">fixed_mset</span><span class="o">=</span> <span class="n">FixedMultiIndexSet</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">totalOrder</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixed_mset</span><span class="p">,</span><span class="n">opts</span><span class="p">)</span>
+        <span class="n">Xtrain</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">dk</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">Xtestk</span> <span class="o">=</span> <span class="n">Xtest</span><span class="p">[</span><span class="n">dk</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">dk</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">fixed_mset</span><span class="o">=</span> <span class="n">FixedMultiIndexSet</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">maxOrder</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixed_mset</span><span class="p">,</span><span class="n">opts</span><span class="p">)</span>
+        <span class="n">Xtrain</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">dk</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">Xtestk</span> <span class="o">=</span> <span class="n">Xtest</span><span class="p">[</span><span class="n">dk</span><span class="o">-</span><span class="mi">1</span><span class="p">,:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">dk</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+        <span class="n">fixed_mset</span><span class="o">=</span> <span class="n">FixedMultiIndexSet</span><span class="p">(</span><span class="n">dk</span><span class="p">,</span><span class="n">totalOrder</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixed_mset</span><span class="p">,</span><span class="n">opts</span><span class="p">)</span>
+        <span class="n">Xtrain</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="n">dk</span><span class="p">,:]</span>
+        <span class="n">Xtestk</span> <span class="o">=</span> <span class="n">Xtest</span><span class="p">[:</span><span class="n">dk</span><span class="p">,:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">multis</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">mset_to</span><span class="o">.</span><span class="n">Size</span><span class="p">(),</span><span class="n">dk</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mset_to</span><span class="o">.</span><span class="n">Size</span><span class="p">()):</span>
+            <span class="n">multis_to</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">mset_to</span><span class="p">[</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()])</span>
+            <span class="n">multis</span><span class="p">[</span><span class="n">s</span><span class="p">,:</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="n">multis_to</span><span class="p">[</span><span class="mi">0</span><span class="p">,:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">multis</span><span class="p">[</span><span class="n">s</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span><span class="o">=</span><span class="n">multis_to</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span>
+        <span class="n">mset</span> <span class="o">=</span> <span class="n">MultiIndexSet</span><span class="p">(</span><span class="n">multis</span><span class="p">)</span>
+        <span class="n">fixed_mset</span> <span class="o">=</span> <span class="n">mset</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">S</span> <span class="o">=</span> <span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixed_mset</span><span class="p">,</span><span class="n">opts</span><span class="p">)</span>
+        <span class="n">Xtrain</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="n">dk</span><span class="p">,:]</span>
+        <span class="n">Xtestk</span> <span class="o">=</span> <span class="n">Xtest</span><span class="p">[:</span><span class="n">dk</span><span class="p">,:]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of coefficients: &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">numCoeffs</span><span class="p">))</span>
+    <span class="n">ListCoeffs_sa</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">numCoeffs</span><span class="p">)</span>
+
+    <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gtol&#39;</span><span class="p">:</span> <span class="mf">1e-3</span><span class="p">,</span> <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="n">CoeffMap</span><span class="p">(),</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">Xtrain</span><span class="p">),</span> <span class="n">jac</span><span class="o">=</span><span class="n">grad_obj</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BFGS&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">outputDim</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">S</span><span class="o">.</span><span class="n">outputDim</span><span class="p">))</span>
+    <span class="n">logPdfTM</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">logPdfTM</span><span class="p">,</span><span class="n">log_cond_pullback_pdf</span><span class="p">(</span><span class="n">S</span><span class="p">,</span><span class="n">rho</span><span class="p">,</span><span class="n">Xtestk</span><span class="p">)))</span>
+<span class="n">logPdfTM_sa</span><span class="o">=</span><span class="n">logPdfTM</span><span class="p">[</span><span class="mi">1</span><span class="p">:,:]</span>
+
+<span class="c1"># Compute joint KL divergence</span>
+<span class="n">KL_sa</span> <span class="o">=</span> <span class="n">compute_joint_KL</span><span class="p">(</span><span class="n">logPdfSV</span><span class="p">,</span><span class="n">logPdfTM_sa</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1
+Number of coefficients: 3
+Optimization terminated successfully.
+         Current function value: 1.436067
+         Iterations: 4
+         Function evaluations: 6
+         Gradient evaluations: 6
+2
+Number of coefficients: 10
+Optimization terminated successfully.
+         Current function value: -1.013273
+         Iterations: 77
+         Function evaluations: 85
+         Gradient evaluations: 85
+3
+Number of coefficients: 10
+Optimization terminated successfully.
+         Current function value: 2.418943
+         Iterations: 31
+         Function evaluations: 33
+         Gradient evaluations: 33
+4
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.049576
+         Iterations: 57
+         Function evaluations: 63
+         Gradient evaluations: 63
+5
+Number of coefficients: 15
+Warning: Desired error not necessarily achieved due to precision loss.
+         Current function value: 0.036014
+         Iterations: 71
+         Function evaluations: 139
+         Gradient evaluations: 139
+6
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.022025
+         Iterations: 68
+         Function evaluations: 73
+         Gradient evaluations: 73
+7
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.039399
+         Iterations: 68
+         Function evaluations: 73
+         Gradient evaluations: 73
+8
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.021233
+         Iterations: 61
+         Function evaluations: 69
+         Gradient evaluations: 69
+9
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.038385
+         Iterations: 57
+         Function evaluations: 62
+         Gradient evaluations: 62
+10
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.012163
+         Iterations: 60
+         Function evaluations: 64
+         Gradient evaluations: 64
+11
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.011023
+         Iterations: 69
+         Function evaluations: 77
+         Gradient evaluations: 77
+12
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.047447
+         Iterations: 69
+         Function evaluations: 75
+         Gradient evaluations: 75
+13
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.021687
+         Iterations: 69
+         Function evaluations: 76
+         Gradient evaluations: 76
+14
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.047097
+         Iterations: 70
+         Function evaluations: 76
+         Gradient evaluations: 76
+15
+Number of coefficients: 15
+Warning: Desired error not necessarily achieved due to precision loss.
+         Current function value: -0.011264
+         Iterations: 83
+         Function evaluations: 150
+         Gradient evaluations: 145
+16
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.027647
+         Iterations: 71
+         Function evaluations: 77
+         Gradient evaluations: 77
+17
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.041917
+         Iterations: 86
+         Function evaluations: 95
+         Gradient evaluations: 95
+18
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.016327
+         Iterations: 71
+         Function evaluations: 76
+         Gradient evaluations: 76
+19
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.053865
+         Iterations: 69
+         Function evaluations: 74
+         Gradient evaluations: 74
+20
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.046373
+         Iterations: 61
+         Function evaluations: 66
+         Gradient evaluations: 66
+21
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.040657
+         Iterations: 56
+         Function evaluations: 65
+         Gradient evaluations: 65
+22
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.039531
+         Iterations: 61
+         Function evaluations: 66
+         Gradient evaluations: 66
+23
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.034895
+         Iterations: 70
+         Function evaluations: 76
+         Gradient evaluations: 76
+24
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.031849
+         Iterations: 70
+         Function evaluations: 75
+         Gradient evaluations: 75
+25
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.035489
+         Iterations: 69
+         Function evaluations: 77
+         Gradient evaluations: 77
+26
+Number of coefficients: 15
+Warning: Desired error not necessarily achieved due to precision loss.
+         Current function value: 0.028026
+         Iterations: 41
+         Function evaluations: 96
+         Gradient evaluations: 91
+27
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.037513
+         Iterations: 60
+         Function evaluations: 69
+         Gradient evaluations: 69
+28
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.036478
+         Iterations: 69
+         Function evaluations: 74
+         Gradient evaluations: 74
+29
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.035683
+         Iterations: 68
+         Function evaluations: 73
+         Gradient evaluations: 73
+30
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.035141
+         Iterations: 57
+         Function evaluations: 65
+         Gradient evaluations: 65
+31
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.032838
+         Iterations: 71
+         Function evaluations: 77
+         Gradient evaluations: 77
+32
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.017892
+         Iterations: 69
+         Function evaluations: 76
+         Gradient evaluations: 76
+33
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.038658
+         Iterations: 68
+         Function evaluations: 79
+         Gradient evaluations: 79
+34
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: -0.009042
+         Iterations: 66
+         Function evaluations: 76
+         Gradient evaluations: 76
+35
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.038325
+         Iterations: 71
+         Function evaluations: 80
+         Gradient evaluations: 80
+36
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.032045
+         Iterations: 69
+         Function evaluations: 79
+         Gradient evaluations: 79
+37
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.009283
+         Iterations: 72
+         Function evaluations: 85
+         Gradient evaluations: 85
+38
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.017250
+         Iterations: 68
+         Function evaluations: 79
+         Gradient evaluations: 79
+39
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.040507
+         Iterations: 67
+         Function evaluations: 76
+         Gradient evaluations: 76
+40
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: -0.002994
+         Iterations: 74
+         Function evaluations: 81
+         Gradient evaluations: 81
+41
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.028854
+         Iterations: 58
+         Function evaluations: 67
+         Gradient evaluations: 67
+42
+Number of coefficients: 15
+Optimization terminated successfully.
+         Current function value: 0.018719
+         Iterations: 69
+         Function evaluations: 81
+         Gradient evaluations: 81
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Compare map approximations</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="n">KL_to1</span><span class="p">,</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Total order 1&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="n">KL_to2</span><span class="p">,</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Total order 2&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="n">KL_sa</span><span class="p">,</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Custom MultiIndexSet&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;KL&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Increasing the total order of the approximation should improve the quality of approximation.</span>
+<span class="c1"># However, at a certain number of dimension the number of coefficients to optimize is too large compare to the number of samples.</span>
+<span class="c1"># That&#39;s why using a custom MultiIndexSet that exploits sparsity of the problem helps solving this problem</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="n">ListCoeffs_to1</span><span class="p">,</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Total order 1&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="n">ListCoeffs_to2</span><span class="p">,</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Total order 2&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">d</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="n">ListCoeffs_sa</span><span class="p">,</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s1">&#39;Custom MultiIndexSet&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;# coefficients&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_StochasticVolatility.nbconvert_15_0.png" src="../../_images/source_tutorials_StochasticVolatility.nbconvert_15_0.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_StochasticVolatility.nbconvert_15_1.png" src="../../_images/source_tutorials_StochasticVolatility.nbconvert_15_1.png" />
+</div>
+</div>
+</section>
+
+
+              </article>
+              
+
+              
+              <footer class="bd-footer-article">
+                  <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="MonotoneLeastSquares.nbconvert.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Monotone least squares</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="../mathematics.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Mathematical Background</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+              </footer>
+              
+          </div>
+          
+      </div>
+    </div>
+
+  
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=92025949c220c2e29695"></script>
+
+<footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    <p class="copyright">
+    &copy; Copyright 2022, The MParT development team..<br>
+</p>
+  </div>
+  
+  <div class="footer-item">
+    <p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
+</p>
+  </div>
+  
+</div>
+</footer>
+  </body>
+</html>
