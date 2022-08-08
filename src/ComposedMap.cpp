@@ -108,7 +108,6 @@ void ComposedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpa
         
         comps_.at(i)->InverseImpl(intX1, intR, output);
         Kokkos::deep_copy(intR, output);
-        //Kokkos::deep_copy(intX1, output);  // TODO: What should x1 change to? should it be constant?
 
     }
 
@@ -120,44 +119,19 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
                                                StridedMatrix<const double, MemorySpace> const& sens,
                                                StridedMatrix<double, MemorySpace>              output)
 {
-    // Evaluate the output for each component
-    StridedMatrix<const double, MemorySpace> subPts;
-    StridedMatrix<const double, MemorySpace> subSens; 
-    StridedMatrix<double, MemorySpace> subOut;
-
-    int startOutDim = 0;
-    int startParamDim = 0;
-    for(unsigned int i=0; i<comps_.size(); ++i){
-
-        subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
-        subSens = Kokkos::subview(sens, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
-
-        subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
-        comps_.at(i)->CoeffGradImpl(subPts, subSens, subOut);
-
-        startOutDim += comps_.at(i)->outputDim;
-        startParamDim += comps_.at(i)->numCoeffs;
-    }
+        std::stringstream msg;
+        msg << "ComposedMap CoeffGradImpl not implemented";
+        throw std::invalid_argument(msg.str());
 }
 
 template<typename MemorySpace>
 void ComposedMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                                              StridedMatrix<double, MemorySpace>              output)
 {
-    // Evaluate the output for each component
-    StridedMatrix<const double, MemorySpace> subPts;
-    StridedMatrix<double, MemorySpace> subOut;
+        std::stringstream msg;
+        msg << "ComposedMap LogDeterminantCoeffGradImpl not implemented";
+        throw std::invalid_argument(msg.str());
 
-    int startParamDim = 0;
-    for(unsigned int i=0; i<comps_.size(); ++i){
-
-        subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
-       
-        subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
-        comps_.at(i)->LogDeterminantCoeffGradImpl(subPts, subOut);
-
-        startParamDim += comps_.at(i)->numCoeffs;
-    }
 }
 
 
