@@ -22,8 +22,7 @@ Make sure doxygen, sphinx, breathe, nbsphinx, and the pydata-sphinx-theme are in
 
 .. code-block:: bash
 
-   conda install -c conda-forge doxygen sphinx breathe pydata-sphinx-theme nbsphinx
-   pip install sphinx-design sphinx-tabs
+   conda install -c conda-forge doxygen sphinx sphinx-design breathe pydata-sphinx-theme nbsphinx
 
 Then, after configuring MParT with CMake, you build the documentation with :code:`make sphinx`. The entire process might look like
 
