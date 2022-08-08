@@ -12,11 +12,12 @@ using namespace mpart::binding;
 template<typename MemorySpace>
 void mpart::binding::MapFactoryWrapper(py::module &m)
 {
+    bool isDevice = !std::is_same<MemorySpace,Kokkos::HostSpace>::value;
     // CreateComponent
-    m.def("CreateComponent", &MapFactory::CreateComponent<MemorySpace>);
+    m.def(isDevice? "CreateComponentDevice" : "CreateComponent", &MapFactory::CreateComponent<MemorySpace>);
 
     // CreateTriangular
-    m.def("CreateTriangular", &MapFactory::CreateTriangular<MemorySpace>);
+    m.def(isDevice? "CreateTriangularDevice" : "CreateTriangular", &MapFactory::CreateTriangular<MemorySpace>);
 
 }
 

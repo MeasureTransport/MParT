@@ -21,9 +21,12 @@ void Initialize(pybind11::dict opts);
  */
 void CommonUtilitiesWrapper(pybind11::module &m);
 
+void MapOptionsWrapper(pybind11::module &m);
+
 void MultiIndexWrapper(pybind11::module &m);
 
-void MapOptionsWrapper(pybind11::module &m);
+template<typename MemorySpace>
+void FixedMultiIndexSetWrapper(pybind11::module &m);
 
 template<typename MemorySpace>
 void ConditionalMapBaseWrapper(pybind11::module &m);

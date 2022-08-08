@@ -1,4 +1,4 @@
-#include "CommonPybindUtilities.h"
+ #include "CommonPybindUtilities.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexNeighborhood.h"
@@ -137,15 +137,22 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("__call__", &MultiIndexLimiter::Xor::operator())
     ;
 
+}
+
+template<typename MemorySpace>
+void mpart::binding::FixedMultiIndexSetWrapper(py::module &m) {
     //==========================================================================================================
     //FixedMultiIndexSet
 
-    py::class_<FixedMultiIndexSet<Kokkos::HostSpace>, std::shared_ptr<FixedMultiIndexSet<Kokkos::HostSpace>>>(m, "FixedMultiIndexSet")
+    std::string tName = "FixedMultiIndexSet";
+    if(!std::is_same<MemorySpace, Kokkos::HostSpace>::value) tName += "Device";
+
+    py::class_<FixedMultiIndexSet<MemorySpace>, std::shared_ptr<FixedMultiIndexSet<MemorySpace>>>(m, tName.c_str())
 
         .def(py::init( [](unsigned int dim,
                           Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &orders)
         {
-            return new FixedMultiIndexSet<Kokkos::HostSpace>(dim, VecToKokkos<unsigned int,Kokkos::HostSpace>(orders));
+            return new FixedMultiIndexSet<MemorySpace>(dim, VecToKokkos<unsigned int,MemorySpace>(orders));
         }))
 
         .def(py::init( [](unsigned int dim,
@@ -153,15 +160,15 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
                           Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &nzDims,
                           Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &nzOrders)
         {
-            return new FixedMultiIndexSet<Kokkos::HostSpace>(dim,
-                                          VecToKokkos<unsigned int, Kokkos::HostSpace>(nzStarts),
-                                          VecToKokkos<unsigned int, Kokkos::HostSpace>(nzDims),
-                                          VecToKokkos<unsigned int, Kokkos::HostSpace>(nzOrders));
+            return new FixedMultiIndexSet<MemorySpace>(dim,
+                                          VecToKokkos<unsigned int, MemorySpace>(nzStarts),
+                                          VecToKokkos<unsigned int, MemorySpace>(nzDims),
+                                          VecToKokkos<unsigned int, MemorySpace>(nzOrders));
         }))
 
         .def(py::init<unsigned int, unsigned int>())
 
-        .def("MaxDegrees", [] (const FixedMultiIndexSet<Kokkos::HostSpace> &set)
+        .def("MaxDegrees", [] (const FixedMultiIndexSet<MemorySpace> &set)
         {
             auto maxDegrees = set.MaxDegrees(); // auto finds the type, but harder to read (because you don't tell reader the type)
             Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> maxDegreesEigen(maxDegrees.extent(0));
@@ -172,6 +179,9 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
             return maxDegreesEigen;
         })
         ;
-
-
 }
+
+template void mpart::binding::FixedMultiIndexSetWrapper<Kokkos::HostSpace>(py::module&);
+#if defined(MPART_ENABLE_GPU)
+template void mpart::binding::FixedMultiIndexSetWrapper<mpart::DeviceSpace>(py::module&);
+#endif // MPART_ENABLE_GPU
