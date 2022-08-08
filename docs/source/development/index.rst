@@ -18,7 +18,7 @@ Contributing
 Building the Documentation
 ---------------------------
 
-Make sure doxygen, sphinx, breathe, nbsphinx, and the pydata-sphinx-theme are installed.  This is easily done with conda and pip:
+Make sure doxygen, sphinx, sphinx-design, breathe, nbsphinx, and the pydata-sphinx-theme are installed.  This is easily done with conda and pip:
 
 .. code-block:: bash
 
