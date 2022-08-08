@@ -46,9 +46,9 @@ public:
         @param expansion The expansion used to define the function \f$f\f$.
         @param quad The quadrature rule used to approximate \f$\int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt\f$
         @param useCondDeriv A flag to specify whether the analytic derivative of \f$T(x_1, x_2, ..., x_D)\f$ should be used by default, or if the derivative of the discretized integral should be used.  If "true", the analytic or "continuous" derivative will be used.  If "false", the derivative of the numerically approximated integral will be used.
-        @verbatim embed:rst 
+        @verbatim embed:rst
           See the :ref:`diag_deriv_section` mathematical background for more details.
-        @endverbatim 
+        @endverbatim
     */
     MonotoneComponent(ExpansionType  const& expansion,
                       QuadratureType const& quad,
@@ -100,7 +100,7 @@ public:
         });
     }
 
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override
     {
@@ -123,9 +123,9 @@ public:
     }
 
 
-    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                              StridedMatrix<double, MemorySpace>              output) override
-    {   
+    {
         Kokkos::View<double*,MemorySpace> derivs("Diagonal Derivative", pts.extent(1));
 
         // First, get the diagonal derivative
@@ -361,7 +361,7 @@ public:
     //     StridedVector<const double, MemorySpace> coeffs2 = coeffs;
     //     return ContinuousDerivative<ExecutionSpace>(pts2,coeffs2);
     // }
-    
+
 
 
     /**
