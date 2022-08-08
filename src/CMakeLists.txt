@@ -14,4 +14,5 @@ target_sources(mpart
     MapFactory.cpp
     Initialization.cpp
     ComposedMap.cpp
+    IdentityMap.cpp
 )

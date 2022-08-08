@@ -28,8 +28,8 @@ is positive definite.
 
  */
 template<typename MemorySpace>
-class TriangularMap : public ConditionalMapBase<MemorySpace>
-{
+class TriangularMap : public ConditionalMapBase<MemorySpace>{
+        
 public:
 
     /** @brief Construct a block triangular map from a collection of other ConditionalMapBase objects.

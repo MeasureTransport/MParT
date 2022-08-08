@@ -16,6 +16,9 @@ namespace mpart {
     template<typename MemorySpace>
     class ComposedMap;
 
+    template<typename MemorySpace>
+    class IdentityMap;
+
     /**
      @brief Provides an abstract base class for conditional transport maps where the input dimension might be larger than output dimension.
      @details
@@ -30,6 +33,8 @@ namespace mpart {
 
         friend class TriangularMap<MemorySpace>;
         friend class ComposedMap<MemorySpace>;
+        friend class IdentityMap<MemorySpace>;
+
 
     public:
 
