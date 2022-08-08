@@ -67,16 +67,16 @@ Python
 ^^^^^^^^^
 First, make sure the relevant path variables include the installation of MParT:
 
-.. tabs::
+.. tab-set::
 
-    .. tab:: MacOS
+    .. tab-item:: MacOS
 
         .. code-block:: bash
 
             export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
             export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
 
-    .. tab:: Linux
+    .. tab-item:: Linux
 
         .. code-block:: bash
 
