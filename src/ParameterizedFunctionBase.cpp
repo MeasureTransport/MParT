@@ -1,4 +1,5 @@
 #include "MParT/ParameterizedFunctionBase.h"
+#include "MParT/Utilities/KokkosSpaceMappings.h"
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Utilities/Miscellaneous.h"
 #include "MParT/Utilities/GPUtils.h"
@@ -51,9 +52,14 @@ Eigen::RowMatrixXd ParameterizedFunctionBase<DeviceSpace>::Evaluate(Eigen::Ref<c
 
     Eigen::RowMatrixXd output(outputDim, pts.cols());
     StridedMatrix<const double, DeviceSpace> ptsView = ConstRowMatToKokkos<double,DeviceSpace>(pts);
-    auto outView = Evaluate(ptsView);
-    auto hostOut = Kokkos::create_mirror_view(outView);
-    return KokkosToMat(hostOut);
+    StridedMatrix<double, Kokkos::HostSpace> outView_host = MatToKokkos<double,Kokkos::HostSpace>(output);
+    auto space = Kokkos::DefaultExecutionSpace();
+    StridedMatrix<double, DeviceSpace> outView = Kokkos::create_mirror_view(space, outView_host);
+    EvaluateImpl(ptsView, outView);
+    std::cout << "Creating hostOut" << std::endl;
+    Kokkos::deep_copy(outView_host, outView);
+    std::cout << "Created hostOut" << std::endl;
+    return output;
 }
 
 template<typename MemorySpace>
