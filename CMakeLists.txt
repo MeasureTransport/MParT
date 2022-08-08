@@ -4,7 +4,7 @@ project(MParT VERSION 0.0.1)
 
 # Add the cmake folder as a search path and include files
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
-INCLUDE(Submodules)
+Include(FetchContent)
 
 ##############################################################
 # Options
@@ -12,6 +12,7 @@ INCLUDE(Submodules)
 option(MPART_PYTHON "Build python bindings with pybind11" ON)
 option(MPART_MATLAB "Build matlab bindings with pybind11" ON)
 option(MPART_JULIA "Build julia bindings with CxxWrap.jl" ON)
+option(MPART_FETCH_DEPS "If CMake should be allowed to fetch and build external dependencies that weren't found." ON)
 
 ##############################################################
 # Compiler configuration
@@ -39,7 +40,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 ##############################################################
-# RPATH settings 
+# RPATH settings
 
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -69,9 +70,18 @@ endif("${isSystemDir}" STREQUAL "-1")
 find_package(Kokkos QUIET)
 
 if(NOT Kokkos_FOUND)
-    message(STATUS "Could not find Kokkos.  Using internal build.")
-    UpdateGitSubmodule(kokkos)
-    add_subdirectory(external/kokkos)
+    IF(MPART_FETCH_DEPS)
+        message(STATUS "Could not find Kokkos.  Fetching source.")
+        
+        FetchContent_Declare(
+            kokkos
+            GIT_REPOSITORY https://github.com/kokkos/kokkos
+            GIT_TAG 3.5.00
+        )
+        FetchContent_MakeAvailable(kokkos)
+    else()
+        message(FATAL_ERROR "Could not find Kokkos library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install Kokkos itself." )
+    endif()
 else()
     message(STATUS "Found Kokkos!")
 endif()
@@ -79,9 +89,18 @@ endif()
 # Add Eigen
 find_package(Eigen3 QUIET)
 if(NOT Eigen3_FOUND)
-    message(STATUS "Could not find Eigen.  Using internal build.")
-    UpdateGitSubmodule(eigen)
-    add_subdirectory(external/eigen)
+    if(MPART_FETCH_DEPS)
+        message(STATUS "Could not find Eigen. Fetching source.")
+
+        FetchContent_Declare(
+            eigen3 
+            GIT_REPOSITORY https://gitlab.com/libeigen/eigen
+            GIT_TAG 3.4.0
+        )
+        FetchContent_MakeAvailable(eigen3)
+    else()
+        message(FATAL_ERROR "Could not find Eigen3 library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install Eigen3 itself." )
+    endif()
 else()
   message(STATUS "Found Eigen!")
 endif()
@@ -90,9 +109,19 @@ endif()
 if(MPART_PYTHON)
   find_package(pybind11 CONFIG QUIET)
   if(NOT pybind11_FOUND)
-    message(STATUS "Could not find pybind11. Using internal build.")
-    UpdateGitSubmodule(pybind11)
-    add_subdirectory(external/pybind11)
+    if(${MPART_FETCH_DEPS})
+        message(STATUS "Could not find pybind11. Fetching source.")
+        
+        FetchContent_Declare(
+            pybind11
+            GIT_REPOSITORY https://github.com/pybind/pybind11
+            GIT_TAG        v2.10.0
+        )
+        FetchContent_MakeAvailable(pybind11)
+    else()
+        message(FATAL_ERROR "Could not find pybind11 library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install pybind11 itself." )
+    endif()
+
   else()
     message(STATUS "Found pybind11!")
   endif()
@@ -108,7 +137,6 @@ if(MPART_JULIA)
   endif()
   execute_process(COMMAND ${JULIA_EXE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
   list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}/lib/cmake/JlCxx/" )
-
   find_package(JlCxx)
 
   if(NOT JlCxx_FOUND)
@@ -119,7 +147,7 @@ if(MPART_JULIA)
     get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
     get_filename_component(JlCxx_src ${JlCxx_location} DIRECTORY)
     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
-    include_directories(${Julia_INCLUDE_DIRS} ${JlCxx_src}/include)
+    include_directories(${JlCxx_src}/include)
   endif()
 
 endif()
@@ -167,19 +195,32 @@ if(MPART_BUILD_TESTS)
     # Install Catch2
     find_package(Catch2 QUIET)
     if(NOT Catch2_FOUND)
-        message(STATUS "Could not find Catch2.  Using internal build.")
-        UpdateGitSubmodule(catch2)
-        PinSubmoduleVersion(catch2 v3.0.0-preview3)
-        add_subdirectory(external/catch2)
+        IF(MPART_FETCH_DEPS)
+            message(STATUS "Could not find Catch2.  Fetching Catch2 source.")
+            
+            FetchContent_Declare(
+                Catch2
+                GIT_REPOSITORY https://github.com/catchorg/Catch2.git
+                GIT_TAG        v3.0.0-preview3 
+            )
+
+            FetchContent_MakeAvailable(Catch2)
+        else()
+            message(WARNING "Could not find Catch library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install Catch2 itself.  Tests will not be built." )
+            set(MPART_BUILD_TESTS OFF)
+        endif()
+
     else()
         message(STATUS "Found Catch2!")
     endif()
 
+endif()
+
+if(MPART_BUILD_TESTS)
     # Define test sources
     add_subdirectory(tests)
     add_executable(RunTests ${TEST_SOURCES})
     target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen)
-
 endif()
 
 add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
@@ -237,11 +278,15 @@ find_package(Sphinx)
 if(Sphinx_FOUND AND Doxygen_FOUND)
 
     message("SPHINX Executable = ${SPHINX_EXECUTABLE}")
-    set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/docs)
+    set(SPHINX_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/docs/docs)
     set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
 
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/mpart.doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile @ONLY)
     file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs)
+    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/src)
+
+    # Copy the docs folder to the working folder so we can add to it
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/docs DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/docs)
 
     add_custom_target(sphinx
                   COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile

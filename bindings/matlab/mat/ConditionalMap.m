@@ -24,19 +24,22 @@ methods
   function this = ConditionalMap(varargin)
 
     if(nargin==2)
-        mset = varargin{1};
-        mapOptions = varargin{2};
-        mexOptions = mapOptions.getMexOptions;
-
-        input_str=['MParT_(',char(39),'ConditionalMap_newMap',char(39),',mset.get_id()'];
-        for o=1:length(mexOptions)
-            input_o=[',mexOptions{',num2str(o),'}'];
-            input_str=[input_str,input_o];
+        if(isstring(varargin{2}))
+          if(varargin{2}=="id")
+            this.id_=varargin{1};
+          end
+        else
+          mset = varargin{1};
+          mapOptions = varargin{2};
+          mexOptions = mapOptions.getMexOptions;
+          input_str=['MParT_(',char(39),'ConditionalMap_newMap',char(39),',mset.get_id()'];
+          for o=1:length(mexOptions)
+              input_o=[',mexOptions{',num2str(o),'}'];
+              input_str=[input_str,input_o];
+          end
+          input_str=[input_str,')'];
+          this.id_ = eval(input_str);
         end
-        input_str=[input_str,')'];
-        
-        this.id_ = eval(input_str);
-
     elseif(nargin==4)
       inputDim = varargin{1};
       outputDim = varargin{2};
@@ -54,8 +57,7 @@ methods
       this.id_ = eval(input_str);
 
     elseif(nargin==1)
-         MParT_('ConditionalMap_newTriMap', varargin{1});
-
+         this.id_=MParT_('ConditionalMap_newTriMap', varargin{1});
     else
         error('Invalid number of inputs') 
     end
@@ -66,12 +68,26 @@ methods
     MParT_('ConditionalMap_deleteMap', this.id_);
   end
 
+  function condMap = GetComponent(this,i)
+    condMap_id = MParT_('ConditionalMap_GetComponent',this.id_,i-1);
+    condMap = ConditionalMap(condMap_id,"id");
+  end
+
+  function parFunc = GetBaseFunction(this)
+    parFunc_id=MParT_('ConditionalMap_GetBaseFunction',this.id_);
+    parFunc = ParameterizedFunction(parFunc_id,"id");
+  end
+
   function SetCoeffs(this,coeffs)
     MParT_('ConditionalMap_SetCoeffs',this.id_,coeffs(:));
   end
 
   function result = Coeffs(this)
     result = MParT_('ConditionalMap_Coeffs',this.id_);
+  end
+
+  function result = CoeffMap(this)
+    result = MParT_('ConditionalMap_CoeffMap',this.id_);
   end
 
   function result = numCoeffs(this)

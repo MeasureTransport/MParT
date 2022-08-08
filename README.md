@@ -1,5 +1,6 @@
 ![](https://github.com/MeasureTransport/MParT/actions/workflows/build-doc.yml/badge.svg)
 ![](https://github.com/MeasureTransport/MParT/actions/workflows/build-tests.yml/badge.svg)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MeasureTransport/MParT-examples/HEAD)
 
 # MParT: A Monotone Parameterization Toolkit
 A CPU/GPU performance-portable library for parameterizing and constructing monotone functions in the context of measure transport and regression.
@@ -10,10 +11,7 @@ See [measuretransport.github.io/MParT/](https://measuretransport.github.io/MParT
 ## Installation
 
 ### Dependencies
-MParT uses Kokkos and eigen. Clone external repositories using:
-```
-git submodule update --init --recursive
-```
+MParT uses Kokkos and Eigen directly as dependencies, Catch2 as a test dependency, and Pybind11 as a dependency for building Python bindings. The first three dependencies will be downloaded and built using CMake if CMake cannot find any libraries to use, and the last one will be downloaded and built using CMake assuming the Python bindings are being built. You can force CMake to use local dependencies via the option `MPART_FETCH_DEPS=OFF`.
 
 ### Compiling from source
 MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:
@@ -42,9 +40,7 @@ cd build
 cmake                                        \
   -DCMAKE_INSTALL_PREFIX=<your/install/path> \
   -DPYTHON_EXECUTABLE=`which python`         \
-  -DCMAKE_BUILD_TYPE=Release                 \
   -DCMAKE_OSX_ARCHITECTURES=x86_64           \
-  -DMatlab_MEX_EXTENSION="mexmaci64"         \
   -DKokkos_ENABLE_PTHREAD=ON                 \
   -DKokkos_ENABLE_SERIAL=ON                  \
 ..
