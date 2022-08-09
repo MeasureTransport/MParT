@@ -1,3 +1,6 @@
 .git
 .gitignore
 Dockerfile*
+build
+external
+docs
