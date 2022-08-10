@@ -1,6 +1,6 @@
 .git
 .gitignore
-Dockerfile*
+.docker/Dockerfile
 build
 external
 docs

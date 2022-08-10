@@ -2,10 +2,40 @@ FROM continuumio/miniconda3
 
 COPY . MParT_
 
-RUN conda env create -f MParT_/docker/environment.yml
+RUN --mount=type=cache,target=/opt/conda/pkgs conda env create -f MParT_/.docker/environment.yml
 
 SHELL ["conda", "run", "-n", "mpart", "/bin/bash", "-c"]
 
-RUN ./MParT_/docker/build_kokkos.sh
+RUN git clone https://github.com/kokkos/kokkos.git && \
+    mkdir kokkos/build && cd kokkos/build && \
+    cmake \
+          -DKokkos_ENABLE_SERIAL=ON \
+          -DKokkos_ENABLE_OPENMP=ON \
+          -DBUILD_SHARED_LIBS=ON    \
+          -DKokkos_CXX_STANDARD=17  \
+          ../ && \
+    make install && \
+    rm -rf kokkos
 
-RUN ./MParT_/docker/build_mpart.sh
+RUN cd MParT_ && \
+    mkdir build && cd build && \
+    cmake -DMPART_BUILD_TESTS=OFF -DPYTHON_EXECUTABLE=`which python` -DMPART_FETCH_DEPS=OFF ../ && \
+    make install 
+
+ENV NB_USER Bayes
+ENV NB_UID 1000
+
+RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER
+
+WORKDIR /home/${NB_USER}
+USER $NB_USER
+
+SHELL ["/bin/bash","-c"]
+RUN conda init
+RUN echo 'conda activate mpart' >> ~/.bashrc
+
+ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib \
+    PYTHONPATH=$PYTHONPATH:/usr/local/python \
+    OMP_PROC_BIND=spread \
+    OMP_PLACES=threads \
+    KOKKOS_NUM_THREADS=4
