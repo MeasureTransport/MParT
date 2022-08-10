@@ -46,4 +46,4 @@ RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib' >> ~/.bashrc &
     echo 'export PYTHONPATH=$PYTHONPATH:/usr/local/python' >> ~/.bashrc && \
     echo 'export OMP_PROC_BIND=spread' >> ~/.bashrc && \
     echo 'export OMP_PLACES=threads' >> ~/.bashrc && \
-    echo 'export KOKKOS_NUM_THREADS=4' >> ~/.bashrc 
+    echo 'export KOKKOS_NUM_THREADS=`nproc`' >> ~/.bashrc 
