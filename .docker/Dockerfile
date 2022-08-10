@@ -42,8 +42,8 @@ SHELL ["/bin/bash","-c"]
 RUN conda init && \
     echo 'conda activate mpart' >> ~/.bashrc
 
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib \
-    PYTHONPATH=$PYTHONPATH:/usr/local/python \
-    OMP_PROC_BIND=spread \
-    OMP_PLACES=threads \
-    KOKKOS_NUM_THREADS=4
+RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib' >> ~/.bashrc && \
+    echo 'export PYTHONPATH=$PYTHONPATH:/usr/local/python' >> ~/.bashrc && \
+    echo 'export OMP_PROC_BIND=spread' >> ~/.bashrc && \
+    echo 'export OMP_PLACES=threads' >> ~/.bashrc && \
+    echo 'export KOKKOS_NUM_THREADS=4' >> ~/.bashrc 
