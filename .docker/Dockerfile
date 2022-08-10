@@ -2,7 +2,8 @@ FROM continuumio/miniconda3
 
 COPY . MParT_
 
-RUN --mount=type=cache,target=/opt/conda/pkgs conda env create -f MParT_/.docker/environment.yml
+RUN --mount=type=cache,target=/opt/conda/pkgs conda env create -f MParT_/.docker/environment.yml && \
+    conda clean -afy
 
 SHELL ["conda", "run", "-n", "mpart", "/bin/bash", "-c"]
 
@@ -29,7 +30,7 @@ RUN cd MParT_ && \
     cd / && \
     rm -rf MParT_
 
-ENV NB_USER=Bayes \
+ENV NB_USER=bayes \
     NB_UID=1000
 
 RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER
