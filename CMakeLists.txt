@@ -131,22 +131,18 @@ endif()
 # Add Julia if necessary
 if(MPART_JULIA)
   find_package(Julia REQUIRED)
-  # Set the julie executable and look for the location of cxxwrap
-  execute_process(COMMAND ${Julia_EXECUTABLE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
-  list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}/lib/cmake/JlCxx/" )
+
+  # Use JlCxx_DIR to tell where CxxWrap is located
   find_package(JlCxx)
 
   if(NOT JlCxx_FOUND)
     set(MPART_JULIA OFF)
     message(WARNING "Requested Julia bindings but CMake could not find JlCxx package.  Setting MPART_JULIA=OFF.")
+
   else()
     add_definitions(-DJULIA_ENABLE_THREADING)
-    get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
-    get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
-    get_filename_component(JlCxx_src ${JlCxx_location} DIRECTORY)
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location};${Julia_LIBRARY_DIR}")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${Julia_LIBRARY_DIR}")
     set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-    include_directories(${JlCxx_src}/include)
 
   endif()
 
