@@ -72,7 +72,7 @@ find_package(Kokkos QUIET)
 if(NOT Kokkos_FOUND)
     IF(MPART_FETCH_DEPS)
         message(STATUS "Could not find Kokkos.  Fetching source.")
-        
+
         FetchContent_Declare(
             kokkos
             GIT_REPOSITORY https://github.com/kokkos/kokkos
@@ -93,7 +93,7 @@ if(NOT Eigen3_FOUND)
         message(STATUS "Could not find Eigen. Fetching source.")
 
         FetchContent_Declare(
-            eigen3 
+            eigen3
             GIT_REPOSITORY https://gitlab.com/libeigen/eigen
             GIT_TAG 3.4.0
         )
@@ -111,7 +111,7 @@ if(MPART_PYTHON)
   if(NOT pybind11_FOUND)
     if(${MPART_FETCH_DEPS})
         message(STATUS "Could not find pybind11. Fetching source.")
-        
+
         FetchContent_Declare(
             pybind11
             GIT_REPOSITORY https://github.com/pybind/pybind11
@@ -130,12 +130,9 @@ endif()
 
 # Add Julia if necessary
 if(MPART_JULIA)
-
+  find_package(Julia REQUIRED)
   # Set the julie executable and look for the location of cxxwrap
-  if(NOT DEFINED JULIA_EXE)
-      set(JULIA_EXE "julia")
-  endif()
-  execute_process(COMMAND ${JULIA_EXE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
+  execute_process(COMMAND ${Julia_EXECUTABLE} -e "using CxxWrap; print(CxxWrap.prefix_path())" OUTPUT_VARIABLE cxxwrap_location)
   list(APPEND CMAKE_PREFIX_PATH "${cxxwrap_location}/lib/cmake/JlCxx/" )
   find_package(JlCxx)
 
@@ -143,11 +140,14 @@ if(MPART_JULIA)
     set(MPART_JULIA OFF)
     message(WARNING "Requested Julia bindings but CMake could not find JlCxx package.  Setting MPART_JULIA=OFF.")
   else()
+    add_definitions(-DJULIA_ENABLE_THREADING)
     get_target_property(JlCxx_location JlCxx::cxxwrap_julia LOCATION)
     get_filename_component(JlCxx_location ${JlCxx_location} DIRECTORY)
     get_filename_component(JlCxx_src ${JlCxx_location} DIRECTORY)
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location}")
+    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib;${JlCxx_location};${Julia_LIBRARY_DIR}")
+    set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
     include_directories(${JlCxx_src}/include)
+
   endif()
 
 endif()
@@ -197,11 +197,11 @@ if(MPART_BUILD_TESTS)
     if(NOT Catch2_FOUND)
         IF(MPART_FETCH_DEPS)
             message(STATUS "Could not find Catch2.  Fetching Catch2 source.")
-            
+
             FetchContent_Declare(
                 Catch2
                 GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-                GIT_TAG        v3.0.0-preview3 
+                GIT_TAG        v3.0.0-preview3
             )
 
             FetchContent_MakeAvailable(Catch2)
