@@ -28,6 +28,19 @@ if(Julia_EXECUTABLE)
     )
 else()
     find_file(Julia_VERSION_INCLUDE julia_version.h PATH_SUFFIXES include/julia)
+    message(STATUS "Julia_VERSION_INCLUDE = ${Julia_VERSION_INCLUDE}")
+    if(NOT Julia_VERSION_INCLUDE)
+        
+        include(FindPackageHandleStandardArgs)
+        find_package_handle_standard_args(Julia
+            REQUIRED_VARS   Julia_LIBRARY Julia_LIBRARY_DIR Julia_INCLUDE_DIRS Julia_MAIN_HEADER
+            VERSION_VAR     Julia_VERSION_STRING
+            FAIL_MESSAGE    "Julia not found"
+        )
+
+        return() 
+    endif()
+
     file(READ ${Julia_VERSION_INCLUDE} Julia_VERSION_STRING)
     string(REGEX MATCH "JULIA_VERSION_STRING.*" Julia_VERSION_STRING ${Julia_VERSION_STRING})
 endif()
