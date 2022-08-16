@@ -21,7 +21,8 @@ Requesting a Feature
 Contributing
 --------------
 We encourage users to take active part in developing and documenting the core of MParT or the examples. 
-If you want to influence the direction and focus of the project consider becoming an active developer.
+If you want to influence the direction and focus of the project consider becoming an active developer by forking MParT and submitting a pull request with your changes.
+
 
 Building the Documentation
 ---------------------------
