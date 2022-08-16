@@ -67,19 +67,21 @@ Python
 ^^^^^^^^^
 First, make sure the relevant path variables include the installation of MParT:
 
-.. tabbed:: OSX
+.. tab-set::
 
-    .. code-block:: bash
+    .. tab-item:: MacOS
 
-        export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
-        export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
+        .. code-block:: bash
 
-.. tabbed:: Linux
+            export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
+            export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
 
-    .. code-block:: bash
+    .. tab-item:: Linux
 
-         export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
-         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
+        .. code-block:: bash
+
+            export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
+            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
 
 You should now be able to run python and import the MParT package!
 
@@ -94,27 +96,13 @@ You should now be able to run python and import the MParT package!
 
 Julia
 ^^^^^^^^^^
-First, make sure your library path includes the installation of MParT:
-
-.. tabbed:: OSX
-
-    .. code-block:: bash
-
-        export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
-
-.. tabbed:: Linux
-
-    .. code-block:: bash
-
-         export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
-
-You should now be able to use MParT from Julia by including MParT as a local package.  For example:
+See the section :ref:`compiling_julia` for information on how to set up the Julia environment manually. After this setup, you should now be able to use MParT from Julia by including MParT as a local package.  For example:
 
 .. code-block:: julia
 
-    include("<your/install/path>/julia/mpart/MParT.jl")
+    using MParT
 
     dim = 3
     value = 1
-    idx = MParT.MultiIndex(dim,value)
+    idx = MultiIndex(dim,value)
     print(idx)

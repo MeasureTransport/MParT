@@ -63,6 +63,108 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
             output->Coeffs() = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
             return output;
         }
+
+    }else if(opts.quadType==QuadTypes::ClenshawCurtis){
+
+        ClenshawCurtisQuadrature<MemorySpace> quad(opts.quadPts, 1);
+            
+        if(opts.basisType==BasisTypes::ProbabilistHermite){
+
+            MultivariateExpansionWorker<ProbabilistHermite,MemorySpace> expansion(mset);
+            std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
+
+            switch(opts.posFuncType) {
+                case PosFuncTypes::SoftPlus:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv); break;
+                case PosFuncTypes::Exp:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv); break;
+            }
+
+            output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
+            return output;
+
+        }else if(opts.basisType==BasisTypes::PhysicistHermite){
+
+            MultivariateExpansionWorker<PhysicistHermite, MemorySpace> expansion(mset);
+            std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
+
+            switch(opts.posFuncType) {
+                case PosFuncTypes::SoftPlus:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv); break;
+                case PosFuncTypes::Exp:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv); break;
+            }
+
+            output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
+            return output;
+
+        }else if(opts.basisType==BasisTypes::HermiteFunctions){
+
+            MultivariateExpansionWorker<HermiteFunction, MemorySpace> expansion(mset);
+            std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
+
+            switch(opts.posFuncType) {
+                case PosFuncTypes::SoftPlus:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv);
+                case PosFuncTypes::Exp:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv);
+            }
+
+            output->Coeffs() = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
+            return output;
+        }
+
+    }else if(opts.quadType==QuadTypes::AdaptiveClenshawCurtis){
+
+        unsigned int level = std::log2(opts.quadPts-2);
+        AdaptiveClenshawCurtis<MemorySpace> quad(level, opts.quadMaxSub, 1, nullptr, opts.quadAbsTol, opts.quadRelTol, QuadError::First, opts.quadMinSub);
+
+        if(opts.basisType==BasisTypes::ProbabilistHermite){
+
+            MultivariateExpansionWorker<ProbabilistHermite,MemorySpace> expansion(mset);
+            std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
+
+            switch(opts.posFuncType) {
+                case PosFuncTypes::SoftPlus:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv); break;
+                case PosFuncTypes::Exp:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv); break;
+            }
+
+            output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
+            return output;
+
+        }else if(opts.basisType==BasisTypes::PhysicistHermite){
+
+            MultivariateExpansionWorker<PhysicistHermite, MemorySpace> expansion(mset);
+            std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
+
+            switch(opts.posFuncType) {
+                case PosFuncTypes::SoftPlus:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv); break;
+                case PosFuncTypes::Exp:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv); break;
+            }
+
+            output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
+            return output;
+
+        }else if(opts.basisType==BasisTypes::HermiteFunctions){
+
+            MultivariateExpansionWorker<HermiteFunction, MemorySpace> expansion(mset);
+            std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
+
+            switch(opts.posFuncType) {
+                case PosFuncTypes::SoftPlus:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), SoftPlus, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv);
+                case PosFuncTypes::Exp:
+                    output = std::make_shared<MonotoneComponent<decltype(expansion), Exp, decltype(quad), MemorySpace>>(mset, quad, opts.contDeriv);
+            }
+
+            output->Coeffs() = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
+            return output;
+        }
+
     }
 
 

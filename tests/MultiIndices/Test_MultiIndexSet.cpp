@@ -143,20 +143,6 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         REQUIRE( isAdmiss );
     }
 
-    SECTION("Visualize")
-    {
-        auto limiter = [](MultiIndex const& multi){ return ( (multi.Get(0)==0)||(multi.Get(1)==0)||((multi.Get(0)<2)&&(multi.Get(1)<2)));};
-
-        MultiIndexSet set = MultiIndexSet::CreateTotalOrder(2, 3, limiter);
-        set.SetLimiter( MultiIndexLimiter::None() );
-
-        std::stringstream truth, output;
-        truth << " 4 | r  \n 3 | a  m  \n 2 | a  r  \n 1 | a  a  r  m  \n 0 | a  a  a  a  r  \n    ----------------\n     0  1  2  3  4  \n";
-
-        set.Visualize(output);
-
-        REQUIRE(output.str() == truth.str());
-    }
 
     /*
     AdmissableNeighbor.UndefinedNeighbor
@@ -432,5 +418,71 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         REQUIRE( set.at(inds.at(1)) == MultiIndex{1,1} );
         REQUIRE( set.at(inds.at(2)) == MultiIndex{3,0} );
 
+    }
+}
+
+
+TEST_CASE("MultiIndexSet Visualization Test", "[MultiIndexSet_Viz]")
+{
+    SECTION("Floating"){
+        Eigen::MatrixXi multis(1,2);
+        multis << 3,3;
+        MultiIndexSet mset = MultiIndexSet(multis);
+
+        std::stringstream sstream;
+        mset.Visualize(sstream);
+
+        std::stringstream expected;
+        expected << " 4 |          m     \n"     
+                << " 3 |       m  a  m  \n"
+                << " 2 |          m     \n"
+                << " 1 |                \n"
+                << " 0 |                \n"
+                << "    ----------------\n"
+                << "     0  1  2  3  4  \n";
+
+        CHECK(expected.str() == sstream.str());
+    }
+
+    SECTION("Fixed"){
+        Eigen::MatrixXi multis(2,2);
+        multis << 1,3,
+                  3,3;
+        MultiIndexSet mset = MultiIndexSet(multis);
+
+        std::stringstream sstream;
+        mset.Visualize(sstream);
+
+        std::stringstream expected;
+        expected <<" 4 |    m     m     \n"     
+                << " 3 | m  a  m  a  m  \n"
+                << " 2 |    m     m     \n"
+                << " 1 |                \n"
+                << " 0 |                \n"
+                << "    ----------------\n"
+                << "     0  1  2  3  4  \n";
+
+        CHECK(expected.str() == sstream.str());
+    }
+
+    SECTION("TotalOrder")
+    {
+        auto limiter = [](MultiIndex const& multi){ return ( (multi.Get(0)==0)||(multi.Get(1)==0)||((multi.Get(0)<2)&&(multi.Get(1)<2)));};
+
+        MultiIndexSet set = MultiIndexSet::CreateTotalOrder(2, 3, limiter);
+        set.SetLimiter( MultiIndexLimiter::None() );
+
+        std::stringstream truth, output;
+        truth << " 4 | r              \n"
+              << " 3 | a  m           \n"
+              << " 2 | a  r           \n"
+              << " 1 | a  a  r  m     \n"
+              << " 0 | a  a  a  a  r  \n"
+              << "    ----------------\n"
+              << "     0  1  2  3  4  \n";
+
+        set.Visualize(output);
+
+        REQUIRE(output.str() == truth.str());
     }
 }
