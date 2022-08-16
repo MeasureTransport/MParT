@@ -17,5 +17,5 @@ pybind11_add_module(pympart SHARED NO_EXTRAS ${PYTHON_BINDING_SOURCES})
 target_link_libraries(pympart PRIVATE mpart Kokkos::kokkos Eigen3::Eigen)
 
 # Add an installation target for the python bindings
-install(TARGETS pympart DESTINATION python/mpart)
-install(DIRECTORY package/ DESTINATION python/mpart)
+install(TARGETS pympart DESTINATION "${PYTHON_INSTALL_PREFIX}/mpart")
+install(DIRECTORY package/ DESTINATION "${PYTHON_INSTALL_PREFIX}/mpart")
