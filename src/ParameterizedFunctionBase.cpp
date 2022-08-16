@@ -49,13 +49,18 @@ template<>
 Eigen::RowMatrixXd ParameterizedFunctionBase<DeviceSpace>::Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
 {
     CheckCoefficients("Evaluate");
-
+    std::cout << "Creating output on host" << std::endl;
     Eigen::RowMatrixXd output(outputDim, pts.cols());
+    std::cout << "Creating view of points" << std::endl;
     StridedMatrix<const double, DeviceSpace> ptsView = ConstRowMatToKokkos<double,DeviceSpace>(pts);
+    std::cout << "Creating view of output on host" << std::endl;
     StridedMatrix<double, Kokkos::HostSpace> outView_host = MatToKokkos<double,Kokkos::HostSpace>(output);
     auto space = Kokkos::DefaultExecutionSpace();
+    std::cout << "Creating device view" << std::endl;
     StridedMatrix<double, DeviceSpace> outView = Kokkos::create_mirror_view(space, outView_host);
+    std::cout << "EvaluateImpl launching..." << std::endl;
     EvaluateImpl(ptsView, outView);
+    Kokkos::fence();
     std::cout << "Creating hostOut" << std::endl;
     Kokkos::deep_copy(outView_host, outView);
     std::cout << "Created hostOut" << std::endl;
