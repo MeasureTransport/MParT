@@ -8,3 +8,10 @@ else()
 endif()
 
 message(STATUS "Python packages will be installed to ${PYTHON_INSTALL_PREFIX}.")
+
+if(JULIA_INSTALL_PREFIX)
+  message(STATUS "JULIA_INSTALL_PREFIX was set by user to be ${JULIA_INSTALL_PREFIX}.")
+else()
+  message(STATUS "JULIA_INSTALL_PREFIX was not set by user, defaulting to CMAKE_INSTALL_PREFIX/julia.")
+  set(JULIA_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/julia)
+endif()
