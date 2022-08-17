@@ -49,68 +49,24 @@ bibliography: paper.bib
 
 # Summary
 
-The forces on stars, galaxies, and dark matter under external gravitational
-fields lead to the dynamical evolution of structures in the universe. The orbits
-of these bodies are therefore key to understanding the formation, history, and
-future state of galaxies. The field of "galactic dynamics," which aims to model
-the gravitating components of galaxies to study their structure and evolution,
-is now well-established, commonly taught, and frequently used in astronomy.
-Aside from toy problems and demonstrations, the majority of problems require
-efficient numerical tools, many of which require the same base code (e.g., for
-performing numerical orbit integration).
+Multivariate monotone functions arise throughout computational science and scientific machine learning; they are used for constructing random variable transformations, for isotonic regression, and in domain adaptation.   In the Bayesian inference setting, random variable transformations based on monotone functions, called transport maps, have been used for accelerating posterior sampling [@Parno:], likelihood free inference [@Baptista], and high dimensional density estimation [@].  The idea is to convert the problem of characterizing a probability distribution through sampling or density estimation into an optimization over monotone functions.   In practice, this requires the definition of a parameterized family of multivariate monotone functions.  The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee", aims to provide performance portable implementations of such parameterizations.  MParT is a c++ library (with bindings to Python, Julia, and Matlab) that emphasizes fast execution and parsimonius parameterizations that can enable near real-time computation on low and moderate dimensional problems.
 
-# Statement of need
 
-`Gala` is an Astropy-affiliated Python package for galactic dynamics. Python
-enables wrapping low-level languages (e.g., C) for speed without losing
-flexibility or ease-of-use in the user-interface. The API for `Gala` was
-designed to provide a class-based and user-friendly interface to fast (C or
-Cython-optimized) implementations of common operations such as gravitational
-potential and force evaluation, orbit integration, dynamical transformations,
-and chaos indicators for nonlinear dynamics. `Gala` also relies heavily on and
-interfaces well with the implementations of physical units and astronomical
-coordinate systems in the `Astropy` package [@astropy] (`astropy.units` and
-`astropy.coordinates`).
+# Statement of need 
 
-`Gala` was designed to be used by both astronomical researchers and by
-students in courses on gravitational dynamics or astronomy. It has already been
-used in a number of scientific publications [@Pearson:2017] and has also been
-used in graduate courses on Galactic dynamics to, e.g., provide interactive
-visualizations of textbook material [@Binney:2008]. The combination of speed,
-design, and support for Astropy functionality in `Gala` will enable exciting
-scientific explorations of forthcoming data releases from the *Gaia* mission
-[@gaia] by students and experts alike.
+Several existing software packages have the ability to parameterize monotone functions, including Tensorflow Probability [@dillon2017tensorflow], TransportMaps [@transportmaps], ATM [@atm], and MUQ [@parno2021muq].  Tensorflow probability has a bijection class that allows deep neural based functions, such as normalizing flows [@papamakarios2021normalizing] to be easily defined and trained while also leveraging GPU computing resources if available.  The TransportMaps, ATM, and MUQ packages use an alternative parameterization based on rectified polynomial expansions.  At the core of these packages are scalar valued functions $T_d : \mathbb{R}^d \rightarrow \mathbb{R}$ with the form 
 
-# Mathematics
-
-Single dollars ($) are required for inline mathematics e.g. $f(x) = e^{\pi/x}$
-
-Double dollars make self-standing equations:
-
-$$\Theta(x) = \left\{\begin{array}{l}
-0\textrm{ if } x < 0\cr
-1\textrm{ else}
-\end{array}\right.$$
-
-You can also use plain \LaTeX for equations
-\begin{equation}\label{eq:fourier}
-\hat f(\omega) = \int_{-\infty}^{\infty} f(x) e^{i\omega x} dx
+\begin{equation}
+T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt,
+\label{eq:rectified}
 \end{equation}
-and refer to \autoref{eq:fourier} from text.
 
-# Citations
+where $f(\mathbf{x}_{1:d}; \mathbf{w})$ is a general (non-monotone) function parameterized by coefficients $\mathbf{w}$ and $g:\mathbb{R}\rightarrow\mathbb{R}^+$ is any positive-valued function.  Typically $f$ takes the form of a multivariate polynomial expansion.  The efficient implementation \autoref{eq:rectified} is non-trivial as it requires the coordination of numerical quadrature, polynomial evaluations, and gradient computations with respect to both the input $\mathbf{x}$ and the parameters $\mathbf{w}$.   MParT aims to provide a performance portable shared-memory implementation of parameterizations built on \autoref{eq:rectified}.  `MParT` uses Kokkos [@edwards2014kokkos] to leverage multithreading on either CPUs or GPUs with a common code base.  
 
-Citations to entries in paper.bib should be in
-[rMarkdown](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
-format.
+`MParT` provides an efficient fundamental library that can then be used to accelerate higher level packages like TransportMaps, ATM, and MUQ that cannot currently leverage GPU resources.  The fast c++ core of `MParT` can also be used from Python, Julia, or Matlab.  This enables a wide variety of researchers and other software packages to benefit from the increased performance of `MParT`.
 
-If you want to cite a software repository URL (e.g. something on GitHub without a preferred
-citation) then you can do it with the example BibTeX entry below for @fidgit.
+# Performance and Scalability 
 
-For a quick reference, the following citation commands can be used:
-- `@author:2001`  ->  "Author et al. (2001)"
-- `[@author:2001]` -> "(Author et al., 2001)"
-- `[@author1:2001; @author2:2001]` -> "(Author1 et al., 2001; Author2 et al., 2002)"
 
 # Figures
 
