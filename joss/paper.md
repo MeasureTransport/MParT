@@ -5,18 +5,18 @@ tags:
   - Julia
   - Matlab
   - c++
-  - Bayesian inference
   - measure transport
+  - Knothe-Rosenblatt rearrangement
   - isotonic regression
-  - conditional density estimation
+  - density estimation
+  - Bayesian inference
 authors:
   - name: Matthew Parno
     orcid: 0000-0002-9419-2693
     corresponding: true
-    affiliation: "1" # (Multiple affiliations must be quoted)
+    affiliation: 1
   - name: Paul-Baptiste Rubio
-    orcid: 0000-0000-0000-0000
-    #equal-contrib: true # (This is how you can denote equal contributions between multiple authors)
+    orcid: 0000-0002-9765-1162
     affiliation: 2
   - name: Daniel Sharp
     orcid: 0000-0000-0000-0000
@@ -25,7 +25,7 @@ authors:
     orcid: 0000-0000-0000-0000
     affiliation: 2 
   - name: Ricardo Baptista 
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-0421-890X
     affiliation: 2
   - name: Henning Bonart
     orcid: 0000-0000-0000-0000
@@ -41,15 +41,15 @@ affiliations:
 date: 22 July 2022
 bibliography: paper.bib
 
-# Optional fields if submitting to a AAS journal too, see this blog post:
-# https://blog.joss.theoj.org/2018/12/a-new-collaboration-with-aas-publishing
-#aas-doi: 10.3847/xxxxx <- update this with the DOI from AAS once you know it.
-#aas-journal: Astrophysical Journal <- The name of the AAS journal.
 ---
 
 # Summary
 
-Multivariate monotone functions arise throughout computational science and scientific machine learning; they are used for constructing random variable transformations, for isotonic regression, and in domain adaptation.   In the Bayesian inference setting, random variable transformations based on monotone functions, called transport maps, have been used for accelerating posterior sampling [@Parno:], likelihood free inference [@Baptista], and high dimensional density estimation [@].  The idea is to convert the problem of characterizing a probability distribution through sampling or density estimation into an optimization over monotone functions.   In practice, this requires the definition of a parameterized family of multivariate monotone functions.  The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee", aims to provide performance portable implementations of such parameterizations.  MParT is a c++ library (with bindings to Python, Julia, and Matlab) that emphasizes fast execution and parsimonius parameterizations that can enable near real-time computation on low and moderate dimensional problems.
+Measure transport is a rich area in applied mathematics that constructs deterministic transformations--known as transport maps--between random variables [@santambrogio2015optimal]. These maps characterize a complex target distribution as a transformation of a simple reference distribution (e.g., a standard Gaussian). In the context of probabilistic modeling, transport maps permit easily generating samples from a target distribution and evaluating its probability density function. Monotone triangular maps are one class of transport maps that have several computational advantages over non-triangular maps and provide a building block for the normalizing flows architectures commonly used in the machine learning community [@papamakarios2021normalizing].
+
+Triangular maps are also well suited for many tasks in Bayesian inference, including the modeling of conditional distributions [@Marzouk2016] and the acceleration of posterior sampling [@el2012bayesian; @bigoni2016adaptive; @parno2018transport; @cotter2019ensemble].  The fundamental idea is to convert the problem of characterizing a probability distribution through sampling or density estimation into an optimization problem over a multivariate monotone function.  The efficient solution of this optimization problem is important when using maps as part of online algorithms, as commonly found in sequential inference problems[@spantini2019coupling].
+
+In practice, working with triangular maps requires the definition of a parameterized family of multivariate monotone functions.  The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee", aims to provide performance portable implementations of such parameterizations.  MParT is a c++ library (with bindings to Python, Julia, and Matlab) that emphasizes fast execution and parsimonius parameterizations that can enable near real-time computation on low and moderate dimensional problems.
 
 
 # Statement of need 
@@ -61,7 +61,7 @@ T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_
 \label{eq:rectified}
 \end{equation}
 
-where $f(\mathbf{x}_{1:d}; \mathbf{w})$ is a general (non-monotone) function parameterized by coefficients $\mathbf{w}$ and $g:\mathbb{R}\rightarrow\mathbb{R}^+$ is any positive-valued function.  Typically $f$ takes the form of a multivariate polynomial expansion.  The efficient implementation \autoref{eq:rectified} is non-trivial as it requires the coordination of numerical quadrature, polynomial evaluations, and gradient computations with respect to both the input $\mathbf{x}$ and the parameters $\mathbf{w}$.   MParT aims to provide a performance portable shared-memory implementation of parameterizations built on \autoref{eq:rectified}.  `MParT` uses Kokkos [@edwards2014kokkos] to leverage multithreading on either CPUs or GPUs with a common code base.  
+where $f(\mathbf{x}_{1:d}; \mathbf{w})$ is a general (non-monotone) function parameterized by coefficients $\mathbf{w}$ and $g:\mathbb{R}\rightarrow\mathbb{R}^+$ is any positive-valued function.  Typically $f$ takes the form of a multivariate polynomial expansion.  The efficient implementation \autoref{eq:rectified} is non-trivial as it requires the coordination of numerical quadrature, polynomial evaluations, and gradient computations with respect to both the input $\mathbf{x}$ and the parameters $\mathbf{w}$.   `MParT` aims to provide a performance portable shared-memory implementation of parameterizations built on \autoref{eq:rectified}.  `MParT` uses Kokkos [@edwards2014kokkos] to leverage multithreading on either CPUs or GPUs with a common code base.  
 
 `MParT` provides an efficient fundamental library that can then be used to accelerate higher level packages like TransportMaps, ATM, and MUQ that cannot currently leverage GPU resources.  The fast c++ core of `MParT` can also be used from Python, Julia, or Matlab.  This enables a wide variety of researchers and other software packages to benefit from the increased performance of `MParT`.
 
@@ -79,7 +79,4 @@ Figure sizes can be customized by adding an optional second parameter:
 
 # Acknowledgements
 
-We acknowledge contributions from Brigitta Sipocz, Syrtis Major, and Semyeong
-Oh, and support from Kathryn Johnston during the genesis of this project.
-
-# References
+We acknowledge support from the US Office of Naval Research under MURI Grant N00014-20-1-2595, the US Department of Energy under grant DE‐SC0021226, and computing resources Dartmouth College and the Massachusetts Institute of Technology. 
