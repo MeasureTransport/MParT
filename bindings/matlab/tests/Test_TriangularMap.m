@@ -13,7 +13,7 @@ mset2 = MultiIndexSet(multis2);
 map1 = ConditionalMap(mset1,opts); %create ConditionalMap with Matlab MultiIndexSet and MapOptions
 map2 = ConditionalMap(mset2,opts);
 
-triMap = TriangularMap([map1.get_id(),map2.get_id()]);
+triMap = TriangularMap([map1,map2]);
 
 disp(map1.Coeffs)
 coeffs = 0.1*[1 2 3 4 5 6];
