@@ -18,7 +18,7 @@ authors:
     orcid: 0000-0002-9765-1162
     affiliation: 2
   - name: Daniel Sharp
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-0439-5084
     affiliation: 2
   - name: Michael Brennan
     orcid: 0000-0000-0000-0000
@@ -47,7 +47,7 @@ Measure transport is a rich area in applied mathematics that constructs determin
 
 Triangular maps are also well suited for many tasks in Bayesian inference, including the modeling of conditional distributions [@Marzouk2016] and the acceleration of posterior sampling [@el2012bayesian; @bigoni2016adaptive; @parno2018transport; @cotter2019ensemble].  The fundamental idea is to convert the problem of characterizing a probability distribution through sampling or density estimation into an optimization problem over a multivariate monotone function.  The efficient solution of this optimization problem is important when using maps as part of online algorithms, as commonly found in sequential inference problems[@spantini2019coupling].
 
-In practice, working with triangular maps requires the definition of a parameterized family of multivariate monotone functions.  The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee", aims to provide performance portable implementations of such parameterizations.  MParT is a c++ library (with bindings to Python, Julia, and Matlab) that emphasizes fast execution and parsimonious parameterizations that can enable near real-time computation on low and moderate dimensional problems.
+In practice, working with triangular maps requires the definition of a parameterized family of multivariate monotone functions.  The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee", aims to provide performance portable implementations of such parameterizations.  `MParT` is a C++ library (with bindings to Python, Julia, and Matlab) that emphasizes fast execution and parsimonious parameterizations that can enable near real-time computation on low and moderate dimensional problems.
 
 
 # Statement of need 
@@ -60,7 +60,7 @@ T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_
 
 where $f(\mathbf{x}_{1:d}; \mathbf{w})$ is a general (non-monotone) function parameterized by coefficients $\mathbf{w}$ and $g:\mathbb{R}\rightarrow\mathbb{R}^+$ is any positive-valued function.  Typically $f$ takes the form of a multivariate polynomial expansion.  The efficient implementation \autoref{eq:rectified} is non-trivial as it requires the coordination of numerical quadrature, polynomial evaluations, and gradient computations with respect to both the input $\mathbf{x}$ and the parameters $\mathbf{w}$.   `MParT` aims to provide a performance portable shared-memory implementation of parameterizations built on \autoref{eq:rectified}.  `MParT` uses Kokkos [@edwards2014kokkos] to leverage multithreading on either CPUs or GPUs with a common code base.  
 
-`MParT` provides an efficient low-level library that can then be used to accelerate higher level packages like TransportMaps, ATM, and MUQ that cannot currently leverage GPU resources.  Bindings to Python, Julia, and Matlab are also provided to enable a wide variety of users to leverage the fast c++ core from the language of their choice.
+`MParT` provides an efficient low-level library that can then be used to accelerate higher level packages like TransportMaps, ATM, and MUQ that cannot currently leverage GPU resources.  Bindings to Python, Julia, and Matlab are also provided to enable a wide variety of users to leverage the fast C++ core from the language of their choice.
 
 
 # Performance and Scalability 
