@@ -90,7 +90,7 @@ void FixedMultiIndexSet<MemorySpace>::SetupTerms()
 
     nzStarts = Kokkos::View<unsigned int*, MemorySpace>("Start of a Multiindex", numTerms+1);
     Kokkos::parallel_for(numTerms, StartSetter<MemorySpace>(nzStarts,dim));
-    Kokkos::parallel_for(dim*numTerms, DimSetter<MemorySpace>(nzDims,dim));
+    Kokkos::parallel_for(dim*numTerms, DimSetter<#MemorySpace>(nzDims,dim));
 }
 template<>
 void FixedMultiIndexSet<Kokkos::HostSpace>::SetupTerms()

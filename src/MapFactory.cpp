@@ -175,6 +175,26 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
     return nullptr;
 }
 
+template<>
+std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateTriangular(unsigned int inputDim,
+                                                                         unsigned int outputDim,
+                                                                         unsigned int totalOrder,
+                                                                         MapOptions options)
+{
+
+    std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> comps(outputDim);
+
+    unsigned int extraInputs = inputDim - outputDim;
+
+    for(unsigned int i=0; i<outputDim; ++i){
+        FixedMultiIndexSet<Kokkos::HostSpace> mset(i+extraInputs+1, totalOrder);
+        comps.at(i) = CreateComponent<Kokkos::HostSpace>(mset, options);
+    }
+    auto output = std::make_shared<TriangularMap<Kokkos::HostSpace>>(comps);
+    output->SetCoeffs(Kokkos::View<double*,Kokkos::HostSpace>("Component Coefficients", output->numCoeffs));
+    return output;
+}
+
 template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriangular(unsigned int inputDim,
                                                                          unsigned int outputDim,
@@ -187,10 +207,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriang
     unsigned int extraInputs = inputDim - outputDim;
 
     for(unsigned int i=0; i<outputDim; ++i){
-        FixedMultiIndexSet<MemorySpace> mset(i+extraInputs+1, totalOrder);
-        comps.at(i) = CreateComponent<MemorySpace>(mset, options);
+        FixedMultiIndexSet<Kokkos::HostSpace> mset(i+extraInputs+1, totalOrder);
+        comps.at(i) = CreateComponent<MemorySpace>(mset.ToDevice(), options);
     }
-
     auto output = std::make_shared<TriangularMap<MemorySpace>>(comps);
     output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
     return output;
