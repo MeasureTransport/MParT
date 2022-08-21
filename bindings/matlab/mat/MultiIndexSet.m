@@ -114,15 +114,18 @@ methods
     else
       error('Wrong number of inputs') 
     end
+    result = result + 1;
   end  
 
   function result = ForciblyExpand(this,activeInd)
     %-1 to keep consitent with matlab ordering
     result = MParT_('MultiIndexSet_ForciblyExpand',this.id_,activeInd-1);
+    result = result + 1;
   end
 
   function result = ForciblyActivate(this,multi)
     result = MParT_('MultiIndexSet_ForciblyActivate',this.id_,multi.get_id());
+    result = result + 1;
   end  
 
   function listMultis = AdmissibleForwardNeighbors(this,activeInd)
@@ -136,6 +139,7 @@ methods
 
   function result = Frontier(this)
     result = MParT_('MultiIndexSet_Frontier',this.id_);
+    result = result + 1;
   end
 
   function listMultis = Margin(this)
@@ -158,11 +162,13 @@ methods
 
   function result = StrictFrontier(this)
     result = MParT_('MultiIndexSet_StrictFrontier',this.id_);
+    result = result + 1;
   end  
 
   function result = BackwardNeighbors(this,activeIndex)
     %-1 to keep consitent with matlab ordering
     result = MParT_('MultiIndexSet_BackwardNeighbors',this.id_,activeIndex-1);
+    result = result + 1;
   end
 
   function result = IsAdmissible(this,multi)
