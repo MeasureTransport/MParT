@@ -5,10 +5,6 @@ on:
     branches:
       - 191-create-docker-container
 
-defaults:
-  run:
-    working-directory: ./MParT
-
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -32,6 +28,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: .docker/Dockerfile
-          context: ./MparT
+          context: .
           push: true
           tags: mpart_base:latest
