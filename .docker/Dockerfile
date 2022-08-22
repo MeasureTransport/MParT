@@ -21,10 +21,16 @@ RUN git clone https://github.com/kokkos/kokkos.git && \
     cd / && \
     rm -rf kokkos
 
+RUN julia -e "Pkg.add(\"CxxWrap\")"
+
 RUN cd MParT_ && \
     mkdir build && \
     cd build && \
-    cmake -DMPART_BUILD_TESTS=OFF -DPYTHON_EXECUTABLE=`which python` -DMPART_FETCH_DEPS=OFF ../ && \
+    cmake \
+        -DMPART_BUILD_TESTS=OFF \
+        -DPYTHON_EXECUTABLE=`which python` \
+        -DMPART_FETCH_DEPS=OFF \
+        ../ && \
     make -j$(nproc) && \
     make install && \
     cd / && \
@@ -46,4 +52,6 @@ RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib' >> ~/.bashrc &
     echo 'export PYTHONPATH=$PYTHONPATH:/usr/local/python' >> ~/.bashrc && \
     echo 'export OMP_PROC_BIND=spread' >> ~/.bashrc && \
     echo 'export OMP_PLACES=threads' >> ~/.bashrc && \
-    echo 'export KOKKOS_NUM_THREADS=`nproc`' >> ~/.bashrc 
+    echo 'export KOKKOS_NUM_THREADS=`nproc`' >> ~/.bashrc
+
+RUN echo '[bee5971c-294f-5168-9fcd-9fb3c811d495]\nMParT = \"/usr/local/lib\"'

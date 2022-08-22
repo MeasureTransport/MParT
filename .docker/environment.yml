@@ -5,6 +5,7 @@ channels:
 dependencies:
   - eigen
   - pybind11
+  - julia
   - catch2
   - cmake
   - gcc
