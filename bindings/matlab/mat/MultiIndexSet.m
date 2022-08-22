@@ -99,7 +99,7 @@ methods
     end
     if nargout == 1 
     %should be use mainly in the case mset = mset + something
-    %mset2 = mset + something will create two names (mset and mset2) for the same object
+    %mset2 = mset + something will create two names (mset and mset2) for the same object (mset)
       varargout{1} = this;
     end
   end  
