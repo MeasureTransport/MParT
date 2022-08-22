@@ -28,7 +28,13 @@ end
 methods
   function this = MultiIndexSet(varargin)
     if(nargin==2)
+      if(isstring(varargin{2}))
+        if(varargin{2}=="id")
+          this.id_ = varargin{1};
+        end
+      else
         this.id_ = MParT_('MultiIndexSet_newTotalOrder', varargin{1},varargin{2});
+      end
     else
         this.id_ = MParT_('MultiIndexSet_newEigen',varargin{1});
     end
@@ -83,13 +89,16 @@ methods
     result = MParT_('MultiIndexSet_Size', this.id_);
   end  
 
-  function result = plus(this,toAdd)
+  function varargout = plus(this,toAdd)
     if strcmp(class(toAdd),'MultiIndexSet')
       MParT_('MultiIndexSet_addMultiIndexSet',this.id_,toAdd.get_id());
     elseif strcmp(class(toAdd),'MultiIndex')
       MParT_('MultiIndexSet_addMultiIndex',this.id_,toAdd.get_id());
     else
       error('Unrecognized type to add to MultiIndexSet')
+    end
+    if nargout == 1
+      varargout{1} = MultiIndexSet("id",this.get_id);
     end
   end  
 
