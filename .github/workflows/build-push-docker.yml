@@ -3,7 +3,7 @@ name: build-and-push-docker
 on:
   push:
     branches:
-      - 191-create-docker-container
+      - main
 
 jobs:
   docker:
