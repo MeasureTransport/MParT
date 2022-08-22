@@ -21,7 +21,7 @@ namespace {
 MEX_DEFINE(FixedMultiIndexSet_newTotalOrder) (int nlhs, mxArray* plhs[],
                                               int nrhs, const mxArray* prhs[]) {
   
-  InputArguments input(nrhs, prhs, 1);
+  InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
   const unsigned int dim = input.get<unsigned int>(0);
   const unsigned int order = input.get<unsigned int>(1);

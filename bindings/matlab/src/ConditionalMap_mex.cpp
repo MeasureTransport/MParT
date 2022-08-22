@@ -110,6 +110,21 @@ MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(mset.Fix(),opts)));
 }
 
+MEX_DEFINE(ConditionalMap_newMapFixed) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 10);
+  OutputArguments output(nlhs, plhs, 1);
+  const FixedMultiIndexSet<MemorySpace>& mset = Session<FixedMultiIndexSet<MemorySpace>>::getConst(input.get(0));
+  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
+                                         input.get<std::string>(3),input.get<double>(4),
+                                         input.get<double>(5),input.get<unsigned int>(6),
+                                         input.get<unsigned int>(7),input.get<unsigned int>(8),
+                                         input.get<bool>(9));
+
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(mset,opts)));
+}
+
 // Defines MEX API for delete.
 MEX_DEFINE(ConditionalMap_deleteMap) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {

@@ -1,19 +1,28 @@
 .. _development:
 
-Development
+Community
 =============
 
 We're always looking to grow the MParT development team.   Below is information on how you can help make MParT better.
 
+Asking questions
+----------------
+Please feel free to ask questions about the usage of MParT or reach out if you want to discuss ideas for enhancements!
+You can file an issue or start a discussion on GitHub or write the developers an email.
 
 Reporting a Bug
 ----------------
+If you encounter something you think might be a bug of MParT or in one of the examples, please file an issue on GitHub (https://github.com/MeasureTransport/MParT and https://github.com/MeasureTransport/MParT-examples). 
+If possible post complete but minimal code examples.
 
 Requesting a Feature
 ---------------------
 
 Contributing
 --------------
+We encourage users to take active part in developing and documenting the core of MParT or the examples. 
+If you want to influence the direction and focus of the project consider becoming an active developer by forking MParT and submitting a pull request with your changes.
+
 
 Building the Documentation
 ---------------------------
