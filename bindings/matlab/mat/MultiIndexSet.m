@@ -98,7 +98,7 @@ methods
       error('Unrecognized type to add to MultiIndexSet')
     end
     if nargout == 1
-      varargout{1} = MultiIndexSet("id",this.get_id);
+      varargout = MultiIndexSet(this.get_id,"id");
     end
   end  
 
