@@ -97,8 +97,10 @@ methods
     else
       error('Unrecognized type to add to MultiIndexSet')
     end
-    if nargout == 1
-      varargout{1} = MultiIndexSet(this.get_id,"id");
+    if nargout == 1 
+    %should be use mainly in the case mset = mset + something
+    %mset2 = mset + something will create two names (mset and mset2) for the same object
+      varargout{1} = this;
     end
   end  
 
