@@ -32,6 +32,6 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: .docker/Dockerfile
-          context: ./MParT
+          context: ./MparT
           push: true
           tags: mpart_base:latest
