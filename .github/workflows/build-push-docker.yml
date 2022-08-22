@@ -28,4 +28,4 @@ jobs:
           context: .
           file: ./.docker/Dockerfile
           push: true
-          tags: mpart_base:latest
+          tags: quay.io/measuretransport/mpart_base:latest
