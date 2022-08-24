@@ -48,7 +48,7 @@ mpart::StridedMatrix<double, Kokkos::HostSpace> JuliaToKokkos(jlcxx::ArrayRef<do
  * @param mat Reference to the Julia matrix to wrap
  * @return auto an Eigen Map to the same memory as the Julia matrix
  */
-Eigen::Map<const Eigen::Matrix<int,Eigen::Dynamic,1>,0,Eigen::OuterStride<>> JuliaToEigen(jlcxx::ArrayRef<int,2> mat);
+Eigen::Map<const Eigen::Matrix<int,Eigen::Dynamic,Eigen::Dynamic>,0,Eigen::OuterStride<>> JuliaToEigenMat(jlcxx::ArrayRef<int,2> mat);
 
 /**
  * @brief Allocate array that Julia is responsible for

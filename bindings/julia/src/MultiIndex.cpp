@@ -48,7 +48,7 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
     ;
 
     mod.method("MultiIndexSet", [](jlcxx::ArrayRef<int,2> idxs) {
-        return MultiIndexSet(JuliaToEigen(idxs));
+        return MultiIndexSet(JuliaToEigenMat(idxs));
     });
 
     mod.set_override_module(jl_base_module);

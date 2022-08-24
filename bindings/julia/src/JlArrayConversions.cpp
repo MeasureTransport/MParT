@@ -36,11 +36,11 @@ StridedMatrix<double, Kokkos::HostSpace> JuliaToKokkos(jlcxx::ArrayRef<double,2>
  * @param mat Reference to the Julia matrix to wrap
  * @return auto an Eigen Map to the same memory as the Julia matrix
  */
-Eigen::Map<const Eigen::Matrix<int,Eigen::Dynamic,1>,0,Eigen::OuterStride<>> JuliaToEigen(jlcxx::ArrayRef<int,2> mat) {
+Eigen::Map<const Eigen::Matrix<int,Eigen::Dynamic, Eigen::Dynamic>,0,Eigen::OuterStride<>> JuliaToEigenMat(jlcxx::ArrayRef<int,2> mat) {
     int* mptr = mat.data();
     unsigned int rows = size(mat,0);
     unsigned int cols = size(mat,1);
-    return Eigen::Map<const Eigen::Matrix<int,Eigen::Dynamic,1>,0,Eigen::OuterStride<>>(mptr, rows, cols, Eigen::OuterStride<>(std::max(rows,cols)));
+    return Eigen::Map<const Eigen::Matrix<int,Eigen::Dynamic, Eigen::Dynamic>,0,Eigen::OuterStride<>>(mptr, rows, cols, Eigen::OuterStride<>(std::max(rows,cols)));
 }
 
 /**
