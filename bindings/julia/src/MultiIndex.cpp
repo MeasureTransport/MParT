@@ -22,12 +22,10 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
 
     jlcxx::stl::apply_stl<MultiIndex>(mod);
 
-    // FixedMultiIndexSet
-    mod.add_type<jlcxx::Parametric<jlcxx::TypeVar<1>>>("FixedMultiIndexSet")
-        .apply<FixedMultiIndexSet<Kokkos::HostSpace>>([](auto wrapped) {
-            typedef typename decltype(wrapped)::type WrappedT;
-            wrapped.method("MaxDegreesExtent", [] (const WrappedT &set) { return set.MaxDegrees().extent(0); });
-    });
+    mod.add_type<FixedMultiIndexSet<Kokkos::HostSpace>>("FixedMultiIndexSet")
+        .constructor<unsigned int, unsigned int>()
+        .method("MaxDegreesExtent", [] (const FixedMultiIndexSet<Kokkos::HostSpace> &set) { return set.MaxDegrees().extent(0); })
+    ;
 
     // MultiIndexSet
     mod.add_type<MultiIndexSet>("MultiIndexSet")
