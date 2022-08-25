@@ -5,6 +5,8 @@
 #include "MParT/MultivariateExpansionWorker.h"
 #include "MParT/Utilities/KokkosSpaceMappings.h"
 
+#include "MParT/Utilities/KokkosHelpers.h"
+
 #include <algorithm>
 
 namespace mpart{
@@ -83,15 +85,9 @@ namespace mpart{
             };
 
             auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
-            Kokkos::TeamPolicy<ExecutionSpace> policy;
-            policy.set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
             
-            const unsigned int threadsPerTeam = std::min<unsigned int>(numPts, policy.team_size_recommended(functor, Kokkos::ParallelForTag()));
-            const unsigned int numTeams = std::ceil( double(numPts) / threadsPerTeam );
-            
-            policy = Kokkos::TeamPolicy<ExecutionSpace>(numTeams, threadsPerTeam).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
-
             // Paralel loop over each point computing T(x_1,...,x_D) for that point
+            auto policy = GetCachedRangePolicy<ExecutionSpace>(numPts, cacheBytes, functor);
             Kokkos::parallel_for(policy, functor);
     
             Kokkos::fence();
@@ -147,15 +143,9 @@ namespace mpart{
 
 
             auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize + maxParams);
-            Kokkos::TeamPolicy<ExecutionSpace> policy;
-            policy.set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
-
-            const unsigned int threadsPerTeam = std::min<unsigned int>(numPts, policy.team_size_recommended(functor, Kokkos::ParallelForTag()));
-            const unsigned int numTeams = std::ceil( double(numPts) / threadsPerTeam );
             
-            policy = Kokkos::TeamPolicy<ExecutionSpace>(numTeams, threadsPerTeam).set_scratch_size(1,Kokkos::PerTeam(0), Kokkos::PerThread(cacheBytes));
-
             // Paralel loop over each point computing T(x_1,...,x_D) for that point
+            auto policy = GetCachedRangePolicy<ExecutionSpace>(numPts, cacheBytes, functor);
             Kokkos::parallel_for(policy, functor);
 
             Kokkos::fence();
