@@ -18,16 +18,16 @@ authors:
     orcid: 0000-0002-9765-1162
     affiliation: 2
   - name: Daniel Sharp
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-0439-5084
     affiliation: 2
   - name: Michael Brennan
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0001-7812-9347
     affiliation: 2 
   - name: Ricardo Baptista 
     orcid: 0000-0002-0421-890X
     affiliation: 2
   - name: Henning Bonart
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0002-5026-4499
     affiliation: 2
   - name: Youssef Marzouk 
     orcid: 0000-0000-0000-0000
