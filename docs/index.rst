@@ -24,6 +24,37 @@ Contents
    source/api/index
    source/development/index
 
+
+Measure transport
+-------------
+Measure transport is a rich area in applied mathematics that constructs deterministic transformations--known as transport maps--between 
+random variables [1]. These maps characterize a complex target distribution as a transformation of a simple reference 
+distribution (e.g., a standard Gaussian). In the context of probabilistic modeling, transport maps permit easily generating samples from a 
+target distribution and evaluating its probability density function. Monotone triangular maps are one class of transport maps that have several 
+computational advantages over non-triangular maps and provide a building block for the normalizing flows architectures commonly used in the 
+machine learning community [2]. Triangular maps are also well suited for many tasks in Bayesian inference, 
+including the modeling of conditional distributions [3] and the acceleration of posterior sampling 
+[4, 5, 6, 7].  The fundamental idea is to convert the problem of 
+characterizing a probability distribution through sampling or density estimation into an optimization problem over a multivariate function.
+In practice, working with triangular maps requires the definition of a parameterized family of multivariate monotone functions.  
+The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee", aims to provide performance portable implementations of such 
+parameterizations.  MParT is a c++ library (with bindings to Python, Julia, and Matlab) that emphasizes fast execution and parsimonious 
+parameterizations that can enable near real-time computation on low and moderate dimensional problems.
+
+[1] Santambrogio, Filippo. "Optimal transport for applied mathematicians." Birkäuser, NY 55.58-63 (2015): 94.
+
+[2] Papamakarios, George, et al. "Normalizing Flows for Probabilistic Modeling and Inference." J. Mach. Learn. Res. 22.57 (2021): 1-64.
+
+[3] Marzouk, Y., Moselhy, T., Parno, M., Spantini, A. (2016). Sampling via Measure Transport: An Introduction. In: Ghanem, R., Higdon, D., Owhadi, H. (eds) Handbook of Uncertainty Quantification. Springer, Cham. https://doi.org/10.1007/978-3-319-11259-6_23-1
+
+[4] El Moselhy, Tarek A., and Youssef M. Marzouk. "Bayesian inference with optimal maps." Journal of Computational Physics 231.23 (2012): 7815-7850.
+
+[5] Bigoni, Daniele, Alessio Spantini, and Youssef Marzouk. "Adaptive construction of measure transports for Bayesian inference." NIPS workshop on Approximate Inference. 2016.
+
+[6] Parno, Matthew D., and Youssef M. Marzouk. "Transport map accelerated markov chain monte carlo." SIAM/ASA Journal on Uncertainty Quantification 6.2 (2018): 645-682.
+
+[7] Cotter, Colin, Simon Cotter, and Paul Russell. "Ensemble transport adaptive importance sampling." SIAM/ASA Journal on Uncertainty Quantification 7.2 (2019): 444-471.
+
 Citing 
 -------------
 
