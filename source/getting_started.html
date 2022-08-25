@@ -300,15 +300,16 @@ Linux</label><div class="sd-tab-content docutils">
 </div>
 </div>
 </div>
-<p>You should now be able to run python and import the MParT package!</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mpart</span>
+<p>You should now be able to run python and import the MParT package! For example, we can make a multiindex and print its contents with</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mpart</span> <span class="k">as</span> <span class="nn">mt</span>
 
 <span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">idx</span> <span class="o">=</span> <span class="n">mpart</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
+<span class="n">idx</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>This should display <code class="code docutils literal notranslate"><span class="pre">1</span> <span class="pre">1</span> <span class="pre">1</span></code>. See <a class="reference internal" href="tutorials/index.html#tutorials"><span class="std std-ref">Tutorials</span></a> for several examples using MParT for measure transport in python.</p>
 </section>
 <section id="julia">
 <h2>Julia<a class="headerlink" href="#julia" title="Permalink to this heading">#</a></h2>
