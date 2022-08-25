@@ -89,19 +89,17 @@ methods
     result = MParT_('MultiIndexSet_Size', this.id_);
   end  
 
-  function varargout = plus(this,toAdd)
+  function result = plus(this,toAdd)
     if strcmp(class(toAdd),'MultiIndexSet')
-      MParT_('MultiIndexSet_addMultiIndexSet',this.id_,toAdd.get_id());
+      multi_id = MParT_('MultiIndexSet_addMultiIndexSet',this.id_,toAdd.get_id());
+      result = MultiIndex(multi_id,"id");
     elseif strcmp(class(toAdd),'MultiIndex')
-      MParT_('MultiIndexSet_addMultiIndex',this.id_,toAdd.get_id());
+      multi_id = MParT_('MultiIndexSet_addMultiIndex',this.id_,toAdd.get_id());
+      result = MultiIndex(multi_id,"id");
     else
       error('Unrecognized type to add to MultiIndexSet')
     end
-    if nargout == 1 
-    %should be use mainly in the case mset = mset + something
-    %mset2 = mset + something will create two names (mset and mset2) for the same object (mset)
-      varargout{1} = this;
-    end
+    
   end  
 
   function result = Union(this,mset)
