@@ -92,10 +92,10 @@ methods
   function result = plus(this,toAdd)
     if strcmp(class(toAdd),'MultiIndexSet')
       multi_id = MParT_('MultiIndexSet_addMultiIndexSet',this.id_,toAdd.get_id());
-      result = MultiIndex(multi_id,"id");
+      result = MultiIndexSet(multi_id,"id");
     elseif strcmp(class(toAdd),'MultiIndex')
       multi_id = MParT_('MultiIndexSet_addMultiIndex',this.id_,toAdd.get_id());
-      result = MultiIndex(multi_id,"id");
+      result = MultiIndexSet(multi_id,"id");
     else
       error('Unrecognized type to add to MultiIndexSet')
     end
