@@ -61,13 +61,11 @@ public:
         }
     }
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
-
     /** @brief Copy this FixedMultiIndexSet to device memory.
         @return A fixed multiindexset with arrays that live in device memory.
     */
     FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> ToDevice();
-#endif
+
 
     Kokkos::View<unsigned int*, MemorySpace> nzStarts;
     Kokkos::View<unsigned int*, MemorySpace> nzDims;

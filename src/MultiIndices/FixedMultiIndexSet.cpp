@@ -350,6 +350,7 @@ void FixedMultiIndexSet<MemorySpace>::FillTotalOrder(unsigned int maxOrder,
         nzStarts(currTerm) = currNz;
 }
 
+
 // If a device is being used, compile code to copy the FixedMultiIndexSet to device memory
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
 
@@ -361,6 +362,12 @@ void FixedMultiIndexSet<MemorySpace>::FillTotalOrder(unsigned int maxOrder,
         auto deviceOrders =  mpart::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(nzOrders);
         FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> output(dim, deviceStarts, deviceDims, deviceOrders);
         return output;
+    }
+#else 
+    template<typename MemorySpace>
+    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> FixedMultiIndexSet<MemorySpace>::ToDevice()
+    {
+        return *this;
     }
 
 #endif
