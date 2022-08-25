@@ -1,5 +1,5 @@
-![](https://github.com/MeasureTransport/MParT/actions/workflows/build-doc.yml/badge.svg)
-![](https://github.com/MeasureTransport/MParT/actions/workflows/build-tests.yml/badge.svg)
+[![](https://github.com/MeasureTransport/MParT/actions/workflows/build-doc.yml/badge.svg)](https://measuretransport.github.io/MParT/)
+[![](https://github.com/MeasureTransport/MParT/actions/workflows/build-tests.yml/badge.svg)](https://github.com/MeasureTransport/MParT/actions/workflows/build-tests.yml)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MeasureTransport/MParT-examples/HEAD)
 
 # MParT: A Monotone Parameterization Toolkit
