@@ -188,7 +188,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriang
 
     for(unsigned int i=0; i<outputDim; ++i){
         FixedMultiIndexSet<Kokkos::HostSpace> mset(i+extraInputs+1, totalOrder);
-        comps.at(i) = CreateComponent<MemorySpace>(mset.ToDevice(), options);
+        comps.at(i) = CreateComponent<MemorySpace>(mset.ToDevice<MemorySpace>(), options);
     }
     auto output = std::make_shared<TriangularMap<MemorySpace>>(comps);
     output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
