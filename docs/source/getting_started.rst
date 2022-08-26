@@ -28,6 +28,12 @@ Linking to MParT is straightforward using CMake.  Let's say you want to compile 
         return 0;
     }
 
+The number of threads used by Kokkos can be set using the :code:`Kokkos::initialize` function e.g.,
+
+.. code-block:: cpp 
+    args.num_threads = 8;
+    Kokkos::initialize(args);
+
 The following :code:`CMakeLists.txt` file can be used to configure the executable.
 
 .. code-block:: cmake
@@ -95,7 +101,8 @@ You should now be able to run python and import the MParT package! For example, 
     print(idx)
 
 This should display :code:`1 1 1`. See :ref:`tutorials` for several examples using MParT for measure transport in python.
-Number of threads used by Kokkos can be set via the environment variable `KOKKOS_NUM_THREADS`, e.g., in Python:
+Number of threads used by Kokkos can be set via the environment variable :code:`KOKKOS_NUM_THREADS`, e.g., in Python:
+
 .. code-block:: python
 
     import os
@@ -114,7 +121,8 @@ See the section :ref:`compiling_julia` for information on how to set up the Juli
     idx = MultiIndex(dim,value)
     print(idx)
 
-Number of threads used by Kokkos can be set via the environment variable `KOKKOS_NUM_THREADS`, e.g.,
+Number of threads used by Kokkos can be set via the environment variable :code:`KOKKOS_NUM_THREADS`, e.g.,
+
 .. code-block:: bash
 
     export KOKKOS_NUM_THREADS=8
@@ -122,11 +130,13 @@ Number of threads used by Kokkos can be set via the environment variable `KOKKOS
 Matlab
 ^^^^^^^^^^
 In Matlab you need the specify the path where the matlab bindings are installed:
+
 .. code-block:: matlab
 
     addpath(genpath('<your/MParT/install/path>'))
 
 Should now be able to use MParT in Matlab! For example here is a simple code to
+
 .. code-block:: matlab
 
     using MParT
@@ -136,7 +146,9 @@ Should now be able to use MParT in Matlab! For example here is a simple code to
     idx = MultiIndex(dim,value)
     print(idx)
 
-Number of threads used by Kokkos can be set using the Matlab function `KokkosInitialize` e.g.,
-.. code-block:: matlab
+Number of threads used by Kokkos can be set using the Matlab function :code:`KokkosInitialize` e.g.,
 
+.. code-block:: matlab
+    
+    num_threads = 8;
     KokkosInitialize(num_threads);
