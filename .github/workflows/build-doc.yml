@@ -22,7 +22,7 @@ jobs:
       - uses: shrink/actions-docker-extract@v1
         id: extract
         with:
-          image: quay.io/hbonart/mpart_examples:latest
+          image: quay.io/measuretransport/mpart_examples:latest
           path: /home/bayes/examples/python/.
       
       - name: Move notebooks into documentation
