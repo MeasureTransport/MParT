@@ -115,7 +115,7 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWo
     unsigned int dim = 3;
     unsigned int maxDegree = 3; 
     FixedMultiIndexSet<Kokkos::HostSpace> hset(dim,maxDegree);
-    FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice(); // Create a total order limited fixed multindex set
+    FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice<DeviceSpace>(); // Create a total order limited fixed multindex set
 
     MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> hexpansion(hset);
     MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> dexpansion(dset);

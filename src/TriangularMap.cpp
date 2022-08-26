@@ -1,5 +1,7 @@
 #include "MParT/TriangularMap.h"
 
+#include "MParT/Utilities/KokkosSpaceMappings.h"
+
 #include <numeric>
 
 using namespace mpart;
@@ -51,7 +53,7 @@ void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> co
 template<typename MemorySpace>
 void TriangularMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                     StridedVector<double, MemorySpace>              output)
-{
+{   
     // Evaluate the log determinant for the first component
     StridedMatrix<const double, MemorySpace> subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(0)->inputDim)), Kokkos::ALL());
     comps_.at(0)->LogDeterminantImpl(subPts, output);
@@ -62,13 +64,17 @@ void TriangularMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, 
     // Vector to hold log determinant for a single component
     Kokkos::View<double*, MemorySpace> compDet("Log Determinant", output.extent(0));
 
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0,output.size());
+
+
     for(unsigned int i=1; i<comps_.size(); ++i){
         subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
         comps_.at(i)->LogDeterminantImpl(subPts, compDet);
 
         // Add to the output
-        for(unsigned int j=0; j<output.size(); ++j)
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j){
             output(j) += compDet(j);
+        });
     }
 }
 

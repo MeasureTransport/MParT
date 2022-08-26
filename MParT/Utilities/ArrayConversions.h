@@ -242,11 +242,36 @@ namespace mpart{
     }
 
     template<typename DeviceMemoryType, typename ScalarType, class... OtherTraits>
-    Kokkos::View<ScalarType**, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, OtherTraits...>const& inview){
+    Kokkos::View<ScalarType**, Kokkos::LayoutLeft, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, Kokkos::LayoutLeft, OtherTraits...>const& inview){
 
-        Kokkos::View<ScalarType**, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
+        Kokkos::View<ScalarType**, Kokkos::LayoutLeft, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
         Kokkos::deep_copy(outview, inview);
         return outview;
+    }
+
+    template<typename DeviceMemoryType, typename ScalarType, class... OtherTraits>
+    Kokkos::View<ScalarType**, Kokkos::LayoutRight, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, Kokkos::LayoutRight, OtherTraits...>const& inview){
+
+        Kokkos::View<ScalarType**, Kokkos::LayoutRight, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
+        Kokkos::deep_copy(outview, inview);
+        return outview;
+    }
+
+    template<typename DeviceMemoryType, typename ScalarType, class... OtherTraits>
+    Kokkos::View<ScalarType**, Kokkos::LayoutStride, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, Kokkos::LayoutStride, OtherTraits...>const& inview){
+
+        size_t stride0 = inview.stride_0();
+        size_t stride1 = inview.stride_1();
+        
+        if(stride0==1){
+            return ToDevice<DeviceMemoryType, ScalarType, OtherTraits...>(Kokkos::View<ScalarType**, Kokkos::LayoutLeft, OtherTraits...>(inview));
+        }else if(stride1==1){
+            return ToDevice<DeviceMemoryType, ScalarType, OtherTraits...>(Kokkos::View<ScalarType**, Kokkos::LayoutRight, OtherTraits...>(inview));
+        }else{
+            std::stringstream msg;
+            msg << "Cannot copy generally strided matrix to device.  MParT currently only supports copies of view with continguous memory layouts.";
+            throw std::runtime_error(msg.str());
+        }
     }
 
     template<typename DeviceMemoryType,typename ScalarType>

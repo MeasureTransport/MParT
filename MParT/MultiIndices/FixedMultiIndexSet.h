@@ -61,13 +61,12 @@ public:
         }
     }
 
-#if defined(MPART_ENABLE_GPU)
-
     /** @brief Copy this FixedMultiIndexSet to device memory.
         @return A fixed multiindexset with arrays that live in device memory.
     */
-    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> ToDevice();
-#endif
+    template<typename OtherMemorySpace>
+    FixedMultiIndexSet<OtherMemorySpace> ToDevice();
+
 
     Kokkos::View<unsigned int*, MemorySpace> nzStarts;
     Kokkos::View<unsigned int*, MemorySpace> nzDims;
