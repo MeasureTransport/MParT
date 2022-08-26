@@ -167,7 +167,6 @@ public:
     */
     bool operator<=(const MultiIndex &b) const;
 
-
 private:
 
     unsigned int length;
