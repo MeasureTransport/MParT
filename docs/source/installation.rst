@@ -5,7 +5,7 @@ Installation
 
 .. card:: Install with Conda
 
-    Install with conda is now available via conda-forge:
+    Install with conda is now available via `conda-forge <https://anaconda.org/conda-forge/mpart>`__:
 
     .. code-block:: bash
 
@@ -22,10 +22,10 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
 
    mkdir build
    cd build
-   cmake                                         \
+   cmake                                               \
      -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
-     -DKokkos_ENABLE_PTHREAD=ON                  \
-     -DKokkos_ENABLE_SERIAL=ON                   \
+     -DKokkos_ENABLE_PTHREAD=ON                        \
+     -DKokkos_ENABLE_SERIAL=ON                         \
    ..
    make install
 
@@ -33,13 +33,13 @@ This will compile the :code:`mpart` library and the python bindings. If you are 
 
 .. code-block:: bash
 
-    cmake                                        \
+    cmake                                              \
      -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
-     -DKokkos_ROOT=<your/kokkos/install/root>    \
-     -DEigen3_ROOT=<your/eigen3/install/root>    \
-     -DCatch2_ROOT=<your/catch2/install/root>    \
-     -DKokkos_ENABLE_PTHREAD=ON                  \
-     -DKokkos_ENABLE_SERIAL=ON                   \
+     -DKokkos_ROOT=<your/kokkos/install/root>          \
+     -DEigen3_ROOT=<your/eigen3/install/root>          \
+     -DCatch2_ROOT=<your/catch2/install/root>          \
+     -DKokkos_ENABLE_PTHREAD=ON                        \
+     -DKokkos_ENABLE_SERIAL=ON                         \
    ..
 
 Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, and Catch2 with libraries you don't already have using these :code:`X_ROOT` flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version >=3.13. Further, it has been tested with Kokkos 3.6.0, Eigen 3.4.0, Pybind11 2.9.2, and Catch2 3.0.0-preview3 (there are some issues encountered when compiling MParT with Catch2 3.0.1).
@@ -133,7 +133,7 @@ Using the above documentation on building with an external install of Kokkos, we
 .. code-block:: bash
 
     cmake \
-        -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>                     \
+        -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>                 \
         -DKokkos_ROOT=</new/kokkos/install/path>                         \
         -DCMAKE_CXX_COMPILER=</new/kokkos/install/path>/bin/nvcc_wrapper \
     ..
