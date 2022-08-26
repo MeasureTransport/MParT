@@ -83,16 +83,18 @@ First, make sure the relevant path variables include the installation of MParT:
             export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
             export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
 
-You should now be able to run python and import the MParT package!
+You should now be able to run python and import the MParT package! For example, we can make a multiindex and print its contents with
 
 .. code-block:: python
 
-    import mpart
+    import mpart as mt
 
     dim = 3
     value = 1
-    idx = mpart.MultiIndex(dim,value)
+    idx = mt.MultiIndex(dim,value)
     print(idx)
+
+This should display :code:`1 1 1`. See :ref:`tutorials` for several examples using MParT for measure transport in python.
 
 Julia
 ^^^^^^^^^^

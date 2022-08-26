@@ -746,3 +746,21 @@ MultiIndexSet& MultiIndexSet::operator+=(MultiIndex const& rhs)
   AddActive(rhs);
   return *this;
 }
+
+MultiIndexSet& MultiIndexSet::operator=(const MultiIndexSet& rhs){
+
+    if(rhs.length != this->length)
+        throw std::runtime_error("Cannot copy MultiIndexSet because sizes don't match.");
+
+    this->allMultis = rhs.allMultis;
+    this->limiter = rhs.limiter;
+    this->active2global = rhs.active2global;
+    this->global2active = rhs.global2active;
+    this->outEdges = rhs.outEdges;
+    this->inEdges = rhs.inEdges; 
+    this->maxOrders = rhs.maxOrders; 
+    this->neighborhood = rhs.neighborhood;
+    this->multi2global = rhs.multi2global;
+
+    return *this;
+  }

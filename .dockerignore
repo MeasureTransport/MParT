@@ -1,0 +1,6 @@
+.git
+.gitignore
+.docker/Dockerfile
+build
+external
+docs
