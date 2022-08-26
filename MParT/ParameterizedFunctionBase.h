@@ -49,11 +49,19 @@ namespace mpart {
         /** Const version of the Coeffs() function. */
         virtual Kokkos::View<const double*, MemorySpace> Coeffs() const{return this->savedCoeffs;};
 
-        
+        /** Evaluate function with conversion from regular strided matrix to const strided matrix. */
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> Evaluate(StridedMatrix<double, AnyMemorySpace> const& pts){StridedMatrix<const double, AnyMemorySpace> newpts(pts); return this->Evaluate(newpts);}
 
-        virtual StridedMatrix<double, MemorySpace> Evaluate(StridedMatrix<const double, MemorySpace> const& pts);
+        /** Evaluate function with conversion between default view layout and const strided matrix. */
+        template<typename... AllTraits>
+        StridedMatrix<double, typename Kokkos::View<double**,AllTraits...>::memory_space> Evaluate(Kokkos::View<double**, AllTraits...> pts){StridedMatrix<const double, typename Kokkos::View<double**,AllTraits...>::memory_space> newpts(pts); return this->Evaluate(newpts);}
 
-        virtual Eigen::RowMatrixXd Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
+        /** Main Evaluate function. */
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> Evaluate(StridedMatrix<const double, AnyMemorySpace> const& pts);
+
+        Eigen::RowMatrixXd Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
         virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                   StridedMatrix<double, MemorySpace>              output) = 0;

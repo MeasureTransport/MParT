@@ -67,9 +67,7 @@ public:
                               StridedMatrix<double, MemorySpace>              output) override
     {
         StridedVector<double,MemorySpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
-        std::cout << "Created outputSlice" << std::endl;
         EvaluateImpl(pts, this->savedCoeffs, outputSlice);
-        std::cout << "Inner EvaluateImpl done" << std::endl;
     }
 
     virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
