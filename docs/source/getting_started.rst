@@ -61,7 +61,7 @@ Building the :code:`Simple` binary involves running :code:`cmake` and then :code
 
    .. code-block:: bash
 
-       cmake -DCMAKE_PREFIX_PATH=<your/mpart/install/path> ..
+       cmake -DCMAKE_PREFIX_PATH=<your/MParT/install/path> ..
 
 Python
 ^^^^^^^^^
@@ -73,15 +73,15 @@ First, make sure the relevant path variables include the installation of MParT:
 
         .. code-block:: bash
 
-            export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
-            export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
+            export PYTHONPATH=$PYTHONPATH:<your/MParT/install/path>/python
+            export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/MParT/install/path>/lib:<your/MParT/install/path>/python
 
     .. tab-item:: Linux
 
         .. code-block:: bash
 
-            export PYTHONPATH=$PYTHONPATH:<your/install/path>/python
-            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<your/install/path>/lib:<your/install/path>/python
+            export PYTHONPATH=$PYTHONPATH:<your/MParT/install/path>/python
+            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<your/MParT/install/path>/lib:<your/MParT/install/path>/python
 
 You should now be able to run python and import the MParT package! For example, we can make a multiindex and print its contents with
 
@@ -95,6 +95,11 @@ You should now be able to run python and import the MParT package! For example, 
     print(idx)
 
 This should display :code:`1 1 1`. See :ref:`tutorials` for several examples using MParT for measure transport in python.
+Number of threads used by Kokkos can be set via the environment variable `KOKKOS_NUM_THREADS`, e.g., in Python:
+.. code-block:: python
+
+    import os
+    os.environ['KOKKOS_NUM_THREADS'] = '8'
 
 Julia
 ^^^^^^^^^^
@@ -109,20 +114,29 @@ See the section :ref:`compiling_julia` for information on how to set up the Juli
     idx = MultiIndex(dim,value)
     print(idx)
 
+Number of threads used by Kokkos can be set via the environment variable `KOKKOS_NUM_THREADS`, e.g.,
+.. code-block:: bash
+
+    export KOKKOS_NUM_THREADS=8
+
 Matlab
 ^^^^^^^^^^
-First path to the matlab bindings needs to be set:
+In Matlab you need the specify the path where the matlab bindings are installed:
 .. code-block:: matlab
-    addpath(genpath('<your/install/path>'))
 
-Also use :code:'KokkosInitialize(ncpus)' to be able to use :code:'Kokkos' with :code:'ncpus' threads.
-An examples of use is:
+    addpath(genpath('<your/MParT/install/path>'))
 
+Should now be able to use MParT in Matlab! For example here is a simple code to
 .. code-block:: matlab
-    addpath(genpath('<your/install/path>'))
-    KokkosInitialize(ncpus)
+
+    using MParT
 
     dim = 3
     value = 1
     idx = MultiIndex(dim,value)
-    disp(idx)
+    print(idx)
+
+Number of threads used by Kokkos can be set using the Matlab function `KokkosInitialize` e.g.,
+.. code-block:: matlab
+
+    KokkosInitialize(num_threads);

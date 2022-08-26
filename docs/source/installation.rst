@@ -5,7 +5,7 @@ Installation
 
 .. card:: Install with Conda
 
-    COMING SOON!
+    Install with conda is now available via conda-forge:
 
     .. code-block:: bash
 
@@ -23,7 +23,7 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
    mkdir build
    cd build
    cmake                                         \
-     -DCMAKE_INSTALL_PREFIX=<your/install/path>  \
+     -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
      -DKokkos_ENABLE_PTHREAD=ON                  \
      -DKokkos_ENABLE_SERIAL=ON                   \
    ..
@@ -34,7 +34,7 @@ This will compile the :code:`mpart` library and the python bindings. If you are 
 .. code-block:: bash
 
     cmake                                        \
-     -DCMAKE_INSTALL_PREFIX=<your/install/path>  \
+     -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
      -DKokkos_ROOT=<your/kokkos/install/root>    \
      -DEigen3_ROOT=<your/eigen3/install/root>    \
      -DCatch2_ROOT=<your/catch2/install/root>    \
@@ -133,7 +133,7 @@ Using the above documentation on building with an external install of Kokkos, we
 .. code-block:: bash
 
     cmake \
-        -DCMAKE_INSTALL_PREFIX=<your/install/path>                       \
+        -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>                     \
         -DKokkos_ROOT=</new/kokkos/install/path>                         \
         -DCMAKE_CXX_COMPILER=</new/kokkos/install/path>/bin/nvcc_wrapper \
     ..
