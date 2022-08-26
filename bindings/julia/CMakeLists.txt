@@ -16,4 +16,4 @@ add_library(mpartjl SHARED ${JULIA_BINDING_SOURCES})
 target_link_libraries(mpartjl PRIVATE mpart JlCxx::cxxwrap_julia JlCxx::cxxwrap_julia_stl Kokkos::kokkos Eigen3::Eigen)
 
 # Add an installation target for the julia bindings
-install(TARGETS mpartjl DESTINATION julia/mpart)
+install(TARGETS mpartjl DESTINATION "${JULIA_INSTALL_PREFIX}")

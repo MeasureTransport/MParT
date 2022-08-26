@@ -1,27 +1,17 @@
 Installation
 ------------
 
-Install from Conda
-==================
+.. _installation:
 
-.. panels::
-    :container: container-lg pb-3
-    :column: col-lg-12 p-2
+.. card:: Install with Conda
 
-    ^^^^^^^^^^^^^^^^^^^
     COMING SOON!
-
-
-    ++++++++++++++++++++++
 
     .. code-block:: bash
 
         conda install -c conda-forge mpart
 
-    ---
-    :column: col-lg-12 p-2
 
-.. _installation:
 
 
 Compiling from Source
@@ -52,7 +42,7 @@ This will compile the :code:`mpart` library and the python bindings. If you are 
      -DKokkos_ENABLE_SERIAL=ON                   \
    ..
 
-Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, and Catch2 with submodules you don't already have using these :code:`X_ROOT` flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version >=3.13. Further, it has been tested with Kokkos 3.6.0, Eigen 3.4.0, Pybind11 2.9.2, and Catch2 3.0.0-preview3 (there are some issues encountered when compiling MParT with Catch2 3.0.1).
+Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, and Catch2 with libraries you don't already have using these :code:`X_ROOT` flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version >=3.13. Further, it has been tested with Kokkos 3.6.0, Eigen 3.4.0, Pybind11 2.9.2, and Catch2 3.0.0-preview3 (there are some issues encountered when compiling MParT with Catch2 3.0.1).
 
 The command :code:`make install` will also create a test executable called :code:`RunTests` in the :code:`build` directory.  The tests can be run with:
 
@@ -106,21 +96,14 @@ If you have Julia installed, but CMake was not able to find it during MParT conf
 
 To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set :code:`MPART_JULIA=OFF` during the CMake configuration.
 
-Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :code:`<your MParT install path>/julia/`, you can easily use :code:`mpart` in Julia by first adding the path to your library path
+Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :code:`your/MParT/install/path`, you can using MParT in Julia with a few last steps. First, add :code:`MParT.jl`, which holds the Julia interface for MParT, via :code:`]add https://github.com/MeasureTransport/MParT.jl` in the Julia REPL. Then, create a file :code:`~/.julia/artifacts/Override.toml` with the following lines
 
-.. tabbed:: MacOS
+.. code-block:: toml
 
-    .. code-block:: bash
+    [bee5971c-294f-5168-9fcd-9fb3c811d495]
+    MParT = "your/MParT/install/path"
 
-        $ export DYLD_LIBRARY_PATH=<your MParT install path>/julia/mpart/:$DYLD_LIBRARY_PATH
-        $ export JULIA_LOAD_PATH="<your MParT install path>/julia/mpart/:$JULIA_LOAD_PATH"
-
-.. tabbed:: Linux
-
-    .. code-block:: bash
-
-        $ export LD_LIBRARY_PATH=<your MParT install path>/julia/mpart/:$LD_LIBRARY_PATH
-        $ export JULIA_LOAD_PATH="<your MParT install path>/julia/mpart/:$JULIA_LOAD_PATH"
+At this point, you should be able to open up a REPL and type :code:`using MParT` and get going with any of the provided examples!
 
 Compiling with CUDA Support
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
