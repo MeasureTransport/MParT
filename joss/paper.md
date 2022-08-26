@@ -67,9 +67,8 @@ where $f(\mathbf{x}_{1:d}; \mathbf{w})$ is a general (non-monotone) function par
 
 The following plots show the performance of MParT on the evaluation of a $5^{th}$ order map in $\mathbb{R}^5$ when using different languages and Kokkos backends.  The monotone parameterization is constructed from Hermite polynomials and an adaptive Simpson quadrature rule.   Random map coefficients and sample locations are used in this test.  At each sample level, the map is evaluated at fifty randomly selected coefficients.
 
-![Time to evaluate triangular map from different languages.](plot_joss_evaluate.png){ width=50% }
+![Time to evaluate triangular map from different languages and backends.](performance_comparison.png)
 
-![Time to evaluate triangular map in c++ with different Kokkos backends.](ST_CPP_eval_d5_to5_simpson_comparison.png){ width=50% }
 
 The results show similar performance across languages (each using OpenMP backend with 8 threads) and nearly identical performance between the Threads and OpenMP backends.   For the evaluation of $10^6$ samples, the OpenMP backend with 16 threads is approximately $14\times$ faster than the serial backend.  The CUDA backend is approximately $82\times$ faster than the serial backend, or $6\times$ faster than the OpenMP backend.   Tests were performed in a Kubernetes container using 8 cores of a Intel(R) Xeon(R) Gold 6248 CPU and a Tesla V100-SXM2 GPU with Cuda version 11.2.
 
