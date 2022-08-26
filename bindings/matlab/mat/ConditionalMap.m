@@ -32,13 +32,25 @@ methods
           mset = varargin{1};
           mapOptions = varargin{2};
           mexOptions = mapOptions.getMexOptions;
-          input_str=['MParT_(',char(39),'ConditionalMap_newMap',char(39),',mset.get_id()'];
-          for o=1:length(mexOptions)
-              input_o=[',mexOptions{',num2str(o),'}'];
-              input_str=[input_str,input_o];
+          if isa(mset,"MultiIndexSet")
+              input_str=['MParT_(',char(39),'ConditionalMap_newMap',char(39),',mset.get_id()'];
+              for o=1:length(mexOptions)
+                  input_o=[',mexOptions{',num2str(o),'}'];
+                  input_str=[input_str,input_o];
+              end
+              input_str=[input_str,')'];
+              this.id_ = eval(input_str);
+          elseif isa(mset,"FixedMultiIndexSet")
+              input_str=['MParT_(',char(39),'ConditionalMap_newMapFixed',char(39),',mset.get_id()'];
+              for o=1:length(mexOptions)
+                  input_o=[',mexOptions{',num2str(o),'}'];
+                  input_str=[input_str,input_o];
+              end
+              input_str=[input_str,')'];
+              this.id_ = eval(input_str);
+          else
+              error("Wrong input argument");
           end
-          input_str=[input_str,')'];
-          this.id_ = eval(input_str);
         end
     elseif(nargin==4)
       inputDim = varargin{1};

@@ -32,10 +32,11 @@ methods
 
   function ind = MultiToIndex(this, multi)
     ind = MParT_('FixedMultiIndexSet_MultiToIndex', this.id_, multi);
+    ind = ind + 1;
   end 
 
-  function multi = IndexToMulti(this, multi)
-    multi = MParT_('FixedMultiIndexSet_IndexToMulti', this.id_, multi);
+  function multi = IndexToMulti(this, index)
+    multi = MParT_('FixedMultiIndexSet_IndexToMulti', this.id_, index-1);
   end 
 
   function dim = Length(this)
