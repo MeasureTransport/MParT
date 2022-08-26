@@ -19,7 +19,7 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
 mkdir build
 cd build
 cmake                                        \
-  -DCMAKE_INSTALL_PREFIX=<your/install/path> \
+  -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path> \
   -DKokkos_ENABLE_PTHREAD=ON                 \
   -DKokkos_ENABLE_SERIAL=ON                  \
 ..
@@ -32,19 +32,6 @@ This will compile the `mpart` library and also create a test executable called `
 Or, with the additional specification of the number of Kokkos threads to use:
 ```
 ./RunTests --kokkos-threads=4
-```
-### Robust compilation for matlab and M1 Mac
-```
-mkdir build
-cd build
-cmake                                        \
-  -DCMAKE_INSTALL_PREFIX=<your/install/path> \
-  -DPYTHON_EXECUTABLE=`which python`         \
-  -DCMAKE_OSX_ARCHITECTURES=x86_64           \
-  -DKokkos_ENABLE_PTHREAD=ON                 \
-  -DKokkos_ENABLE_SERIAL=ON                  \
-..
-make install
 ```
 
 #### Kokkos Options:
