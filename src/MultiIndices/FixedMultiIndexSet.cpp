@@ -350,17 +350,40 @@ void FixedMultiIndexSet<MemorySpace>::FillTotalOrder(unsigned int maxOrder,
         nzStarts(currTerm) = currNz;
 }
 
+template<>
+template<>
+FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<Kokkos::HostSpace>()
+{
+    return *this;
+}
+
 // If a device is being used, compile code to copy the FixedMultiIndexSet to device memory
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
-
-    template<typename MemorySpace>
-    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> FixedMultiIndexSet<MemorySpace>::ToDevice()
+    template<>
+    template<>
+    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>()
     {
         auto deviceStarts = mpart::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(nzStarts);
         auto deviceDims = mpart::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(nzDims);
         auto deviceOrders =  mpart::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(nzOrders);
         FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> output(dim, deviceStarts, deviceDims, deviceOrders);
         return output;
+    }
+    
+    template<>
+    template<>
+    FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>::ToDevice<Kokkos::HostSpace>()
+    {
+        assert(false);
+        return FixedMultiIndexSet<Kokkos::HostSpace>(0,0);
+    }
+
+    template<>
+    template<>
+    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>()
+    {
+        assert(false);
+        return FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>(0,0);
     }
 
 #endif

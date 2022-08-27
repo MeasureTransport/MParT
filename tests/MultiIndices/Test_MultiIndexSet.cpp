@@ -69,7 +69,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class copy to device", "[FixedMultiIn
 
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim,maxOrder);
 
-    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> deviceSet = mset.ToDevice();
+    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> deviceSet = mset.ToDevice<Kokkos::DefaultExecutionSpace::memory_space>();
 
 }
 #endif
