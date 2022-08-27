@@ -199,6 +199,11 @@
    Julia
   </a>
  </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#matlab">
+   Matlab
+  </a>
+ </li>
 </ul>
 
 </nav>
@@ -222,21 +227,37 @@
 <span id="example"></span><h1>Using MParT<a class="headerlink" href="#using-mpart" title="Permalink to this heading">#</a></h1>
 <section id="c">
 <h2>C++<a class="headerlink" href="#c" title="Permalink to this heading">#</a></h2>
-<p>Linking to MParT is straightforward using CMake.  Let’s say you want to compile the following code, which simply creates a multiindex set.</p>
+<p>Linking to MParT is straightforward using CMake.  Let’s say you want to compile the following code, which simply creates a map component from a custom multiindex set.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">SmallExample.cpp</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
 <div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Kokkos_Core.hpp&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;Eigen/Core&gt;</span><span class="cp"></span>
 <span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;MParT/MultiIndices/MultiIndexSet.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;MParT/MultiIndices/FixedMultiIndexSet.h&quot;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;MParT/ConditionalMapBase.h&gt;</span><span class="cp"></span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;MParT/MapFactory.h&gt;</span><span class="cp"></span>
+
 
 <span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">mpart</span><span class="p">;</span><span class="w"></span>
 
 <span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(){</span><span class="w"></span>
-<span class="w">    </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">initialize</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">args</span><span class="p">.</span><span class="n">num_threads</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span><span class="w"></span>
+<span class="w">    </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">initialize</span><span class="p">(</span><span class="n">args</span><span class="p">);</span><span class="w"></span>
 <span class="w">    </span><span class="p">{</span><span class="w"></span>
-<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXi</span><span class="w"> </span><span class="n">multis</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">multis</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="w"></span>
+<span class="w">            </span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
 
-<span class="w">    </span><span class="n">MultiIndexSet</span><span class="w"> </span><span class="n">mset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MultiIndexSet</span><span class="o">::</span><span class="n">CreateTotalOrder</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
-<span class="w">    </span><span class="n">mset</span><span class="p">.</span><span class="n">Visualize</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="n">MultiIndexSet</span><span class="w"> </span><span class="n">mset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MultiIndexSet</span><span class="p">(</span><span class="n">multis</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">FixedMultiIndexSet</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">fixedSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mset</span><span class="p">.</span><span class="n">Fix</span><span class="p">();</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">MapOptions</span><span class="w"> </span><span class="n">opts</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">ConditionalMapBase</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">mapComponent</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">mapComponent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MapFactory</span><span class="o">::</span><span class="n">CreateComponent</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="p">(</span><span class="n">fixedSet</span><span class="p">,</span><span class="n">opts</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">nc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapComponent</span><span class="o">-&gt;</span><span class="n">numCoeffs</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="n">nc</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span><span class="w"></span>
 
 <span class="w">    </span><span class="p">}</span><span class="w"></span>
 <span class="w">    </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">finalize</span><span class="p">();</span><span class="w"></span>
@@ -274,7 +295,7 @@ make                    <span class="c1"># Call make to build the executable</sp
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>If CMake throws an error saying it couldn’t find <code class="code docutils literal notranslate"><span class="pre">KokkosConfig.cmake</span></code>, try manually specifying the path to your MParT (or Kokkos) installations in your cmake call using <code class="code docutils literal notranslate"><span class="pre">X_ROOT</span></code>.  For example,</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake -DCMAKE_PREFIX_PATH<span class="o">=</span>&lt;your/mpart/install/path&gt; ..
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake -DCMAKE_PREFIX_PATH<span class="o">=</span>&lt;your/MParT/install/path&gt; ..
 </pre></div>
 </div>
 </div>
@@ -286,42 +307,90 @@ make                    <span class="c1"># Call make to build the executable</sp
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 MacOS</label><div class="sd-tab-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
-<span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/MParT/install/path&gt;/python
+<span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/MParT/install/path&gt;/lib:&lt;your/MParT/install/path&gt;/python
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 Linux</label><div class="sd-tab-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/install/path&gt;/python
-<span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;your/install/path&gt;/lib:&lt;your/install/path&gt;/python
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/MParT/install/path&gt;/python
+<span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;your/MParT/install/path&gt;/lib:&lt;your/MParT/install/path&gt;/python
 </pre></div>
 </div>
 </div>
 </div>
-<p>You should now be able to run python and import the MParT package! For example, we can make a multiindex and print its contents with</p>
+<p>Number of threads used by Kokkos can be set via the environment variable <code class="code docutils literal notranslate"><span class="pre">KOKKOS_NUM_THREADS</span></code> before importing MParT, e.g.,:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;KOKKOS_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;8&#39;</span>
+<span class="kn">import</span> <span class="nn">mpart</span> <span class="k">as</span> <span class="nn">mt</span>
+</pre></div>
+</div>
+<p>You should now be able to run python and import the MParT package! For example, we can make a map component from a custom multi-index set:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mpart</span> <span class="k">as</span> <span class="nn">mt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="n">dim</span> <span class="o">=</span> <span class="mi">3</span>
-<span class="n">value</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">idx</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">MultiIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">value</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+<span class="n">multis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">mset</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">MultiIndexSet</span><span class="p">(</span><span class="n">multis</span><span class="p">)</span>
+<span class="n">fixedSet</span> <span class="o">=</span> <span class="n">mset</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">opts</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">MapOptions</span><span class="p">()</span>
+<span class="n">mapComponent</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixedSet</span><span class="p">,</span><span class="n">opts</span><span class="p">)</span>
+
+<span class="n">nc</span> <span class="o">=</span> <span class="n">mapComponent</span><span class="o">.</span><span class="n">numCoeffs</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>This should display <code class="code docutils literal notranslate"><span class="pre">1</span> <span class="pre">1</span> <span class="pre">1</span></code>. See <a class="reference internal" href="tutorials/index.html#tutorials"><span class="std std-ref">Tutorials</span></a> for several examples using MParT for measure transport in python.</p>
+<p>This should display <code class="code docutils literal notranslate"><span class="pre">3</span></code> as the number of coefficients is equal to the number of multi-indices in the set. See <a class="reference internal" href="tutorials/index.html#tutorials"><span class="std std-ref">Tutorials</span></a> for several examples using MParT for measure transport in python.</p>
 </section>
 <section id="julia">
 <h2>Julia<a class="headerlink" href="#julia" title="Permalink to this heading">#</a></h2>
-<p>See the section <a class="reference internal" href="installation.html#compiling-julia"><span class="std std-ref">Compiling with Julia Bindings</span></a> for information on how to set up the Julia environment manually. After this setup, you should now be able to use MParT from Julia by including MParT as a local package.  For example:</p>
+<p>See the section <a class="reference internal" href="installation.html#compiling-julia"><span class="std std-ref">Compiling with Julia Bindings</span></a> for information on how to set up the Julia environment manually. After this setup, you should now be able to use MParT from Julia by including MParT as a local package.
+For example, the following creates a map component from a custom multi-index set in dimension 2:</p>
 <div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">MParT</span><span class="w"></span>
 
-<span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w"></span>
-<span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="w"></span>
-<span class="n">idx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MultiIndex</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span><span class="n">value</span><span class="p">)</span><span class="w"></span>
-<span class="n">print</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span><span class="w"></span>
+<span class="n">multis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="mi">2</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="mi">1</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"></span>
+<span class="n">mset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MultiIndexSet</span><span class="p">(</span><span class="n">multis</span><span class="p">)</span><span class="w"></span>
+<span class="n">fixedSet</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Fix</span><span class="p">(</span><span class="n">mset</span><span class="p">,</span><span class="w"> </span><span class="nb">true</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">opts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MapOptions</span><span class="p">()</span><span class="w"></span>
+<span class="n">mapComponent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixedSet</span><span class="p">,</span><span class="n">opts</span><span class="p">)</span><span class="w"></span>
+
+<span class="n">nc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">numCoeffs</span><span class="p">(</span><span class="n">mapComponent</span><span class="p">)</span><span class="w"></span>
+<span class="n">print</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
+<p>This should display <code class="code docutils literal notranslate"><span class="pre">3</span></code> as the number of coefficients is equal to the number of multi-indices in the set.</p>
+<p>Number of threads used by Kokkos can be set via the environment variable <code class="code docutils literal notranslate"><span class="pre">KOKKOS_NUM_THREADS</span></code>, e.g.,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">KOKKOS_NUM_THREADS</span><span class="o">=</span><span class="m">8</span>
+</pre></div>
+</div>
+</section>
+<section id="matlab">
+<h2>Matlab<a class="headerlink" href="#matlab" title="Permalink to this heading">#</a></h2>
+<p>In Matlab you need the specify the path where the matlab bindings are installed:</p>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="nb">addpath</span><span class="p">(</span><span class="nb">genpath</span><span class="p">(</span><span class="s">&#39;&lt;your/MParT/install/path&gt;&#39;</span><span class="p">))</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Number of threads used by Kokkos can be set using the Matlab function <code class="code docutils literal notranslate"><span class="pre">KokkosInitialize</span></code> e.g.,</p>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">num_threads</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="mi">8</span><span class="p">;</span><span class="w"></span>
+<span class="n">KokkosInitialize</span><span class="p">(</span><span class="n">num_threads</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+<p>Should now be able to use MParT in Matlab! For example, the following creates a map component from a custom multi-index set in dimension 2:</p>
+<div class="highlight-matlab notranslate"><div class="highlight"><pre><span></span><span class="n">multis</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">;</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">;</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span><span class="w"></span>
+<span class="n">mset</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">MultiIndexSet</span><span class="p">(</span><span class="n">multis</span><span class="p">);</span><span class="w"></span>
+<span class="n">fixedSet</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mset</span><span class="p">.</span><span class="n">Fix</span><span class="p">();</span><span class="w"></span>
+
+<span class="n">opts</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">MapOptions</span><span class="p">();</span><span class="w"></span>
+<span class="n">mapComponent</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixedSet</span><span class="p">,</span><span class="n">opts</span><span class="p">);</span><span class="w"></span>
+
+<span class="n">nc</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="n">mapComponent</span><span class="p">.</span><span class="n">numCoeffs</span><span class="p">;</span><span class="w"></span>
+<span class="nb">disp</span><span class="p">(</span><span class="n">nc</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p>This should display <code class="code docutils literal notranslate"><span class="pre">3</span></code> as the number of coefficients is equal to the number of multi-indices in the set.</p>
 </section>
 </section>
 

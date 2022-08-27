@@ -226,7 +226,7 @@
 <div class="sd-card-body docutils">
 <div class="sd-card-title sd-font-weight-bold docutils">
 Install with Conda</div>
-<p class="sd-card-text">COMING SOON!</p>
+<p class="sd-card-text">Install with conda is now available via <a class="reference external" href="https://anaconda.org/conda-forge/mpart">conda-forge</a>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge mpart
 </pre></div>
 </div>
@@ -237,22 +237,22 @@ Install with Conda</div>
 <p>MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir build
 <span class="nb">cd</span> build
-cmake                                         <span class="se">\</span>
-  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/install/path&gt;  <span class="se">\</span>
-  -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON                  <span class="se">\</span>
-  -DKokkos_ENABLE_SERIAL<span class="o">=</span>ON                   <span class="se">\</span>
+cmake                                               <span class="se">\</span>
+  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;  <span class="se">\</span>
+  -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON                        <span class="se">\</span>
+  -DKokkos_ENABLE_SERIAL<span class="o">=</span>ON                         <span class="se">\</span>
 ..
 make install
 </pre></div>
 </div>
 <p>This will compile the <code class="code docutils literal notranslate"><span class="pre">mpart</span></code> library and the python bindings. If you are compiling on a multicore machine, you can use <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">-j</span> <span class="pre">N_JOBS</span> <span class="pre">install</span></code>, where <code class="code docutils literal notranslate"><span class="pre">N_JOBS</span></code> is the number of processes the computer can compile with in parallel.  This installation should also automatically install and build Kokkos, Eigen, and Catch2, assuming they aren’t installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span> cmake                                        <span class="se">\</span>
-  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/install/path&gt;  <span class="se">\</span>
-  -DKokkos_ROOT<span class="o">=</span>&lt;your/kokkos/install/root&gt;    <span class="se">\</span>
-  -DEigen3_ROOT<span class="o">=</span>&lt;your/eigen3/install/root&gt;    <span class="se">\</span>
-  -DCatch2_ROOT<span class="o">=</span>&lt;your/catch2/install/root&gt;    <span class="se">\</span>
-  -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON                  <span class="se">\</span>
-  -DKokkos_ENABLE_SERIAL<span class="o">=</span>ON                   <span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span> cmake                                              <span class="se">\</span>
+  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;  <span class="se">\</span>
+  -DKokkos_ROOT<span class="o">=</span>&lt;your/kokkos/install/root&gt;          <span class="se">\</span>
+  -DEigen3_ROOT<span class="o">=</span>&lt;your/eigen3/install/root&gt;          <span class="se">\</span>
+  -DCatch2_ROOT<span class="o">=</span>&lt;your/catch2/install/root&gt;          <span class="se">\</span>
+  -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON                        <span class="se">\</span>
+  -DKokkos_ENABLE_SERIAL<span class="o">=</span>ON                         <span class="se">\</span>
 ..
 </pre></div>
 </div>
@@ -325,7 +325,7 @@ make install
 </div>
 <p>Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the <code class="code docutils literal notranslate"><span class="pre">build</span></code> directory using the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake <span class="se">\</span>
-    -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/install/path&gt;                       <span class="se">\</span>
+    -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;                 <span class="se">\</span>
     -DKokkos_ROOT<span class="o">=</span>&lt;/new/kokkos/install/path&gt;                         <span class="se">\</span>
     -DCMAKE_CXX_COMPILER<span class="o">=</span>&lt;/new/kokkos/install/path&gt;/bin/nvcc_wrapper <span class="se">\</span>
 ..
