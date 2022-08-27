@@ -14,10 +14,10 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
 {
     bool isDevice = !std::is_same<MemorySpace,Kokkos::HostSpace>::value;
     // CreateComponent
-    m.def(isDevice? "CreateComponentDevice" : "CreateComponent", &MapFactory::CreateComponent<MemorySpace>);
+    m.def(isDevice? "dCreateComponent" : "CreateComponent", &MapFactory::CreateComponent<MemorySpace>);
 
     // CreateTriangular
-    m.def(isDevice? "CreateTriangularDevice" : "CreateTriangular", &MapFactory::CreateTriangular<MemorySpace>);
+    m.def(isDevice? "dCreateTriangular" : "CreateTriangular", &MapFactory::CreateTriangular<MemorySpace>);
 
 }
 

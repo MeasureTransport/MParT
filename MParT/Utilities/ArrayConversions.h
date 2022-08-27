@@ -183,6 +183,13 @@ namespace mpart{
         return outview;
     }
 
+    template<typename DeviceMemoryType, typename ScalarType>
+    StridedMatrix<ScalarType, Kokkos::HostSpace> ToHost(StridedMatrix<ScalarType,DeviceMemoryType> const& inview){
+        typename StridedMatrix<ScalarType,DeviceMemoryType>::HostMirror outview = Kokkos::create_mirror_view(inview);
+        Kokkos::deep_copy (outview, inview);
+        return outview;
+    }
+
     /**
     @brief Copies a range of elements from a Kokkos array in device to host memory
     @details
@@ -242,17 +249,17 @@ namespace mpart{
     }
 
     template<typename DeviceMemoryType, typename ScalarType, class... OtherTraits>
-    Kokkos::View<ScalarType**, Kokkos::LayoutLeft, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, Kokkos::LayoutLeft, OtherTraits...>const& inview){
+    Kokkos::View<typename std::remove_const<ScalarType>::type**, Kokkos::LayoutLeft, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, Kokkos::LayoutLeft, OtherTraits...>const& inview){
 
-        Kokkos::View<ScalarType**, Kokkos::LayoutLeft, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
+        Kokkos::View<typename std::remove_const<ScalarType>::type**, Kokkos::LayoutLeft, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
         Kokkos::deep_copy(outview, inview);
         return outview;
     }
 
     template<typename DeviceMemoryType, typename ScalarType, class... OtherTraits>
-    Kokkos::View<ScalarType**, Kokkos::LayoutRight, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, Kokkos::LayoutRight, OtherTraits...>const& inview){
+    Kokkos::View<typename std::remove_const<ScalarType>::type**, Kokkos::LayoutRight, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, Kokkos::LayoutRight, OtherTraits...>const& inview){
 
-        Kokkos::View<ScalarType**, Kokkos::LayoutRight, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
+        Kokkos::View<typename std::remove_const<ScalarType>::type**, Kokkos::LayoutRight, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
         Kokkos::deep_copy(outview, inview);
         return outview;
     }
@@ -483,8 +490,8 @@ namespace mpart{
        @return Eigen::Matrix<ScalarType,Eigen::Dynamic,1> An Eigen vector with a copy of the contents in the Kokkos view.
      */
     template<typename ScalarType, typename... OtherTraits>
-    inline Eigen::Matrix<ScalarType,Eigen::Dynamic,1> CopyKokkosToVec(Kokkos::View<ScalarType*, OtherTraits...> view){
-        return KokkosToVec(view);
+    inline Eigen::Matrix<typename std::remove_const<ScalarType>::type,Eigen::Dynamic,1> CopyKokkosToVec(Kokkos::View<ScalarType*, OtherTraits...> view){
+        return KokkosToVec<ScalarType>(view);
     }
 
 

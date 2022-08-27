@@ -13,14 +13,14 @@ template<typename MemorySpace>
 void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
 {
     std::string tName = "ConditionalMapBase";
-    if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName += "Device";
+    if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName = "d" + tName;
 
     // ConditionalMapBase
     py::class_<ConditionalMapBase<MemorySpace>, ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<ConditionalMapBase<MemorySpace>>>(m, tName.c_str())
 
-        .def("LogDeterminant", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<MemorySpace>::LogDeterminant))
-        .def("Inverse", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<MemorySpace>::Inverse))
-        .def("LogDeterminantCoeffGrad", py::overload_cast<Eigen::Ref<const Eigen::RowMatrixXd> const&>(&ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad))
+        .def("LogDeterminant", static_cast<Eigen::VectorXd (ConditionalMapBase<MemorySpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ConditionalMapBase<MemorySpace>::LogDeterminant))
+        .def("Inverse", static_cast<Eigen::RowMatrixXd (ConditionalMapBase<MemorySpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ConditionalMapBase<MemorySpace>::Inverse))
+        .def("LogDeterminantCoeffGrad", static_cast<Eigen::RowMatrixXd (ConditionalMapBase<MemorySpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad))
         .def("GetBaseFunction", &ConditionalMapBase<MemorySpace>::GetBaseFunction)
         ;
 

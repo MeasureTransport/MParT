@@ -14,12 +14,11 @@ template<typename MemorySpace>
 void mpart::binding::TriangularMapWrapper(py::module &m)
 {
     std::string tName = "TriangularMap";
-    if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName += "Device";
+    if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName = "d" + tName;
 
     // TriangularMap
     py::class_<TriangularMap<MemorySpace>, ConditionalMapBase<MemorySpace>, std::shared_ptr<TriangularMap<MemorySpace>>>(m, tName.c_str())
         .def(py::init<std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>>())
-        .def("InverseInplace", &TriangularMap<MemorySpace>::InverseInplace)
         .def("GetComponent", &TriangularMap<MemorySpace>::GetComponent)
         ;
 

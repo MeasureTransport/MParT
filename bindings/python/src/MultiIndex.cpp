@@ -172,9 +172,9 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
             return maxDegreesEigen;
         })
 #if defined(MPART_ENABLE_GPU)
-        .def("ToDevice", &FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice)
+        .def("ToDevice", &FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<mpart::DeviceSpace>)
     ;
-    py::class_<FixedMultiIndexSet<mpart::DeviceSpace>, std::shared_ptr<FixedMultiIndexSet<mpart::DeviceSpace>>>(m, "FixedMultiIndexSetDevice")
+    py::class_<FixedMultiIndexSet<mpart::DeviceSpace>, std::shared_ptr<FixedMultiIndexSet<mpart::DeviceSpace>>>(m, "dFixedMultiIndexSet")
 #endif // defined(MPART_ENABLE_GPU)
     ;
 }

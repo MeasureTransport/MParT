@@ -53,9 +53,20 @@ namespace mpart {
         \f]
         @param pts The points where we want to evaluate the log determinant.
         */
-        virtual Kokkos::View<double*, MemorySpace> LogDeterminant(StridedMatrix<const double, MemorySpace> const& pts);
+        template<typename AnyMemorySpace>
+        Kokkos::View<double*, AnyMemorySpace> LogDeterminant(StridedMatrix<const double, AnyMemorySpace> const& pts);
 
-        virtual Eigen::VectorXd LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
+        /** LogDeterminant function with conversion between default view layout and const strided matrix. */
+        template<typename... AllTraits>
+        Kokkos::View<double*, typename Kokkos::View<double**, AllTraits...>::memory_space> LogDeterminant(Kokkos::View<double**, AllTraits...> pts){StridedMatrix<const double, typename Kokkos::View<double**,AllTraits...>::memory_space> newpts(pts); return this->LogDeterminant(newpts);}
+
+        /** LogDeterminant function with conversion from regular strided matrix to const strided matrix. */
+        template<typename AnyMemorySpace>
+        Kokkos::View<double*, AnyMemorySpace> LogDeterminant(StridedMatrix<double, AnyMemorySpace> const& pts){StridedMatrix<const double, AnyMemorySpace> newpts(pts); return this->LogDeterminant(newpts);}
+
+
+        /** LogDeterminant function with conversion from Eigen to Kokkos (and possibly copy to/from device.) */
+        Eigen::VectorXd LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
         virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                         StridedVector<double, MemorySpace>              output) = 0;
@@ -64,11 +75,21 @@ namespace mpart {
         /** Returns the value of \f$x_2\f$ given \f$x_1\f$ and \f$r\f$.   Note that the \f$x1\f$ view may contain more
             than \f$N\f$ rows, but only the first \f$N\f$ will be used in this function.
         */
-        virtual StridedMatrix<double, MemorySpace> Inverse(StridedMatrix<const double, MemorySpace> const& x1,
-                                                           StridedMatrix<const double, MemorySpace> const& r);
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> Inverse(StridedMatrix<const double, AnyMemorySpace> const& x1,
+                                                      StridedMatrix<const double, AnyMemorySpace> const& r);
 
-        virtual Eigen::RowMatrixXd Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1, 
-                                           Eigen::Ref<const Eigen::RowMatrixXd> const& r);
+        /** Inverse function with conversion between general view type and const strided matrix. */
+        template<typename ViewType1, typename ViewType2>
+        StridedMatrix<double, typename ViewType1::memory_space> Inverse(ViewType1 x,  ViewType2 r){
+            StridedMatrix<const double, typename ViewType1::memory_space> newx(x); 
+            StridedMatrix<const double, typename ViewType2::memory_space> newr(r); 
+            return this->Inverse(newx,newr);
+        }
+
+        /** Inverse function with conversion between eigen matrix and Kokkos view. */
+        Eigen::RowMatrixXd Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1, 
+                                   Eigen::Ref<const Eigen::RowMatrixXd> const& r);
 
         virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
                                  StridedMatrix<const double, MemorySpace> const& r,
@@ -83,10 +104,19 @@ namespace mpart {
            at multiple points \f$x_i\f$.
            @param pts A collection of points where we want to evaluate the gradient.  Each column corresponds to a point.
            @return A matrix containing the coefficient gradient at each input point.  The \f$i^{th}\f$ column  contains \f$\nabla_w \det{\nabla_x T(x_i; w)}\f$.
-         */
-        virtual StridedMatrix<double, MemorySpace> LogDeterminantCoeffGrad(StridedMatrix<const double, MemorySpace> const& pts);
+        */
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> LogDeterminantCoeffGrad(StridedMatrix<const double, AnyMemorySpace> const& pts);
 
-        virtual Eigen::RowMatrixXd LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
+        /** Include conversion between general view type and Strided matrix. */
+        template<typename ViewType>
+        StridedMatrix<double, typename ViewType::memory_space> LogDeterminantCoeffGrad(ViewType pts){
+            StridedMatrix<const double, typename ViewType::memory_space> newpts(pts); 
+            return  this->LogDeterminantCoeffGrad(newpts);
+        }
+
+        /** Evaluation with additional conversion of Eigen matrix to Kokkos unmanaged view. */
+        Eigen::RowMatrixXd LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
         virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                                  StridedMatrix<double, MemorySpace>              output) = 0;
