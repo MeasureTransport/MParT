@@ -5,7 +5,7 @@
 
 .. module:: mpart
 
-MParT: Monotone Parameterization Toolbox
+MParT: Monotone Parameterization Toolkit
 ========================================
 :mod:`mpart` is a toolbox for constructing and using monotone functions for measure transport and regression.
 
@@ -65,7 +65,7 @@ reference is
 
 .. epigraph::
 
-   MParT Development Team. <YEAR>. MParT: A Monotone Parameterization Toolbox, <VERSION>. https://measuretransport.github.io/MParT/
+   MParT Development Team. <YEAR>. MParT: A Monotone Parameterization Toolkit, <VERSION>. https://measuretransport.github.io/MParT/
 
 In bibtex, this is::
 
