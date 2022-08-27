@@ -136,7 +136,7 @@ TEST_CASE( "Testing evaluation of an identity conditional map", "[ConditionalMap
             }
         }
 
-        Kokkos::View<const double**, Kokkos::HostSpace> ptsConst = pts;
+        StridedMatrix<const double, Kokkos::HostSpace> ptsConst = pts;
 
         Kokkos::View<double**, Kokkos::HostSpace> output = map.Evaluate(ptsConst);
 

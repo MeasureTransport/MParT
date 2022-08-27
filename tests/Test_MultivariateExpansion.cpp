@@ -30,7 +30,7 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     func.SetCoeffs(coeffs);
 
     
-    Kokkos::View<double**,Kokkos::HostSpace> pts("Points",inDim,numPts);
+    StridedMatrix<double, Kokkos::HostSpace> pts = Kokkos::View<double**,Kokkos::HostSpace>("Points",inDim,numPts);
     for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
         for(unsigned int d=0; d<inDim; ++d){
             pts(d,ptInd) = d+1 + double(ptInd+1)/numPts;
@@ -38,7 +38,7 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     }
 
     SECTION("Evaluate"){
-        Kokkos::View<double**,Kokkos::HostSpace> evals = func.Evaluate(pts);
+        StridedMatrix<double,Kokkos::HostSpace> evals = func.Evaluate(pts);
         
         for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
             for(unsigned int d=0; d<outDim; ++d){

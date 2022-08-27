@@ -390,7 +390,7 @@ FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<Kokkos::HostSpace>::ToD
 
 
 // Explicit template instantiation
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
     template class mpart::FixedMultiIndexSet<Kokkos::HostSpace>;
     template class mpart::FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>;
 #else

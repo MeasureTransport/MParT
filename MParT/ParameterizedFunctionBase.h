@@ -4,6 +4,8 @@
 #include "MParT/Utilities/EigenTypes.h"
 #include "MParT/Utilities/ArrayConversions.h"
 
+#include "MParT/Utilities/GPUtils.h"
+
 #include <Eigen/Core>
 
 namespace mpart {
@@ -38,7 +40,12 @@ namespace mpart {
             internally stored view.
             @param[in] coeffs A view to save internally.
         */
-        virtual void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs);
+        virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs);
+
+        #if defined(MPART_ENABLE_GPU)
+        virtual void SetCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs);
+        #endif 
+
         virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs);
 
         /** Returns an eigen map wrapping around the coefficient vector, which is stored in a Kokkos::View.  Updating the
@@ -49,11 +56,16 @@ namespace mpart {
         /** Const version of the Coeffs() function. */
         virtual Kokkos::View<const double*, MemorySpace> Coeffs() const{return this->savedCoeffs;};
 
-        
+        /** Evaluate function with conversion between default view layout and const strided matrix. */
+        template<typename ViewType>
+        StridedMatrix<double, typename ViewType::memory_space> Evaluate(ViewType pts){StridedMatrix<const double, typename ViewType::memory_space> newpts(pts); return this->Evaluate(newpts);}
 
-        virtual StridedMatrix<double, MemorySpace> Evaluate(StridedMatrix<const double, MemorySpace> const& pts);
+        /** Evaluate function with conversion from Eigen to Kokkos (and possibly copy to/from device.) */
+        Eigen::RowMatrixXd Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual Eigen::RowMatrixXd Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
+        /** Main Evaluate function. */
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> Evaluate(StridedMatrix<const double, AnyMemorySpace> const& pts);
 
         virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                   StridedMatrix<double, MemorySpace>              output) = 0;
@@ -76,11 +88,21 @@ namespace mpart {
                     this view should therefore have the same number of columns as `pts`.  It should also have \f$M\f$ rows.   
         @return A collection of vectors \f$g_i\f$.  Will have the same number of columns as pts with \f$K\f$ rows.
         */
-        virtual StridedMatrix<double, MemorySpace> CoeffGrad(StridedMatrix<const double, MemorySpace> const& pts, 
-                                                             StridedMatrix<const double, MemorySpace> const& sens);
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> CoeffGrad(StridedMatrix<const double, AnyMemorySpace> const& pts, 
+                                                        StridedMatrix<const double, AnyMemorySpace> const& sens);
 
-        virtual Eigen::RowMatrixXd CoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts,
-                                             Eigen::Ref<const Eigen::RowMatrixXd> const& sens);
+        /** CoeffGrad function with conversion between general view type and const strided matrix. */
+        template<typename PtsViewType, typename SensViewType>
+        StridedMatrix<double, typename PtsViewType::memory_space> CoeffGrad(PtsViewType pts,  SensViewType sens){
+            StridedMatrix<const double, typename PtsViewType::memory_space> newpts(pts); 
+            StridedMatrix<const double, typename SensViewType::memory_space> newsens(sens); 
+            return this->CoeffGrad(newpts,newsens);
+        }
+
+
+        Eigen::RowMatrixXd CoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts,
+                                     Eigen::Ref<const Eigen::RowMatrixXd> const& sens);
 
         virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                                    StridedMatrix<const double, MemorySpace> const& sens,
