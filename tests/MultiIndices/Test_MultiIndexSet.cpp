@@ -421,6 +421,38 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
     }
 }
 
+TEST_CASE("MultiIndexSet Operator Tests", "[MultiIndexSet_Operators]")
+{   
+    Eigen::MatrixXi multis1(2,2);
+    multis1 << 0,0,
+               1,0;
+    MultiIndexSet mset1(multis1); 
+
+    Eigen::MatrixXi multis2(2,2);
+    multis2 << 0,0,
+               0,1;
+    MultiIndexSet mset2(multis2); 
+
+    MultiIndexSet mset3(multis1);
+    mset3 += mset2;
+    REQUIRE(mset3.Size() == 3);
+    REQUIRE(mset3.at(0) == MultiIndex{0,0});
+    REQUIRE(mset3.at(1) == MultiIndex{1,0});
+    REQUIRE(mset3.at(2) == MultiIndex{0,1});
+
+    mset3 = mset1 + mset2;
+    REQUIRE(mset3.Size() == 3);
+    REQUIRE(mset3.at(0) == MultiIndex{0,0});
+    REQUIRE(mset3.at(1) == MultiIndex{1,0});
+    REQUIRE(mset3.at(2) == MultiIndex{0,1});
+
+    MultiIndexSet mset4(mset1 + mset2);
+    REQUIRE(mset4.Size() == 3);
+    REQUIRE(mset4.at(0) == MultiIndex{0,0});
+    REQUIRE(mset4.at(1) == MultiIndex{1,0});
+    REQUIRE(mset4.at(2) == MultiIndex{0,1});
+
+}
 
 TEST_CASE("MultiIndexSet Visualization Test", "[MultiIndexSet_Viz]")
 {

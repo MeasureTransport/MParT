@@ -126,7 +126,7 @@ namespace mpart {
 
         Kokkos::View<double*, MemorySpace> savedCoeffs;
 
-    }; // class ConditionalMapBase<MemorySpace>
+    }; // class ParameterizedFunctionBase
 }
 
 #endif
