@@ -1,0 +1,1286 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Characterization of Bayesian posterior density &#8212; MParT  documentation</title>
+  <script>
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+
+  
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'source/tutorials/BayesianInference_BOD.nbconvert';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fas fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">MParT  documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="../installation.html">
+                        Installation
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../getting_started.html">
+                        Using MParT
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">
+                        Tutorials
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../mathematics.html">
+                        Mathematical Background
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../api/index.html">
+                        API Reference
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                <li class="nav-item">
+                    <a class="nav-link" href="../development/index.html">
+                        Community
+                    </a>
+                </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      <div class="navbar-end-item navbar-end__search-button-container">
+        
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MeasureTransport/MParT" title="GitHub" class="nav-link" rel="noopener" target="_blank"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  <div class="search-button-container--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+  </div>
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fas fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="../installation.html">
+                        Installation
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../getting_started.html">
+                        Using MParT
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">
+                        Tutorials
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../mathematics.html">
+                        Mathematical Background
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../api/index.html">
+                        API Reference
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                <li class="nav-item">
+                    <a class="nav-link" href="../development/index.html">
+                        Community
+                    </a>
+                </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MeasureTransport/MParT" title="GitHub" class="nav-link" rel="noopener" target="_blank"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+  <div class="sidebar-start-items sidebar-primary__section">
+    <div class="sidebar-start-items__item">
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+      </div>
+      <main class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Characterization-of-Bayesian-posterior-density">
+<h1>Characterization of Bayesian posterior density<a class="headerlink" href="#Characterization-of-Bayesian-posterior-density" title="Permalink to this heading">#</a></h1>
+<p>The objective of this example is to demonstrate how transport maps can be used to represent posterior distribution of Bayesian inference problems.</p>
+<section id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this heading">#</a></h2>
+<p>First, import MParT and other packages used in this notebook. Note that it is possible to specify the number of threads used by MParT by setting the <code class="docutils literal notranslate"><span class="pre">KOKKOS_NUM_THREADS</span></code> environment variable <strong>before</strong> importing MParT.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_normal</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;KOKKOS_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;8&#39;</span>
+
+<span class="kn">import</span> <span class="nn">mpart</span> <span class="k">as</span> <span class="nn">mt</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Kokkos is using&#39;</span><span class="p">,</span> <span class="n">mt</span><span class="o">.</span><span class="n">Concurrency</span><span class="p">(),</span> <span class="s1">&#39;threads&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">110</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Kokkos is using 8 threads
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+  process threads available :   2,  requested thread :   8
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 2 cores per node.
+                                    Detected: 1 MPI_ranks per node.
+                                    Requested: 8 threads per process.
+</pre></div></div>
+</div>
+</section>
+<section id="Problem-formulation">
+<h2>Problem formulation<a class="headerlink" href="#Problem-formulation" title="Permalink to this heading">#</a></h2>
+<section id="Bayesian-inference">
+<h3>Bayesian inference<a class="headerlink" href="#Bayesian-inference" title="Permalink to this heading">#</a></h3>
+<p>A way construct a transport map is from an unnormalized density. One situation where we know the probality density function up to a normalization constant is when modeling inverse problems with Bayesian inference.</p>
+<p>For an inverse problem, the objective is to characterize the value of some parameters <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> of a given system, knowing some the value of some noisy observations <span class="math notranslate nohighlight">\(\mathbf{y}\)</span>.</p>
+<p>With Bayesian inference, the characterization of parameters <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> is done via a <em>posterior</em> density <span class="math notranslate nohighlight">\(\pi(\boldsymbol{\theta}|\mathbf{y})\)</span>. This density characterizes the distribution of the parameters knowing the value of the observations.</p>
+<p>Using Bayes’ rule, the posterior can decomposed into the product of two probability densities:</p>
+<ol class="arabic simple">
+<li><p>The prior density <span class="math notranslate nohighlight">\(\pi(\boldsymbol{\theta})\)</span> which is used to enforce any <em>a priori</em> knowledge about the parameters.</p></li>
+<li><p>The likelihood function <span class="math notranslate nohighlight">\(\pi(\mathbf{y}|\boldsymbol{\theta})\)</span>. This quantity can be seen as a function of <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span> and gives the likelihood that the considered system produced the observation <span class="math notranslate nohighlight">\(\mathbf{y}\)</span> for a fixed value of <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span>. When the model that describes the system is known in closed form, the likelihood function is also knwon in closed form.</p></li>
+</ol>
+<p>Hence, the posterior density reads:</p>
+<div class="math notranslate nohighlight">
+\[\pi(\boldsymbol{\theta}|\mathbf{y}) = \frac{1}{c} \pi(\mathbf{y}|\boldsymbol{\theta}) \pi(\boldsymbol{\theta})\]</div>
+<p>where <span class="math notranslate nohighlight">\(c = \int \pi(\mathbf{y}|\boldsymbol{\theta}) \pi(\boldsymbol{\theta}) d\theta\)</span> is an normalizing constant that ensures that the product of the two quantities is a proper density. Typically, the integral in this definition cannot be evaluated and <span class="math notranslate nohighlight">\(c\)</span> is assumed to be unknown.</p>
+<p>The objective of this examples is, from the knowledge of <span class="math notranslate nohighlight">\(\pi(\mathbf{y}|\boldsymbol{\theta})\pi(\boldsymbol{\theta})\)</span> build a transport map that transports samples from the reference <span class="math notranslate nohighlight">\(\eta\)</span> to samples from posterior <span class="math notranslate nohighlight">\(\pi(\boldsymbol{\theta}|\mathbf{y})\)</span>.</p>
+</section>
+<section id="Application-with-the-Biochemical-Oxygen-Demand-(BOD)-model-from-[Sullivan-et-al.,-2010]">
+<h3>Application with the Biochemical Oxygen Demand (BOD) model from <a class="reference external" href="https://or.water.usgs.gov/proj/keno_reach/download/chemgeo_bod_final.pdf">[Sullivan et al., 2010]</a><a class="headerlink" href="#Application-with-the-Biochemical-Oxygen-Demand-(BOD)-model-from-[Sullivan-et-al.,-2010]" title="Permalink to this heading">#</a></h3>
+<section id="Definition">
+<h4>Definition<a class="headerlink" href="#Definition" title="Permalink to this heading">#</a></h4>
+<p>To illustrate the process describe above, we consider the BOD inverse problem described in <a class="reference external" href="https://arxiv.org/pdf/1602.05023.pdf">[Marzouk et al., 2016]</a>. The goal is to estimate <span class="math notranslate nohighlight">\(2\)</span> coefficients in a time-dependent model of oxygen demand, which is used as an indication of biological activity in a water sample.</p>
+<p>The time dependent forward model is defined as</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{B}(t) = A(1-\exp(-Bt))+\mathcal{E},\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+\mathcal{E} &amp; \sim \mathcal{N}(0,1e-3)\\
+A &amp; = \left[0.4 + 0.4\left(1 + \text{erf}\left(\frac{\theta_1}{\sqrt{2}} \right)\right) \right]\\
+B &amp; = \left[0.01 + 0.15\left(1 + \text{erf}\left(\frac{\theta_2}{\sqrt{2}} \right)\right) \right]
+\end{aligned}\end{split}\]</div>
+<p>The objective is to characterize the posterior density of parameters <span class="math notranslate nohighlight">\(\boldsymbol{\theta}=(\theta_1,\theta_2)\)</span> knowing observation of the system at time <span class="math notranslate nohighlight">\(t=\left\{1,2,3,4,5 \right\}\)</span> i.e. <span class="math notranslate nohighlight">\(\mathbf{y} = (y_1,y_2,y_3,y_4,y_5) = (\mathcal{B}(1),\mathcal{B}(2),\mathcal{B}(3),\mathcal{B}(4),\mathcal{B}(5))\)</span>.</p>
+<p>Definition of the forward model and gradient with respect to <span class="math notranslate nohighlight">\(\mathbf{\theta}\)</span>:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">forward_model</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+  <span class="n">A</span> <span class="o">=</span> <span class="mf">0.4</span><span class="o">+</span><span class="mf">0.4</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">p1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+  <span class="n">B</span> <span class="o">=</span> <span class="mf">0.01</span><span class="o">+</span><span class="mf">0.15</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">p2</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+  <span class="n">out</span> <span class="o">=</span> <span class="n">A</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">B</span><span class="o">*</span><span class="n">t</span><span class="p">))</span>
+  <span class="k">return</span> <span class="n">out</span>
+
+<span class="k">def</span> <span class="nf">grad_x_forward_model</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">t</span><span class="p">):</span>
+  <span class="n">A</span> <span class="o">=</span> <span class="mf">0.4</span><span class="o">+</span><span class="mf">0.4</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">p1</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+  <span class="n">B</span> <span class="o">=</span> <span class="mf">0.01</span><span class="o">+</span><span class="mf">0.15</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">scipy</span><span class="o">.</span><span class="n">special</span><span class="o">.</span><span class="n">erf</span><span class="p">(</span><span class="n">p2</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)))</span>
+  <span class="n">dAdx1</span> <span class="o">=</span> <span class="mf">0.31954</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">p1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+  <span class="n">dBdx2</span> <span class="o">=</span> <span class="mf">0.119683</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="n">p2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+  <span class="n">dOutdx1</span> <span class="o">=</span> <span class="n">dAdx1</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">B</span><span class="o">*</span><span class="n">t</span><span class="p">))</span>
+  <span class="n">dOutdx2</span> <span class="o">=</span> <span class="n">t</span><span class="o">*</span><span class="n">A</span><span class="o">*</span><span class="n">dBdx2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">t</span><span class="o">*</span><span class="n">B</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">dOutdx1</span><span class="p">,</span><span class="n">dOutdx2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>One simulation of the forward model:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">forward_model</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">t</span><span class="p">));</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;t&quot;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;BOD&quot;</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_BayesianInference_BOD.nbconvert_12_0.png" src="../../_images/source_tutorials_BayesianInference_BOD.nbconvert_12_0.png" />
+</div>
+</div>
+<p>For this problem, as noise <span class="math notranslate nohighlight">\(\mathcal{E}\)</span> is Gaussian and additive, the likelihood function <span class="math notranslate nohighlight">\(\pi(\mathbf{y}|\boldsymbol{\theta})\)</span>, can be decomposed for each time step as:</p>
+<div class="math notranslate nohighlight">
+\[\pi(\mathbf{y}|\boldsymbol{\theta}) = \prod_{t=1}^{5} \pi(y_t|\boldsymbol{\theta}),\]</div>
+<p>where</p>
+<div class="math notranslate nohighlight">
+\[\pi(\mathbf{y}_t|\boldsymbol{\theta})=\frac{1}{\sqrt{0.002.\pi}}\exp \left(-\frac{1}{0.002} \left(y_t - \mathcal{B}(t)\right)^2 \right), t \in \{1,...,5\}.\]</div>
+<p>Likelihood function and its gradient with respect to parameters:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">log_likelihood</span><span class="p">(</span><span class="n">std_noise</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">yobs</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="n">forward_model</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
+  <span class="n">log_lkl</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">std_noise</span><span class="p">)</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="p">((</span><span class="n">y</span><span class="o">-</span><span class="n">yobs</span><span class="p">)</span><span class="o">/</span><span class="n">std_noise</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+  <span class="k">return</span> <span class="n">log_lkl</span>
+
+<span class="k">def</span> <span class="nf">grad_x_log_likelihood</span><span class="p">(</span><span class="n">std_noise</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">yobs</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="n">forward_model</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
+  <span class="n">dydx</span> <span class="o">=</span> <span class="n">grad_x_forward_model</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">,</span><span class="n">t</span><span class="p">)</span>
+  <span class="n">grad_x_lkl</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">std_noise</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">yobs</span><span class="p">)</span><span class="o">*</span><span class="n">dydx</span>
+  <span class="k">return</span> <span class="n">grad_x_lkl</span>
+</pre></div>
+</div>
+</div>
+<p>We can then define the unnormalized posterior and its gradient with respect to parameters:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">log_posterior</span><span class="p">(</span><span class="n">std_noise</span><span class="p">,</span><span class="n">std_prior1</span><span class="p">,</span><span class="n">std_prior2</span><span class="p">,</span><span class="n">list_t</span><span class="p">,</span><span class="n">list_yobs</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span>
+  <span class="n">log_prior1</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">std_prior1</span><span class="p">)</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">p1</span><span class="o">/</span><span class="n">std_prior1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">log_prior2</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">*</span><span class="n">std_prior2</span><span class="p">)</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">p2</span><span class="o">/</span><span class="n">std_prior2</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+  <span class="n">log_posterior</span> <span class="o">=</span> <span class="n">log_prior1</span><span class="o">+</span><span class="n">log_prior2</span>
+  <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">list_t</span><span class="p">):</span>
+    <span class="n">log_posterior</span> <span class="o">+=</span> <span class="n">log_likelihood</span><span class="p">(</span><span class="n">std_noise</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">list_yobs</span><span class="p">[</span><span class="n">k</span><span class="p">],</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">log_posterior</span>
+
+<span class="k">def</span> <span class="nf">grad_x_log_posterior</span><span class="p">(</span><span class="n">std_noise</span><span class="p">,</span><span class="n">std_prior1</span><span class="p">,</span><span class="n">std_prior2</span><span class="p">,</span><span class="n">list_t</span><span class="p">,</span><span class="n">list_yobs</span><span class="p">,</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">):</span>
+  <span class="n">grad_x1_prior</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">std_prior1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+  <span class="n">grad_x2_prior</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">std_prior2</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">p2</span><span class="p">)</span>
+  <span class="n">grad_x_prior</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">grad_x1_prior</span><span class="p">,</span><span class="n">grad_x2_prior</span><span class="p">))</span>
+  <span class="n">grad_x_log_posterior</span> <span class="o">=</span> <span class="n">grad_x_prior</span>
+  <span class="k">for</span> <span class="n">k</span><span class="p">,</span><span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">list_t</span><span class="p">):</span>
+    <span class="n">grad_x_log_posterior</span> <span class="o">+=</span> <span class="n">grad_x_log_likelihood</span><span class="p">(</span><span class="n">std_noise</span><span class="p">,</span><span class="n">t</span><span class="p">,</span><span class="n">list_yobs</span><span class="p">[</span><span class="n">k</span><span class="p">],</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">grad_x_log_posterior</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Observations">
+<h4>Observations<a class="headerlink" href="#Observations" title="Permalink to this heading">#</a></h4>
+<p>We consider the following realization of observation <span class="math notranslate nohighlight">\(\mathbf{y}\)</span>:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">list_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">])</span>
+<span class="n">list_yobs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.18</span><span class="p">,</span><span class="mf">0.32</span><span class="p">,</span><span class="mf">0.42</span><span class="p">,</span><span class="mf">0.49</span><span class="p">,</span><span class="mf">0.54</span><span class="p">])</span>
+
+<span class="n">std_noise</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1e-3</span><span class="p">)</span>
+<span class="n">std_prior1</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">std_prior2</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Visualization-of-the-unnormalized-posterior-density">
+<h4>Visualization of the <strong>unnormalized</strong> posterior density<a class="headerlink" href="#Visualization-of-the-unnormalized-posterior-density" title="Permalink to this heading">#</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Ngrid</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">,</span> <span class="n">Ngrid</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="n">Ngrid</span><span class="p">)</span>
+<span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="n">Z</span> <span class="o">=</span> <span class="n">log_posterior</span><span class="p">(</span><span class="n">std_noise</span><span class="p">,</span><span class="n">std_prior1</span><span class="p">,</span><span class="n">std_prior2</span><span class="p">,</span><span class="n">list_t</span><span class="p">,</span><span class="n">list_yobs</span><span class="p">,</span><span class="n">X</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">Y</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span>
+<span class="n">Z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">Z</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Ngrid</span><span class="p">,</span><span class="n">Ngrid</span><span class="p">))</span>
+
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">CS</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\theta_1$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\theta_2$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_BayesianInference_BOD.nbconvert_21_0.png" src="../../_images/source_tutorials_BayesianInference_BOD.nbconvert_21_0.png" />
+</div>
+</div>
+<p>Target density for the map from density is non-Gaussian which mean that a non linear map will be required to achieve good approximation.</p>
+</section>
+</section>
+</section>
+<section id="Map-computation">
+<h2>Map computation<a class="headerlink" href="#Map-computation" title="Permalink to this heading">#</a></h2>
+<p>After the definition of the log-posterior and gradient, the construction of the desired map <span class="math notranslate nohighlight">\(T\)</span> to characterize the posterior density result in a “classic” map from unnomarlized computation.</p>
+<section id="Definition-of-the-objective-function:">
+<h3>Definition of the objective function:<a class="headerlink" href="#Definition-of-the-objective-function:" title="Permalink to this heading">#</a></h3>
+<p>Knowing the closed form of unnormalized posterior <span class="math notranslate nohighlight">\(\bar{\pi}(\boldsymbol{\theta} |\mathbf{y})= \pi(\mathbf{y}|\boldsymbol{\theta})\pi(\boldsymbol{\theta})\)</span>, the objective is to find a map-induced density <span class="math notranslate nohighlight">\(\tilde{\pi}_{\mathbf{w}}(\mathbf{x})\)</span> that is a good approximation to the posterior <span class="math notranslate nohighlight">\(\pi(\boldsymbol{\theta} |\mathbf{y})\)</span>.</p>
+<p>In order to characterize this posterior density, one method is to build a transport map.</p>
+<p>For the map from unnormalized density estimation, the objective function on parameter <span class="math notranslate nohighlight">\(\mathbf{w}\)</span> reads:</p>
+<div class="math notranslate nohighlight">
+\[J(\mathbf{w}) = - \frac{1}{N}\sum_{i=1}^N \left( \log\pi\left(T(\mathbf{z}^i;\mathbf{w})\right) + \log  \text{det }\nabla_\mathbf{z} T(\mathbf{z}^i;\mathbf{w})\right), \,\,\, \mathbf{z}^i \sim \mathcal{N}(\mathbf{0},\mathbf{I}_d),\]</div>
+<p>where <span class="math notranslate nohighlight">\(T\)</span> is the transport map pushing forward the standard normal <span class="math notranslate nohighlight">\(\mathcal{N}(\mathbf{0},\mathbf{I}_d)\)</span> to the target density <span class="math notranslate nohighlight">\(\pi(\mathbf{x})\)</span>, which will be the the posterior density. The gradient of this objective function reads:</p>
+<div class="math notranslate nohighlight">
+\[\nabla_\mathbf{w} J(\mathbf{w}) = - \frac{1}{N}\sum_{i=1}^N \left( \nabla_\mathbf{w} T(\mathbf{z}^i;\mathbf{w}).\nabla_\mathbf{x}\log\pi\left(T(\mathbf{z}^i;\mathbf{w})\right) + \nabla_{\mathbf{w}}\log  \text{det }\nabla_\mathbf{z} T(\mathbf{z}^i;\mathbf{w})\right), \,\,\, \mathbf{z}^i \sim \mathcal{N}(\mathbf{0},\mathbf{I}_d).\]</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">grad_x_log_target</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+  <span class="n">out</span> <span class="o">=</span> <span class="n">grad_x_log_posterior</span><span class="p">(</span><span class="n">std_noise</span><span class="p">,</span><span class="n">std_prior1</span><span class="p">,</span><span class="n">std_prior2</span><span class="p">,</span><span class="n">list_t</span><span class="p">,</span><span class="n">list_yobs</span><span class="p">,</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,:])</span>
+  <span class="k">return</span> <span class="n">out</span>
+
+<span class="k">def</span> <span class="nf">log_target</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+  <span class="n">out</span> <span class="o">=</span> <span class="n">log_posterior</span><span class="p">(</span><span class="n">std_noise</span><span class="p">,</span><span class="n">std_prior1</span><span class="p">,</span><span class="n">std_prior2</span><span class="p">,</span><span class="n">list_t</span><span class="p">,</span><span class="n">list_yobs</span><span class="p">,</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,:])</span>
+  <span class="k">return</span> <span class="n">out</span>
+
+<span class="k">def</span> <span class="nf">obj</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">tri_map</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">num_points</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">tri_map</span><span class="o">.</span><span class="n">SetCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+    <span class="n">map_of_x</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">rho_of_map_of_x</span> <span class="o">=</span> <span class="n">log_target</span><span class="p">(</span><span class="n">map_of_x</span><span class="p">)</span>
+    <span class="n">log_det</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">LogDeterminant</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rho_of_map_of_x</span> <span class="o">+</span> <span class="n">log_det</span><span class="p">)</span><span class="o">/</span><span class="n">num_points</span>
+
+<span class="k">def</span> <span class="nf">grad_obj</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">tri_map</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">num_points</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">tri_map</span><span class="o">.</span><span class="n">SetCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+    <span class="n">map_of_x</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">sensi</span> <span class="o">=</span> <span class="n">grad_x_log_target</span><span class="p">(</span><span class="n">map_of_x</span><span class="p">)</span>
+    <span class="n">grad_rho_of_map_of_x</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">CoeffGrad</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sensi</span><span class="p">)</span>
+    <span class="n">grad_log_det</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">LogDeterminantCoeffGrad</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad_rho_of_map_of_x</span> <span class="o">+</span> <span class="n">grad_log_det</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">num_points</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1">#Draw reference samples to define objective</span>
+<span class="n">N</span><span class="o">=</span><span class="mi">10000</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">N</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="Map-parametrization">
+<h4>Map parametrization<a class="headerlink" href="#Map-parametrization" title="Permalink to this heading">#</a></h4>
+<p>We use the MParT function <code class="docutils literal notranslate"><span class="pre">CreateTriangular</span></code> to directly create a transport map object of dimension with given total order parameterization.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create transport map</span>
+<span class="n">opts</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">MapOptions</span><span class="p">()</span>
+<span class="n">total_order</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">tri_map</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">CreateTriangular</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">total_order</span><span class="p">,</span><span class="n">opts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Optimization">
+<h4>Optimization<a class="headerlink" href="#Optimization" title="Permalink to this heading">#</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gtol&#39;</span><span class="p">:</span> <span class="mf">1e-2</span><span class="p">,</span> <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">CoeffMap</span><span class="p">(),</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">tri_map</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">jac</span><span class="o">=</span><span class="n">grad_obj</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BFGS&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Optimization terminated successfully.
+         Current function value: -6.240009
+         Iterations: 30
+         Function evaluations: 33
+         Gradient evaluations: 33
+</pre></div></div>
+</div>
+</section>
+</section>
+</section>
+<section id="Accuracy-checks">
+<h2>Accuracy checks<a class="headerlink" href="#Accuracy-checks" title="Permalink to this heading">#</a></h2>
+<section id="Comparing-density-contours">
+<h3>Comparing density contours<a class="headerlink" href="#Comparing-density-contours" title="Permalink to this heading">#</a></h3>
+<p>Comparison between contours of the posterior <span class="math notranslate nohighlight">\(\pi(\boldsymbol{\theta}|\mathbf{y})\)</span> and conoturs of pushforward density <span class="math notranslate nohighlight">\(T_\sharp \eta\)</span>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pushforward distribution</span>
+<span class="k">def</span> <span class="nf">push_forward_pdf</span><span class="p">(</span><span class="n">tri_map</span><span class="p">,</span><span class="n">ref</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+  <span class="n">xinv</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">Inverse</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+  <span class="n">log_det_grad_x_inverse</span> <span class="o">=</span> <span class="o">-</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">LogDeterminant</span><span class="p">(</span><span class="n">xinv</span><span class="p">)</span>
+  <span class="n">log_pdf</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">xinv</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">+</span><span class="n">log_det_grad_x_inverse</span>
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_pdf</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reference distribution</span>
+<span class="n">ref</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="n">xx_eval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span><span class="n">Y</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
+<span class="n">Z2</span> <span class="o">=</span> <span class="n">push_forward_pdf</span><span class="p">(</span><span class="n">tri_map</span><span class="p">,</span><span class="n">ref</span><span class="p">,</span><span class="n">xx_eval</span><span class="p">)</span>
+<span class="n">Z2</span> <span class="o">=</span> <span class="n">Z2</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">Ngrid</span><span class="p">,</span><span class="n">Ngrid</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">CS1</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span>
+<span class="n">CS2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z2</span><span class="p">,</span><span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\theta_1$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\theta_2$&#39;</span><span class="p">)</span>
+<span class="n">h1</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">CS1</span><span class="o">.</span><span class="n">legend_elements</span><span class="p">()</span>
+<span class="n">h2</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">CS2</span><span class="o">.</span><span class="n">legend_elements</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">h1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">h2</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="s1">&#39;Unnormilzed posterior&#39;</span><span class="p">,</span> <span class="s1">&#39;TM approximation&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_BayesianInference_BOD.nbconvert_37_0.png" src="../../_images/source_tutorials_BayesianInference_BOD.nbconvert_37_0.png" />
+</div>
+</div>
+</section>
+<section id="Variance-diagnostic">
+<h3>Variance diagnostic<a class="headerlink" href="#Variance-diagnostic" title="Permalink to this heading">#</a></h3>
+<p>A commonly used accuracy check when facing computation maps from density is the so-called variance diagnostic defined as:</p>
+<div class="math notranslate nohighlight">
+\[\epsilon_\sigma = \frac{1}{2} \mathbb{V}\text{ar}_\rho \left[ \log \frac{\rho}{T^\sharp \bar{\pi}} \right]\]</div>
+<p>This diagnostic is asymptotically equivalent to the minimized KL divergence <span class="math notranslate nohighlight">\(D_{KL}(\eta || T^\sharp \pi)\)</span> and should converge to zero when the computed map converge to the theoritical true map.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">variance_diagnostic</span><span class="p">(</span><span class="n">tri_map</span><span class="p">,</span><span class="n">ref</span><span class="p">,</span><span class="n">target_logpdf</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+  <span class="n">ref_logpdf</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="n">pullback_logpdf</span> <span class="o">=</span> <span class="n">target_logpdf</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">LogDeterminant</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="n">diff</span> <span class="o">=</span> <span class="n">ref_logpdf</span> <span class="o">-</span> <span class="n">pullback_logpdf</span>
+  <span class="n">expect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+  <span class="n">var</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">diff</span><span class="o">-</span><span class="n">expect</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">var</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reference distribution</span>
+<span class="n">ref_distribution</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+
+<span class="n">test_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10000</span><span class="p">)</span>
+<span class="c1"># Compute variance diagnostic</span>
+<span class="n">var_diag</span> <span class="o">=</span> <span class="n">variance_diagnostic</span><span class="p">(</span><span class="n">tri_map</span><span class="p">,</span><span class="n">ref</span><span class="p">,</span><span class="n">log_target</span><span class="p">,</span><span class="n">test_z</span><span class="p">)</span>
+
+<span class="c1"># Print final coeffs and objective</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==================&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Variance diagnostic: </span><span class="si">{:.2E}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_diag</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==================&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+==================
+Variance diagnostic: 2.31E-02
+==================
+</pre></div></div>
+</div>
+</section>
+<section id="Drawing-samples-from-approximate-posterior">
+<h3>Drawing samples from approximate posterior<a class="headerlink" href="#Drawing-samples-from-approximate-posterior" title="Permalink to this heading">#</a></h3>
+<p>Once the transport map from reference to unnormalized posterior is estimated it can be used to sample from the posterior to characterize the Bayesian inference solution.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Znew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">5000</span><span class="p">)</span>
+<span class="n">colors</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">Znew</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span><span class="n">Znew</span><span class="p">[</span><span class="mi">0</span><span class="p">,:])</span>
+
+<span class="n">Xpost</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">Znew</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span><span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">ncols</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Xpost</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span><span class="n">Xpost</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">,</span> <span class="s1">&#39;box&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\theta_1$&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\theta_2$&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Approximate Posterior Samples&#39;</span><span class="p">)</span>
+
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">Znew</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span><span class="n">Znew</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span> <span class="n">c</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">,</span> <span class="s1">&#39;box&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$z_1$&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$z_2$&#39;</span><span class="p">)</span>
+<span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Reference Samples&#39;</span><span class="p">)</span>
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_BayesianInference_BOD.nbconvert_42_0.png" src="../../_images/source_tutorials_BayesianInference_BOD.nbconvert_42_0.png" />
+</div>
+</div>
+<p>Samples can then be used to compute quantity of interest with respect to parameters <span class="math notranslate nohighlight">\(\boldsymbol{\theta}\)</span>. For example the sample mean:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">X_mean</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">Xpost</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Mean a posteriori: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">X_mean</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Mean a posteriori: [0.04329544 0.90898705]
+</pre></div></div>
+</div>
+<p>Samples can also be used to study parameters marginas. Here are the one-dimensional marginals histograms:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">Xpost</span><span class="p">[</span><span class="mi">0</span><span class="p">,:],</span> <span class="mi">50</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\theta_1$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\tilde{\pi}(\theta_1)$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">Xpost</span><span class="p">[</span><span class="mi">1</span><span class="p">,:],</span> <span class="mi">50</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">density</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\theta_2$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$\tilde{\pi}(\theta_2)$&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_BayesianInference_BOD.nbconvert_46_0.png" src="../../_images/source_tutorials_BayesianInference_BOD.nbconvert_46_0.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fas fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Problem-formulation">
+   Problem formulation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Bayesian-inference">
+     Bayesian inference
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Application-with-the-Biochemical-Oxygen-Demand-(BOD)-model-from-[Sullivan-et-al.,-2010]">
+     Application with the Biochemical Oxygen Demand (BOD) model from [Sullivan et al., 2010]
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Definition">
+       Definition
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Observations">
+       Observations
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Visualization-of-the-unnormalized-posterior-density">
+       Visualization of the
+       <strong>
+        unnormalized
+       </strong>
+       posterior density
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Map-computation">
+   Map computation
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Definition-of-the-objective-function:">
+     Definition of the objective function:
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Map-parametrization">
+       Map parametrization
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Optimization">
+       Optimization
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Accuracy-checks">
+   Accuracy checks
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Comparing-density-contours">
+     Comparing density contours
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Variance-diagnostic">
+     Variance diagnostic
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Drawing-samples-from-approximate-posterior">
+     Drawing samples from approximate posterior
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="../../_sources/source/tutorials/BayesianInference_BOD.nbconvert.ipynb.txt">
+        <i class="fas fa-file-alt"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, The MParT development team..<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1161 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Transport Map from density &#8212; MParT  documentation</title>
+  <script>
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+
+  
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/6.1.2/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
+
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'source/tutorials/FromDensity2D_banana.nbconvert';</script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fas fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">MParT  documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="../installation.html">
+                        Installation
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../getting_started.html">
+                        Using MParT
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">
+                        Tutorials
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../mathematics.html">
+                        Mathematical Background
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../api/index.html">
+                        API Reference
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                <li class="nav-item">
+                    <a class="nav-link" href="../development/index.html">
+                        Community
+                    </a>
+                </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      <div class="navbar-end-item navbar-end__search-button-container">
+        
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MeasureTransport/MParT" title="GitHub" class="nav-link" rel="noopener" target="_blank"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  <div class="search-button-container--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+  </div>
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fas fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="../installation.html">
+                        Installation
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../getting_started.html">
+                        Using MParT
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html">
+                        Tutorials
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../mathematics.html">
+                        Mathematical Background
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../api/index.html">
+                        API Reference
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                <li class="nav-item">
+                    <a class="nav-link" href="../development/index.html">
+                        Community
+                    </a>
+                </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MeasureTransport/MParT" title="GitHub" class="nav-link" rel="noopener" target="_blank"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+  <div class="sidebar-start-items sidebar-primary__section">
+    <div class="sidebar-start-items__item">
+<form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+      </div>
+      <main class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Transport-Map-from-density">
+<h1>Transport Map from density<a class="headerlink" href="#Transport-Map-from-density" title="Permalink to this heading">#</a></h1>
+<p>The objective of this example is to show how a transport map can be build in MParT when the the unnormalized probability density function of the target density is known.</p>
+<section id="Problem-description">
+<h2>Problem description<a class="headerlink" href="#Problem-description" title="Permalink to this heading">#</a></h2>
+<p>We consider <span class="math notranslate nohighlight">\(T(\mathbf{z};\mathbf{w})\)</span> a monotone triangular transport map parameterized by <span class="math notranslate nohighlight">\(\mathbf{w}\)</span> (e.g., polynomial coefficients). This map which is invertible and has an invertible Jacobian for any parameter <span class="math notranslate nohighlight">\(\mathbf{w}\)</span>, transports samples <span class="math notranslate nohighlight">\(\mathbf{z}^i\)</span> from the reference density <span class="math notranslate nohighlight">\(\eta\)</span> to samples <span class="math notranslate nohighlight">\(T(\mathbf{z}^i;\mathbf{w})\)</span> from the map induced density <span class="math notranslate nohighlight">\(\tilde{\pi}_\mathbf{w}(\mathbf{z})\)</span> defined as:</p>
+<div class="math notranslate nohighlight">
+\[\tilde{\pi}_\mathbf{w}(\mathbf{z}) = \eta(T^{-1}(\mathbf{z};\mathbf{w}))|\text{det } T^{-1}(\mathbf{z};\mathbf{w})|,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\text{det } T^{-1}\)</span> is the determinant of the inverse map Jacobian at the point <span class="math notranslate nohighlight">\(\mathbf{z}\)</span>. We refer to <span class="math notranslate nohighlight">\(\tilde{\pi}_{\mathbf{w}}(\mathbf{x})\)</span> as the <em>map-induced</em> density or <em>pushforward distribution</em> and will commonly interchange notation for densities and measures to use the notation <span class="math notranslate nohighlight">\(\tilde{\pi} = T_{\sharp} \eta\)</span>.</p>
+<p>The objective of this example is, knowing some unnormalized target density <span class="math notranslate nohighlight">\(\bar{\pi}\)</span>, find the map <span class="math notranslate nohighlight">\(T\)</span> that transport samples drawn from <span class="math notranslate nohighlight">\(\eta\)</span> to samples drawn from the target <span class="math notranslate nohighlight">\(\pi\)</span>.</p>
+</section>
+<section id="Imports">
+<h2>Imports<a class="headerlink" href="#Imports" title="Permalink to this heading">#</a></h2>
+<p>First, import MParT and other packages used in this notebook. Note that it is possible to specify the number of threads used by MParT by setting the <code class="docutils literal notranslate"><span class="pre">KOKKOS_NUM_THREADS</span></code> environment variable <strong>before</strong> importing MParT.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">minimize</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">multivariate_normal</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;KOKKOS_NUM_THREADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;8&#39;</span>
+
+<span class="kn">import</span> <span class="nn">mpart</span> <span class="k">as</span> <span class="nn">mt</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Kokkos is using&#39;</span><span class="p">,</span> <span class="n">mt</span><span class="o">.</span><span class="n">Concurrency</span><span class="p">(),</span> <span class="s1">&#39;threads&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;figure.dpi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">110</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Kokkos is usingKokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+  process threads available :   2,  requested thread :   8
+ 8 threads
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+                                    Detected: 2 cores per node.
+                                    Detected: 1 MPI_ranks per node.
+                                    Requested: 8 threads per process.
+</pre></div></div>
+</div>
+</section>
+<section id="Target-density-and-exact-map">
+<h2>Target density and exact map<a class="headerlink" href="#Target-density-and-exact-map" title="Permalink to this heading">#</a></h2>
+<p>In this example we use a 2D target density known as the <em>banana</em> density where the unnormalized probability density, samples and the exact transport map are known.</p>
+<p>The banana density is defined as:</p>
+<div class="math notranslate nohighlight">
+\[\pi(x_1,x_2) \propto N_1(x_1)\times N_1(x_2-x_1^2)\]</div>
+<p>where <span class="math notranslate nohighlight">\(N_1\)</span> is the 1D standard normal density.</p>
+<p>The exact transport map that transport the 2D standard normal density to <span class="math notranslate nohighlight">\(\pi\)</span> is known as:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}    {T}^\text{true}(z_1,z_2)=
+    \begin{bmatrix}
+z_1\\
+z_2 + z_1^2
+\end{bmatrix}\end{split}\]</div>
+<p>Contours of the target density can be visualized as:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Unnomalized target density required for objective</span>
+<span class="k">def</span> <span class="nf">target_logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+  <span class="n">rv1</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+  <span class="n">rv2</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+  <span class="n">logpdf1</span> <span class="o">=</span> <span class="n">rv1</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+  <span class="n">logpdf2</span> <span class="o">=</span> <span class="n">rv2</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+  <span class="n">logpdf</span> <span class="o">=</span> <span class="n">logpdf1</span> <span class="o">+</span> <span class="n">logpdf2</span>
+  <span class="k">return</span> <span class="n">logpdf</span>
+
+<span class="c1"># Grid for plotting</span>
+<span class="n">ngrid</span><span class="o">=</span><span class="mi">100</span>
+<span class="n">x1_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="n">ngrid</span><span class="p">)</span>
+<span class="n">x2_t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">,</span><span class="mf">7.5</span><span class="p">,</span><span class="n">ngrid</span><span class="p">)</span>
+<span class="n">xx1</span><span class="p">,</span><span class="n">xx2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x1_t</span><span class="p">,</span><span class="n">x2_t</span><span class="p">)</span>
+
+<span class="n">xx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">xx1</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">xx2</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+
+<span class="c1"># Target contours</span>
+<span class="n">target_pdf_at_grid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">target_logpdf</span><span class="p">(</span><span class="n">xx</span><span class="p">))</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">CS1</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">xx1</span><span class="p">,</span> <span class="n">xx2</span><span class="p">,</span> <span class="n">target_pdf_at_grid</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ngrid</span><span class="p">,</span><span class="n">ngrid</span><span class="p">))</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$x_1$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$x_2$&#39;</span><span class="p">)</span>
+<span class="n">h1</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">CS1</span><span class="o">.</span><span class="n">legend_elements</span><span class="p">()</span>
+<span class="n">legend1</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">h1</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="s1">&#39;target density&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_FromDensity2D_banana.nbconvert_6_0.png" src="../../_images/source_tutorials_FromDensity2D_banana.nbconvert_6_0.png" />
+</div>
+</div>
+</section>
+<section id="Map-training">
+<h2>Map training<a class="headerlink" href="#Map-training" title="Permalink to this heading">#</a></h2>
+<section id="Defining-objective-function-and-its-gradient">
+<h3>Defining objective function and its gradient<a class="headerlink" href="#Defining-objective-function-and-its-gradient" title="Permalink to this heading">#</a></h3>
+<p>Knowing the closed form of the unnormalized target density <span class="math notranslate nohighlight">\(\bar{\pi}\)</span>, the objective is to find a map-induced density <span class="math notranslate nohighlight">\(\tilde{\pi}_{\mathbf{w}}(\mathbf{z})\)</span> that is a good approximation of the target <span class="math notranslate nohighlight">\(\pi\)</span>.</p>
+<p>In order to characterize this posterior density, one method is to build a monotone triangular transport map <span class="math notranslate nohighlight">\(T\)</span> such that the KL divergence <span class="math notranslate nohighlight">\(D_{KL}(\eta || T^\sharp \pi)\)</span> is minmized. If <span class="math notranslate nohighlight">\(T\)</span> is map parameterized by <span class="math notranslate nohighlight">\(\mathbf{w}\)</span>, the objective function derived from the discrete KL divergence reads:</p>
+<div class="math notranslate nohighlight">
+\[J(\mathbf{w}) = - \frac{1}{N}\sum_{i=1}^N \left( \log\pi\left(T(\mathbf{z}^i;\mathbf{w})\right) + \log  \text{det }\nabla_\mathbf{z} T(\mathbf{z}^i;\mathbf{w})\right), \,\,\, \mathbf{z}^i \sim \mathcal{N}(\mathbf{0},\mathbf{I}_d),\]</div>
+<p>where <span class="math notranslate nohighlight">\(T\)</span> is the transport map pushing forward the standard normal <span class="math notranslate nohighlight">\(\mathcal{N}(\mathbf{0},\mathbf{I}_d)\)</span> to the target density <span class="math notranslate nohighlight">\(\pi(\mathbf{z})\)</span>. The gradient of this objective function reads</p>
+<div class="math notranslate nohighlight">
+\[\nabla_\mathbf{w} J(\mathbf{w}) = - \frac{1}{N}\sum_{i=1}^N \left( \nabla_\mathbf{w} T(\mathbf{z}^i;\mathbf{w}).\nabla_\mathbf{x}\log\pi\left(T(\mathbf{z}^i;\mathbf{w})\right) + \nabla_{\mathbf{w}}\log  \text{det }\nabla_\mathbf{z} T(\mathbf{z}^i;\mathbf{w})\right), \,\,\, \mathbf{z}^i \sim \mathcal{N}(\mathbf{0},\mathbf{I}_d).\]</div>
+<p>The objective function and gradient can be defined using MParT as:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># KL divergence objective</span>
+<span class="k">def</span> <span class="nf">obj</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">transport_map</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">num_points</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">transport_map</span><span class="o">.</span><span class="n">SetCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+    <span class="n">map_of_x</span> <span class="o">=</span> <span class="n">transport_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">logpdf</span><span class="o">=</span> <span class="n">target_logpdf</span><span class="p">(</span><span class="n">map_of_x</span><span class="p">)</span>
+    <span class="n">log_det</span> <span class="o">=</span> <span class="n">transport_map</span><span class="o">.</span><span class="n">LogDeterminant</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">logpdf</span> <span class="o">+</span> <span class="n">log_det</span><span class="p">)</span><span class="o">/</span><span class="n">num_points</span>
+
+<span class="c1"># Gradient of unnomalized target density required for gradient objective</span>
+<span class="k">def</span> <span class="nf">target_grad_logpdf</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+  <span class="n">grad1</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+  <span class="n">grad2</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">,:])</span>
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">((</span><span class="n">grad1</span><span class="p">,</span><span class="n">grad2</span><span class="p">))</span>
+
+<span class="c1"># Gradient of KL divergence objective</span>
+<span class="k">def</span> <span class="nf">grad_obj</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">transport_map</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="n">num_points</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">transport_map</span><span class="o">.</span><span class="n">SetCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+    <span class="n">map_of_x</span> <span class="o">=</span> <span class="n">transport_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">sens_vecs</span> <span class="o">=</span> <span class="n">target_grad_logpdf</span><span class="p">(</span><span class="n">map_of_x</span><span class="p">)</span>
+    <span class="n">grad_logpdf</span> <span class="o">=</span> <span class="n">transport_map</span><span class="o">.</span><span class="n">CoeffGrad</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sens_vecs</span><span class="p">)</span>
+    <span class="n">grad_log_det</span> <span class="o">=</span> <span class="n">transport_map</span><span class="o">.</span><span class="n">LogDeterminantCoeffGrad</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">grad_logpdf</span> <span class="o">+</span> <span class="n">grad_log_det</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">num_points</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Map-parameterization">
+<h3>Map parameterization<a class="headerlink" href="#Map-parameterization" title="Permalink to this heading">#</a></h3>
+<p>For the parameterization of <span class="math notranslate nohighlight">\(T\)</span> we use a total order multivariate expansion of hermite functions. Knowing <span class="math notranslate nohighlight">\(T^\text{true}\)</span>, any parameterization with total order greater than one will include the true solution of the map finding problem.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set-up first component and initialize map coefficients</span>
+<span class="n">map_options</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">MapOptions</span><span class="p">()</span>
+
+<span class="n">total_order</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># Create dimension 2 triangular map</span>
+<span class="n">transport_map</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">CreateTriangular</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="n">total_order</span><span class="p">,</span><span class="n">map_options</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Approximation-before-optimization">
+<h3>Approximation before optimization<a class="headerlink" href="#Approximation-before-optimization" title="Permalink to this heading">#</a></h3>
+<p>Coefficients of triangular map are set to 0 upon creation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Make reference samples for training</span>
+<span class="n">num_points</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">num_points</span><span class="p">)</span>
+
+<span class="c1"># Make reference samples for testing</span>
+<span class="n">test_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">5000</span><span class="p">)</span>
+
+<span class="c1"># Pushed samples</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">transport_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">test_z</span><span class="p">)</span>
+
+<span class="c1"># Before optimization plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">xx1</span><span class="p">,</span> <span class="n">xx2</span><span class="p">,</span> <span class="n">target_pdf_at_grid</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ngrid</span><span class="p">,</span><span class="n">ngrid</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Pushed samples&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_FromDensity2D_banana.nbconvert_14_0.png" src="../../_images/source_tutorials_FromDensity2D_banana.nbconvert_14_0.png" />
+</div>
+</div>
+<p>At initialization, samples are “far” from being distributed according to the banana distribution.</p>
+<p>Initial objective and coefficients:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Print initial coeffs and objective</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==================&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Starting coeffs&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">transport_map</span><span class="o">.</span><span class="n">CoeffMap</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Initial objective value: </span><span class="si">{:.2E}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obj</span><span class="p">(</span><span class="n">transport_map</span><span class="o">.</span><span class="n">CoeffMap</span><span class="p">(),</span> <span class="n">transport_map</span><span class="p">,</span> <span class="n">test_z</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==================&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+==================
+Starting coeffs
+[0. 0. 0. 0. 0. 0. 0. 0. 0.]
+Initial objective value: 3.40E+00
+==================
+</pre></div></div>
+</div>
+</section>
+<section id="Minimization">
+<h3>Minimization<a class="headerlink" href="#Minimization" title="Permalink to this heading">#</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==================&#39;</span><span class="p">)</span>
+<span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;gtol&#39;</span><span class="p">:</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="s1">&#39;disp&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">transport_map</span><span class="o">.</span><span class="n">CoeffMap</span><span class="p">(),</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">transport_map</span><span class="p">,</span> <span class="n">z</span><span class="p">),</span> <span class="n">jac</span><span class="o">=</span><span class="n">grad_obj</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;BFGS&#39;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">options</span><span class="p">)</span>
+
+<span class="c1"># Print final coeffs and objective</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Final coeffs:&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">transport_map</span><span class="o">.</span><span class="n">CoeffMap</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Final objective value: </span><span class="si">{:.2E}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">obj</span><span class="p">(</span><span class="n">transport_map</span><span class="o">.</span><span class="n">CoeffMap</span><span class="p">(),</span> <span class="n">transport_map</span><span class="p">,</span> <span class="n">test_z</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==================&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+==================
+Optimization terminated successfully.
+         Current function value: 2.828350
+         Iterations: 16
+         Function evaluations: 19
+         Gradient evaluations: 19
+Final coeffs:
+[ 1.44894398e-02  5.36800724e-01 -4.20160932e-05  9.97053066e-01
+  5.61138999e-01 -4.43370535e-03  4.36849897e-02  1.12980650e-02
+  1.00036081e+00]
+Final objective value: 2.86E+00
+==================
+</pre></div></div>
+</div>
+</section>
+<section id="Approximation-after-optimization">
+<h3>Approximation after optimization<a class="headerlink" href="#Approximation-after-optimization" title="Permalink to this heading">#</a></h3>
+<section id="Pushed-samples">
+<h4>Pushed samples<a class="headerlink" href="#Pushed-samples" title="Permalink to this heading">#</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pushed samples</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">transport_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">test_z</span><span class="p">)</span>
+
+<span class="c1"># After optimization plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">xx1</span><span class="p">,</span> <span class="n">xx2</span><span class="p">,</span> <span class="n">target_pdf_at_grid</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ngrid</span><span class="p">,</span><span class="n">ngrid</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Pushed samples&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_FromDensity2D_banana.nbconvert_22_0.png" src="../../_images/source_tutorials_FromDensity2D_banana.nbconvert_22_0.png" />
+</div>
+</div>
+<p>After optimization, pushed samples <span class="math notranslate nohighlight">\(T(z^i)\)</span>, <span class="math notranslate nohighlight">\(z^i \sim \mathcal{N}(0,I)\)</span> are approximately distributed according to the target <span class="math notranslate nohighlight">\(\pi\)</span></p>
+</section>
+<section id="Variance-diagnostic">
+<h4>Variance diagnostic<a class="headerlink" href="#Variance-diagnostic" title="Permalink to this heading">#</a></h4>
+<p>A commonly used accuracy check when facing computation maps from density is the so-called variance diagnostic defined as:</p>
+<div class="math notranslate nohighlight">
+\[\epsilon_\sigma = \frac{1}{2} \mathbb{V}\text{ar}_\rho \left[ \log \frac{\rho}{T^\sharp \bar{\pi}} \right]\]</div>
+<p>This diagnostic is asymptotically equivalent to the minimized KL divergence <span class="math notranslate nohighlight">\(D_{KL}(\eta || T^\sharp \pi)\)</span> and should converge to zero when the computed map converge to the true map.</p>
+<p>The variance diagnostic can be computed as follow:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">variance_diagnostic</span><span class="p">(</span><span class="n">tri_map</span><span class="p">,</span><span class="n">ref</span><span class="p">,</span><span class="n">target_logpdf</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+  <span class="n">ref_logpdf</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+  <span class="n">y</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">Evaluate</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="n">pullback_logpdf</span> <span class="o">=</span> <span class="n">target_logpdf</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">+</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">LogDeterminant</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="n">diff</span> <span class="o">=</span> <span class="n">ref_logpdf</span> <span class="o">-</span> <span class="n">pullback_logpdf</span>
+  <span class="n">expect</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">diff</span><span class="p">)</span>
+  <span class="n">var</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">diff</span><span class="o">-</span><span class="n">expect</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">var</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Reference distribution</span>
+<span class="n">ref_distribution</span> <span class="o">=</span> <span class="n">multivariate_normal</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">2</span><span class="p">));</span>
+
+<span class="c1"># Compute variance diagnostic</span>
+<span class="n">var_diag</span> <span class="o">=</span> <span class="n">variance_diagnostic</span><span class="p">(</span><span class="n">transport_map</span><span class="p">,</span><span class="n">ref_distribution</span><span class="p">,</span><span class="n">target_logpdf</span><span class="p">,</span><span class="n">test_z</span><span class="p">)</span>
+
+<span class="c1"># Print variance diagnostic</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==================&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Variance diagnostic: </span><span class="si">{:.2E}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">var_diag</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;==================&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+==================
+Variance diagnostic: 5.82E-04
+==================
+</pre></div></div>
+</div>
+</section>
+<section id="Pushforward-density">
+<h4>Pushforward density<a class="headerlink" href="#Pushforward-density" title="Permalink to this heading">#</a></h4>
+<p>We can also plot the contour of the unnormalized density <span class="math notranslate nohighlight">\(\bar{\pi}\)</span> and the pushforward approximation <span class="math notranslate nohighlight">\(T_\sharp \eta\)</span>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># Pushforward definition</span>
+<span class="k">def</span> <span class="nf">push_forward_pdf</span><span class="p">(</span><span class="n">tri_map</span><span class="p">,</span><span class="n">ref</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
+  <span class="n">xinv</span> <span class="o">=</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">Inverse</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+  <span class="n">log_det_grad_x_inverse</span> <span class="o">=</span> <span class="o">-</span> <span class="n">tri_map</span><span class="o">.</span><span class="n">LogDeterminant</span><span class="p">(</span><span class="n">xinv</span><span class="p">)</span>
+  <span class="n">log_pdf</span> <span class="o">=</span> <span class="n">ref</span><span class="o">.</span><span class="n">logpdf</span><span class="p">(</span><span class="n">xinv</span><span class="o">.</span><span class="n">T</span><span class="p">)</span><span class="o">+</span><span class="n">log_det_grad_x_inverse</span>
+  <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">log_pdf</span><span class="p">)</span>
+
+<span class="n">map_approx_grid</span> <span class="o">=</span> <span class="n">push_forward_pdf</span><span class="p">(</span><span class="n">transport_map</span><span class="p">,</span><span class="n">ref_distribution</span><span class="p">,</span><span class="n">xx</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">CS1</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">xx1</span><span class="p">,</span> <span class="n">xx2</span><span class="p">,</span> <span class="n">target_pdf_at_grid</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ngrid</span><span class="p">,</span><span class="n">ngrid</span><span class="p">))</span>
+<span class="n">CS2</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">xx1</span><span class="p">,</span> <span class="n">xx2</span><span class="p">,</span> <span class="n">map_approx_grid</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">ngrid</span><span class="p">,</span><span class="n">ngrid</span><span class="p">),</span><span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$x_1$&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$x_2$&#39;</span><span class="p">)</span>
+<span class="n">h1</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">CS1</span><span class="o">.</span><span class="n">legend_elements</span><span class="p">()</span>
+<span class="n">h2</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">CS2</span><span class="o">.</span><span class="n">legend_elements</span><span class="p">()</span>
+<span class="n">legend1</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">h1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">h2</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="p">[</span><span class="s1">&#39;Unnormalized target&#39;</span><span class="p">,</span> <span class="s1">&#39;TM approximation&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../../_images/source_tutorials_FromDensity2D_banana.nbconvert_32_0.png" src="../../_images/source_tutorials_FromDensity2D_banana.nbconvert_32_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fas fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Problem-description">
+   Problem description
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Imports">
+   Imports
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Target-density-and-exact-map">
+   Target density and exact map
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#Map-training">
+   Map training
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Defining-objective-function-and-its-gradient">
+     Defining objective function and its gradient
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Map-parameterization">
+     Map parameterization
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Approximation-before-optimization">
+     Approximation before optimization
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Minimization">
+     Minimization
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#Approximation-after-optimization">
+     Approximation after optimization
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Pushed-samples">
+       Pushed samples
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Variance-diagnostic">
+       Variance diagnostic
+      </a>
+     </li>
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#Pushforward-density">
+       Pushforward density
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="../../_sources/source/tutorials/FromDensity2D_banana.nbconvert.ipynb.txt">
+        <i class="fas fa-file-alt"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, The MParT development team..<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>
