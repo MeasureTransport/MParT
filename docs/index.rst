@@ -5,7 +5,7 @@
 
 .. module:: mpart
 
-MParT: Monotone Parameterization Toolbox
+MParT: Monotone Parameterization Toolkit
 ========================================
 :mod:`mpart` is a toolbox for constructing and using monotone functions for measure transport and regression.
 
@@ -37,8 +37,12 @@ including the modeling of conditional distributions [3] and the acceleration of 
 [4, 5, 6, 7]. 
 
 In practice, working with triangular maps requires the definition of a parameterized family of multivariate monotone functions 
-and particular computations to enable map optimization. The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee", is a 
-C++ library (with bindings to Python, Julia, and Matlab) that aims to provide performance portable implementations of such parameterizations.  
+and particular computations to enable map optimization. 
+
+Several existing software packages have the ability to parameterize monotone functions such as TransportMaps [8], ATM [9], and MUQ [10]. 
+
+The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee", is a 
+C++ library (with bindings to Python, Julia, and Matlab) that aims to provide performance portable implementations of such parameterizations that can be used to accelerate higher level packages like TransportMaps, ATM, and MUQ that cannot currently leverage GPU resources.
 MParT emphasizes fast execution and parsimonious parameterizations that can permit near real-time computation on low and moderate dimensional 
 problems.
 
@@ -56,6 +60,12 @@ problems.
 
 [7] Cotter, Colin, Simon Cotter, and Paul Russell. "Ensemble transport adaptive importance sampling." SIAM/ASA Journal on Uncertainty Quantification 7.2 (2019): 444-471.
 
+[8] Bigoni, D. (2015). TransportMaps. In Bitbucket repository. https://transportmaps.mit.edu
+
+[9] Baptista, R. Zahm O., P-B. Rubio, and Marzouk Y. (2021). ATM. In GitHub repository. https://github.com/baptistar/ATM
+
+[10] Parno, M. Davis A., and Seelinger L. (2021). "MUQ: The MIT uncertainty quantification library". Journal of Open Source Software, 6(68), 3076.
+
 Citing 
 -------------
 
@@ -65,7 +75,7 @@ reference is
 
 .. epigraph::
 
-   MParT Development Team. <YEAR>. MParT: A Monotone Parameterization Toolbox, <VERSION>. https://measuretransport.github.io/MParT/
+   MParT Development Team. <YEAR>. MParT: A Monotone Parameterization Toolkit, <VERSION>. https://measuretransport.github.io/MParT/
 
 In bibtex, this is::
 
