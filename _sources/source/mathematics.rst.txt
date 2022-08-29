@@ -3,22 +3,15 @@
 Mathematical Background
 =========================
 
-Tensor Product Expansions 
+Triangular Transport Maps
 --------------------------
 
-For a point :math:`\mathbf{x}\in\mathbb{R}^d` and coefficients :math:`\mathbf{w}`, we consider expansions of the form 
+Let :math:`\pi` and :math:`\eta` be two densities on :math:`\mathbb{R}^d`. In measure transport, our goal is to find a multivariate transformation :math:`T` that pushes forward :math:`\eta` to :math:`\pi`, meaning that if :math:`\mathbf{X} \sim \eta`, then :math:`T(\mathbf{X}) \sim \pi`. Given such a map, we can easily generate samples from :math:`\eta` by pushing samples :math:`\mathbf{x}^i \sim \eta` through the map :math:`T(\mathbf{x}^i) \sim \pi`. Furthermore, we can express the push-forward density of a diffeomorphic map by :math:`T_{\sharp}\eta(\mathbf{x}) := \eta(T^{-1}(\mathbf{x}))|\nabla T^{-1}(\mathbf{x})|`.
+
+While there are infinitely many transformations that couple densities, if :math:`\pi` is absolutely continuous with respect to :math:`\eta`, there exists a unique lower triangular and monotone function :math:`T\colon \mathbb{R}^d \rightarrow \mathbb{R}^d` that pushes forward :math:`\pi` to :math:`\eta` of the form
 
 .. math::
-
-    f(\mathbf{x}; \mathbf{w}) = \sum_{\alpha\in \mathcal{A}} w_\alpha \Phi_\alpha(\mathbf{x}),
-
-where :math:`\alpha\in\mathbb{N}^d` is a multi-index, :math:`\mathcal{A}` is a multiindex set, and :math:`\Phi_{\mathbf{\alpha}}` is a
-multivariate function defined as a tensor product of one-dimensional functions :math:`\phi_{\alpha_i}\colon  \mathbb{R}\rightarrow \mathbb{R}`
-through
-
-.. math::
-
-    \Phi_\mathbf{\alpha}(\mathbf{x}) = \prod_{\alpha_i \in \mathbf{\alpha}} \phi_{\alpha_i}(x_i).
+    T(\mathbf{x}) = \begin{bmatrix} T_1(x_1) \\ T_2(x_1,x_2) \\ \vdots \\ T_d(x_1,\dots,x_d) \end{bmatrix}.
 
 
 Monotone Parameterizations
@@ -38,8 +31,28 @@ Other choices for the :math:`g` include the squared and exponential functions. T
 
 Using the representation for monotone functions with a bijective :math:`g`, we can approximate :math:`T_d` by finding :math:`f`.
 
+
+Tensor Product Expansions 
+--------------------------
+
+For a point :math:`\mathbf{x}\in\mathbb{R}^d` and coefficients :math:`\mathbf{w}`, we consider expansions of the form 
+
+.. math::
+
+    f(\mathbf{x}; \mathbf{w}) = \sum_{\alpha\in \mathcal{A}} w_\alpha \Phi_\alpha(\mathbf{x}),
+
+where :math:`\alpha\in\mathbb{N}^d` is a multi-index, :math:`\mathcal{A}` is a multiindex set, and :math:`\Phi_{\mathbf{\alpha}}` is a
+multivariate function defined as a tensor product of one-dimensional functions :math:`\phi_{\alpha_i}\colon  \mathbb{R}\rightarrow \mathbb{R}`
+through
+
+.. math::
+
+    \Phi_\mathbf{\alpha}(\mathbf{x}) = \prod_{\alpha_i \in \mathbf{\alpha}} \phi_{\alpha_i}(x_i).
+
+
+
 Numerical Integration
-^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------
 
 Computationally, we approximate the integral in the definition of :math:`T_d(\mathbf{x}_{1:d}; \mathbf{w})` using a quadrature rule with :math:`N` points :math:`\{t^{(1)}, \ldots, t^{(N)}\}` and corresponding weights :math:`\{c^{(1)}, \ldots, c^{(N)}\}` designed to approximate integrals over :math:`[0,1]`.  Note that these points and weights will often be chosen adaptively.    The quadrature rule yields an approximation of the map component in :eq:`cont_map` with the form
 
@@ -53,7 +66,7 @@ where the :math:`x_d` term outside the summation comes from a change of integrat
 .. _diag_deriv_section:
 
 Diagonal Derivatives
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------
 
 We will often require derivatives of :math:`T_d` with respect to an input :math:`x_i` or the parameters :math:`\mathbf{w}`.  When computing these derivatives however, we have a choice of whether to differentiate the continuous map form in :eq:`cont_map` or the discretized map in :eq:`discr_map`.  This is similar to the "discretize-then-optimize" or "optimize-then-discretize" choice in PDE-constrained optimization.  When the quadrature rule is accurate, there might not be a large practical difference in these approaches.  For approximate rules however, using the continuous derivative may cause issues during optimization because the derivative will not be consistent with the discreteized map: a finite difference approximation will not converge to the continuous derivative.   In these cases, it is preferrable to differentiate the discrete map in :eq:`discr_map`.   
 
@@ -75,7 +88,7 @@ The discrete derivative on the other hand is more complicated:
 
 
 Coefficient Derivatives 
-^^^^^^^^^^^^^^^^^^^^^^^^
+----------------------------
 In addition to computing :math:`\partial T_d/\partial d`, we will also need the gradient of the monotone function :math:`T_d` with respect to the parameters :math:`\mathbf{w}`, denoted by :math:`\nabla_{\mathbf{w}}T_d`. 
 
 .. math::
@@ -105,14 +118,4 @@ The gradient of the discrete derivative is more expansive and takes the form
     &+ x_d \sum_{i=1}^N c^{(i)} t^{(i)} \partial^2 g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \partial^2_{dd}f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) \nabla_{\mathbf{w}}\left[ \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) \right]  \\
     &  + x_d \sum_{i=1}^N c^{(i)} t^{(i)} \partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) )  \nabla_{\mathbf{w}}\left[\partial^2_{dd}f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w})\right].
 
-
-Triangular Transport Maps
---------------------------
-
-Let :math:`\pi` and :math:`\eta` be two densities on :math:`\mathbb{R}^d`. In measure transport, our goal is to find a multivariate transformation :math:`T` that pushes forward :math:`\eta` to :math:`\pi`, meaning that if :math:`\mathbf{X} \sim \eta`, then :math:`T(\mathbf{X}) \sim \pi`. Given such a map, we can easily generate samples from :math:`\eta` by pushing samples :math:`\mathbf{x}^i \sim \eta` through the map :math:`T(\mathbf{x}^i) \sim \pi`. Furthermore, we can express the push-forward density of a diffeomorphic map by :math:`T_{\sharp}\eta(\mathbf{x}) := \eta(T^{-1}(\mathbf{x}))|\nabla T^{-1}(\mathbf{x})|`.
-
-While there are infinitely many transformations that couple densities, if :math:`\pi` is absolutely continuous with respect to :math:`\eta`, there exists a unique lower triangular and monotone function :math:`T\colon \mathbb{R}^d \rightarrow \mathbb{R}^d` that pushes forward :math:`\pi` to :math:`\eta` of the form
-
-.. math::
-    T(\mathbf{x}) = \begin{bmatrix} T_1(x_1) \\ T_2(x_1,x_2) \\ \vdots \\ T_d(x_1,\dots,x_d) \end{bmatrix}.
 

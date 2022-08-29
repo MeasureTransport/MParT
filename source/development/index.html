@@ -118,7 +118,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="../getting_started.html">
-                        Using MParT
+                        Getting Started
                     </a>
                 </li>
                 
@@ -243,7 +243,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="../getting_started.html">
-                        Using MParT
+                        Getting Started
                     </a>
                 </li>
                 
@@ -368,6 +368,7 @@ If possible post complete but minimal code examples.</p>
 </section>
 <section id="requesting-a-feature">
 <h2>Requesting a Feature<a class="headerlink" href="#requesting-a-feature" title="Permalink to this heading">#</a></h2>
+<p>Similar to a bug report, please file an issue on <a class="reference external" href="https://github.com/MeasureTransport/MParT/issues">GitHub</a> to start a discussion about new features.</p>
 </section>
 <section id="contributing">
 <h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this heading">#</a></h2>
@@ -376,8 +377,8 @@ If you want to influence the direction and focus of the project consider becomin
 </section>
 <section id="building-the-documentation">
 <h2>Building the Documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this heading">#</a></h2>
-<p>Make sure doxygen, sphinx, sphinx-design, breathe, nbsphinx, and the pydata-sphinx-theme are installed.  This is easily done with conda and pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge doxygen sphinx sphinx-design breathe pydata-sphinx-theme nbsphinx
+<p>MParT’s documentation uses a combination of <a class="reference external" href="https://www.sphinx-doc.org/en/master/">sphinx</a> and <a class="reference external" href="https://doxygen.nl/">doxygen</a> through the <a class="reference external" href="https://breathe.readthedocs.io/en/latest/">breathe</a> package.  It also depends on rendering the tutorials in the <a class="reference external" href="https://github.com/MeasureTransport/MParT-examples">MParT-examples</a> repository.  To build the documentation locally, you’ll need to install these packages and a few other extensions.  In particular, make sure doxygen, sphinx, sphinx-design, breathe, nbsphinx, jupytext, and the pydata-sphinx-theme are installed.  This is easily done with conda and pip:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge doxygen sphinx sphinx-design breathe pydata-sphinx-theme nbsphinx jupytext
 </pre></div>
 </div>
 <p>Then, after configuring MParT with CMake, you build the documentation with <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">sphinx</span></code>. The entire process might look like</p>
@@ -396,6 +397,24 @@ make install
 <p class="admonition-title">Tip</p>
 <p>If you’re sure all the dependencies are installed but you still see errors complaining that a package cannot be found, you might need to manually specify paths in the <code class="code docutils literal notranslate"><span class="pre">conf.py</span></code> sphinx configuration file.</p>
 </div>
+<section id="controlling-tutorial-documentation">
+<h3>Controlling Tutorial Documentation<a class="headerlink" href="#controlling-tutorial-documentation" title="Permalink to this heading">#</a></h3>
+<p>The <span class="xref std std-ref">_tutorials</span> page relies on examples in the <a class="reference external" href="https://github.com/MeasureTransport/MParT-examples">MParT-examples</a> repository.   MParT’s CMake scripts can interact with this repository in three ways: (1) via a local copy of the repository, (2) by temporarily cloning the repository when <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">sphinx</span></code> is called, and (3) extracting the examples from the <a class="reference external" href="https://quay.io/repository/measuretransport/mpart_examples">mpart_examples docker image</a> on quay.io.   This last option has the advantage that the python examples can be executed and the any output or plots produced by the example can be included in the example.   It is also possible to skip all attempts at including the examples in the documentation by setting <code class="code docutils literal notranslate"><span class="pre">MPART_BUILD_EXAMPLES=OFF</span></code> in your CMake configuration.</p>
+<p>To use a local copy of <code class="code docutils literal notranslate"><span class="pre">MParT-examples</span></code>, define the CMake <code class="code docutils literal notranslate"><span class="pre">MPART_EXAMPLES_DIR</span></code> variable.  For example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake <span class="se">\</span>
+  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>~/Installations/MPART <span class="se">\</span>
+  -DMPART_EXAMPLES_DIR<span class="o">=</span>/path/to/MParT-examples <span class="se">\</span>
+..
+</pre></div>
+</div>
+<p>If you do not set <code class="code docutils literal notranslate"><span class="pre">MPART_EXAMPLES_DIR</span></code>, the examples will be pulled from Github.   To extract the examples from the docker image, set the <code class="code docutils literal notranslate"><span class="pre">MPART_DOCKER_EXAMPLES</span></code> option to <code class="code docutils literal notranslate"><span class="pre">ON</span></code>.  For example,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake <span class="se">\</span>
+  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>~/Installations/MPART <span class="se">\</span>
+  -DMPART_DOCKER_EXAMPLES<span class="o">=</span>ON <span class="se">\</span>
+..
+</pre></div>
+</div>
+</section>
 </section>
 </section>
 
@@ -454,6 +473,13 @@ make install
   <a class="reference internal nav-link" href="#building-the-documentation">
    Building the Documentation
   </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#controlling-tutorial-documentation">
+     Controlling Tutorial Documentation
+    </a>
+   </li>
+  </ul>
  </li>
 </ul>
 

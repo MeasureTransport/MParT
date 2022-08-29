@@ -118,7 +118,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="source/getting_started.html">
-                        Using MParT
+                        Getting Started
                     </a>
                 </li>
                 
@@ -243,7 +243,7 @@
 
                 <li class="nav-item">
                     <a class="nav-link" href="source/getting_started.html">
-                        Using MParT
+                        Getting Started
                     </a>
                 </li>
                 
@@ -362,7 +362,8 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="source/installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="source/getting_started.html">Using MParT</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/installation.html#compiling-from-source">Compiling from Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="source/getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/tutorials/index.html">Tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/mathematics.html">Mathematical Background</a></li>
 <li class="toctree-l1"><a class="reference internal" href="source/api/index.html">API Reference</a></li>
@@ -370,33 +371,15 @@
 </ul>
 </div>
 </section>
-<section id="measure-transport-and-mpart">
-<h2>Measure transport and MParT<a class="headerlink" href="#measure-transport-and-mpart" title="Permalink to this heading">#</a></h2>
-<p>Measure transport is a rich area in applied mathematics that constructs deterministic transformations–known as transport maps–between
-random variables [1]. These maps characterize a complex target distribution as a transformation of a simple reference
-distribution (e.g., a standard Gaussian). In the context of probabilistic modeling, transport maps enable sampling from the
-target distribution and the evaluation of its probability density function. Monotone triangular maps are one class of transport maps that have
-several computational advantages over non-triangular maps and provide a building block for the normalizing flows architectures commonly used
-in the machine learning community [2]. Triangular maps are also well suited for many tasks in Bayesian inference,
-including the modeling of conditional distributions [3] and the acceleration of posterior sampling
-[4, 5, 6, 7].</p>
-<p>In practice, working with triangular maps requires the definition of a parameterized family of multivariate monotone functions
-and particular computations to enable map optimization.</p>
-<p>Several existing software packages have the ability to parameterize monotone functions such as TransportMaps [8], ATM [9], and MUQ [10].</p>
+<section id="what-is-mpart">
+<h2>What is MParT?<a class="headerlink" href="#what-is-mpart" title="Permalink to this heading">#</a></h2>
+<p>Measure transport is a rich area in applied mathematics that constructs deterministic transformations–known as transport maps–between random variables. These maps characterize a complex target distribution as a transformation of a simple reference
+distribution (e.g., a standard Gaussian). Monotone triangular maps are one class of transport maps that are well suited for many tasks in Bayesian inference,
+including the modeling of conditional distributions and the acceleration of posterior sampling.</p>
 <p>The Monotone Parameterization Toolkit (<cite>MParT</cite>), pronounced “em-par-tee”, is a
-C++ library (with bindings to Python, Julia, and Matlab) that aims to provide performance portable implementations of such parameterizations that can be used to accelerate higher level packages like TransportMaps, ATM, and MUQ that cannot currently leverage GPU resources.
-MParT emphasizes fast execution and parsimonious parameterizations that can permit near real-time computation on low and moderate dimensional
-problems.</p>
-<p>[1] Santambrogio, Filippo. “Optimal transport for applied mathematicians.” Birkäuser, NY 55.58-63 (2015): 94.</p>
-<p>[2] Papamakarios, George, et al. “Normalizing Flows for Probabilistic Modeling and Inference.” J. Mach. Learn. Res. 22.57 (2021): 1-64.</p>
-<p>[3] Marzouk, Y., Moselhy, T., Parno, M., Spantini, A. (2016). Sampling via Measure Transport: An Introduction. In: Ghanem, R., Higdon, D., Owhadi, H. (eds) Handbook of Uncertainty Quantification. Springer, Cham. <a class="reference external" href="https://doi.org/10.1007/978-3-319-11259-6_23-1">https://doi.org/10.1007/978-3-319-11259-6_23-1</a></p>
-<p>[4] El Moselhy, Tarek A., and Youssef M. Marzouk. “Bayesian inference with optimal maps.” Journal of Computational Physics 231.23 (2012): 7815-7850.</p>
-<p>[5] Bigoni, Daniele, Alessio Spantini, and Youssef Marzouk. “Adaptive construction of measure transports for Bayesian inference.” NIPS workshop on Approximate Inference. 2016.</p>
-<p>[6] Parno, Matthew D., and Youssef M. Marzouk. “Transport map accelerated markov chain monte carlo.” SIAM/ASA Journal on Uncertainty Quantification 6.2 (2018): 645-682.</p>
-<p>[7] Cotter, Colin, Simon Cotter, and Paul Russell. “Ensemble transport adaptive importance sampling.” SIAM/ASA Journal on Uncertainty Quantification 7.2 (2019): 444-471.</p>
-<p>[8] Bigoni, D. (2015). TransportMaps. In Bitbucket repository. <a class="reference external" href="https://transportmaps.mit.edu">https://transportmaps.mit.edu</a></p>
-<p>[9] Baptista, R. Zahm O., P-B. Rubio, and Marzouk Y. (2021). ATM. In GitHub repository. <a class="reference external" href="https://github.com/baptistar/ATM">https://github.com/baptistar/ATM</a></p>
-<p>[10] Parno, M. Davis A., and Seelinger L. (2021). “MUQ: The MIT uncertainty quantification library”. Journal of Open Source Software, 6(68), 3076.</p>
+C++ library (with bindings to Python, Julia, and Matlab) that provides performance portable implementations of monotone functions that can be used for measure transport as well as other applications.   See <a class="reference internal" href="source/mathematics.html#mathematics"><span class="std std-ref">Mathematical Background</span></a> for a more thorough discussion of the types of parameterization MParT targets.</p>
+<p>MParT emphasizes fast execution and parsimonious parameterizations that can permit near real-time computation on low and moderate dimensional
+problems.  Our goal is to provide fast implementations of common parameterizations that can then be used in higher level libraries such as <a class="reference external" href="https://transportmaps.mit.edu/docs/">TransportMaps</a> or <a class="reference external" href="https://mituq.bitbucket.io/source/_site/index.html">MUQ</a>.</p>
 </section>
 <section id="citing">
 <h2>Citing<a class="headerlink" href="#citing" title="Permalink to this heading">#</a></h2>
@@ -472,8 +455,8 @@ All rights reserved.</p>
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#measure-transport-and-mpart">
-   Measure transport and MParT
+  <a class="reference internal nav-link" href="#what-is-mpart">
+   What is MParT?
   </a>
  </li>
  <li class="toc-h2 nav-item toc-entry">
