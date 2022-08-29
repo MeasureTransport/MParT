@@ -1,6 +1,6 @@
 .. _installation:
 
-Conda Installation
+Installation
 ===================
 
 .. card:: Install with Conda
