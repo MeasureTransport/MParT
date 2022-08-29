@@ -31,7 +31,7 @@ Gallery (Python)
         Construct a transport map from two dimensional samples.
 
     .. grid-item-card:: Monotone Least Squares
-        :link: python/FromSamples2D_banana.ipynb
+        :link: python/MonotoneLeastSquares.ipynb
 
         Use a one dimensional monotone parameterization for regression constrained to the space of strictly increasing functions.
 
