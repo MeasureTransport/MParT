@@ -29,7 +29,7 @@ authors:
   - given-names: Ricardo
     family-names: Baptista
     email: rsb@mit.edu
-    orcid:
+    orcid: https://orcid.org/0000-0002-0421-890X
   - given-names: Youssef 
     family-names: Marzouk
     email: ymarz@mit.edu
