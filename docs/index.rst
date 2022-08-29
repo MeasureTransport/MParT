@@ -25,46 +25,18 @@ Contents
    source/development/index
 
 
-Measure transport and MParT
--------------
-Measure transport is a rich area in applied mathematics that constructs deterministic transformations--known as transport maps--between 
-random variables [1]. These maps characterize a complex target distribution as a transformation of a simple reference 
-distribution (e.g., a standard Gaussian). In the context of probabilistic modeling, transport maps enable sampling from the 
-target distribution and the evaluation of its probability density function. Monotone triangular maps are one class of transport maps that have 
-several computational advantages over non-triangular maps and provide a building block for the normalizing flows architectures commonly used 
-in the machine learning community [2]. Triangular maps are also well suited for many tasks in Bayesian inference, 
-including the modeling of conditional distributions [3] and the acceleration of posterior sampling 
-[4, 5, 6, 7]. 
-
-In practice, working with triangular maps requires the definition of a parameterized family of multivariate monotone functions 
-and particular computations to enable map optimization. 
-
-Several existing software packages have the ability to parameterize monotone functions such as TransportMaps [8], ATM [9], and MUQ [10]. 
+What is MParT?
+---------------------------
+Measure transport is a rich area in applied mathematics that constructs deterministic transformations--known as transport maps--between random variables. These maps characterize a complex target distribution as a transformation of a simple reference 
+distribution (e.g., a standard Gaussian). Monotone triangular maps are one class of transport maps that are well suited for many tasks in Bayesian inference, 
+including the modeling of conditional distributions and the acceleration of posterior sampling. 
 
 The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee", is a 
-C++ library (with bindings to Python, Julia, and Matlab) that aims to provide performance portable implementations of such parameterizations that can be used to accelerate higher level packages like TransportMaps, ATM, and MUQ that cannot currently leverage GPU resources.
+C++ library (with bindings to Python, Julia, and Matlab) that provides performance portable implementations of monotone functions that can be used for measure transport as well as other applications.   See :ref:`mathematics` for a more thorough discussion of the types of parameterization MParT targets.
+
 MParT emphasizes fast execution and parsimonious parameterizations that can permit near real-time computation on low and moderate dimensional 
-problems.
+problems.  Our goal is to provide fast implementations of common parameterizations that can then be used in higher level libraries such as `TransportMaps <https://transportmaps.mit.edu/docs/>`_ or `MUQ <https://mituq.bitbucket.io/source/_site/index.html>`_.
 
-[1] Santambrogio, Filippo. "Optimal transport for applied mathematicians." Birkäuser, NY 55.58-63 (2015): 94.
-
-[2] Papamakarios, George, et al. "Normalizing Flows for Probabilistic Modeling and Inference." J. Mach. Learn. Res. 22.57 (2021): 1-64.
-
-[3] Marzouk, Y., Moselhy, T., Parno, M., Spantini, A. (2016). Sampling via Measure Transport: An Introduction. In: Ghanem, R., Higdon, D., Owhadi, H. (eds) Handbook of Uncertainty Quantification. Springer, Cham. https://doi.org/10.1007/978-3-319-11259-6_23-1
-
-[4] El Moselhy, Tarek A., and Youssef M. Marzouk. "Bayesian inference with optimal maps." Journal of Computational Physics 231.23 (2012): 7815-7850.
-
-[5] Bigoni, Daniele, Alessio Spantini, and Youssef Marzouk. "Adaptive construction of measure transports for Bayesian inference." NIPS workshop on Approximate Inference. 2016.
-
-[6] Parno, Matthew D., and Youssef M. Marzouk. "Transport map accelerated markov chain monte carlo." SIAM/ASA Journal on Uncertainty Quantification 6.2 (2018): 645-682.
-
-[7] Cotter, Colin, Simon Cotter, and Paul Russell. "Ensemble transport adaptive importance sampling." SIAM/ASA Journal on Uncertainty Quantification 7.2 (2019): 444-471.
-
-[8] Bigoni, D. (2015). TransportMaps. In Bitbucket repository. https://transportmaps.mit.edu
-
-[9] Baptista, R. Zahm O., P-B. Rubio, and Marzouk Y. (2021). ATM. In GitHub repository. https://github.com/baptistar/ATM
-
-[10] Parno, M. Davis A., and Seelinger L. (2021). "MUQ: The MIT uncertainty quantification library". Journal of Open Source Software, 6(68), 3076.
 
 Citing 
 -------------

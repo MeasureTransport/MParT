@@ -289,31 +289,7 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/MParTConfig.cmake
 
 ##############################################################
 # Documentation
-find_package(Doxygen)
 
+Include(BuildDocs)
 
-find_package(Sphinx)
-if(Sphinx_FOUND AND Doxygen_FOUND)
-
-    message("SPHINX Executable = ${SPHINX_EXECUTABLE}")
-    set(SPHINX_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/docs/docs)
-    set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
-
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/mpart.doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile @ONLY)
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs)
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/src)
-
-    # Copy the docs folder to the working folder so we can add to it
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/docs DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/docs)
-
-    add_custom_target(sphinx
-                  COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile
-                  COMMAND ${SPHINX_EXECUTABLE} -b html
-                  # Tell Breathe where to find the Doxygen output
-                  -Dbreathe_projects.mpart=${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen/xml
-                  ${SPHINX_SOURCE} ${SPHINX_BUILD}
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                  COMMENT "Generating documentation with Sphinx")
-
-endif()
 ##############################################################
