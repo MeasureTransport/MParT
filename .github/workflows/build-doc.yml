@@ -28,8 +28,8 @@ jobs:
       - name: Move notebooks into documentation
         run: |
           mkdir ${{ github.workspace }}/docs/source/tutorials/python
-          cp ${{ steps.extract.outputs.destination }}/*.nbconvert.ipynb ${{ github.workspace }}/docs/source/tutorials/python.
-          for file in ${{ github.workspace }}/docs/source/tutorials/*.nbconvert.ipynb; do mv "${file}" "${file/nbconvert./}"; done
+          cp ${{ steps.extract.outputs.destination }}/*.nbconvert.ipynb ${{ github.workspace }}/docs/source/tutorials/python/
+          for file in ${{ github.workspace }}/docs/source/tutorials/python/*.nbconvert.ipynb; do mv "${file}" "${file/nbconvert./}"; done
         
       - name: Install sphinx extensions
         shell: bash -l {0}
