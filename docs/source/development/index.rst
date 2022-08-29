@@ -17,6 +17,7 @@ If possible post complete but minimal code examples.
 
 Requesting a Feature
 ---------------------
+Similar to a bug report, please file an issue on `GitHub <https://github.com/MeasureTransport/MParT/issues>`_ to start a discussion about new features.
 
 Contributing
 --------------
@@ -53,8 +54,8 @@ Open the sphinx output
 .. tip::
     If you're sure all the dependencies are installed but you still see errors complaining that a package cannot be found, you might need to manually specify paths in the :code:`conf.py` sphinx configuration file.
 
-Controlling the Tutorials
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+Controlling Tutorial Documentation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The :ref:`_tutorials` page relies on examples in the `MParT-examples <https://github.com/MeasureTransport/MParT-examples>`_ repository.   MParT's CMake scripts can interact with this repository in three ways: (1) via a local copy of the repository, (2) by temporarily cloning the repository when :code:`make sphinx` is called, and (3) extracting the examples from the `mpart_examples docker image <https://quay.io/repository/measuretransport/mpart_examples>`_ on quay.io.   This last option has the advantage that the python examples can be executed and the any output or plots produced by the example can be included in the example.   It is also possible to skip all attempts at including the examples in the documentation by setting :code:`MPART_BUILD_EXAMPLES=OFF` in your CMake configuration.
 

@@ -1,11 +1,24 @@
 .. _tutorials:
 
-================
 Tutorials
-================
+===========
+The :code:`MParT-examples` repository provides several tutorials demonstrating how to use MParT in c++, python, Julia, and Matlab.   Below are a gallery of these examples linking to python notebooks.  For other languages, please go to the example repository.
+
+.. card::
+    View examples from all languages on Github
+
+    .. button-link:: https://github.com/MeasureTransport/MParT-examples
+        :color: info
+        :shadow:
+        :expand:
+
+        MeasureTransport/MParT-examples
+
+Gallery (Python)
+-----------------
 
 .. grid:: 1 2 2 3
-    :gutter: 1 
+    :gutter: 3 
 
     .. grid-item-card:: Map from Density
         :link: python/FromDensity2D_banana.ipynb
