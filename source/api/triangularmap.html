@@ -430,7 +430,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="multivariateexpansionworker.html">
-   Multivariate Expansion
+   Multivariate Expansion Worker
   </a>
  </li>
  <li class="toctree-l1 has-children">
@@ -455,7 +455,7 @@
     <ul>
      <li class="toctree-l3">
       <a class="reference internal" href="multivariateexpansionworker.html">
-       Multivariate Expansion
+       Multivariate Expansion Worker
       </a>
      </li>
      <li class="toctree-l3">
@@ -548,10 +548,10 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMap9SetCoeffsEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE">
 <span class="target" id="classmpart_1_1_triangular_map_1ac26cd92e9adf4074bcb7a2bb9b40f818"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SetCoeffs</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">coeffs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart13TriangularMap9SetCoeffsEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>&#64;briefs Set the internally stored view of coefficients. &#64;detail Performs a shallow copy of the input coefficients to the internally stored coefficients. If values in the view passed to this function are changed, the values will also change in the internally stored view. </p>
+<dd><p>Set the internally stored view of coefficients. &#64;detail Performs a shallow copy of the input coefficients to the internally stored coefficients. If values in the view passed to this function are changed, the values will also change in the internally stored view. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>coeffs</strong> – <strong>[in]</strong> A view to save internally. </p>
+<dd class="field-odd"><p><strong>coeffs</strong> – A view to save internally. </p>
 </dd>
 </dl>
 </dd></dl>
@@ -613,7 +613,18 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMap13CoeffGradImplERK13StridedMatrixIKd11MemorySpaceERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE">
 <span class="target" id="classmpart_1_1_triangular_map_1afea395919eeaaae077ac8d2672320449"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffGradImpl</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart13TriangularMapE" title="mpart::TriangularMap::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart13TriangularMapE" title="mpart::TriangularMap::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sens</span></span>, <span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart13TriangularMapE" title="mpart::TriangularMap::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart13TriangularMap13CoeffGradImplERK13StridedMatrixIKd11MemorySpaceERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Pure virtual function overridden by child classes for computing the gradient of the function output with respect to the parameter vector <span class="math notranslate nohighlight">\(\mathbf{w}\)</span>. See the non-virtual CoeffGrad function for more details. </p>
+<p>Evaluates the gradient with respect to the coefficients and stores the results in a preallocated matrix. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – A <span class="math notranslate nohighlight">\(d_{in}\times N\)</span> matrix containining <span class="math notranslate nohighlight">\(N\)</span> points in <span class="math notranslate nohighlight">\(\mathbb{R}^d\)</span> where this function be evaluated. Each column is a point. </p></li>
+<li><p><strong>sens</strong> – A matrix of sensitivity vectors. Each column contains one sensitivity. </p></li>
+<li><p><strong>output</strong> – A preallocated matrix to store the results. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart13TriangularMap27LogDeterminantCoeffGradImplERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE">

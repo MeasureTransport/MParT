@@ -37,6 +37,8 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'source/getting_started';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -357,6 +359,38 @@
   <section id="getting-started">
 <span id="example"></span><h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this heading">#</a></h1>
 <p>Below are short snippets providing a first glimpse of MParT usage.  For more detailed examples, check out the <a class="reference internal" href="tutorials/index.html#tutorials"><span class="std std-ref">Tutorials</span></a> page and the corresponding <a class="reference external" href="https://github.com/MeasureTransport/MParT-examples">MParT-Examples</a> repository.</p>
+<p>At the core of MParT’s monotone parameterizations are functions with the general form</p>
+<div class="math notranslate nohighlight">
+\[T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt,\]</div>
+<p>where <span class="math notranslate nohighlight">\(\mathbf{x}\in\mathbb{R}^d\)</span> is the function input, <span class="math notranslate nohighlight">\(\mathbf{w}\)</span> is a vector of parameters, and <span class="math notranslate nohighlight">\(g:\mathbb{R}\rightarrow\mathbb{R}^+\)</span> is positive-valued “rectifier”.  The function <span class="math notranslate nohighlight">\(f(\mathbf{x})\)</span> is a general non-monotone function, which MParT represents with a linear expansion of the form</p>
+<div class="math notranslate nohighlight">
+\[f(\mathbf{x}) = \sum_{\mathbf{\alpha}\in\mathcal{A}} w_{\mathbf{\alpha}} \Phi_{\mathbf{\alpha}}(\mathbb{x})\]</div>
+<p>and the multivariate basis functions <span class="math notranslate nohighlight">\(\Phi_{\mathbf{\alpha}}\)</span> are defined through the multiindex <span class="math notranslate nohighlight">\(\mathbf{\alpha}\in \mathbb{N}^d\)</span> and the tensor-product of 1d basis functions, i.e.,</p>
+<div class="math notranslate nohighlight">
+\[\Phi_{\mathbf{\alpha}}(\mathbb{x}) = \prod_{j=1}^d \phi_{\alpha_j}(x_j),\]</div>
+<p>where <span class="math notranslate nohighlight">\(\phi_{\alpha_j}\)</span> will typically be a polynomial of order <span class="math notranslate nohighlight">\(\alpha_j\)</span>.</p>
+<p>The monotone component <span class="math notranslate nohighlight">\(T_d\)</span> is therefore defined by five main options:</p>
+<ol class="arabic simple">
+<li><p>Which family of 1d basis functions are used to define <span class="math notranslate nohighlight">\(\phi_{\alpha_j}\)</span> (e.g., Hermite polynomials)</p></li>
+<li><p>The multiindex set <span class="math notranslate nohighlight">\(\mathcal{A}\)</span>, which defines the terms that are included in the linear expansion.  A common, although not always optimal, choice is to choose the set containing terms with a maximum total order, i.e., <span class="math notranslate nohighlight">\(\mathcal{A} = \{\mathbf{\alpha} \in \mathbb{Z}^+ : \|\mathbf{\alpha}\|_1 \leq a_{max}\}\)</span></p></li>
+<li><p>The coefficient vector <span class="math notranslate nohighlight">\(\mathbf{w}\in\mathbb{R}^{|\mathcal{A}|}\)</span></p></li>
+<li><p>The choice of rectifier function <span class="math notranslate nohighlight">\(g\)</span>.</p></li>
+<li><p>How the integral is approximated numerically.</p></li>
+</ol>
+<div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Overview</div>
+<p class="sd-card-text">The code snippets below construct a single component <span class="math notranslate nohighlight">\(T_d : \mathbb{R}^2\rightarrow \mathbb{R}\)</span> by first defining the multiindex set <span class="math notranslate nohighlight">\(\mathcal{A}\)</span> and then using default options for the other choices.</p>
+<p class="sd-card-text">The multiindex set is given by</p>
+<div class="math notranslate nohighlight">
+\[\mathcal{A} = \left\{ [0,1],[2,0],[1,1] \right\}\]</div>
+<ul class="simple">
+<li><p class="sd-card-text">See the <a class="reference internal" href="api/mapfactory.html#_CPPv4N5mpart10MapOptionsE" title="mpart::MapOptions"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">MapOptions</span></code></a> structure for available options and the default values that are used here.</p></li>
+<li><p class="sd-card-text">See the <a class="reference internal" href="api/conditionalmapbase.html#_CPPv4I0EN5mpart18ConditionalMapBaseE" title="mpart::ConditionalMapBase"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">ConditionalMapBase</span></code></a> and <a class="reference internal" href="api/parameterizedfunctionbase.html#_CPPv4I0EN5mpart25ParameterizedFunctionBaseE" title="mpart::ParameterizedFunctionBase"><code class="xref cpp cpp-class docutils literal notranslate"><span class="pre">ParameterizedFunctionBase</span></code></a> classes for how to interact with the created <code class="code docutils literal notranslate"><span class="pre">mapComponent</span></code> object.</p></li>
+</ul>
+</div>
+</div>
 <div class="sd-tab-set docutils">
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">

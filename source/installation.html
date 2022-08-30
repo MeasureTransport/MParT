@@ -370,8 +370,10 @@ Install with Conda</div>
 </section>
 <section id="compiling-from-source">
 <span id="compiling-source"></span><h1>Compiling from Source<a class="headerlink" href="#compiling-from-source" title="Permalink to this heading">#</a></h1>
+<p>The MParT source code can be obtained in the <a class="reference external" href="https://github.com/MeasureTransport/MParT">MeasureTransport/MParT</a> repository on Github.</p>
 <p>MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir build
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> &lt;/path/to/MParT&gt;
+mkdir build
 <span class="nb">cd</span> build
 cmake                                               <span class="se">\</span>
   -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;  <span class="se">\</span>
@@ -478,8 +480,11 @@ Linux</label><div class="sd-tab-content docutils">
 <section id="compiling-with-cuda-support">
 <h2>Compiling with CUDA Support<a class="headerlink" href="#compiling-with-cuda-support" title="Permalink to this heading">#</a></h2>
 <p>To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides.</p>
-<p>First, we compile Kokkos with the required options:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake <span class="se">\</span>
+<p>First, we compile Kokkos with the required options.  Kokkos source code can be obtained from the <a class="reference external" href="https://github.com/kokkos/kokkos">kokkos/kokkos</a> repository on Github.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> &lt;path/to/kokkos&gt;
+mkdir build
+<span class="nb">cd</span> build
+cmake <span class="se">\</span>
     -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;/new/kokkos/install/path&gt; <span class="se">\</span>
     -DBUILD_SHARED_LIBS<span class="o">=</span>ON                            <span class="se">\</span>
     -DKokkos_ENABLE_SERIAL<span class="o">=</span>OFF                        <span class="se">\</span>
@@ -495,10 +500,13 @@ Linux</label><div class="sd-tab-content docutils">
 <p>Replace the <code class="code docutils literal notranslate"><span class="pre">Kokkos_ARCH_VOLTA70</span></code> as needed with whatever other arch the compute resource uses that Kokkos supports. If you aren’t sure, try omitting this as Kokkos has some machinery to detect such architecture.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
-<p>If you’re getting an error about C++ standards, try using a new version of your compiler; <code class="code docutils literal notranslate"><span class="pre">g++</span></code>, for example, does not support the flag <code class="code docutils literal notranslate"><span class="pre">--std=c++17</span></code> below version 8, where <code class="code docutils literal notranslate"><span class="pre">nvcc</span></code> only supports such syntax. For more details, see <a class="reference external" href="https://github.com/kokkos/kokkos/issues/5157">this issue</a> in Kokkos.</p>
+<p>If you’re getting an error about C++ standards, try using a new version of your compiler; <code class="code docutils literal notranslate"><span class="pre">g++</span></code>, for example, does not support the flag <code class="code docutils literal notranslate"><span class="pre">--std=c++17</span></code> below version 8. For more details, see <a class="reference external" href="https://github.com/kokkos/kokkos/issues/5157">this issue</a> in Kokkos.</p>
 </div>
 <p>Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the <code class="code docutils literal notranslate"><span class="pre">build</span></code> directory using the following command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake <span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> &lt;path/to/MParT&gt;
+mkdir build
+<span class="nb">cd</span> build
+cmake <span class="se">\</span>
     -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;                 <span class="se">\</span>
     -DKokkos_ROOT<span class="o">=</span>&lt;/new/kokkos/install/path&gt;                         <span class="se">\</span>
     -DCMAKE_CXX_COMPILER<span class="o">=</span>&lt;/new/kokkos/install/path&gt;/bin/nvcc_wrapper <span class="se">\</span>

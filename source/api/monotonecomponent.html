@@ -430,7 +430,7 @@
  </li>
  <li class="toctree-l1">
   <a class="reference internal" href="multivariateexpansionworker.html">
-   Multivariate Expansion
+   Multivariate Expansion Worker
   </a>
  </li>
  <li class="toctree-l1 current active has-children">
@@ -455,7 +455,7 @@
     <ul>
      <li class="toctree-l3">
       <a class="reference internal" href="multivariateexpansionworker.html">
-       Multivariate Expansion
+       Multivariate Expansion Worker
       </a>
      </li>
      <li class="toctree-l3">
@@ -555,7 +555,7 @@
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent15GetBaseFunctionEv">
-<span class="target" id="classmpart_1_1_monotone_component_1a3ada8dda5b5a15e055d0951b8972eaeb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">ParameterizedFunctionBase</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000EN5mpart17MonotoneComponentE" title="mpart::MonotoneComponent::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBaseFunction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent15GetBaseFunctionEv" title="Permalink to this definition">#</a><br /></dt>
+<span class="target" id="classmpart_1_1_monotone_component_1a3ada8dda5b5a15e055d0951b8972eaeb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="parameterizedfunctionbase.html#_CPPv4I0EN5mpart25ParameterizedFunctionBaseE" title="mpart::ParameterizedFunctionBase"><span class="n"><span class="pre">ParameterizedFunctionBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0000EN5mpart17MonotoneComponentE" title="mpart::MonotoneComponent::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetBaseFunction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent15GetBaseFunctionEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>For Monotone parameterizations that are based on a non-monotone base function, this function will return the base function. If the monotone parameterization is not constructed from a non-monotone base, then this function will return a nullptr. </p>
 </dd></dl>
 
@@ -568,7 +568,8 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent11InverseImplERK13StridedMatrixIKd11MemorySpaceERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE">
 <span class="target" id="classmpart_1_1_monotone_component_1ab85e73e6e5391eb9e644c0e4e5bbeb35"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InverseImpl</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000EN5mpart17MonotoneComponentE" title="mpart::MonotoneComponent::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">x1</span></span>, <span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000EN5mpart17MonotoneComponentE" title="mpart::MonotoneComponent::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">r</span></span>, <span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000EN5mpart17MonotoneComponentE" title="mpart::MonotoneComponent::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent11InverseImplERK13StridedMatrixIKd11MemorySpaceERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Pure abstract function overridden by child classes. </p>
+</dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent18LogDeterminantImplERK13StridedMatrixIKd11MemorySpaceE13StridedVectorId11MemorySpaceE">
@@ -578,7 +579,18 @@
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent13CoeffGradImplERK13StridedMatrixIKd11MemorySpaceERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE">
 <span class="target" id="classmpart_1_1_monotone_component_1a8feb2858b678650f6f00affd63ddb6f8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffGradImpl</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000EN5mpart17MonotoneComponentE" title="mpart::MonotoneComponent::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pts</span></span>, <span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000EN5mpart17MonotoneComponentE" title="mpart::MonotoneComponent::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sens</span></span>, <span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0000EN5mpart17MonotoneComponentE" title="mpart::MonotoneComponent::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">output</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart17MonotoneComponent13CoeffGradImplERK13StridedMatrixIKd11MemorySpaceERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
+<dd><p>Pure virtual function overridden by child classes for computing the gradient of the function output with respect to the parameter vector <span class="math notranslate nohighlight">\(\mathbf{w}\)</span>. See the non-virtual CoeffGrad function for more details. </p>
+<p>Evaluates the gradient with respect to the coefficients and stores the results in a preallocated matrix. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pts</strong> – A <span class="math notranslate nohighlight">\(d_{in}\times N\)</span> matrix containining <span class="math notranslate nohighlight">\(N\)</span> points in <span class="math notranslate nohighlight">\(\mathbb{R}^d\)</span> where this function be evaluated. Each column is a point. </p></li>
+<li><p><strong>sens</strong> – A matrix of sensitivity vectors. Each column contains one sensitivity. </p></li>
+<li><p><strong>output</strong> – A preallocated matrix to store the results. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart17MonotoneComponent27LogDeterminantCoeffGradImplERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE">
@@ -755,7 +767,7 @@
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>cache</strong> – Memory used by the MultivariateExpansion to cache evaluations </p></li>
+<li><p><strong>cache</strong> – Memory used by the <a class="reference internal" href="multivariateexpansion.html#classmpart_1_1_multivariate_expansion"><span class="std std-ref">MultivariateExpansion</span></a> to cache evaluations </p></li>
 <li><p><strong>workspace</strong> – Memory used by the quadrature routine to store evaluations </p></li>
 <li><p><strong>pt</strong> – </p></li>
 <li><p><strong>coeffs</strong> – </p></li>

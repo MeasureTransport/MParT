@@ -1,7 +1,7 @@
 ==============================
-Multivariate Expansion Worker
+Parameterized Function Base
 ==============================
 
-.. doxygenclass:: mpart::MultivariateExpansionWorker
+.. doxygenclass:: mpart::ParameterizedFunctionBase
     :members:
     :undoc-members:

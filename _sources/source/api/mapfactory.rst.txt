@@ -2,6 +2,11 @@
 Map Factory
 ==============================
 
+.. doxygennamespace:: mpart::MapFactory
+
+.. doxygenfunction:: mpart::MapFactory::CreateComponent
+
+.. doxygenfunction:: mpart::MapFactory::CreateTriangular
 
 .. doxygenstruct:: mpart::MapOptions
     :members:
@@ -12,5 +17,3 @@ Map Factory
 .. doxygenenum:: mpart::PosFuncTypes
 
 .. doxygenenum:: mpart::QuadTypes
-
-.. doxygenfunction:: mpart::MapFactory::CreateComponent
