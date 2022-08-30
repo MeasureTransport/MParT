@@ -75,6 +75,6 @@ The results show similar performance across languages (each using OpenMP backend
 
 # Acknowledgements
 
-We acknowledge support from the US Office of Naval Research under MURI Grant N00014-20-1-2595, the US Department of Energy under grant DE‐SC0021226, and computing resources from Dartmouth College and the Massachusetts Institute of Technology. 
+We acknowledge support from the US Office of Naval Research under MURI Grant N00014-20-1-2595, the US Department of Energy under grant DE‐SC0021226, the Deutsche Forschungsgemeinschaft (DFG, German Research Foundation) – Projektnummern 459970814; 459970841, and computing resources from Dartmouth College and the Massachusetts Institute of Technology.
 
 # References
