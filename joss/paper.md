@@ -69,7 +69,7 @@ where $f(\mathbf{x}_{1:d}; \mathbf{w})$ is a general (non-monotone) function par
 
 The following plots show the performance of MParT for the evaluation of a rectified degree-$5$ polynomial transport map on $\mathbb{R}^5$, using different languages and Kokkos backends. The monotone parameterization is constructed from Hermite polynomials and an adaptive Simpson quadrature rule.  Random map coefficients and sample locations are used in this test.  At each sample level, the map is evaluated at fifty randomly selected coefficients.
 
-![Time to evaluate triangular map from different languages and backends.](performance_comparison.pdf)
+![Time to evaluate triangular map from different languages and backends.](performance_comparison.png)
 
 The results show similar performance across languages (each using OpenMP backend with 8 threads) and nearly identical performance between the Threads and OpenMP backends.   For the evaluation of $10^6$ samples, the OpenMP backend with 16 threads is approximately $14\times$ faster than the serial backend.  The CUDA backend is approximately $82\times$ faster than the serial backend, or $6\times$ faster than the OpenMP backend.   Tests were performed in a Kubernetes container using 8 cores of a Intel(R) Xeon(R) Gold 6248 CPU and a Tesla V100-SXM2 GPU with CUDA version 11.2.
 
