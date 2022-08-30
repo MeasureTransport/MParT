@@ -31,7 +31,7 @@ authors:
     orcid: 0000-0002-5026-4499
     affiliation: 2
   - name: Youssef Marzouk 
-    orcid: 0000-0000-0000-0000
+    orcid: 0000-0001-8242-3290
     affiliation: 2
 affiliations:
  - name: Dartmouth College, USA
@@ -64,7 +64,7 @@ where $f(\mathbf{x}_{1:d}; \mathbf{w})$ is a general (non-monotone) function par
 `MParT` aims to provide a performance portable shared-memory implementation of parameterizations built on \autoref{eq:rectified}.  `MParT` uses Kokkos [@edwards2014kokkos] to leverage multithreading on either CPUs or GPUs with a common code base.  `MParT` provides an efficient low-level library that can then be used to accelerate higher level packages like TransportMaps, ATM, and MUQ that cannot currently leverage GPU resources.  Bindings to Python, Julia, and Matlab are also provided to enable a wide variety of users to leverage the fast C++ core from the language of their choice.
 
 
-# Performance and Scalability 
+# Performance and scalability 
 
 The following plots show the performance of MParT for the evaluation of a rectified degree-$5$ polynomial transport map on $\mathbb{R}^5$, using different languages and Kokkos backends. The monotone parameterization is constructed from Hermite polynomials and an adaptive Simpson quadrature rule.  Random map coefficients and sample locations are used in this test.  At each sample level, the map is evaluated at fifty randomly selected coefficients.
 
