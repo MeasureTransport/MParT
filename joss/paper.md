@@ -3,13 +3,14 @@ title: 'MParT: Monotone Parameterization Toolkit'
 tags:
   - Python
   - Julia
-  - Matlab
-  - c++
+  - MATLAB
+  - C++
   - measure transport
   - transport map
   - density estimation
   - Bayesian inference
   - normalizing flows
+  - machine learning
 authors:
   - name: Matthew Parno
     orcid: 0000-0002-9419-2693
@@ -44,15 +45,15 @@ bibliography: paper.bib
 
 # Summary
 
-Measure transport is a rich area in applied mathematics that involves the construction of deterministic transformations---known as transport maps---between probability distributions [@santambrogio2015optimal]. These maps characterize a complex target distribution as a (deterministic) transformation of a simple reference distribution (e.g., a standard Gaussian). In the context of probabilistic modeling, transport maps enable easy generation of samples from the target distribution and direct evaluation of the target probability density function. Monotone triangular maps [@baptista2022adaptive] are specific class of transport maps endowed with several computational advantages over non-triangular maps, and yet sufficiently general to represent any absolutely continuous distribution; they are also the building block of many normalizing flow architectures commonly used in the machine learning community [@papamakarios2021normalizing].
+Measure transport is a rich area in applied mathematics that involves the construction of deterministic transformations--known as transport maps--between probability distributions [@santambrogio2015optimal]. These maps characterize a complex target distribution as a (deterministic) transformation of a simple reference distribution (e.g., a standard Gaussian). In the context of probabilistic modeling, transport maps enable easy generation of samples from the target distribution and direct evaluation of the target probability density function. Monotone triangular maps [@baptista2022adaptive] are a specific class of transport maps endowed with several computational advantages over non-triangular maps, such as easy invertibility and training, and yet sufficiently general to represent any absolutely continuous distribution; they are also the building block of many normalizing flow architectures commonly used in the machine learning community [@papamakarios2021normalizing].
 
-Triangular maps are also well suited to many tasks in Bayesian inference, including the modeling of conditional distributions [@Marzouk2016,@spantini2018inference] and the acceleration of posterior sampling [@el2012bayesian; @bigoni2016adaptive; @parno2018transport; @cotter2019ensemble].  The fundamental idea is to convert the problem of characterizing a probability distribution through Monte Carlo sampling, variational inference, or density estimation into an optimization problem over multivariate monotone functions. The efficient solution of this optimization problem is important when using maps as part of online algorithms, as commonly encountered in sequential inference [@spantini2019coupling].
+Triangular maps are also well suited to many tasks in Bayesian inference, including the modeling of conditional distributions [@Marzouk2016,@spantini2018inference] and the acceleration of posterior sampling [@el2012bayesian; @bigoni2016adaptive; @parno2018transport; @cotter2019ensemble].  The fundamental idea is to convert the problem of characterizing a probability distribution through Monte Carlo sampling, variational inference, or density estimation into an optimization problem over multivariate monotone functions. The efficient solution of this optimization problem is especially important when using maps as part of online algorithms, as commonly encountered in sequential inference [@spantini2019coupling].
 
-In practice, working with triangular maps requires the definition of a parametric family of multivariate monotone functions.  The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee," aims to provide performance-portable implementations of such parameterizations.  `MParT` is a C++ library (with bindings to Python, Julia, and Matlab) that emphasizes fast execution and parsimonious parameterizations that can enable near real-time computation on low- and moderate-dimensional problems.
+In practice, working with triangular maps requires the definition of a parametric family of multivariate monotone functions.  The Monotone Parameterization Toolkit (`MParT`), pronounced aims to provide performance-portable implementations of such parameterizations.  `MParT` is a C++ library with bindings to Python, Julia, and Matlab that emphasizes fast execution and parsimonious parameterizations that can enable near real-time computation on low- and moderate-dimensional problems.
 
 
 # Statement of need 
-Several existing software packages have the ability to parameterize monotone functions, including TensorFlow Probability [@dillon2017tensorflow], TransportMaps [@transportmaps], ATM [@atm], and MUQ [@parno2021muq].  TensorFlow probability has a bijection class that allows deep neural network-based functions, such as normalizing flows [@papamakarios2021normalizing] to be easily defined and trained while also leveraging GPU computing resources if available.  The TransportMaps, ATM, and MUQ packages use an alternative parameterization based on rectified polynomial expansions.  At the core of these packages are scalar-valued functions $T_d : \mathbb{R}^d \rightarrow \mathbb{R}$ of the form 
+Several existing software packages have the ability to parameterize monotone functions, including TensorFlow Probability [@dillon2017tensorflow], TransportMaps [@transportmaps], ATM [@atm], and MUQ [@parno2021muq].  TensorFlow probability has a bijection class that allows deep neural network-based functions, such as normalizing flows [@papamakarios2021normalizing] to be easily defined and trained while also leveraging GPU computing resources if available but is focused on deep neural network parameterizations best suited for high dimensional problems.   The TransportMaps, ATM, and MUQ packages use an alternative parameterization based on rectified polynomial expansions that is more compact and easier to train on low to moderate dimensional problems.  At the core of these packages are scalar-valued functions $T_d : \mathbb{R}^d \rightarrow \mathbb{R}$ of the form 
 
 \begin{equation}
 T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) \, dt,
