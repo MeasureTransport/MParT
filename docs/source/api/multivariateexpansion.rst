@@ -1,7 +1,7 @@
 ==============================
-Multivariate Expansion Worker
+Multivariate Expansion
 ==============================
 
-.. doxygenclass:: mpart::MultivariateExpansionWorker
+.. doxygenclass:: mpart::MultivariateExpansion
     :members:
     :undoc-members:

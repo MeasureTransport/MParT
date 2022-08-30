@@ -4,6 +4,49 @@ Getting Started
 ----------------------
 Below are short snippets providing a first glimpse of MParT usage.  For more detailed examples, check out the :ref:`tutorials` page and the corresponding `MParT-Examples <https://github.com/MeasureTransport/MParT-examples>`_ repository.
 
+At the core of MParT's monotone parameterizations are functions with the general form 
+
+.. math::
+
+    T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt,
+
+where :math:`\mathbf{x}\in\mathbb{R}^d` is the function input, :math:`\mathbf{w}` is a vector of parameters, and :math:`g:\mathbb{R}\rightarrow\mathbb{R}^+` is positive-valued "rectifier".  The function :math:`f(\mathbf{x})` is a general non-monotone function, which MParT represents with a linear expansion of the form 
+
+.. math::
+
+    f(\mathbf{x}) = \sum_{\mathbf{\alpha}\in\mathcal{A}} w_{\mathbf{\alpha}} \Phi_{\mathbf{\alpha}}(\mathbb{x})
+
+and the multivariate basis functions :math:`\Phi_{\mathbf{\alpha}}` are defined through the multiindex :math:`\mathbf{\alpha}\in \mathbb{N}^d` and the tensor-product of 1d basis functions, i.e.,
+
+.. math::
+
+    \Phi_{\mathbf{\alpha}}(\mathbb{x}) = \prod_{j=1}^d \phi_{\alpha_j}(x_j),
+
+where :math:`\phi_{\alpha_j}` will typically be a polynomial of order :math:`\alpha_j`.
+
+The monotone component :math:`T_d` is therefore defined by five main options:
+
+#. Which family of 1d basis functions are used to define :math:`\phi_{\alpha_j}` (e.g., Hermite polynomials)
+#. The multiindex set :math:`\mathcal{A}`, which defines the terms that are included in the linear expansion.  A common, although not always optimal, choice is to choose the set containing terms with a maximum total order, i.e., :math:`\mathcal{A} = \{\mathbf{\alpha} \in \mathbb{Z}^+ : \|\mathbf{\alpha}\|_1 \leq a_{max}\}`
+#. The coefficient vector :math:`\mathbf{w}\in\mathbb{R}^{|\mathcal{A}|}`
+#. The choice of rectifier function :math:`g`. 
+#. How the integral is approximated numerically.
+
+.. card:: Overview
+
+    The code snippets below construct a single component :math:`T_d : \mathbb{R}^2\rightarrow \mathbb{R}` by first defining the multiindex set :math:`\mathcal{A}` and then using default options for the other choices.   
+
+    The multiindex set is given by 
+    
+    .. math::
+
+        \mathcal{A} = \left\{ [0,1],[2,0],[1,1] \right\}
+        
+    * See the :cpp:class:`MapOptions <mpart::MapOptions>` structure for available options and the default values that are used here.
+    * See the :cpp:class:`ConditionalMapBase <mpart::ConditionalMapBase>` and :cpp:class:`ParameterizedFunctionBase <mpart::ParameterizedFunctionBase>` classes for how to interact with the created :code:`mapComponent` object.
+
+
+
 .. tab-set::
 
 
