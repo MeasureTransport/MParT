@@ -8,6 +8,30 @@
 
 namespace mpart{
 
+    /**
+     @brief Namespace containing factory methods for constructing triangular maps and map components.
+
+     Example usage:
+     @code{.cpp}
+    // First, set options defining the paramterization
+    MapOptions options;
+    options.basisType = BasisTypes::ProbabilistHermite; // Optional. Default = BasisTypes::ProbabilistHermite
+    options.posFuncType = PosFuncTypes::SoftPlus;       // Optional. Default = PosFuncTypes::SoftPlus
+    options.quadType = QuadTypes::AdaptiveSimpson;      // Optional. Default = QuadTypes::AdaptiveSimpson
+    options.quadAbsTol = 1e-6;                          // Optional. Default = 1e-6
+    options.quadRelTol = 1e-6;                          // Optional. Default = 1e-6
+    options.quadMaxSub = 10;                            // Optional. Default = 30
+    options.contDeriv = true;                           // Optional. Default = true
+
+    // Create a triangular map with these options
+    unsigned int inDim = 4;
+    unsigned int outDim = 3;
+    unsigned int totalOrder = 3;
+    auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(inDim, outDim, totalOrder, options);
+
+     @endcode
+     
+     */
     namespace MapFactory{
 
         /**

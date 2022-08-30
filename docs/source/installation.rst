@@ -19,10 +19,13 @@ Installation
 
 Compiling from Source
 =====================
+The MParT source code can be obtained in the `MeasureTransport/MParT <https://github.com/MeasureTransport/MParT>`_ repository on Github.
+
 MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:
 
 .. code-block:: bash
 
+   cd </path/to/MParT>
    mkdir build
    cd build
    cmake                                               \
@@ -158,10 +161,13 @@ Compiling with CUDA Support
 
 To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides. 
 
-First, we compile Kokkos with the required options:
+First, we compile Kokkos with the required options.  Kokkos source code can be obtained from the `kokkos/kokkos <https://github.com/kokkos/kokkos>`_ repository on Github.
 
 .. code-block:: bash
-
+    
+    cd <path/to/kokkos>
+    mkdir build 
+    cd build
     cmake \
         -DCMAKE_INSTALL_PREFIX=</new/kokkos/install/path> \
         -DBUILD_SHARED_LIBS=ON                            \
@@ -177,12 +183,15 @@ First, we compile Kokkos with the required options:
 Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the compute resource uses that Kokkos supports. If you aren't sure, try omitting this as Kokkos has some machinery to detect such architecture.
 
 .. tip::
-    If you're getting an error about C++ standards, try using a new version of your compiler; :code:`g++`, for example, does not support the flag :code:`--std=c++17` below version 8, where :code:`nvcc` only supports such syntax. For more details, see `this issue <https://github.com/kokkos/kokkos/issues/5157>`_ in Kokkos.
+    If you're getting an error about C++ standards, try using a new version of your compiler; :code:`g++`, for example, does not support the flag :code:`--std=c++17` below version 8. For more details, see `this issue <https://github.com/kokkos/kokkos/issues/5157>`_ in Kokkos.
 
 Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the :code:`build` directory using the following command:
 
 .. code-block:: bash
 
+    cd <path/to/MParT>
+    mkdir build 
+    cd build
     cmake \
         -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>                 \
         -DKokkos_ROOT=</new/kokkos/install/path>                         \
