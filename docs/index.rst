@@ -7,7 +7,7 @@
 
 MParT: Monotone Parameterization Toolkit
 ========================================
-:mod:`mpart` is a toolbox for constructing and using monotone functions for measure transport and regression.
+:mod:`mpart`, pronounced "em-par-tee", is a multi-language toolkit for constructing and using monotone functions for measure transport and regression.
 
 .. image:: _static/pics/Transformation2d.png
 
@@ -47,14 +47,14 @@ reference is
 
 .. epigraph::
 
-   MParT Development Team. <YEAR>. MParT: A Monotone Parameterization Toolkit, <VERSION>. https://measuretransport.github.io/MParT/
+   MParT Development Team. <YEAR>. MParT: Monotone Parameterization Toolkit, <VERSION>. https://measuretransport.github.io/MParT/
 
 In bibtex, this is::
 
    @misc{mpart2022,
-      title = {{MParT: A Monotone Parameterization Toolbox}},
+      title = {{Monotone Parameterization Toolbkit (MParT)}},
       author = {{MParT Development Team}},
-      note = {Version 0.0.1},
+      note = {Version 1.0.0},
       year = {2022},
       url = {https://measuretransport.github.io/MParT/},
    }
