@@ -31,14 +31,16 @@ namespace mpart {
             When the values of the larger view are updated, the subview stored by this class will also be updated. This
             is particularly convenient when simultaneously optimizing the coefficients over many conditional maps because
             each map can just use a slice into the larger vector of all coefficients that is updated by the optimizer.
+
+            @return A reference to the Kokkos::View containing the coefficients.
         */
         virtual Kokkos::View<double*, MemorySpace>& Coeffs(){return this->savedCoeffs;};
 
-        /** @briefs Set the internally stored view of coefficients.
+        /** @brief Set the internally stored view of coefficients.
             @detail Performs a shallow copy of the input coefficients to the internally stored coefficients.
             If values in the view passed to this function are changed, the values will also change in the
             internally stored view.
-            @param[in] coeffs A view to save internally.
+            @param coeffs A view to save internally.
         */
         virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs);
 
@@ -46,6 +48,7 @@ namespace mpart {
         virtual void SetCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs);
         #endif 
 
+        /** SetCoeffs function with conversion from Eigen to Kokkos vector types.*/
         virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs);
 
         /** Returns an eigen map wrapping around the coefficient vector, which is stored in a Kokkos::View.  Updating the
@@ -63,10 +66,18 @@ namespace mpart {
         /** Evaluate function with conversion from Eigen to Kokkos (and possibly copy to/from device.) */
         Eigen::RowMatrixXd Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        /** Main Evaluate function. */
+        /** @brief Evaluate the function at multiple points.
+        @details Computes \f$\mathbf{y}^{(i)}=T(\mathbf{x}^{(i)}; \mathbf{w})\f$ for \f$N\f$ points \f$\{\mathbf{x}^{(1)},\ldots,\mathbf{x}^{(N)}\}\f$.  The parameters \f$\mathbf{w}\f$ are defined by the :code:`SetCoeffs` function.
+        @param pts A \f$d_{in}\times N\f$ matrix containining \f$N\f$ points in \f$\mathbb{R}^d\f$ where this function be evaluated.  Each column is a point.
+        @return A \f$d_{out}\times N\f$ matrix containing evaluations of this function.  
+        */
         template<typename AnyMemorySpace>
         StridedMatrix<double, AnyMemorySpace> Evaluate(StridedMatrix<const double, AnyMemorySpace> const& pts);
 
+        /** Pure virtual EvaluateImpl function that is overridden by children of this class.
+        @param pts A \f$d_{in}\times N\f$ matrix containining \f$N\f$ points in \f$\mathbb{R}^d\f$ where this function be evaluated.  Each column is a point.
+        @param output A preallocated \f$d_{out}\times N\f$ that will be filled with the evaluations.  This matrix must be sized correctly before being passed into this function.
+        */
         virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                   StridedMatrix<double, MemorySpace>              output) = 0;
 
@@ -100,10 +111,16 @@ namespace mpart {
             return this->CoeffGrad(newpts,newsens);
         }
 
-
+        /** Coeff grad function with conversion between Eigen and Kokkos matrix types. */
         Eigen::RowMatrixXd CoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts,
                                      Eigen::Ref<const Eigen::RowMatrixXd> const& sens);
 
+        /** @brief Pure virtual function overridden by child classes for computing the gradient of the function output with respect to the parameter vector \f$\mathbf{w}\f$.  See the non-virtual CoeffGrad function for more details.
+        @details Evaluates the gradient with respect to the coefficients and stores the results in a preallocated matrix.
+        @param pts A \f$d_{in}\times N\f$ matrix containining \f$N\f$ points in \f$\mathbb{R}^d\f$ where this function be evaluated.  Each column is a point.
+        @param sens A matrix of sensitivity vectors.  Each column contains one sensitivity.
+        @param output A preallocated matrix to store the results.
+        */
         virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                                    StridedMatrix<const double, MemorySpace> const& sens,
                                    StridedMatrix<double, MemorySpace>              output) = 0;
