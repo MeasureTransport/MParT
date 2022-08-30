@@ -145,7 +145,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def(py::init( [](unsigned int dim,
                           Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &orders)
         {
-            return new FixedMultiIndexSet<Kokkos::HostSpace>(dim, VecToKokkos<unsigned int>(orders));
+            return new FixedMultiIndexSet<Kokkos::HostSpace>(dim, VecToKokkos<unsigned int,Kokkos::HostSpace>(orders));
         }))
 
         .def(py::init( [](unsigned int dim,
@@ -154,9 +154,9 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
                           Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &nzOrders)
         {
             return new FixedMultiIndexSet<Kokkos::HostSpace>(dim,
-                                          VecToKokkos<unsigned int>(nzStarts),
-                                          VecToKokkos<unsigned int>(nzDims),
-                                          VecToKokkos<unsigned int>(nzOrders));
+                                          VecToKokkos<unsigned int, Kokkos::HostSpace>(nzStarts),
+                                          VecToKokkos<unsigned int, Kokkos::HostSpace>(nzDims),
+                                          VecToKokkos<unsigned int, Kokkos::HostSpace>(nzOrders));
         }))
 
         .def(py::init<unsigned int, unsigned int>())
@@ -171,7 +171,10 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
             }
             return maxDegreesEigen;
         })
-        ;
-
-
+#if defined(MPART_ENABLE_GPU)
+        .def("ToDevice", &FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<mpart::DeviceSpace>)
+    ;
+    py::class_<FixedMultiIndexSet<mpart::DeviceSpace>, std::shared_ptr<FixedMultiIndexSet<mpart::DeviceSpace>>>(m, "dFixedMultiIndexSet")
+#endif // defined(MPART_ENABLE_GPU)
+    ;
 }

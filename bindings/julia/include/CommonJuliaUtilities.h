@@ -53,6 +53,10 @@ void TriangularMapWrapper(jlcxx::Module&);
  */
 void MapFactoryWrapper(jlcxx::Module&);
 
+#if defined(MPART_ENABLE_GPU)
+void ConditionalMapBaseDeviceWrapper(jlcxx::Module&);
+#endif
+
 } // namespace binding
 } // namespace mpart
 

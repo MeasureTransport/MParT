@@ -631,13 +631,13 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
 
 TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[MonotoneComponent_CoeffGrad]")
 {
-    const double testTol = 1e-4;
+    //const double testTol = 1e-4;
     unsigned int dim = 2;
  
     // Create points evently spaced on [lb,ub]
     unsigned int numPts = 20;
-    double lb = -0.5;
-    double ub = 0.5;
+    //double lb = -0.5;
+    //double ub = 0.5;
 
     Kokkos::View<double**, HostSpace> evalPts("Evaluate Points", dim, numPts);
     for(unsigned int i=0; i<numPts; ++i){
@@ -720,7 +720,7 @@ TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
     unsigned int dim = 1;
     unsigned int maxDegree = 1;
     FixedMultiIndexSet<HostSpace> hset(dim, maxDegree);
-    FixedMultiIndexSet<DeviceSpace> mset = hset.ToDevice(); // Create a total order limited fixed multindex set
+    FixedMultiIndexSet<DeviceSpace> mset = hset.ToDevice<DeviceSpace>(); // Create a total order limited fixed multindex set
 
     MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> expansion(mset);
 
@@ -843,7 +843,7 @@ TEST_CASE( "Testing MonotoneComponent::EvaluateSingle on Device", "[MonotoneComp
     unsigned int dim = 2;
     unsigned int maxDegree = 1;
     FixedMultiIndexSet<HostSpace> hset(dim,maxDegree);
-    FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice(); // Create a total order limited fixed multindex set
+    FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice<DeviceSpace>(); // Create a total order limited fixed multindex set
 
     MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> dexpansion(dset);
 
@@ -913,7 +913,7 @@ TEST_CASE( "Testing 1d monotone component evaluation on device", "[MonotoneCompo
     SECTION("Affine Map"){
         unsigned int maxDegree = 1;
         FixedMultiIndexSet<HostSpace> hset(dim, maxDegree);
-        FixedMultiIndexSet<DeviceSpace> mset = hset.ToDevice();
+        FixedMultiIndexSet<DeviceSpace> mset = hset.ToDevice<DeviceSpace>();
 
         MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> expansion(mset);
 
@@ -949,7 +949,7 @@ TEST_CASE( "Testing 1d monotone component evaluation on device", "[MonotoneCompo
         unsigned int maxDegree = 2;
 
         FixedMultiIndexSet<HostSpace> hset(dim, maxDegree);
-        FixedMultiIndexSet<DeviceSpace> mset = hset.ToDevice();
+        FixedMultiIndexSet<DeviceSpace> mset = hset.ToDevice<DeviceSpace>();
 
         MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> expansion(mset);
 

@@ -1,0 +1,12 @@
+name: mpart
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - eigen
+  - pybind11
+  - catch2
+  - cmake
+  - gcc
+  - gxx
+  - make

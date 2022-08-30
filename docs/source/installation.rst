@@ -1,18 +1,21 @@
-Installation
-------------
-
 .. _installation:
+
+Installation
+===================
 
 .. card:: Install with Conda
 
-    COMING SOON!
+    It is possible to install the main c++ MParT library and its python wrapper via `conda-forge <https://anaconda.org/conda-forge/mpart>`__:
 
     .. code-block:: bash
 
         conda install -c conda-forge mpart
 
+    Julia, Matlab, and CUDA are currently only supported when compiling from source. 
 
 
+
+.. _compiling_source:
 
 Compiling from Source
 =====================
@@ -22,27 +25,48 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
 
    mkdir build
    cd build
-   cmake                                         \
-     -DCMAKE_INSTALL_PREFIX=<your/install/path>  \
-     -DKokkos_ENABLE_PTHREAD=ON                  \
-     -DKokkos_ENABLE_SERIAL=ON                   \
+   cmake                                               \
+     -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
+     -DKokkos_ENABLE_PTHREAD=ON                        \
    ..
    make install
 
-This will compile the :code:`mpart` library and the python bindings. If you are compiling on a multicore machine, you can use :code:`make -j N_JOBS install`, where :code:`N_JOBS` is the number of processes the computer can compile with in parallel.  This installation should also automatically install and build Kokkos, Eigen, and Catch2, assuming they aren't installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:
+This will compile the main c++ :code:`mpart` library as well as any other language bindings that can be automatically configured.  If you are compiling on a multicore machine, you can use :code:`make -j N_JOBS install`, where :code:`N_JOBS` is the number of processes the computer can compile with in parallel.  
+
+This installation should also automatically install and build Kokkos, Eigen, and Catch2, assuming they aren't installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:
 
 .. code-block:: bash
 
-    cmake                                        \
-     -DCMAKE_INSTALL_PREFIX=<your/install/path>  \
-     -DKokkos_ROOT=<your/kokkos/install/root>    \
-     -DEigen3_ROOT=<your/eigen3/install/root>    \
-     -DCatch2_ROOT=<your/catch2/install/root>    \
-     -DKokkos_ENABLE_PTHREAD=ON                  \
-     -DKokkos_ENABLE_SERIAL=ON                   \
+    cmake                                              \
+     -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
+     -DKokkos_ROOT=<your/kokkos/install/root>          \
+     -DEigen3_ROOT=<your/eigen3/install/root>          \
+     -DCatch2_ROOT=<your/catch2/install/root>          \
+     -DKokkos_ENABLE_PTHREAD=ON                        \
+     -DKokkos_ENABLE_SERIAL=ON                         \
    ..
 
 Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, and Catch2 with libraries you don't already have using these :code:`X_ROOT` flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version >=3.13. Further, it has been tested with Kokkos 3.6.0, Eigen 3.4.0, Pybind11 2.9.2, and Catch2 3.0.0-preview3 (there are some issues encountered when compiling MParT with Catch2 3.0.1).
+
+You can force MParT to use previously installed versions of the dependencies by setting :code:`MPART_FETCH_DEPS=OFF`.  The default value of :code:`MPART_FETCH_DEPS=ON` will allow MParT to download and locally install any external dependencies using CMake's :code:`FetchContent` directive.
+
+Note that if you do not wish to compile bindings for Python, Julia, or Matlab, you can turn off binding compilation by setting the :code:`MPART_<language>=OFF` variable during CMake configuration.  For a default build with only the core c++ library, you can use 
+
+.. code-block:: bash
+
+    cmake                                              \
+     -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
+     -DKokkos_ENABLE_PTHREAD=ON                        \
+     -DMPART_PYTHON=OFF                                \
+     -DMPART_MATLAB=OFF                                \
+     -DMPART_JULIA=OFF                                 \
+   ..
+
+
+MParT is built on Kokkos, which provides a single interface to many different multithreading capabilities like pthreads, OpenMP, CUDA, and OpenCL.   A list of available backends can be found on the [Kokkos wiki](https://github.com/kokkos/kokkos/blob/master/BUILD.md#device-backends).   The `Kokkos_ENABLE_PTHREAD` option in the CMake configuration above can be changed to reflect different choices in device backends.   The OSX-provided clang compiler does not support OpenMP, so `PTHREAD` is a natural choice for CPU-based multithreading on OSX.   However, you may find that OpenMP has slightly better performance with other compilers and operating systems.
+
+Tests
+---------
 
 The command :code:`make install` will also create a test executable called :code:`RunTests` in the :code:`build` directory.  The tests can be run with:
 
@@ -55,6 +79,29 @@ Or, with the additional specification of the number of Kokkos threads to use:
 .. code-block::
 
    ./RunTests --kokkos-threads=4
+
+
+Environment Paths 
+------------------
+
+The final step is to set the relevant path variables to include the installation of MParT:
+
+.. tab-set::
+
+    .. tab-item:: MacOS
+
+        .. code-block:: bash
+
+            export PYTHONPATH=$PYTHONPATH:<your/MParT/install/path>/python
+            export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:<your/MParT/install/path>/lib:<your/MParT/install/path>/python
+
+    .. tab-item:: Linux
+
+        .. code-block:: bash
+
+            export PYTHONPATH=$PYTHONPATH:<your/MParT/install/path>/python
+            export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<your/MParT/install/path>/lib:<your/MParT/install/path>/python
+
 
 
 .. tip::
@@ -84,8 +131,9 @@ Or, with the additional specification of the number of Kokkos threads to use:
 
 .. _compiling_julia:
 
-Compiling with Julia Bindings
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Julia Configuration
+------------------
+
 By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia :code:`CxxWrap` package is installed.   To install :code:`CxxWrap`, run the following command in your Julia prompt:
 
 .. code-block:: julia
@@ -106,8 +154,11 @@ Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :
 At this point, you should be able to open up a REPL and type :code:`using MParT` and get going with any of the provided examples!
 
 Compiling with CUDA Support
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides. First, we compile Kokkos with the required options:
+------------------
+
+To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides. 
+
+First, we compile Kokkos with the required options:
 
 .. code-block:: bash
 
@@ -133,14 +184,14 @@ Using the above documentation on building with an external install of Kokkos, we
 .. code-block:: bash
 
     cmake \
-        -DCMAKE_INSTALL_PREFIX=<your/install/path>                       \
+        -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>                 \
         -DKokkos_ROOT=</new/kokkos/install/path>                         \
         -DCMAKE_CXX_COMPILER=</new/kokkos/install/path>/bin/nvcc_wrapper \
     ..
 
 Make sure that :code:`CMAKE_CXX_COMPILER` uses a full path from the root!
 
+
 .. tip::
    If you're using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into :code:`CMakeFiles.txt` and add :code:`add_compile_definition(EIGEN_DONT_VECTORIZE)`.
-
 

@@ -34,6 +34,8 @@ include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-Wno-deprecated-gpu-targets" COMPILER_IS_NVCC1)
 check_cxx_compiler_flag("--expt-relaxed-constexpr" COMPILER_IS_NVCC2)
 if(COMPILER_IS_NVCC1 AND COMPILER_IS_NVCC2)
+    add_definitions(-DMPART_ENABLE_GPU)
+    message(STATUS "GPU support detected")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-gpu-targets --expt-relaxed-constexpr")
     add_compile_definitions(EIGEN_NO_CUDA)
 endif()
@@ -287,31 +289,7 @@ install (FILES ${CMAKE_CURRENT_BINARY_DIR}/MParTConfig.cmake
 
 ##############################################################
 # Documentation
-find_package(Doxygen)
 
+Include(BuildDocs)
 
-find_package(Sphinx)
-if(Sphinx_FOUND AND Doxygen_FOUND)
-
-    message("SPHINX Executable = ${SPHINX_EXECUTABLE}")
-    set(SPHINX_SOURCE ${CMAKE_CURRENT_BINARY_DIR}/docs/docs)
-    set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/docs/sphinx)
-
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/mpart.doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile @ONLY)
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs)
-    file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/docs/src)
-
-    # Copy the docs folder to the working folder so we can add to it
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/docs DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/docs)
-
-    add_custom_target(sphinx
-                  COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/mpart.doxyfile
-                  COMMAND ${SPHINX_EXECUTABLE} -b html
-                  # Tell Breathe where to find the Doxygen output
-                  -Dbreathe_projects.mpart=${CMAKE_CURRENT_BINARY_DIR}/docs/doxygen/xml
-                  ${SPHINX_SOURCE} ${SPHINX_BUILD}
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-                  COMMENT "Generating documentation with Sphinx")
-
-endif()
 ##############################################################

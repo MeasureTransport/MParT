@@ -165,6 +165,12 @@ MultiIndexSet set(length, limiter);
   */
   MultiIndexSet& operator+=(const MultiIndexSet &rhs);
 
+  friend MultiIndexSet operator+(MultiIndexSet lhs, const MultiIndexSet& rhs)
+  {
+    lhs += rhs;
+    return lhs;
+  }
+
   /** @brief Add a single MultiIndex to the set.
     @details This functions checks to see if the input basis function is
             already in the set and if the input function is unique, it is
@@ -174,6 +180,15 @@ MultiIndexSet set(length, limiter);
             MultiIndex in rhs.
     */
   MultiIndexSet& operator+=(MultiIndex const& rhs);
+  
+  friend MultiIndexSet operator+(MultiIndexSet lhs, const MultiIndex& rhs)
+  {
+    lhs += rhs;
+    return lhs;
+  }
+
+  /** Assignment operator.  Will throw a runtime_error exception if the rhs does not have the same size of *this. */
+  MultiIndexSet& operator=(const MultiIndexSet& rhs);
 
   /** @brief Add all terms in rhs to this instance.
     @details This function adds all unique MultiIndices from the rhs into this MultiIndexSet.  In the event that a multiindex is active in one set, but not the other, the union will set that multiindex to be active.
