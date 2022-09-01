@@ -524,8 +524,27 @@
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BasisEvaluatorType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_worker"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansionWorker</span></span></span><a class="headerlink" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Defines a function in terms of the tensor product of unary basis functions. </p>
 <p><ul class="simple">
-<li><p>Cache memory managed elsewhere <div class="math notranslate nohighlight">
-\[\begin{split} \text{cache} = \left[\begin{array}{c} \phi_1^0(x_1)\\ \phi_1^1(x_1)\\ \vdots \phi_1^{p_1}\\ \phi_2^0(x_2)\\ \vdots\\ \phi_2^{p_2}(x_2)\\ \vdots \\ \phi_d^{p_d}(x_d)\\ \frac{\partial}{\partial x_d}\phi_d^0(x_d)\\ \vdots\\ \frac{\partial}{\partial x_d}\phi_d^{p_d}(x_d)\\ \frac{\partial^2}{\partial x_d}\phi_d^0(x_d^2)\\ \vdots\\ \frac{\partial^2}{\partial x_d^2}\phi_d^{p_d}(x_d) \end{array} \right] \end{split}\]</div>
+<li><p>Cache memory managed elsewhere  <div class="math notranslate nohighlight">
+\[\begin{split}
+    \text{cache} = \left[\begin{array}{c}
+    \phi_1^0(x_1)\\
+    \phi_1^1(x_1)\\
+    \vdots
+    \phi_1^{p_1}\\
+    \phi_2^0(x_2)\\
+    \vdots\\
+    \phi_2^{p_2}(x_2)\\
+    \vdots \\
+    \phi_d^{p_d}(x_d)\\
+    \frac{\partial}{\partial x_d}\phi_d^0(x_d)\\
+    \vdots\\
+    \frac{\partial}{\partial x_d}\phi_d^{p_d}(x_d)\\
+    \frac{\partial^2}{\partial x_d}\phi_d^0(x_d^2)\\
+    \vdots\\
+    \frac{\partial^2}{\partial x_d^2}\phi_d^{p_d}(x_d)
+    \end{array}
+    \right]
+ \end{split}\]</div>
 </p></li>
 </ul>
 </p>
