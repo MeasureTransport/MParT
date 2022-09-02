@@ -13,7 +13,7 @@ namespace mpart{
                                         std::string quadType, double quadAbsTol,
                                         double quadRelTol, unsigned int quadMaxSub, 
                                         unsigned int quadMinSub,unsigned int quadPts, 
-                                        bool contDeriv);
+                                        bool contDeriv, double basisLB, double basisUB);
 }
 
 
