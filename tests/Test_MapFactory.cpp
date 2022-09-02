@@ -65,6 +65,62 @@ TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
 }
 
 
+TEST_CASE( "Testing map component factory with linearized basis", "[MapFactoryLinearizedComponent]" ) {
+
+    
+    MapOptions options;
+    options.basisType = BasisTypes::ProbabilistHermite;
+    options.basisLB = -3;
+    options.basisUB = 3;
+    
+    unsigned int dim = 3;
+    unsigned int maxDegree = 5;
+    FixedMultiIndexSet<MemorySpace> mset(dim,maxDegree);
+
+    SECTION("AdaptiveSimpson"){
+        options.quadType = QuadTypes::AdaptiveSimpson;
+
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
+        REQUIRE(map!=nullptr);
+
+        unsigned int numPts = 100;
+        Kokkos::View<double**,MemorySpace> pts("Points", dim, numPts);
+        for(unsigned int i=0; i<numPts; ++i)
+            pts(dim-1,i) = 5.0*double(i)/double(numPts-1);
+
+        Kokkos::View<double**, MemorySpace> eval = map->Evaluate(pts);
+    }
+
+    SECTION("ClenshawCurtis"){
+        options.quadType = QuadTypes::ClenshawCurtis;
+        
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
+        REQUIRE(map!=nullptr);
+
+        unsigned int numPts = 100;
+        Kokkos::View<double**,MemorySpace> pts("Points", dim, numPts);
+        for(unsigned int i=0; i<numPts; ++i)
+            pts(dim-1,i) = double(i)/double(numPts-1);
+
+        Kokkos::View<double**, MemorySpace> eval = map->Evaluate(pts);
+    }
+
+    SECTION("AdaptiveClenshawCurtis"){
+        options.quadType = QuadTypes::AdaptiveClenshawCurtis;
+        
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
+        REQUIRE(map!=nullptr);
+
+        unsigned int numPts = 100;
+        Kokkos::View<double**,MemorySpace> pts("Points", dim, numPts);
+        for(unsigned int i=0; i<numPts; ++i)
+            pts(dim-1,i) = double(i)/double(numPts-1);
+
+        Kokkos::View<double**, MemorySpace> eval = map->Evaluate(pts);
+    }
+}
+
+
 TEST_CASE( "Testing multivariate expansion factory", "[MapFactoryExpansion]" ) {
 
     MapOptions options;

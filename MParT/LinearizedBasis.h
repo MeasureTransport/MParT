@@ -1,5 +1,5 @@
-#ifndef MPART_HERMITEFUNCTION_H
-#define MPART_HERMITEFUNCTION_H
+#ifndef MPART_LINEARIZEDBASIS_H
+#define MPART_LINEARIZEDBASIS_H
 
 #include <Kokkos_Core.hpp>
 

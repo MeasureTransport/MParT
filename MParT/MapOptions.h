@@ -1,6 +1,8 @@
 #ifndef MPART_MAPOPTIONS_H
 #define MPART_MAPOPTIONS_H
 
+#include <limits>
+
 namespace mpart{
 
     enum class BasisTypes
@@ -45,6 +47,11 @@ namespace mpart{
         /** The type of 1d basis function used to define the multivariate expansion. */
         BasisTypes basisType = BasisTypes::ProbabilistHermite;
 
+        /** Linearization bounds for the 1d basis function. The basis function is linearized outside [lb,ub] */
+        double basisLB = -std::numeric_limits<double>::infinity();
+        double basisUB =  std::numeric_limits<double>::infinity();
+        
+
         /** The type of positive bijector used inside the monotonicity-guaranteeing integral 
             formulation. 
         */
@@ -53,6 +60,7 @@ namespace mpart{
         /** The type of quadrature rule to use. */
         QuadTypes quadType = QuadTypes::AdaptiveSimpson;
 
+        
         /** The absolute tolerance used by adaptive quadrature rules like AdaptiveSimpson and 
             AdaptiveClenshawCurtis. 
         */
