@@ -37,7 +37,7 @@ namespace {
 MEX_DEFINE(ParameterizedFunction_newMap) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 11);
+  InputArguments input(nrhs, prhs, 13);
   OutputArguments output(nlhs, plhs, 1);
   unsigned int outputDim = input.get<unsigned int>(0);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(1));
