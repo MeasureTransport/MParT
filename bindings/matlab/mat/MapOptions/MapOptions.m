@@ -1,8 +1,8 @@
 classdef MapOptions
     properties (Access = public)
         basisType = BasisTypes.ProbabilistHermite;
-        basisLB = -10^15;
-        basisUB = 10^15;
+        basisLB = log(0);
+        basisUB = 1.0/0.0;
         posFuncType = PosFuncTypes.SoftPlus;
         quadType = QuadTypes.AdaptiveSimpson;
         quadAbsTol = 1e-6;
