@@ -70,54 +70,52 @@ TEST_CASE( "Testing map component factory with linearized basis", "[MapFactoryLi
     
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
-    options.basisLB = -3;
-    options.basisUB = 3;
+    options.basisLB = -5;
+    options.basisUB = 4;
     
-    unsigned int dim = 3;
-    unsigned int maxDegree = 5;
+    MapOptions options2;
+    options2.basisType = BasisTypes::ProbabilistHermite;
+
+    unsigned int dim = 1;
+    unsigned int maxDegree = 7;
     FixedMultiIndexSet<MemorySpace> mset(dim,maxDegree);
 
     SECTION("AdaptiveSimpson"){
         options.quadType = QuadTypes::AdaptiveSimpson;
 
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
-        REQUIRE(map!=nullptr);
-
-        unsigned int numPts = 100;
-        Kokkos::View<double**,MemorySpace> pts("Points", dim, numPts);
-        for(unsigned int i=0; i<numPts; ++i)
-            pts(dim-1,i) = 5.0*double(i)/double(numPts-1);
-
-        Kokkos::View<double**, MemorySpace> eval = map->Evaluate(pts);
-    }
-
-    SECTION("ClenshawCurtis"){
-        options.quadType = QuadTypes::ClenshawCurtis;
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> linearized_map = MapFactory::CreateComponent<MemorySpace>(mset, options);
         
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options2);
+        REQUIRE(linearized_map!=nullptr);
         REQUIRE(map!=nullptr);
 
-        unsigned int numPts = 100;
+        Kokkos::View<double*,MemorySpace> coeffs("Coefficients", map->numCoeffs);
+        for(unsigned int i=0; i<map->numCoeffs; ++i)
+            coeffs(i) = 1.0;
+        map->SetCoeffs(coeffs);
+        linearized_map->SetCoeffs(coeffs);
+
+        unsigned int numPts = 5;
         Kokkos::View<double**,MemorySpace> pts("Points", dim, numPts);
-        for(unsigned int i=0; i<numPts; ++i)
-            pts(dim-1,i) = double(i)/double(numPts-1);
-
-        Kokkos::View<double**, MemorySpace> eval = map->Evaluate(pts);
-    }
-
-    SECTION("AdaptiveClenshawCurtis"){
-        options.quadType = QuadTypes::AdaptiveClenshawCurtis;
+        pts(0,0) = -6;
+        pts(0,1) = -4.5;
+        pts(0,2) = 0;
+        pts(0,3) = 3.5;
+        pts(0,4) = 4.5;
         
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
-        REQUIRE(map!=nullptr);
+        
+        Kokkos::View<double**, MemorySpace> linearized_evals = linearized_map->Evaluate(pts);
+        Kokkos::View<double**, MemorySpace> evals = map->Evaluate(pts);
 
-        unsigned int numPts = 100;
-        Kokkos::View<double**,MemorySpace> pts("Points", dim, numPts);
-        for(unsigned int i=0; i<numPts; ++i)
-            pts(dim-1,i) = double(i)/double(numPts-1);
-
-        Kokkos::View<double**, MemorySpace> eval = map->Evaluate(pts);
+        for(unsigned int i=0; i<numPts; ++i){
+            if((pts(0,i)<options.basisLB)||(pts(0,i)>options.basisUB)){
+                CHECK( std::abs(linearized_evals(0,i) - evals(0,i))>1e-13);
+            }else{
+                CHECK( linearized_evals(0,i) == Approx(evals(0,i)).epsilon(1e-15));
+            }
+        }
     }
+
 }
 
 

@@ -11,14 +11,14 @@ TEST_CASE( "Testing Linearized hermite basis", "[LinearizedHermite]" ) {
 
     const double floatTol = 1e-15;
 
-    double lb = -3;
-    double ub = 3;
+    double lb = -4;
+    double ub = 5;
 
-    LinearizedBasis<ProbabilistHermite> basis(-3,3);
+    LinearizedBasis<ProbabilistHermite> basis(lb,ub);
 
-    std::vector<double> xs1{-1.9, -0.25, 0.0, 0.5, 1.9};
-    std::vector<double> xs2{-5.0,-4.0,-3.1};
-    std::vector<double> xs3{3.1,4.0,5.0};
+    std::vector<double> xs1{-3.5, -0.25, 0.0, 0.5, 4.5};
+    std::vector<double> xs2{-5.0,-4.5,-4.1};
+    std::vector<double> xs3{5.1,5.5,6.0};
     std::vector<double> allvals(5);
     std::vector<double> allderivs(5);
     std::vector<double> allderivs2(5);
