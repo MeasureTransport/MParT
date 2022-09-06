@@ -90,6 +90,9 @@ namespace mpart{
             is differentiated. 
         */
         bool contDeriv = true;
+
+        /** If orthogonal polynomial basis functions should be normalized. */
+        bool normalizePolys = true;
     }; 
 };
 

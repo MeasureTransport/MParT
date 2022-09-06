@@ -16,6 +16,7 @@ TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
     
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
+    options.normalizePolys = false;
 
     unsigned int dim = 3;
     unsigned int maxDegree = 5;
@@ -72,10 +73,13 @@ TEST_CASE( "Testing map component factory with linearized basis", "[MapFactoryLi
     options.basisType = BasisTypes::ProbabilistHermite;
     options.basisLB = -5;
     options.basisUB = 4;
+    options.normalizePolys = false;
+    
     
     MapOptions options2;
     options2.basisType = BasisTypes::ProbabilistHermite;
-
+    options2.normalizePolys = false;
+    
     unsigned int dim = 1;
     unsigned int maxDegree = 7;
     FixedMultiIndexSet<MemorySpace> mset(dim,maxDegree);
@@ -123,7 +127,7 @@ TEST_CASE( "Testing multivariate expansion factory", "[MapFactoryExpansion]" ) {
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
-
+    
     unsigned int outDim = 5;
     unsigned int inDim = 3;
     unsigned int maxDegree = 5;
@@ -147,7 +151,6 @@ TEST_CASE( "Testing factory method for triangular map", "[MapFactoryTriangular]"
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
-
 
     std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateTriangular<MemorySpace>(4,3,5, options);
 

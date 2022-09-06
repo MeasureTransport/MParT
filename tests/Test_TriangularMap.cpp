@@ -11,7 +11,8 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
-
+    options.normalizePolys = false;
+    
     unsigned int numBlocks = 3;
     unsigned int maxDegree = 2;
     unsigned int extraInputs = 1;
