@@ -16,7 +16,7 @@ TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
     
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
-    options.normalizePolys = false;
+    options.basisNorm = false;
 
     unsigned int dim = 3;
     unsigned int maxDegree = 5;
@@ -73,12 +73,12 @@ TEST_CASE( "Testing map component factory with linearized basis", "[MapFactoryLi
     options.basisType = BasisTypes::ProbabilistHermite;
     options.basisLB = -5;
     options.basisUB = 4;
-    options.normalizePolys = false;
+    options.basisNorm = false;
     
     
     MapOptions options2;
     options2.basisType = BasisTypes::ProbabilistHermite;
-    options2.normalizePolys = false;
+    options2.basisNorm = false;
     
     unsigned int dim = 1;
     unsigned int maxDegree = 7;
