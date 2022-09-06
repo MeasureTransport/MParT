@@ -4,6 +4,7 @@
 #include <Kokkos_Core.hpp>
 
 #include "MParT/OrthogonalPolynomial.h"
+#include "MParT/Utilities/MathFunctions.h"
 
 namespace mpart{
 
@@ -135,13 +136,6 @@ public:
 
 private:
     PhysicistHermite polyBase;
-
-    KOKKOS_INLINE_FUNCTION unsigned int Factorial(unsigned int d) const{
-        unsigned int out = 1;
-        for(unsigned int i=2; i<=d; ++i)
-            out *= i;
-        return out;
-    }
     
 }; // class HermiteFunction
 
