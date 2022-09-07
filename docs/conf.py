@@ -32,7 +32,6 @@ extensions = [ 'sphinx.ext.autodoc',
     'sphinx.ext.todo',
     'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
-    'sphinx_tabs.tabs',
     'sphinx_design',
     'breathe',
     'nbsphinx']
@@ -56,6 +55,14 @@ html_sidebars = {
     "**": ["search-field.html", "sidebar-nav-bs.html"]
 }
 
+nbsphinx_prolog = """
+Launch this notebook on on mybinder.org:
+
+.. image:: https://mybinder.org/badge_logo.svg
+   :target: https://mybinder.org/v2/gh/MeasureTransport/MParT-examples/main?urlpath=lab/tree/examples/python/{{ env.docname | basename }}.ipynb
+   
+----
+"""
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

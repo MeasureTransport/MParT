@@ -50,8 +50,11 @@ public:
                   start at index \f$\sum_{j=1}^{k-1} C_j\f$.
     */
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
-    virtual void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
-
+    virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+    #if defined(MPART_ENABLE_GPU)
+    virtual void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
+    #endif 
+    
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}
 
     /** @brief Computes the log determinant of the Jacobian matrix of this map.
@@ -75,7 +78,10 @@ public:
     void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                       StridedMatrix<double, MemorySpace>              output) override;
 
-
+    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                              StridedMatrix<const double, MemorySpace> const& sens,
+                              StridedMatrix<double, MemorySpace>              output) override;
+    
     /** @brief Evaluates the map inverse.
 
     @details To understand this function, consider splitting the map input \f$x_{1:N}\f$ into two parts so that \f$x_{1:N} = [x_{1:N-M},x_{N-M+1:M}]\f$.  Note that the

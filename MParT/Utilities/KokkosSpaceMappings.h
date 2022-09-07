@@ -6,7 +6,7 @@
 namespace mpart{
 
     /** Used to convert Kokkos memory space type (e.g., Kokkos::CudaSpace) to an execution space that can access that memory.
-        Note that mapping from memory space to device space is not unique.  This metaprogramming technique is only guaranteed 
+        Note that mapping from memory space to device space is not unique.  This metaprogramming technique is only guaranteed
         to return one of the possible execution spaces.
     */
     template<typename MemorySpace>
@@ -14,10 +14,10 @@ namespace mpart{
 
     template<> struct MemoryToExecution<Kokkos::HostSpace>{using Space = Kokkos::DefaultHostExecutionSpace;};
 
-    #if defined(KOKKOS_ENABLE_CUDA)
+    #if defined(MPART_ENABLE_GPU)
     template<> struct MemoryToExecution<Kokkos::CudaSpace>{using Space = Kokkos::Cuda;};
     #endif
-    
+
 }
 
-#endif 
+#endif

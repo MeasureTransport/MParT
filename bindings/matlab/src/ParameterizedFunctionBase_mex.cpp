@@ -37,7 +37,7 @@ namespace {
 MEX_DEFINE(ParameterizedFunction_newMap) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 11);
+  InputArguments input(nrhs, prhs, 14);
   OutputArguments output(nlhs, plhs, 1);
   unsigned int outputDim = input.get<unsigned int>(0);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(1));
@@ -45,7 +45,7 @@ MEX_DEFINE(ParameterizedFunction_newMap) (int nlhs, mxArray* plhs[],
                                          input.get<std::string>(4),input.get<double>(5),
                                          input.get<double>(6),input.get<unsigned int>(7),
                                          input.get<unsigned int>(8),input.get<unsigned int>(9),
-                                         input.get<bool>(10));
+                                         input.get<bool>(10),input.get<double>(11),input.get<double>(12),input.get<bool>(13));
 
   output.set(0, Session<ParameterizedFunctionMex>::create(new ParameterizedFunctionMex(outputDim,mset.Fix(),opts)));
 }
@@ -136,6 +136,21 @@ MEX_DEFINE(ParameterizedFunction_CoeffGrad) (int nlhs, mxArray* plhs[],
   auto out = MexToKokkos2d(prhs[3]);
   
   parFunc.fun_ptr->CoeffGradImpl(pts,sens,out);
+}
+
+MEX_DEFINE(ParameterizedFunction_Gradient) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 4);
+  OutputArguments output(nlhs, plhs, 0);
+
+  const ParameterizedFunctionMex& parFunc = Session<ParameterizedFunctionMex>::getConst(input.get(0));
+
+  auto pts = MexToKokkos2d(prhs[1]);
+  auto sens = MexToKokkos2d(prhs[2]);
+  auto out = MexToKokkos2d(prhs[3]);
+  
+  parFunc.fun_ptr->GradientImpl(pts,sens,out);
 }
 
 } // namespace

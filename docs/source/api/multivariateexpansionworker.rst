@@ -1,5 +1,5 @@
 ==============================
-Multivariate Expansion
+Multivariate Expansion Worker
 ==============================
 
 .. doxygenclass:: mpart::MultivariateExpansionWorker

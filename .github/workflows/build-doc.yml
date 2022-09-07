@@ -22,11 +22,14 @@ jobs:
       - uses: shrink/actions-docker-extract@v1
         id: extract
         with:
-          image: quay.io/hbonart/mpart:latest
-          path: /home/jovyan/examples/python/.
+          image: quay.io/measuretransport/mpart_examples:latest
+          path: /home/bayes/examples/python/.
       
       - name: Move notebooks into documentation
-        run: cp ${{ steps.extract.outputs.destination }}/*.nbconvert.ipynb ${{ github.workspace }}/docs/source/tutorials/.
+        run: |
+          mkdir ${{ github.workspace }}/docs/source/tutorials/python
+          cp ${{ steps.extract.outputs.destination }}/*.nbconvert.ipynb ${{ github.workspace }}/docs/source/tutorials/python/
+          for file in ${{ github.workspace }}/docs/source/tutorials/python/*.nbconvert.ipynb; do mv "${file}" "${file/nbconvert./}"; done
         
       - name: Install sphinx extensions
         shell: bash -l {0}
@@ -37,7 +40,7 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           mkdir build && cd build
-          cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON -DPYTHON_EXECUTABLE=`which python` ../
+          cmake -DKokkos_ENABLE_PTHREAD=ON -DKokkos_ENABLE_SERIAL=ON -DPYTHON_EXECUTABLE=`which python` -DMPART_BUILD_EXAMPLES=OFF ../
 
       - name: Build Docs
         shell: bash -l {0}

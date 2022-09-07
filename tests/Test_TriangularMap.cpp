@@ -11,7 +11,8 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
-
+    options.basisNorm = false;
+    
     unsigned int numBlocks = 3;
     unsigned int maxDegree = 2;
     unsigned int extraInputs = 1;
@@ -141,6 +142,47 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
                 CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
             }
             coeffs(i) -= fdstep;
+        }
+        
+    }
+
+
+    SECTION("Input Gradient"){
+
+        Kokkos::View<double**,Kokkos::HostSpace> sens("Sensitivities", triMap->outputDim, numSamps);
+        for(unsigned int j=0; j<numSamps; ++j){
+            for(unsigned int i=0; i<triMap->outputDim; ++i){
+                sens(i,j) = 1.0 + 0.1*i + j;
+            }
+        }
+
+        Kokkos::View<double**,Kokkos::HostSpace> evals = triMap->Evaluate(in);
+        Kokkos::View<double**,Kokkos::HostSpace> evals2;
+
+        Kokkos::View<double**,Kokkos::HostSpace> inputGrad = triMap->Gradient(in, sens);
+
+        REQUIRE(inputGrad.extent(0)==triMap->inputDim);
+        REQUIRE(inputGrad.extent(1)==numSamps);
+
+        // Compare with finite differences
+        double fdstep = 1e-5;
+        for(unsigned int i=0; i<triMap->inputDim; ++i){
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
+                in(i,ptInd) += fdstep;
+
+            evals2 = triMap->Evaluate(in);
+
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
+                
+                double fdDeriv = 0.0;
+                for(unsigned int j=0; j<triMap->outputDim; ++j)
+                    fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
+
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
+            }
+
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
+                in(i,ptInd) -= fdstep;
         }
         
     }

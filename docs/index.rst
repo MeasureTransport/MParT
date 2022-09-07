@@ -5,9 +5,9 @@
 
 .. module:: mpart
 
-MParT: Monotone Parameterization Toolbox
+MParT: Monotone Parameterization Toolkit
 ========================================
-:mod:`mpart` is a toolbox for constructing and using monotone functions for measure transport and regression.
+:mod:`mpart`, pronounced "em-par-tee", is a multi-language toolkit for constructing and using monotone functions for measure transport and regression.
 
 .. image:: _static/pics/Transformation2d.png
 
@@ -24,6 +24,20 @@ Contents
    source/api/index
    source/development/index
 
+
+What is MParT?
+---------------------------
+Measure transport is a rich area in applied mathematics that constructs deterministic transformations--known as transport maps--between random variables. These maps characterize a complex target distribution as a transformation of a simple reference 
+distribution (e.g., a standard Gaussian). Monotone triangular maps are one class of transport maps that are well suited for many tasks in Bayesian inference, 
+including the modeling of conditional distributions and the acceleration of posterior sampling. 
+
+The Monotone Parameterization Toolkit (`MParT`), pronounced "em-par-tee", is a 
+C++ library (with bindings to Python, Julia, and Matlab) that provides performance portable implementations of monotone functions that can be used for measure transport as well as other applications.   See :ref:`mathematics` for a more thorough discussion of the types of parameterization MParT targets.
+
+MParT emphasizes fast execution and parsimonious parameterizations that can permit near real-time computation on low and moderate dimensional 
+problems.  Our goal is to provide fast implementations of common parameterizations that can then be used in higher level libraries such as `TransportMaps <https://transportmaps.mit.edu/docs/>`_ or `MUQ <https://mituq.bitbucket.io/source/_site/index.html>`_.
+
+
 Citing 
 -------------
 
@@ -33,14 +47,14 @@ reference is
 
 .. epigraph::
 
-   MParT Development Team. <YEAR>. MParT: A Monotone Parameterization Toolbox, <VERSION>. https://measuretransport.github.io/MParT/
+   MParT Development Team. <YEAR>. MParT: Monotone Parameterization Toolkit, <VERSION>. https://measuretransport.github.io/MParT/
 
 In bibtex, this is::
 
    @misc{mpart2022,
-      title = {{MParT: A Monotone Parameterization Toolbox}},
+      title = {{Monotone Parameterization Toolbkit (MParT)}},
       author = {{MParT Development Team}},
-      note = {Version 0.0.1},
+      note = {Version 1.0.0},
       year = {2022},
       url = {https://measuretransport.github.io/MParT/},
    }

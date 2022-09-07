@@ -1,6 +1,9 @@
 classdef MapOptions
     properties (Access = public)
         basisType = BasisTypes.ProbabilistHermite;
+        basisLB = log(0);
+        basisUB = 1.0/0.0;
+        basisNorm = true;
         posFuncType = PosFuncTypes.SoftPlus;
         quadType = QuadTypes.AdaptiveSimpson;
         quadAbsTol = 1e-6;
@@ -14,6 +17,15 @@ classdef MapOptions
     methods
         function obj = set.basisType(obj,type)
             obj.basisType = type;
+        end
+        function obj = set.basisLB(obj,value)
+            obj.basisLB = value;
+        end
+        function obj = set.basisUB(obj,value)
+            obj.basisUB = value;
+        end
+        function obj = set.basisNorm(obj,value)
+            obj.basisNorm = value;
         end
         function obj = set.posFuncType(obj,type)
             obj.posFuncType = type;
@@ -49,6 +61,9 @@ classdef MapOptions
             optionsArray{7} = obj.quadMinSub;
             optionsArray{8} = obj.quadPts;
             optionsArray{9} = obj.contDeriv;
+            optionsArray{10} = obj.basisLB;
+            optionsArray{11} = obj.basisUB;
+            optionsArray{12} = obj.basisNorm;
         end
     end
 

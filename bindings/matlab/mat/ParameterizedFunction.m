@@ -76,6 +76,11 @@ methods
     MParT_('ParameterizedFunction_CoeffGrad',this.id_,pts,sens,result);
   end
 
+  function result = Gradient(this,pts,sens)
+    result = zeros(size(pts,1), size(pts,2));
+    MParT_('ParameterizedFunction_Gradient',this.id_,pts,sens,result);
+  end
+
   function result = get_id(this)
     result = this.id_;
   end

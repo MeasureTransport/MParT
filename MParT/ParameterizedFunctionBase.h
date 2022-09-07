@@ -4,6 +4,8 @@
 #include "MParT/Utilities/EigenTypes.h"
 #include "MParT/Utilities/ArrayConversions.h"
 
+#include "MParT/Utilities/GPUtils.h"
+
 #include <Eigen/Core>
 
 namespace mpart {
@@ -29,16 +31,24 @@ namespace mpart {
             When the values of the larger view are updated, the subview stored by this class will also be updated. This
             is particularly convenient when simultaneously optimizing the coefficients over many conditional maps because
             each map can just use a slice into the larger vector of all coefficients that is updated by the optimizer.
+
+            @return A reference to the Kokkos::View containing the coefficients.
         */
         virtual Kokkos::View<double*, MemorySpace>& Coeffs(){return this->savedCoeffs;};
 
-        /** @briefs Set the internally stored view of coefficients.
+        /** @brief Set the internally stored view of coefficients.
             @detail Performs a shallow copy of the input coefficients to the internally stored coefficients.
             If values in the view passed to this function are changed, the values will also change in the
             internally stored view.
-            @param[in] coeffs A view to save internally.
+            @param coeffs A view to save internally.
         */
-        virtual void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs);
+        virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs);
+
+        #if defined(MPART_ENABLE_GPU)
+        virtual void SetCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs);
+        #endif 
+
+        /** SetCoeffs function with conversion from Eigen to Kokkos vector types.*/
         virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs);
 
         /** Returns an eigen map wrapping around the coefficient vector, which is stored in a Kokkos::View.  Updating the
@@ -49,13 +59,62 @@ namespace mpart {
         /** Const version of the Coeffs() function. */
         virtual Kokkos::View<const double*, MemorySpace> Coeffs() const{return this->savedCoeffs;};
 
-        
+        /** Evaluate function with conversion between default view layout and const strided matrix. */
+        template<typename ViewType>
+        StridedMatrix<double, typename ViewType::memory_space> Evaluate(ViewType pts){StridedMatrix<const double, typename ViewType::memory_space> newpts(pts); return this->Evaluate(newpts);}
 
-        virtual StridedMatrix<double, MemorySpace> Evaluate(StridedMatrix<const double, MemorySpace> const& pts);
+        /** Evaluate function with conversion from Eigen to Kokkos (and possibly copy to/from device.) */
+        Eigen::RowMatrixXd Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual Eigen::RowMatrixXd Evaluate(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
+        /** @brief Evaluate the function at multiple points.
+        @details Computes \f$\mathbf{y}^{(i)}=T(\mathbf{x}^{(i)}; \mathbf{w})\f$ for \f$N\f$ points \f$\{\mathbf{x}^{(1)},\ldots,\mathbf{x}^{(N)}\}\f$.  The parameters \f$\mathbf{w}\f$ are defined by the :code:`SetCoeffs` function.
+        @param pts A \f$d_{in}\times N\f$ matrix containining \f$N\f$ points in \f$\mathbb{R}^d\f$ where this function be evaluated.  Each column is a point.
+        @return A \f$d_{out}\times N\f$ matrix containing evaluations of this function.  
+        */
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> Evaluate(StridedMatrix<const double, AnyMemorySpace> const& pts);
 
+        /** Pure virtual EvaluateImpl function that is overridden by children of this class.
+        @param pts A \f$d_{in}\times N\f$ matrix containining \f$N\f$ points in \f$\mathbb{R}^d\f$ where this function be evaluated.  Each column is a point.
+        @param output A preallocated \f$d_{out}\times N\f$ that will be filled with the evaluations.  This matrix must be sized correctly before being passed into this function.
+        */
         virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                  StridedMatrix<double, MemorySpace>              output) = 0;
+
+
+        /** Evaluate the gradient of the function with conversion between default view layout and const strided matrix. */
+        template<typename ViewType1, typename ViewType2>
+        StridedMatrix<double, typename ViewType1::memory_space> Gradient(ViewType1 pts, ViewType2 sens){
+            StridedMatrix<const double, typename ViewType1::memory_space> newpts(pts);
+            StridedMatrix<const double, typename ViewType1::memory_space> newSens(sens);
+            return this->Gradient(newpts, newSens);
+        }
+
+        /** Evaluate the gradient of the function with conversion from Eigen to Kokkos (and possibly copy to/from device.) */
+        Eigen::RowMatrixXd Gradient(Eigen::Ref<const Eigen::RowMatrixXd> const& pts,
+                                    Eigen::Ref<const Eigen::RowMatrixXd> const& sens);
+
+        /** @brief Evaluate the gradient of the function at multiple points.
+        @details For input points \f$x^{(i)}\f$ and sensitivity vectors \f$s^{(i)}\f$, this function computes 
+                 \f[
+                    g^{(i)} = \left[s^{(i)}\right]^T\nabla_x T(x^{(i)}; w),
+                 \f] 
+        where \f$\nabla_x T\f$ is the Jacobian of the function \f$T\f$ with respect to the input \f$x\f$.  Note that this function can
+        be used to evaluate one step of the chain rule (e.g., one backpropagation step).  Given a scalar-valued function \f$g\f$, the gradient of 
+        \f$g(T(x))\f$ with respect to \f$x\f$ is given by \f$\left(\nabla g\right)^T \left(\nabla_x T\right)\f$.  Passing \f$\nabla g\f$ as the 
+        sensitivity input to this function then allows you to compute this product and thus the gradient of the composed function \f$g(T(x))\f$.
+        
+        @param pts A \f$d_{in}\times N\f$ matrix containining \f$N\f$ points in \f$\mathbb{R}^{d_{in}}\f$ where this function be evaluated.  Each column is a point.
+        @param sens A \f$d_{out}\times N\f$ matrix containing \f$N\f$ sensitivity vectors in \f$\mathbb{R}^{d_{out}}\f$.  
+        @return A \f$d_{in}\times N\f$ matrix containing the gradient of vectors.  Each column corresponds to the gradient at a particular point and sensitivity.  
+        */
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> Gradient(StridedMatrix<const double, AnyMemorySpace> const& pts,
+                                                       StridedMatrix<const double, AnyMemorySpace> const& sens);
+
+
+        virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                                  StridedMatrix<const double, MemorySpace> const& sens,
                                   StridedMatrix<double, MemorySpace>              output) = 0;
 
 
@@ -76,12 +135,28 @@ namespace mpart {
                     this view should therefore have the same number of columns as `pts`.  It should also have \f$M\f$ rows.   
         @return A collection of vectors \f$g_i\f$.  Will have the same number of columns as pts with \f$K\f$ rows.
         */
-        virtual StridedMatrix<double, MemorySpace> CoeffGrad(StridedMatrix<const double, MemorySpace> const& pts, 
-                                                             StridedMatrix<const double, MemorySpace> const& sens);
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> CoeffGrad(StridedMatrix<const double, AnyMemorySpace> const& pts, 
+                                                        StridedMatrix<const double, AnyMemorySpace> const& sens);
 
-        virtual Eigen::RowMatrixXd CoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts,
-                                             Eigen::Ref<const Eigen::RowMatrixXd> const& sens);
+        /** CoeffGrad function with conversion between general view type and const strided matrix. */
+        template<typename PtsViewType, typename SensViewType>
+        StridedMatrix<double, typename PtsViewType::memory_space> CoeffGrad(PtsViewType pts,  SensViewType sens){
+            StridedMatrix<const double, typename PtsViewType::memory_space> newpts(pts); 
+            StridedMatrix<const double, typename SensViewType::memory_space> newsens(sens); 
+            return this->CoeffGrad(newpts,newsens);
+        }
 
+        /** Coeff grad function with conversion between Eigen and Kokkos matrix types. */
+        Eigen::RowMatrixXd CoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts,
+                                     Eigen::Ref<const Eigen::RowMatrixXd> const& sens);
+
+        /** @brief Pure virtual function overridden by child classes for computing the gradient of the function output with respect to the parameter vector \f$\mathbf{w}\f$.  See the non-virtual CoeffGrad function for more details.
+        @details Evaluates the gradient with respect to the coefficients and stores the results in a preallocated matrix.
+        @param pts A \f$d_{in}\times N\f$ matrix containining \f$N\f$ points in \f$\mathbb{R}^d\f$ where this function be evaluated.  Each column is a point.
+        @param sens A matrix of sensitivity vectors.  Each column contains one sensitivity.
+        @param output A preallocated matrix to store the results.
+        */
         virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                                    StridedMatrix<const double, MemorySpace> const& sens,
                                    StridedMatrix<double, MemorySpace>              output) = 0;
@@ -104,7 +179,7 @@ namespace mpart {
 
         Kokkos::View<double*, MemorySpace> savedCoeffs;
 
-    }; // class ConditionalMapBase<MemorySpace>
+    }; // class ParameterizedFunctionBase
 }
 
 #endif

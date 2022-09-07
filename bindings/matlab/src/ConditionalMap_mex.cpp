@@ -80,7 +80,7 @@ MEX_DEFINE(ConditionalMap_newTriMap) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
                                            int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 12);
+  InputArguments input(nrhs, prhs, 15);
   OutputArguments output(nlhs, plhs, 1);
   unsigned int inputDim = input.get<unsigned int>(0);
   unsigned int outputDim = input.get<unsigned int>(1);
@@ -90,7 +90,7 @@ MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
                                          input.get<std::string>(5),input.get<double>(6),
                                          input.get<double>(7),input.get<unsigned int>(8),
                                          input.get<unsigned int>(9),input.get<unsigned int>(10),
-                                         input.get<bool>(11));
+                                         input.get<bool>(11),input.get<double>(12),input.get<double>(13),input.get<bool>(14));
 
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(inputDim,outputDim,totalOrder,opts)));
 }
@@ -98,16 +98,31 @@ MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 10);
+  InputArguments input(nrhs, prhs, 13);
   OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
                                          input.get<std::string>(3),input.get<double>(4),
                                          input.get<double>(5),input.get<unsigned int>(6),
                                          input.get<unsigned int>(7),input.get<unsigned int>(8),
-                                         input.get<bool>(9));
+                                         input.get<bool>(9),input.get<double>(10),input.get<double>(11),input.get<bool>(12));
 
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(mset.Fix(),opts)));
+}
+
+MEX_DEFINE(ConditionalMap_newMapFixed) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 13);
+  OutputArguments output(nlhs, plhs, 1);
+  const FixedMultiIndexSet<MemorySpace>& mset = Session<FixedMultiIndexSet<MemorySpace>>::getConst(input.get(0));
+  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
+                                         input.get<std::string>(3),input.get<double>(4),
+                                         input.get<double>(5),input.get<unsigned int>(6),
+                                         input.get<unsigned int>(7),input.get<unsigned int>(8),
+                                         input.get<bool>(9),input.get<double>(10),input.get<double>(11),input.get<bool>(12));
+
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(mset,opts)));
 }
 
 // Defines MEX API for delete.
@@ -251,6 +266,21 @@ MEX_DEFINE(ConditionalMap_CoeffGrad) (int nlhs, mxArray* plhs[],
   auto out = MexToKokkos2d(prhs[3]);
   
   condMap.map_ptr->CoeffGradImpl(pts,sens,out);
+}
+
+MEX_DEFINE(ConditionalMap_Gradient) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 4);
+  OutputArguments output(nlhs, plhs, 0);
+
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+
+  auto pts = MexToKokkos2d(prhs[1]);
+  auto sens = MexToKokkos2d(prhs[2]);
+  auto out = MexToKokkos2d(prhs[3]);
+  
+  condMap.map_ptr->GradientImpl(pts,sens,out);
 }
 
 MEX_DEFINE(ConditionalMap_LogDeterminantCoeffGrad) (int nlhs, mxArray* plhs[],
