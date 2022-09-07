@@ -4,6 +4,8 @@
 #include <Kokkos_Core.hpp>
 #include <cmath>
 
+#include "MParT/Utilities/MathFunctions.h"
+
 namespace mpart{
 
 /*
@@ -13,6 +15,8 @@ template<class Mixer>
 class OrthogonalPolynomial : public Mixer
 {
 public:
+
+    OrthogonalPolynomial(bool normalize=false) : normalize_(normalize){};
 
     /* Evaluates all polynomials up to a specified order. */
     KOKKOS_FUNCTION void EvaluateAll(double*              output,
@@ -26,6 +30,13 @@ public:
 
         for(unsigned int order=2; order<=maxOrder; ++order)
             output[order] = (this->ak(order)*x + this->bk(order))*output[order-1] - this->ck(order)*output[order-2];
+
+        if(normalize_){
+            double norm;
+            for(unsigned int order=0; order<=maxOrder; ++order){
+                output[order] /= this->Normalization(order); 
+            }
+        }
     }
 
     /** Evaluates the derivative of every polynomial in this family up to degree maxOrder (inclusive).
@@ -59,6 +70,13 @@ public:
             currVal = (ak*x + bk)*oldVal - ck*oldOldVal;
             derivs[order] = ak*oldVal + (ak*x + bk)*derivs[order-1] - ck*derivs[order-2];
         }
+
+        if(normalize_){
+            double norm;
+            for(unsigned int order=0; order<=maxDegree; ++order){
+                derivs[order] /= this->Normalization(order);
+            }
+        }
     }
 
     /** Evaluates the value and derivative of every polynomial in this family up to degree maxOrder (inclusive).
@@ -85,6 +103,15 @@ public:
             ck = this->ck(order);
             vals[order] = (ak*x + bk)*vals[order-1] - ck*vals[order-2];
             derivs[order] = ak*vals[order-1] + (ak*x + bk)*derivs[order-1] - ck*derivs[order-2];
+        }
+
+        if(normalize_){
+            double norm;
+            for(unsigned int order=0; order<=maxOrder; ++order){
+                norm = this->Normalization(order);
+                vals[order] /= norm;
+                derivs[order] /= norm;
+            }
         }
     }
 
@@ -114,6 +141,16 @@ public:
             derivs[order] = ak*vals[order-1] + (ak*x + bk)*derivs[order-1] - ck*derivs[order-2];
             secondDerivs[order] = ak*derivs[order-1] + ak*derivs[order-1] + (ak*x+bk)*secondDerivs[order-1] - ck*secondDerivs[order-2];
         }
+
+        if(normalize_){
+            double norm;
+            for(unsigned int order=0; order<=maxOrder; ++order){
+                norm = this->Normalization(order);
+                vals[order] /= norm;
+                derivs[order] /= norm;
+                secondDerivs[order] /= norm;
+            }
+        }
     }
 
 
@@ -121,10 +158,15 @@ public:
     KOKKOS_FUNCTION double Evaluate(unsigned int const order,
                     double const x) const
     {
+        double norm = 1.0;
+        if(normalize_){
+            norm = this->Normalization(order);
+        }
+
         if(order==0){
-            return this->phi0(x);
+            return this->phi0(x) / norm;
         }else if(order==1){
-            return this->phi1(x);
+            return this->phi1(x) / norm;
         }else{
 
             // "Downward" Clenshaw algorithm  http://mathworld.wolfram.com/ClenshawRecurrenceFormula.html
@@ -143,7 +185,7 @@ public:
             }
 
             beta = -this->ck(2);
-            return yk1*this->phi1(x) + beta * this->phi0(x)*yk2;
+            return (yk1*this->phi1(x) + beta * this->phi0(x)*yk2) / norm;
         }
     }
 
@@ -179,7 +221,11 @@ public:
                 next_deriv = ak*lag1_val + (ak*x + bk)*lag1_deriv - ck*lag2_deriv;
             }
 
-            return next_deriv;
+            if(normalize_){
+                return next_deriv / this->Normalization(order);
+            }else{
+                return next_deriv;
+            }
         }
     }
 
@@ -221,16 +267,22 @@ public:
                 next_deriv2 = ak*lag1_deriv + ak*lag1_deriv + (ak*x + bk)*lag1_deriv2 - ck*lag2_deriv2;
             }
 
-            return next_deriv2;
+            if(normalize_){
+                return next_deriv2 / this->Normalization(order);
+            }else{
+                return next_deriv2;
+            }
         }
     }
+
+    const bool normalize_;
 };
 
 
 class ProbabilistHermiteMixer{
 public:
 
-    KOKKOS_INLINE_FUNCTION double Normalization(unsigned int polyOrder) const {return sqrt(2.0*M_PI) * tgamma(polyOrder+1); }
+    KOKKOS_INLINE_FUNCTION double Normalization(unsigned int polyOrder) const {return sqrt(sqrt(2.0*M_PI) * Factorial(polyOrder)); }
 
 protected:
 
@@ -248,7 +300,7 @@ typedef OrthogonalPolynomial<ProbabilistHermiteMixer> ProbabilistHermite;
 class PhysicistHermiteMixer{
 public:
 
-    KOKKOS_INLINE_FUNCTION double Normalization(unsigned int polyOrder) const {return sqrt(M_PI) * pow(2.0, static_cast<double>(polyOrder)) * tgamma(polyOrder+1); }
+    KOKKOS_INLINE_FUNCTION double Normalization(unsigned int polyOrder) const {return sqrt(sqrt(M_PI) * pow(2.0, static_cast<double>(polyOrder)) * Factorial(polyOrder)); }
 
 protected:
 

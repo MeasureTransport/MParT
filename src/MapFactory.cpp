@@ -23,7 +23,8 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
             
             if(isinf(opts.basisLB) && isinf(opts.basisUB)){
                
-                MultivariateExpansionWorker<ProbabilistHermite,MemorySpace> expansion(mset);
+                ProbabilistHermite basis1d(opts.basisNorm);
+                MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
                 switch(opts.posFuncType) {
@@ -38,8 +39,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
             }else{
 
-                LinearizedBasis<ProbabilistHermite> basis1d(opts.basisLB, opts.basisUB);
-
+                LinearizedBasis<ProbabilistHermite> basis1d(ProbabilistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
                 MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
@@ -59,7 +59,8 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
             if(isinf(opts.basisLB) && isinf(opts.basisUB)){
                 
-                MultivariateExpansionWorker<PhysicistHermite, MemorySpace> expansion(mset);
+                PhysicistHermite basis1d(opts.basisNorm);
+                MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
                 switch(opts.posFuncType) {
@@ -74,7 +75,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
             }else{
 
-                LinearizedBasis<PhysicistHermite> basis1d(opts.basisLB, opts.basisUB);
+                LinearizedBasis<PhysicistHermite> basis1d(PhysicistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
                 MultivariateExpansionWorker<decltype(basis1d), MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
@@ -91,7 +92,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
         }else if(opts.basisType==BasisTypes::HermiteFunctions){
             if(isinf(opts.basisLB) && isinf(opts.basisUB)){
-                    
+                
                 MultivariateExpansionWorker<HermiteFunction, MemorySpace> expansion(mset);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
@@ -130,8 +131,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
         if(opts.basisType==BasisTypes::ProbabilistHermite){
             
             if(isinf(opts.basisLB) && isinf(opts.basisUB)){
-
-                MultivariateExpansionWorker<ProbabilistHermite,MemorySpace> expansion(mset);
+                
+                ProbabilistHermite basis1d(opts.basisNorm);
+                MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
                 switch(opts.posFuncType) {
@@ -146,7 +148,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
             }else{
                 
-                LinearizedBasis<ProbabilistHermite> basis1d(opts.basisLB, opts.basisUB);
+                LinearizedBasis<ProbabilistHermite> basis1d(ProbabilistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
 
                 MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
@@ -167,7 +169,8 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
             if(isinf(opts.basisLB) && isinf(opts.basisUB)){
                     
-                MultivariateExpansionWorker<PhysicistHermite, MemorySpace> expansion(mset);
+                PhysicistHermite basis1d(opts.basisNorm);
+                MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
                 switch(opts.posFuncType) {
@@ -181,7 +184,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
                 return output;
             }else{
 
-                LinearizedBasis<PhysicistHermite> basis1d(opts.basisLB, opts.basisUB);
+                LinearizedBasis<PhysicistHermite> basis1d(PhysicistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
                 MultivariateExpansionWorker<decltype(basis1d), MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
@@ -237,7 +240,8 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
             
             if(isinf(opts.basisLB) && isinf(opts.basisUB)){
 
-                MultivariateExpansionWorker<ProbabilistHermite,MemorySpace> expansion(mset);
+                ProbabilistHermite basis1d(opts.basisNorm);
+                MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
                 switch(opts.posFuncType) {
@@ -252,7 +256,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
             }else{
                 
-                LinearizedBasis<ProbabilistHermite> basis1d(opts.basisLB, opts.basisUB);
+                LinearizedBasis<ProbabilistHermite> basis1d(ProbabilistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
 
                 MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
@@ -273,7 +277,8 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
 
             if(isinf(opts.basisLB) && isinf(opts.basisUB)){
                     
-                MultivariateExpansionWorker<PhysicistHermite, MemorySpace> expansion(mset);
+                PhysicistHermite basis1d(opts.basisNorm);
+                MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
                 switch(opts.posFuncType) {
@@ -287,7 +292,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateCompon
                 return output;
             }else{
 
-                LinearizedBasis<PhysicistHermite> basis1d(opts.basisLB, opts.basisUB);
+                LinearizedBasis<PhysicistHermite> basis1d(PhysicistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
                 MultivariateExpansionWorker<decltype(basis1d), MemorySpace> expansion(mset, basis1d);
                 std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
@@ -374,19 +379,19 @@ std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::Creat
     if(opts.basisType==BasisTypes::ProbabilistHermite){
         
         if(isinf(opts.basisLB) && isinf(opts.basisUB)){
-            ProbabilistHermite basis1d;
+            ProbabilistHermite basis1d(opts.basisNorm);
             output = std::make_shared<MultivariateExpansion<ProbabilistHermite, MemorySpace>>(outputDim, mset, basis1d);
         }else{
-            LinearizedBasis<ProbabilistHermite> basis1d(opts.basisLB, opts.basisUB);
+            LinearizedBasis<ProbabilistHermite> basis1d(ProbabilistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
             output = std::make_shared<MultivariateExpansion<decltype(basis1d), MemorySpace>>(outputDim, mset, basis1d);
         }
     }else if(opts.basisType==BasisTypes::PhysicistHermite){
 
         if(isinf(opts.basisLB) && isinf(opts.basisUB)){
-            PhysicistHermite basis1d;
+            PhysicistHermite basis1d(opts.basisNorm);
             output = std::make_shared<MultivariateExpansion<PhysicistHermite, MemorySpace>>(outputDim, mset, basis1d);
         }else{
-            LinearizedBasis<PhysicistHermite> basis1d(opts.basisLB, opts.basisUB);
+            LinearizedBasis<PhysicistHermite> basis1d(PhysicistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
             output = std::make_shared<MultivariateExpansion<decltype(basis1d), MemorySpace>>(outputDim, mset, basis1d);
         }
     }else if(opts.basisType==BasisTypes::HermiteFunctions){
