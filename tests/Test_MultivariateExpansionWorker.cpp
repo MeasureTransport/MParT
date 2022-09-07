@@ -20,7 +20,7 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
     MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> expansion(mset);
 
     unsigned int cacheSize = expansion.CacheSize();
-    CHECK(cacheSize == (maxDegree+1)*(dim+2));
+    CHECK(cacheSize == (maxDegree+1)*(2*dim+1));
 
     // Allocate some memory for the cache 
     std::vector<double> cache(cacheSize);
@@ -90,7 +90,7 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
     CHECK( gradEig.dot(stepDir) == Approx((f2-f)/fdStep).epsilon(1e-4));
 
     // Mixed first derivatives
-    df2 = expansion.MixedDerivative(&cache[0], coeffs, 1, grad);
+    df2 = expansion.MixedCoeffDerivative(&cache[0], coeffs, 1, grad);
     CHECK(df2==Approx(df).epsilon(1e-15));
 
     df2 = expansion.DiagonalDerivative(&cache[0], coeffs2, 1);
@@ -98,11 +98,55 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
 
     
     // Mixed second derivatives (grad of d2f wrt coeffs)
-    double d2f2 = expansion.MixedDerivative(&cache[0], coeffs, 2, grad);
+    double d2f2 = expansion.MixedCoeffDerivative(&cache[0], coeffs, 2, grad);
     CHECK(d2f2==Approx(d2f).epsilon(1e-15));
 
     d2f2 = expansion.DiagonalDerivative(&cache[0], coeffs2, 2);
     CHECK( gradEig.dot(stepDir) == Approx((d2f2-d2f)/fdStep).epsilon(1e-4));
+
+    SECTION("Input Derivatives"){
+        // Check input derivatives 
+        expansion.FillCache1(&cache[0], pt, DerivativeFlags::Input);
+        expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Input);
+            
+        Kokkos::View<double*,Kokkos::HostSpace> inGrad("Input Gradient", dim);
+        double eval = expansion.Evaluate(&cache[0], coeffs);
+        double eval2 = expansion.InputDerivative(&cache[0], coeffs, inGrad);
+        CHECK(eval2 == Approx(eval).epsilon(1e-13));
+
+        for(unsigned int wrt=0; wrt<dim; ++wrt){
+            pt(wrt) += fdStep;
+            expansion.FillCache1(&cache[0], pt, DerivativeFlags::None);
+            expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::None);
+            
+            eval2 = expansion.Evaluate(&cache[0], coeffs);
+
+            CHECK(inGrad(wrt) == Approx((eval2-eval)/fdStep).epsilon(1e-4));
+            pt(wrt) -= fdStep;
+        }    
+    }
+
+    SECTION("Mixed Input Derivatives"){
+        // Check input derivatives 
+        expansion.FillCache1(&cache[0], pt, DerivativeFlags::MixedInput);
+        expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::MixedInput);
+            
+        Kokkos::View<double*,Kokkos::HostSpace> inGrad("Input Gradient", dim);
+        double df = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
+        double df2 = expansion.MixedInputDerivative(&cache[0], coeffs, inGrad);
+        CHECK(df2 == Approx(df).epsilon(1e-13));
+
+        for(unsigned int wrt=0; wrt<dim; ++wrt){
+            pt(wrt) += fdStep;
+            expansion.FillCache1(&cache[0], pt, DerivativeFlags::Diagonal);
+            expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
+            
+            df2 = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
+
+            CHECK(inGrad(wrt) == Approx((df2-df)/fdStep).epsilon(1e-4));
+            pt(wrt) -= fdStep;
+        }    
+    }
 }
 
 

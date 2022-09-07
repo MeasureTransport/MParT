@@ -78,7 +78,10 @@ public:
     void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                       StridedMatrix<double, MemorySpace>              output) override;
 
-
+    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                              StridedMatrix<const double, MemorySpace> const& sens,
+                              StridedMatrix<double, MemorySpace>              output) override;
+    
     /** @brief Evaluates the map inverse.
 
     @details To understand this function, consider splitting the map input \f$x_{1:N}\f$ into two parts so that \f$x_{1:N} = [x_{1:N-M},x_{N-M+1:M}]\f$.  Note that the

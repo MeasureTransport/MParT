@@ -158,6 +158,45 @@ void TriangularMap<MemorySpace>::InverseInplace(StridedMatrix<double, MemorySpac
 
 
 template<typename MemorySpace>
+void TriangularMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                              StridedMatrix<const double, MemorySpace> const& sens,
+                                              StridedMatrix<double, MemorySpace>              output)
+{
+    // Evaluate the output for each component
+    StridedMatrix<const double, MemorySpace> subPts;
+    StridedMatrix<const double, MemorySpace> subSens;
+
+    
+    
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0,pts.extent(1));
+    unsigned int dim = pts.extent(0);
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& ptInd){
+        for(unsigned int d=0; d<dim; ++d)
+            output(d,ptInd) = 0.0;
+    });
+    Kokkos::fence();
+    
+    int startOutDim = 0;
+    for(unsigned int i=0; i<comps_.size(); ++i){
+
+        subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
+        subSens = Kokkos::subview(sens, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
+
+        Kokkos::View<double**, MemorySpace> subOut("Component Jacobian", comps_.at(i)->inputDim, pts.extent(1));
+        comps_.at(i)->GradientImpl(subPts, subSens, subOut);
+
+        dim = comps_.at(i)->inputDim;
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& ptInd){
+            for(unsigned int d=0; d<dim; ++d)
+                output(d,ptInd) += subOut(d,ptInd);
+        });
+        Kokkos::fence();
+
+        startOutDim += comps_.at(i)->outputDim;
+    }
+}
+
+template<typename MemorySpace>
 void TriangularMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                StridedMatrix<const double, MemorySpace> const& sens,
                                                StridedMatrix<double, MemorySpace>              output)

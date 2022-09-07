@@ -82,6 +82,42 @@ namespace mpart {
                                   StridedMatrix<double, MemorySpace>              output) = 0;
 
 
+        /** Evaluate the gradient of the function with conversion between default view layout and const strided matrix. */
+        template<typename ViewType1, typename ViewType2>
+        StridedMatrix<double, typename ViewType1::memory_space> Gradient(ViewType1 pts, ViewType2 sens){
+            StridedMatrix<const double, typename ViewType1::memory_space> newpts(pts);
+            StridedMatrix<const double, typename ViewType1::memory_space> newSens(sens);
+            return this->Gradient(newpts, newSens);
+        }
+
+        /** Evaluate the gradient of the function with conversion from Eigen to Kokkos (and possibly copy to/from device.) */
+        Eigen::RowMatrixXd Gradient(Eigen::Ref<const Eigen::RowMatrixXd> const& pts,
+                                    Eigen::Ref<const Eigen::RowMatrixXd> const& sens);
+
+        /** @brief Evaluate the gradient of the function at multiple points.
+        @details For input points \f$x^{(i)}\f$ and sensitivity vectors \f$s^{(i)}\f$, this function computes 
+                 \f[
+                    g^{(i)} = \left[s^{(i)}\right]^T\nabla_x T(x^{(i)}; w),
+                 \f] 
+        where \f$\nabla_x T\f$ is the Jacobian of the function \f$T\f$ with respect to the input \f$x\f$.  Note that this function can
+        be used to evaluate one step of the chain rule (e.g., one backpropagation step).  Given a scalar-valued function \f$g\f$, the gradient of 
+        \f$g(T(x))\f$ with respect to \f$x\f$ is given by \f$\left(\nabla g\right)^T \left(\nabla_x T\right)\f$.  Passing \f$\nabla g\f$ as the 
+        sensitivity input to this function then allows you to compute this product and thus the gradient of the composed function \f$g(T(x))\f$.
+        
+        @param pts A \f$d_{in}\times N\f$ matrix containining \f$N\f$ points in \f$\mathbb{R}^{d_{in}}\f$ where this function be evaluated.  Each column is a point.
+        @param sens A \f$d_{out}\times N\f$ matrix containing \f$N\f$ sensitivity vectors in \f$\mathbb{R}^{d_{out}}\f$.  
+        @return A \f$d_{in}\times N\f$ matrix containing the gradient of vectors.  Each column corresponds to the gradient at a particular point and sensitivity.  
+        */
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> Gradient(StridedMatrix<const double, AnyMemorySpace> const& pts,
+                                                       StridedMatrix<const double, AnyMemorySpace> const& sens);
+
+
+        virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                                  StridedMatrix<const double, MemorySpace> const& sens,
+                                  StridedMatrix<double, MemorySpace>              output) = 0;
+
+
         /** @brief Computes the gradient of the map output with respect to the map coefficients.
         @details Consider a map \f$T(x; w) : \mathbb{R}^N \rightarrow \mathbb{R}^M\f$ parameterized by coefficients \f$w\in\mathbb{R}^K\f$.
                  This function computes 
