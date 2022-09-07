@@ -268,6 +268,21 @@ MEX_DEFINE(ConditionalMap_CoeffGrad) (int nlhs, mxArray* plhs[],
   condMap.map_ptr->CoeffGradImpl(pts,sens,out);
 }
 
+MEX_DEFINE(ConditionalMap_Gradient) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 4);
+  OutputArguments output(nlhs, plhs, 0);
+
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+
+  auto pts = MexToKokkos2d(prhs[1]);
+  auto sens = MexToKokkos2d(prhs[2]);
+  auto out = MexToKokkos2d(prhs[3]);
+  
+  condMap.map_ptr->GradientImpl(pts,sens,out);
+}
+
 MEX_DEFINE(ConditionalMap_LogDeterminantCoeffGrad) (int nlhs, mxArray* plhs[],
                  int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 3);

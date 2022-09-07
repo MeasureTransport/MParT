@@ -20,69 +20,6 @@ using namespace mpart::binding;
 
 void mpart::binding::MultiIndexWrapper(py::module &m)
 {
-    // MultiIndex
-    py::class_<MultiIndex, std::shared_ptr<MultiIndex>>(m, "MultiIndex")
-        .def(py::init<>())
-        .def(py::init<unsigned int>())
-        .def(py::init<unsigned int, unsigned int>())
-        .def(py::init<std::vector<unsigned int> const&>())
-
-        .def("tolist",&MultiIndex::Vector)
-        .def("sum", &MultiIndex::Sum)
-        .def("max", &MultiIndex::Max)
-
-        .def("__setitem__", &MultiIndex::Set)
-        .def("__getitem__", &MultiIndex::Get)
-        .def("count_nonzero", &MultiIndex::NumNz)
-
-        .def("__str__", &MultiIndex::String)
-        .def("__repl__",&MultiIndex::String)
-        .def("__len__", &MultiIndex::Length)
-        .def("__eq__", &MultiIndex::operator==)
-        .def("__neq__", &MultiIndex::operator!=)
-        .def("__lt__", &MultiIndex::operator<)
-        .def("__gt__", &MultiIndex::operator>)
-        .def("__le__", &MultiIndex::operator<=)
-        .def("__ge__", &MultiIndex::operator>=);
-
-
-    // MultiIndexSet
-    py::class_<MultiIndexSet, std::shared_ptr<MultiIndexSet>>(m, "MultiIndexSet")
-        .def(py::init<const unsigned int>())
-        .def(py::init<Eigen::Ref<const Eigen::MatrixXi> const&>())
-        .def("fix", &MultiIndexSet::Fix)
-        .def("__len__", &MultiIndexSet::Length)
-        .def("__getitem__", &MultiIndexSet::at)
-        .def("at", &MultiIndexSet::at)
-        .def("Size", &MultiIndexSet::Size)
-
-        .def("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder)
-        .def("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct)
-
-        .def("union", &MultiIndexSet::Union)
-        .def("SetLimiter",&MultiIndexSet::SetLimiter)
-        .def("GetLimiter", &MultiIndexSet::GetLimiter)
-        .def("IndexToMulti",&MultiIndexSet::IndexToMulti)
-        .def("MultiToIndex", &MultiIndexSet::MultiToIndex)
-        .def("MaxOrders", &MultiIndexSet::MaxOrders)
-        .def("Expand", py::overload_cast<unsigned int>(&MultiIndexSet::Expand))
-        .def("append", py::overload_cast<MultiIndex const&>(&MultiIndexSet::operator+=))
-        .def("__iadd__", py::overload_cast<MultiIndex const&>(&MultiIndexSet::operator+=))
-        .def("Activate", py::overload_cast<MultiIndex const&>(&MultiIndexSet::Activate))
-        .def("AddActive", &MultiIndexSet::AddActive)
-        .def("Frontier", &MultiIndexSet::Frontier)
-        .def("Margin", &MultiIndexSet::Margin)
-        .def("ReducedMargin", &MultiIndexSet::ReducedMargin)
-        .def("StrictFrontier", &MultiIndexSet::StrictFrontier)
-        .def("IsExpandable", &MultiIndexSet::IsExpandable)
-        .def("NumActiveForward", &MultiIndexSet::NumActiveForward)
-        .def("NumForward", &MultiIndexSet::NumForward)
-        //.def("IsAdmissible", &MultiIndexSet::IsAdmissible)
-        //.def("IsActive", &MultiIndexSet::IsActive)
-        //.def("Visualize", &MultiIndexSet::Visualize)
-        ;
-
-
     // MultiIndexSetLimiters
     //TotalOrder
     py::class_<MultiIndexLimiter::TotalOrder, std::shared_ptr<MultiIndexLimiter::TotalOrder>>(m, "TotalOrder")
@@ -137,6 +74,71 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("__call__", &MultiIndexLimiter::Xor::operator())
     ;
 
+
+    // MultiIndex
+    py::class_<MultiIndex, std::shared_ptr<MultiIndex>>(m, "MultiIndex")
+        .def(py::init<>())
+        .def(py::init<unsigned int>())
+        .def(py::init<unsigned int, unsigned int>())
+        .def(py::init<std::vector<unsigned int> const&>())
+
+        .def("tolist",&MultiIndex::Vector)
+        .def("sum", &MultiIndex::Sum)
+        .def("max", &MultiIndex::Max)
+
+        .def("__setitem__", &MultiIndex::Set)
+        .def("__getitem__", &MultiIndex::Get)
+        .def("count_nonzero", &MultiIndex::NumNz)
+
+        .def("__str__", &MultiIndex::String)
+        .def("__repl__",&MultiIndex::String)
+        .def("__len__", &MultiIndex::Length)
+        .def("__eq__", &MultiIndex::operator==)
+        .def("__neq__", &MultiIndex::operator!=)
+        .def("__lt__", &MultiIndex::operator<)
+        .def("__gt__", &MultiIndex::operator>)
+        .def("__le__", &MultiIndex::operator<=)
+        .def("__ge__", &MultiIndex::operator>=);
+
+
+    // MultiIndexSet
+    py::class_<MultiIndexSet, std::shared_ptr<MultiIndexSet>>(m, "MultiIndexSet")
+        .def(py::init<const unsigned int>())
+        .def(py::init<Eigen::Ref<const Eigen::MatrixXi> const&>())
+        .def("fix", &MultiIndexSet::Fix)
+        .def("__len__", &MultiIndexSet::Length)
+        .def("__getitem__", &MultiIndexSet::at)
+        .def("at", &MultiIndexSet::at)
+        .def("Size", &MultiIndexSet::Size)
+
+        .def_static("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder, py::arg("length"), py::arg("maxOrder"), py::arg("limiter")=MultiIndexLimiter::None())
+        .def_static("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct, py::arg("length"), py::arg("maxOrder"), py::arg("limiter")=MultiIndexLimiter::None())
+
+        .def("union", &MultiIndexSet::Union)
+        .def("SetLimiter",&MultiIndexSet::SetLimiter)
+        .def("GetLimiter", &MultiIndexSet::GetLimiter)
+        .def("IndexToMulti",&MultiIndexSet::IndexToMulti)
+        .def("MultiToIndex", &MultiIndexSet::MultiToIndex)
+        .def("MaxOrders", &MultiIndexSet::MaxOrders)
+        .def("Expand", py::overload_cast<unsigned int>(&MultiIndexSet::Expand))
+        .def("append", py::overload_cast<MultiIndex const&>(&MultiIndexSet::operator+=))
+        .def("__iadd__", py::overload_cast<MultiIndex const&>(&MultiIndexSet::operator+=))
+        .def("Activate", py::overload_cast<MultiIndex const&>(&MultiIndexSet::Activate))
+        .def("AddActive", &MultiIndexSet::AddActive)
+        .def("Frontier", &MultiIndexSet::Frontier)
+        .def("Margin", &MultiIndexSet::Margin)
+        .def("ReducedMargin", &MultiIndexSet::ReducedMargin)
+        .def("StrictFrontier", &MultiIndexSet::StrictFrontier)
+        .def("IsExpandable", &MultiIndexSet::IsExpandable)
+        .def("NumActiveForward", &MultiIndexSet::NumActiveForward)
+        .def("NumForward", &MultiIndexSet::NumForward)
+        //.def("IsAdmissible", &MultiIndexSet::IsAdmissible)
+        //.def("IsActive", &MultiIndexSet::IsActive)
+        //.def("Visualize", &MultiIndexSet::Visualize)
+        ;
+
+
+    
     //==========================================================================================================
     //FixedMultiIndexSet
 

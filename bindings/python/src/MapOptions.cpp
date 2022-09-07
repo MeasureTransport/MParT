@@ -44,7 +44,4 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     .def_readwrite("quadPts", &MapOptions::quadPts)
     .def_readwrite("contDeriv", &MapOptions::contDeriv);
     
-        
-
-
 }

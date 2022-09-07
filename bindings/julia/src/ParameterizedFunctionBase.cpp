@@ -25,5 +25,12 @@ void mpart::binding::ParameterizedFunctionBaseWrapper(jlcxx::Module &mod) {
             pfb.CoeffGradImpl(JuliaToKokkos(pts), JuliaToKokkos(sens), JuliaToKokkos(output));
             return output;
         })
+        .method("Gradient", [](ParameterizedFunctionBase<Kokkos::HostSpace> &pfb, jlcxx::ArrayRef<double,2> pts, jlcxx::ArrayRef<double,2> sens) {
+            unsigned int numPts = size(pts,1);
+            unsigned int dim = size(pts,0);
+            jlcxx::ArrayRef<double,2> output = jlMalloc<double>(dim, numPts);
+            pfb.GradientImpl(JuliaToKokkos(pts), JuliaToKokkos(sens), JuliaToKokkos(output));
+            return output;
+        })
     ;
 }
