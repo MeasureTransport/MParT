@@ -91,6 +91,42 @@ void ComposedMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySp
 }
 
 template<typename MemorySpace>
+void ComposedMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                                               StridedMatrix<const double, MemorySpace> const& sens,
+                                               StridedMatrix<double, MemorySpace>              output)
+{
+
+    // gradient of first component
+    comps_.at(0)->GradientImpl(pts, sens, output);
+    if(comps_.size()==1)
+        return;
+
+    // variable to hold intermediate points and gradients 
+    Kokkos::View<double**, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
+    Kokkos::View<double**, MemorySpace>  intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
+    Kokkos::deep_copy(intPts1, pts);
+
+    Kokkos::View<double*, MemorySpace> intSens("int sens", output.extent(0));
+    Kokkos::deep_copy(intSens, output)
+
+    for(unsigned int i=1; i<comps_.size(); ++i){
+        
+        // Compute x_i = T_{i-1}(x_{i-1})
+        comps_.at(i-1)->EvaluateImpl(intPts1, intPts2);
+
+        // gradient of T_{i}(x_i), using past output as sensitivity vector
+        comps_.at(i)->GradientImpl(intPts2, intSens, output);
+
+        // update current x_{i-1} <-- x_{i}
+        Kokkos::deep_copy(intPts1, intPts2);
+        // update sensitive vector s
+        Kokkos::deep_copy(intSens, output);
+    }
+
+}
+
+
+template<typename MemorySpace>
 void ComposedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
                                              StridedMatrix<const double, MemorySpace> const& r,
                                              StridedMatrix<double, MemorySpace>              output)
@@ -112,6 +148,7 @@ void ComposedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpa
     }
 
 }
+
 
 
 template<typename MemorySpace>

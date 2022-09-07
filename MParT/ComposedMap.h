@@ -100,6 +100,10 @@ public:
 
     virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                              StridedMatrix<double, MemorySpace>              output) override;
+
+    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                            StridedMatrix<const double, MemorySpace> const& sens,
+                            StridedMatrix<double, MemorySpace>              output) override;
 private:
 
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;
