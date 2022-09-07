@@ -126,6 +126,11 @@ methods
     MParT_('ConditionalMap_CoeffGrad',this.id_,pts,sens,result);
   end
 
+  function result = Gradient(this,pts,sens)
+    result = zeros(size(pts,1), size(pts,2));
+    MParT_('ConditionalMap_Gradient',this.id_,pts,sens,result);
+  end
+
   function result = LogDeterminantCoeffGrad(this,pts)
     result = zeros(this.numCoeffs, size(pts,2));
     MParT_('ConditionalMap_LogDeterminantCoeffGrad',this.id_,pts,result);

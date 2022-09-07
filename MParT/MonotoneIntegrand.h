@@ -42,7 +42,7 @@ public:
 
     /**
       @param cache A pointer to memory storing evaluations of \phi_{i,p}(x_i) for each i.  These terms need
-                   to be evaluated outside this class (e.g., using `_expansion.FillCache1` for \f$i\in\{0,\ldots,D-1\}\f$.
+                   to be evaluated outside this class (e.g., using `expansion_.FillCache1` for \f$i\in\{0,\ldots,D-1\}\f$.
       @param expansion
       @param xd
       @param coeffs
@@ -57,44 +57,45 @@ public:
     }
 
     KOKKOS_INLINE_FUNCTION MonotoneIntegrand(double*                            cache,
-                      ExpansionType               const& expansion,
-                      PointType                   const& pt,
-                      double                             xd,
-                      CoeffsType                  const& coeffs,
-                      DerivativeFlags::DerivativeType    derivType) : _dim(pt.extent(0)),
-                                                                      _cache(cache),
-                                                                      _expansion(expansion),
-                                                                      _pt(pt),
-                                                                      _xd(xd),
-                                                                      _coeffs(coeffs),
-                                                                      _derivType(derivType)
+                                             ExpansionType               const& expansion,
+                                             PointType                   const& pt,
+                                             double                             xd,
+                                             CoeffsType                  const& coeffs,
+                                             DerivativeFlags::DerivativeType    derivType) : dim_(pt.extent(0)),
+                                                                                            cache_(cache),
+                                                                                            expansion_(expansion),
+                                                                                            pt_(pt),
+                                                                                            xd_(xd),
+                                                                                            coeffs_(coeffs),
+                                                                                            derivType_(derivType)
     {
         assert(derivType!=DerivativeFlags::Mixed);
+        assert(derivType!=DerivativeFlags::MixedInput);
     }
 
     KOKKOS_INLINE_FUNCTION MonotoneIntegrand(double*                            cache,
-                      ExpansionType               const& expansion,
-                      PointType                   const& pt,
-                      CoeffsType                  const& coeffs,
-                      DerivativeFlags::DerivativeType    derivType,
-                      Kokkos::View<double*, MemorySpace> workspace) : MonotoneIntegrand(cache, expansion, pt, pt(pt.extent(0)-1), coeffs, derivType, workspace)
+                                             ExpansionType               const& expansion,
+                                             PointType                   const& pt,
+                                             CoeffsType                  const& coeffs,
+                                             DerivativeFlags::DerivativeType    derivType,
+                                             Kokkos::View<double*, MemorySpace> workspace) : MonotoneIntegrand(cache, expansion, pt, pt(pt.extent(0)-1), coeffs, derivType, workspace)
     {
     }
 
     KOKKOS_INLINE_FUNCTION MonotoneIntegrand(double*                            cache,
-                      ExpansionType               const& expansion,
-                      PointType                   const& pt,
-                      double                             xd,
-                      CoeffsType                  const& coeffs,
-                      DerivativeFlags::DerivativeType    derivType,
-                      Kokkos::View<double*, MemorySpace> workspace) : _dim(pt.extent(0)),
-                                                                      _cache(cache),
-                                                                      _expansion(expansion),
-                                                                      _pt(pt),
-                                                                      _xd(xd),
-                                                                      _coeffs(coeffs),
-                                                                      _derivType(derivType),
-                                                                      _workspace(workspace)
+                                             ExpansionType               const& expansion,
+                                             PointType                   const& pt,
+                                             double                             xd,
+                                             CoeffsType                  const& coeffs,
+                                             DerivativeFlags::DerivativeType    derivType,
+                                             Kokkos::View<double*, MemorySpace> workspace) : dim_(pt.extent(0)),
+                                                                                            cache_(cache),
+                                                                                            expansion_(expansion),
+                                                                                            pt_(pt),
+                                                                                            xd_(xd),
+                                                                                            coeffs_(coeffs),
+                                                                                            derivType_(derivType),
+                                                                                            _workspace(workspace)
     {
         if(derivType==DerivativeFlags::Mixed)
             assert(workspace.extent(0)>=coeffs.extent(0));
@@ -109,58 +110,69 @@ public:
     */
     KOKKOS_INLINE_FUNCTION void operator()(double t, double* output) const
     {
-        const unsigned int numTerms = _expansion.NumCoeffs();
+        const unsigned int numTerms = expansion_.NumCoeffs();
+        const unsigned int dim = pt_.size();
 
         unsigned int numOutputs = 1;
-        if(_derivType==DerivativeFlags::Diagonal)
+        if(derivType_==DerivativeFlags::Diagonal)
             numOutputs++;
-        if((_derivType==DerivativeFlags::Parameters) || (_derivType==DerivativeFlags::Mixed))
+        if((derivType_==DerivativeFlags::Parameters) || (derivType_==DerivativeFlags::Mixed))
             numOutputs += numTerms;
+        if((derivType_==DerivativeFlags::Input) || (derivType_==DerivativeFlags::MixedInput))
+            numOutputs += dim;
 
         // Finish filling in the cache at the quadrature point (FillCache1 is called outside this class)
-        if((_derivType==DerivativeFlags::Diagonal)||(_derivType==DerivativeFlags::Mixed)){
-            _expansion.FillCache2(_cache, _pt, t*_xd, DerivativeFlags::Diagonal2);
+        if((derivType_==DerivativeFlags::Diagonal)||(derivType_==DerivativeFlags::Mixed)||(derivType_==DerivativeFlags::Input)){
+            expansion_.FillCache2(cache_, pt_, t*xd_, DerivativeFlags::Diagonal2);
         }else{
-            _expansion.FillCache2(_cache, _pt, t*_xd, DerivativeFlags::Diagonal);
+            expansion_.FillCache2(cache_, pt_, t*xd_, DerivativeFlags::Diagonal);
         }
 
-        // Use the cache to evaluate \partial_d f and, optionally, the gradient of \partial_d f wrt the coefficients.
+        // Use the cache to evaluate \partial_d f and, optionally, the gradient of \partial_d f wrt the coefficients or input.
         double df = 0;
-        if(_derivType==DerivativeFlags::Parameters){
+        if(derivType_==DerivativeFlags::Parameters){
             Kokkos::View<double*,MemorySpace,Kokkos::MemoryTraits<Kokkos::Unmanaged>> gradSeg(&output[1], numTerms);
-            df = _expansion.MixedDerivative(_cache, _coeffs, 1, gradSeg);
+            df = expansion_.MixedCoeffDerivative(cache_, coeffs_, 1, gradSeg);
 
-            double scale = _xd*PosFuncType::Derivative(df);
+            double scale = xd_*PosFuncType::Derivative(df);
             for(unsigned int i=0; i<numTerms;++i)
                 gradSeg(i) *= scale;
 
-        }else if(_derivType==DerivativeFlags::Mixed){
+        }else if(derivType_==DerivativeFlags::Mixed){
 
-            df = _expansion.DiagonalDerivative(_cache, _coeffs, 1);
+            df = expansion_.DiagonalDerivative(cache_, coeffs_, 1);
 
             double dgdf = PosFuncType::Derivative(df);
-            double df2 = _expansion.MixedDerivative(_cache, _coeffs, 2, _workspace);
+            double df2 = expansion_.MixedCoeffDerivative(cache_, coeffs_, 2, _workspace);
 
-            double scale = _xd* t * dgdf;
+            double scale = xd_* t * dgdf;
             for(unsigned int i=0; i<numTerms; ++i)
                 _workspace(i) *= scale;
 
             Kokkos::View<double*,MemorySpace,Kokkos::MemoryTraits<Kokkos::Unmanaged>> gradSeg(&output[1], numTerms);
-            df = _expansion.MixedDerivative(_cache, _coeffs, 1, gradSeg);
+            df = expansion_.MixedCoeffDerivative(cache_, coeffs_, 1, gradSeg);
 
-            scale = _xd*t*df2*PosFuncType::SecondDerivative(df) + dgdf;
+            scale = xd_*t*df2*PosFuncType::SecondDerivative(df) + dgdf;
             for(unsigned int i=0; i<numTerms; ++i)
                 gradSeg(i) = scale*gradSeg(i) + _workspace(i);
 
+        }else if(derivType_==DerivativeFlags::Input){
+            
+            Kokkos::View<double*,MemorySpace,Kokkos::MemoryTraits<Kokkos::Unmanaged>> gradSeg(&output[1], dim);
+            df = expansion_.MixedInputDerivative(cache_, coeffs_, gradSeg);
+
+            double scale = xd_*PosFuncType::Derivative(df);
+            for(unsigned int i=0; i<dim-1;++i)
+                gradSeg(i) *= scale;
 
         }else{
-            df = _expansion.DiagonalDerivative(_cache, _coeffs, 1);
+            df = expansion_.DiagonalDerivative(cache_, coeffs_, 1);
         }
 
         // First output is always the integrand itself
         double gf = PosFuncType::Evaluate(df);
-        output[0] = _xd*gf;
-
+        output[0] = xd_*gf;
+        
         // Check for infs or nans
         if(std::isinf(gf)){
             printf("\nERROR: In MonotoneIntegrand, value of g(df(...)) is inf.  The value of df(...) is %0.4f, and the value of f(df(...)) is %0.4f.\n\n", df, gf);
@@ -169,26 +181,27 @@ public:
         }
 
         // Compute the derivative with respect to x_d
-        if(_derivType==DerivativeFlags::Diagonal){
-
+        if((derivType_==DerivativeFlags::Diagonal) || (derivType_==DerivativeFlags::Input)){
+            
+            unsigned int ind = (derivType_==DerivativeFlags::Diagonal) ? 1 : dim;
             // Compute \partial^2_d f
-            output[1] = _expansion.DiagonalDerivative(_cache, _coeffs, 2);
+            output[ind] = expansion_.DiagonalDerivative(cache_, coeffs_, 2);
 
             // Use the chain rule to get \partial_d g(f)
-            output[1] *= _xd*t*PosFuncType::Derivative(df);
-            output[1] += gf;
+            output[ind] *= xd_*t*PosFuncType::Derivative(df);
+            output[ind] += gf;
         }
     }
 
 private:
 
-    const unsigned int _dim;
-    double* _cache;
-    ExpansionType const& _expansion;
-    PointType const& _pt;
-    double _xd;
-    CoeffsType const& _coeffs;
-    DerivativeFlags::DerivativeType _derivType;
+    const unsigned int dim_;
+    double* cache_;
+    ExpansionType const& expansion_;
+    PointType const& pt_;
+    double xd_;
+    CoeffsType const& coeffs_;
+    DerivativeFlags::DerivativeType derivType_;
     Kokkos::View<double*,MemorySpace> _workspace;
 
 }; // class MonotoneIntegrand

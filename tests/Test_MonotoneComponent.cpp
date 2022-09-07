@@ -25,7 +25,7 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
 
     MultivariateExpansionWorker<ProbabilistHermite, HostSpace> expansion(mset);
 
-    // // Make room for the cache
+    // Make room for the cache
     std::vector<double> cache(expansion.CacheSize());
     REQUIRE(cache.size() == 6);
 
@@ -129,7 +129,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
         pt(i) = 0.25;
 
     // Set up the first part of the cache
-    expansion.FillCache1(&cache[0], pt, DerivativeFlags::None);
+    expansion.FillCache1(&cache[0], pt, DerivativeFlags::MixedInput);
 
     SECTION("Integrand Only") {
 
@@ -168,6 +168,35 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
         }
     }
 
+    SECTION("Integrand Input Gradient") {
+        double fdStep = 1e-5;
+
+        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Input);
+
+        // Evaluate the expansion
+        double df, d2f;
+        Kokkos::View<double*,HostSpace> fval("Integrand", dim+1);
+        Kokkos::View<double*,HostSpace> coeffGrad("Coefficient Gradient", dim);
+
+        for(double t : std::vector<double>{0.0, 0.5, -0.5, 1.0}){
+            
+            
+            integrand(t, fval.data());
+            
+            // Compute what it should be
+            double xd = pt(dim-1);
+            expansion.FillCache2(&cache[0], pt, t*xd, DerivativeFlags::Diagonal);
+            
+            df = expansion.MixedInputDerivative(&cache[0], coeffs, coeffGrad);
+            REQUIRE(fval(0) == Approx(std::abs(xd)*exp(df)).epsilon(testTol));
+
+            // Check the derivative against finite differences
+            for(unsigned int wrt=0; wrt<dim-1; ++wrt){
+                CHECK(fval(wrt+1) == Approx(xd * std::exp(df)*coeffGrad(wrt)).epsilon(1e-4));  
+            }
+        }
+    }
+
     SECTION("Integrand Parameters Gradient") {
 
         MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters);
@@ -183,7 +212,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
 
             expansion.FillCache2(&cache[0], pt, t*xd, DerivativeFlags::Diagonal);
             df = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
-            expansion.MixedDerivative(&cache[0], coeffs, 1, coeffGrad);
+            expansion.MixedCoeffDerivative(&cache[0], coeffs, 1, coeffGrad);
 
             integrand(t, fval.data());
             CHECK(fval(0) == Approx(xd*exp(df)).epsilon(testTol));
@@ -213,8 +242,8 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
             expansion.FillCache2(&cache[0], pt, t*xd, DerivativeFlags::Diagonal2);
             df = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
             d2f = expansion.DiagonalDerivative(&cache[0], coeffs, 2);
-            expansion.MixedDerivative(&cache[0], coeffs, 1, coeffGrad1);
-            double d2f2 = expansion.MixedDerivative(&cache[0], coeffs, 2, coeffGrad2);
+            expansion.MixedCoeffDerivative(&cache[0], coeffs, 1, coeffGrad1);
+            double d2f2 = expansion.MixedCoeffDerivative(&cache[0], coeffs, 2, coeffGrad2);
 
             CHECK(d2f == Approx(d2f2).epsilon(1e-15));
 
@@ -568,6 +597,35 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
             }
 
             coeffs2(j) = coeffs(j);
+        }
+
+    }
+
+    SECTION("Input Jacobian"){
+
+        const double fdStep = 1e-4;
+
+        Kokkos::View<double*, HostSpace> evals("Evaluations", numPts);
+        Kokkos::View<double*, HostSpace> evals2("Evaluations 2", numPts);
+
+        Kokkos::View<double**, HostSpace> jac("Jacobian", dim, numPts);
+
+        comp.InputJacobian(evalPts, coeffs, evals, jac);
+
+        Kokkos::View<double**, HostSpace> evalPts2("Points2", evalPts.extent(0), evalPts.extent(1));
+        Kokkos::deep_copy(evalPts2, evalPts);
+
+        for(unsigned int j=0; j<dim; ++j){
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+                evalPts2(j,ptInd) += fdStep;
+
+            comp.EvaluateImpl(evalPts2, coeffs, evals2);
+
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+                CHECK(jac(j,ptInd)==Approx((evals2(ptInd) - evals(ptInd))/fdStep).epsilon(1e-4).margin(1e-3));
+
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+                evalPts2(j,ptInd) = evalPts(j,ptInd);
         }
 
     }

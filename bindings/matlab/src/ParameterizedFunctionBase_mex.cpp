@@ -138,4 +138,19 @@ MEX_DEFINE(ParameterizedFunction_CoeffGrad) (int nlhs, mxArray* plhs[],
   parFunc.fun_ptr->CoeffGradImpl(pts,sens,out);
 }
 
+MEX_DEFINE(ParameterizedFunction_Gradient) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 4);
+  OutputArguments output(nlhs, plhs, 0);
+
+  const ParameterizedFunctionMex& parFunc = Session<ParameterizedFunctionMex>::getConst(input.get(0));
+
+  auto pts = MexToKokkos2d(prhs[1]);
+  auto sens = MexToKokkos2d(prhs[2]);
+  auto out = MexToKokkos2d(prhs[3]);
+  
+  parFunc.fun_ptr->GradientImpl(pts,sens,out);
+}
+
 } // namespace

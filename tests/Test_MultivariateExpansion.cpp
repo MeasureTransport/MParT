@@ -96,4 +96,52 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
         }
         
     }
+
+
+    SECTION("Input Gradient"){
+        Kokkos::View<double**,Kokkos::HostSpace> sens("Sensitivity", outDim, numPts);
+        Kokkos::View<double**,Kokkos::HostSpace> grads;
+
+        for(unsigned int d=0; d<outDim; ++d){
+            
+            // Set the sensitivity wrt this output to 1
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+                sens(d,ptInd) = 1.0;
+
+            // Evaluate the gradient
+            grads = func.Gradient(pts,sens);
+
+            REQUIRE(grads.extent(0)==inDim);
+            REQUIRE(grads.extent(1)==numPts);
+
+            // Check the solution
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
+
+                for(unsigned int inWrt=0; inWrt<inDim; ++inWrt){
+
+                    double deriv = 0.0;
+                    for(unsigned int term=0; term<mset.Size(); ++term){
+                        auto multi = mset.IndexToMulti(term);
+                        double termVal = 1.0;
+
+                        for(unsigned int i=0; i<inDim; ++i){
+                            if(i==inWrt){
+                                termVal *= basis.Derivative(multi.at(i), pts(i,ptInd));
+                            }else{
+                                termVal *= basis.Evaluate(multi.at(i), pts(i,ptInd));
+                            }
+                        }
+                        deriv += coeffs(term) * termVal;
+                    }
+                    CHECK(grads(inWrt,ptInd) == Approx(deriv).epsilon(1e-13));
+                }
+            }
+            
+            // Reset this row to 0
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+                sens(d,ptInd) = 0.0;
+
+        }
+        
+    }
 }
