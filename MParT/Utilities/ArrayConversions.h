@@ -509,13 +509,24 @@ namespace mpart{
     template<typename ViewType>
     struct ViewToEigen{
     };
+    template<typename ViewType>
+    struct ConstViewToEigen{
+    };
     template<typename ScalarType, typename... OtherTraits>
     struct ViewToEigen<Kokkos::View<ScalarType*,OtherTraits...>>{
         using Type = typename Eigen::Matrix<ScalarType,Eigen::Dynamic,1>;
     };
     template<typename ScalarType, typename... OtherTraits>
+    struct ConstViewToEigen<Kokkos::View<ScalarType*,OtherTraits...>>{
+        using Type = const typename Eigen::Matrix<typename std::remove_const<ScalarType>::type,Eigen::Dynamic,1>;
+    };
+    template<typename ScalarType, typename... OtherTraits>
     struct ViewToEigen<Kokkos::View<ScalarType**,OtherTraits...>>{
-        using Type = typename Eigen::Matrix<ScalarType,Eigen::Dynamic, Eigen::Dynamic, LayoutToEigen<typename Kokkos::View<ScalarType*,OtherTraits...>::array_layout>::Layout>;
+        using Type = typename Eigen::Matrix<typename std::remove_const<ScalarType>::type, Eigen::Dynamic, Eigen::Dynamic, LayoutToEigen<typename Kokkos::View<ScalarType*,OtherTraits...>::array_layout>::Layout>;
+    };
+    template<typename ScalarType, typename... OtherTraits>
+    struct ConstViewToEigen<Kokkos::View<ScalarType**,OtherTraits...>>{
+        using Type = const typename Eigen::Matrix<typename std::remove_const<ScalarType>::type, Eigen::Dynamic, Eigen::Dynamic, LayoutToEigen<typename Kokkos::View<ScalarType*,OtherTraits...>::array_layout>::Layout>;
     };
 
 
@@ -534,6 +545,14 @@ namespace mpart{
         view.stride(strides);
         assert((strides[0]==1)||(strides[1]==1));
         return Eigen::Map<typename ViewToEigen<Kokkos::View<ScalarType**, OtherTraits...>>::Type, 0, Eigen::OuterStride<>>(view.data(), view.extent(0), view.extent(1), Eigen::OuterStride<>(std::max(strides[0],strides[1])));
+    }
+    template<typename ScalarType, typename... OtherTraits>
+    inline Eigen::Map<typename ConstViewToEigen<Kokkos::View<ScalarType**,OtherTraits...>>::Type, 0, Eigen::OuterStride<>> ConstKokkosToMat(Kokkos::View<const ScalarType**,OtherTraits...> view)
+    {
+        size_t strides[2];
+        view.stride(strides);
+        assert((strides[0]==1)||(strides[1]==1));
+        return Eigen::Map<typename ConstViewToEigen<Kokkos::View<ScalarType**, OtherTraits...>>::Type, 0, Eigen::OuterStride<>>(view.data(), view.extent(0), view.extent(1), Eigen::OuterStride<>(std::max(strides[0],strides[1])));
     }
 
     /**

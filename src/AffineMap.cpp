@@ -1,0 +1,135 @@
+#include "MParT/AffineMap.h"
+#include "MParT/Utilities/KokkosSpaceMappings.h"
+
+#include "MParT/Utilities/ArrayConversions.h"
+
+using namespace mpart;
+
+template<typename MemorySpace>
+AffineMap<MemorySpace>::AffineMap(StridedVector<double,MemorySpace> b) : ConditionalMapBase<MemorySpace>(b.size(),b.size(),0), 
+                                                                  b_(b), 
+                                                                  logDet_(0.0)
+{}
+
+template<typename MemorySpace>
+AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A) : ConditionalMapBase<MemorySpace>(A.extent(0),A.extent(0),0),
+                                                                  A_(A)
+{
+    Factorize(A_);
+}
+
+
+template<typename MemorySpace>
+AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A,
+                                  StridedVector<double,MemorySpace> b) : ConditionalMapBase<MemorySpace>(A.extent(0),A.extent(0),0),
+                                                                  A_(A),
+                                                                  b_(b)
+{
+    Factorize(A_);
+}
+
+
+template<>
+void AffineMap<Kokkos::HostSpace>::Factorize(StridedMatrix<double,Kokkos::HostSpace> A){
+
+    auto eigA = KokkosToMat(A);
+
+    // Use eigen to compute the LU decomposition in place
+    luSolver_ = std::make_shared<Eigen::PartialPivLU<Eigen::MatrixXd>>(eigA);
+    logDet_ = log(luSolver_->determinant());
+}
+
+template<typename MemorySpace>
+void AffineMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                                StridedVector<double, MemorySpace>              output)
+{
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0,output.size());
+
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& i) {
+        output(i) = logDet_;
+    });
+}
+
+template<>
+void AffineMap<Kokkos::HostSpace>::InverseImpl(StridedMatrix<const double, Kokkos::HostSpace> const& x1,
+                                               StridedMatrix<const double, Kokkos::HostSpace> const& r,
+                                               StridedMatrix<double, Kokkos::HostSpace>              output)
+{
+
+    auto eigOut = KokkosToMat<double>(output);
+    auto eigR = ConstKokkosToMat<double>(r);
+
+    // Bias part
+    if(b_.size()>0){
+        auto eigB = KokkosToVec<double>(b_);
+        eigOut = eigR.colwise() - eigB;
+
+    }else{
+        eigOut = eigR;
+    }
+
+    if(A_.extent(0)>0){
+        eigOut = luSolver_->solve(eigOut);
+    }
+}
+
+template<typename MemorySpace>
+void AffineMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                                         StridedMatrix<double, MemorySpace>              output)
+{
+    return;
+}
+
+template<>
+void AffineMap<Kokkos::HostSpace>::EvaluateImpl(StridedMatrix<const double, Kokkos::HostSpace> const& pts,
+                                                StridedMatrix<double, Kokkos::HostSpace>              output)
+{
+    auto eigOut = KokkosToMat<double>(output);
+    auto eigPts = ConstKokkosToMat<double>(pts);
+
+    // Linear part
+    if(A_.extent(0)>0){
+
+        auto eigA = KokkosToMat<double>(A_);
+        eigOut = eigA * eigPts;
+    }else{
+        eigOut = eigPts;
+    }
+
+    // Bias part
+    if(b_.size()>0){
+        auto eigB = KokkosToVec<double>(b_);
+        eigOut.colwise() += eigB;
+    }
+}
+
+template<typename MemorySpace>
+void AffineMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                                           StridedMatrix<const double, MemorySpace> const& sens,
+                                           StridedMatrix<double, MemorySpace>              output)
+{
+    return;
+}
+    
+template<>
+void AffineMap<Kokkos::HostSpace>::GradientImpl(StridedMatrix<const double, Kokkos::HostSpace> const& pts,  
+                                                StridedMatrix<const double, Kokkos::HostSpace> const& sens,
+                                                StridedMatrix<double, Kokkos::HostSpace>              output)
+{
+    auto eigOut = KokkosToMat<double>(output);
+    auto eigSens = ConstKokkosToMat<double>(sens);
+
+    // Linear part
+    if(A_.extent(0)>0){
+        auto eigA = KokkosToMat<double>(A_);
+        eigOut = eigA.transpose() * eigSens;
+    }else{
+        eigOut = eigSens;
+    }
+}
+
+
+template class mpart::AffineMap<Kokkos::HostSpace>;
+#if defined(MPART_ENABLE_GPU)
+    template class mpart::AffineMap<DeviceSpace>;
+#endif

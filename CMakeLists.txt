@@ -30,6 +30,8 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+set(COMPILER_IS_NVCC OFF)
+
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-Wno-deprecated-gpu-targets" COMPILER_IS_NVCC1)
 check_cxx_compiler_flag("--expt-relaxed-constexpr" COMPILER_IS_NVCC2)
@@ -38,6 +40,7 @@ if(COMPILER_IS_NVCC1 AND COMPILER_IS_NVCC2)
     message(STATUS "GPU support detected")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-gpu-targets --expt-relaxed-constexpr")
     add_compile_definitions(EIGEN_NO_CUDA)
+    set(COMPILER_IS_NVCC ON)
 endif()
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
@@ -83,6 +86,7 @@ if(NOT Kokkos_FOUND)
             kokkos
             GIT_REPOSITORY https://github.com/kokkos/kokkos
             GIT_TAG 3.5.00
+            GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(kokkos)
     else()
@@ -90,6 +94,34 @@ if(NOT Kokkos_FOUND)
     endif()
 else()
     message(STATUS "Found Kokkos!")
+endif()
+
+
+if(${COMPILER_IS_NVCC})
+    message(STATUS "Searching for MAGMA GPU-accelerated linear algebra library.")
+    find_package(magma QUIET)
+
+    if(NOT magma_FOUND)
+        IF(MPART_FETCH_DEPS)
+            message(STATUS "Could not find Magma.  Fetching source.")
+
+            set(USE_FORTRAN OFF CACHE INTERNAL "")
+            set(MAGMA_ENABLE_CUDA OFF CACHE INTERNAL "")
+            FetchContent_Declare(
+                magma
+                GIT_REPOSITORY https://bitbucket.org/icl/magma
+                GIT_TAG v2.6.2
+                GIT_SHALLOW TRUE
+            )
+            FetchContent_MakeAvailable(magma)
+        else()
+            message(FATAL_ERROR "Could not find Magma library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install Magma itself." )
+        endif()
+    else()
+        message(STATUS "Found Magma!")
+    endif()
+else()
+    message(STATUS "MParT is not compiled with CUDA support, so MAGMA will not be used.")
 endif()
 
 # Add Eigen
@@ -102,6 +134,7 @@ if(NOT Eigen3_FOUND)
             eigen3
             GIT_REPOSITORY https://gitlab.com/libeigen/eigen
             GIT_TAG 3.4.0
+            GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(eigen3)
     else()
@@ -122,6 +155,7 @@ if(MPART_PYTHON)
             pybind11
             GIT_REPOSITORY https://github.com/pybind/pybind11
             GIT_TAG        v2.10.0
+            GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(pybind11)
     else()
