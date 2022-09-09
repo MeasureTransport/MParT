@@ -102,18 +102,37 @@ if(${COMPILER_IS_NVCC})
     find_package(magma QUIET)
 
     if(NOT magma_FOUND)
+        #add_subdirectory(MPART_MAGMA_DIR)
         IF(MPART_FETCH_DEPS)
             message(STATUS "Could not find Magma.  Fetching source.")
 
-            set(USE_FORTRAN OFF CACHE INTERNAL "")
-            set(MAGMA_ENABLE_CUDA OFF CACHE INTERNAL "")
             FetchContent_Declare(
                 magma
                 GIT_REPOSITORY https://bitbucket.org/icl/magma
-                GIT_TAG v2.6.2
                 GIT_SHALLOW TRUE
             )
-            FetchContent_MakeAvailable(magma)
+            FetchContent_GetProperties(magma)
+            if(NOT magma_POPULATED)
+                FetchContent_Populate(magma)
+
+                set(USE_FORTRAN OFF CACHE INTERNAL "")
+                set(MAGMA_ENABLE_CUDA ON CACHE INTERNAL "")
+
+                # Use Magma's makefile system to generate code that will be included in CMake
+                message(STATUS "Generaing MAGMA source files.  This can take a few minutes...")
+                file(WRITE ${magma_SOURCE_DIR}/make.inc "FORT = false\nGPU_TARGET = Volta\nBACKEND = cuda\n")
+                execute_process(COMMAND make generate WORKING_DIRECTORY ${magma_SOURCE_DIR} OUTPUT_QUIET)
+
+                # Replace source and binary directories with current version so that MAGMA works with add_subdirectory
+                file(READ ${magma_SOURCE_DIR}/CMakeLists.txt FILE_CONTENTS)
+                string(REPLACE "{CMAKE_SOURCE_DIR}" "{CMAKE_CURRENT_SOURCE_DIR}" FILE_CONTENTS "${FILE_CONTENTS}")
+                string(REPLACE "{CMAKE_BINARY_DIR}" "{CMAKE_CURRENT_BINARY_DIR}" FILE_CONTENTS "${FILE_CONTENTS}")
+                file(WRITE ${magma_SOURCE_DIR}/CMakeLists.txt "${FILE_CONTENTS}")
+
+                # Bring the populated content into the build
+                add_subdirectory(${magma_SOURCE_DIR} ${magma_BINARY_DIR})
+            endif()
+
         else()
             message(FATAL_ERROR "Could not find Magma library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install Magma itself." )
         endif()
