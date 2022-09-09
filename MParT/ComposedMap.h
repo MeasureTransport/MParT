@@ -50,8 +50,11 @@ public:
                   start at index \f$\sum_{j=1}^{k-1} C_j\f$.
     */
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
-    virtual void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
-
+    virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+    #if defined(MPART_ENABLE_GPU)
+    virtual void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
+    #endif 
+    
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}
 
     /** @brief Computes the log determinant of the Jacobian matrix of this map.

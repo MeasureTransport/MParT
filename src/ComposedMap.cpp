@@ -22,7 +22,7 @@ ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMap
 }
 
 template<typename MemorySpace>
-void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs)
+void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
@@ -37,6 +37,25 @@ void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> coef
         cumNumCoeffs += comps_.at(i)->numCoeffs;
     }
 }
+
+#if defined(MPART_ENABLE_GPU)
+template<typename MemorySpace>
+void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs)
+{
+    // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
+    ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
+
+    // Now create subviews for each of the components
+    unsigned int cumNumCoeffs = 0;
+    for(unsigned int i=0; i<comps_.size(); ++i){
+        assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
+
+        comps_.at(i)->savedCoeffs = Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
+        cumNumCoeffs += comps_.at(i)->numCoeffs;
+    }
+}
+#endif
 
 template<typename MemorySpace>
 void ComposedMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
@@ -96,31 +115,33 @@ void ComposedMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySp
                                                StridedMatrix<double, MemorySpace>              output)
 {
 
-    // gradient of first component
-    comps_.at(0)->GradientImpl(pts, sens, output);
-    if(comps_.size()==1)
-        return;
+    // g = s^T J_n * J_n-1 *...*J_1
+    // for i = n,...,1
+    //      x* = T_{i-1} o ... o T_1(x)
+    //      s_{i-1}^T = s_{i}^T J_i(x*)
+    // output: s0
 
-    // variable to hold intermediate points and gradients 
     Kokkos::View<double**, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
     Kokkos::View<double**, MemorySpace>  intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
-    Kokkos::deep_copy(intPts1, pts);
 
-    Kokkos::View<double*, MemorySpace> intSens("int sens", output.extent(0));
-    Kokkos::deep_copy(intSens, output)
-
-    for(unsigned int i=1; i<comps_.size(); ++i){
+    Kokkos::View<double**, MemorySpace>  intSens("intermediate Sens", sens.extent(0), sens.extent(1));
+    Kokkos::deep_copy(intSens,sens);    
+    for(int i = comps_.size() - 1; i>=0; --i){
         
-        // Compute x_i = T_{i-1}(x_{i-1})
-        comps_.at(i-1)->EvaluateImpl(intPts1, intPts2);
+        // x* = T_{i-1} o ... o T_1(x)
 
-        // gradient of T_{i}(x_i), using past output as sensitivity vector
-        comps_.at(i)->GradientImpl(intPts2, intSens, output);
+        // reset intPts1 to initial pts
+        Kokkos::deep_copy(intPts1, pts);
+        for(int j = 0; j<i; j++){
+            // x = T_j(x)
+            comps_.at(j)->EvaluateImpl(intPts1, intPts2);
+            Kokkos::deep_copy(intPts1, intPts2);
+        }
 
-        // update current x_{i-1} <-- x_{i}
-        Kokkos::deep_copy(intPts1, intPts2);
-        // update sensitive vector s
+        //s_{i-1}^T = s_{i}^T J_i(x*)
+        comps_.at(i)->GradientImpl(intPts1, intSens, output);
         Kokkos::deep_copy(intSens, output);
+
     }
 
 }
@@ -156,9 +177,48 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
                                                StridedMatrix<const double, MemorySpace> const& sens,
                                                StridedMatrix<double, MemorySpace>              output)
 {
-        std::stringstream msg;
-        msg << "ComposedMap CoeffGradImpl not implemented";
-        throw std::invalid_argument(msg.str());
+
+    // T(x) = T_{n} o ... o T_1(x), T_i coeffs w_i
+    // s^T \nabla_{w_i} T(x) = s^T J_n * J_{n-1} *...*J_{i-1}* \nabla_w_i T_i 
+
+    Kokkos::View<double**, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
+    Kokkos::View<double**, MemorySpace> intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
+
+    Kokkos::View<double**, MemorySpace>  intSens1("intermediate sens 1", sens.extent(0), sens.extent(1));
+    Kokkos::View<double**, MemorySpace>  intSens2("intermediate sens 2", sens.extent(0), sens.extent(1));
+    Kokkos::deep_copy(intSens1, sens);
+
+    StridedMatrix<double, MemorySpace> subOut;
+    int startParamDim = 0;   
+    for(int i = comps_.size() - 1; i>=0; --i){
+        
+        // reset intPts1 to initial pts
+        Kokkos::deep_copy(intPts1, pts);
+        for(int j = 0; j<i; j++){
+            // x = T_j(x)
+            comps_.at(j)->EvaluateImpl(intPts1, intPts2);
+            Kokkos::deep_copy(intPts1, intPts2);
+        }
+        // intPts1 = T_{i-1} o ... o T_1(x) 
+
+        // finish g_i = s^T \nabla_{w_i} T(x)
+        subOut = Kokkos::subview(output, 
+                                 std::make_pair(startParamDim, int(startParamDim+comps_.at(i)->numCoeffs)), 
+                                 Kokkos::ALL());
+
+
+        // get subview of output (storing gradient wrt w_i)
+        comps_.at(i)->CoeffGradImpl(intPts1, intSens1, subOut);
+
+        // increment sens to for next iteration
+
+        //s_{i-1}^T = s_{i}^T J_i(x*)
+        comps_.at(i)->GradientImpl(intPts1, intSens1, intSens2);
+        Kokkos::deep_copy(intSens1, intSens2);
+        startParamDim += comps_.at(i)->numCoeffs;
+
+    }
+
 }
 
 template<typename MemorySpace>
