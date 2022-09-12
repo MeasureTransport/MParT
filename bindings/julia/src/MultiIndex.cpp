@@ -49,6 +49,8 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
         return MultiIndexSet(JuliaToEigenMat(idxs));
     });
 
+    mod.method("CreateTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::None()); });
+
     mod.set_override_module(jl_base_module);
     mod.method("sum", [](MultiIndex const& idx){ return idx.Sum(); });
     mod.method("setindex!", [](MultiIndex& idx, unsigned int val, unsigned int ind) { return idx.Set(ind, val); });
