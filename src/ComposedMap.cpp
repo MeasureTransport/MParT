@@ -32,8 +32,8 @@ void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace
     for(unsigned int i=0; i<comps_.size(); ++i){
         assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
 
-        comps_.at(i)->savedCoeffs = Kokkos::subview(this->savedCoeffs,
-            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
+        comps_.at(i)->WrapCoeffs(Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
         cumNumCoeffs += comps_.at(i)->numCoeffs;
     }
 }
