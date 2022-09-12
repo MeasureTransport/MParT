@@ -144,4 +144,27 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
         }
         
     }
+
+
+    SECTION("WrapCoeffs"){
+        Eigen::VectorXd newCoeffs = Eigen::VectorXd::Random(func.numCoeffs);
+        func.WrapCoeffs(newCoeffs);
+
+        StridedMatrix<double,Kokkos::HostSpace> evals1 = func.Evaluate(pts);
+
+        // Change the coefficients in place 
+        for(unsigned int i=0;i<newCoeffs.size(); ++i)
+            newCoeffs(i) += 1.0;
+
+        StridedMatrix<double,Kokkos::HostSpace> evals2 = func.Evaluate(pts);
+        
+        for(unsigned int i=0; i<newCoeffs.size(); ++i)
+            CHECK(&newCoeffs(i) == &func.Coeffs()(i));
+
+        for(unsigned int d=0; d<outDim; ++d){
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
+                CHECK(!(evals1(d,ptInd) == Approx(evals2(d,ptInd)).epsilon(1e-14)));
+            }
+        }
+    }
 }

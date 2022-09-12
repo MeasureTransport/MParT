@@ -44,8 +44,25 @@ void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpa
     for(unsigned int i=0; i<comps_.size(); ++i){
         assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
 
-        comps_.at(i)->savedCoeffs = Kokkos::subview(this->savedCoeffs,
-            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
+        comps_.at(i)->WrapCoeffs( Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
+        cumNumCoeffs += comps_.at(i)->numCoeffs;
+    }
+}
+
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+{
+    // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
+    ConditionalMapBase<MemorySpace>::WrapCoeffs(coeffs);
+
+    // Now create subviews for each of the components
+    unsigned int cumNumCoeffs = 0;
+    for(unsigned int i=0; i<comps_.size(); ++i){
+        assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
+
+        comps_.at(i)->WrapCoeffs( Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
         cumNumCoeffs += comps_.at(i)->numCoeffs;
     }
 }
@@ -62,8 +79,25 @@ void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::Default
     for(unsigned int i=0; i<comps_.size(); ++i){
         assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
 
-        comps_.at(i)->savedCoeffs = Kokkos::subview(this->savedCoeffs,
-            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
+        comps_.at(i)->WrapCoeffs( Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
+        cumNumCoeffs += comps_.at(i)->numCoeffs;
+    }
+}
+
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs)
+{
+    // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
+    ConditionalMapBase<MemorySpace>::WrapCoeffs(coeffs);
+
+    // Now create subviews for each of the components
+    unsigned int cumNumCoeffs = 0;
+    for(unsigned int i=0; i<comps_.size(); ++i){
+        assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
+
+        comps_.at(i)->WrapCoeffs( Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
         cumNumCoeffs += comps_.at(i)->numCoeffs;
     }
 }
