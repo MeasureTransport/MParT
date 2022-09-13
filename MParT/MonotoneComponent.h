@@ -169,6 +169,29 @@ public:
         });
     }
 
+    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                             StridedMatrix<double, MemorySpace>              output) override
+    {
+        Kokkos::View<double*,MemorySpace> derivs("Diagonal Derivative", pts.extent(1));
+
+        // First, get the diagonal derivative
+        if(useContDeriv_){
+            ContinuousMixedInputJacobian(pts,this->savedCoeffs, output);
+            ContinuousDerivative(pts, this->savedCoeffs, derivs);
+        }else{
+            // Kokkos::View<double*,MemorySpace> evals("Evaluations", pts.extent(1));
+            // DiscreteMixedJacobian(pts,this->savedCoeffs, output);
+            // DiscreteDerivative(pts, this->savedCoeffs, evals, derivs);
+        }
+
+        // Now take the log
+        auto policy = Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space>(0,pts.extent(1));
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (unsigned int ptInd) {
+            for(unsigned int i=0; i<this->numCoeffs; ++i)
+                output(i,ptInd) *= 1.0/derivs(ptInd);
+        });
+    }
+
     /**
      * @brief Support calling EvaluateImpl with non-const views.
      */
@@ -771,6 +794,58 @@ public:
 
                 // Scale the jacobian by dg(df)
                 for(unsigned int i=0; i<numTerms; ++i)
+                    jacView(i) *= dgdf;
+            }
+
+        };
+
+        // Paralel loop over each point computing T(x_1,...,x_D) for that point
+        auto policy = GetCachedRangePolicy<ExecutionSpace>(numPts, cacheBytes, functor);
+        Kokkos::parallel_for(policy, functor);
+    }
+
+    template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
+    void ContinuousMixedInputJacobian(StridedMatrix<const double, MemorySpace> const& pts,
+                                 StridedVector<const double, MemorySpace> const& coeffs,
+                                 StridedMatrix<double, MemorySpace>              jacobian)
+    {
+        const unsigned int numPts = pts.extent(1);
+        const unsigned int dim = pts.extent(0);
+
+        assert(jacobian.extent(1)==numPts);
+        assert(jacobian.extent(0)==dim);
+
+        // Ask the expansion how much memory it would like for it's one-point cache
+        const unsigned int cacheSize = expansion_.CacheSize();
+
+        // Create a policy with enough scratch memory to cache the polynomial evaluations
+        auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
+        
+        auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
+
+            // The index of the for loop
+            unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
+
+            if(ptInd<numPts){
+                // Create a subview containing only the current point
+                auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
+                auto jacView = Kokkos::subview(jacobian, Kokkos::ALL(), ptInd);
+
+                // Evaluate the orthgonal polynomials in each direction (except the last) for all possible orders
+                Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
+
+                // Precompute anything that does not depend on x_d.  The DerivativeFlags::None arguments specifies that we won't want to derivative wrt to x_i for i<d
+                expansion_.FillCache1(cache.data(), pt, DerivativeFlags::None);
+
+                // Fill in parts of the cache that depend on x_d.  Tell the expansion we're going to want first derivatives wrt x_d
+                expansion_.FillCache2(cache.data(), pt, pt(dim-1), DerivativeFlags::Diagonal);
+
+                // Compute \partial_d f
+                double df = expansion_.MixedInputDerivative(cache.data(), coeffs, 1, jacView);
+                double dgdf = PosFuncType::Derivative(df);
+
+                // Scale the jacobian by dg(df)
+                for(unsigned int i=0; i<dim; ++i)
                     jacView(i) *= dgdf;
             }
 
