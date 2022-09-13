@@ -182,6 +182,9 @@ public:
             // Kokkos::View<double*,MemorySpace> evals("Evaluations", pts.extent(1));
             // DiscreteMixedJacobian(pts,this->savedCoeffs, output);
             // DiscreteDerivative(pts, this->savedCoeffs, evals, derivs);
+            std::stringstream msg;
+            msg << "Discrete derivative version is not implemented yet (To Do)";
+            throw std::invalid_argument(msg.str());
         }
 
         // Now take the log
