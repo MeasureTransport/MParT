@@ -844,7 +844,7 @@ public:
                 expansion_.FillCache2(cache.data(), pt, pt(dim-1), DerivativeFlags::Diagonal);
 
                 // Compute \partial_d f
-                double df = expansion_.MixedInputDerivative(cache.data(), coeffs, 1, jacView);
+                double df = expansion_.MixedInputDerivative(cache.data(), coeffs, jacView);
                 double dgdf = PosFuncType::Derivative(df);
 
                 // Scale the jacobian by dg(df)
