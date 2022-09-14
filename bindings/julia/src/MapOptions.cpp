@@ -5,17 +5,6 @@
 
 using namespace mpart;
 
-JLCXX_MODULE BasisType_julia_module(jlcxx::Module& mod) {
-    // BasisTypes
-    
-}
-
-JLCXX_MODULE PosFuncType_julia_module(jlcxx::Module &mod) {
-}
-
-JLCXX_MODULE QuadType_julia_module(jlcxx::Module &mod) {
-}
-
 void mpart::binding::MapOptionsWrapper(jlcxx::Module &mod) {
     // BasisTypes
     mod.add_bits<BasisTypes>("__BasisTypes", jlcxx::julia_type("CppEnum"));
