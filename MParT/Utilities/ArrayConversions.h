@@ -177,8 +177,8 @@ namespace mpart{
     @return A kokkos array in host memory.  Note that the layout (row-major or col-major) might be different than the default on the Host.  The layout will match the device's default layout.
     */
     template<typename DeviceMemoryType, typename ScalarType>
-    Kokkos::View<ScalarType, Kokkos::HostSpace> ToHost(Kokkos::View<ScalarType,DeviceMemoryType> const& inview){
-        typename Kokkos::View<ScalarType>::HostMirror outview = Kokkos::create_mirror_view(inview);
+    typename Kokkos::View<ScalarType,DeviceMemoryType>::HostMirror ToHost(Kokkos::View<ScalarType,DeviceMemoryType> const& inview){
+        typename Kokkos::View<ScalarType,DeviceMemoryType>::HostMirror outview = Kokkos::create_mirror_view(inview);
         Kokkos::deep_copy (outview, inview);
         return outview;
     }

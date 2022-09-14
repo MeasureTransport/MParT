@@ -37,6 +37,11 @@ void ParameterizedFunctionBaseWrapper(pybind11::module &m);
 template<typename MemorySpace>
 void MapFactoryWrapper(pybind11::module &m);
 
+void AffineMapWrapperHost(pybind11::module &m);
+void AffineMapWrapperDevice(pybind11::module &m);
+void AffineFunctionWrapperHost(pybind11::module &m);
+void AffineFunctionWrapperDevice(pybind11::module &m);
+
 } // namespace binding
 } // namespace mpart
 

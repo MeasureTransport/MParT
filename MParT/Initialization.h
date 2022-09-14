@@ -9,6 +9,10 @@
 #include <algorithm>
 #include <cctype>
 
+#if defined(MPART_ENABLE_GPU)
+#include <magma_v2.h>
+#endif 
+
 namespace mpart{
 
     /** @defgroup InitializationHelpers
@@ -67,6 +71,11 @@ int main( int argc, char* argv[] ) {
         
             // Initialize kokkos
             Kokkos::initialize(arg1, args...);
+
+#if defined(MPART_ENABLE_GPU)
+            // Initialize MAGMA if necessary
+            magma_init();
+#endif
 
             // Make sure Kokkos::finalize() is called at program exit.
             std::atexit(&mpart::Finalize);

@@ -157,11 +157,14 @@ Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :
 At this point, you should be able to open up a REPL and type :code:`using MParT` and get going with any of the provided examples!
 
 Compiling with CUDA Support
-------------------
+----------------------------
 
-To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides. 
 
-First, we compile Kokkos with the required options.  Kokkos source code can be obtained from the `kokkos/kokkos <https://github.com/kokkos/kokkos>`_ repository on Github.
+Building the Kokkos Dependency 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides.  Because of this, MParT cannot use an internal build of Kokkos and Kokkos must therefore be compiled (or otherwise installed) manually.
+
+The following cmake command can be used to compile Kokkos with the CUDA backend enabled and with all options required by MParT.  Kokkos source code can be obtained from the `kokkos/kokkos <https://github.com/kokkos/kokkos>`_ repository on Github.
 
 .. code-block:: bash
     
@@ -185,7 +188,59 @@ Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the c
 .. tip::
     If you're getting an error about C++ standards, try using a new version of your compiler; :code:`g++`, for example, does not support the flag :code:`--std=c++17` below version 8. For more details, see `this issue <https://github.com/kokkos/kokkos/issues/5157>`_ in Kokkos.
 
-Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the :code:`build` directory using the following command:
+Installing MAGMA 
+^^^^^^^^^^^^^^^^^
+
+MParT also uses the `MAGMA <https://icl.utk.edu/magma/>`_ library for GPU-accelerated linear algebra.    If not found, MParT will attempt to compile and install MAGMA internally, but this requires CUBLAS, CUSPARSE, BLAS and LAPACK to be installed on your machine and findable by CMake.  Compiling MAGMA can also take a long time.
+
+NVIDIA's `Cuda installation guide <https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html>`_ provides detailed instructions on how to install CUDA.   For Debian-based x86_64 systems, we have been able to successfully install cuda, cublas, and cusparse for CUDA 11.4 using the command below.  Similar commands may be useful on other systems.
+
+.. code-block:: bash 
+
+    export CUDA_VERSION=11.4
+    export CUDA_COMPAT_VERSION=470.129.06-1
+    export CUDA_CUDART_VERSION=11.4.148-1
+
+    curl -sL "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub" | apt-key add - 
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /" > /etc/apt/sources.list.d/cuda.list 
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC 
+    
+    sudo apt-get -yq update 
+    sudo apt-get -yq install --no-install-recommends \
+        cuda-compat-${CUDA_VERSION/./-}=${CUDA_COMPAT_VERSION} \
+        cuda-cudart-${CUDA_VERSION/./-}=${CUDA_CUDART_VERSION} \
+        libcublas-${CUDA_VERSION/./-} \
+        libcublas-dev-${CUDA_VERSION/./-} \
+        libcufft-${CUDA_VERSION/./-} \
+        libcurand-${CUDA_VERSION/./-} \
+        libcusolver-${CUDA_VERSION/./-} \
+        libcusparse-${CUDA_VERSION/./-} \
+        libcusparse-dev-${CUDA_VERSION/./-}
+
+
+.. tip::
+    The MAGMA library requires an installation of LAPACK and BLAS.   If these aren't installed, or CMake can't find them, you may see many linking errors similar to
+
+    .. code-block::
+
+        lib/libmagma.so: undefined reference to `zswap_'
+    
+    It is possible to install LAPACK and BLAS with conda (or :code:`apt-get`).  For example, the following commands will install LAPACK and the Intel Math Kernel library, then set the environment variabl :code:`MKLROOT` which is needed for CMake to find the MKL Blas installation.
+
+    .. code-block:: bash 
+        
+        conda install -c conda-forge lapack mkl mkl-include
+        export MKLROOT=/opt/conda/
+        cmake \
+            -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>                 \
+            -DKokkos_ROOT=</new/kokkos/install/path>                         \
+            -DCMAKE_CXX_COMPILER=</new/kokkos/install/path>/bin/nvcc_wrapper \
+        ..
+
+Building MParT
+^^^^^^^^^^^^^^^
+
+Using the above documentation on building with an external install of Kokkos, we can then configure MParT from the :code:`build` directory using the following command:
 
 .. code-block:: bash
 

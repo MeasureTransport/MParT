@@ -4,10 +4,14 @@
 #include <Kokkos_Core.hpp>
 
 #include "MParT/ConditionalMapBase.h"
+#include "MParT/Utilities/GPUtils.h"
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
 
+#if defined(MPART_ENABLE_GPU)
+#include <magma_v2.h>
+#endif 
 
 namespace mpart{
 
@@ -54,6 +58,10 @@ public:
     virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                               StridedMatrix<const double, MemorySpace> const& sens,
                               StridedMatrix<double, MemorySpace>              output) override;
+
+    /** Computes an LU factorization of the matrix A_ */
+    void Factorize();
+
 protected:
     
     StridedMatrix<double,MemorySpace> A_;
@@ -61,9 +69,17 @@ protected:
 
     std::shared_ptr<Eigen::PartialPivLU<Eigen::MatrixXd>> luSolver_;
 
+#if defined(MPART_ENABLE_GPU)
+    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> LU_;
+    Kokkos::View<magma_int_t*, Kokkos::HostSpace> pivots_;
+    int ldA;
+#endif
+
     double logDet_;
 
-    void Factorize(StridedMatrix<double,MemorySpace> A);
+    
+
+
 
 };
 

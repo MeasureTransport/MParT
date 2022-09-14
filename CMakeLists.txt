@@ -102,9 +102,11 @@ if(${COMPILER_IS_NVCC})
     find_package(magma QUIET)
 
     if(NOT magma_FOUND)
-        #add_subdirectory(MPART_MAGMA_DIR)
         IF(MPART_FETCH_DEPS)
             message(STATUS "Could not find Magma.  Fetching source.")
+
+            # Make sure LAPACK can be found because it is needed by MAGMA
+            find_package(LAPACK REQUIRED)
 
             FetchContent_Declare(
                 magma
@@ -131,6 +133,18 @@ if(${COMPILER_IS_NVCC})
 
                 # Bring the populated content into the build
                 add_subdirectory(${magma_SOURCE_DIR} ${magma_BINARY_DIR})
+
+                # Ignore the Magma testing targets
+                get_property(all_magma_targets DIRECTORY ${magma_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
+                foreach(magma_target ${all_magma_targets})
+                    if(magma_target MATCHES "test")
+                        SET_TARGET_PROPERTIES(${magma_target} PROPERTIES EXCLUDE_FROM_ALL True)
+                    endif()
+                endforeach()
+                
+                set(MAGMA_LIBRARIES magma magma_sparse)
+                include_directories(${magma_SOURCE_DIR}/include ${magma_BINARY_DIR}/include)
+                set(MAGMA_EXPORTS magma magma_sparse magma_nvcc_flags)
             endif()
 
         else()
@@ -138,9 +152,11 @@ if(${COMPILER_IS_NVCC})
         endif()
     else()
         message(STATUS "Found Magma!")
+        include_directories(${MAGMA_INCLUDE_DIRS})
     endif()
 else()
     message(STATUS "MParT is not compiled with CUDA support, so MAGMA will not be used.")
+    set(MAGMA_LIBRARIES "")
 endif()
 
 # Add Eigen
@@ -228,7 +244,7 @@ endif()
 add_library(mpart "")
 add_library (MParT::mpart ALIAS mpart)
 
-target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen)
+target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen ${MAGMA_LIBRARIES})
 
 target_include_directories(mpart
                            PUBLIC
@@ -291,7 +307,7 @@ if(MPART_BUILD_TESTS)
     # Define test sources
     add_subdirectory(tests)
     add_executable(RunTests ${TEST_SOURCES})
-    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen)
+    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen ${MAGMA_LIBRARIES})
 endif()
 
 add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
@@ -299,7 +315,7 @@ target_link_libraries(PrintKokkosInfo Kokkos::kokkos)
 
 ##############################################################
 # Installation
-install(TARGETS mpart
+install(TARGETS mpart ${MAGMA_EXPORTS}
         EXPORT MParTTargets
         DESTINATION lib)
 
@@ -329,7 +345,7 @@ install(FILES
 )
 
 
-export (TARGETS mpart ${KOKKOS_EXPORTS} NAMESPACE MParT:: FILE MParTTargets.cmake)
+export (TARGETS mpart ${KOKKOS_EXPORTS} ${MAGMA_EXPORTS} NAMESPACE MParT:: FILE MParTTargets.cmake)
 export (PACKAGE MParT)
 
 install (EXPORT MParTTargets NAMESPACE MParT:: DESTINATION lib/cmake/MParT)

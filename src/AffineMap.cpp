@@ -3,6 +3,10 @@
 
 #include "MParT/Utilities/ArrayConversions.h"
 
+#if defined(MPART_ENABLE_GPU)
+#include "magma_v2.h"
+#endif 
+
 using namespace mpart;
 
 template<typename MemorySpace>
@@ -16,27 +20,26 @@ AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A) : Conditi
                                                                   A_(A)
 {
     assert(A_.extent(0)<=A_.extent(1));
-    Factorize(A_);
+    Factorize();
 }
 
 
 template<typename MemorySpace>
 AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A,
-                                  StridedVector<double,MemorySpace> b) : ConditionalMapBase<MemorySpace>(A.extent(0),A.extent(0),0),
+                                  StridedVector<double,MemorySpace> b) : ConditionalMapBase<MemorySpace>(A.extent(1),A.extent(0),0),
                                                                   A_(A),
                                                                   b_(b)
 {   
     assert(A_.extent(0)<=A_.extent(1));
     assert(A_.extent(0) == b_.extent(0));
-
-    Factorize(A_);
+    Factorize();
 }
 
 
 template<>
-void AffineMap<Kokkos::HostSpace>::Factorize(StridedMatrix<double,Kokkos::HostSpace> A){
+void AffineMap<Kokkos::HostSpace>::Factorize(){
 
-    auto eigA = KokkosToMat(A);
+    auto eigA = KokkosToMat(A_);
     unsigned int nrows = eigA.rows();
     unsigned int ncols = eigA.cols();
 
@@ -45,13 +48,14 @@ void AffineMap<Kokkos::HostSpace>::Factorize(StridedMatrix<double,Kokkos::HostSp
     logDet_ = log(abs(luSolver_->determinant()));
 }
 
+
 template<typename MemorySpace>
 void AffineMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                 StridedVector<double, MemorySpace>              output)
 {
     Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0,output.size());
 
-    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& i) {
+    Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& i) {
         output(i) = logDet_;
     });
 }
@@ -89,6 +93,8 @@ void AffineMap<Kokkos::HostSpace>::InverseImpl(StridedMatrix<const double, Kokko
         eigOut = luSolver_->solve(eigOut);
     }
 }
+
+
 
 template<typename MemorySpace>
 void AffineMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
@@ -148,5 +154,307 @@ void AffineMap<Kokkos::HostSpace>::GradientImpl(StridedMatrix<const double, Kokk
 
 template class mpart::AffineMap<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)
-    template class mpart::AffineMap<DeviceSpace>;
+
+template<>
+void AffineMap<mpart::DeviceSpace>::Factorize()
+{
+    // If A_ is not column major, create a column major version
+    if(A_.stride_0()!=1){
+        Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace> anew("A_", A_.extent(0), A_.extent(1));
+        Kokkos::deep_copy(anew, A_);
+        A_ = anew;
+    }
+    ldA = A_.stride_1();
+
+    int nrows = A_.extent(0);
+    int ncols = A_.extent(1);
+
+    // Resize the space for storing the LU factorization
+    LU_ = Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace>("LU", A_.extent(0), A_.extent(0));
+    pivots_ = Kokkos::View<magma_int_t*, Kokkos::HostSpace>("Pivots", A_.extent(0));
+
+    magma_int_t ldLU = LU_.stride_1();
+    magma_int_t info;
+
+    // Copy the right block of the matrix A_ into LU_
+    Kokkos::deep_copy(LU_, Kokkos::subview(A_, Kokkos::ALL(), std::make_pair(ncols-nrows, int(A_.extent(1)))));
+    
+    // Factorize the right block of the matrix
+    magma_dgetrf_gpu(static_cast<magma_int_t>(LU_.extent(0)), 
+                     static_cast<magma_int_t>(LU_.extent(1)), 
+                     reinterpret_cast<magmaDouble_ptr>(LU_.data()), 
+                     ldLU, 
+                     pivots_.data(), 
+                     &info);
+
+    // Error handling
+    if(info<0){
+        std::stringstream msg;
+        msg << "In AffineMap::Factorize(): Argument " << -info << " to magma_dgetrf_gpu had an illegal value or memory allocation failed.  Could not compute factorization.";
+        throw std::runtime_error(msg.str());
+    }else if(info>0){
+        std::stringstream msg;
+        msg << "In AffineMap::Factorize(): The " << info << " diagonal entry of the matrix U is exactly zero.  The right block of matrix A is singular.";
+        throw std::runtime_error(msg.str());
+    }
+
+    // Compute the log determinant 
+    logDet_ = 0.0;
+    Kokkos::parallel_reduce(LU_.extent(0), KOKKOS_CLASS_LAMBDA (const int& i, double& lsum ) {
+        lsum += log(abs(LU_(i,i)));
+    },logDet_);
+}
+
+template<>
+void AffineMap<mpart::DeviceSpace>::InverseImpl(StridedMatrix<const double, mpart::DeviceSpace> const& x1,
+                                                StridedMatrix<const double, mpart::DeviceSpace> const& r,
+                                                StridedMatrix<double, mpart::DeviceSpace>              output)
+{
+    if((A_.extent(0)>0)&&(LU_.extent(0)==0))
+        throw std::runtime_error("In AffineMap::InverseImpl: Cannot compute inverse because factorization of A has not occured.");
+    
+    int numPts = r.extent(1);
+
+    // Make sure we work with a column major output matrix if there is a linear component and we need to use MAGMA
+    bool copyOut = false;
+    Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace> outLeft;
+    if(A_.extent(0)>0){
+        if(output.stride_0()==1){
+            outLeft = output;
+        }else{
+            outLeft = Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace>("OutLeft", output.extent(0), output.extent(1));
+            copyOut = true;
+        }
+    }else{
+        outLeft = output;
+    }
+    
+    // Bias part
+    if(b_.size()>0){
+
+        Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<mpart::DeviceSpace>::Space> policy({{0, 0}}, {{numPts, outputDim}});
+
+        // After this for loop, we will have out = r - b
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
+            outLeft(i,j) = r(i,j) - b_(i); 
+        });
+
+    }else{
+        Kokkos::deep_copy(outLeft, r);
+    }
+
+    // Linear part
+    if(A_.extent(0)>0){
+
+        int nrows = A_.extent(0);
+        int ncols = A_.extent(1);
+
+        int ldOut = outLeft.stride_1();
+        int ldLU = LU_.stride_1();
+
+        // If the matrix is rectangular, treat it as the lower part of a block triangular matrix
+        // The value of x1 contains the compute inverse for the first block
+        if(nrows != ncols){
+
+            Kokkos::View<const double**,Kokkos::LayoutLeft, mpart::DeviceSpace> xLeft;
+            if(x1.stride_0()==1){
+                xLeft = x1;
+            }else{
+                Kokkos::View<double**,Kokkos::LayoutLeft, mpart::DeviceSpace> xTemp("xLeft", ncols-nrows, x1.extent(1));
+                Kokkos::deep_copy(xTemp, Kokkos::subview(x1, std::make_pair(0,ncols-nrows), std::make_pair(0,int(x1.extent(1)))));
+                xLeft = xTemp;
+            }
+
+            int ldX = xLeft.stride_1(); // Spacing between columns int ptsLeft
+            
+            // Perform the matrix multiplication
+            magma_int_t device;
+            magma_queue_t queue;
+            magma_getdevice( &device );
+            magma_queue_create( device, &queue );
+
+            // After this degemm, we will have out = r - b - A_{11}*x_1
+            magma_dgemm( MagmaNoTrans,
+                        MagmaNoTrans, static_cast<magma_int_t>(nrows), 
+                        static_cast<magma_int_t>(xLeft.extent(1)),
+                        static_cast<magma_int_t>(ncols-nrows),
+                        -1.0, 
+                        reinterpret_cast<magmaDouble_ptr>(A_.data()), 
+                        static_cast<magma_int_t>(ldA),
+                        reinterpret_cast<magmaDouble_ptr>(const_cast<double*>(xLeft.data())), 
+                        static_cast<magma_int_t>(ldX),
+                        1.0, 
+                        reinterpret_cast<magmaDouble_ptr>(outLeft.data()), 
+                        static_cast<magma_int_t>(ldOut),
+                        queue ); 
+
+            magma_queue_sync( queue );
+            magma_queue_destroy( queue );
+        }
+
+
+        // Compute the inverse in-place using the outLeft matrix:  out = A_{12}^{-1}(r - b - A_{11}*x_1)
+        magma_int_t info;
+        magma_dgetrs_gpu(MagmaNoTrans, 
+                         static_cast<magma_int_t>(A_.extent(0)),
+                        static_cast<magma_int_t>(numPts), 
+                        reinterpret_cast<magmaDouble_ptr>(LU_.data()), 
+                        static_cast<magma_int_t>(ldLU), 
+                        pivots_.data(), 
+                        reinterpret_cast<magmaDouble_ptr>(outLeft.data()), 
+                        static_cast<magma_int_t>(ldOut), 
+                        &info);
+        
+        // Error checking
+        if(info!=0){
+            std::stringstream msg;
+            msg << "In AffineMap::InverseImpl: Could not compute inverse with magma_dgetrs_gpu.  Argument " << -info << " to magma_dgetrs_gpu had a bad value.";
+            throw std::runtime_error(msg.str());
+        }
+
+        // Copy the inverse back if necessary
+        if(copyOut)
+            Kokkos::deep_copy(output, outLeft);
+    }
+}
+
+
+template<>
+void AffineMap<mpart::DeviceSpace>::EvaluateImpl(StridedMatrix<const double, mpart::DeviceSpace> const& pts,
+                                                 StridedMatrix<double, mpart::DeviceSpace>              output)
+{
+    // Linear part
+    if(A_.extent(0)>0){
+        Kokkos::View<const double**, Kokkos::LayoutLeft, mpart::DeviceSpace> ptsLeft;
+        Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace> outLeft;
+    
+        // Make sure the ptsLeft array is column major
+        if(pts.stride_0()==1){
+            ptsLeft = pts;
+        }else{
+            Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace> ptsTemp("PtsLeft", pts.extent(0), pts.extent(1));
+            Kokkos::deep_copy(ptsTemp, pts);
+            ptsLeft = ptsTemp;
+        }
+        
+        bool copyOut = false;
+        if(output.stride_0()==1){
+            outLeft = output;
+        }else{
+            outLeft = Kokkos::View<double**, Kokkos::LayoutLeft,mpart::DeviceSpace>("OutLeft", output.extent(0), output.extent(1));
+            copyOut = true;
+        }
+        
+        int ldPts = ptsLeft.stride_1(); // Spacing between columns int ptsLeft
+        int ldOut = outLeft.stride_1(); // Spacing between columns int outLeft
+        
+
+        std::cout << "Here 0" << std::endl;
+        // Perform the matrix multiplication
+        magma_int_t device;
+        magma_queue_t queue;
+        magma_getdevice( &device );
+        std::cout << "Here 0a" << std::endl;
+        magma_queue_create( device, &queue );
+
+        std::cout << "Here 0b" << std::endl;
+        magma_dgemm( MagmaNoTrans,
+                     MagmaNoTrans, 
+                     static_cast<magma_int_t>(A_.extent(0)),
+                     static_cast<magma_int_t>(ptsLeft.extent(1)),
+                     static_cast<magma_int_t>(A_.extent(0)),
+                     1.0, 
+                     reinterpret_cast<magmaDouble_ptr>(A_.data()), 
+                     static_cast<magma_int_t>(ldA),
+                     reinterpret_cast<magmaDouble_ptr>(const_cast<double*>(ptsLeft.data())), 
+                     static_cast<magma_int_t>(ldPts),
+                     0.0, 
+                     reinterpret_cast<magmaDouble_ptr>(outLeft.data()),
+                     static_cast<magma_int_t>(ldOut),
+                     queue );
+
+        std::cout << "Here 1" << std::endl;
+        magma_queue_sync( queue );
+        std::cout << "Here 2" << std::endl;
+        magma_queue_destroy( queue );
+
+        std::cout << "Here 3" << std::endl;
+        // The layouts didn't match, so we have to copy back
+        if(copyOut)
+            Kokkos::deep_copy(output, outLeft);
+
+    }else{
+        Kokkos::deep_copy(output, pts);
+    }
+
+    // Bias part
+    if(b_.size()>0){
+
+        unsigned int numPts = pts.extent(1);
+        Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<mpart::DeviceSpace>::Space> policy({{0, 0}}, {{numPts, outputDim}});
+
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
+            output(i,j) += b_(i);
+        });
+    }
+}
+
+template<>
+void AffineMap<mpart::DeviceSpace>::GradientImpl(StridedMatrix<const double, mpart::DeviceSpace> const& pts,  
+                                                 StridedMatrix<const double, mpart::DeviceSpace> const& sens,
+                                                 StridedMatrix<double, mpart::DeviceSpace>              output)
+{
+    // Linear part
+    if(A_.extent(0)>0){
+
+        Kokkos::View<const double**, Kokkos::LayoutLeft,mpart::DeviceSpace> sensLeft;
+        Kokkos::View<double**, Kokkos::LayoutLeft,mpart::DeviceSpace> outLeft;
+    
+        // Make sure the sensLeft array is column major
+        if(sens.stride_0()==1){
+            sensLeft = sens;
+        }else{
+            Kokkos::View<double**, Kokkos::LayoutLeft,mpart::DeviceSpace> sensTemp("SensLeft", sens.extent(0), sens.extent(1));
+            Kokkos::deep_copy(sensTemp, sens);
+            sensLeft = sensTemp;
+        }
+        
+        bool copyOut = false;
+        if(output.stride_0()==1){
+            outLeft = output;
+        }else{
+            outLeft = Kokkos::View<double**, Kokkos::LayoutLeft,mpart::DeviceSpace>("OutLeft", output.extent(0), output.extent(1));
+            copyOut = true;
+        }
+        
+        int ldSens = sensLeft.stride_1(); // Spacing between columns int ptsLeft
+        int ldOut = outLeft.stride_1(); // Spacing between columns int outLeft
+        
+
+        // Perform the matrix multiplication
+        int device;
+        magma_queue_t queue;
+        magma_getdevice( &device );
+        magma_queue_create( device, &queue );
+
+        magma_dgemm( MagmaTrans,
+                     MagmaNoTrans, A_.extent(0), sensLeft.extent(1), A_.extent(0),
+                     1.0, A_.data(), ldA,
+                          sensLeft.data(), ldSens,
+                     0.0, outLeft.data(), ldOut, queue );
+
+        magma_queue_sync( queue );
+        magma_queue_destroy( queue );
+
+        // The layouts didn't match, so we have to copy back
+        if(copyOut)
+            Kokkos::deep_copy(output, outLeft);
+
+    }else{
+        Kokkos::deep_copy(output, sens);
+    }
+}
+
+
+template class mpart::AffineMap<DeviceSpace>;
 #endif

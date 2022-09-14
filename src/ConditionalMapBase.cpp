@@ -40,14 +40,14 @@ Kokkos::View<double*, mpart::DeviceSpace> ConditionalMapBase<mpart::DeviceSpace>
 template<>
 template<>
 Kokkos::View<double*, Kokkos::HostSpace> ConditionalMapBase<mpart::DeviceSpace>::LogDeterminant(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
-{
+{   
     return ToHost( this->LogDeterminant( ToDevice<mpart::DeviceSpace>(pts) ));
 }
 
 template<>
 template<>
 Kokkos::View<double*, mpart::DeviceSpace> ConditionalMapBase<Kokkos::HostSpace>::LogDeterminant(StridedMatrix<const double, mpart::DeviceSpace> const& pts)
-{
+{   
     return ToDevice<mpart::DeviceSpace>( this->LogDeterminant( ToHost(pts) ));
 }
 

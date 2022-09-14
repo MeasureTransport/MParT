@@ -914,7 +914,7 @@ TEST_CASE( "Testing MonotoneComponent::EvaluateSingle on Device", "[MonotoneComp
     Kokkos::View<double*,DeviceSpace> dcoeffs = ToDevice<DeviceSpace>(hcoeffs);
 
     unsigned int cacheSize = dexpansion.CacheSize();
-    CHECK(cacheSize == (maxDegree+1)*(dim+2));
+    CHECK(cacheSize == (maxDegree+1)*(2*dim+1));
 
     // Allocate some memory for the cache
     Kokkos::View<double*, DeviceSpace> dcache("device cache", cacheSize);

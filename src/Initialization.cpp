@@ -5,6 +5,10 @@ using namespace mpart;
 
 void mpart::Finalize()
 {
+#if defined(MPART_ENABLE_GPU)
+    magma_finalize();
+#endif 
+
     Kokkos::finalize();
 }
 
