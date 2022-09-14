@@ -147,6 +147,22 @@ namespace mpart {
                                                  StridedMatrix<double, MemorySpace>              output) = 0;
 
 
+        template<typename AnyMemorySpace>
+        StridedMatrix<double, AnyMemorySpace> LogDeterminantInputGrad(StridedMatrix<const double, AnyMemorySpace> const& pts);
+
+        /** Include conversion between general view type and Strided matrix. */
+        template<typename ViewType>
+        StridedMatrix<double, typename ViewType::memory_space> LogDeterminantInputGrad(ViewType pts){
+            StridedMatrix<const double, typename ViewType::memory_space> newpts(pts); 
+            return  this->LogDeterminantInputGrad(newpts);
+        }
+
+        /** Evaluation with additional conversion of Eigen matrix to Kokkos unmanaged view. */
+        Eigen::RowMatrixXd LogDeterminantInputGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
+
+        virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                                 StridedMatrix<double, MemorySpace>              output) = 0;
+
     }; // class ConditionalMapBase<MemorySpace>
 }
 
