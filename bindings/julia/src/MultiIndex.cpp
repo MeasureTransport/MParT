@@ -56,10 +56,12 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
     mod.method("sum", [](MultiIndex const& idx){ return idx.Sum(); });
     mod.method("setindex!", [](MultiIndex& idx, unsigned int val, unsigned int ind) { return idx.Set(ind, val); });
     mod.method("getindex", [](MultiIndex const& idx, unsigned int ind) { return idx.Get(ind); });
+    mod.method("getindex", [](MultiIndexSet const& idx, int ind) { return idx.at(ind); });
     mod.method("maximum", [](MultiIndex const& idx){ return idx.Max(); });
-    mod.method("String", [](MultiIndex const& idx){ return idx.String(); });
+    mod.method("string", [](MultiIndex const& idx){ return idx.String(); });
     mod.method("length", [](MultiIndex const& idx){ return idx.Length(); });
     mod.method("length", [](MultiIndexSet const& idx){ return idx.Length(); });
+    mod.method("vec", [](MultiIndex const& idx){ return idx.Vector(); });
     mod.method("==", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 == idx2; });
     mod.method("!=", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 != idx2; });
     mod.method("<", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 < idx2; });
