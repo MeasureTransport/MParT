@@ -283,15 +283,23 @@ void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
     StridedMatrix<const double, MemorySpace> subPts;
     StridedMatrix<double, MemorySpace> subOut;
 
-    int startParamDim = 0;
+    int numPts = pts.extent(1);    
+    Kokkos::View<double**,MemorySpace> compGrad("Component Gradient", this->inputDim, numPts);
+    Kokkos::View<double**,MemorySpace> subGrad;
+    
     for(unsigned int i=0; i<comps_.size(); ++i){
+        int compDim = comps_.at(i)->inputDim;
+        subPts = Kokkos::subview(pts, std::make_pair(0,compDim), Kokkos::ALL());
+        subGrad = Kokkos::subview(compGrad, std::make_pair(0,compDim), Kokkos::ALL());
 
-        subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
+        comps_.at(i)->LogDeterminantInputGradImpl(subPts, subGrad);
 
-        subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->inputDim)), Kokkos::ALL());
-        comps_.at(i)->LogDeterminantInputGradImpl(subPts, subOut);
+        // Now accumulate the input gradient
+        Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{compDim, numPts}});
 
-        startParamDim += comps_.at(i)->inputDim;
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& i, const int& j) {
+            output(i,j) += subGrad(i,j);
+        });
     }
 }
 

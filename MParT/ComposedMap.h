@@ -100,6 +100,11 @@ public:
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override;
 
+    void EvaluateUntilK(int k, 
+                        StridedMatrix<const double, MemorySpace> const& pts,
+                        StridedMatrix<double, MemorySpace> intPts, 
+                        StridedMatrix<double, MemorySpace> output);
+
     void LogDeterminantCoeffGradImplUpdate( int compInd,
                                             int termInd, 
                                             StridedMatrix<const double, MemorySpace> const& pts, 

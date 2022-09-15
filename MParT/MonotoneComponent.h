@@ -190,7 +190,7 @@ public:
         // Now take the log
         auto policy = Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space>(0,pts.extent(1));
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA (unsigned int ptInd) {
-            for(unsigned int i=0; i<this->numCoeffs; ++i)
+            for(unsigned int i=0; i<this->dim_; ++i)
                 output(i,ptInd) *= 1.0/derivs(ptInd);
         });
     }
