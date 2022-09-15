@@ -815,6 +815,7 @@ public:
         const unsigned int numPts = pts.extent(1);
         const unsigned int dim = pts.extent(0);
 
+
         assert(jacobian.extent(1)==numPts);
         assert(jacobian.extent(0)==dim);
 
@@ -838,14 +839,15 @@ public:
                 Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
 
                 // Precompute anything that does not depend on x_d.  The DerivativeFlags::None arguments specifies that we won't want to derivative wrt to x_i for i<d
-                expansion_.FillCache1(cache.data(), pt, DerivativeFlags::None);
+                expansion_.FillCache1(cache.data(), pt, DerivativeFlags::MixedInput);
 
                 // Fill in parts of the cache that depend on x_d.  Tell the expansion we're going to want first derivatives wrt x_d
-                expansion_.FillCache2(cache.data(), pt, pt(dim-1), DerivativeFlags::Diagonal);
+                expansion_.FillCache2(cache.data(), pt, pt(dim-1), DerivativeFlags::MixedInput);
 
                 // Compute \partial_d f
                 double df = expansion_.MixedInputDerivative(cache.data(), coeffs, jacView);
                 double dgdf = PosFuncType::Derivative(df);
+
 
                 // Scale the jacobian by dg(df)
                 for(unsigned int i=0; i<dim; ++i)

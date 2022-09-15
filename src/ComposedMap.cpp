@@ -222,16 +222,129 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
 }
 
 template<typename MemorySpace>
+void ComposedMap<MemorySpace>::LogDeterminantCoeffGradImplUpdate( int compInd,
+                                        int termInd, 
+                                        StridedMatrix<const double, MemorySpace> const& pts, 
+                                        StridedMatrix<double, MemorySpace> output){
+
+    
+    // compute first sensitive vector 
+    Kokkos::View<double**, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
+    Kokkos::View<double**, MemorySpace>  intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
+
+    Kokkos::deep_copy(intPts1, pts);
+    for(int j = 0; j<termInd; j++){
+        // x = T_j(x)
+        comps_.at(j)->EvaluateImpl(intPts1, intPts2);
+        Kokkos::deep_copy(intPts1, intPts2);
+    }
+
+    Kokkos::View<double**, MemorySpace>  intOutput("intOutput", pts.extent(0), pts.extent(1));
+    comps_.at(termInd)->LogDeterminantInputGradImpl(intPts1, intOutput);
+
+
+    // loop through computing input gradient terms
+    for(int i = termInd - 1; i>compInd; --i){
+        
+        // x* = T_{i-1} o ... o T_1(x)
+
+        // reset intPts1 to initial pts
+        Kokkos::deep_copy(intPts1, pts);
+        for(int j = 0; j<i; j++){
+            // x = T_j(x)
+            comps_.at(j)->EvaluateImpl(intPts1, intPts2);
+            Kokkos::deep_copy(intPts1, intPts2);
+        }
+
+        //s_{i-1}^T = s_{i}^T J_i(x*)
+        comps_.at(i)->GradientImpl(intPts1, intOutput, output);
+        Kokkos::deep_copy(intOutput, output);
+    }
+
+    // last part, coeff gradient of comp.at(compInd)
+    Kokkos::deep_copy(intPts1, pts);
+    for(int j = 0; j<compInd; j++){
+        // x = T_j(x)
+        comps_.at(j)->EvaluateImpl(intPts1, intPts2);
+        Kokkos::deep_copy(intPts1, intPts2);
+    }
+    comps_.at(compInd)->CoeffGradImpl(intPts1, intOutput, output);
+
+}
+
+template<typename MemorySpace>
 void ComposedMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                                              StridedMatrix<double, MemorySpace>              output)
 {
-        std::stringstream msg;
-        msg << "ComposedMap LogDeterminantCoeffGradImpl not implemented";
-        throw std::invalid_argument(msg.str());
+
+    unsigned const int numComps = comps_.size();
+
+    Kokkos::View<double**, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
+    Kokkos::View<double**, MemorySpace> intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
+    // set intPts1 to initial pts
+    Kokkos::deep_copy(intPts1, pts);
+
+    StridedMatrix<double, MemorySpace> subOut;
+    StridedMatrix<double, MemorySpace> subOutUpdate;
+    // First set the output to the contribution from LogDeterminantCoeffGradImpl from each component
+    int startParamDim = 0;   
+    for(int i = 0; i<numComps; ++i){
+        
+        comps_.at(i)->EvaluateImpl(intPts1, intPts2);
+        Kokkos::deep_copy(intPts1, intPts2);
+        //intPts1 = T_i(x_{i-1})
+
+        // get current subOut for coeffs of comp.at(i)
+        subOut = Kokkos::subview(output, 
+                                 std::make_pair(startParamDim, int(startParamDim+comps_.at(i)->numCoeffs)), 
+                                 Kokkos::ALL());
+
+        
+        // get subview of output (storing gradient wrt w_i)
+        comps_.at(i)->LogDeterminantCoeffGradImpl(intPts1, subOut);
+
+        startParamDim += comps_.at(i)->numCoeffs;
+    }
+
+    // Loop through terms in the sum
+    for(int k = 0; k<numComps; ++k){
+
+        startParamDim = 0;  
+        
+        // loop over w_i: coeffs of comps_.at(i): Loop ends at k-1
+        for(int i = 0; i<k; ++i){
+
+
+            // get current subOut for coeffs of comp.at(i)
+            subOut = Kokkos::subview(output, 
+                                 std::make_pair(startParamDim, int(startParamDim+comps_.at(i)->numCoeffs)), 
+                                 Kokkos::ALL());
+            
+            subOutUpdate = Kokkos::View<double**, MemorySpace>("subOutUpdate", subOut.extent(0), subOut.extent(1));
+
+            LogDeterminantCoeffGradImplUpdate(i, k, pts, subOut);
+            for(int idx1 = 0; idx1<subOut.extent(0); ++idx1){
+                for(int idx2 = 0; idx2<subOut.extent(1); ++idx2){
+                    subOut(idx1,idx2) += subOutUpdate(idx1,idx2);
+                }
+            }
+
+            startParamDim += comps_.at(i)->numCoeffs;
+        }
+    
+    }
 
 }
 
 
+
+template<typename MemorySpace>
+void ComposedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                                             StridedMatrix<double, MemorySpace>              output)
+{
+
+
+}
 
 // Explicit template instantiation
 template class mpart::ComposedMap<Kokkos::HostSpace>;

@@ -100,9 +100,18 @@ public:
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override;
 
+    void LogDeterminantCoeffGradImplUpdate( int compInd,
+                                            int termInd, 
+                                            StridedMatrix<const double, MemorySpace> const& pts, 
+                                            StridedMatrix<double, MemorySpace> output);
 
     virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                              StridedMatrix<double, MemorySpace>              output) override;
+
+
+    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                             StridedMatrix<double, MemorySpace>              output) override;
+
 
     virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                             StridedMatrix<const double, MemorySpace> const& sens,
