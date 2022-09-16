@@ -2,6 +2,7 @@
 #include "MParT/Utilities/KokkosSpaceMappings.h"
 
 #include "MParT/Utilities/ArrayConversions.h"
+#include "MParT/Initialization.h"
 
 #if defined(MPART_ENABLE_GPU)
 #include "magma_v2.h"
@@ -128,18 +129,27 @@ void AffineFunction<mpart::DeviceSpace>::EvaluateImpl(StridedMatrix<const double
         
 
         // Perform the matrix multiplication
-        int device;
+        magma_int_t device;
         magma_queue_t queue;
         magma_getdevice( &device );
         magma_queue_create( device, &queue );
-
+        
         magma_dgemm( MagmaNoTrans,
-                     MagmaNoTrans, A_.extent(0), ptsLeft.extent(1), A_.extent(0),
-                     1.0, A_.data(), ldA,
-                          ptsLeft.data(), ldPts,
-                     0.0, outLeft.data(), ldOut, queue );
+                     MagmaNoTrans, 
+                     static_cast<magma_int_t>(A_.extent(0)),
+                     static_cast<magma_int_t>(ptsLeft.extent(1)),
+                     static_cast<magma_int_t>(A_.extent(0)),
+                     1.0, 
+                     reinterpret_cast<magmaDouble_ptr>(A_.data()), 
+                     static_cast<magma_int_t>(ldA),
+                     reinterpret_cast<magmaDouble_ptr>(const_cast<double*>(ptsLeft.data())), 
+                     static_cast<magma_int_t>(ldPts),
+                     0.0, 
+                     reinterpret_cast<magmaDouble_ptr>(outLeft.data()),
+                     static_cast<magma_int_t>(ldOut),
+                     queue );
 
-        magma_queue_sync( queue );
+        magma_queue_sync( queue ); // <- This seems to hang
         magma_queue_destroy( queue );
 
         // The layouts didn't match, so we have to copy back
@@ -199,6 +209,7 @@ void AffineFunction<mpart::DeviceSpace>::GradientImpl(StridedMatrix<const double
         magma_queue_t queue;
         magma_getdevice( &device );
         magma_queue_create( device, &queue );
+        
 
         magma_dgemm( MagmaTrans,
                      MagmaNoTrans, A_.extent(0), sensLeft.extent(1), A_.extent(0),
@@ -206,7 +217,7 @@ void AffineFunction<mpart::DeviceSpace>::GradientImpl(StridedMatrix<const double
                           sensLeft.data(), ldSens,
                      0.0, outLeft.data(), ldOut, queue );
 
-        magma_queue_sync( queue );
+        magma_queue_sync( queue ); // <- This seems to hang
         magma_queue_destroy( queue );
 
         // The layouts didn't match, so we have to copy back

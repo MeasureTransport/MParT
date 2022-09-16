@@ -261,17 +261,17 @@ TEST_CASE( "Testing Linear-only AffineMap on Device", "[DeviceLinearMap]" ) {
     auto devals = map->Evaluate(dpts);
     auto hevals = ToHost(devals);
 
-    // auto dpts2 = map->Inverse(dpts, devals);
-    // auto hpts2 = ToHost(dpts2);
+    auto dpts2 = map->Inverse(dpts, devals);
+    auto hpts2 = ToHost(dpts2);
     
-    // for(unsigned int i=0; i<numPts; ++i){
-    //     double trueOut1 = hA(0,0)*hpts(0,i) + hA(0,1)*hpts(1,i);
-    //     double trueOut2 = hA(1,0)*hpts(0,i) + hA(1,1)*hpts(1,i);
-    //     CHECK(hevals(0,i)==Approx(trueOut1).epsilon(1e-14));
-    //     CHECK(hevals(1,i)==Approx(trueOut2).epsilon(1e-14));
-    //     CHECK(hpts2(0,i)==Approx(hpts(0,i)).epsilon(1e-14));
-    //     CHECK(hpts2(1,i)==Approx(hpts(1,i)).epsilon(1e-14));
-    // }
+    for(unsigned int i=0; i<numPts; ++i){
+        double trueOut1 = hA(0,0)*hpts(0,i) + hA(0,1)*hpts(1,i);
+        double trueOut2 = hA(1,0)*hpts(0,i) + hA(1,1)*hpts(1,i);
+        CHECK(hevals(0,i)==Approx(trueOut1).epsilon(1e-14));
+        CHECK(hevals(1,i)==Approx(trueOut2).epsilon(1e-14));
+        CHECK(hpts2(0,i)==Approx(hpts(0,i)).epsilon(1e-14));
+        CHECK(hpts2(1,i)==Approx(hpts(1,i)).epsilon(1e-14));
+    }
 
 }
 

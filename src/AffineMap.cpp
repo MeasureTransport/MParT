@@ -2,6 +2,7 @@
 #include "MParT/Utilities/KokkosSpaceMappings.h"
 
 #include "MParT/Utilities/ArrayConversions.h"
+#include "MParT/Initialization.h"
 
 #if defined(MPART_ENABLE_GPU)
 #include "magma_v2.h"
@@ -266,13 +267,13 @@ void AffineMap<mpart::DeviceSpace>::InverseImpl(StridedMatrix<const double, mpar
             }
 
             int ldX = xLeft.stride_1(); // Spacing between columns int ptsLeft
-            
+
             // Perform the matrix multiplication
             magma_int_t device;
             magma_queue_t queue;
             magma_getdevice( &device );
             magma_queue_create( device, &queue );
-
+            
             // After this degemm, we will have out = r - b - A_{11}*x_1
             magma_dgemm( MagmaNoTrans,
                         MagmaNoTrans, static_cast<magma_int_t>(nrows), 
@@ -288,10 +289,9 @@ void AffineMap<mpart::DeviceSpace>::InverseImpl(StridedMatrix<const double, mpar
                         static_cast<magma_int_t>(ldOut),
                         queue ); 
 
-            magma_queue_sync( queue );
+            magma_queue_sync( queue ); // <- This seems to hang
             magma_queue_destroy( queue );
         }
-
 
         // Compute the inverse in-place using the outLeft matrix:  out = A_{12}^{-1}(r - b - A_{11}*x_1)
         magma_int_t info;
@@ -349,15 +349,12 @@ void AffineMap<mpart::DeviceSpace>::EvaluateImpl(StridedMatrix<const double, mpa
         int ldOut = outLeft.stride_1(); // Spacing between columns int outLeft
         
 
-        std::cout << "Here 0" << std::endl;
         // Perform the matrix multiplication
         magma_int_t device;
         magma_queue_t queue;
         magma_getdevice( &device );
-        std::cout << "Here 0a" << std::endl;
         magma_queue_create( device, &queue );
-
-        std::cout << "Here 0b" << std::endl;
+        
         magma_dgemm( MagmaNoTrans,
                      MagmaNoTrans, 
                      static_cast<magma_int_t>(A_.extent(0)),
@@ -373,12 +370,9 @@ void AffineMap<mpart::DeviceSpace>::EvaluateImpl(StridedMatrix<const double, mpa
                      static_cast<magma_int_t>(ldOut),
                      queue );
 
-        std::cout << "Here 1" << std::endl;
-        magma_queue_sync( queue );
-        std::cout << "Here 2" << std::endl;
+        magma_queue_sync( queue ); // <- This seems to hang, at least with MParT's build of magma
         magma_queue_destroy( queue );
-
-        std::cout << "Here 3" << std::endl;
+        
         // The layouts didn't match, so we have to copy back
         if(copyOut)
             Kokkos::deep_copy(output, outLeft);
@@ -436,6 +430,7 @@ void AffineMap<mpart::DeviceSpace>::GradientImpl(StridedMatrix<const double, mpa
         magma_queue_t queue;
         magma_getdevice( &device );
         magma_queue_create( device, &queue );
+        
 
         magma_dgemm( MagmaTrans,
                      MagmaNoTrans, A_.extent(0), sensLeft.extent(1), A_.extent(0),
@@ -443,9 +438,9 @@ void AffineMap<mpart::DeviceSpace>::GradientImpl(StridedMatrix<const double, mpa
                           sensLeft.data(), ldSens,
                      0.0, outLeft.data(), ldOut, queue );
 
-        magma_queue_sync( queue );
+        magma_queue_sync( queue ); // <- This seems to hang
         magma_queue_destroy( queue );
-
+        
         // The layouts didn't match, so we have to copy back
         if(copyOut)
             Kokkos::deep_copy(output, outLeft);
