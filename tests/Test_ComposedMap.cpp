@@ -106,47 +106,44 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
 
     // }
 
-    // SECTION("CoeffGrad"){
+    SECTION("CoeffGrad"){
 
-    //     //Kokkos::View<double**,Kokkos::HostSpace> sens("Sensitivities", composedMap->outputDim, numSamps);
-    //     Eigen::RowMatrixXd sens(composedMap->outputDim, numSamps);
-    //     for(unsigned int j=0; j<numSamps; ++j){
-    //         for(unsigned int i=0; i<composedMap->outputDim; ++i){
-    //             sens(i,j) = 1.0 + 0.1*i + j;
-    //         }
-    //     }
-
-    //     // Kokkos::View<double**,Kokkos::HostSpace> evals = composedMap->Evaluate(in);
-    //     // Kokkos::View<double**,Kokkos::HostSpace> evals2;
-
-    //     // Kokkos::View<double**,Kokkos::HostSpace> coeffGrad = composedMap->CoeffGrad(in, sens);
-    //     Eigen::RowMatrixXd evals = composedMap->Evaluate(in);
-    //     Eigen::RowMatrixXd evals2;
-
-    //     Eigen::RowMatrixXd coeffGrad = composedMap->CoeffGrad(in, sens);
-    //     // REQUIRE(coeffGrad.extent(0)==composedMap->numCoeffs);
-    //     // REQUIRE(coeffGrad.extent(1)==numSamps);
-
-    //     // Compare with finite differences
-    //     double fdstep = 1e-5;
-    //     for(unsigned int i=0; i<composedMap->numCoeffs; ++i){
-    //         coeffs(i) += fdstep;
-
-    //         composedMap->SetCoeffs(coeffs);
-    //         evals2 = composedMap->Evaluate(in);
-
-    //         for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
-    //             double fdDeriv = 0.0;
-    //             for(unsigned int j=0; j<composedMap->outputDim; ++j)
-    //                 fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
-
-    //             CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
-    //         }
-    //         coeffs(i) -= fdstep;
-    //     }
+        Kokkos::View<double**,Kokkos::HostSpace> sens("Sensitivities", composedMap->outputDim, numSamps);
         
-    // }
+        for(unsigned int j=0; j<numSamps; ++j){
+            for(unsigned int i=0; i<composedMap->outputDim; ++i){
+                sens(i,j) = 1.0 + 0.1*i + j;
+            }
+        }
+
+        Kokkos::View<double**,Kokkos::HostSpace> evals = composedMap->Evaluate(in);
+        Kokkos::View<double**,Kokkos::HostSpace> evals2;
+
+        Kokkos::View<double**,Kokkos::HostSpace> coeffGrad = composedMap->CoeffGrad(in, sens);
+
+        REQUIRE(coeffGrad.extent(0)==composedMap->numCoeffs);
+        REQUIRE(coeffGrad.extent(1)==numSamps);
+
+        // Compare with finite differences
+        double fdstep = 1e-5;
+        for(unsigned int i=0; i<composedMap->numCoeffs; ++i){
+            coeffs(i) += fdstep;
+
+            composedMap->SetCoeffs(coeffs);
+            evals2 = composedMap->Evaluate(in);
+
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
+                
+                double fdDeriv = 0.0;
+                for(unsigned int j=0; j<composedMap->outputDim; ++j)
+                    fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
+
+                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
+            }
+            coeffs(i) -= fdstep;
+        }
+        
+    }
 
 
     SECTION("Input Gradient"){

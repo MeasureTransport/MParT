@@ -208,7 +208,7 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
     Kokkos::deep_copy(intSens1, sens);
 
     StridedMatrix<double, MemorySpace> subOut;
-    int startParamDim = 0;   
+    int endParamDim = this->numCoeffs;   
     for(int i = comps_.size() - 1; i>=0; --i){
         
         // reset intPts1 to initial pts
@@ -223,7 +223,7 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
 
         // finish g_i = s^T \nabla_{w_i} T(x)
         subOut = Kokkos::subview(output, 
-                                 std::make_pair(startParamDim, int(startParamDim+comps_.at(i)->numCoeffs)), 
+                                 std::make_pair(int(endParamDim-comps_.at(i)->numCoeffs), endParamDim), 
                                  Kokkos::ALL());
 
 
@@ -234,7 +234,7 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
         //s_{i-1}^T = s_{i}^T J_i(x*)
         comps_.at(i)->GradientImpl(intPts1, intSens1, intSens2);
         Kokkos::deep_copy(intSens1, intSens2);
-        startParamDim += comps_.at(i)->numCoeffs;
+        endParamDim -= comps_.at(i)->numCoeffs;
 
     }
 
