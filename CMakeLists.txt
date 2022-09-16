@@ -99,8 +99,8 @@ endif()
 
 if(${COMPILER_IS_NVCC})
     message(STATUS "Searching for CUBLAS and CUSOLVER linear algebra libraries.")
-    find_package(CUDAToolkit)
-    set(CUDA_LIBRARIES CUDA::toolkit)
+    find_package(CUDAToolkit COMPONENTS cudart cublas cusolver REQUIRED)
+    set(CUDA_LIBRARIES CUDA::cudart CUDA::cublas CUDA::cusolver)
 
 else()
     message(STATUS "MParT is not compiled with CUDA support, so CUBLAS and CUSOLVER will not be used.")

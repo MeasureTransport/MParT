@@ -12,7 +12,7 @@
 #if defined(MPART_ENABLE_GPU)
 #include <cuda_runtime.h>
 #include <cublas_v2.h>
-#include <cusolverRf.h>
+#include <cusolverDn.h>
 #endif 
 
 namespace mpart{
@@ -74,7 +74,7 @@ protected:
 #if defined(MPART_ENABLE_GPU)
     cusolverDnParams_t params;
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> LU_;
-    Kokkos::View<int*, MemorySpace> pivots_;
+    Kokkos::View<int64_t*, MemorySpace> pivots_;
     int ldA;
 #endif
 

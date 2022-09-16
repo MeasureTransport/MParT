@@ -169,7 +169,7 @@ void AffineMap<mpart::DeviceSpace>::Factorize()
 
     // Resize the space for storing the LU factorization
     LU_ = Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace>("LU", A_.extent(0), A_.extent(0));
-    pivots_ = Kokkos::View<int*, mpart::DeviceSpace>("Pivots", A_.extent(0));
+    pivots_ = Kokkos::View<int64_t*, mpart::DeviceSpace>("Pivots", A_.extent(0));
 
     int ldLU = LU_.stride_1();
     int info;
@@ -178,39 +178,39 @@ void AffineMap<mpart::DeviceSpace>::Factorize()
     Kokkos::deep_copy(LU_, Kokkos::subview(A_, Kokkos::ALL(), std::make_pair(ncols-nrows, int(A_.extent(1)))));
 
     // Set up cuSolver options
-    CUSOLVER_CHECK(cusolverDnCreateParams(&params));
-    CUSOLVER_CHECK(cusolverDnSetAdvOptions(params, CUSOLVERDN_GETRF, CUSOLVER_ALG_0));
+    cusolverDnCreateParams(&params);
+    cusolverDnSetAdvOptions(params, CUSOLVERDN_GETRF, CUSOLVER_ALG_0);
     
     size_t d_workSize, h_workSize;
     cusolverDnXgetrf_bufferSize(GetInitializeStatusObject().GetCusolverHandle(), 
                                 params,
                                 LU_.extent(0),
                                 LU_.extent(1), 
-                                traits<double>::cuda_data_type, 
+                                CUDA_R_64F, 
                                 LU_.data(),
                                 ldLU, 
-                                traits<double>::cuda_data_type, 
+                                CUDA_R_64F, 
                                 &d_workSize, 
                                 &h_workSize);
 
 
     Kokkos::View<double*, mpart::DeviceSpace> d_workspace("LU Workspace", d_workSize);
     Kokkos::View<double*, Kokkos::HostSpace> h_workspace("LU Workspace", h_workSize);
-    Kokkos::View<double*, mpart::DeviceSpace> d_info("Info",1);
+    Kokkos::View<int*, mpart::DeviceSpace> d_info("Info",1);
 
     cusolverDnXgetrf(GetInitializeStatusObject().GetCusolverHandle(), 
                      params, 
                      LU_.extent(0), 
                      LU_.extent(1), 
-                     traits<double>::cuda_data_type,
+                     CUDA_R_64F,
                      LU_.data(), ldLU, 
-                     pivots_,
-                     traits<double>::cuda_data_type, 
-                     d_workspace,
+                     pivots_.data(),
+                     CUDA_R_64F, 
+                     d_workspace.data(),
                      d_workSize, 
-                     h_workspace, 
+                     h_workspace.data(), 
                      h_workSize,
-                     d_info);
+                     d_info.data());
     
     info = ToHost(d_info)(0);
 
@@ -313,7 +313,7 @@ void AffineMap<mpart::DeviceSpace>::InverseImpl(StridedMatrix<const double, mpar
                            A_.data(), ldA,
                            xLeft.data(), ldX,
                            &beta,
-                           outLeft.data(), ldOut;)
+                           outLeft.data(), ldOut);
 
             // // Perform the matrix multiplication
             // magma_int_t device;
@@ -341,21 +341,21 @@ void AffineMap<mpart::DeviceSpace>::InverseImpl(StridedMatrix<const double, mpar
         }
 
         int info;
-        Kokkos::View<double*, mpart::DeviceSpace> d_info("Info", 1);
+        Kokkos::View<int*, mpart::DeviceSpace> d_info("Info", 1);
 
         cusolverDnXgetrs(GetInitializeStatusObject().GetCusolverHandle(), 
                          params, 
                          CUBLAS_OP_N, 
                          LU_.extent(0), 
                          numPts,
-                         traits<double>::cuda_data_type, 
+                         CUDA_R_64F, 
                          LU_.data(), 
                          ldLU, 
                          pivots_.data(),
-                         traits<double>::cuda_data_type, 
+                         CUDA_R_64F, 
                          outLeft.data(), 
                          ldOut, 
-                         d_info);
+                         d_info.data());
         info = ToHost(d_info)(0);
 
         // // Compute the inverse in-place using the outLeft matrix:  out = A_{12}^{-1}(r - b - A_{11}*x_1)
@@ -424,7 +424,7 @@ void AffineMap<mpart::DeviceSpace>::EvaluateImpl(StridedMatrix<const double, mpa
                            A_.data(), ldA,
                            ptsLeft.data(), ldPts,
                            &beta,
-                           outLeft.data(), ldOut;)
+                           outLeft.data(), ldOut);
 
         // magma_int_t device;
         // magma_queue_t queue;
@@ -510,7 +510,7 @@ void AffineMap<mpart::DeviceSpace>::GradientImpl(StridedMatrix<const double, mpa
                            A_.data(), ldA,
                            sensLeft.data(), ldSens,
                            &beta,
-                           outLeft.data(), ldOut;)
+                           outLeft.data(), ldOut);
 
         
         // The layouts didn't match, so we have to copy back

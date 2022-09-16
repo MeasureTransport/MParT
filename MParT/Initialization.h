@@ -11,7 +11,8 @@
 
 #if defined(MPART_ENABLE_GPU)
 #include <cuda_runtime.h>
-#include "cublas_v2.h"
+#include <cublas_v2.h>
+#include <cusolverDn.h>
 #endif 
 
 namespace mpart{
@@ -85,7 +86,7 @@ int main( int argc, char* argv[] ) {
 #if defined(MPART_ENABLE_GPU)
              // Set up the cublas handles
             cublasCreate(&GetInitializeStatusObject().GetCublasHandle());
-            cusolverDnCreate(&GetInitializeStatusObject().GetCusolverHandle())
+            cusolverDnCreate(&GetInitializeStatusObject().GetCusolverHandle());
 #endif
 
             // Make sure Kokkos::finalize() is called at program exit.
