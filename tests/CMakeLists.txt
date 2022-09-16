@@ -13,6 +13,7 @@ set (TEST_SOURCES
      tests/Test_ArrayConversions.cpp
      tests/Test_ConditionalMapBase.cpp
      tests/Test_TriangularMap.cpp
+     tests/Test_ComposedMap.cpp
      tests/Test_MapFactory.cpp
      tests/Test_LinearizedBasis.cpp
      #tests/Test_TensorProductFunction.cpp

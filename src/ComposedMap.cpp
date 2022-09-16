@@ -170,6 +170,25 @@ void ComposedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpa
 
 }
 
+template<typename MemorySpace>
+void ComposedMap<MemorySpace>::EvaluateUntilK( int k, 
+                                        StridedMatrix<const double, MemorySpace> const& pts,
+                                        StridedMatrix<double, MemorySpace> intPts, 
+                                        StridedMatrix<double, MemorySpace> output){
+
+
+    Kokkos::deep_copy(intPts, pts);
+    for(int j = 0; j<k; j++){
+        // x = T_j(x)
+        comps_.at(j)->EvaluateImpl(intPts, output);
+        Kokkos::deep_copy(intPts, output);
+    }
+
+}
+
+
+
+
 
 
 template<typename MemorySpace>
@@ -194,6 +213,7 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
         
         // reset intPts1 to initial pts
         Kokkos::deep_copy(intPts1, pts);
+
         for(int j = 0; j<i; j++){
             // x = T_j(x)
             comps_.at(j)->EvaluateImpl(intPts1, intPts2);
@@ -211,7 +231,6 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
         comps_.at(i)->CoeffGradImpl(intPts1, intSens1, subOut);
 
         // increment sens to for next iteration
-
         //s_{i-1}^T = s_{i}^T J_i(x*)
         comps_.at(i)->GradientImpl(intPts1, intSens1, intSens2);
         Kokkos::deep_copy(intSens1, intSens2);
@@ -221,21 +240,9 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
 
 }
 
-template<typename MemorySpace>
-void ComposedMap<MemorySpace>::EvaluateUntilK( int k, 
-                                        StridedMatrix<const double, MemorySpace> const& pts,
-                                        StridedMatrix<double, MemorySpace> intPts, 
-                                        StridedMatrix<double, MemorySpace> output){
 
 
-    Kokkos::deep_copy(intPts, pts);
-    for(int j = 0; j<k; j++){
-        // x = T_j(x)
-        comps_.at(j)->EvaluateImpl(intPts, output);
-        Kokkos::deep_copy(intPts, output);
-    }
 
-}
 
 
 template<typename MemorySpace>

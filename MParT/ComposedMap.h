@@ -105,6 +105,7 @@ public:
                         StridedMatrix<double, MemorySpace> intPts, 
                         StridedMatrix<double, MemorySpace> output);
 
+
     void LogDeterminantCoeffGradImplUpdate( int compInd,
                                             int termInd, 
                                             StridedMatrix<const double, MemorySpace> const& pts, 
