@@ -138,7 +138,7 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
                 for(unsigned int j=0; j<composedMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
+                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
             }
             coeffs(i) -= fdstep;
         }
@@ -177,7 +177,7 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
                 for(unsigned int j=0; j<composedMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
             }
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
@@ -204,11 +204,41 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
             logDet2 = composedMap->LogDeterminant(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                std::cout << detGrad(i,ptInd) - (logDet2(ptInd)-logDet(ptInd))/fdstep << std::endl;
-                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-5)); 
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-3)); 
                 
             }
             coeffs(i) -= fdstep;
+        }
+
+    }
+
+
+        SECTION("LogDeterminantInputGrad"){
+
+        Kokkos::View<double**,Kokkos::HostSpace> detGrad = composedMap->LogDeterminantInputGrad(in);
+        REQUIRE(detGrad.extent(0)==composedMap->outputDim);
+        REQUIRE(detGrad.extent(1)==numSamps);
+        
+        
+        Kokkos::View<double*,Kokkos::HostSpace> logDet = composedMap->LogDeterminant(in);
+        Kokkos::View<double*,Kokkos::HostSpace> logDet2;
+
+        // Compare with finite differences
+        double fdstep = 1e-5;
+        for(unsigned int i=0; i<composedMap->inputDim; ++i){
+
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
+                in(i,ptInd) += fdstep;
+
+            logDet2 = composedMap->LogDeterminant(in);
+
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-3)); 
+                
+            }
+
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
+                in(i,ptInd) -= fdstep;
         }
 
     }
