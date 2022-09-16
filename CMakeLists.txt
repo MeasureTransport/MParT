@@ -98,65 +98,13 @@ endif()
 
 
 if(${COMPILER_IS_NVCC})
-    message(STATUS "Searching for MAGMA GPU-accelerated linear algebra library.")
-    find_package(magma QUIET)
+    message(STATUS "Searching for CUBLAS and CUSOLVER linear algebra libraries.")
+    find_package(CUDAToolkit)
+    set(CUDA_LIBRARIES CUDA::toolkit)
 
-    if(NOT magma_FOUND)
-        IF(MPART_FETCH_DEPS)
-            message(STATUS "Could not find Magma.  Fetching source.")
-
-            # Make sure LAPACK can be found because it is needed by MAGMA
-            find_package(LAPACK REQUIRED)
-
-            FetchContent_Declare(
-                magma
-                GIT_REPOSITORY https://bitbucket.org/icl/magma
-                GIT_SHALLOW TRUE
-            )
-            FetchContent_GetProperties(magma)
-            if(NOT magma_POPULATED)
-                FetchContent_Populate(magma)
-
-                set(USE_FORTRAN OFF CACHE INTERNAL "")
-                set(MAGMA_ENABLE_CUDA ON CACHE INTERNAL "")
-
-                # Use Magma's makefile system to generate code that will be included in CMake
-                message(STATUS "Generaing MAGMA source files.  This can take a few minutes...")
-                file(WRITE ${magma_SOURCE_DIR}/make.inc "FORT = false\nGPU_TARGET = Volta\nBACKEND = cuda\n")
-                execute_process(COMMAND make generate WORKING_DIRECTORY ${magma_SOURCE_DIR} OUTPUT_QUIET)
-
-                # Replace source and binary directories with current version so that MAGMA works with add_subdirectory
-                file(READ ${magma_SOURCE_DIR}/CMakeLists.txt FILE_CONTENTS)
-                string(REPLACE "{CMAKE_SOURCE_DIR}" "{CMAKE_CURRENT_SOURCE_DIR}" FILE_CONTENTS "${FILE_CONTENTS}")
-                string(REPLACE "{CMAKE_BINARY_DIR}" "{CMAKE_CURRENT_BINARY_DIR}" FILE_CONTENTS "${FILE_CONTENTS}")
-                file(WRITE ${magma_SOURCE_DIR}/CMakeLists.txt "${FILE_CONTENTS}")
-
-                # Bring the populated content into the build
-                add_subdirectory(${magma_SOURCE_DIR} ${magma_BINARY_DIR})
-
-                # Ignore the Magma testing targets
-                get_property(all_magma_targets DIRECTORY ${magma_SOURCE_DIR} PROPERTY BUILDSYSTEM_TARGETS)
-                foreach(magma_target ${all_magma_targets})
-                    if(magma_target MATCHES "test")
-                        SET_TARGET_PROPERTIES(${magma_target} PROPERTIES EXCLUDE_FROM_ALL True)
-                    endif()
-                endforeach()
-                
-                set(MAGMA_LIBRARIES magma magma_sparse)
-                include_directories(${magma_SOURCE_DIR}/include ${magma_BINARY_DIR}/include)
-                set(MAGMA_EXPORTS magma magma_sparse magma_nvcc_flags)
-            endif()
-
-        else()
-            message(FATAL_ERROR "Could not find Magma library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install Magma itself." )
-        endif()
-    else()
-        message(STATUS "Found Magma!")
-        include_directories(${MAGMA_INCLUDE_DIRS})
-    endif()
 else()
-    message(STATUS "MParT is not compiled with CUDA support, so MAGMA will not be used.")
-    set(MAGMA_LIBRARIES "")
+    message(STATUS "MParT is not compiled with CUDA support, so CUBLAS and CUSOLVER will not be used.")
+    set(CUDA_LIBRARIES "")
 endif()
 
 # Add Eigen
@@ -244,7 +192,7 @@ endif()
 add_library(mpart "")
 add_library (MParT::mpart ALIAS mpart)
 
-target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen ${MAGMA_LIBRARIES})
+target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES})
 
 target_include_directories(mpart
                            PUBLIC
@@ -307,7 +255,7 @@ if(MPART_BUILD_TESTS)
     # Define test sources
     add_subdirectory(tests)
     add_executable(RunTests ${TEST_SOURCES})
-    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen ${MAGMA_LIBRARIES})
+    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES})
 endif()
 
 add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
@@ -315,7 +263,7 @@ target_link_libraries(PrintKokkosInfo Kokkos::kokkos)
 
 ##############################################################
 # Installation
-install(TARGETS mpart ${MAGMA_EXPORTS}
+install(TARGETS mpart
         EXPORT MParTTargets
         DESTINATION lib)
 
@@ -345,7 +293,7 @@ install(FILES
 )
 
 
-export (TARGETS mpart ${KOKKOS_EXPORTS} ${MAGMA_EXPORTS} NAMESPACE MParT:: FILE MParTTargets.cmake)
+export (TARGETS mpart ${KOKKOS_EXPORTS} NAMESPACE MParT:: FILE MParTTargets.cmake)
 export (PACKAGE MParT)
 
 install (EXPORT MParTTargets NAMESPACE MParT:: DESTINATION lib/cmake/MParT)

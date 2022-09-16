@@ -10,7 +10,9 @@
 #include <Eigen/Dense>
 
 #if defined(MPART_ENABLE_GPU)
-#include <magma_v2.h>
+#include <cuda_runtime.h>
+#include <cublas_v2.h>
+#include <cusolverRf.h>
 #endif 
 
 namespace mpart{
@@ -70,8 +72,9 @@ protected:
     std::shared_ptr<Eigen::PartialPivLU<Eigen::MatrixXd>> luSolver_;
 
 #if defined(MPART_ENABLE_GPU)
+    cusolverDnParams_t params;
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> LU_;
-    Kokkos::View<magma_int_t*, Kokkos::HostSpace> pivots_;
+    Kokkos::View<int*, MemorySpace> pivots_;
     int ldA;
 #endif
 

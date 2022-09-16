@@ -10,7 +10,8 @@
 #include <cctype>
 
 #if defined(MPART_ENABLE_GPU)
-#include <magma_v2.h>
+#include <cuda_runtime.h>
+#include "cublas_v2.h"
 #endif 
 
 namespace mpart{
@@ -41,8 +42,17 @@ int main( int argc, char* argv[] ) {
         bool Get(){return isInitialized;};
         void Set(){isInitialized = true;} 
 
+        #if defined(MPART_ENABLE_GPU)
+        cublasHandle_t& GetCublasHandle(){return blasHandle;}
+        cusolverDnHandle_t& GetCusolverHandle(){return solverHandle;}
+        #endif 
     private:
         bool isInitialized = false;
+
+        #if defined(MPART_ENABLE_GPU)
+        cublasHandle_t blasHandle;
+        cusolverDnHandle_t solverHandle;
+        #endif
     };
 
     // Holds a static InitializeStatus object
@@ -73,8 +83,9 @@ int main( int argc, char* argv[] ) {
             Kokkos::initialize(arg1, args...);
 
 #if defined(MPART_ENABLE_GPU)
-            // Initialize MAGMA if necessary
-            magma_init();
+             // Set up the cublas handles
+            cublasCreate(&GetInitializeStatusObject().GetCublasHandle());
+            cusolverDnCreate(&GetInitializeStatusObject().GetCusolverHandle())
 #endif
 
             // Make sure Kokkos::finalize() is called at program exit.

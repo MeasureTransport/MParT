@@ -3,10 +3,7 @@
 
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Initialization.h"
-
-#if defined(MPART_ENABLE_GPU)
-#include "magma_v2.h"
-#endif 
+ 
 
 using namespace mpart;
 
@@ -172,26 +169,65 @@ void AffineMap<mpart::DeviceSpace>::Factorize()
 
     // Resize the space for storing the LU factorization
     LU_ = Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace>("LU", A_.extent(0), A_.extent(0));
-    pivots_ = Kokkos::View<magma_int_t*, Kokkos::HostSpace>("Pivots", A_.extent(0));
+    pivots_ = Kokkos::View<int*, mpart::DeviceSpace>("Pivots", A_.extent(0));
 
-    magma_int_t ldLU = LU_.stride_1();
-    magma_int_t info;
+    int ldLU = LU_.stride_1();
+    int info;
 
     // Copy the right block of the matrix A_ into LU_
     Kokkos::deep_copy(LU_, Kokkos::subview(A_, Kokkos::ALL(), std::make_pair(ncols-nrows, int(A_.extent(1)))));
+
+    // Set up cuSolver options
+    CUSOLVER_CHECK(cusolverDnCreateParams(&params));
+    CUSOLVER_CHECK(cusolverDnSetAdvOptions(params, CUSOLVERDN_GETRF, CUSOLVER_ALG_0));
     
-    // Factorize the right block of the matrix
-    magma_dgetrf_gpu(static_cast<magma_int_t>(LU_.extent(0)), 
-                     static_cast<magma_int_t>(LU_.extent(1)), 
-                     reinterpret_cast<magmaDouble_ptr>(LU_.data()), 
-                     ldLU, 
-                     pivots_.data(), 
-                     &info);
+    size_t d_workSize, h_workSize;
+    cusolverDnXgetrf_bufferSize(GetInitializeStatusObject().GetCusolverHandle(), 
+                                params,
+                                LU_.extent(0),
+                                LU_.extent(1), 
+                                traits<double>::cuda_data_type, 
+                                LU_.data(),
+                                ldLU, 
+                                traits<double>::cuda_data_type, 
+                                &d_workSize, 
+                                &h_workSize);
+
+
+    Kokkos::View<double*, mpart::DeviceSpace> d_workspace("LU Workspace", d_workSize);
+    Kokkos::View<double*, Kokkos::HostSpace> h_workspace("LU Workspace", h_workSize);
+    Kokkos::View<double*, mpart::DeviceSpace> d_info("Info",1);
+
+    cusolverDnXgetrf(GetInitializeStatusObject().GetCusolverHandle(), 
+                     params, 
+                     LU_.extent(0), 
+                     LU_.extent(1), 
+                     traits<double>::cuda_data_type,
+                     LU_.data(), ldLU, 
+                     pivots_,
+                     traits<double>::cuda_data_type, 
+                     d_workspace,
+                     d_workSize, 
+                     h_workspace, 
+                     h_workSize,
+                     d_info);
+    
+    info = ToHost(d_info)(0);
+
+    // cusolverStatus_t res = 
+    // cusolverDnDgetrf(GetInitializeStatusObject().GetCublasHandle(),
+    //                  LU_.extent(0),
+    //                  LU_.extent(1),
+    //                  LU_.data(),
+    //                  ldLU,
+    //                  workspace.data(),
+    //                  pivots_.data(),
+    //                  &info);
 
     // Error handling
     if(info<0){
         std::stringstream msg;
-        msg << "In AffineMap::Factorize(): Argument " << -info << " to magma_dgetrf_gpu had an illegal value or memory allocation failed.  Could not compute factorization.";
+        msg << "In AffineMap::Factorize(): Argument " << -info << " to cusolverDnDgetrf had an illegal value or memory allocation failed.  Could not compute factorization.";
         throw std::runtime_error(msg.str());
     }else if(info>0){
         std::stringstream msg;
@@ -268,42 +304,71 @@ void AffineMap<mpart::DeviceSpace>::InverseImpl(StridedMatrix<const double, mpar
 
             int ldX = xLeft.stride_1(); // Spacing between columns int ptsLeft
 
-            // Perform the matrix multiplication
-            magma_int_t device;
-            magma_queue_t queue;
-            magma_getdevice( &device );
-            magma_queue_create( device, &queue );
-            
-            // After this degemm, we will have out = r - b - A_{11}*x_1
-            magma_dgemm( MagmaNoTrans,
-                        MagmaNoTrans, static_cast<magma_int_t>(nrows), 
-                        static_cast<magma_int_t>(xLeft.extent(1)),
-                        static_cast<magma_int_t>(ncols-nrows),
-                        -1.0, 
-                        reinterpret_cast<magmaDouble_ptr>(A_.data()), 
-                        static_cast<magma_int_t>(ldA),
-                        reinterpret_cast<magmaDouble_ptr>(const_cast<double*>(xLeft.data())), 
-                        static_cast<magma_int_t>(ldX),
-                        1.0, 
-                        reinterpret_cast<magmaDouble_ptr>(outLeft.data()), 
-                        static_cast<magma_int_t>(ldOut),
-                        queue ); 
+            double alpha = -1.0;
+            double beta = 1.0;
+            cublasStatus_t info =  cublasDgemm(GetInitializeStatusObject().GetCublasHandle(),
+                           CUBLAS_OP_N, CUBLAS_OP_N,
+                           nrows, xLeft.extent(1), ncols-nrows,
+                           &alpha,
+                           A_.data(), ldA,
+                           xLeft.data(), ldX,
+                           &beta,
+                           outLeft.data(), ldOut;)
 
-            magma_queue_sync( queue ); // <- This seems to hang
-            magma_queue_destroy( queue );
+            // // Perform the matrix multiplication
+            // magma_int_t device;
+            // magma_queue_t queue;
+            // magma_getdevice( &device );
+            // magma_queue_create( device, &queue );
+            
+            // // After this degemm, we will have out = r - b - A_{11}*x_1
+            // magma_dgemm( MagmaNoTrans,
+            //             MagmaNoTrans, static_cast<magma_int_t>(nrows), 
+            //             static_cast<magma_int_t>(xLeft.extent(1)),
+            //             static_cast<magma_int_t>(ncols-nrows),
+            //             -1.0, 
+            //             reinterpret_cast<magmaDouble_ptr>(A_.data()), 
+            //             static_cast<magma_int_t>(ldA),
+            //             reinterpret_cast<magmaDouble_ptr>(const_cast<double*>(xLeft.data())), 
+            //             static_cast<magma_int_t>(ldX),
+            //             1.0, 
+            //             reinterpret_cast<magmaDouble_ptr>(outLeft.data()), 
+            //             static_cast<magma_int_t>(ldOut),
+            //             queue ); 
+
+            // magma_queue_sync( queue ); // <- This seems to hang
+            // magma_queue_destroy( queue );
         }
 
-        // Compute the inverse in-place using the outLeft matrix:  out = A_{12}^{-1}(r - b - A_{11}*x_1)
-        magma_int_t info;
-        magma_dgetrs_gpu(MagmaNoTrans, 
-                         static_cast<magma_int_t>(A_.extent(0)),
-                        static_cast<magma_int_t>(numPts), 
-                        reinterpret_cast<magmaDouble_ptr>(LU_.data()), 
-                        static_cast<magma_int_t>(ldLU), 
-                        pivots_.data(), 
-                        reinterpret_cast<magmaDouble_ptr>(outLeft.data()), 
-                        static_cast<magma_int_t>(ldOut), 
-                        &info);
+        int info;
+        Kokkos::View<double*, mpart::DeviceSpace> d_info("Info", 1);
+
+        cusolverDnXgetrs(GetInitializeStatusObject().GetCusolverHandle(), 
+                         params, 
+                         CUBLAS_OP_N, 
+                         LU_.extent(0), 
+                         numPts,
+                         traits<double>::cuda_data_type, 
+                         LU_.data(), 
+                         ldLU, 
+                         pivots_.data(),
+                         traits<double>::cuda_data_type, 
+                         outLeft.data(), 
+                         ldOut, 
+                         d_info);
+        info = ToHost(d_info)(0);
+
+        // // Compute the inverse in-place using the outLeft matrix:  out = A_{12}^{-1}(r - b - A_{11}*x_1)
+        // magma_int_t info;
+        // magma_dgetrs_gpu(MagmaNoTrans, 
+        //                  static_cast<magma_int_t>(A_.extent(0)),
+        //                 static_cast<magma_int_t>(numPts), 
+        //                 reinterpret_cast<magmaDouble_ptr>(LU_.data()), 
+        //                 static_cast<magma_int_t>(ldLU), 
+        //                 pivots_.data(), 
+        //                 reinterpret_cast<magmaDouble_ptr>(outLeft.data()), 
+        //                 static_cast<magma_int_t>(ldOut), 
+        //                 &info);
         
         // Error checking
         if(info!=0){
@@ -350,28 +415,39 @@ void AffineMap<mpart::DeviceSpace>::EvaluateImpl(StridedMatrix<const double, mpa
         
 
         // Perform the matrix multiplication
-        magma_int_t device;
-        magma_queue_t queue;
-        magma_getdevice( &device );
-        magma_queue_create( device, &queue );
-        
-        magma_dgemm( MagmaNoTrans,
-                     MagmaNoTrans, 
-                     static_cast<magma_int_t>(A_.extent(0)),
-                     static_cast<magma_int_t>(ptsLeft.extent(1)),
-                     static_cast<magma_int_t>(A_.extent(0)),
-                     1.0, 
-                     reinterpret_cast<magmaDouble_ptr>(A_.data()), 
-                     static_cast<magma_int_t>(ldA),
-                     reinterpret_cast<magmaDouble_ptr>(const_cast<double*>(ptsLeft.data())), 
-                     static_cast<magma_int_t>(ldPts),
-                     0.0, 
-                     reinterpret_cast<magmaDouble_ptr>(outLeft.data()),
-                     static_cast<magma_int_t>(ldOut),
-                     queue );
+        double alpha = 1.0;
+        double beta = 0.0;
+        cublasStatus_t info =  cublasDgemm(GetInitializeStatusObject().GetCublasHandle(),
+                           CUBLAS_OP_N, CUBLAS_OP_N,
+                           A_.extent(0), ptsLeft.extent(1), A_.extent(1),
+                           &alpha,
+                           A_.data(), ldA,
+                           ptsLeft.data(), ldPts,
+                           &beta,
+                           outLeft.data(), ldOut;)
 
-        magma_queue_sync( queue ); // <- This seems to hang, at least with MParT's build of magma
-        magma_queue_destroy( queue );
+        // magma_int_t device;
+        // magma_queue_t queue;
+        // magma_getdevice( &device );
+        // magma_queue_create( device, &queue );
+        
+        // magma_dgemm( MagmaNoTrans,
+        //              MagmaNoTrans, 
+        //              static_cast<magma_int_t>(A_.extent(0)),
+        //              static_cast<magma_int_t>(ptsLeft.extent(1)),
+        //              static_cast<magma_int_t>(A_.extent(0)),
+        //              1.0, 
+        //              reinterpret_cast<magmaDouble_ptr>(A_.data()), 
+        //              static_cast<magma_int_t>(ldA),
+        //              reinterpret_cast<magmaDouble_ptr>(const_cast<double*>(ptsLeft.data())), 
+        //              static_cast<magma_int_t>(ldPts),
+        //              0.0, 
+        //              reinterpret_cast<magmaDouble_ptr>(outLeft.data()),
+        //              static_cast<magma_int_t>(ldOut),
+        //              queue );
+
+        // magma_queue_sync( queue ); // <- This seems to hang, at least with MParT's build of magma
+        // magma_queue_destroy( queue );
         
         // The layouts didn't match, so we have to copy back
         if(copyOut)
@@ -424,22 +500,18 @@ void AffineMap<mpart::DeviceSpace>::GradientImpl(StridedMatrix<const double, mpa
         int ldSens = sensLeft.stride_1(); // Spacing between columns int ptsLeft
         int ldOut = outLeft.stride_1(); // Spacing between columns int outLeft
         
-
         // Perform the matrix multiplication
-        int device;
-        magma_queue_t queue;
-        magma_getdevice( &device );
-        magma_queue_create( device, &queue );
-        
+        double alpha = 1.0;
+        double beta = 0.0;
+        cublasStatus_t info =  cublasDgemm(GetInitializeStatusObject().GetCublasHandle(),
+                           CUBLAS_OP_T, CUBLAS_OP_N,
+                           A_.extent(1), sensLeft.extent(1), A_.extent(0),
+                           &alpha,
+                           A_.data(), ldA,
+                           sensLeft.data(), ldSens,
+                           &beta,
+                           outLeft.data(), ldOut;)
 
-        magma_dgemm( MagmaTrans,
-                     MagmaNoTrans, A_.extent(0), sensLeft.extent(1), A_.extent(0),
-                     1.0, A_.data(), ldA,
-                          sensLeft.data(), ldSens,
-                     0.0, outLeft.data(), ldOut, queue );
-
-        magma_queue_sync( queue ); // <- This seems to hang
-        magma_queue_destroy( queue );
         
         // The layouts didn't match, so we have to copy back
         if(copyOut)

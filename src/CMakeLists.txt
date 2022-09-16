@@ -13,7 +13,7 @@ target_sources(mpart
     TriangularMap.cpp
     MapFactory.cpp
     AffineMap.cpp
-    AffineFunction.cpp
+    #AffineFunction.cpp
     
     MapFactoryImpl1.cpp
     MapFactoryImpl2.cpp
