@@ -205,7 +205,7 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
                 std::cout << detGrad(i,ptInd) - (logDet2(ptInd)-logDet(ptInd))/fdstep << std::endl;
-                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).epsilon(1e-3)); 
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-5)); 
                 
             }
             coeffs(i) -= fdstep;
