@@ -364,7 +364,19 @@ Install with Conda</div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge mpart
 </pre></div>
 </div>
-<p class="sd-card-text">Julia, Matlab, and CUDA are currently only supported when compiling from source.</p>
+<p class="sd-card-text">Matlab, and CUDA are currently only supported when compiling from source.</p>
+</div>
+</div>
+<div class="sd-card sd-sphinx-override sd-mb-3 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Install with Julia</div>
+<p class="sd-card-text">It is also possible to install MParT with Julia bindings using the Julia package manager:</p>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Pkg</span><span class="w"></span>
+<span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;MParT&quot;</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+<p class="sd-card-text">Julia-specific documentation is hosted <a class="reference external" href="https://measuretransport.github.io/MParT.jl/dev/">here</a>.</p>
 </div>
 </div>
 </section>
@@ -462,20 +474,23 @@ Linux</label><div class="sd-tab-content docutils">
 </div>
 </div>
 </section>
-<section id="julia-configuration">
-<span id="compiling-julia"></span><h2>Julia Configuration<a class="headerlink" href="#julia-configuration" title="Permalink to this heading">#</a></h2>
+<section id="julia-source-installation">
+<span id="compiling-julia"></span><h2>Julia Source Installation<a class="headerlink" href="#julia-source-installation" title="Permalink to this heading">#</a></h2>
 <p>By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code> package is installed.   To install <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code>, run the following command in your Julia prompt:</p>
 <div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="n">Pkg</span><span class="p">;</span><span class="w"> </span><span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;CxxWrap&quot;</span><span class="p">)</span><span class="w"></span>
 </pre></div>
 </div>
-<p>If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify <code class="code docutils literal notranslate"><span class="pre">JULIA_EXE</span></code> variable during configuration.  For example, adding <code class="code docutils literal notranslate"><span class="pre">-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia</span></code> will tell CMake to use the Julia executable installed by anaconda in the <code class="code docutils literal notranslate"><span class="pre">mpart</span></code> conda environment.</p>
-<p>To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=OFF</span></code> during the CMake configuration.</p>
-<p>Once MParT is installed with Julia bindings (i.e. <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=ON</span></code>) into <code class="code docutils literal notranslate"><span class="pre">your/MParT/install/path</span></code>, you can using MParT in Julia with a few last steps. First, add <code class="code docutils literal notranslate"><span class="pre">MParT.jl</span></code>, which holds the Julia interface for MParT, via <code class="code docutils literal notranslate"><span class="pre">]add</span> <span class="pre">https://github.com/MeasureTransport/MParT.jl</span></code> in the Julia REPL. Then, create a file <code class="code docutils literal notranslate"><span class="pre">~/.julia/artifacts/Override.toml</span></code> with the following lines</p>
+<p>To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are installed, set <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=OFF</span></code> during the CMake configuration.</p>
+<p>Once MParT is installed with Julia bindings (i.e. <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=ON</span></code>) into <code class="code docutils literal notranslate"><span class="pre">/your/MParT/install/path</span></code> (an equivalent path to <code class="code docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX</span></code>), you can use MParT in Julia with a few more steps. First, add <code class="code docutils literal notranslate"><span class="pre">MParT.jl</span></code>, which holds the Julia interface for MParT, via <code class="code docutils literal notranslate"><span class="pre">using</span> <span class="pre">Pkg;</span> <span class="pre">Pkg.add(&quot;MParT&quot;)</span></code> in the Julia REPL. Then, create a file <code class="code docutils literal notranslate"><span class="pre">~/.julia/artifacts/Overrides.toml</span></code> with the following lines</p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bee5971c-294f-5168-9fcd-9fb3c811d495]</span><span class="w"></span>
-<span class="n">MParT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;your/MParT/install/path&quot;</span><span class="w"></span>
+<span class="n">MParT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/your/MParT/install/path&quot;</span><span class="w"></span>
 </pre></div>
 </div>
-<p>At this point, you should be able to open up a REPL and type <code class="code docutils literal notranslate"><span class="pre">using</span> <span class="pre">MParT</span></code> and get going with any of the provided examples!</p>
+<p>Make sure that this file includes a full installation path from root! At this point, you should be able to open up a REPL and type <code class="code docutils literal notranslate"><span class="pre">using</span> <span class="pre">MParT</span></code> and get going with any of the provided examples. If you want to develop MParT’s bindings on the Julia-side, then use <code class="code docutils literal notranslate"><span class="pre">using</span> <span class="pre">Pkg;</span> <span class="pre">Pkg.develop(&quot;MParT&quot;)</span></code> instead of <code class="code docutils literal notranslate"><span class="pre">Pkg.add(&quot;MParT&quot;)</span></code> to install the package.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If you installed Julia with Conda, you may not have a folder at <code class="code docutils literal notranslate"><span class="pre">~/.julia</span></code>. In this case, you will likely find the <code class="code docutils literal notranslate"><span class="pre">artifacts</span></code> folder in <code class="code docutils literal notranslate"><span class="pre">~/anaconda3/envs/&lt;YOUR</span> <span class="pre">ENVIRONMENT&gt;/share/julia/artifacts</span></code> (or alternatively, <code class="code docutils literal notranslate"><span class="pre">~/miniconda</span></code>, depending on what version of Conda you installed). If this is the case, then you will need to create a file <code class="code docutils literal notranslate"><span class="pre">~/anaconda3/envs/&lt;YOUR</span> <span class="pre">ENVIRONMENT&gt;/share/julia/artifacts/Overrides.toml</span></code> with the same contents as above.</p>
+</div>
 </section>
 <section id="compiling-with-cuda-support">
 <h2>Compiling with CUDA Support<a class="headerlink" href="#compiling-with-cuda-support" title="Permalink to this heading">#</a></h2>
@@ -580,8 +595,8 @@ cmake <span class="se">\</span>
     </a>
    </li>
    <li class="toc-h2 nav-item toc-entry">
-    <a class="reference internal nav-link" href="#julia-configuration">
-     Julia Configuration
+    <a class="reference internal nav-link" href="#julia-source-installation">
+     Julia Source Installation
     </a>
    </li>
    <li class="toc-h2 nav-item toc-entry">
