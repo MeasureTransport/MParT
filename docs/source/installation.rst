@@ -21,6 +21,8 @@ Installation
         using Pkg
         Pkg.add("MParT")
 
+    Julia-specific documentation is hosted `here <https://measuretransport.github.io/MParT.jl/dev/>`_.
+
 .. _compiling_source:
 
 Compiling from Source
