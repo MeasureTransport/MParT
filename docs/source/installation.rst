@@ -153,14 +153,14 @@ By default, MParT will look for Julia during configuration and will attempt to b
 
 To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are installed, set :code:`MPART_JULIA=OFF` during the CMake configuration.
 
-Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :code:`your/MParT/install/path`, you can using MParT in Julia with a few last steps. First, add :code:`MParT.jl`, which holds the Julia interface for MParT, via :code:`using Pkg; Pkg.add("MParT")` in the Julia REPL. Then, create a file :code:`~/.julia/artifacts/Overrides.toml` with the following lines
+Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :code:`/your/MParT/install/path` (an equivalent path to :code:`CMAKE_INSTALL_PREFIX`), you can use MParT in Julia with a few more steps. First, add :code:`MParT.jl`, which holds the Julia interface for MParT, via :code:`using Pkg; Pkg.add("MParT")` in the Julia REPL. Then, create a file :code:`~/.julia/artifacts/Overrides.toml` with the following lines
 
 .. code-block:: toml
 
     [bee5971c-294f-5168-9fcd-9fb3c811d495]
-    MParT = "/your/full/MParT/install/path"
+    MParT = "/your/MParT/install/path"
 
-Make sure that this file includes a full installation path from root, copying whatever was set as :code:`DCMAKE_INSTALL_PREFIX`. At this point, you should be able to open up a REPL and type :code:`using MParT` and get going with any of the provided examples! If you want to develop MParT's bindings on the Julia-side, then use :code:`using Pkg; Pkg.develop("MParT")` instead of :code:`Pkg.add("MParT")` to install the package.
+Make sure that this file includes a full installation path from root! At this point, you should be able to open up a REPL and type :code:`using MParT` and get going with any of the provided examples. If you want to develop MParT's bindings on the Julia-side, then use :code:`using Pkg; Pkg.develop("MParT")` instead of :code:`Pkg.add("MParT")` to install the package.
 
 .. tip::
 
