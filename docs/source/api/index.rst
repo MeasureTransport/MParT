@@ -13,6 +13,7 @@ API Reference
    monotonecomponent
    multiindex
    quadrature
+   utilities/linearalgebra
    utilities/kokkoswrappers
    multivariateexpansionworker
    templateconcepts

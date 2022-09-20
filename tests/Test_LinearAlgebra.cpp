@@ -21,10 +21,17 @@ TEST_CASE( "Testing Matrix Sum", "[Mat+Mat]" ) {
             CHECK(C(i,j) == Approx(A(i,j)+B(i,j)).epsilon(1e-15).margin(1e-15));
         }
     }
+
+    A += B;
+    for(unsigned int i=0; i<A.extent(0); ++i){
+        for(unsigned int j=0; j<A.extent(1); ++j){
+            CHECK(A(i,j) == Approx(C(i,j)).epsilon(1e-15).margin(1e-15));
+        }
+    }
 }
 
 
-TEST_CASE( "Testing Vecotr Sum", "[Vec+vec]" ) {
+TEST_CASE( "Testing Vector Sum", "[Vec+vec]" ) {
 
     Kokkos::View<double*, Kokkos::HostSpace> A("A", 2);
     Kokkos::View<double* ,Kokkos::HostSpace> B("B", 2);
@@ -37,6 +44,11 @@ TEST_CASE( "Testing Vecotr Sum", "[Vec+vec]" ) {
     Kokkos::View<double*, Kokkos::HostSpace> C = A + B;
     for(unsigned int i=0; i<A.extent(0); ++i){
         CHECK(C(i) == Approx(A(i)+B(i)).epsilon(1e-15).margin(1e-15));
+    }
+
+    A += B;
+    for(unsigned int i=0; i<A.extent(0); ++i){
+        CHECK(A(i) == Approx(C(i)).epsilon(1e-15).margin(1e-15));
     }
 }
 
