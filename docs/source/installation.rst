@@ -188,12 +188,12 @@ Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the c
 .. tip::
     If you're getting an error about C++ standards, try using a new version of your compiler; :code:`g++`, for example, does not support the flag :code:`--std=c++17` below version 8. For more details, see `this issue <https://github.com/kokkos/kokkos/issues/5157>`_ in Kokkos.
 
-Installing MAGMA 
-^^^^^^^^^^^^^^^^^
+Installing cublas and cusolver 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-MParT also uses the `MAGMA <https://icl.utk.edu/magma/>`_ library for GPU-accelerated linear algebra.    If not found, MParT will attempt to compile and install MAGMA internally, but this requires CUBLAS, CUSPARSE, BLAS and LAPACK to be installed on your machine and findable by CMake.  Compiling MAGMA can also take a long time.
+MParT uses the CUBLAS and CUSOLVER components of the <NVIDIA CUDA Toolkit `https://developer.nvidia.com/cuda-toolkit`>_ for GPU-accelerated linear algebra.   
 
-NVIDIA's `Cuda installation guide <https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html>`_ provides detailed instructions on how to install CUDA.   For Debian-based x86_64 systems, we have been able to successfully install cuda, cublas, and cusparse for CUDA 11.4 using the command below.  Similar commands may be useful on other systems.
+NVIDIA's `Cuda installation guide <https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html>`_ provides detailed instructions on how to install CUDA.   For Debian-based x86_64 systems, we have been able to successfully install cuda, cublas, and cusparse for CUDA 11.4 using the command below.  Notice the installation of :code:`*-dev` packages, which are required to obtain the necessary header files.  Similar commands may be useful on other systems.
 
 .. code-block:: bash 
 
@@ -211,31 +211,10 @@ NVIDIA's `Cuda installation guide <https://docs.nvidia.com/cuda/cuda-installatio
         cuda-cudart-${CUDA_VERSION/./-}=${CUDA_CUDART_VERSION} \
         libcublas-${CUDA_VERSION/./-} \
         libcublas-dev-${CUDA_VERSION/./-} \
-        libcufft-${CUDA_VERSION/./-} \
-        libcurand-${CUDA_VERSION/./-} \
         libcusolver-${CUDA_VERSION/./-} \
-        libcusparse-${CUDA_VERSION/./-} \
-        libcusparse-dev-${CUDA_VERSION/./-}
+        libcusolver-dev-${CUDA_VERSION/./-}
 
 
-.. tip::
-    The MAGMA library requires an installation of LAPACK and BLAS.   If these aren't installed, or CMake can't find them, you may see many linking errors similar to
-
-    .. code-block::
-
-        lib/libmagma.so: undefined reference to `zswap_'
-    
-    It is possible to install LAPACK and BLAS with conda (or :code:`apt-get`).  For example, the following commands will install LAPACK and the Intel Math Kernel library, then set the environment variabl :code:`MKLROOT` which is needed for CMake to find the MKL Blas installation.
-
-    .. code-block:: bash 
-        
-        conda install -c conda-forge lapack mkl mkl-include
-        export MKLROOT=/opt/conda/
-        cmake \
-            -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>                 \
-            -DKokkos_ROOT=</new/kokkos/install/path>                         \
-            -DCMAKE_CXX_COMPILER=</new/kokkos/install/path>/bin/nvcc_wrapper \
-        ..
 
 Building MParT
 ^^^^^^^^^^^^^^^
