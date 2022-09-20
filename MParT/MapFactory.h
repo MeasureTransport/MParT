@@ -6,6 +6,8 @@
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
+#include <math.h>
+
 #include <map>
 
 namespace mpart{
