@@ -7,13 +7,14 @@ target_sources(mpart
     MultiIndices/MultiIndexNeighborhood.cpp
 
     Utilities/Miscellaneous.cpp
-
+    Utilities/LinearAlgebra.cpp 
+    
     ParameterizedFunctionBase.cpp
     ConditionalMapBase.cpp
     TriangularMap.cpp
     MapFactory.cpp
     AffineMap.cpp
-    #AffineFunction.cpp
+    AffineFunction.cpp
     
     MapFactoryImpl1.cpp
     MapFactoryImpl2.cpp
