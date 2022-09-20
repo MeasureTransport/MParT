@@ -284,8 +284,8 @@ TEST_CASE( "Testing Full AffineFunction on Device", "[DeviceFullAffineFunction]"
     auto hevals = ToHost(devals);
     
     for(unsigned int i=0; i<numPts; ++i){
-        double trueOut1 = hA(0,0)*hpts(0,i) + hA(0,1)*hpts(1,i);
-        double trueOut2 = hA(1,0)*hpts(0,i) + hA(1,1)*hpts(1,i);
+        double trueOut1 = hA(0,0)*hpts(0,i) + hA(0,1)*hpts(1,i) + hb(0);
+        double trueOut2 = hA(1,0)*hpts(0,i) + hA(1,1)*hpts(1,i) + hb(1);
         CHECK(hevals(0,i)==Approx(trueOut1).epsilon(1e-14));
         CHECK(hevals(1,i)==Approx(trueOut2).epsilon(1e-14));
     }

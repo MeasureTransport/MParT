@@ -5,15 +5,10 @@
 
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/Utilities/GPUtils.h"
+#include "MParT/Utilities/LinearAlgebra.h"
 
 #include <Eigen/Core>
 #include <Eigen/Dense>
-
-#if defined(MPART_ENABLE_GPU)
-#include <cuda_runtime.h>
-#include <cublas_v2.h>
-#include <cusolverDn.h>
-#endif 
 
 namespace mpart{
 
@@ -69,21 +64,8 @@ protected:
     StridedMatrix<double,MemorySpace> A_;
     StridedVector<double,MemorySpace> b_;
 
-    std::shared_ptr<Eigen::PartialPivLU<Eigen::MatrixXd>> luSolver_;
-
-#if defined(MPART_ENABLE_GPU)
-    cusolverDnParams_t params;
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> LU_;
-    Kokkos::View<int64_t*, MemorySpace> pivots_;
-    int ldA;
-#endif
-
+    mpart::PartialPivLU<MemorySpace> luSolver_;
     double logDet_;
-
-    
-
-
-
 };
 
 }

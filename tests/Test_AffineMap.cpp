@@ -79,11 +79,10 @@ TEST_CASE( "Testing Linear-only AffineMap", "[LinearMap]" ) {
         CHECK(pts2(0,i)==Approx(pts(0,i)).epsilon(1e-14));
         CHECK(pts2(1,i)==Approx(pts(1,i)).epsilon(1e-14));
     }
-
 }
 
 
-TEST_CASE( "Testing Rectangular AffineMap", "[Rectangular LinearMap]" ) {
+TEST_CASE( "Testing Rectangular AffineMap", "[RectangularLinearMap]" ) {
 
     Kokkos::View<double**, Kokkos::HostSpace> A("A", 2,3);
     
@@ -98,6 +97,7 @@ TEST_CASE( "Testing Rectangular AffineMap", "[Rectangular LinearMap]" ) {
     A(0,2) = 1.0;
     A(1,2) = 4.0;
     
+
 
     auto map = std::make_shared<AffineMap<Kokkos::HostSpace>>(A);
     REQUIRE(map->inputDim==3);
