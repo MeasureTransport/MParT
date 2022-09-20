@@ -1,0 +1,1013 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Linear Algebra &#8212; MParT  documentation</title>
+  <script>
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=9b1a4fa89bdd0e95b23b" rel="stylesheet">
+
+  
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b">
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'source/api/utilities/linearalgebra';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Kokkos Array Conversions" href="kokkoswrappers.html" />
+    <link rel="prev" title="Adaptive Simpson Integration" href="../quadrature/adaptivesimpson.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fas fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="../../../index.html">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+  
+    <p class="title logo__title">MParT  documentation</p>
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="../../installation.html">
+                        Installation
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../../getting_started.html">
+                        Getting Started
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../../tutorials/index.html">
+                        Tutorials
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../../mathematics.html">
+                        Mathematical Background
+                    </a>
+                </li>
+                
+
+                <li class="nav-item current active">
+                    <a class="nav-link" href="../index.html">
+                        API Reference
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                <li class="nav-item">
+                    <a class="nav-link" href="../../development/index.html">
+                        Community
+                    </a>
+                </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      <div class="navbar-end-item navbar-end__search-button-container">
+        
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MeasureTransport/MParT" title="GitHub" class="nav-link" rel="noopener" target="_blank"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  <div class="search-button-container--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search">
+  <i class="fas fa-search"></i>
+</button>
+  </div>
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fas fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                <li class="nav-item">
+                    <a class="nav-link" href="../../installation.html">
+                        Installation
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../../getting_started.html">
+                        Getting Started
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../../tutorials/index.html">
+                        Tutorials
+                    </a>
+                </li>
+                
+
+                <li class="nav-item">
+                    <a class="nav-link" href="../../mathematics.html">
+                        Mathematical Background
+                    </a>
+                </li>
+                
+
+                <li class="nav-item current active">
+                    <a class="nav-link" href="../index.html">
+                        API Reference
+                    </a>
+                </li>
+                
+            <div class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More
+                </button>
+                <div class="dropdown-menu">
+                    
+                <li class="nav-item">
+                    <a class="nav-link" href="../../development/index.html">
+                        Community
+                    </a>
+                </li>
+                
+                </div>
+            </div>
+            
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <span class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle">
+    <a class="theme-switch" data-mode="light"><i class="fas fa-sun"></i></a>
+    <a class="theme-switch" data-mode="dark"><i class="far fa-moon"></i></a>
+    <a class="theme-switch" data-mode="auto"><i class="fas fa-adjust"></i></a>
+</span>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MeasureTransport/MParT" title="GitHub" class="nav-link" rel="noopener" target="_blank"><span><i class="fab fa-github-square"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+  <div class="sidebar-start-items sidebar-primary__section">
+    <div class="sidebar-start-items__item">
+<form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+    <div class="sidebar-start-items__item"><nav class="bd-links" id="bd-docs-nav" aria-label="Section navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">
+    Section Navigation
+  </p>
+  <div class="bd-toc-item navbar-nav">
+    <p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  API
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../mapfactory.html">
+   Map Factory
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../conditionalmapbase.html">
+   Conditional Map Base
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../triangularmap.html">
+   Triangular Map
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../monotonecomponent.html">
+   Monotone Component
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../multiindex.html">
+   MultiIndices
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label class="toctree-toggle" for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../multiindices/multiindex.html">
+     MultiIndex
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../multiindices/multiindexset.html">
+     MultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../multiindices/fixedmultiindexset.html">
+     FixedMultiIndexSet
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../multiindices/multiindexlimiter.html">
+     MultiIndexLimiter
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../multiindices/multiindexneighborhood.html">
+     MultiIndexNeighborhood
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../quadrature.html">
+   Quadrature
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/>
+  <label class="toctree-toggle" for="toctree-checkbox-2">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../quadrature/clenshawcurtis.html">
+     Clenshaw Curtis Quadrature
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../quadrature/adaptivesimpson.html">
+     Adaptive Simpson Integration
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Linear Algebra
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="kokkoswrappers.html">
+   Kokkos Array Conversions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../multivariateexpansionworker.html">
+   Multivariate Expansion Worker
+  </a>
+ </li>
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../templateconcepts.html">
+   Template Concepts
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/>
+  <label class="toctree-toggle" for="toctree-checkbox-3">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../concepts/cachedparameterization.html">
+     Cached Parameterization Concept
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/>
+    <label class="toctree-toggle" for="toctree-checkbox-4">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../multivariateexpansionworker.html">
+       Multivariate Expansion Worker
+      </a>
+     </li>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../tensorproductfunction.html">
+       Tensor Product Function
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toctree-l2 has-children">
+    <a class="reference internal" href="../concepts/parameterizedfunction.html">
+     Parameterized Function Concept
+    </a>
+    <input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/>
+    <label class="toctree-toggle" for="toctree-checkbox-5">
+     <i class="fas fa-chevron-down">
+     </i>
+    </label>
+    <ul>
+     <li class="toctree-l3">
+      <a class="reference internal" href="../monotonecomponent.html">
+       Monotone Component
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="initialization.html">
+   Initialization Helpers
+  </a>
+ </li>
+</ul>
+
+  </div>
+</nav>
+    </div>
+  </div>
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+      </div>
+      <main class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="linear-algebra">
+<h1>Linear Algebra<a class="headerlink" href="#linear-algebra" title="Permalink to this heading">#</a></h1>
+<p>Kokkos provides the <code class="code docutils literal notranslate"><span class="pre">Kokkos::View</span></code> class to store multi-dimensional arrays.  Kokkos itself does not provide tools BLAS (e.g., Mat-Mat multiplication) or LAPACK (e.g., LU factorizations and solves) operations.   MParT provides a small collection of c++ classes and functions for easily working with one- and two-dimensional <code class="code docutils literal notranslate"><span class="pre">Kokkos::View</span></code> objects as if they were vectors and matrices, respectively.</p>
+<p>Below is a comparison of the MParT linear algebra tools and <a class="reference external" href="https://eigen.tuxfamily.org/index.php?title=Main_Page">Eigen</a>.  These examples focus on views defined in the <code class="code docutils literal notranslate"><span class="pre">Kokkos::HostSpace</span></code> memory space, but these operators are defined for views in device memory (e.g., <code class="code docutils literal notranslate"><span class="pre">mpart::DeviceSpace</span></code>) as well.</p>
+<p>The eigen code snippets require <code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;Eigen/Core&gt;</span></code> and <code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;Eigen/Dense&gt;</span></code> while the MParT snippets require <code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&lt;Kokkos_Core.hpp&gt;</span></code>, <code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;MParT/Utilities/LinearAlgebra.h&quot;</span></code>, and the addition of <code class="code docutils literal notranslate"><span class="pre">using</span> <span class="pre">namespace</span> <span class="pre">mpart;</span></code>.</p>
+<section id="construction">
+<h2>Construction<a class="headerlink" href="#construction" title="Permalink to this heading">#</a></h2>
+<p>For completeness, we first show how to construct two matrices <span class="math notranslate nohighlight">\(A\)</span> and <span class="math notranslate nohighlight">\(B\)</span> using either Eigen or Kokkos.</p>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Matrix Construction (Eigen)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="nf">A</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
+<span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="nf">B</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
+
+<span class="n">A</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="mf">0.5</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">B</span><span class="w"> </span><span class="o">&lt;&lt;</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w">   </span><span class="mf">2.0</span><span class="p">,</span><span class="w"></span>
+<span class="w">     </span><span class="mf">0.125</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Matrix Construction (Kokkos)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Kokkos</span><span class="o">::</span><span class="n">View</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">**</span><span class="p">,</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">A</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
+<span class="n">Kokkos</span><span class="o">::</span><span class="n">View</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">**</span><span class="w"> </span><span class="p">,</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">B</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">);</span><span class="w"></span>
+
+<span class="n">A</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="n">A</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0</span><span class="p">;</span><span class="w"></span>
+<span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="p">;</span><span class="w"> </span><span class="n">A</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"></span>
+
+<span class="n">B</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w">   </span><span class="n">B</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0</span><span class="p">;</span><span class="w"></span>
+<span class="n">B</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.125</span><span class="p">;</span><span class="w"> </span><span class="n">B</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="summation">
+<h2>Summation<a class="headerlink" href="#summation" title="Permalink to this heading">#</a></h2>
+<p>We will now compute <span class="math notranslate nohighlight">\(C=2A+B\)</span> by first computing <span class="math notranslate nohighlight">\(A+B\)</span> and then adding an additional <span class="math notranslate nohighlight">\(A\)</span> to the result.  This is simply to demonstrate the use of both the <code class="code docutils literal notranslate"><span class="pre">+</span></code> and <code class="code docutils literal notranslate"><span class="pre">+=</span></code> operators.</p>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Matrix Sum (Eigen)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="n">C</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">B</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">A</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Matrix Sum (Kokkos+MParT)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Kokkos</span><span class="o">::</span><span class="n">View</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">**</span><span class="w"> </span><span class="p">,</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">C</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">B</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">A</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="multiplication">
+<h2>Multiplication<a class="headerlink" href="#multiplication" title="Permalink to this heading">#</a></h2>
+<p>The <code class="code docutils literal notranslate"><span class="pre">*</span></code> operator is overloaded in both Eigen and MParT to implement matrix multiplication.  Currently MParT does not provide any built-in tools for componentwise multiplication.  The snippet below computes the product <span class="math notranslate nohighlight">\(AB\)</span>.</p>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Matrix Product (Eigen)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="n">C</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">B</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Matrix Product (Kokkos+MParT)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">StridedMatrix</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">C</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">B</span><span class="p">;</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>Computing products with transposes is also straightforward.  Below we compute both <span class="math notranslate nohighlight">\(A^TB\)</span> and <span class="math notranslate nohighlight">\(A^TB^T\)</span>.  Because MParT must use out-of-class implementations, the transpose syntax is slightly different between Eigen and MParT, but equally straightforward:</p>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Transposed Matrix Product (Eigen)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="n">C</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">.</span><span class="n">transpose</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">B</span><span class="p">;</span><span class="w"> </span><span class="c1">// A^T B</span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">.</span><span class="n">transpose</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">B</span><span class="p">.</span><span class="n">transpose</span><span class="p">()</span><span class="w"> </span><span class="c1">// A^T B^T</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Transposed Matrix Product (Kokkos+MParT)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">StridedMatrix</span><span class="o">&lt;</span><span class="kt">double</span><span class="p">,</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">C</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">transpose</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">B</span><span class="p">;</span><span class="w"> </span><span class="c1">// A^T B</span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tranpose</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">transpose</span><span class="p">(</span><span class="n">B</span><span class="p">);</span><span class="w"> </span><span class="c1">// A^T B^T</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="lu-factorization-and-solve">
+<h2>LU Factorization and Solve<a class="headerlink" href="#lu-factorization-and-solve" title="Permalink to this heading">#</a></h2>
+<p>MParT provides a class similar to Eigen’s <code class="code docutils literal notranslate"><span class="pre">PartialPivLU</span></code> class for LU factorizations.  The <code class="code docutils literal notranslate"><span class="pre">Kokkos::HostSpace</span></code> version of MParT’s implementation is actually just a thin wrapper around the Eigen implementation.   The <code class="code docutils literal notranslate"><span class="pre">DeviceSpace</span></code> version uses the <a class="reference external" href="https://docs.nvidia.com/cuda/cusolver/index.html">cuSolver</a> library.</p>
+<p>The following snippets compute <span class="math notranslate nohighlight">\(C=A^{-1} B\)</span> using an LU factorization of the matrix <span class="math notranslate nohighlight">\(A\)</span>.  The determinant of <span class="math notranslate nohighlight">\(A\)</span> is also computed from the factorization.</p>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+LU Solve (Eigen)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">PartialPivLU</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="o">&gt;</span><span class="w"> </span><span class="n">solver</span><span class="p">;</span><span class="w"></span>
+<span class="n">solver</span><span class="p">.</span><span class="n">compute</span><span class="p">(</span><span class="n">A</span><span class="p">);</span><span class="w"> </span><span class="c1">// Compute the LU factorization of A</span>
+
+<span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="w"> </span><span class="n">C</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solver</span><span class="p">.</span><span class="n">solve</span><span class="p">(</span><span class="n">B</span><span class="p">);</span><span class="w"></span>
+
+<span class="kt">double</span><span class="w"> </span><span class="n">det</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solver</span><span class="p">.</span><span class="n">determinant</span><span class="p">();</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+LU Solve (Kokkos+MParT)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">mpart</span><span class="o">::</span><span class="n">PartialPivLU</span><span class="w"> </span><span class="n">solver</span><span class="p">;</span><span class="w"></span>
+<span class="n">solver</span><span class="p">.</span><span class="n">compute</span><span class="p">(</span><span class="n">A</span><span class="p">);</span><span class="w"> </span><span class="c1">// Compute the LU factorization of A</span>
+
+<span class="n">Kokkos</span><span class="o">::</span><span class="n">View</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">**</span><span class="p">,</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">C</span><span class="p">;</span><span class="w"></span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solver</span><span class="p">.</span><span class="n">solve</span><span class="p">(</span><span class="n">B</span><span class="p">);</span><span class="w"></span>
+
+<span class="kt">double</span><span class="w"> </span><span class="n">det</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solver</span><span class="p">.</span><span class="n">determinant</span><span class="p">();</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>The MParT <code class="code docutils literal notranslate"><span class="pre">mpart::PartialPivLU</span></code> class also has a <code class="code docutils literal notranslate"><span class="pre">solveInPlace</span></code> function that computes <span class="math notranslate nohighlight">\(A^{-1}B\)</span> in place by overwriting the matrix <span class="math notranslate nohighlight">\(B\)</span>.  The use of <code class="code docutils literal notranslate"><span class="pre">solveInPlace</span></code> can reduce memory allocations because additional space to store the matrix <code class="code docutils literal notranslate"><span class="pre">C</span></code> is not needed.  Here is an example:</p>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-2 sd-row-cols-xs-2 sd-row-cols-sm-2 sd-row-cols-md-2 sd-row-cols-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+In-place LU Solve (Eigen)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">Eigen</span><span class="o">::</span><span class="n">PartialPivLU</span><span class="o">&lt;</span><span class="n">Eigen</span><span class="o">::</span><span class="n">MatrixXd</span><span class="o">&gt;</span><span class="w"> </span><span class="n">solver</span><span class="p">;</span><span class="w"></span>
+<span class="n">solver</span><span class="p">.</span><span class="n">compute</span><span class="p">(</span><span class="n">A</span><span class="p">);</span><span class="w"></span>
+
+<span class="n">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solver</span><span class="p">.</span><span class="n">solve</span><span class="p">(</span><span class="n">B</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+In-place LU Solve (Kokkos+MParT)</div>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">mpart</span><span class="o">::</span><span class="n">PartialPivLU</span><span class="w"> </span><span class="n">solver</span><span class="p">;</span><span class="w"></span>
+<span class="n">solver</span><span class="p">.</span><span class="n">compute</span><span class="p">(</span><span class="n">A</span><span class="p">);</span><span class="w"></span>
+<span class="n">solver</span><span class="p">.</span><span class="n">solveInPlace</span><span class="p">(</span><span class="n">B</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="classes-and-functions">
+<h2>Classes and Functions<a class="headerlink" href="#classes-and-functions" title="Permalink to this heading">#</a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN5mpart12PartialPivLUE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_partial_piv_l_u"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PartialPivLU</span></span></span><a class="headerlink" href="#_CPPv4I0EN5mpart12PartialPivLUE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Mimics the interface of the Eigen::PartialPivLU class, but using Kokkos::Views and CUBLAS/CUSOLVER linear algebra.</p>
+<p>Note that the layout of the matrices used in this class is important. Cublas expects column major (layout left). </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart12PartialPivLU12PartialPivLUEv">
+<span class="target" id="classmpart_1_1_partial_piv_l_u_1aef996d7b2c52c88abbc502ed1d424c78"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PartialPivLU</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart12PartialPivLU12PartialPivLUEv" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart12PartialPivLU12PartialPivLUEN6Kokkos4ViewIPPKdN6Kokkos10LayoutLeftE11MemorySpaceEE">
+<span class="target" id="classmpart_1_1_partial_piv_l_u_1a0c6f96d34cee518bfab291dda2069900"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PartialPivLU</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart12PartialPivLUE" title="mpart::PartialPivLU::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">A</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart12PartialPivLU12PartialPivLUEN6Kokkos4ViewIPPKdN6Kokkos10LayoutLeftE11MemorySpaceEE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart12PartialPivLU7computeEN6Kokkos4ViewIPPKdN6Kokkos10LayoutLeftE11MemorySpaceEE">
+<span class="target" id="classmpart_1_1_partial_piv_l_u_1aa67227fb586706184bf27b339d89d3b5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart12PartialPivLUE" title="mpart::PartialPivLU::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">A</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart12PartialPivLU7computeEN6Kokkos4ViewIPPKdN6Kokkos10LayoutLeftE11MemorySpaceEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Computes the LU factorization of a matrix A </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart12PartialPivLU12solveInPlaceEN6Kokkos4ViewIPPdN6Kokkos10LayoutLeftE11MemorySpaceEE">
+<span class="target" id="classmpart_1_1_partial_piv_l_u_1a2590c35b55e897ffb633b7c19fb117c6"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">solveInPlace</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart12PartialPivLUE" title="mpart::PartialPivLU::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart12PartialPivLU12solveInPlaceEN6Kokkos4ViewIPPdN6Kokkos10LayoutLeftE11MemorySpaceEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Computes A^{-1}x and stores the results in x. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart12PartialPivLU5solveE13StridedMatrixIKd11MemorySpaceE">
+<span class="target" id="classmpart_1_1_partial_piv_l_u_1a298e1164a5dc2910f767d7a800d8b6cc"></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart12PartialPivLUE" title="mpart::PartialPivLU::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">solve</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart12PartialPivLUE" title="mpart::PartialPivLU::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart12PartialPivLU5solveE13StridedMatrixIKd11MemorySpaceE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Returns a view containing A^{-1}x. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart12PartialPivLU11determinantEv">
+<span class="target" id="classmpart_1_1_partial_piv_l_u_1af8cc4ba130d37095bd147e0a2636071e"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">determinant</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart12PartialPivLU11determinantEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Returns the determinant of the matrix A based on its LU factorization. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN5mpart15TransposeObjectE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="structmpart_1_1_transpose_object"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransposeObject</span></span></span><a class="headerlink" href="#_CPPv4I0EN5mpart15TransposeObjectE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Wrapper around a Kokkos view also storing a bool indicating whether the view should be transposed in matrix multiplications. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>MemorySpace</strong> – </p>
+</dd>
+</dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart15TransposeObject15TransposeObjectE13StridedMatrixIKd11MemorySpaceEb">
+<span class="target" id="structmpart_1_1_transpose_object_1ad527d0c7dfe2616fc0cb35fbe308d6b2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TransposeObject</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart15TransposeObjectE" title="mpart::TransposeObject::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">viewIn</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">isTransposedIn</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">false</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart15TransposeObject15TransposeObjectE13StridedMatrixIKd11MemorySpaceEb" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart15TransposeObject4rowsEv">
+<span class="target" id="structmpart_1_1_transpose_object_1aa15bccf4d8e24632081d6552f1c6a152"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rows</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart15TransposeObject4rowsEv" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart15TransposeObject4colsEv">
+<span class="target" id="structmpart_1_1_transpose_object_1ae4d910160114532fc975fbe31d0024a8"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cols</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart15TransposeObject4colsEv" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart15TransposeObject12isTransposedE">
+<span class="target" id="structmpart_1_1_transpose_object_1aa91937732124542171d3d4fd6116ee86"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isTransposed</span></span></span><a class="headerlink" href="#_CPPv4N5mpart15TransposeObject12isTransposedE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart15TransposeObject4viewE">
+<span class="target" id="structmpart_1_1_transpose_object_1ad3acffae781e4767d30579dcc5ac45fe"></span><span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart15TransposeObjectE" title="mpart::TransposeObject::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">view</span></span></span><a class="headerlink" href="#_CPPv4N5mpart15TransposeObject4viewE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN5mpart9transposeE15TransposeObjectIN6Kokkos4ViewIDp6TraitsE12memory_spaceEEN6Kokkos4ViewIDp6TraitsEE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="_linear_algebra_8h_1aff7d701f5e55d76c033102308888dee2"></span><a class="reference internal" href="#_CPPv4I0EN5mpart15TransposeObjectE" title="mpart::TransposeObject"><span class="n"><span class="pre">TransposeObject</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN5mpart9transposeE15TransposeObjectIN6Kokkos4ViewIDp6TraitsE12memory_spaceEEN6Kokkos4ViewIDp6TraitsEE" title="mpart::transpose::Traits"><span class="n"><span class="pre">Traits</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">memory_space</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">transpose</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN5mpart9transposeE15TransposeObjectIN6Kokkos4ViewIDp6TraitsE12memory_spaceEEN6Kokkos4ViewIDp6TraitsEE" title="mpart::transpose::Traits"><span class="n"><span class="pre">Traits</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">view</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN5mpart9transposeE15TransposeObjectIN6Kokkos4ViewIDp6TraitsE12memory_spaceEEN6Kokkos4ViewIDp6TraitsEE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Returns a transpose object around a view. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN5mpart5dgemmEvd15TransposeObjectI11MemorySpaceE15TransposeObjectI11MemorySpaceEd13StridedMatrixId11MemorySpaceE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="_linear_algebra_8h_1ad57eae14191472c2aa950889d8da8338"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">dgemm</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">alpha</span></span>, <a class="reference internal" href="#_CPPv4I0EN5mpart15TransposeObjectE" title="mpart::TransposeObject"><span class="n"><span class="pre">TransposeObject</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN5mpart5dgemmEvd15TransposeObjectI11MemorySpaceE15TransposeObjectI11MemorySpaceEd13StridedMatrixId11MemorySpaceE" title="mpart::dgemm::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">A</span></span>, <a class="reference internal" href="#_CPPv4I0EN5mpart15TransposeObjectE" title="mpart::TransposeObject"><span class="n"><span class="pre">TransposeObject</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN5mpart5dgemmEvd15TransposeObjectI11MemorySpaceE15TransposeObjectI11MemorySpaceEd13StridedMatrixId11MemorySpaceE" title="mpart::dgemm::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">B</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">beta</span></span>, <span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart5dgemmEvd15TransposeObjectI11MemorySpaceE15TransposeObjectI11MemorySpaceEd13StridedMatrixId11MemorySpaceE" title="mpart::dgemm::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">C</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN5mpart5dgemmEvd15TransposeObjectI11MemorySpaceE15TransposeObjectI11MemorySpaceEd13StridedMatrixId11MemorySpaceE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>BLAS-like function computing <span class="math notranslate nohighlight">\( C = \alpha AB + \beta C\)</span>, <span class="math notranslate nohighlight">\(C=\alpha A^TB + \beta C\)</span>, <span class="math notranslate nohighlight">\(C=\alpha AB^T+\beta C\)</span> or <span class="math notranslate nohighlight">\(C=\alpha A^TB^T + \beta C\)</span>.</p>
+<p>The matrix C must be preallocated. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpDpEN5mpart10AddInPlaceEvN6Kokkos4ViewIPPdDp7Traits1EEN6Kokkos4ViewIPPKdDp7Traits2EE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="_linear_algebra_8h_1ac8cfcb9bd872d86f4c2bcdc36cbd686a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">AddInPlace</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpDpEN5mpart10AddInPlaceEvN6Kokkos4ViewIPPdDp7Traits1EEN6Kokkos4ViewIPPKdDp7Traits2EE" title="mpart::AddInPlace::Traits1"><span class="n"><span class="pre">Traits1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpDpEN5mpart10AddInPlaceEvN6Kokkos4ViewIPPdDp7Traits1EEN6Kokkos4ViewIPPKdDp7Traits2EE" title="mpart::AddInPlace::Traits2"><span class="n"><span class="pre">Traits2</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpDpEN5mpart10AddInPlaceEvN6Kokkos4ViewIPPdDp7Traits1EEN6Kokkos4ViewIPPKdDp7Traits2EE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>x += y </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpDpEN5mpart10AddInPlaceEvN6Kokkos4ViewIPdDp7Traits1EEN6Kokkos4ViewIPKdDp7Traits2EE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="_linear_algebra_8h_1aceaf1040ede6c0496bb2da0ce6110970"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">AddInPlace</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpDpEN5mpart10AddInPlaceEvN6Kokkos4ViewIPdDp7Traits1EEN6Kokkos4ViewIPKdDp7Traits2EE" title="mpart::AddInPlace::Traits1"><span class="n"><span class="pre">Traits1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4IDpDpEN5mpart10AddInPlaceEvN6Kokkos4ViewIPdDp7Traits1EEN6Kokkos4ViewIPKdDp7Traits2EE" title="mpart::AddInPlace::Traits2"><span class="n"><span class="pre">Traits2</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpDpEN5mpart10AddInPlaceEvN6Kokkos4ViewIPdDp7Traits1EEN6Kokkos4ViewIPKdDp7Traits2EE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>x += y </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScalarType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="_linear_algebra_8h_1a58621b35ee9fa8eeb9deec2e1c398eff"></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::Traits1"><span class="n"><span class="pre">Traits1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">memory_space</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::Traits1"><span class="n"><span class="pre">Traits1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::Traits2"><span class="n"><span class="pre">Traits2</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScalarType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="_linear_algebra_8h_1a148c04f4f44d75cad3a619199b73c7e7"></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::Traits1"><span class="n"><span class="pre">Traits1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">memory_space</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::Traits1"><span class="n"><span class="pre">Traits1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+::Traits2"><span class="n"><span class="pre">Traits2</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpDpEN5mpartplEN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPK10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>z = x + y </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScalarType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="_linear_algebra_8h_1a33c5f878eadf6956f6bbcdd7b918bd3e"></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::Traits1"><span class="n"><span class="pre">Traits1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">memory_space</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+=</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::Traits1"><span class="n"><span class="pre">Traits1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::Traits2"><span class="n"><span class="pre">Traits2</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIPP10ScalarTypeN6Kokkos4ViewIPP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIPP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPPK10ScalarTypeDp7Traits2EE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScalarType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits1</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Traits2</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="_linear_algebra_8h_1aacb896732d4380340a302f0b16813a0f"></span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::Traits1"><span class="n"><span class="pre">Traits1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">memory_space</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">+=</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::Traits1"><span class="n"><span class="pre">Traits1</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">x</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::ScalarType"><span class="n"><span class="pre">ScalarType</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="mpart::operator+=::Traits2"><span class="n"><span class="pre">Traits2</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">y</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpDpEN5mpartpLERN6Kokkos4ViewIP10ScalarTypeN6Kokkos4ViewIP10ScalarTypeDp7Traits1E12memory_spaceEEEN6Kokkos4ViewIP10ScalarTypeDp7Traits1EEN6Kokkos4ViewIPK10ScalarTypeDp7Traits2EE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN5mpartmlE13StridedMatrixId11MemorySpaceE15TransposeObjectI11MemorySpaceE15TransposeObjectI11MemorySpaceE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="_linear_algebra_8h_1a616cce21e18fd364b0e43678aa3853f4"></span><span class="n"><span class="pre">StridedMatrix</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpartmlE13StridedMatrixId11MemorySpaceE15TransposeObjectI11MemorySpaceE15TransposeObjectI11MemorySpaceE" title="mpart::operator*::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><span class="n"><span class="pre">mpart</span></span><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">*</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN5mpart15TransposeObjectE" title="mpart::TransposeObject"><span class="n"><span class="pre">TransposeObject</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN5mpartmlE13StridedMatrixId11MemorySpaceE15TransposeObjectI11MemorySpaceE15TransposeObjectI11MemorySpaceE" title="mpart::operator*::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">A</span></span>, <a class="reference internal" href="#_CPPv4I0EN5mpart15TransposeObjectE" title="mpart::TransposeObject"><span class="n"><span class="pre">TransposeObject</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN5mpartmlE13StridedMatrixId11MemorySpaceE15TransposeObjectI11MemorySpaceE15TransposeObjectI11MemorySpaceE" title="mpart::operator*::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">B</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN5mpartmlE13StridedMatrixId11MemorySpaceE15TransposeObjectI11MemorySpaceE15TransposeObjectI11MemorySpaceE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Returns C = A*B, or A^T*B or A^T*B^T or A*B^T </p>
+</dd></dl>
+
+</section>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='left-prev' id="prev-link" href="../quadrature/adaptivesimpson.html" title="previous page">
+      <i class="fas fa-angle-left"></i>
+      <div class="prev-next-info">
+          <p class="prev-next-subtitle">previous</p>
+          <p class="prev-next-title">Adaptive Simpson Integration</p>
+      </div>
+  </a>
+  <a class='right-next' id="next-link" href="kokkoswrappers.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">Kokkos Array Conversions</p>
+  </div>
+  <i class="fas fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fas fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#construction">
+   Construction
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#summation">
+   Summation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#multiplication">
+   Multiplication
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lu-factorization-and-solve">
+   LU Factorization and Solve
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#classes-and-functions">
+   Classes and Functions
+  </a>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="../../../_sources/source/api/utilities/linearalgebra.rst.txt">
+        <i class="fas fa-file-alt"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=9b1a4fa89bdd0e95b23b"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2022, The MParT development team..<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.1.1.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

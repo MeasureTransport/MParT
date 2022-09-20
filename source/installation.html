@@ -494,8 +494,10 @@ Linux</label><div class="sd-tab-content docutils">
 </section>
 <section id="compiling-with-cuda-support">
 <h2>Compiling with CUDA Support<a class="headerlink" href="#compiling-with-cuda-support" title="Permalink to this heading">#</a></h2>
-<p>To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides.</p>
-<p>First, we compile Kokkos with the required options.  Kokkos source code can be obtained from the <a class="reference external" href="https://github.com/kokkos/kokkos">kokkos/kokkos</a> repository on Github.</p>
+<section id="building-the-kokkos-dependency">
+<h3>Building the Kokkos Dependency<a class="headerlink" href="#building-the-kokkos-dependency" title="Permalink to this heading">#</a></h3>
+<p>To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides.  Because of this, MParT cannot use an internal build of Kokkos and Kokkos must therefore be compiled (or otherwise installed) manually.</p>
+<p>The following cmake command can be used to compile Kokkos with the CUDA backend enabled and with all options required by MParT.  Kokkos source code can be obtained from the <a class="reference external" href="https://github.com/kokkos/kokkos">kokkos/kokkos</a> repository on Github.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> &lt;path/to/kokkos&gt;
 mkdir build
 <span class="nb">cd</span> build
@@ -517,7 +519,33 @@ cmake <span class="se">\</span>
 <p class="admonition-title">Tip</p>
 <p>If you’re getting an error about C++ standards, try using a new version of your compiler; <code class="code docutils literal notranslate"><span class="pre">g++</span></code>, for example, does not support the flag <code class="code docutils literal notranslate"><span class="pre">--std=c++17</span></code> below version 8. For more details, see <a class="reference external" href="https://github.com/kokkos/kokkos/issues/5157">this issue</a> in Kokkos.</p>
 </div>
-<p>Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the <code class="code docutils literal notranslate"><span class="pre">build</span></code> directory using the following command:</p>
+</section>
+<section id="installing-cublas-and-cusolver">
+<h3>Installing cublas and cusolver<a class="headerlink" href="#installing-cublas-and-cusolver" title="Permalink to this heading">#</a></h3>
+<p>MParT uses the CUBLAS and CUSOLVER components of the <a class="reference external" href="https://developer.nvidia.com/cuda-toolkit">NVIDIA CUDA Toolkit</a> for GPU-accelerated linear algebra.</p>
+<p>NVIDIA’s <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html">Cuda installation guide</a> provides detailed instructions on how to install CUDA.   For Debian-based x86_64 systems, we have been able to successfully install cuda, cublas, and cusparse for CUDA 11.4 using the command below.  Notice the installation of <code class="code docutils literal notranslate"><span class="pre">*-dev</span></code> packages, which are required to obtain the necessary header files.  Similar commands may be useful on other systems.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">CUDA_VERSION</span><span class="o">=</span><span class="m">11</span>.4
+<span class="nb">export</span> <span class="nv">CUDA_COMPAT_VERSION</span><span class="o">=</span><span class="m">470</span>.129.06-1
+<span class="nb">export</span> <span class="nv">CUDA_CUDART_VERSION</span><span class="o">=</span><span class="m">11</span>.4.148-1
+
+curl -sL <span class="s2">&quot;https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub&quot;</span> <span class="p">|</span> apt-key add -
+<span class="nb">echo</span> <span class="s2">&quot;deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /&quot;</span> &gt; /etc/apt/sources.list.d/cuda.list
+sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
+
+sudo apt-get -yq update
+sudo apt-get -yq install --no-install-recommends <span class="se">\</span>
+    cuda-compat-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span><span class="o">=</span><span class="si">${</span><span class="nv">CUDA_COMPAT_VERSION</span><span class="si">}</span> <span class="se">\</span>
+    cuda-cudart-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span><span class="o">=</span><span class="si">${</span><span class="nv">CUDA_CUDART_VERSION</span><span class="si">}</span> <span class="se">\</span>
+    libcublas-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span> <span class="se">\</span>
+    libcublas-dev-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span> <span class="se">\</span>
+    libcusolver-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span> <span class="se">\</span>
+    libcusolver-dev-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span>
+</pre></div>
+</div>
+</section>
+<section id="building-mpart">
+<h3>Building MParT<a class="headerlink" href="#building-mpart" title="Permalink to this heading">#</a></h3>
+<p>Using the above documentation on building with an external install of Kokkos, we can then configure MParT from the <code class="code docutils literal notranslate"><span class="pre">build</span></code> directory using the following command:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> &lt;path/to/MParT&gt;
 mkdir build
 <span class="nb">cd</span> build
@@ -533,6 +561,7 @@ cmake <span class="se">\</span>
 <p class="admonition-title">Tip</p>
 <p>If you’re using a Power8 or Power9 architecture, Eigen may give you trouble when trying to incorporate vectorization using Altivec, specifically when compiling for GPU. In this case, go into <code class="code docutils literal notranslate"><span class="pre">CMakeFiles.txt</span></code> and add <code class="code docutils literal notranslate"><span class="pre">add_compile_definition(EIGEN_DONT_VECTORIZE)</span></code>.</p>
 </div>
+</section>
 </section>
 </section>
 
@@ -603,6 +632,23 @@ cmake <span class="se">\</span>
     <a class="reference internal nav-link" href="#compiling-with-cuda-support">
      Compiling with CUDA Support
     </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#building-the-kokkos-dependency">
+       Building the Kokkos Dependency
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#installing-cublas-and-cusolver">
+       Installing cublas and cusolver
+      </a>
+     </li>
+     <li class="toc-h3 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#building-mpart">
+       Building MParT
+      </a>
+     </li>
+    </ul>
    </li>
   </ul>
  </li>
