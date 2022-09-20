@@ -191,7 +191,7 @@ Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the c
 Installing cublas and cusolver 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-MParT uses the CUBLAS and CUSOLVER components of the <NVIDIA CUDA Toolkit `https://developer.nvidia.com/cuda-toolkit`>_ for GPU-accelerated linear algebra.   
+MParT uses the CUBLAS and CUSOLVER components of the `NVIDIA CUDA Toolkit <https://developer.nvidia.com/cuda-toolkit>`_ for GPU-accelerated linear algebra.   
 
 NVIDIA's `Cuda installation guide <https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html>`_ provides detailed instructions on how to install CUDA.   For Debian-based x86_64 systems, we have been able to successfully install cuda, cublas, and cusparse for CUDA 11.4 using the command below.  Notice the installation of :code:`*-dev` packages, which are required to obtain the necessary header files.  Similar commands may be useful on other systems.
 

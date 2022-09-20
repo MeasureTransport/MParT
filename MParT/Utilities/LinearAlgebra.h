@@ -141,6 +141,11 @@ Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memo
 
 
 
+/**
+ * @brief Wrapper around a Kokkos view also storing a bool indicating whether the view should be transposed in matrix multiplications.
+ * 
+ * @tparam MemorySpace
+ */
 template<typename MemorySpace>
 struct TransposeObject{
 
@@ -155,13 +160,15 @@ struct TransposeObject{
     inline int cols() const{ return isTransposed ? view.extent(0) : view.extent(1);};
 };
 
+/** Returns a transpose object around a view. */
 template<typename... Traits>
 TransposeObject<typename Kokkos::View<Traits...>::memory_space> transpose(Kokkos::View<Traits...> view){return TransposeObject<typename Kokkos::View<Traits...>::memory_space>(view, true);};
+
 
 template<typename MemorySpace>
 TransposeObject<MemorySpace> transpose(TransposeObject<MemorySpace> tview){return TransposeObject<MemorySpace>(tview.view, tview.isTransposed ? false : true);};
 
-
+/** Performs the matrix multiplication of two matrix A and B. */
 template<typename... Traits1, typename... Traits2>
 StridedMatrix<typename Kokkos::View<Traits1...>::non_const_value_type, typename Kokkos::View<Traits1...>::memory_space> operator*(Kokkos::View<Traits1...> A, 
                                              Kokkos::View<Traits2...> B)
@@ -198,7 +205,9 @@ void dgemm(double                              alpha,
                        C);
 }
 
-/** C = alpha * A * B + beta * C
+/** BLAS-like function computing \f$ C = \alpha AB + \beta C\f$, \f$C=\alpha A^TB + \beta C\f$, \f$C=\alpha AB^T+\beta C\f$ or \f$C=\alpha A^TB^T + \beta C\f$.
+
+    The matrix C must be preallocated.
 */
 template<typename MemorySpace>
 void dgemm(double                              alpha, 
