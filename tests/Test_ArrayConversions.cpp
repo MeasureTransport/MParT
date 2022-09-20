@@ -162,6 +162,77 @@ TEST_CASE( "Testing mapping from memory space to valid execution space.", "[Kokk
 
 #endif
 
+TEST_CASE( "Testing KokkosToEigen", "[RectangularKokkosToEigen]" ) {
+
+    Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> A("A", 2,3);
+    
+    
+    /* 
+     A = [[2.0, 3.0, 1.0],
+          [1.0, 1.0, 4.0]]
+    */
+    A(0,0) = 2.0;
+    A(1,0) = 1.0;
+    A(0,1) = 3.0;
+    A(1,1) = 1.0;
+    A(0,2) = 1.0;
+    A(1,2) = 4.0;
+
+    SECTION("Non-Const"){
+        auto eigA = KokkosToMat(A);
+
+        REQUIRE(eigA.rows() == A.extent(0));
+        REQUIRE(eigA.cols() == A.extent(1));
+        
+        for(unsigned int i=0; i<A.extent(0); ++i){
+            for(unsigned int j=0; j<A.extent(1); ++j){
+                CHECK( A(i,j)== eigA(i,j));
+            }
+        }
+    }
+
+    SECTION("Const"){
+        Kokkos::View<const double**, Kokkos::LayoutLeft, Kokkos::HostSpace> Aconst = A;
+        auto eigA = ConstKokkosToMat(Aconst);
+
+        REQUIRE(eigA.rows() == A.extent(0));
+        REQUIRE(eigA.cols() == A.extent(1));
+        
+        for(unsigned int i=0; i<A.extent(0); ++i){
+            for(unsigned int j=0; j<A.extent(1); ++j){
+                CHECK( A(i,j)== eigA(i,j));
+            }
+        }
+    }
+
+    SECTION("Strided"){
+        StridedMatrix<double, Kokkos::HostSpace> Astride = A;
+        auto eigA = KokkosToMat(Astride);
+
+        REQUIRE(eigA.rows() == A.extent(0));
+        REQUIRE(eigA.cols() == A.extent(1));
+        
+        for(unsigned int i=0; i<A.extent(0); ++i){
+            for(unsigned int j=0; j<A.extent(1); ++j){
+                CHECK( A(i,j)== eigA(i,j));
+            }
+        }
+    }
+
+    SECTION("Const Strided"){
+        StridedMatrix<const double, Kokkos::HostSpace> Astride = A;
+        auto eigA = ConstKokkosToMat(Astride);
+
+        REQUIRE(eigA.rows() == A.extent(0));
+        REQUIRE(eigA.cols() == A.extent(1));
+        
+        for(unsigned int i=0; i<A.extent(0); ++i){
+            for(unsigned int j=0; j<A.extent(1); ++j){
+                CHECK( A(i,j)== eigA(i,j));
+            }
+        }
+    }
+}
 TEST_CASE( "Testing Eigen to Kokkos Conversions in 1D", "[EigenArrayConversions1D]" ) {
 
     unsigned int size = 128;
