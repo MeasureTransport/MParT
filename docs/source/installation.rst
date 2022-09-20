@@ -167,11 +167,13 @@ Make sure that this file includes a full installation path from root! At this po
     If you installed Julia with Conda, you may not have a folder at :code:`~/.julia`. In this case, you will likely find the :code:`artifacts` folder in :code:`~/anaconda3/envs/<YOUR ENVIRONMENT>/share/julia/artifacts` (or alternatively, :code:`~/miniconda`, depending on what version of Conda you installed). If this is the case, then you will need to create a file :code:`~/anaconda3/envs/<YOUR ENVIRONMENT>/share/julia/artifacts/Overrides.toml` with the same contents as above.
 
 Compiling with CUDA Support
-------------------
+----------------------------
 
-To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides.
+Building the Kokkos Dependency 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides.  Because of this, MParT cannot use an internal build of Kokkos and Kokkos must therefore be compiled (or otherwise installed) manually.
 
-First, we compile Kokkos with the required options.  Kokkos source code can be obtained from the `kokkos/kokkos <https://github.com/kokkos/kokkos>`_ repository on Github.
+The following cmake command can be used to compile Kokkos with the CUDA backend enabled and with all options required by MParT.  Kokkos source code can be obtained from the `kokkos/kokkos <https://github.com/kokkos/kokkos>`_ repository on Github.
 
 .. code-block:: bash
 
@@ -195,7 +197,38 @@ Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the c
 .. tip::
     If you're getting an error about C++ standards, try using a new version of your compiler; :code:`g++`, for example, does not support the flag :code:`--std=c++17` below version 8. For more details, see `this issue <https://github.com/kokkos/kokkos/issues/5157>`_ in Kokkos.
 
-Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the :code:`build` directory using the following command:
+Installing cublas and cusolver 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+MParT uses the CUBLAS and CUSOLVER components of the `NVIDIA CUDA Toolkit <https://developer.nvidia.com/cuda-toolkit>`_ for GPU-accelerated linear algebra.   
+
+NVIDIA's `Cuda installation guide <https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html>`_ provides detailed instructions on how to install CUDA.   For Debian-based x86_64 systems, we have been able to successfully install cuda, cublas, and cusparse for CUDA 11.4 using the command below.  Notice the installation of :code:`*-dev` packages, which are required to obtain the necessary header files.  Similar commands may be useful on other systems.
+
+.. code-block:: bash 
+
+    export CUDA_VERSION=11.4
+    export CUDA_COMPAT_VERSION=470.129.06-1
+    export CUDA_CUDART_VERSION=11.4.148-1
+
+    curl -sL "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub" | apt-key add - 
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /" > /etc/apt/sources.list.d/cuda.list 
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC 
+    
+    sudo apt-get -yq update 
+    sudo apt-get -yq install --no-install-recommends \
+        cuda-compat-${CUDA_VERSION/./-}=${CUDA_COMPAT_VERSION} \
+        cuda-cudart-${CUDA_VERSION/./-}=${CUDA_CUDART_VERSION} \
+        libcublas-${CUDA_VERSION/./-} \
+        libcublas-dev-${CUDA_VERSION/./-} \
+        libcusolver-${CUDA_VERSION/./-} \
+        libcusolver-dev-${CUDA_VERSION/./-}
+
+
+
+Building MParT
+^^^^^^^^^^^^^^^
+
+Using the above documentation on building with an external install of Kokkos, we can then configure MParT from the :code:`build` directory using the following command:
 
 .. code-block:: bash
 

@@ -9,6 +9,12 @@
 #include <algorithm>
 #include <cctype>
 
+#if defined(MPART_ENABLE_GPU)
+#include <cuda_runtime.h>
+#include <cublas_v2.h>
+#include <cusolverDn.h>
+#endif 
+
 namespace mpart{
 
     /** @defgroup InitializationHelpers
@@ -37,8 +43,17 @@ int main( int argc, char* argv[] ) {
         bool Get(){return isInitialized;};
         void Set(){isInitialized = true;} 
 
+        #if defined(MPART_ENABLE_GPU)
+        cublasHandle_t& GetCublasHandle(){return blasHandle;}
+        cusolverDnHandle_t& GetCusolverHandle(){return solverHandle;}
+        #endif 
     private:
         bool isInitialized = false;
+
+        #if defined(MPART_ENABLE_GPU)
+        cublasHandle_t blasHandle;
+        cusolverDnHandle_t solverHandle;
+        #endif
     };
 
     // Holds a static InitializeStatus object
@@ -67,6 +82,12 @@ int main( int argc, char* argv[] ) {
         
             // Initialize kokkos
             Kokkos::initialize(arg1, args...);
+
+#if defined(MPART_ENABLE_GPU)
+             // Set up the cublas handles
+            cublasCreate(&GetInitializeStatusObject().GetCublasHandle());
+            cusolverDnCreate(&GetInitializeStatusObject().GetCusolverHandle());
+#endif
 
             // Make sure Kokkos::finalize() is called at program exit.
             std::atexit(&mpart::Finalize);

@@ -14,11 +14,15 @@ PYBIND11_MODULE(pympart, m) {
     ConditionalMapBaseWrapper<Kokkos::HostSpace>(m);
     TriangularMapWrapper<Kokkos::HostSpace>(m);
     MapFactoryWrapper<Kokkos::HostSpace>(m);
+    AffineMapWrapperHost(m);
+    AffineFunctionWrapperHost(m);
 
 #if defined(MPART_ENABLE_GPU)
     ParameterizedFunctionBaseWrapper<mpart::DeviceSpace>(m);
     ConditionalMapBaseWrapper<mpart::DeviceSpace>(m);
     TriangularMapWrapper<mpart::DeviceSpace>(m);
     MapFactoryWrapper<mpart::DeviceSpace>(m);
+    AffineMapWrapperDevice(m);
+    AffineFunctionWrapperDevice(m);
 #endif
 }

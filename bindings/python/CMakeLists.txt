@@ -8,6 +8,7 @@ set(PYTHON_BINDING_SOURCES
   src/TriangularMap.cpp
   src/MapFactory.cpp
   src/ParameterizedFunctionBase.cpp
+  src/AffineMap.cpp
   
   ../common/src/CommonUtilities.cpp
 )
