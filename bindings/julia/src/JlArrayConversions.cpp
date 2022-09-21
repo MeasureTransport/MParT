@@ -8,7 +8,8 @@ namespace binding {
  * @param vec Julia vector to take view of
  * @return mpart::StridedVector<double, Kokkos::HostSpace> Same memory, but now a Kokkos View
  */
-StridedVector<double, Kokkos::HostSpace> JuliaToKokkos(jlcxx::ArrayRef<double,1> &vec)
+template<typename MemorySpace>
+StridedVector<double, MemorySpace> JuliaToKokkos(jlcxx::ArrayRef<double,1> &vec)
 {
     double* vptr = vec.data();
     unsigned int vsize = vec.size();
