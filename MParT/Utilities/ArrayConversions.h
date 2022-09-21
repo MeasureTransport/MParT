@@ -42,16 +42,16 @@ namespace mpart{
         @return A Kokkos view wrapping around the memory pointed to by ptr.
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
-    template<typename ScalarType>
-    inline Kokkos::View<ScalarType*,Kokkos::HostSpace> ToKokkos(ScalarType* ptr, unsigned int dim)
+    template<typename ScalarType, typename MemorySpace = Kokkos::HostSpace>
+    inline Kokkos::View<ScalarType*,MemorySpace> ToKokkos(ScalarType* ptr, unsigned int dim)
     {
-        return Kokkos::View<ScalarType*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, dim);
+        return Kokkos::View<ScalarType*, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, dim);
     }
 
-    template<typename ScalarType>
-    inline Kokkos::View<const ScalarType*,Kokkos::HostSpace> ToConstKokkos(ScalarType* ptr, unsigned int dim)
+    template<typename ScalarType, typename MemorySpace = Kokkos::HostSpace>
+    inline Kokkos::View<const ScalarType*,MemorySpace> ToConstKokkos(ScalarType* ptr, unsigned int dim)
     {
-        return Kokkos::View<const ScalarType*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, dim);
+        return Kokkos::View<const ScalarType*, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, dim);
     }
 
     /** @brief Converts a pointer to a 2d unmanaged Kokkos view.
@@ -90,16 +90,16 @@ namespace mpart{
         @tparam LayoutType A kokkos layout type dictating whether the memory in ptr is organized in column major format or row major format.   If LayoutType is Kokkos::LayoutRight, the data is treated in row major form.  If LayoutType is Kokkos::LayoutLeft, the data is treated in column major form.  Defaults to Kokkos::LayoutLeft.
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
-    template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft>
-    inline Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace> ToKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
+    template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft, typename MemorySpace = Kokkos::HostSpace>
+    inline Kokkos::View<ScalarType**, LayoutType, MemorySpace> ToKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
     {
-        return Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
+        return Kokkos::View<ScalarType**, LayoutType, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 
-    template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft>
-    inline Kokkos::View<const ScalarType**, LayoutType, Kokkos::HostSpace> ToConstKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
+    template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft, typename MemorySpace = Kokkos::HostSpace>
+    inline Kokkos::View<const ScalarType**, LayoutType, MemorySpace> ToConstKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
     {
-        return Kokkos::View<const ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
+        return Kokkos::View<const ScalarType**, LayoutType, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 
 
@@ -128,7 +128,7 @@ namespace mpart{
      * @return StridedVector<ScalarType*, MemorySpace>
      */
     template<typename ScalarType, class MemorySpace>
-    StridedVector<ScalarType, Kokkos::HostSpace> VecToKokkos(std::vector<ScalarType> &vec)
+    StridedVector<ScalarType, MemorySpace> VecToKokkos(std::vector<ScalarType> &vec)
     {
         return Kokkos::View<ScalarType*, MemorySpace>(vec.data(), vec.size());
     }
@@ -142,7 +142,7 @@ namespace mpart{
      * @return Kokkos::View<ScalarType*, MemorySpace>
      */
     template<typename ScalarType, class MemorySpace>
-    StridedMatrix<ScalarType, Kokkos::HostSpace> MatToKokkos(std::vector<ScalarType> &vec, int cols)
+    StridedMatrix<ScalarType, MemorySpace> MatToKokkos(std::vector<ScalarType> &vec, int cols)
     {
         auto rows = vec.size()/cols;
         return Kokkos::View<ScalarType**, MemorySpace>(vec.data(), rows, cols);
@@ -163,7 +163,7 @@ namespace mpart{
      * @return Kokkos::View<ScalarType*, MemorySpace>
      */
     template<typename ScalarType, class MemorySpace>
-    StridedMatrix<const ScalarType, Kokkos::HostSpace> MatToConstKokkos(std::vector<ScalarType> &vec, int cols)
+    StridedMatrix<const ScalarType, MemorySpace> MatToConstKokkos(std::vector<ScalarType> &vec, int cols)
     {
         auto rows = vec.size()/cols;
         return Kokkos::View<const ScalarType**, MemorySpace>(vec.data(), rows, cols);
@@ -289,7 +289,7 @@ namespace mpart{
 
     //     size_t stride0 = inview.stride_0();
     //     size_t stride1 = inview.stride_1();
-        
+
     //     if(stride0==1){
     //         return ToDevice<DeviceMemoryType, ScalarType, OtherTraits...>(Kokkos::View<ScalarType**, Kokkos::LayoutLeft, OtherTraits...>(inview));
     //     }else if(stride1==1){
