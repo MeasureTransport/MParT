@@ -30,6 +30,8 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+set(COMPILER_IS_NVCC OFF)
+
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-Wno-deprecated-gpu-targets" COMPILER_IS_NVCC1)
 check_cxx_compiler_flag("--expt-relaxed-constexpr" COMPILER_IS_NVCC2)
@@ -38,6 +40,7 @@ if(COMPILER_IS_NVCC1 AND COMPILER_IS_NVCC2)
     message(STATUS "GPU support detected")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-gpu-targets --expt-relaxed-constexpr")
     add_compile_definitions(EIGEN_NO_CUDA)
+    set(COMPILER_IS_NVCC ON)
 endif()
 
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
@@ -83,6 +86,7 @@ if(NOT Kokkos_FOUND)
             kokkos
             GIT_REPOSITORY https://github.com/kokkos/kokkos
             GIT_TAG 3.5.00
+            GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(kokkos)
     else()
@@ -90,6 +94,17 @@ if(NOT Kokkos_FOUND)
     endif()
 else()
     message(STATUS "Found Kokkos!")
+endif()
+
+
+if(${COMPILER_IS_NVCC})
+    message(STATUS "Searching for CUBLAS and CUSOLVER linear algebra libraries.")
+    find_package(CUDAToolkit COMPONENTS cudart cublas cusolver REQUIRED)
+    set(CUDA_LIBRARIES CUDA::cudart CUDA::cublas CUDA::cusolver)
+
+else()
+    message(STATUS "MParT is not compiled with CUDA support, so CUBLAS and CUSOLVER will not be used.")
+    set(CUDA_LIBRARIES "")
 endif()
 
 # Add Eigen
@@ -102,6 +117,7 @@ if(NOT Eigen3_FOUND)
             eigen3
             GIT_REPOSITORY https://gitlab.com/libeigen/eigen
             GIT_TAG 3.4.0
+            GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(eigen3)
     else()
@@ -122,6 +138,7 @@ if(MPART_PYTHON)
             pybind11
             GIT_REPOSITORY https://github.com/pybind/pybind11
             GIT_TAG        v2.10.0
+            GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(pybind11)
     else()
@@ -175,7 +192,7 @@ endif()
 add_library(mpart "")
 add_library (MParT::mpart ALIAS mpart)
 
-target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen)
+target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES})
 
 target_include_directories(mpart
                            PUBLIC
@@ -238,7 +255,7 @@ if(MPART_BUILD_TESTS)
     # Define test sources
     add_subdirectory(tests)
     add_executable(RunTests ${TEST_SOURCES})
-    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen)
+    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES})
 endif()
 
 add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)

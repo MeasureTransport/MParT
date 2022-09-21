@@ -63,7 +63,7 @@ template<>
 StridedMatrix<double, Kokkos::HostSpace> ParameterizedFunctionBase<mpart::DeviceSpace>::Evaluate(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
 {
     // Copy the points to the device space 
-    StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace,const double>(pts);
+    StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace>(pts);
 
     // Evaluate on the device space 
     StridedMatrix<double, mpart::DeviceSpace> evals_device = this->Evaluate(pts_device);
@@ -83,7 +83,7 @@ StridedMatrix<double, mpart::DeviceSpace> ParameterizedFunctionBase<Kokkos::Host
     StridedMatrix<double, Kokkos::HostSpace> evals_host = this->Evaluate(pts_host);
 
     // Copy back to the device
-    return ToDevice<mpart::DeviceSpace,double>(evals_host);
+    return ToDevice<mpart::DeviceSpace>(evals_host);
 }
 
 
@@ -143,8 +143,8 @@ template<>
 StridedMatrix<double, Kokkos::HostSpace> ParameterizedFunctionBase<mpart::DeviceSpace>::Gradient(StridedMatrix<const double, Kokkos::HostSpace> const& pts, StridedMatrix<const double, Kokkos::HostSpace> const& sens)
 {
     // Copy the points to the device space 
-    StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace,const double>(pts);
-    StridedMatrix<const double, mpart::DeviceSpace> sens_device = ToDevice<mpart::DeviceSpace,const double>(sens);
+    StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace>(pts);
+    StridedMatrix<const double, mpart::DeviceSpace> sens_device = ToDevice<mpart::DeviceSpace>(sens);
     // Evaluate on the device space 
     StridedMatrix<double, mpart::DeviceSpace> evals_device = this->Gradient(pts_device, sens_device);
 
@@ -164,7 +164,7 @@ StridedMatrix<double, mpart::DeviceSpace> ParameterizedFunctionBase<Kokkos::Host
     StridedMatrix<double, Kokkos::HostSpace> evals_host = this->Gradient(pts_host, sens_host);
 
     // Copy back to the device
-    return ToDevice<mpart::DeviceSpace,double>(evals_host);
+    return ToDevice<mpart::DeviceSpace>(evals_host);
 }
 
 
