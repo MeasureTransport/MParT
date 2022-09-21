@@ -32,7 +32,6 @@ public:
             output[order] = (this->ak(order)*x + this->bk(order))*output[order-1] - this->ck(order)*output[order-2];
 
         if(normalize_){
-            double norm;
             for(unsigned int order=0; order<=maxOrder; ++order){
                 output[order] /= this->Normalization(order); 
             }

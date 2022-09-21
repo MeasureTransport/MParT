@@ -155,8 +155,8 @@ void TriangularMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemoryS
                                              StridedMatrix<const double, MemorySpace> const& r,
                                              StridedMatrix<double, MemorySpace>              output)
 {
-    unsigned int ipdim = ConditionalMapBase<MemorySpace>::inputDim;
-    unsigned int opdim = ConditionalMapBase<MemorySpace>::outputDim;
+    unsigned int ipdim = this->inputDim;
+    unsigned int opdim = this->outputDim;
     Kokkos::View<double**, MemorySpace> fullOut("Full Output", ipdim, x1.extent(1));
     Kokkos::deep_copy(Kokkos::subview(fullOut, std::make_pair(0,int(x1.extent(0))), Kokkos::ALL()), x1);
 

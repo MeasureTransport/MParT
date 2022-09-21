@@ -165,7 +165,7 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWo
     MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> dexpansion(dset);
 
     unsigned int cacheSize = hexpansion.CacheSize();
-    CHECK(cacheSize == (maxDegree+1)*(dim+2));
+    CHECK(cacheSize == (maxDegree+1)*(2*dim+1));
 
     // Allocate some memory for the cache 
     Kokkos::View<double*, Kokkos::HostSpace> hcache("host cache", cacheSize);

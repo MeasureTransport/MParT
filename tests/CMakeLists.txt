@@ -16,5 +16,8 @@ set (TEST_SOURCES
      tests/Test_ComposedMap.cpp
      tests/Test_MapFactory.cpp
      tests/Test_LinearizedBasis.cpp
+     tests/Test_AffineMap.cpp
+     tests/Test_LinearAlgebra.cpp
+     tests/Test_AffineFunction.cpp
      #tests/Test_TensorProductFunction.cpp
 PARENT_SCOPE) 

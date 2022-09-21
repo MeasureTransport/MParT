@@ -6,6 +6,10 @@
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
+#include <math.h>
+
+#include <map>
+
 namespace mpart{
 
     /**
@@ -72,6 +76,40 @@ namespace mpart{
         std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> CreateExpansion(unsigned int outputDim,
                                                                                 FixedMultiIndexSet<MemorySpace> const& mset,
                                                                                 MapOptions options = MapOptions());
+
+
+
+        /** This struct is used to map the options to functions that can create a map component with types corresponding 
+            to the options.
+        */
+        template<typename MemorySpace>
+        struct CompFactoryImpl{
+            typedef std::tuple<BasisTypes, bool, PosFuncTypes, QuadTypes> OptionsKeyType;
+            typedef std::function<std::shared_ptr<ConditionalMapBase<MemorySpace>>(FixedMultiIndexSet<MemorySpace> const&, MapOptions options)> FactoryFunctionType;
+            typedef std::map<OptionsKeyType, FactoryFunctionType> FactoryMapType;
+
+            static FactoryFunctionType GetFactoryFunction(MapOptions opts)
+            {
+                bool isLinearized = (!isinf(opts.basisLB)) ||(!isinf(opts.basisUB));
+                OptionsKeyType optionsKey(opts.basisType, isLinearized, opts.posFuncType, opts.quadType);
+
+                auto factoryMap = GetFactoryMap();
+
+                auto iter = factoryMap->find(optionsKey);
+                if(iter == factoryMap->end())
+                    throw std::runtime_error("Could not find registered factory method for given MapOptions.");
+                
+                return iter->second;
+            }
+
+            static std::shared_ptr<FactoryMapType> GetFactoryMap()
+            {
+                static std::shared_ptr<FactoryMapType> map;
+                if( !map ) 
+                    map = std::make_shared<FactoryMapType>();
+                return map;
+            }
+        };
 
     }
 }

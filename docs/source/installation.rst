@@ -2,7 +2,6 @@
 
 Installation
 ===================
-
 .. card:: Install with Conda
 
     It is possible to install the main c++ MParT library and its python wrapper via `conda-forge <https://anaconda.org/conda-forge/mpart>`__:
@@ -11,9 +10,18 @@ Installation
 
         conda install -c conda-forge mpart
 
-    Julia, Matlab, and CUDA are currently only supported when compiling from source. 
+    Matlab, and CUDA are currently only supported when compiling from source.
 
+.. card:: Install with Julia
 
+    It is also possible to install MParT with Julia bindings using the Julia package manager:
+
+    .. code-block:: julia
+
+        using Pkg
+        Pkg.add("MParT")
+
+    Julia-specific documentation is hosted `here <https://measuretransport.github.io/MParT.jl/dev/>`_.
 
 .. _compiling_source:
 
@@ -34,7 +42,7 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
    ..
    make install
 
-This will compile the main c++ :code:`mpart` library as well as any other language bindings that can be automatically configured.  If you are compiling on a multicore machine, you can use :code:`make -j N_JOBS install`, where :code:`N_JOBS` is the number of processes the computer can compile with in parallel.  
+This will compile the main c++ :code:`mpart` library as well as any other language bindings that can be automatically configured.  If you are compiling on a multicore machine, you can use :code:`make -j N_JOBS install`, where :code:`N_JOBS` is the number of processes the computer can compile with in parallel.
 
 This installation should also automatically install and build Kokkos, Eigen, and Catch2, assuming they aren't installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:
 
@@ -53,7 +61,7 @@ Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, an
 
 You can force MParT to use previously installed versions of the dependencies by setting :code:`MPART_FETCH_DEPS=OFF`.  The default value of :code:`MPART_FETCH_DEPS=ON` will allow MParT to download and locally install any external dependencies using CMake's :code:`FetchContent` directive.
 
-Note that if you do not wish to compile bindings for Python, Julia, or Matlab, you can turn off binding compilation by setting the :code:`MPART_<language>=OFF` variable during CMake configuration.  For a default build with only the core c++ library, you can use 
+Note that if you do not wish to compile bindings for Python, Julia, or Matlab, you can turn off binding compilation by setting the :code:`MPART_<language>=OFF` variable during CMake configuration.  For a default build with only the core c++ library, you can use
 
 .. code-block:: bash
 
@@ -84,7 +92,7 @@ Or, with the additional specification of the number of Kokkos threads to use:
    ./RunTests --kokkos-threads=4
 
 
-Environment Paths 
+Environment Paths
 ------------------
 
 The final step is to set the relevant path variables to include the installation of MParT:
@@ -134,7 +142,7 @@ The final step is to set the relevant path variables to include the installation
 
 .. _compiling_julia:
 
-Julia Configuration
+Julia Source Installation
 ------------------
 
 By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia :code:`CxxWrap` package is installed.   To install :code:`CxxWrap`, run the following command in your Julia prompt:
@@ -143,30 +151,34 @@ By default, MParT will look for Julia during configuration and will attempt to b
 
     import Pkg; Pkg.add("CxxWrap")
 
-If you have Julia installed, but CMake was not able to find it during MParT configuration, you may need to manually specify :code:`JULIA_EXE` variable during configuration.  For example, adding :code:`-DJULIA_EXE=~/opt/anaconda3/envs/mpart/bin/julia` will tell CMake to use the Julia executable installed by anaconda in the :code:`mpart` conda environment.
+To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are installed, set :code:`MPART_JULIA=OFF` during the CMake configuration.
 
-To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are found, set :code:`MPART_JULIA=OFF` during the CMake configuration.
-
-Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :code:`your/MParT/install/path`, you can using MParT in Julia with a few last steps. First, add :code:`MParT.jl`, which holds the Julia interface for MParT, via :code:`]add https://github.com/MeasureTransport/MParT.jl` in the Julia REPL. Then, create a file :code:`~/.julia/artifacts/Override.toml` with the following lines
+Once MParT is installed with Julia bindings (i.e. :code:`MPART_JULIA=ON`) into :code:`/your/MParT/install/path` (an equivalent path to :code:`CMAKE_INSTALL_PREFIX`), you can use MParT in Julia with a few more steps. First, add :code:`MParT.jl`, which holds the Julia interface for MParT, via :code:`using Pkg; Pkg.add("MParT")` in the Julia REPL. Then, create a file :code:`~/.julia/artifacts/Overrides.toml` with the following lines
 
 .. code-block:: toml
 
     [bee5971c-294f-5168-9fcd-9fb3c811d495]
-    MParT = "your/MParT/install/path"
+    MParT = "/your/MParT/install/path"
 
-At this point, you should be able to open up a REPL and type :code:`using MParT` and get going with any of the provided examples!
+Make sure that this file includes a full installation path from root! At this point, you should be able to open up a REPL and type :code:`using MParT` and get going with any of the provided examples. If you want to develop MParT's bindings on the Julia-side, then use :code:`using Pkg; Pkg.develop("MParT")` instead of :code:`Pkg.add("MParT")` to install the package.
+
+.. tip::
+
+    If you installed Julia with Conda, you may not have a folder at :code:`~/.julia`. In this case, you will likely find the :code:`artifacts` folder in :code:`~/anaconda3/envs/<YOUR ENVIRONMENT>/share/julia/artifacts` (or alternatively, :code:`~/miniconda`, depending on what version of Conda you installed). If this is the case, then you will need to create a file :code:`~/anaconda3/envs/<YOUR ENVIRONMENT>/share/julia/artifacts/Overrides.toml` with the same contents as above.
 
 Compiling with CUDA Support
-------------------
+----------------------------
 
-To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides. 
+Building the Kokkos Dependency 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides.  Because of this, MParT cannot use an internal build of Kokkos and Kokkos must therefore be compiled (or otherwise installed) manually.
 
-First, we compile Kokkos with the required options.  Kokkos source code can be obtained from the `kokkos/kokkos <https://github.com/kokkos/kokkos>`_ repository on Github.
+The following cmake command can be used to compile Kokkos with the CUDA backend enabled and with all options required by MParT.  Kokkos source code can be obtained from the `kokkos/kokkos <https://github.com/kokkos/kokkos>`_ repository on Github.
 
 .. code-block:: bash
-    
+
     cd <path/to/kokkos>
-    mkdir build 
+    mkdir build
     cd build
     cmake \
         -DCMAKE_INSTALL_PREFIX=</new/kokkos/install/path> \
@@ -185,12 +197,43 @@ Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the c
 .. tip::
     If you're getting an error about C++ standards, try using a new version of your compiler; :code:`g++`, for example, does not support the flag :code:`--std=c++17` below version 8. For more details, see `this issue <https://github.com/kokkos/kokkos/issues/5157>`_ in Kokkos.
 
-Using the above documentation on building with an external install of Kokkos, we can then configure MParT once in the :code:`build` directory using the following command:
+Installing cublas and cusolver 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+MParT uses the CUBLAS and CUSOLVER components of the `NVIDIA CUDA Toolkit <https://developer.nvidia.com/cuda-toolkit>`_ for GPU-accelerated linear algebra.   
+
+NVIDIA's `Cuda installation guide <https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html>`_ provides detailed instructions on how to install CUDA.   For Debian-based x86_64 systems, we have been able to successfully install cuda, cublas, and cusparse for CUDA 11.4 using the command below.  Notice the installation of :code:`*-dev` packages, which are required to obtain the necessary header files.  Similar commands may be useful on other systems.
+
+.. code-block:: bash 
+
+    export CUDA_VERSION=11.4
+    export CUDA_COMPAT_VERSION=470.129.06-1
+    export CUDA_CUDART_VERSION=11.4.148-1
+
+    curl -sL "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub" | apt-key add - 
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /" > /etc/apt/sources.list.d/cuda.list 
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC 
+    
+    sudo apt-get -yq update 
+    sudo apt-get -yq install --no-install-recommends \
+        cuda-compat-${CUDA_VERSION/./-}=${CUDA_COMPAT_VERSION} \
+        cuda-cudart-${CUDA_VERSION/./-}=${CUDA_CUDART_VERSION} \
+        libcublas-${CUDA_VERSION/./-} \
+        libcublas-dev-${CUDA_VERSION/./-} \
+        libcusolver-${CUDA_VERSION/./-} \
+        libcusolver-dev-${CUDA_VERSION/./-}
+
+
+
+Building MParT
+^^^^^^^^^^^^^^^
+
+Using the above documentation on building with an external install of Kokkos, we can then configure MParT from the :code:`build` directory using the following command:
 
 .. code-block:: bash
 
     cd <path/to/MParT>
-    mkdir build 
+    mkdir build
     cd build
     cmake \
         -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>                 \
