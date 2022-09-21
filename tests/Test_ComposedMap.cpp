@@ -3,6 +3,8 @@
 #include "MParT/ComposedMap.h"
 #include "MParT/MapFactory.h"
 
+#include "MParT/Utilities/LinearAlgebra.h"
+
 using namespace mpart;
 using namespace Catch;
 using MemorySpace = Kokkos::HostSpace;
@@ -36,7 +38,7 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
     Eigen::RowVectorXd coeffs(composedMap->numCoeffs);
     for(unsigned int i=0; i<composedMap->numCoeffs; ++i)
         coeffs(i) = 0.1*(i+1);
-        
+    
     SECTION("Coefficients"){
         
         // Set the coefficients of the triangular map
@@ -65,46 +67,48 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
 
     composedMap->SetCoeffs(coeffs);
     auto out = composedMap->Evaluate(in);
-    // Kokkos::View<double*,Kokkos::HostSpace> coeffs("Coefficients", composedMap->numCoeffs);
-    // // intermediate output
-    // Kokkos::View<double**, MemorySpace> intOutput("intermediate output", output.extent(0), output.extent(1));
     
-    // // Copy points to output, then output = map(output) looped over each component
-    // Kokkos::deep_copy(output, pts);
-    // for(unsigned int i=0; i<comps_.size(); ++i){
-        
-    //     comps_.at(i)->EvaluateImpl(output, intOutput);
-    //     Kokkos::deep_copy(output,intOutput);
-    // }
+    SECTION("Evaluate"){
+        Kokkos::View<double**, Kokkos::HostSpace> trueOut("True output", dim, numSamps);
+        Kokkos::deep_copy(trueOut, in);
+        for(auto& comp : maps)
+            trueOut = comp->Evaluate(trueOut);
 
+        for(unsigned int i=0; i<in.extent(0); ++i){
+            for(unsigned int j=0; j<numSamps; ++j)
+                CHECK( out(i,j) == Approx(trueOut(i,j)).epsilon(1e-7).margin(1e-7));
+        }
+    }
 
-    // SECTION("Inverse"){
+    SECTION("Inverse"){
 
-    //     auto inv = triMap->Inverse(in,out);
+        auto inv = composedMap->Inverse(in,out);
 
-    //     for(unsigned int i=0; i<numBlocks; ++i){
-    //         for(unsigned int j=0; j<numSamps; ++j)
-    //             CHECK( inv(i,j) == Approx(in(i+extraInputs,j)).epsilon(1e-6));
-    //     }
-    // }
+        for(unsigned int i=0; i<in.extent(0); ++i){
+            for(unsigned int j=0; j<numSamps; ++j)
+                CHECK( inv(i,j) == Approx(in(i,j)).epsilon(1e-5).margin(1e-5));
+        }
+    }
 
-    // SECTION("LogDeterminant"){
-    //     auto logDet = triMap->LogDeterminant(in);
+    SECTION("LogDeterminant"){
+        auto logDet = composedMap->LogDeterminant(in);
 
-    //     REQUIRE(logDet.extent(0)==numSamps);
-    //     Kokkos::View<double*, Kokkos::HostSpace> truth("True Log Det", numSamps);
+        REQUIRE(logDet.extent(0)==numSamps);
+        Kokkos::View<double*, Kokkos::HostSpace> truth("True Log Det", numSamps);
+        Kokkos::View<double*, Kokkos::HostSpace> partialDet("Partial log det", numSamps);
+        Kokkos::View<double**, Kokkos::HostSpace> currPts("intermediate points", in.extent(0), in.extent(1));
+        Kokkos::deep_copy(currPts, in);
 
-    //     for(unsigned int i=0; i<numBlocks; ++i){
-    //         auto blockLogDet = blocks.at(i)->LogDeterminant(Kokkos::subview(in, std::make_pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
+        for(auto& map : maps){
+            partialDet = map->LogDeterminant(currPts);
+            currPts = map->Evaluate(currPts);
+            truth += partialDet;
+        }
 
-    //         for(unsigned int j=0; j<numSamps; ++j)
-    //             truth(j) += blockLogDet(j);
-    //     }
+        for(unsigned int j=0; j<numSamps; ++j)
+            CHECK(logDet(j) == Approx(truth(j)).epsilon(1e-10));
 
-    //     for(unsigned int j=0; j<numSamps; ++j)
-    //         CHECK(logDet(j) == Approx(truth(j)).epsilon(1e-10));
-
-    // }
+    }
 
     SECTION("CoeffGrad"){
 
@@ -213,7 +217,7 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
     }
 
 
-        SECTION("LogDeterminantInputGrad"){
+    SECTION("LogDeterminantInputGrad"){
 
         Kokkos::View<double**,Kokkos::HostSpace> detGrad = composedMap->LogDeterminantInputGrad(in);
         REQUIRE(detGrad.extent(0)==composedMap->outputDim);
@@ -224,7 +228,7 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
         Kokkos::View<double*,Kokkos::HostSpace> logDet2;
 
         // Compare with finite differences
-        double fdstep = 1e-5;
+        double fdstep = 1e-6;
         for(unsigned int i=0; i<composedMap->inputDim; ++i){
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
@@ -234,7 +238,6 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
                 CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-3)); 
-                
             }
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
