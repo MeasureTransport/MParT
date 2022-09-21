@@ -269,48 +269,30 @@ namespace mpart{
         }
 
     }
-    // Kokkos::View<typename std::remove_const<ScalarType>::type**, Kokkos::LayoutLeft, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, Kokkos::LayoutLeft, OtherTraits...>const& inview){
 
-    //     Kokkos::View<typename std::remove_const<ScalarType>::type**, Kokkos::LayoutLeft, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
-    //     Kokkos::deep_copy(outview, inview);
-    //     return outview;
-    // }
+    template<typename ScalarType>
+    inline Kokkos::View<ScalarType*,DeviceSpace> ToKokkos<ScalarType,DeviceSpace>(ScalarType* ptr, unsigned int dim) {
+        Kokkos::View<ScalarType*,DeviceSpace> view = ToKokkos(ptr, dim);
+        return ToDevice(view);
+    }
 
-    // template<typename DeviceMemoryType, typename ScalarType, class... OtherTraits>
-    // Kokkos::View<typename std::remove_const<ScalarType>::type**, Kokkos::LayoutRight, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, Kokkos::LayoutRight, OtherTraits...>const& inview){
+    template<typename ScalarType>
+    inline Kokkos::View<const ScalarType*,DeviceSpace> ToConstKokkos<ScalarType,DeviceSpace>(ScalarType* ptr, unsigned int dim) {
+        Kokkos::View<const ScalarType*,DeviceSpace> view = ToConstKokkos(ptr, dim);
+        return ToDevice(view);
+    }
 
-    //     Kokkos::View<typename std::remove_const<ScalarType>::type**, Kokkos::LayoutRight, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
-    //     Kokkos::deep_copy(outview, inview);
-    //     return outview;
-    // }
+    template<typename ScalarType>
+    inline Kokkos::View<ScalarType**,DeviceSpace> ToKokkos<ScalarType,DeviceSpace>(ScalarType* ptr, unsigned int rows, unsigned int cols) {
+        Kokkos::View<ScalarType*,DeviceSpace> view = ToKokkos(ptr, rows, cols);
+        return ToDevice(view);
+    }
 
-    // template<typename DeviceMemoryType, typename ScalarType, class... OtherTraits>
-    // Kokkos::View<ScalarType**, Kokkos::LayoutStride, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, Kokkos::LayoutStride, OtherTraits...>const& inview){
-
-    //     size_t stride0 = inview.stride_0();
-    //     size_t stride1 = inview.stride_1();
-
-    //     if(stride0==1){
-    //         return ToDevice<DeviceMemoryType, ScalarType, OtherTraits...>(Kokkos::View<ScalarType**, Kokkos::LayoutLeft, OtherTraits...>(inview));
-    //     }else if(stride1==1){
-    //         return ToDevice<DeviceMemoryType, ScalarType, OtherTraits...>(Kokkos::View<ScalarType**, Kokkos::LayoutRight, OtherTraits...>(inview));
-    //     }else{
-    //         std::stringstream msg;
-    //         msg << "Cannot copy generally strided matrix to device.  MParT currently only supports copies of view with continguous memory layouts.";
-    //         throw std::runtime_error(msg.str());
-    //     }
-    // }
-
-    // template<typename DeviceMemoryType,typename ScalarType>
-    // Kokkos::View<ScalarType*, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType*, DeviceMemoryType> const& inview){
-    //     return inview;
-    // }
-
-    // template<typename DeviceMemoryType,typename ScalarType>
-    // Kokkos::View<ScalarType**, DeviceMemoryType> ToDevice(Kokkos::View<ScalarType**, DeviceMemoryType> const& inview){
-    //     return inview;
-    // }
-
+    template<typename ScalarType>
+    inline Kokkos::View<const ScalarType**,DeviceSpace> ToConstKokkos<ScalarType,DeviceSpace>(ScalarType* ptr, unsigned int rows, unsigned int cols) {
+        Kokkos::View<const ScalarType*,DeviceSpace> view = ToConstKokkos(ptr, rows, cols);
+        return ToDevice(view);
+    }
 
 #endif
 
