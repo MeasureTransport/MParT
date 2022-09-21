@@ -279,6 +279,12 @@ template<typename MemorySpace>
 void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                              StridedMatrix<double, MemorySpace>              output)
 {
+    // Initialize the output to zero 
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> zeroPolicy({0, 0}, {output.extent(0), output.extent(1)});
+    Kokkos::parallel_for(zeroPolicy, KOKKOS_LAMBDA(const int& i, const int& j) {
+        output(i,j) = 0.0;
+    });
+
     // Evaluate the output for each component
     StridedMatrix<const double, MemorySpace> subPts;
     StridedMatrix<double, MemorySpace> subOut;
