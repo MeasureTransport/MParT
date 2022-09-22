@@ -41,9 +41,7 @@ void IdentityMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpa
                                              StridedMatrix<double, MemorySpace>              output)
 {
 
-    StridedMatrix<const double, MemorySpace> tailR = Kokkos::subview(
-        r, std::make_pair(int(this->inputDim - this->outputDim), int(this->inputDim)), Kokkos::ALL());
-    Kokkos::deep_copy(output, tailR);
+    Kokkos::deep_copy(output, r);
 
 }
 
@@ -53,6 +51,24 @@ void IdentityMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
                                                StridedMatrix<const double, MemorySpace> const& sens,
                                                StridedMatrix<double, MemorySpace>              output)
 {
+    assert(false);
+}
+
+
+void IdentityMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                            StridedMatrix<const double, MemorySpace> const& sens,
+                            StridedMatrix<double, MemorySpace>              output) override
+{
+
+
+    // zero until inputDim-outDim
+    for(unsigned int j=0; j<int(this->inputDim - this->outputDim); ++j)
+        output(j) = 0.0;
+
+    StridedMatrix<const double, MemorySpace> tailOut = Kokkos::subview(
+        output, std::make_pair(int(this->inputDim - this->outputDim), int(this->inputDim)), Kokkos::ALL());
+
+    Kokkos::deep_copy(tailOutput, sens);
 
 }
 
@@ -60,7 +76,15 @@ template<typename MemorySpace>
 void IdentityMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                                              StridedMatrix<double, MemorySpace>              output)
 {
+    assert(false);
+}
 
+void IdentityMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                            StridedMatrix<double, MemorySpace>              output) override
+{   
+    // Add to logdet of full map
+    for(unsigned int j=0; j<output.size(); ++j)
+        output(j) = 0.0;
 }
 
 // Explicit template instantiation
