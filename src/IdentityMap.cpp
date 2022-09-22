@@ -1,5 +1,5 @@
 #include "MParT/IdentityMap.h"
-
+#include "MParT/Utilities/KokkosSpaceMappings.h"
 #include <numeric>
 
 using namespace mpart;
@@ -19,10 +19,10 @@ void IdentityMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, Me
                                                     StridedVector<double, MemorySpace>              output)
 {
 
-    // Add to logdet of full map
-    for(unsigned int j=0; j<output.size(); ++j)
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0,output.size());
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j){
         output(j) = 0.0;
-
+    });
 
 }
 
@@ -63,10 +63,11 @@ void IdentityMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySp
 {
 
 
-    //zero until inputDim-outDim
-    for(unsigned int i=0; i<int(this->inputDim - this->outputDim); ++i)
-        for(unsigned int j=0; j<int(this->inputDim); ++j)
-            output(i,j) = 0.0;
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> zeroPolicy({0, 0}, {int(this->inputDim - this->outputDim), output.extent_int(1)});
+    Kokkos::parallel_for(zeroPolicy, KOKKOS_LAMBDA(const int& i, const int& j) {
+        output(i,j) = 0.0;
+    });
+
 
     StridedMatrix<double, MemorySpace> tailOut = Kokkos::subview(
         output, std::make_pair(int(this->inputDim - this->outputDim), int(this->inputDim)), Kokkos::ALL());
@@ -86,10 +87,11 @@ template<typename MemorySpace>
 void IdentityMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                             StridedMatrix<double, MemorySpace>              output)
 {   
-    // Add to logdet of full map
-    for(unsigned int i=0; i<output.extent(0); ++i)
-        for(unsigned int j=0; j<output.extent(1); ++j)
-            output(i,j) = 0.0;
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> zeroPolicy({0, 0}, {output.extent(0), output.extent(1)});
+    Kokkos::parallel_for(zeroPolicy, KOKKOS_LAMBDA(const int& i, const int& j) {
+        output(i,j) = 0.0;
+    });
+
 }
 
 // Explicit template instantiation
