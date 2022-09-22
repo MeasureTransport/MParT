@@ -220,7 +220,7 @@ TEST_CASE( "Testing 5 layer composed map", "[ComposedMap_Constructor]" ) {
     SECTION("LogDeterminantInputGrad"){
 
         Kokkos::View<double**,Kokkos::HostSpace> detGrad = composedMap->LogDeterminantInputGrad(in);
-        REQUIRE(detGrad.extent(0)==composedMap->outputDim);
+        REQUIRE(detGrad.extent(0)==composedMap->inputDim);
         REQUIRE(detGrad.extent(1)==numSamps);
         
         

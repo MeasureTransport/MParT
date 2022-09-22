@@ -44,19 +44,19 @@ public:
 
     void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                        StridedMatrix<const double, MemorySpace> const& sens,
-                       StridedMatrix<double, MemorySpace>              output) override;
+                       StridedMatrix<double, MemorySpace>              output);
     
     
     void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                        StridedMatrix<const double, MemorySpace> const& sens,
-                       StridedMatrix<double, MemorySpace>              output) override;
+                       StridedMatrix<double, MemorySpace>              output);
 
 
     void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                     StridedMatrix<double, MemorySpace>              output) override;
+                                     StridedMatrix<double, MemorySpace>              output);
 
     void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                     StridedMatrix<double, MemorySpace>              output) override;
+                                     StridedMatrix<double, MemorySpace>              output);
 
 }; // class IdentityMap
 
