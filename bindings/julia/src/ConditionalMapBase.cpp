@@ -1,13 +1,14 @@
 #include "MParT/ConditionalMapBase.h"
 
 #include "CommonJuliaUtilities.h"
+#include "JlArrayConversions.h"
 
 namespace jlcxx {
     // Tell CxxWrap.jl the supertype structure for ConditionalMapBase
     template<> struct SuperType<mpart::ConditionalMapBase<Kokkos::HostSpace>> {typedef mpart::ParameterizedFunctionBase<Kokkos::HostSpace> type;};
 }
 
-void mpart::binding::ConditionalMapBaseWrapper(jlcxx::module &m) {
+void mpart::binding::ConditionalMapBaseWrapper(jlcxx::Module &mod) {
     // ConditionalMapBase
     mod.add_type<ConditionalMapBase<Kokkos::HostSpace>>("ConditionalMapBase", jlcxx::julia_base_type<ParameterizedFunctionBase<Kokkos::HostSpace>>())
         .method("GetBaseFunction", &ConditionalMapBase<Kokkos::HostSpace>::GetBaseFunction)
@@ -32,4 +33,5 @@ void mpart::binding::ConditionalMapBaseWrapper(jlcxx::module &m) {
             return output;
         })
         ;
+    // jlcxx::stl::apply_stl<ConditionalMapBase<Kokkos::HostSpace>>(mod);
 }
