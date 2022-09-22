@@ -166,7 +166,14 @@ void AffineMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpa
 {
     return;
 }
-    
+
+template<typename MemorySpace> 
+void AffineMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                                         StridedMatrix<double, MemorySpace>              output)
+{
+    return;
+}
+
 template<typename MemorySpace>
 void AffineMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                                           StridedMatrix<const double, MemorySpace> const& sens,

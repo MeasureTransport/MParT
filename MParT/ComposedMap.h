@@ -100,16 +100,17 @@ public:
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override;
 
+    /** Computes the input to layer k. 
+        @param k The layer we're considering
+        @param pts The input to the entire composed map
+        @param intPts Workspace the same size as pts.  Upon exit, this view will contain the input to layer k-1 (if k>1)
+        @param output Space for the output.  Should be same size as pts.  Upon exit, will contain the input to layer k.
+    */
     void EvaluateUntilK(int k, 
                         StridedMatrix<const double, MemorySpace> const& pts,
-                        StridedMatrix<double, MemorySpace> intPts, 
-                        StridedMatrix<double, MemorySpace> output);
+                        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>& intPts, 
+                        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>& output);
 
-
-    void LogDeterminantCoeffGradImplUpdate( int compInd,
-                                            int termInd, 
-                                            StridedMatrix<const double, MemorySpace> const& pts, 
-                                            StridedMatrix<double, MemorySpace> output);
 
     virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                              StridedMatrix<double, MemorySpace>              output) override;
