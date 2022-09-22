@@ -55,7 +55,7 @@ public:
     virtual void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
     #endif 
     
-    virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}
+    virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return maps_.at(i);}
 
     /** @brief Computes the log determinant of the Jacobian matrix of this map.
 
@@ -125,7 +125,7 @@ public:
                             StridedMatrix<double, MemorySpace>              output) override;
 private:
 
-    std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;
+    std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> maps_;
 
 
 }; // class ComposedMap
