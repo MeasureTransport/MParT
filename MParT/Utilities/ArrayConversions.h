@@ -90,16 +90,16 @@ namespace mpart{
         @tparam LayoutType A kokkos layout type dictating whether the memory in ptr is organized in column major format or row major format.   If LayoutType is Kokkos::LayoutRight, the data is treated in row major form.  If LayoutType is Kokkos::LayoutLeft, the data is treated in column major form.  Defaults to Kokkos::LayoutLeft.
         @tparam ScalarType The scalar type, typically double, int, or unsigned int.
     */
-    template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft>
-    inline Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace> ToKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
+    template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft, typename MemorySpace=Kokkos::HostSpace>
+    inline Kokkos::View<ScalarType**, LayoutType, MemorySpace> ToKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
     {
-        return Kokkos::View<ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
+        return Kokkos::View<ScalarType**, LayoutType, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 
-    template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft>
-    inline Kokkos::View<const ScalarType**, LayoutType, Kokkos::HostSpace> ToConstKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
+    template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft, typename MemorySpace=Kokkos::HostSpace>
+    inline Kokkos::View<const ScalarType**, LayoutType, MemorySpace> ToConstKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
     {
-        return Kokkos::View<const ScalarType**, LayoutType, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
+        return Kokkos::View<const ScalarType**, LayoutType, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 
 
@@ -177,7 +177,7 @@ namespace mpart{
     @return A kokkos array in host memory.  Note that the layout (row-major or col-major) might be different than the default on the Host.  The layout will match the device's default layout.
     */
     template<typename DeviceMemoryType, typename ScalarType>
-    typename Kokkos::View<ScalarType,DeviceMemoryType>::HostMirror ToHost(Kokkos::View<ScalarType,DeviceMemoryType> const& inview){
+    typename Kokkos::View<ScalarType,Kokkos::HostSpace>::HostMirror ToHost(Kokkos::View<ScalarType,DeviceMemoryType> const& inview){
         typename Kokkos::View<ScalarType,DeviceMemoryType>::HostMirror outview = Kokkos::create_mirror_view(inview);
         Kokkos::deep_copy (outview, inview);
         return outview;
@@ -282,15 +282,15 @@ namespace mpart{
         return ToDevice(view);
     }
 
-    template<typename ScalarType>
-    inline Kokkos::View<ScalarType**,DeviceSpace> ToKokkos<ScalarType,DeviceSpace>(ScalarType* ptr, unsigned int rows, unsigned int cols) {
-        Kokkos::View<ScalarType*,DeviceSpace> view = ToKokkos(ptr, rows, cols);
+    template<typename ScalarType, typename LayoutType = Kokkos::LayoutLeft>
+    inline StridedMatrix<ScalarType, DeviceSpace> ToKokkos<ScalarType,LayoutType,DeviceSpace>(ScalarType* ptr, unsigned int rows, unsigned int cols) {
+        Kokkos::View<ScalarType*,LayoutType,Kokkos::HostSpace> view = ToKokkos<ScalarType,LayoutType,Kokkos::HostSpace>(ptr, rows, cols);
         return ToDevice(view);
     }
 
-    template<typename ScalarType>
-    inline Kokkos::View<const ScalarType**,DeviceSpace> ToConstKokkos<ScalarType,DeviceSpace>(ScalarType* ptr, unsigned int rows, unsigned int cols) {
-        Kokkos::View<const ScalarType*,DeviceSpace> view = ToConstKokkos(ptr, rows, cols);
+    template<typename ScalarType, typename LayoutType = Kokkos::LayoutLeft>
+    inline StridedMatrix<const ScalarType, DeviceSpace> ToConstKokkos<ScalarType,LayoutType,DeviceSpace>(ScalarType* ptr, unsigned int rows, unsigned int cols) {
+        Kokkos::View<const ScalarType**,LayoutType,Kokkos::HostSpace> view = ToConstKokkos<ScalarType,LayoutType,Kokkos::HostSpace>(ptr, rows, cols);
         return ToDevice(view);
     }
 

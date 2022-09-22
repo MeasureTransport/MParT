@@ -68,7 +68,7 @@ TEST_CASE( "Testing Pointer to Kokkos Conversions in 2D", "[ArrayConversions2D]"
             data[i] = i;
 
 
-        auto rowView = ToKokkos<double, Kokkos::LayoutRight>(&data[0], rows, cols);
+        auto rowView = ToKokkos<double, Kokkos::LayoutRight, Kokkos::HostSpace>(&data[0], rows, cols);
 
         REQUIRE(rowView.extent(0) == rows);
         REQUIRE(rowView.extent(1) == cols);
@@ -83,10 +83,10 @@ TEST_CASE( "Testing Pointer to Kokkos Conversions in 2D", "[ArrayConversions2D]"
             }
         }
 
-        auto colView = ToKokkos<double, Kokkos::LayoutLeft>(&data[0], rows, cols);
+        auto colView = ToKokkos<double, Kokkos::LayoutLeft, Kokkos::HostSpace>(&data[0], rows, cols);
 
-        REQUIRE(rowView.extent(0) == rows);
-        REQUIRE(rowView.extent(1) == cols);
+        REQUIRE(colView.extent(0) == rows);
+        REQUIRE(colView.extent(1) == cols);
 
         for(unsigned int i=0; i<rows; ++i){
             for(unsigned int j=0; j<cols; ++j){
@@ -103,7 +103,7 @@ TEST_CASE( "Testing Pointer to Kokkos Conversions in 2D", "[ArrayConversions2D]"
 }
 
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
 
 TEST_CASE( "Testing functions that copy views between host and device", "[ArrayConversionsHostDevice]" ) {
 
@@ -179,9 +179,6 @@ TEST_CASE( "Testing Pointer to Kokkos Conversions in 1D, Device", "[ArrayConvers
 
             // Make sure the values are the same
             CHECK( data[i] == view(i) );
-
-            // Check sure the memory address is the same  (i.e., we're not copying)
-            CHECK( &data[i] == &view(i) );
         }
     }
 
@@ -200,9 +197,6 @@ TEST_CASE( "Testing Pointer to Kokkos Conversions in 1D, Device", "[ArrayConvers
 
             // Make sure the values are the same
             CHECK( data[i] == view(i) );
-
-            // Check sure the memory address is the same  (i.e., we're not copying)
-            CHECK( &data[i] == &view(i) );
         }
     }
 
@@ -222,7 +216,7 @@ TEST_CASE( "Testing Pointer to Kokkos Conversions in 2D, Device", "[ArrayConvers
             data[i] = i;
 
 
-        StridedMatrix<double, DeviceSpace> rowView_d = ToKokkos<double, DeviceSpace>(&data[0], rows, cols);
+        StridedMatrix<double, DeviceSpace> rowView_d = ToKokkos<double, Kokkos::LayoutRight, DeviceSpace>(&data[0], rows, cols);
         auto rowView = ToHost(rowView_d);
 
         REQUIRE(rowView.extent(0) == rows);
@@ -232,9 +226,19 @@ TEST_CASE( "Testing Pointer to Kokkos Conversions in 2D, Device", "[ArrayConvers
             for(unsigned int j=0; j<cols; ++j){
                 // Make sure the values are the same
                 CHECK( data[i*cols+j] == rowView(i,j) );
+            }
+        }
 
-                // Check sure the memory address is the same  (i.e., we're not copying)
-                CHECK( &data[i*cols+j] == &rowView(i,j) );
+        StridedMatrix<double, DeviceSpace> colView_d = ToKokkos<double, Kokkos::LayoutLeft, DeviceSpace>(&data[0], rows, cols);
+        auto colView = ToHost(colView_d);
+
+        REQUIRE(colView.extent(0) == rows);
+        REQUIRE(colView.extent(1) == cols);
+
+        for(unsigned int i=0; i<rows; ++i){
+            for(unsigned int j=0; j<cols; ++j){
+                // Make sure the values are the same
+                CHECK( data[i +j*rows] == colView(i,j) );
             }
         }
     }
