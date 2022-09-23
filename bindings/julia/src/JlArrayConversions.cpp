@@ -6,7 +6,7 @@ namespace binding {
  * @brief Wrap a Julia vector in a Kokkos View
  *
  * @param vec Julia vector to take view of
- * @return mpart::StridedVector<double, Kokkos::HostSpace> Same memory, but now a Kokkos View
+ * @return mpart::StridedVector<double, MemorySpace> Same memory if on host, but now a Kokkos View
  */
 template<typename MemorySpace>
 StridedVector<double, MemorySpace> JuliaToKokkos(jlcxx::ArrayRef<double,1> &vec)
@@ -20,9 +20,10 @@ StridedVector<double, MemorySpace> JuliaToKokkos(jlcxx::ArrayRef<double,1> &vec)
  * @brief Wrap a Julia matrix in a Kokkos View
  *
  * @param mat Julia matrix to take view of
- * @return mpart::StridedMatrix<double, Kokkos::HostSpace> Same memory, but now a Kokkos View
+ * @return mpart::StridedMatrix<double, MemorySpace> Same memory if on host, but now a Kokkos View
  */
-StridedMatrix<double, Kokkos::HostSpace> JuliaToKokkos(jlcxx::ArrayRef<double,2> &mat)
+template<typename MemorySpace>
+StridedMatrix<double, MemorySpace> JuliaToKokkos(jlcxx::ArrayRef<double,2> &mat)
 {
     double* mptr = mat.data();
     unsigned int rows = size(mat,0);

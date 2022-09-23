@@ -22,7 +22,9 @@ void mpart::binding::ConditionalMapBaseWrapper(jlcxx::Module &mod) {
         .method("LogDeterminant", [](ConditionalMapBase<MemorySpace> &map, jlcxx::ArrayRef<double,2> pts){
             unsigned int numPts = size(pts,1);
             jlcxx::ArrayRef<double> output = jlMalloc<double>(numPts);
-            map.LogDeterminantImpl(JuliaToKokkos(pts), JuliaToKokkos(output));
+            StridedMatrix<double, MemorySpace> output_k = JuliaToKokkos<MemorySpace>(output)
+            map.LogDeterminantImpl(JuliaToKokkos(pts), output_k);
+
             return output;
         })
         .method("LogDeterminantCoeffGrad", [](ConditionalMapBase<MemorySpace>& map, jlcxx::ArrayRef<double,2> pts){
