@@ -111,29 +111,29 @@ Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memo
 
 
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space>& operator+=(Kokkos::View<ScalarType*, Traits1...> x, 
-                                                                                                    Kokkos::View<const ScalarType*, Traits2...> y)
+Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space>& operator+=(Kokkos::View<ScalarType*, Traits1...>& x, 
+                                                                                                    Kokkos::View<const ScalarType*, Traits2...> const& y)
 {
     mpart::AddInPlace(x,y);
     return x;
 }
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memory_space>& operator+=(Kokkos::View<ScalarType**, Traits1...> x, 
-                                                                                                      Kokkos::View<const ScalarType**, Traits2...> y)
+Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memory_space>& operator+=(Kokkos::View<ScalarType**, Traits1...>& x, 
+                                                                                                      Kokkos::View<const ScalarType**, Traits2...> const& y)
 {
     mpart::AddInPlace(x,y);
     return x;
 }
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space>& operator+=(Kokkos::View<ScalarType*, Traits1...> x, 
-                                                                                                    Kokkos::View<ScalarType*, Traits2...> y)
+Kokkos::View<ScalarType*, Traits1...>& operator+=(Kokkos::View<ScalarType*, Traits1...>& x, 
+                                                  Kokkos::View<ScalarType*, Traits2...> const& y)
 {
     mpart::AddInPlace(x,Kokkos::View<const ScalarType*, Traits2...>(y));
     return x;
 }
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memory_space>& operator+=(Kokkos::View<ScalarType**, Traits1...> x, 
-                                                                                                      Kokkos::View<ScalarType**, Traits2...> y)
+Kokkos::View<ScalarType**, Traits1...>& operator+=(Kokkos::View<ScalarType**, Traits1...>& x, 
+                                                   Kokkos::View<ScalarType**, Traits2...> const& y)
 {
     mpart::AddInPlace(x,Kokkos::View<const ScalarType**, Traits2...>(y));
     return x;

@@ -205,6 +205,19 @@ void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kok
     Kokkos::deep_copy(this->savedCoeffs, coeffs);
 }
 
+
+
+template<typename MemorySpace>
+void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs){
+
+    if(coeffs.size() != numCoeffs){
+        std::stringstream msg;
+        msg << "Error in ParameterizedFunctionBase<MemorySpace>::WrapCoeffs.  Expected coefficient vector with size " << numCoeffs << ", but new coefficients have size " << coeffs.size() << ".";
+        throw std::invalid_argument(msg.str());
+    }
+    this->savedCoeffs = coeffs;
+}
+
 #if defined(MPART_ENABLE_GPU)
 
 template<typename MemorySpace>
@@ -229,12 +242,31 @@ void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<double*, mpa
     Kokkos::deep_copy(this->savedCoeffs, coeffs);
 }
 
+
+template<typename MemorySpace>
+void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs)
+{
+
+    if(coeffs.size() != numCoeffs){
+        std::stringstream msg;
+        msg << "Error in ParameterizedFunctionBase<MemorySpace>::WrapCoeffs.  Expected coefficient vector with size " << numCoeffs << ", but new coefficients have size " << coeffs.size() << ".";
+        throw std::invalid_argument(msg.str());
+    }
+    
+    this->savedCoeffs = coeffs;
+}
 #endif
 
 template<typename MemorySpace>
 void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs)
 {
      SetCoeffs(Kokkos::View<double*,MemorySpace>(VecToKokkos<double,MemorySpace>(coeffs)));
+}
+
+template<typename MemorySpace>
+void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs)
+{
+     WrapCoeffs(Kokkos::View<double*,MemorySpace>(VecToKokkos<double,MemorySpace>(coeffs)));
 }
 
 template<>

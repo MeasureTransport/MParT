@@ -37,19 +37,27 @@ namespace mpart {
         virtual Kokkos::View<double*, MemorySpace>& Coeffs(){return this->savedCoeffs;};
 
         /** @brief Set the internally stored view of coefficients.
-            @detail Performs a shallow copy of the input coefficients to the internally stored coefficients.
-            If values in the view passed to this function are changed, the values will also change in the
-            internally stored view.
-            @param coeffs A view to save internally.
+            @detail Performs a deep copy of the input coefficients to the internally stored coefficients.
+            @param coeffs A view containing the coefficients to copy.
         */
         virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs);
 
+        /** @brief Wrap the internal coefficient view around another view.
+            @detail Performs a shallow copy of the input coefficients to the internally stored coefficients.
+            If values in the view passed to this function are changed, the values will also change in the
+            internally stored view.
+            @param coeffs A view containing the coefficients we want to wrap.
+        */
+        virtual void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs);
+
         #if defined(MPART_ENABLE_GPU)
         virtual void SetCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs);
+        virtual void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs);
         #endif 
 
         /** SetCoeffs function with conversion from Eigen to Kokkos vector types.*/
         virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs);
+        virtual void WrapCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs);
 
         /** Returns an eigen map wrapping around the coefficient vector, which is stored in a Kokkos::View.  Updating the
             components of this map should also update the view.

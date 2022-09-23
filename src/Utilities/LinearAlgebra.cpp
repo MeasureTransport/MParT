@@ -256,16 +256,6 @@ double PartialPivLU<mpart::DeviceSpace>::determinant() const
 
 
 template struct mpart::PartialPivLU<mpart::DeviceSpace>;
-template void mpart::dgemm<mpart::DeviceSpace>(double                                     alpha, 
-                                               TransposeObject<mpart::DeviceSpace>        A,
-                                               TransposeObject<mpart::DeviceSpace>        B,
-                                               double                                     beta,
-                                               StridedMatrix<double, mpart::DeviceSpace>  C);
 #endif
 
 template struct mpart::PartialPivLU<Kokkos::HostSpace>;
-template void mpart::dgemm<Kokkos::HostSpace>(double                                    alpha, 
-                                              TransposeObject<Kokkos::HostSpace>        A,
-                                              TransposeObject<Kokkos::HostSpace>        B,
-                                              double                                    beta,
-                                              StridedMatrix<double, Kokkos::HostSpace>  C);

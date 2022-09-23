@@ -13,6 +13,7 @@ target_sources(mpart
     ConditionalMapBase.cpp
     TriangularMap.cpp
     MapFactory.cpp
+
     AffineMap.cpp
     AffineFunction.cpp
     
@@ -33,4 +34,6 @@ target_sources(mpart
     MapFactoryImpl15.cpp
 
     Initialization.cpp
+    ComposedMap.cpp
+    IdentityMap.cpp
 )

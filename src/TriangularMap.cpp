@@ -44,8 +44,25 @@ void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpa
     for(unsigned int i=0; i<comps_.size(); ++i){
         assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
 
-        comps_.at(i)->savedCoeffs = Kokkos::subview(this->savedCoeffs,
-            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
+        comps_.at(i)->WrapCoeffs( Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
+        cumNumCoeffs += comps_.at(i)->numCoeffs;
+    }
+}
+
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+{
+    // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
+    ConditionalMapBase<MemorySpace>::WrapCoeffs(coeffs);
+
+    // Now create subviews for each of the components
+    unsigned int cumNumCoeffs = 0;
+    for(unsigned int i=0; i<comps_.size(); ++i){
+        assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
+
+        comps_.at(i)->WrapCoeffs( Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
         cumNumCoeffs += comps_.at(i)->numCoeffs;
     }
 }
@@ -62,8 +79,25 @@ void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::Default
     for(unsigned int i=0; i<comps_.size(); ++i){
         assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
 
-        comps_.at(i)->savedCoeffs = Kokkos::subview(this->savedCoeffs,
-            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
+        comps_.at(i)->WrapCoeffs( Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
+        cumNumCoeffs += comps_.at(i)->numCoeffs;
+    }
+}
+
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs)
+{
+    // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
+    ConditionalMapBase<MemorySpace>::WrapCoeffs(coeffs);
+
+    // Now create subviews for each of the components
+    unsigned int cumNumCoeffs = 0;
+    for(unsigned int i=0; i<comps_.size(); ++i){
+        assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
+
+        comps_.at(i)->WrapCoeffs( Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
         cumNumCoeffs += comps_.at(i)->numCoeffs;
     }
 }
@@ -238,6 +272,40 @@ void TriangularMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const
         comps_.at(i)->LogDeterminantCoeffGradImpl(subPts, subOut);
 
         startParamDim += comps_.at(i)->numCoeffs;
+    }
+}
+
+template<typename MemorySpace>
+void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                                             StridedMatrix<double, MemorySpace>              output)
+{
+    // Initialize the output to zero 
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> zeroPolicy({0, 0}, {output.extent(0), output.extent(1)});
+    Kokkos::parallel_for(zeroPolicy, KOKKOS_LAMBDA(const int& i, const int& j) {
+        output(i,j) = 0.0;
+    });
+
+    // Evaluate the output for each component
+    StridedMatrix<const double, MemorySpace> subPts;
+    StridedMatrix<double, MemorySpace> subOut;
+
+    int numPts = pts.extent(1);    
+    Kokkos::View<double**,MemorySpace> compGrad("Component Gradient", this->inputDim, numPts);
+    Kokkos::View<double**,MemorySpace> subGrad;
+    
+    for(unsigned int i=0; i<comps_.size(); ++i){
+        int compDim = comps_.at(i)->inputDim;
+        subPts = Kokkos::subview(pts, std::make_pair(0,compDim), Kokkos::ALL());
+        subGrad = Kokkos::subview(compGrad, std::make_pair(0,compDim), Kokkos::ALL());
+
+        comps_.at(i)->LogDeterminantInputGradImpl(subPts, subGrad);
+
+        // Now accumulate the input gradient
+        Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{compDim, numPts}});
+
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& i, const int& j) {
+            output(i,j) += subGrad(i,j);
+        });
     }
 }
 
