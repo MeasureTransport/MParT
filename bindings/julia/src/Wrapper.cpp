@@ -23,5 +23,7 @@ JLCXX_MODULE MParT_julia_module(jlcxx::Module& mod)
     binding::ParameterizedFunctionBaseWrapper(mod);
     binding::ConditionalMapBaseWrapper(mod);
     binding::TriangularMapWrapper(mod);
+    binding::AffineMapWrapper(mod);
+    binding::AffineFunctionWrapper(mod);
     binding::MapFactoryWrapper(mod);
 }
