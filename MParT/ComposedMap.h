@@ -27,6 +27,10 @@ for \f$x_{N_i-M_i:N_i}\f$ given a vector \f$r\in\mathbb{R}^{M_i}\f$ and previous
 This block triangular form is analogous to a block triangular matrix where each \f$M_i\timesM_i\f$ diagonal block
 is positive definite.
 
+Checkpointing can be used for deep maps to reduce the amount of memory that is required for gradient computations.
+The checkpointing logic was adapted from the :code:`revolve` algorithm of `[Griewank and Walther, 2000] <https://dl.acm.org/doi/10.1145/347837.347846>`_,
+which is an optimal binomial checkpointing scheme.
+
  */
 template<typename MemorySpace>
 class ComposedMap : public ConditionalMapBase<MemorySpace>
@@ -37,8 +41,10 @@ public:
 
     @param components A vector of ConditionalMapBase objects defining each \f$T_k\f$ in the block triangular map.
                       To maintain the correct block structure, the dimensions of the components must satisfy \f$N_k = N_{k-1}+M_{k}\f$.
+    @param maxChecks The maximum number of checkpoints to use during gradient computations.  If maxChecks==1, then no checkpointing will be utilized and all forward states will be recomputed.  If maxChecks==components.size(), then all states will be stored and reused during the backward pass.  This is the most efficient option, but can require an intractable amount of memory for high-dimensional or deep parameterizations.   The default value is -1, which will set the maximum number of checkpoints to be equal to the number of layers (i.e., map.size()). 
     */
-    ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components);
+    ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components,
+                int maxChecks=-1);
 
     virtual ~ComposedMap() = default;
 
@@ -116,8 +122,10 @@ public:
 private:
 
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;
+    unsigned int maxChecks_;
 
 
+    /* Class for coordinating checkpoints during gradient evaluations. */
     class Checkpointer {
     public:
 
@@ -134,6 +142,14 @@ private:
         Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> GetLayerInput(unsigned int layerInd);
 
     protected:
+
+        /** Given the current state of the checkpoints and a need to evaluate the input to layer layerInd, this 
+            function computes the next layer input that should be checkpointed.
+            @param[in] layerInd The index of the layer that we eventually want to get the input for.
+            @return An integer specifying the next layer index that should be checkpointed in a forward pass.
+        */
+        int GetNextCheckpoint(unsigned int layerInd) const;
+
         const unsigned int maxSaves_;
         
         Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> workspace1_;

@@ -28,6 +28,62 @@ ComposedMap<MemorySpace>::Checkpointer::Checkpointer(unsigned int maxSaves,
     workspace2_ = Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>("xj", initialPts.extent(0), initialPts.extent(1));
 }
 
+template<typename MemorySpace>
+int ComposedMap<MemorySpace>::Checkpointer::GetNextCheckpoint(unsigned int layerInd) const
+{
+    // ////
+    // Adapted from "revolve" source code distributed with ACM algorithm 799
+    // ////
+
+    int currLayer = checkpointLayers_.back();
+    int oldLayer = currLayer;
+    
+    //ds = snaps - *check;
+    int availSaves = int(maxSaves_) - checkpoints_.size();
+    if(availSaves==0){
+        return -1;
+    }
+
+    int reps = 0;
+    int range = 1;
+    
+    while(range < layerInd+1 - currLayer) { 
+        reps += 1;
+        range = range*(reps + availSaves)/reps; 
+    }
+    
+    int bino1, bino2, bino3, bino4, bino5;
+    bino1 = range*reps/(availSaves+reps);
+    bino2 = (availSaves > 1) ? bino1*availSaves/(availSaves+reps-1) : 1;
+
+    if(availSaves == 1)
+        bino3 = 0;
+    else
+        bino3 = (availSaves > 2) ? bino2*(availSaves-1)/(availSaves+reps-2) : 1;
+
+    bino4 = bino2*(reps-1)/availSaves;
+    if(availSaves < 3)
+        bino5 = 0;
+    else
+        bino5 = (availSaves > 3) ? bino3*(availSaves-2)/reps : 1;
+
+
+    if(layerInd-currLayer <= bino1 + bino3){
+        currLayer = currLayer + bino4;
+    }else{
+        if(layerInd-currLayer >= range - bino5){ 
+            currLayer = currLayer + bino1; 
+        }else{
+            currLayer = layerInd-bino2-bino3;
+        }
+    }
+
+    if (currLayer == oldLayer) 
+        currLayer = oldLayer + 1;  
+
+    return currLayer;
+}
+
 
 template<typename MemorySpace>
 Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> ComposedMap<MemorySpace>::Checkpointer::GetLayerInput(unsigned int layerInd)
@@ -43,25 +99,45 @@ Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> ComposedMap<MemorySpace>
         return GetLayerInput(layerInd);
 
     }else{
-
+        
+        
+        // Figure out how many more checkpoints we can make ("available saves")
+        
+        // Figure out the index of the next checkpoint 
+        int nextCheckLayer = GetNextCheckpoint(layerInd);
+        
         // Compute the input by reevaluating from the last checkpoint
-        unsigned int i = checkpointLayers_.back();
+        int i = checkpointLayers_.back();
         comps_.at(i)->EvaluateImpl(checkpoints_.back(), workspace1_);
         ++i;
         for(; i<layerInd; ++i){
+            
+            if(i==nextCheckLayer){
+                
+                checkpoints_.push_back(Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>("xi", workspace1_.extent(0), workspace1_.extent(1)));
+                Kokkos::deep_copy(checkpoints_.back(),workspace1_);
+
+                checkpointLayers_.push_back(i);
+
+                nextCheckLayer = GetNextCheckpoint(layerInd);
+            }
+
             comps_.at(i)->EvaluateImpl(workspace1_, workspace2_);
             simple_swap(workspace1_,workspace2_);
         }
+
         return workspace1_;
     }
 }
 
 
 template<typename MemorySpace>
-ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components) : ConditionalMapBase<MemorySpace>(components.front()->inputDim,
-                                                                                                                                                         components.back()->outputDim,
-                        std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
-                        comps_(components)
+ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components,
+                                      int maxChecks) : ConditionalMapBase<MemorySpace>(components.front()->inputDim, 
+                                                                                       components.front()->inputDim,
+                                                                                       std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
+                                                        comps_(components),
+                                                        maxChecks_((maxChecks<=0) ? components.size() : maxChecks)
 {
 
     // Check the sizes of all the inputs
@@ -178,7 +254,7 @@ void ComposedMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySp
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens2("intermediate Sens", sens.extent(0), sens.extent(1));
     Kokkos::deep_copy(intSens1,sens);    
     
-    Checkpointer checker(1, pts, comps_);
+    Checkpointer checker(maxChecks_, pts, comps_);
 
     for(int i = comps_.size() - 1; i>=0; --i){
         
@@ -230,7 +306,7 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens2("intermediate sens 2", sens.extent(0), sens.extent(1));
     Kokkos::deep_copy(intSens1, sens);
 
-    Checkpointer checker(1, pts, comps_);
+    Checkpointer checker(maxChecks_, pts, comps_);
 
     StridedMatrix<double, MemorySpace> subOut;
     int endParamDim = this->numCoeffs;   
@@ -271,7 +347,7 @@ void ComposedMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const d
     
 
     // Get the gradient of the log determinant contribution from the last component
-    Checkpointer checker(1, pts, comps_);
+    Checkpointer checker(maxChecks_, pts, comps_);
 
     auto input = checker.GetLayerInput(comps_.size()-1);    
     int endParamDim = this->numCoeffs;
@@ -325,7 +401,7 @@ void ComposedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const d
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens2("intermediate Sens", pts.extent(0), pts.extent(1));
     
     // Get the gradient of the log determinant contribution from the last component
-    Checkpointer checker(1, pts, comps_);
+    Checkpointer checker(maxChecks_, pts, comps_);
     auto input = checker.GetLayerInput(comps_.size()-1);
     
     comps_.back()->LogDeterminantInputGradImpl(input, intSens1);
