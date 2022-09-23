@@ -45,6 +45,12 @@ public:
     {   
         assert(false);
     }
+
+    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                             StridedMatrix<double, MemorySpace>              output) override
+    {   
+        assert(false);
+    }
 };
 
 

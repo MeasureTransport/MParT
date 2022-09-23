@@ -215,6 +215,83 @@ Eigen::RowMatrixXd ConditionalMapBase<mpart::DeviceSpace>::LogDeterminantCoeffGr
 
 #endif
 
+
+template<>
+template<>
+StridedMatrix<double, Kokkos::HostSpace> ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantInputGrad(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
+{
+    this->CheckCoefficients("LogDeterminantInputGrad");
+
+    Kokkos::View<double**, Kokkos::HostSpace> output("LogDeterminantInputGrad", pts.extent(0), pts.extent(1));
+    LogDeterminantInputGradImpl(pts, output);
+    return output;
+}
+
+template<>
+Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantInputGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
+{
+    this->CheckCoefficients("LogDeterminantInputGrad");
+    StridedMatrix<const double, Kokkos::HostSpace> ptsView = ConstRowMatToKokkos<double,Kokkos::HostSpace>(pts);
+
+    Kokkos::View<double**,Kokkos::LayoutRight,Kokkos::HostSpace> outView = LogDeterminantInputGrad(ptsView);
+
+    return KokkosToMat(outView);
+}
+
+#if defined(MPART_ENABLE_GPU)
+
+template<>
+template<>
+StridedMatrix<double, mpart::DeviceSpace> ConditionalMapBase<mpart::DeviceSpace>::LogDeterminantInputGrad(StridedMatrix<const double, mpart::DeviceSpace> const& pts)
+{
+    this->CheckCoefficients("LogDeterminantInputGrad");
+    Kokkos::View<double**, mpart::DeviceSpace> output("LogDeterminantInputGrad", pts.extent(0), pts.extent(1));
+    LogDeterminantInputGradImpl(pts,output);
+    return output;
+}
+
+template<>
+template<>
+StridedMatrix<double, Kokkos::HostSpace> ConditionalMapBase<mpart::DeviceSpace>::LogDeterminantInputGrad(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
+{
+    // Copy the points to the device space 
+    StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace,const double>(pts);
+
+    // Evaluate on the device space 
+    StridedMatrix<double, mpart::DeviceSpace> evals_device = this->LogDeterminantInputGrad(pts_device);
+
+    // Copy back to the host space
+    return ToHost(evals_device);
+}
+
+template<>
+template<>
+StridedMatrix<double, mpart::DeviceSpace> ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantInputGrad(StridedMatrix<const double, mpart::DeviceSpace> const& pts)
+{
+    // Copy the points to the host 
+    StridedMatrix<const double, Kokkos::HostSpace> pts_host = ToHost(pts);
+
+    // Evaluate on the host 
+    StridedMatrix<double, Kokkos::HostSpace> evals_host = this->LogDeterminantInputGrad(pts_host);
+
+    // Copy back to the device
+    return ToDevice<mpart::DeviceSpace,double>(evals_host);
+}
+
+
+template<>
+Eigen::RowMatrixXd ConditionalMapBase<mpart::DeviceSpace>::LogDeterminantInputGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
+{
+    CheckCoefficients("LogDeterminantInputGrad");
+
+    Eigen::RowMatrixXd output(outputDim, pts.cols());
+    StridedMatrix<const double, mpart::DeviceSpace> ptsView = ToDevice<mpart::DeviceSpace>( ConstRowMatToKokkos<double,Kokkos::HostSpace>(pts));
+    return KokkosToMat( ToHost(this->LogDeterminantInputGrad(ptsView)));
+}
+
+
+#endif
+
 // Explicit template instantiation
 template class mpart::ConditionalMapBase<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)

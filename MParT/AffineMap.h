@@ -56,6 +56,9 @@ public:
                               StridedMatrix<const double, MemorySpace> const& sens,
                               StridedMatrix<double, MemorySpace>              output) override;
 
+    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+                                             StridedMatrix<double, MemorySpace>              output) override;
+
     /** Computes an LU factorization of the matrix A_ */
     void Factorize();
 

@@ -1,5 +1,5 @@
-#ifndef MPART_TRIANGULARMAP_H
-#define MPART_TRIANGULARMAP_H
+#ifndef MPART_COMPOSEDMAP_H
+#define MPART_COMPOSEDMAP_H
 
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/Utilities/Miscellaneous.h"
@@ -28,8 +28,8 @@ is positive definite.
 
  */
 template<typename MemorySpace>
-class TriangularMap : public ConditionalMapBase<MemorySpace>{
-        
+class ComposedMap : public ConditionalMapBase<MemorySpace>
+{
 public:
 
     /** @brief Construct a block triangular map from a collection of other ConditionalMapBase objects.
@@ -37,13 +37,13 @@ public:
     @param components A vector of ConditionalMapBase objects defining each \f$T_k\f$ in the block triangular map.
                       To maintain the correct block structure, the dimensions of the components must satisfy \f$N_k = N_{k-1}+M_{k}\f$.
     */
-    TriangularMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components);
+    ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components);
 
-    virtual ~TriangularMap() = default;
+    virtual ~ComposedMap() = default;
 
     /** @brief Sets the coefficients for all components of the map.
 
-    @details This function will copy the provided coeffs vectors into the savedCoeffs object in the TriangularMap class.   To avoid
+    @details This function will copy the provided coeffs vectors into the savedCoeffs object in the ComposedMap class.   To avoid
     duplicating the coefficients, the savedCoeffs member variable for each component will then be set to a subview of this vector.
     @param coeffs A vector containing coefficients for all components.  If component \f$k\f$ is defined by \f$C_k\f$ coefficients,
                   then this vector should have length \f$\sum_{k=1}^K C_i\f$ and the coefficients for component \f$k\f$ should
@@ -51,13 +51,11 @@ public:
     */
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
     virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
-    virtual void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
     #if defined(MPART_ENABLE_GPU)
     virtual void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
-    virtual void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
     #endif 
     
-    virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}
+    virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return maps_.at(i);}
 
     /** @brief Computes the log determinant of the Jacobian matrix of this map.
 
@@ -80,10 +78,7 @@ public:
     void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                       StridedMatrix<double, MemorySpace>              output) override;
 
-    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                              StridedMatrix<const double, MemorySpace> const& sens,
-                              StridedMatrix<double, MemorySpace>              output) override;
-    
+
     /** @brief Evaluates the map inverse.
 
     @details To understand this function, consider splitting the map input \f$x_{1:N}\f$ into two parts so that \f$x_{1:N} = [x_{1:N-M},x_{N-M+1:M}]\f$.  Note that the
@@ -101,26 +96,39 @@ public:
                              StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void InverseInplace(StridedMatrix<double, MemorySpace>              x1,
-                                StridedMatrix<const double, MemorySpace> const& r);
-
-
     virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override;
 
+    /** Computes the input to layer k. 
+        @param k The layer we're considering
+        @param pts The input to the entire composed map
+        @param intPts Workspace the same size as pts.  Upon exit, this view will contain the input to layer k-1 (if k>1)
+        @param output Space for the output.  Should be same size as pts.  Upon exit, will contain the input to layer k.
+    */
+    void EvaluateUntilK(int k, 
+                        StridedMatrix<const double, MemorySpace> const& pts,
+                        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>& intPts, 
+                        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>& output);
+
 
     virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                              StridedMatrix<double, MemorySpace>              output) override;
-    
+
+
     virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                              StridedMatrix<double, MemorySpace>              output) override;
+
+
+    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                            StridedMatrix<const double, MemorySpace> const& sens,
+                            StridedMatrix<double, MemorySpace>              output) override;
 private:
 
-    std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;
+    std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> maps_;
 
 
-}; // class TriangularMap
+}; // class ComposedMap
 
 }
 
