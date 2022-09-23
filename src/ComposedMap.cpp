@@ -11,7 +11,7 @@ template<typename MemorySpace>
 ComposedMap<MemorySpace>::Checkpointer::Checkpointer(unsigned int maxSaves, 
                                                      StridedMatrix<const double, MemorySpace> initialPts,
                                                      std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>& comps) : maxSaves_(maxSaves),
-                                                                                                                            comps_(comps)
+                                                                                                                            maps_(comps)
 {
     if(maxSaves_==0){
         throw std::runtime_error("In ComposedMap::Checkpointer: The maximum number of checkpoints must be larger than 0.");
@@ -108,7 +108,7 @@ Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> ComposedMap<MemorySpace>
         
         // Compute the input by reevaluating from the last checkpoint
         int i = checkpointLayers_.back();
-        comps_.at(i)->EvaluateImpl(checkpoints_.back(), workspace1_);
+        maps_.at(i)->EvaluateImpl(checkpoints_.back(), workspace1_);
         ++i;
         for(; i<layerInd; ++i){
             
@@ -122,7 +122,7 @@ Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> ComposedMap<MemorySpace>
                 nextCheckLayer = GetNextCheckpoint(layerInd);
             }
 
-            comps_.at(i)->EvaluateImpl(workspace1_, workspace2_);
+            maps_.at(i)->EvaluateImpl(workspace1_, workspace2_);
             simple_swap(workspace1_,workspace2_);
         }
 
@@ -136,15 +136,15 @@ ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMap
                                       int maxChecks) : ConditionalMapBase<MemorySpace>(components.front()->inputDim, 
                                                                                        components.front()->inputDim,
                                                                                        std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
-                                                        comps_(components),
+                                                        maps_(components),
                                                         maxChecks_((maxChecks<=0) ? components.size() : maxChecks)
 {
 
     // Check the sizes of all the inputs
-    for(unsigned int i=0; i<comps_.size()-1; ++i){
-        if(comps_.at(i)->outputDim != comps_.at(i+1)->inputDim){
+    for(unsigned int i=0; i<maps_.size()-1; ++i){
+        if(maps_.at(i)->outputDim != maps_.at(i+1)->inputDim){
             std::stringstream msg;
-            msg << "In ComposedMap constructor, the output dimension (" << comps_.at(i)->outputDim << ") of component " << i << " is not equal to the input dimension (" << comps_.at(i+1)->inputDim << ").";
+            msg << "In ComposedMap constructor, the output dimension (" << maps_.at(i)->outputDim << ") of component " << i << " is not equal to the input dimension (" << maps_.at(i+1)->inputDim << ").";
             throw std::invalid_argument(msg.str());
         }
     }
@@ -158,12 +158,12 @@ void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace
 
     // Now create subviews for each of the components
     unsigned int cumNumCoeffs = 0;
-    for(unsigned int i=0; i<comps_.size(); ++i){
-        assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
+    for(unsigned int i=0; i<maps_.size(); ++i){
+        assert(cumNumCoeffs+maps_.at(i)->numCoeffs <= this->savedCoeffs.size());
 
-        comps_.at(i)->WrapCoeffs(Kokkos::subview(this->savedCoeffs,
-            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
-        cumNumCoeffs += comps_.at(i)->numCoeffs;
+        maps_.at(i)->WrapCoeffs(Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+maps_.at(i)->numCoeffs)));
+        cumNumCoeffs += maps_.at(i)->numCoeffs;
     }
 }
 
@@ -176,12 +176,12 @@ void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::DefaultEx
 
     // Now create subviews for each of the components
     unsigned int cumNumCoeffs = 0;
-    for(unsigned int i=0; i<comps_.size(); ++i){
-        assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
+    for(unsigned int i=0; i<maps_.size(); ++i){
+        assert(cumNumCoeffs+maps_.at(i)->numCoeffs <= this->savedCoeffs.size());
 
-        comps_.at(i)->savedCoeffs = Kokkos::subview(this->savedCoeffs,
-            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
-        cumNumCoeffs += comps_.at(i)->numCoeffs;
+        maps_.at(i)->savedCoeffs = Kokkos::subview(this->savedCoeffs,
+            std::make_pair(cumNumCoeffs, cumNumCoeffs+maps_.at(i)->numCoeffs));
+        cumNumCoeffs += maps_.at(i)->numCoeffs;
     }
 }
 #endif
@@ -193,8 +193,8 @@ void ComposedMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, Me
 
 
     // logdet of first component
-    comps_.at(0)->LogDeterminantImpl(pts, output);
-    if(comps_.size()==1)
+    maps_.at(0)->LogDeterminantImpl(pts, output);
+    if(maps_.size()==1)
         return;
 
     // intermediate points and variable to hold logdet increments 
@@ -203,13 +203,13 @@ void ComposedMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, Me
     Kokkos::deep_copy(intPts1, pts);
 
     Kokkos::View<double*, Kokkos::LayoutLeft, MemorySpace> compDetIncrement("Log Determinant", output.extent(0));
-    for(unsigned int i=1; i<comps_.size(); ++i){
+    for(unsigned int i=1; i<maps_.size(); ++i){
         
         // Compute x_i = T_{i-1}(x_{i-1})
-        comps_.at(i-1)->EvaluateImpl(intPts1, intPts2);
+        maps_.at(i-1)->EvaluateImpl(intPts1, intPts2);
 
         // Compute logdet for T_{i}(x_i)
-        comps_.at(i)->LogDeterminantImpl(intPts2, compDetIncrement);
+        maps_.at(i)->LogDeterminantImpl(intPts2, compDetIncrement);
 
         // Add to logdet of full map
         output += compDetIncrement;
@@ -228,10 +228,10 @@ void ComposedMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySp
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
     
-    comps_.at(0)->EvaluateImpl(pts, intPts1);
+    maps_.at(0)->EvaluateImpl(pts, intPts1);
 
-    for(int j = 1; j<comps_.size(); j++){
-        comps_.at(j)->EvaluateImpl(intPts1, intPts2);
+    for(int j = 1; j<maps_.size(); j++){
+        maps_.at(j)->EvaluateImpl(intPts1, intPts2);
         simple_swap(intPts1, intPts2);
     }
 
@@ -254,15 +254,15 @@ void ComposedMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySp
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens2("intermediate Sens", sens.extent(0), sens.extent(1));
     Kokkos::deep_copy(intSens1,sens);    
     
-    Checkpointer checker(maxChecks_, pts, comps_);
+    Checkpointer checker(maxChecks_, pts, maps_);
 
-    for(int i = comps_.size() - 1; i>=0; --i){
+    for(int i = maps_.size() - 1; i>=0; --i){
         
         // x* = T_{i-1} o ... o T_1(x)
         auto input = checker.GetLayerInput(i); 
 
         //s_{i-1}^T = s_{i}^T J_i(x*)
-        comps_.at(i)->GradientImpl(input, intSens1, intSens2);
+        maps_.at(i)->GradientImpl(input, intSens1, intSens2);
         simple_swap<decltype(intSens1)>(intSens1, intSens2);
     }
 
@@ -285,9 +285,9 @@ void ComposedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpa
     // Evaluate the output for each component
     Kokkos::deep_copy(intR1, r);
 
-    for(int i = comps_.size() - 1; i>=0; --i){
+    for(int i = maps_.size() - 1; i>=0; --i){
         
-        comps_.at(i)->InverseImpl(x1, intR1, intR2); // <- Note the x1 doesn't matter here because the layer is square
+        maps_.at(i)->InverseImpl(x1, intR1, intR2); // <- Note the x1 doesn't matter here because the layer is square
         simple_swap<decltype(intR1)>(intR1,intR2);
     }
 
@@ -306,31 +306,31 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens2("intermediate sens 2", sens.extent(0), sens.extent(1));
     Kokkos::deep_copy(intSens1, sens);
 
-    Checkpointer checker(maxChecks_, pts, comps_);
+    Checkpointer checker(maxChecks_, pts, maps_);
 
     StridedMatrix<double, MemorySpace> subOut;
     int endParamDim = this->numCoeffs;   
-    for(int i = comps_.size() - 1; i>=0; --i){
+    for(int i = maps_.size() - 1; i>=0; --i){
 
         // intPts1 = T_{i-1} o ... o T_1(x) 
         auto input = checker.GetLayerInput(i);
 
         // finish g_i = s^T \nabla_{w_i} T(x)
         subOut = Kokkos::subview(output, 
-                                 std::make_pair(int(endParamDim-comps_.at(i)->numCoeffs), endParamDim), 
+                                 std::make_pair(int(endParamDim-maps_.at(i)->numCoeffs), endParamDim), 
                                  Kokkos::ALL());
 
 
         // get subview of output (storing gradient wrt w_i)
-        comps_.at(i)->CoeffGradImpl(input, intSens1, subOut);
+        maps_.at(i)->CoeffGradImpl(input, intSens1, subOut);
 
         // increment sens to for next iteration
         //s_{i-1}^T = s_{i}^T J_i(x*)
         if(i>0){
-            comps_.at(i)->GradientImpl(input, intSens1, intSens2);
+            maps_.at(i)->GradientImpl(input, intSens1, intSens2);
             simple_swap<decltype(intSens1)>(intSens1,intSens2);
         }
-        endParamDim -= comps_.at(i)->numCoeffs;
+        endParamDim -= maps_.at(i)->numCoeffs;
     }
 
 }
@@ -347,47 +347,48 @@ void ComposedMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const d
     
 
     // Get the gradient of the log determinant contribution from the last component
-    Checkpointer checker(maxChecks_, pts, comps_);
-
-    auto input = checker.GetLayerInput(comps_.size()-1);    
+    Checkpointer checker(maxChecks_, pts, maps_);
+    auto input = checker.GetLayerInput(maps_.size()-1); 
+    
     int endParamDim = this->numCoeffs;
     subOut = Kokkos::subview(output, 
-                                 std::make_pair(int(endParamDim-comps_.back()->numCoeffs), endParamDim), 
+                                 std::make_pair(int(endParamDim-maps_.back()->numCoeffs), endParamDim), 
                                  Kokkos::ALL());
-    comps_.back()->LogDeterminantCoeffGradImpl(input, subOut);
+    maps_.back()->LogDeterminantCoeffGradImpl(input, subOut);
 
     // Get the sensitivity of this log determinant term wrt changes in the input
-    comps_.back()->LogDeterminantInputGradImpl(input, intSens1);
+    maps_.back()->LogDeterminantInputGradImpl(input, intSens1);
     
-    endParamDim -= comps_.back()->numCoeffs;  
+    endParamDim -= maps_.back()->numCoeffs;  
 
-    for(int i = comps_.size() - 2; i>=0; --i){
+    for(int i = maps_.size() - 2; i>=0; --i){
         
         // Compute input to this layer
         input = checker.GetLayerInput(i);
 
         // Gradient for direct contribution of these parameters on the log determinant
         subOut = Kokkos::subview(output, 
-                                 std::make_pair(int(endParamDim-comps_.at(i)->numCoeffs), endParamDim), 
+                                 std::make_pair(int(endParamDim-maps_.at(i)->numCoeffs), endParamDim), 
                                  Kokkos::ALL());
-                                 
-        comps_.at(i)->LogDeterminantCoeffGradImpl(input, subOut);
+            
+        maps_.at(i)->LogDeterminantCoeffGradImpl(input, subOut);
 
         // Gradient of later log determinant terms on the coefficients of this layer 
-        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> subOut2("temp", comps_.at(i)->numCoeffs, pts.extent(1));
-        comps_.at(i)->CoeffGradImpl(input, intSens1, subOut2);
+        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> subOut2("temp", maps_.at(i)->numCoeffs, pts.extent(1));
+        maps_.at(i)->CoeffGradImpl(input, intSens1, subOut2);
         subOut += subOut2;
 
         if(i>0){
             // Gradient wrt input
-            comps_.at(i)->GradientImpl(input, intSens1, intSens2);
+            maps_.at(i)->GradientImpl(input, intSens1, intSens2);
             simple_swap<decltype(intSens1)>(intSens1, intSens2);
 
             // Add sensitivity of log determinant to input
-            comps_.at(i)->LogDeterminantInputGradImpl(input, intSens2);  
+            maps_.at(i)->LogDeterminantInputGradImpl(input, intSens2); 
+            
             intSens1 += intSens2;   
         }
-        endParamDim -= comps_.at(i)->numCoeffs;   
+        endParamDim -= maps_.at(i)->numCoeffs;   
     }
 }
 
@@ -401,22 +402,21 @@ void ComposedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const d
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens2("intermediate Sens", pts.extent(0), pts.extent(1));
     
     // Get the gradient of the log determinant contribution from the last component
-    Checkpointer checker(maxChecks_, pts, comps_);
-    auto input = checker.GetLayerInput(comps_.size()-1);
+    Checkpointer checker(maxChecks_, pts, maps_);
+    auto input = checker.GetLayerInput(maps_.size()-1);
     
-    comps_.back()->LogDeterminantInputGradImpl(input, intSens1);
+    maps_.back()->LogDeterminantInputGradImpl(input, intSens1);
 
-    
-    for(int i = comps_.size() - 2; i>=0; --i){
+    for(int i = maps_.size() - 2; i>=0; --i){
         
         // reset intPts1 to initial pts
         input = checker.GetLayerInput(i);
 
         //s_{i-1}^T = s_{i}^T J_i(x*)
-        comps_.at(i)->GradientImpl(input, intSens1, intSens2);
+        maps_.at(i)->GradientImpl(input, intSens1, intSens2);
         simple_swap<decltype(intSens1)>(intSens1, intSens2);
 
-        comps_.at(i)->LogDeterminantInputGradImpl(input, intSens2);  
+        maps_.at(i)->LogDeterminantInputGradImpl(input, intSens2);  
         intSens1 += intSens2;      
     }
 

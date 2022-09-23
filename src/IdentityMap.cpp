@@ -1,8 +1,10 @@
 #include "MParT/IdentityMap.h"
-
+#include "MParT/Utilities/KokkosSpaceMappings.h"
 #include <numeric>
 
 using namespace mpart;
+using MemorySpace = Kokkos::HostSpace;
+
 
 template<typename MemorySpace>
 IdentityMap<MemorySpace>::IdentityMap(unsigned int inDim, unsigned int outDim) : ConditionalMapBase<MemorySpace>(inDim, outDim, 0)
@@ -17,10 +19,10 @@ void IdentityMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, Me
                                                     StridedVector<double, MemorySpace>              output)
 {
 
-    // Add to logdet of full map
-    for(unsigned int j=0; j<output.size(); ++j)
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0,output.size());
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j){
         output(j) = 0.0;
-
+    });
 
 }
 
@@ -54,21 +56,23 @@ void IdentityMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
     assert(false);
 }
 
-
+template<typename MemorySpace>
 void IdentityMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                             StridedMatrix<const double, MemorySpace> const& sens,
-                            StridedMatrix<double, MemorySpace>              output) override
+                            StridedMatrix<double, MemorySpace>              output)
 {
 
 
-    // zero until inputDim-outDim
-    for(unsigned int j=0; j<int(this->inputDim - this->outputDim); ++j)
-        output(j) = 0.0;
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> zeroPolicy({0, 0}, {int(this->inputDim - this->outputDim), output.extent_int(1)});
+    Kokkos::parallel_for(zeroPolicy, KOKKOS_LAMBDA(const int& i, const int& j) {
+        output(i,j) = 0.0;
+    });
 
-    StridedMatrix<const double, MemorySpace> tailOut = Kokkos::subview(
+
+    StridedMatrix<double, MemorySpace> tailOut = Kokkos::subview(
         output, std::make_pair(int(this->inputDim - this->outputDim), int(this->inputDim)), Kokkos::ALL());
 
-    Kokkos::deep_copy(tailOutput, sens);
+    Kokkos::deep_copy(tailOut, sens);
 
 }
 
@@ -79,12 +83,15 @@ void IdentityMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const d
     assert(false);
 }
 
+template<typename MemorySpace>
 void IdentityMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                            StridedMatrix<double, MemorySpace>              output) override
+                                            StridedMatrix<double, MemorySpace>              output)
 {   
-    // Add to logdet of full map
-    for(unsigned int j=0; j<output.size(); ++j)
-        output(j) = 0.0;
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> zeroPolicy({0, 0}, {output.extent(0), output.extent(1)});
+    Kokkos::parallel_for(zeroPolicy, KOKKOS_LAMBDA(const int& i, const int& j) {
+        output(i,j) = 0.0;
+    });
+
 }
 
 // Explicit template instantiation

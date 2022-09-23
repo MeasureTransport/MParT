@@ -1,245 +1,166 @@
 #include <catch2/catch_all.hpp>
 
-#include "MParT/ConditionalMapBase.h"
+#include "MParT/IdentityMap.h"
 
 using namespace mpart;
 using namespace Catch;
 using MemorySpace = Kokkos::HostSpace;
 
-class MyIdentityMap : public ConditionalMapBase<MemorySpace>{
-public:
-    MyIdentityMap(unsigned int dim, unsigned int numCoeffs) : ConditionalMapBase(dim,dim,numCoeffs){};
+TEST_CASE( "Testing identity map", "[IdentityMap]" ) {
 
-    virtual ~MyIdentityMap() = default;
+    unsigned int inDim = 4;
+    unsigned int outDim = 3;
 
-    virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                              StridedMatrix<double, MemorySpace>              output) override{Kokkos::deep_copy(output,pts);};
-
-    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                               StridedMatrix<const double, MemorySpace> const& sens,
-                               StridedMatrix<double, MemorySpace>              output) override
-    {
-        assert(false);  
-    }
-
-    virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const&,
-                                    StridedVector<double, MemorySpace>        output) override{
-        for(unsigned int i=0; i<output.size(); ++i)
-            output(i)=0.0;
-    }
-
-    virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const&,
-                             StridedMatrix<const double, MemorySpace> const& r,
-                             StridedMatrix<double, MemorySpace>              output) override{Kokkos::deep_copy(output,r);};
-
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                               StridedMatrix<const double, MemorySpace> const& sens,
-                               StridedMatrix<double, MemorySpace>              output) override
-    {
-        assert(false);  
-    }
-
-
-    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                             StridedMatrix<double, MemorySpace>              output) override
-    {   
-        assert(false);
-    }
-
-    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                             StridedMatrix<double, MemorySpace>              output) override
-    {   
-        assert(false);
-    }
-};
-
-
-TEST_CASE( "Testing coefficient functions of conditional map base class", "[ConditionalMapBaseCoeffs]" ) {
-
-    unsigned int numCoeffs = 10;
-    MyIdentityMap map(4,numCoeffs);
-
-    CHECK(map.inputDim == 4);
-    CHECK(map.outputDim == 4);
-
-    SECTION("Using Kokkos"){
-
-        Kokkos::View<double*, Kokkos::HostSpace> coeffs("New Coeffs", numCoeffs);
-        for(unsigned int i=0; i<numCoeffs; ++i)
-            coeffs(i) = i;
-
-        map.SetCoeffs(coeffs);
-        CHECK(map.Coeffs().extent(0) == numCoeffs);
-
-        for(unsigned int i=0; i<numCoeffs; ++i)
-            CHECK(map.Coeffs()(i) == coeffs(i));
-
-        coeffs(0) = 100;
-        CHECK(map.Coeffs()(0) != coeffs(0));
-
-        // Now check using a slice of the coefficients
-        unsigned int start = 2;
-        unsigned int end = 4;
-        auto coeffSlice = Kokkos::subview(coeffs, std::make_pair(start, end));
-
-        map.Coeffs() = coeffSlice;
-        CHECK(coeffs.extent(0) == numCoeffs);
-        CHECK(map.Coeffs().extent(0)==(end-start));
-
-        for(unsigned int i=0; i<end-start; ++i)
-            CHECK(map.Coeffs()(i)==coeffs(i+start));
-
-        coeffs(start) = 1024;
-        for(unsigned int i=0; i<end-start; ++i)
-            CHECK(map.Coeffs()(i)==coeffs(i+start));
-
-    }
-
-    SECTION("Using Eigen"){
-
-        Eigen::VectorXd coeffs(numCoeffs);
-        for(unsigned int i=0; i<numCoeffs; ++i)
-            coeffs(i) = i;
-
-        Kokkos::resize(map.Coeffs(), numCoeffs);
-        map.CoeffMap() = coeffs;
-        CHECK(map.Coeffs().extent(0) == numCoeffs);
-
-        for(unsigned int i=0; i<numCoeffs; ++i){
-            CHECK(map.Coeffs()(i) == coeffs(i));
-            coeffs(i)++;
-            CHECK(map.Coeffs()(i) != coeffs(i));
-        }
-
-        map.SetCoeffs(coeffs);
-        for(unsigned int i=0; i<numCoeffs; ++i){
-            CHECK(map.Coeffs()(i) == coeffs(i));
-            coeffs(i)++;
-            CHECK(map.Coeffs()(i) != coeffs(i));
-        }
-
-        map.SetCoeffs(coeffs);
-        for(unsigned int i=0; i<numCoeffs; ++i){
-            CHECK(map.Coeffs()(i) == coeffs(i));
-            coeffs(i)++;
-            map.CoeffMap()(i)++;
-            CHECK(map.Coeffs()(i) == coeffs(i));
-        }
-    }
-
-}
-
-TEST_CASE( "Testing evaluation of an identity conditional map", "[ConditionalMapBaseEvaluation]" ) {
-
-    unsigned int dim = 4;
     unsigned int numPts = 100;
-    MyIdentityMap map(dim,0);
-    CHECK(map.inputDim == dim);
-    CHECK(map.outputDim == dim);
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> map = std::make_shared<IdentityMap<MemorySpace>>(inDim, outDim);
+    CHECK(map->inputDim == inDim);
+    CHECK(map->outputDim == outDim);
 
 
+    Kokkos::View<double**, Kokkos::HostSpace> pts("pts", inDim, numPts);
 
-    SECTION("Using Kokkos"){
-
-        Kokkos::View<double**, Kokkos::HostSpace> pts("pts", dim, numPts);
-
-        for(unsigned int i=0; i<dim; ++i){
-            for(unsigned int j=0; j<numPts; ++j){
-                pts(i,j) = j;
-            }
+    for(unsigned int i=0; i<inDim; ++i){
+        for(unsigned int j=0; j<numPts; ++j){
+            pts(i,j) = j;
         }
+    }
+
+    SECTION("Evaluate"){
 
         StridedMatrix<const double, Kokkos::HostSpace> ptsConst = pts;
 
-        Kokkos::View<double**, Kokkos::HostSpace> output = map.Evaluate(ptsConst);
+        Kokkos::View<double**, Kokkos::HostSpace> output = map->Evaluate(ptsConst);
 
-        REQUIRE(output.extent(0)==dim);
+        REQUIRE(output.extent(0)==outDim);
         REQUIRE(output.extent(1)==numPts);
 
-        for(unsigned int i=0; i<dim; ++i){
+        for(unsigned int i=0; i<outDim; ++i){
             for(unsigned int j=0; j<numPts; ++j){
                 CHECK(output(i,j) == j);
             }
         }
     }
 
-    SECTION("Using Eigen"){
 
-        Eigen::RowMatrixXd pts(dim,numPts);
-        for(unsigned int i=0; i<dim; ++i){
+    SECTION("Inverse"){
+
+        StridedMatrix<const double, Kokkos::HostSpace> ptsConst = pts;
+
+
+        Kokkos::View<double**, Kokkos::HostSpace> x1("x1", inDim-outDim, numPts);
+        Kokkos::View<double**, Kokkos::HostSpace> r("r", outDim, numPts);
+
+        for(unsigned int i=0; i<inDim-outDim; ++i){
             for(unsigned int j=0; j<numPts; ++j){
-                pts(i,j) = j;
+                x1(i,j) = j;
             }
         }
 
-        Eigen::RowMatrixXd output;
-        output = map.Evaluate(pts);
-
-        REQUIRE(output.rows()==dim);
-        REQUIRE(output.cols()==numPts);
-
-        for(unsigned int i=0; i<dim; ++i){
+        for(unsigned int i=0; i<outDim; ++i){
             for(unsigned int j=0; j<numPts; ++j){
-                CHECK(output(i,j) == j);
+                r(i,j) = j;
+            }
+        }
+
+        Kokkos::View<double**, Kokkos::HostSpace> inverse = map->Inverse(x1, r);
+    
+        
+        REQUIRE(inverse.extent(0)==outDim);
+        REQUIRE(inverse.extent(1)==numPts);
+
+        for(unsigned int i=0; i<outDim; ++i){
+            for(unsigned int j=0; j<numPts; ++j){
+                CHECK(inverse(i,j) == j);
             }
         }
     }
+
+    SECTION("LogDet"){
+        StridedMatrix<const double, Kokkos::HostSpace> ptsConst = pts;
+        Kokkos::View<double*, Kokkos::HostSpace> output = map->LogDeterminant(ptsConst);
+    
+        REQUIRE(output.size()==numPts);
+        for(unsigned int j=0; j<numPts; ++j){
+            CHECK(output(j) == 0);
+        }
+        
+    }
+
+
+    SECTION("Input Gradient"){
+
+        StridedMatrix<const double, Kokkos::HostSpace> ptsConst = pts;
+        Kokkos::View<double**,Kokkos::HostSpace> sens("Sensitivities", map->outputDim, numPts);
+
+        for(unsigned int j=0; j<numPts; ++j){
+            for(unsigned int i=0; i<map->outputDim; ++i){
+                sens(i,j) = 1.0 + 0.1*i + j;
+            }
+        }
+
+        Kokkos::View<double**,Kokkos::HostSpace> evals = map->Evaluate(pts);
+        Kokkos::View<double**,Kokkos::HostSpace> evals2;
+
+        Kokkos::View<double**,Kokkos::HostSpace> inputGrad = map->Gradient(pts, sens);
+
+        REQUIRE(inputGrad.extent(0)==map->inputDim);
+        REQUIRE(inputGrad.extent(1)==numPts);
+
+        // Compare with finite differences
+        double fdstep = 1e-5;
+        for(unsigned int i=0; i<map->inputDim; ++i){
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+                pts(i,ptInd) += fdstep;
+
+            evals2 = map->Evaluate(pts);
+
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
+                
+                double fdDeriv = 0.0;
+                for(unsigned int j=0; j<map->outputDim; ++j)
+                    fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
+
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
+            }
+
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+                pts(i,ptInd) -= fdstep;
+        }
+        
+    }
+
+
+
+    SECTION("LogDeterminantInputGrad"){
+
+        Kokkos::View<double**,Kokkos::HostSpace> detGrad = map->LogDeterminantInputGrad(pts);
+        REQUIRE(detGrad.extent(0)==map->inputDim);
+        REQUIRE(detGrad.extent(1)==numPts);
+        
+        
+        Kokkos::View<double*,Kokkos::HostSpace> logDet = map->LogDeterminant(pts);
+        Kokkos::View<double*,Kokkos::HostSpace> logDet2;
+
+        // Compare with finite differences
+        double fdstep = 1e-6;
+        for(unsigned int i=0; i<map->inputDim; ++i){
+
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+                pts(i,ptInd) += fdstep;
+
+            logDet2 = map->LogDeterminant(pts);
+
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd){
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-3)); 
+            }
+
+            for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
+                pts(i,ptInd) -= fdstep;
+        }
+
+    }
+
+
 
 }
 
-
-TEST_CASE( "Testing inverse evaluation of an identity conditional map", "[ConditionalMapBaseInverse]" ) {
-
-    unsigned int dim = 4;
-    unsigned int numPts = 100;
-    MyIdentityMap map(dim,0);
-    CHECK(map.inputDim == dim);
-    CHECK(map.outputDim == dim);
-
-
-
-    SECTION("Using Kokkos"){
-
-        Kokkos::View<double**, Kokkos::HostSpace> pts("pts", dim, numPts);
-
-        for(unsigned int i=0; i<dim; ++i){
-            for(unsigned int j=0; j<numPts; ++j){
-                pts(i,j) = j;
-            }
-        }
-
-        Kokkos::View<double**, Kokkos::HostSpace> output = map.Inverse(pts, pts);
-
-        REQUIRE(output.extent(0)==dim);
-        REQUIRE(output.extent(1)==numPts);
-
-        for(unsigned int i=0; i<dim; ++i){
-            for(unsigned int j=0; j<numPts; ++j){
-                CHECK(output(i,j) == j);
-            }
-        }
-    }
-
-    SECTION("Using Eigen"){
-
-        Eigen::RowMatrixXd pts(dim,numPts);
-        for(unsigned int i=0; i<dim; ++i){
-            for(unsigned int j=0; j<numPts; ++j){
-                pts(i,j) = j;
-            }
-        }
-
-        Eigen::RowMatrixXd output;
-        output = map.Inverse(pts,pts);
-
-        REQUIRE(output.rows()==dim);
-        REQUIRE(output.cols()==numPts);
-
-        for(unsigned int i=0; i<dim; ++i){
-            for(unsigned int j=0; j<numPts; ++j){
-                CHECK(output(i,j) == j);
-            }
-        }
-    }
-
-}
