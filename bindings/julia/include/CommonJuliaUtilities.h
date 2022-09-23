@@ -65,6 +65,12 @@ void AffineFunctionWrapper(jlcxx::Module&);
  */
 void MapFactoryWrapper(jlcxx::Module&);
 
+/**
+ * @brief Adds ComposedMap bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void ComposedMapWrapper(jlcxx::Module &);
+
 #if defined(MPART_ENABLE_GPU)
 void ConditionalMapBaseDeviceWrapper(jlcxx::Module&);
 #endif
