@@ -8,6 +8,7 @@
 
 #include <Kokkos_Core.hpp>
 
+#include <deque>
 
 namespace mpart{
 
@@ -100,17 +101,6 @@ public:
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override;
 
-    /** Computes the input to layer k. 
-        @param k The layer we're considering
-        @param pts The input to the entire composed map
-        @param intPts Workspace the same size as pts.  Upon exit, this view will contain the input to layer k-1 (if k>1)
-        @param output Space for the output.  Should be same size as pts.  Upon exit, will contain the input to layer k.
-    */
-    void EvaluateUntilK(int k, 
-                        StridedMatrix<const double, MemorySpace> const& pts,
-                        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>& intPts, 
-                        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>& output);
-
 
     virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                              StridedMatrix<double, MemorySpace>              output) override;
@@ -127,6 +117,32 @@ private:
 
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;
 
+
+    class Checkpointer {
+    public:
+
+        Checkpointer(unsigned int maxSaves, 
+                     StridedMatrix<const double, MemorySpace> initialPts,
+                     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>& comps);
+
+        /** Returns the input to a layer in the composed map. 
+        
+        Stores checkpoints along the way to assist in backwards passes to compute gradients.  
+        @param[in] layerInd The index of the layer we want the input to.
+        @return A kokkos view containing the input to layer layerInd.  
+        */
+        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> GetLayerInput(unsigned int layerInd);
+
+    protected:
+        const unsigned int maxSaves_;
+        
+        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> workspace1_;
+        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> workspace2_;
+        std::deque<Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>> checkpoints_;
+        std::deque<unsigned int> checkpointLayers_;
+
+        std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>& comps_;
+    };
 
 }; // class ComposedMap
 

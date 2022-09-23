@@ -8,6 +8,56 @@
 using namespace mpart;
 
 template<typename MemorySpace>
+ComposedMap<MemorySpace>::Checkpointer::Checkpointer(unsigned int maxSaves, 
+                                                     StridedMatrix<const double, MemorySpace> initialPts,
+                                                     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>& comps) : maxSaves_(maxSaves),
+                                                                                                                            comps_(comps)
+{
+    if(maxSaves_==0){
+        throw std::runtime_error("In ComposedMap::Checkpointer: The maximum number of checkpoints must be larger than 0.");
+    }
+
+    // Store the initial points as the first checkpoint
+    checkpoints_.push_back(Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>("x0", initialPts.extent(0), initialPts.extent(1)));
+    Kokkos::deep_copy(checkpoints_.back(), initialPts);
+
+    checkpointLayers_.push_back(0);
+
+    // Allocate the workspace 
+    workspace1_ = Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>("xi", initialPts.extent(0), initialPts.extent(1));
+    workspace2_ = Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>("xj", initialPts.extent(0), initialPts.extent(1));
+}
+
+
+template<typename MemorySpace>
+Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> ComposedMap<MemorySpace>::Checkpointer::GetLayerInput(unsigned int layerInd)
+{   
+    // Check if the layer asked for is the last checkpoint
+    if(layerInd==checkpointLayers_.back()){
+        return checkpoints_.back();
+
+    // If the requested layer is before the last checkpoint, free up the checkpoint
+    }else if(layerInd<checkpointLayers_.back()){
+        checkpoints_.pop_back();
+        checkpointLayers_.pop_back();
+        return GetLayerInput(layerInd);
+
+    }else{
+
+        // Compute the input by reevaluating from the last checkpoint
+        unsigned int i = checkpointLayers_.back();
+        comps_.at(i)->EvaluateImpl(checkpoints_.back(), workspace1_);
+        ++i;
+        for(; i<layerInd; ++i){
+            comps_.at(i)->EvaluateImpl(workspace1_, workspace2_);
+            simple_swap(workspace1_,workspace2_);
+        }
+        return workspace1_;
+    }
+}
+
+
+template<typename MemorySpace>
 ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components) : ConditionalMapBase<MemorySpace>(components.front()->inputDim,
                                                                                                                                                          components.back()->outputDim,
                         std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
@@ -102,7 +152,13 @@ void ComposedMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySp
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
     
-    EvaluateUntilK(comps_.size(), pts, intPts2, intPts1);
+    comps_.at(0)->EvaluateImpl(pts, intPts1);
+
+    for(int j = 1; j<comps_.size(); j++){
+        comps_.at(j)->EvaluateImpl(intPts1, intPts2);
+        simple_swap(intPts1, intPts2);
+    }
+
     Kokkos::deep_copy(output, intPts1);
 }
 
@@ -118,20 +174,19 @@ void ComposedMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySp
     //      s_{i-1}^T = s_{i}^T J_i(x*)
     // output: s0
 
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
-
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens1("intermediate Sens", sens.extent(0), sens.extent(1));
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens2("intermediate Sens", sens.extent(0), sens.extent(1));
     Kokkos::deep_copy(intSens1,sens);    
     
+    Checkpointer checker(1, pts, comps_);
+
     for(int i = comps_.size() - 1; i>=0; --i){
         
         // x* = T_{i-1} o ... o T_1(x)
-        EvaluateUntilK(i, pts, intPts2, intPts1);
+        auto input = checker.GetLayerInput(i); 
 
         //s_{i-1}^T = s_{i}^T J_i(x*)
-        comps_.at(i)->GradientImpl(intPts1, intSens1, intSens2);
+        comps_.at(i)->GradientImpl(input, intSens1, intSens2);
         simple_swap<decltype(intSens1)>(intSens1, intSens2);
     }
 
@@ -164,24 +219,6 @@ void ComposedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpa
 }
 
 template<typename MemorySpace>
-void ComposedMap<MemorySpace>::EvaluateUntilK( int k, 
-                                               StridedMatrix<const double, MemorySpace> const& pts,
-                                               Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>& intPts, 
-                                               Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>& output){
-
-    Kokkos::deep_copy(output, pts);
-    for(int j = 0; j<k; j++){
-        comps_.at(j)->EvaluateImpl(output, intPts);
-        simple_swap<Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>>(intPts, output);
-    }
-}
-
-
-
-
-
-
-template<typename MemorySpace>
 void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                                              StridedMatrix<const double, MemorySpace> const& sens,
                                              StridedMatrix<double, MemorySpace>              output)
@@ -189,20 +226,18 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
 
     // T(x) = T_{n} o ... o T_1(x), T_i coeffs w_i
     // s^T \nabla_{w_i} T(x) = s^T J_n * J_{n-1} *...*J_{i-1}* \nabla_w_i T_i 
-
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
-
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens1("intermediate sens 1", sens.extent(0), sens.extent(1));
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens2("intermediate sens 2", sens.extent(0), sens.extent(1));
     Kokkos::deep_copy(intSens1, sens);
+
+    Checkpointer checker(1, pts, comps_);
 
     StridedMatrix<double, MemorySpace> subOut;
     int endParamDim = this->numCoeffs;   
     for(int i = comps_.size() - 1; i>=0; --i){
 
         // intPts1 = T_{i-1} o ... o T_1(x) 
-        EvaluateUntilK(i, pts, intPts2, intPts1);
+        auto input = checker.GetLayerInput(i);
 
         // finish g_i = s^T \nabla_{w_i} T(x)
         subOut = Kokkos::subview(output, 
@@ -211,12 +246,12 @@ void ComposedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
 
 
         // get subview of output (storing gradient wrt w_i)
-        comps_.at(i)->CoeffGradImpl(intPts1, intSens1, subOut);
+        comps_.at(i)->CoeffGradImpl(input, intSens1, subOut);
 
         // increment sens to for next iteration
         //s_{i-1}^T = s_{i}^T J_i(x*)
         if(i>0){
-            comps_.at(i)->GradientImpl(intPts1, intSens1, intSens2);
+            comps_.at(i)->GradientImpl(input, intSens1, intSens2);
             simple_swap<decltype(intSens1)>(intSens1,intSens2);
         }
         endParamDim -= comps_.at(i)->numCoeffs;
@@ -231,50 +266,49 @@ void ComposedMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const d
 {
     StridedMatrix<double, MemorySpace> subOut;
 
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
-
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens1("intermediate Sens", pts.extent(0), pts.extent(1));
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens2("intermediate Sens", pts.extent(0), pts.extent(1));
     
 
     // Get the gradient of the log determinant contribution from the last component
-    EvaluateUntilK(comps_.size()-1, pts, intPts2, intPts1);    
+    Checkpointer checker(1, pts, comps_);
+
+    auto input = checker.GetLayerInput(comps_.size()-1);    
     int endParamDim = this->numCoeffs;
     subOut = Kokkos::subview(output, 
                                  std::make_pair(int(endParamDim-comps_.back()->numCoeffs), endParamDim), 
                                  Kokkos::ALL());
-    comps_.back()->LogDeterminantCoeffGradImpl(intPts1, subOut);
+    comps_.back()->LogDeterminantCoeffGradImpl(input, subOut);
 
     // Get the sensitivity of this log determinant term wrt changes in the input
-    comps_.back()->LogDeterminantInputGradImpl(intPts1, intSens1);
+    comps_.back()->LogDeterminantInputGradImpl(input, intSens1);
     
     endParamDim -= comps_.back()->numCoeffs;  
 
     for(int i = comps_.size() - 2; i>=0; --i){
         
         // Compute input to this layer
-        EvaluateUntilK(i, pts, intPts2, intPts1);
+        input = checker.GetLayerInput(i);
 
         // Gradient for direct contribution of these parameters on the log determinant
         subOut = Kokkos::subview(output, 
                                  std::make_pair(int(endParamDim-comps_.at(i)->numCoeffs), endParamDim), 
                                  Kokkos::ALL());
                                  
-        comps_.at(i)->LogDeterminantCoeffGradImpl(intPts1, subOut);
+        comps_.at(i)->LogDeterminantCoeffGradImpl(input, subOut);
 
         // Gradient of later log determinant terms on the coefficients of this layer 
         Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> subOut2("temp", comps_.at(i)->numCoeffs, pts.extent(1));
-        comps_.at(i)->CoeffGradImpl(intPts1, intSens1, subOut2);
+        comps_.at(i)->CoeffGradImpl(input, intSens1, subOut2);
         subOut += subOut2;
 
         if(i>0){
             // Gradient wrt input
-            comps_.at(i)->GradientImpl(intPts1, intSens1, intSens2);
+            comps_.at(i)->GradientImpl(input, intSens1, intSens2);
             simple_swap<decltype(intSens1)>(intSens1, intSens2);
 
             // Add sensitivity of log determinant to input
-            comps_.at(i)->LogDeterminantInputGradImpl(intPts1, intSens2);  
+            comps_.at(i)->LogDeterminantInputGradImpl(input, intSens2);  
             intSens1 += intSens2;   
         }
         endParamDim -= comps_.at(i)->numCoeffs;   
@@ -287,34 +321,26 @@ template<typename MemorySpace>
 void ComposedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
                                                            StridedMatrix<double, MemorySpace>              output)
 {
-    
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts1("intermediate points 1", pts.extent(0), pts.extent(1));
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intPts2("intermediate points 2", pts.extent(0), pts.extent(1));
-
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens1("intermediate Sens", pts.extent(0), pts.extent(1));
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>  intSens2("intermediate Sens", pts.extent(0), pts.extent(1));
     
     // Get the gradient of the log determinant contribution from the last component
-    EvaluateUntilK(comps_.size()-1, pts, intPts2, intPts1);
+    Checkpointer checker(1, pts, comps_);
+    auto input = checker.GetLayerInput(comps_.size()-1);
     
-    comps_.back()->LogDeterminantInputGradImpl(intPts1, intSens1);
+    comps_.back()->LogDeterminantInputGradImpl(input, intSens1);
 
     
     for(int i = comps_.size() - 2; i>=0; --i){
         
         // reset intPts1 to initial pts
-        Kokkos::deep_copy(intPts1, pts);
-        for(int j = 0; j<i; j++){
-            // x = T_j(x)
-            comps_.at(j)->EvaluateImpl(intPts1, intPts2);
-            simple_swap<decltype(intPts1)>(intPts1, intPts2);
-        }
+        input = checker.GetLayerInput(i);
 
         //s_{i-1}^T = s_{i}^T J_i(x*)
-        comps_.at(i)->GradientImpl(intPts1, intSens1, intSens2);
+        comps_.at(i)->GradientImpl(input, intSens1, intSens2);
         simple_swap<decltype(intSens1)>(intSens1, intSens2);
 
-        comps_.at(i)->LogDeterminantInputGradImpl(intPts1, intSens2);  
+        comps_.at(i)->LogDeterminantInputGradImpl(input, intSens2);  
         intSens1 += intSens2;      
     }
 
