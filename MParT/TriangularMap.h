@@ -29,7 +29,7 @@ is positive definite.
  */
 template<typename MemorySpace>
 class TriangularMap : public ConditionalMapBase<MemorySpace>{
-        
+
 public:
 
     /** @brief Construct a block triangular map from a collection of other ConditionalMapBase objects.
@@ -55,8 +55,22 @@ public:
     #if defined(MPART_ENABLE_GPU)
     virtual void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
     virtual void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
-    #endif 
-    
+    #endif
+
+    /** @brief Returns a subsection of the map
+     * @details This function returns a subsection (or "slice") of the map defined by some contiguous subset of the components.
+     * @param a The index of the first component to take
+     * @param b The index of the last component to take
+     * @return A shared pointer to a new TriangularMap object containing the subsection of the map.
+     */
+    std::shared_ptr<TriangularMap<MemorySpace>> Slice(int a, int b) const {
+        std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
+        for(int i=a; i<=b; i++){
+            components.push_back(this->comps_[i]);
+        }
+        return std::make_shared<TriangularMap<MemorySpace>>(components);
+    }
+
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}
 
     /** @brief Computes the log determinant of the Jacobian matrix of this map.
@@ -80,10 +94,10 @@ public:
     void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                       StridedMatrix<double, MemorySpace>              output) override;
 
-    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                               StridedMatrix<const double, MemorySpace> const& sens,
                               StridedMatrix<double, MemorySpace>              output) override;
-    
+
     /** @brief Evaluates the map inverse.
 
     @details To understand this function, consider splitting the map input \f$x_{1:N}\f$ into two parts so that \f$x_{1:N} = [x_{1:N-M},x_{N-M+1:M}]\f$.  Note that the
@@ -105,15 +119,15 @@ public:
                                 StridedMatrix<const double, MemorySpace> const& r);
 
 
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                              StridedMatrix<double, MemorySpace>              output) override;
-    
-    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+
+    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                              StridedMatrix<double, MemorySpace>              output) override;
 private:
 

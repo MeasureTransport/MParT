@@ -12,7 +12,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
     options.basisNorm = false;
-    
+
     unsigned int numBlocks = 3;
     unsigned int maxDegree = 2;
     unsigned int extraInputs = 1;
@@ -27,7 +27,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
         blocks.at(i) = MapFactory::CreateComponent<MemorySpace>(mset, options);
     }
 
-    std::shared_ptr<ConditionalMapBase<MemorySpace>> triMap = std::make_shared<TriangularMap<MemorySpace>>(blocks);
+    std::shared_ptr<TriangularMap<MemorySpace>> triMap = std::make_shared<TriangularMap<MemorySpace>>(blocks);
 
     CHECK(triMap->outputDim == numBlocks);
     CHECK(triMap->inputDim == numBlocks+extraInputs);
@@ -37,9 +37,9 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
     Kokkos::View<double*,Kokkos::HostSpace> coeffs("Coefficients", triMap->numCoeffs);
     for(unsigned int i=0; i<triMap->numCoeffs; ++i)
         coeffs(i) = 0.1*(i+1);
-        
+
     SECTION("Coefficients"){
-        
+
         // Set the coefficients of the triangular map
         triMap->SetCoeffs(coeffs);
 
@@ -65,11 +65,11 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
 
     triMap->SetCoeffs(coeffs);
     auto out = triMap->Evaluate(in);
-    
+
     SECTION("Evaluation"){
 
         for(unsigned int i=0; i<numBlocks; ++i){
-            
+
             auto outBlock = blocks.at(i)->Evaluate(Kokkos::subview(in, std::make_pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
 
             REQUIRE(outBlock.extent(1)==numSamps);
@@ -134,16 +134,16 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
+                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3));
             }
             coeffs(i) -= fdstep;
         }
-        
+
     }
 
 
@@ -173,18 +173,18 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3));
             }
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
                 in(i,ptInd) -= fdstep;
         }
-        
+
     }
 
     SECTION("LogDeterminantCoeffGrad"){
@@ -199,7 +199,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
         Kokkos::View<double**,Kokkos::HostSpace> detGrad = triMap->LogDeterminantCoeffGrad(in);
         REQUIRE(detGrad.extent(0)==triMap->numCoeffs);
         REQUIRE(detGrad.extent(1)==numSamps);
-        
+
         Kokkos::View<double*,Kokkos::HostSpace> logDet = triMap->LogDeterminant(in);
         Kokkos::View<double*,Kokkos::HostSpace> logDet2;
 
@@ -212,11 +212,29 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
             logDet2 = triMap->LogDeterminant(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
-                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).epsilon(1e-4)); 
-            
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).epsilon(1e-4));
+
             coeffs(i) -= fdstep;
         }
 
+    }
+
+    SECTION("Slice"){
+        int sliceBegin = 1;
+        int sliceEnd = 2;
+        auto slice = triMap->Slice(sliceBegin, sliceEnd);
+        REQUIRE(slice->inputDim == triMap->inputDim);
+        REQUIRE(slice->outputDim == (sliceEnd-sliceBegin+1));
+        // Just test the evaluation
+        for(unsigned int i=sliceBegin; i<=sliceEnd; ++i){
+
+            auto outBlock = blocks.at(i)->Evaluate(Kokkos::subview(in, std::make_pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
+
+            REQUIRE(outBlock.extent(1)==numSamps);
+            REQUIRE(outBlock.extent(0)==1);
+            for(unsigned int j=0; j<numSamps; ++j)
+                CHECK( out(i,j) == Approx(outBlock(0,j)).epsilon(1e-6));
+        }
     }
 
 }
