@@ -20,6 +20,12 @@ void mpart::binding::TriangularMapWrapper(py::module &m)
     py::class_<TriangularMap<MemorySpace>, ConditionalMapBase<MemorySpace>, std::shared_ptr<TriangularMap<MemorySpace>>>(m, tName.c_str())
         .def(py::init<std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>>())
         .def("GetComponent", &TriangularMap<MemorySpace>::GetComponent)
+        .def("Slice", &TriangularMap<MemorySpace>::Slice)
+        .def("__getitem__", &TriangularMap<MemorySpace>::GetComponent)
+        .def("__getitem__", [](const TriangularMap<MemorySpace> &m, const py::slice &s) {
+            if(s.stride() != 1) throw std::runtime_error("TriangularMap slice stride must be 1");
+            return m.Slice(s.start(), s.start() + s.size());
+        })
         ;
 
 }
