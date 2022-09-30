@@ -4,6 +4,7 @@
 #include "MParT/MapOptions.h"
 
 #include "MParT/ConditionalMapBase.h"
+#include "MParT/TriangularMap.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
 #include <math.h>
@@ -34,7 +35,7 @@ namespace mpart{
     auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(inDim, outDim, totalOrder, options);
 
      @endcode
-     
+
      */
     namespace MapFactory{
 
@@ -61,7 +62,7 @@ namespace mpart{
             @param options Additional options that will be passed on to CreateComponent to construct each MonotoneComponent.
          */
         template<typename MemorySpace>
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateTriangular(unsigned int inputDim,
+        std::shared_ptr<TriangularMap<MemorySpace>> CreateTriangular(unsigned int inputDim,
                                                                           unsigned int outputDim,
                                                                           unsigned int totalOrder,
                                                                           MapOptions options = MapOptions());
@@ -79,7 +80,7 @@ namespace mpart{
 
 
 
-        /** This struct is used to map the options to functions that can create a map component with types corresponding 
+        /** This struct is used to map the options to functions that can create a map component with types corresponding
             to the options.
         */
         template<typename MemorySpace>
@@ -98,14 +99,14 @@ namespace mpart{
                 auto iter = factoryMap->find(optionsKey);
                 if(iter == factoryMap->end())
                     throw std::runtime_error("Could not find registered factory method for given MapOptions.");
-                
+
                 return iter->second;
             }
 
             static std::shared_ptr<FactoryMapType> GetFactoryMap()
             {
                 static std::shared_ptr<FactoryMapType> map;
-                if( !map ) 
+                if( !map )
                     map = std::make_shared<FactoryMapType>();
                 return map;
             }

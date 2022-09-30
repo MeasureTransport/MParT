@@ -58,14 +58,14 @@ public:
     #endif
 
     /** @brief Returns a subsection of the map
-     * @details This function returns a subsection (or "slice") of the map defined by some contiguous subset of the components.
+     * @details This function returns a subsection (or "slice") of the map defined by some contiguous subset of the components, python-style indices.
      * @param a The index of the first component to take
-     * @param b The index of the last component to take
+     * @param b The index AFTER the last component to take
      * @return A shared pointer to a new TriangularMap object containing the subsection of the map.
      */
     std::shared_ptr<TriangularMap<MemorySpace>> Slice(int a, int b) const {
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
-        for(int i=a; i<=b; i++){
+        for(int i=a; i<b; i++){
             components.push_back(this->comps_[i]);
         }
         return std::make_shared<TriangularMap<MemorySpace>>(components);

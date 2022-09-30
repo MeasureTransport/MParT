@@ -15,12 +15,12 @@ using namespace mpart;
 template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateComponent(FixedMultiIndexSet<MemorySpace> const& mset,
                                                            MapOptions                                   opts)
-{   
+{
     return CompFactoryImpl<MemorySpace>::GetFactoryFunction(opts)(mset,opts);
 }
 
 template<typename MemorySpace>
-std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriangular(unsigned int inputDim,
+std::shared_ptr<TriangularMap<MemorySpace>> mpart::MapFactory::CreateTriangular(unsigned int inputDim,
                                                                          unsigned int outputDim,
                                                                          unsigned int totalOrder,
                                                                          MapOptions options)
@@ -41,14 +41,14 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriang
 
 
 template<typename MemorySpace>
-std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::CreateExpansion(unsigned int outputDim, 
+std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::CreateExpansion(unsigned int outputDim,
                                                                                            FixedMultiIndexSet<MemorySpace> const& mset,
                                                                                            MapOptions                                   opts)
 {
     std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> output;
 
     if(opts.basisType==BasisTypes::ProbabilistHermite){
-        
+
         if(isinf(opts.basisLB) && isinf(opts.basisUB)){
             ProbabilistHermite basis1d(opts.basisNorm);
             output = std::make_shared<MultivariateExpansion<ProbabilistHermite, MemorySpace>>(outputDim, mset, basis1d);
@@ -91,9 +91,9 @@ std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::Creat
 
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateComponent<Kokkos::HostSpace>(FixedMultiIndexSet<Kokkos::HostSpace> const&, MapOptions);
 template std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> mpart::MapFactory::CreateExpansion<Kokkos::HostSpace>(unsigned int, FixedMultiIndexSet<Kokkos::HostSpace> const&, MapOptions);
-template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateTriangular<Kokkos::HostSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
+template std::shared_ptr<TriangularMap<Kokkos::HostSpace>> mpart::MapFactory::CreateTriangular<Kokkos::HostSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
 #if defined(MPART_ENABLE_GPU)
     template std::shared_ptr<ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>> mpart::MapFactory::CreateComponent<Kokkos::DefaultExecutionSpace::memory_space>(FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> const&, MapOptions);
     template std::shared_ptr<ParameterizedFunctionBase<Kokkos::DefaultExecutionSpace::memory_space>> mpart::MapFactory::CreateExpansion<Kokkos::DefaultExecutionSpace::memory_space>(unsigned int, FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> const&, MapOptions);
-    template std::shared_ptr<ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>> mpart::MapFactory::CreateTriangular<Kokkos::DefaultExecutionSpace::memory_space>(unsigned int, unsigned int, unsigned int, MapOptions);
+    template std::shared_ptr<TriangularMap<Kokkos::DefaultExecutionSpace::memory_space>> mpart::MapFactory::CreateTriangular<Kokkos::DefaultExecutionSpace::memory_space>(unsigned int, unsigned int, unsigned int, MapOptions);
 #endif

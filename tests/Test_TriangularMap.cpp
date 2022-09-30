@@ -221,12 +221,12 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
 
     SECTION("Slice"){
         int sliceBegin = 1;
-        int sliceEnd = 2;
+        int sliceEnd = 3;
         auto slice = triMap->Slice(sliceBegin, sliceEnd);
         REQUIRE(slice->inputDim == triMap->inputDim);
-        REQUIRE(slice->outputDim == (sliceEnd-sliceBegin+1));
+        REQUIRE(slice->outputDim == sliceEnd-sliceBegin);
         // Just test the evaluation
-        for(unsigned int i=sliceBegin; i<=sliceEnd; ++i){
+        for(unsigned int i=sliceBegin; i<sliceEnd; ++i){
 
             auto outBlock = blocks.at(i)->Evaluate(Kokkos::subview(in, std::make_pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
 

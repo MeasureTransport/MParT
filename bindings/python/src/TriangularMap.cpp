@@ -23,8 +23,10 @@ void mpart::binding::TriangularMapWrapper(py::module &m)
         .def("Slice", &TriangularMap<MemorySpace>::Slice)
         .def("__getitem__", &TriangularMap<MemorySpace>::GetComponent)
         .def("__getitem__", [](const TriangularMap<MemorySpace> &m, const py::slice &s) {
-            if(s.stride() != 1) throw std::runtime_error("TriangularMap slice stride must be 1");
-            return m.Slice(s.start(), s.start() + s.size());
+            size_t start = 0, stop = 0, step = 0, slicelength = 0;
+            s.compute(m.outputDim, &start, &stop, &step, &slicelength);
+            if(step != 1) throw std::runtime_error("TriangularMap slice stride must be 1");
+            return m.Slice(start, stop);
         })
         ;
 
