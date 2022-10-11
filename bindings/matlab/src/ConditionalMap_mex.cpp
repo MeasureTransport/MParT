@@ -39,9 +39,6 @@ public:
     map_ptr = MapFactory::CreateTriangular<MemorySpace>(inputDim,outputDim,totalOrder,opts);
   }
 
-  ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> TriMaps){
-    map_ptr = std::make_shared<ComposedMap<MemorySpace>>(TriMaps);
-  }
 }; //end class
 
 class ComposedMapMex {       // The class
