@@ -39,15 +39,10 @@ public:
     map_ptr = MapFactory::CreateTriangular<MemorySpace>(inputDim,outputDim,totalOrder,opts);
   }
 
-}; //end class
-
-class ComposedMapMex {       // The class
-public:             
-  std::shared_ptr<ConditionalMapBase<MemorySpace>> map_ptr;
-
-  ComposedMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> TriMaps){
-    map_ptr = std::make_shared<ComposedMap<MemorySpace>>(TriMaps);
+  ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> triMaps,std::string typeMap){
+    map_ptr = std::make_shared<ComposedMap<MemorySpace>>(triMaps);
   }
+
 }; //end class
 
 class ParameterizedFunctionMex {       // The class
@@ -102,7 +97,8 @@ MEX_DEFINE(ConditionalMap_newComposedMap) (int nlhs, mxArray* plhs[],
       const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(list_id.at(i)); 
       TriMaps.at(i) = condMap.map_ptr;
     }
-  output.set(0, Session<ComposedMapMex>::create(new ComposedMapMex(TriMaps)));
+  std::string typeMap = "composed";
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(TriMaps,typeMap)));
 }
 
 MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
