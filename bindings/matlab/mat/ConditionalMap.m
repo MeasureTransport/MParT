@@ -27,6 +27,8 @@ methods
         if(isstring(varargin{2}))
           if(varargin{2}=="id")
             this.id_=varargin{1};
+          elseif(varargin{2}=="compose")
+            this.id_=MParT_('ConditionalMap_newComposedMap', varargin{1});
           end
         else
           mset = varargin{1};

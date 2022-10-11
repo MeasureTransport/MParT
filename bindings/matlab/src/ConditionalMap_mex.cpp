@@ -7,6 +7,7 @@
 #include "MParT/MapFactory.h"
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/TriangularMap.h"
+#include "MParT/ComposedMap.h"
 #include <Eigen/Dense>
 
 
@@ -36,6 +37,19 @@ public:
   
   ConditionalMapMex(unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder, MapOptions opts){
     map_ptr = MapFactory::CreateTriangular<MemorySpace>(inputDim,outputDim,totalOrder,opts);
+  }
+
+  ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> TriMaps){
+    map_ptr = std::make_shared<ComposedMap<MemorySpace>>(TriMaps);
+  }
+}; //end class
+
+class ComposedMapMex {       // The class
+public:             
+  std::shared_ptr<ConditionalMapBase<MemorySpace>> map_ptr;
+
+  ComposedMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> TriMaps){
+    map_ptr = std::make_shared<ComposedMap<MemorySpace>>(TriMaps);
   }
 }; //end class
 
@@ -75,6 +89,23 @@ MEX_DEFINE(ConditionalMap_newTriMap) (int nlhs, mxArray* plhs[],
       blocks.at(i) = condMap.map_ptr;
     }
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(blocks)));
+}
+
+MEX_DEFINE(ConditionalMap_newComposedMap) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+
+  std::vector<intptr_t> list_id = input.get<std::vector<intptr_t>>(0);
+  unsigned int numMaps = list_id.size();
+  
+  std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> TriMaps(numMaps);
+  for(unsigned int i=0;i<numMaps;++i){
+      const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(list_id.at(i)); 
+      TriMaps.at(i) = condMap.map_ptr;
+    }
+  output.set(0, Session<ComposedMapMex>::create(new ComposedMapMex(TriMaps)));
 }
 
 MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
