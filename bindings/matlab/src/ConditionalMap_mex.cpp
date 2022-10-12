@@ -8,6 +8,7 @@
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/TriangularMap.h"
 #include "MParT/ComposedMap.h"
+#include "MParT/AffineMap.h"
 #include <Eigen/Dense>
 
 
@@ -41,6 +42,10 @@ public:
 
   ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> triMaps,std::string typeMap){
     map_ptr = std::make_shared<ComposedMap<MemorySpace>>(triMaps);
+  }
+
+  ConditionalMapMex(StridedMatrix<double,MemorySpace> A, StridedVector<double,MemorySpace> b){
+    map_ptr = std::make_shared<AffineMap<MemorySpace>>(A,b);
   }
 
 }; //end class
@@ -99,6 +104,18 @@ MEX_DEFINE(ConditionalMap_newComposedMap) (int nlhs, mxArray* plhs[],
     }
   std::string typeMap = "composed";
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(TriMaps,typeMap)));
+}
+
+MEX_DEFINE(ConditionalMap_newAffineMapAb) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+
+  auto A = MexToKokkos2d(prhs[0]);
+  auto b = MexToKokkos1d(prhs[1]);
+
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(A,b)));
 }
 
 MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
