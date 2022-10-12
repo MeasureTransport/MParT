@@ -15,9 +15,9 @@ void mpart::binding::ParameterizedFunctionBaseWrapper(jlcxx::Module &mod) {
             unsigned int numPts = size(pts,1);
             unsigned int outDim = pfb.outputDim;
             jlcxx::ArrayRef<double,2> output = jlMalloc<double>(outDim, numPts);
-            for(int i = 0; i < numPts; i++){
-                for(int j = 0; j < outDim; j++){
-                    output[i*outDim+j] = 0.0;
+            for(int j = 0; j < numPts; j++){
+                for(int i = 0; i < outDim; i++){
+                    output[j*outDim+i] = 0.0;
                 }
             }
             pfb.EvaluateImpl(JuliaToKokkos(pts), JuliaToKokkos(output));
@@ -34,6 +34,11 @@ void mpart::binding::ParameterizedFunctionBaseWrapper(jlcxx::Module &mod) {
             unsigned int numPts = size(pts,1);
             unsigned int dim = size(pts,0);
             jlcxx::ArrayRef<double,2> output = jlMalloc<double>(dim, numPts);
+            for(int j = 0; j < numPts; j++){
+                for(int i = 0; i < dim; i++){
+                    output[j*dim+i] = 0.0;
+                }
+            }
             pfb.GradientImpl(JuliaToKokkos(pts), JuliaToKokkos(sens), JuliaToKokkos(output));
             return output;
         })
