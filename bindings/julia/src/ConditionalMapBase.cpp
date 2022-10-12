@@ -33,5 +33,5 @@ void mpart::binding::ConditionalMapBaseWrapper(jlcxx::Module &mod) {
             return output;
         })
         ;
-    // jlcxx::stl::apply_stl<ConditionalMapBase<Kokkos::HostSpace>>(mod);
+    jlcxx::stl::apply_stl<ConditionalMapBase<Kokkos::HostSpace>*>(mod);
 }
