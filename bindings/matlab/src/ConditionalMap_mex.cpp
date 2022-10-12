@@ -48,6 +48,14 @@ public:
     map_ptr = std::make_shared<AffineMap<MemorySpace>>(A,b);
   }
 
+  ConditionalMapMex(StridedMatrix<double,MemorySpace> A){
+    map_ptr = std::make_shared<AffineMap<MemorySpace>>(A);
+  }
+
+  ConditionalMapMex(StridedVector<double,MemorySpace> b){
+    map_ptr = std::make_shared<AffineMap<MemorySpace>>(b);
+  }
+
 }; //end class
 
 class ParameterizedFunctionMex {       // The class
@@ -116,6 +124,28 @@ MEX_DEFINE(ConditionalMap_newAffineMapAb) (int nlhs, mxArray* plhs[],
   auto b = MexToKokkos1d(prhs[1]);
 
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(A,b)));
+}
+
+MEX_DEFINE(ConditionalMap_newAffineMapA) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+
+  auto A = MexToKokkos2d(prhs[0]);
+
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(A)));
+}
+
+MEX_DEFINE(ConditionalMap_newAffineMapb) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+
+  auto b = MexToKokkos1d(prhs[0]);
+
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(b)));
 }
 
 MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
