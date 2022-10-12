@@ -15,6 +15,11 @@ void mpart::binding::ParameterizedFunctionBaseWrapper(jlcxx::Module &mod) {
             unsigned int numPts = size(pts,1);
             unsigned int outDim = pfb.outputDim;
             jlcxx::ArrayRef<double,2> output = jlMalloc<double>(outDim, numPts);
+            for(int i = 0; i < numPts; i++){
+                for(int j = 0; j < outDim; j++){
+                    output[i*outDim+j] = 0.0;
+                }
+            }
             pfb.EvaluateImpl(JuliaToKokkos(pts), JuliaToKokkos(output));
             return output;
         })
