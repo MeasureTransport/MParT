@@ -931,11 +931,11 @@ class MxArray {
                          R
                        >::type* value) {
     if (mxIsComplex(array)) {
-      
+
       #if MX_HAS_INTERLEAVED_COMPLEX
       mxComplexDouble* pc = mxGetComplexDoubles(array);
-      T real_part = pc[index].real;
-      T imag_part = pc[index].imag;
+      T real_part = static_cast<T>(pc[index].real);
+      T imag_part = static_cast<T>(pc[index].imag);
       #else
       T real_part = *(reinterpret_cast<T*>(mxGetPr(array)) + index);
       T imag_part = *(reinterpret_cast<T*>(mxGetPi(array)) + index);
@@ -959,8 +959,8 @@ class MxArray {
     if (mxIsComplex(array)) {
       #if MX_HAS_INTERLEAVED_COMPLEX
       mxComplexDouble* pc = mxGetComplexDoubles(array);
-      real_part = pc[index].real;
-      imag_part = pc[index].imag;
+      real_part = static_cast<T>(pc[index].real);
+      imag_part = static_cast<T>(pc[index].imag);
       #else
       real_part = *(reinterpret_cast<T*>(mxGetPr(array)) + index);
       imag_part = *(reinterpret_cast<T*>(mxGetPi(array)) + index);
@@ -1129,7 +1129,7 @@ class MxArray {
     if (mxIsComplex(array)) {
       #if MX_HAS_INTERLEAVED_COMPLEX
       mxComplexDouble* pc = mxGetComplexDoubles(array);
-      pc[index].real = reinterpret_cast<R>(value);
+      pc[index].real = value;
       pc[index].imag = 0.0;
       #else
       *(reinterpret_cast<R*>(mxGetPr(array)) + index) = value;
@@ -1152,8 +1152,8 @@ class MxArray {
     if (mxIsComplex(array)) {
       #if MX_HAS_INTERLEAVED_COMPLEX
       mxComplexDouble* pc = mxGetComplexDoubles(array);
-      pc[index].real = reinterpret_cast<R>(value.real());
-      pc[index].imag = reinterpret_cast<R>(value.imag());
+      pc[index].real = value.real();
+      pc[index].imag = value.imag();
       #else
       *(reinterpret_cast<R*>(mxGetPr(array)) + index) = value.real();
       *(reinterpret_cast<R*>(mxGetPi(array)) + index) = value.imag();
@@ -1243,7 +1243,7 @@ mxArray* MxArray::fromInternal(const typename std::enable_if<
                                          MxTypes<T>::class_id,
                                          MxTypes<T>::complexity);
   MEXPLUS_CHECK_NOTNULL(array);
-  
+
   #if MX_HAS_INTERLEAVED_COMPLEX
   mxComplexDouble* pc = mxGetComplexDoubles(array);
   (*pc).real = value.real();
