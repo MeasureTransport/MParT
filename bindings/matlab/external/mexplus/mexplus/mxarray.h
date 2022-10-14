@@ -1619,7 +1619,12 @@ T* MxArray::getImagData() const {
   MEXPLUS_ASSERT(MxTypes<T>::class_id == classID(),
                  "Expected a %s array.",
                  typeid(T).name());
-  return reinterpret_cast<T*>(mxGetPi(array_));
+  #if MX_HAS_INTERLEAVED_COMPLEX
+    throw std::runtime_error("Retrieving imaginary data is not supported for interleaved complex data.");
+    return reinterpret_cast<T*>(nullptr);
+  #else
+    return reinterpret_cast<T*>(mxGetPi(array_));
+  #endif
 }
 
 template <typename T>
