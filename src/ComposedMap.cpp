@@ -431,5 +431,5 @@ void ComposedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const d
 // Explicit template instantiation
 template class mpart::ComposedMap<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)
-    template class mpart::ComposedMap<Kokkos::DefaultExecutionSpace::memory_space>;
+    template class mpart::ComposedMap<DeviceSpace>;
 #endif
