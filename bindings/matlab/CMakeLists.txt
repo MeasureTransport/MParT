@@ -4,9 +4,9 @@ include_directories(include)
 include_directories(external)
 include_directories(external/mexplus)
 
-set(MEX_SOURCE 
+set(MEX_SOURCE
     src/KokkosUtilities_mex.cpp
-    src/ConditionalMap_mex.cpp 
+    src/ConditionalMap_mex.cpp
     src/MultiIndexSet_mex.cpp
     src/MultiIndex_mex.cpp
     src/FixedMultiIndexSet_mex.cpp

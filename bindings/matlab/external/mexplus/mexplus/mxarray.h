@@ -931,8 +931,15 @@ class MxArray {
                          R
                        >::type* value) {
     if (mxIsComplex(array)) {
+
+      #if MX_HAS_INTERLEAVED_COMPLEX
+      mxComplexDouble* pc = mxGetComplexDoubles(array);
+      T real_part = static_cast<T>(pc[index].real);
+      T imag_part = static_cast<T>(pc[index].imag);
+      #else
       T real_part = *(reinterpret_cast<T*>(mxGetPr(array)) + index);
       T imag_part = *(reinterpret_cast<T*>(mxGetPi(array)) + index);
+      #endif
       *value = std::abs(std::complex<R>(real_part, imag_part));
     } else {
       *value = *(reinterpret_cast<T*>(mxGetData(array)) + index);
@@ -950,8 +957,14 @@ class MxArray {
                        >::type* value) {
     typename R::value_type real_part, imag_part;
     if (mxIsComplex(array)) {
+      #if MX_HAS_INTERLEAVED_COMPLEX
+      mxComplexDouble* pc = mxGetComplexDoubles(array);
+      real_part = static_cast<T>(pc[index].real);
+      imag_part = static_cast<T>(pc[index].imag);
+      #else
       real_part = *(reinterpret_cast<T*>(mxGetPr(array)) + index);
       imag_part = *(reinterpret_cast<T*>(mxGetPi(array)) + index);
+      #endif
     } else {
       real_part = *(reinterpret_cast<T*>(mxGetData(array)) + index);
       imag_part = 0.0;
@@ -1009,6 +1022,14 @@ class MxArray {
       T* data_pointer = reinterpret_cast<T*>(mxGetData(array));
       value->assign(data_pointer, data_pointer + array_size);
     } else {
+      #if MX_HAS_INTERLEAVED_COMPLEX
+      mxComplexDouble* pc = mxGetComplexDoubles(array);
+      value->resize(array_size);
+      for (mwSize i = 0; i < array_size; ++i) {
+        double mag = std::abs(std::complex<double>(pc[i].real, pc[i].imag));
+        (*value)[i] = static_cast<T>(mag);
+      }
+      #else
       T* real_part = reinterpret_cast<T*>(mxGetPr(array));
       T* imag_part = reinterpret_cast<T*>(mxGetPi(array));
       value->resize(array_size);
@@ -1018,6 +1039,7 @@ class MxArray {
             static_cast<double>(*(imag_part++))));
         (*value)[i] = static_cast<T>(mag);
       }
+      #endif
     }
   }
   #pragma warning( pop )
@@ -1037,11 +1059,18 @@ class MxArray {
         (*value)[i] = typename R::value_type(*(data_pointer++), 0.0f);
       }
     } else {
+      #if MX_HAS_INTERLEAVED_COMPLEX
+      mxComplexDouble* pc = mxGetComplexDoubles(array);
+      for (mwSize i = 0; i < array_size; ++i) {
+        (*value)[i] = typename R::value_type(pc[i].real, pc[i].imag);
+      }
+      #else
       T* real_part = reinterpret_cast<T*>(mxGetPr(array));
       T* imag_part = reinterpret_cast<T*>(mxGetPi(array));
       for (mwSize i = 0; i < array_size; ++i) {
         (*value)[i] = typename R::value_type(*(real_part++), *(imag_part++));
       }
+      #endif
     }
   }
   /** Explicit char (signed) array assignment.
@@ -1098,8 +1127,14 @@ class MxArray {
                            T
                          >::type& value) {
     if (mxIsComplex(array)) {
+      #if MX_HAS_INTERLEAVED_COMPLEX
+      mxComplexDouble* pc = mxGetComplexDoubles(array);
+      pc[index].real = value;
+      pc[index].imag = 0.0;
+      #else
       *(reinterpret_cast<R*>(mxGetPr(array)) + index) = value;
       *(reinterpret_cast<R*>(mxGetPi(array)) + index) = 0.0;
+      #endif
     } else {
       *(reinterpret_cast<R*>(mxGetData(array)) + index) = value;
     }
@@ -1115,8 +1150,14 @@ class MxArray {
                            T
                          >::type& value) {
     if (mxIsComplex(array)) {
+      #if MX_HAS_INTERLEAVED_COMPLEX
+      mxComplexDouble* pc = mxGetComplexDoubles(array);
+      pc[index].real = value.real();
+      pc[index].imag = value.imag();
+      #else
       *(reinterpret_cast<R*>(mxGetPr(array)) + index) = value.real();
       *(reinterpret_cast<R*>(mxGetPi(array)) + index) = value.imag();
+      #endif
     } else {
       *(reinterpret_cast<R*>(mxGetData(array)) + index) = std::abs(value);
     }
@@ -1202,8 +1243,15 @@ mxArray* MxArray::fromInternal(const typename std::enable_if<
                                          MxTypes<T>::class_id,
                                          MxTypes<T>::complexity);
   MEXPLUS_CHECK_NOTNULL(array);
+
+  #if MX_HAS_INTERLEAVED_COMPLEX
+  mxComplexDouble* pc = mxGetComplexDoubles(array);
+  (*pc).real = value.real();
+  (*pc).imag = value.imag();
+  #else
   *reinterpret_cast<typename T::value_type*>(mxGetPr(array)) = value.real();
   *reinterpret_cast<typename T::value_type*>(mxGetPi(array)) = value.imag();
+  #endif
 
   return array;
 }
@@ -1237,13 +1285,24 @@ mxArray* MxArray::fromInternal(const typename std::enable_if<
                                          MxTypes<ContainerValueType>::class_id,
                                          mxCOMPLEX);
   MEXPLUS_CHECK_NOTNULL(array);
+
+  #if MX_HAS_INTERLEAVED_COMPLEX
+  mxComplexDouble* pc = mxGetComplexDoubles(array);
+  for (const auto& v : value) {
+    (*pc).real = v.real();
+    (*pc).imag = v.imag();
+    ++pc;
+  }
+  #else
   ValueType* real = reinterpret_cast<ValueType*>(mxGetPr(array));
   ValueType* imag = reinterpret_cast<ValueType*>(mxGetPi(array));
+
   typename Container::const_iterator it;
   for (it = value.begin(); it != value.end(); it++) {
       *real++ = (*it).real();
       *imag++ = (*it).imag();
   }
+  #endif
   return array;
 }
 
@@ -1560,7 +1619,12 @@ T* MxArray::getImagData() const {
   MEXPLUS_ASSERT(MxTypes<T>::class_id == classID(),
                  "Expected a %s array.",
                  typeid(T).name());
-  return reinterpret_cast<T*>(mxGetPi(array_));
+  #if MX_HAS_INTERLEAVED_COMPLEX
+    throw std::runtime_error("Retrieving imaginary data is not supported for interleaved complex data.");
+    return reinterpret_cast<T*>(nullptr);
+  #else
+    return reinterpret_cast<T*>(mxGetPi(array_));
+  #endif
 }
 
 template <typename T>
