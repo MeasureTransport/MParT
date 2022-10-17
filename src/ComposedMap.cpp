@@ -142,11 +142,16 @@ ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMap
 
     // Check the sizes of all the inputs
     for(unsigned int i=0; i<maps_.size()-1; ++i){
-        if(maps_.at(i)->inputDim != maps_.at(i)->outputDim){
+        if(maps_.at(i)->inputDim != maps_.at(i)->outputDim || maps_.at(i)->outputDim != maps_.at(i+1)->inputDim){
             std::stringstream msg;
             msg << "In ComposedMap constructor, each map in the composition must be square. Output dimension (" << maps_.at(i)->outputDim << ") of component " << i << " is not equal to the input dimension (" << maps_.at(i)->inputDim << ").";
             throw std::invalid_argument(msg.str());
         }
+    }
+    if(maps_.at(maps_.size()-1)->inputDim != maps_.at(maps_.size()-1)->outputDim){
+        std::stringstream msg;
+        msg << "In ComposedMap constructor, each map in the composition must be square. Output dimension (" << maps_.at(maps_.size()-1)->outputDim << ") of component " << maps_.size()-1 << " is not equal to the input dimension (" << maps_.at(maps_.size()-1)->inputDim << ").";
+        throw std::invalid_argument(msg.str());
     }
 }
 
@@ -425,6 +430,6 @@ void ComposedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const d
 
 // Explicit template instantiation
 template class mpart::ComposedMap<Kokkos::HostSpace>;
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
     template class mpart::ComposedMap<Kokkos::DefaultExecutionSpace::memory_space>;
 #endif
