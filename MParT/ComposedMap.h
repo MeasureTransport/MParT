@@ -15,14 +15,14 @@ namespace mpart{
 /**
  @brief Provides a definition of a transport map defined by the composition of several maps.
  @details
-This class defines a map \f$T:\mathbb{R}^N\rightarrow \mathbb{R}^M\f$ with the composed structure
+This class defines a map \f$T:\mathbb{R}^N\rightarrow \mathbb{R}^N\f$ with the composed structure
 \f[
 T(x) = T_L(x) \circ \ \dots \ \circ T_1(x),
 \f]
 where each map \f$T_i:\mathbb{R}^{N}\rightarrow \mathbb{R}^{N}\f$ is a square transport map.
 
 Checkpointing can be used for deep maps to reduce the amount of memory that is required for gradient computations.
-The checkpointing logic was adapted from the :code:`revolve` algorithm of `[Griewank and Walther, 2000] <https://dl.acm.org/doi/10.1145/347837.347846>`_,
+The checkpointing logic was adapted from the `revolve` algorithm of <a href="https://dl.acm.org/doi/10.1145/347837.347846">[Griewank and Walther, 2000]</a>,
 which is an optimal binomial checkpointing scheme.
 
  */
