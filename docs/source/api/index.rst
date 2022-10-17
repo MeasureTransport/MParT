@@ -10,6 +10,7 @@ API Reference
    mapfactory
    conditionalmapbase
    triangularmap
+   composedmap
    monotonecomponent
    multiindex
    quadrature
