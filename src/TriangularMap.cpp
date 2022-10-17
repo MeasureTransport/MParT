@@ -23,11 +23,12 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
     }
 
     for(unsigned int i=1; i<comps_.size(); ++i){
-        if(comps_.at(i)->inputDim != (comps_.at(i-1)->inputDim + comps_.at(i-1)->outputDim)){
+        if(comps_.at(i)->inputDim != (comps_.at(i-1)->inputDim + comps_.at(i)->outputDim)){
             std::stringstream msg;
             msg << "In TriangularMap constructor, the input dimension of component " << i << " is " << comps_.at(i)->inputDim;
-            msg << ", but is expected to be the sum of the input and output dimensions for component " << i-1;
-            msg << ", which is " << comps_.at(i-1)->inputDim << " + " << comps_.at(i-1)->outputDim << " = " << comps_.at(i-1)->inputDim + comps_.at(i-1)->outputDim << ".";
+            msg << ", but is expected to be the sum of the input dimension for component " << i-1;
+            msg << "and output dimension for component " << i;
+            msg << ", which is " << comps_.at(i-1)->inputDim << " + " << comps_.at(i)->outputDim << " = " << comps_.at(i-1)->inputDim + comps_.at(i)->outputDim << ".";
             throw std::invalid_argument(msg.str());
         }
     }
