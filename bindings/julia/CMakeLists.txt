@@ -8,6 +8,8 @@ set(JULIA_BINDING_SOURCES
   src/ParameterizedFunctionBase.cpp
   src/TriangularMap.cpp
   src/Wrapper.cpp
+  src/AffineMap.cpp
+  src/ComposedMap.cpp
   ../common/src/CommonUtilities.cpp
 )
 

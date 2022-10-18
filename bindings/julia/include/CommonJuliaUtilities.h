@@ -48,10 +48,28 @@ void ConditionalMapBaseWrapper(jlcxx::Module&);
 void TriangularMapWrapper(jlcxx::Module&);
 
 /**
+ * @brief Adds AffineMap bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void AffineMapWrapper(jlcxx::Module&);
+
+/**
+ * @brief Adds AffineFunction bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void AffineFunctionWrapper(jlcxx::Module&);
+
+/**
  * @brief Adds MapFactory bindings to the existing module m.
  * @param mod CxxWrap.jl module
  */
 void MapFactoryWrapper(jlcxx::Module&);
+
+/**
+ * @brief Adds ComposedMap bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void ComposedMapWrapper(jlcxx::Module &);
 
 #if defined(MPART_ENABLE_GPU)
 void ConditionalMapBaseDeviceWrapper(jlcxx::Module&);
