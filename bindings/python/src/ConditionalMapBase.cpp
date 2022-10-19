@@ -22,6 +22,12 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
         .def("Inverse", static_cast<Eigen::RowMatrixXd (ConditionalMapBase<MemorySpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ConditionalMapBase<MemorySpace>::Inverse))
         .def("LogDeterminantCoeffGrad", static_cast<Eigen::RowMatrixXd (ConditionalMapBase<MemorySpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad))
         .def("GetBaseFunction", &ConditionalMapBase<MemorySpace>::GetBaseFunction)
+        .def("__getitem__", [](ConditionalMapBase<MemorySpace> &m, const py::slice &s) {
+            size_t start = 0, stop = 0, step = 0, slicelength = 0;
+            s.compute(m.outputDim, &start, &stop, &step, &slicelength);
+            if(step != 1) throw std::runtime_error("Map slice step size must be 1");
+            return m.Slice(start, stop);
+        })
         ;
 
 }
