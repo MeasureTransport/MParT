@@ -57,6 +57,10 @@ public:
     void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                      StridedMatrix<double, MemorySpace>              output) override;
 
+    // This only slices the tail of the map due to how IdentityMap is defined.
+    // i.e. this is invariant on identical shifting of a,b.
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) override;
+
 }; // class IdentityMap
 
 }

@@ -57,43 +57,7 @@ public:
     void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
     #endif
 
-    virtual std::shared_ptr<TriangularMap<MemorySpace>> Slice(int a, int b) const override {
-        std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
-        // TODO: Handle empty case
-        if( a < 0 || a >= b || b > this->GetNumOutputs() ){
-            throw std::runtime_error("TriangularMap::Slice: 0 <= a < b <= GetNumOutputs() must be satisfied.");
-        }
-        int accum_a = 0;
-        int k_a = 0;
-        //TODO: Check that this is correct
-        while(accum_a < a){
-            k_a++;
-            accum_a += this->components[k_a]->GetNumOutputs();
-        }
-        if(a != accum_a){
-            accum_a -= this->components[k_a]->GetNumOutputs();
-        }
-        int accum_b = 0;
-        int k_b = k_a;
-        //TODO: Check that this is correct
-        while(accum_b < b){
-            k_b++;
-            accum_b += this->components[k_b]->GetNumOutputs();
-        }
-        if(b != accum_b){
-            accum_b -= this->components[k_b]->GetNumOutputs();
-        }
-        if(k_a == k_b){
-            components.push_back(this->components[k_a]->Slice(a-accum_a, b-accum_b));
-        } else {
-            components.push_back(this->components[k_a]->Slice(a-accum_a, this->components[k_a]->GetNumOutputs()));
-            for(int k = k_a+1; k < k_b; k++){
-                components.push_back(this->components[k]);
-            }
-            components.push_back(this->components[k_b]->Slice(0, b-accum_b));
-        }
-        return std::make_shared<TriangularMap<MemorySpace>>(components);
-    }
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) override;
 
     /** @brief Returns a subsection of the map according to index of components
      * @details This function returns a subsection (or "slice") of a block triangular map by simply just taking a subset of the blocks.
@@ -103,10 +67,10 @@ public:
      * @param b The index AFTER the last component block to take
      * @return A shared pointer to a new TriangularMap object containing the subsection of the map.
      */
-    std::shared_ptr<TriangularMap<MemorySpace>> BlockSlice(int a, int b) const {
+    std::shared_ptr<TriangularMap<MemorySpace>> BlockSlice(int a, int b) {
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
         for(int k = a; k < b; k++){
-            components.push_back(this->components[k]);
+            components.push_back(this->comps_[k]);
         }
         return std::make_shared<TriangularMap<MemorySpace>>(components);
     }

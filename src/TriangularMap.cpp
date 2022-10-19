@@ -106,7 +106,7 @@ void TriangularMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::Defaul
 template<typename MemorySpace>
 void TriangularMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                     StridedVector<double, MemorySpace>              output)
-{   
+{
     // Evaluate the log determinant for the first component
     StridedMatrix<const double, MemorySpace> subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(0)->inputDim)), Kokkos::ALL());
     comps_.at(0)->LogDeterminantImpl(subPts, output);
@@ -200,8 +200,8 @@ void TriangularMap<MemorySpace>::GradientImpl(StridedMatrix<const double, Memory
     StridedMatrix<const double, MemorySpace> subPts;
     StridedMatrix<const double, MemorySpace> subSens;
 
-    
-    
+
+
     Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0,pts.extent(1));
     unsigned int dim = pts.extent(0);
     Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& ptInd){
@@ -209,7 +209,7 @@ void TriangularMap<MemorySpace>::GradientImpl(StridedMatrix<const double, Memory
             output(d,ptInd) = 0.0;
     });
     Kokkos::fence();
-    
+
     int startOutDim = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
 
@@ -279,7 +279,7 @@ template<typename MemorySpace>
 void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                              StridedMatrix<double, MemorySpace>              output)
 {
-    // Initialize the output to zero 
+    // Initialize the output to zero
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> zeroPolicy({0, 0}, {output.extent(0), output.extent(1)});
     Kokkos::parallel_for(zeroPolicy, KOKKOS_LAMBDA(const int& i, const int& j) {
         output(i,j) = 0.0;
@@ -289,10 +289,10 @@ void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
     StridedMatrix<const double, MemorySpace> subPts;
     StridedMatrix<double, MemorySpace> subOut;
 
-    int numPts = pts.extent(1);    
+    int numPts = pts.extent(1);
     Kokkos::View<double**,MemorySpace> compGrad("Component Gradient", this->inputDim, numPts);
     Kokkos::View<double**,MemorySpace> subGrad;
-    
+
     for(unsigned int i=0; i<comps_.size(); ++i){
         int compDim = comps_.at(i)->inputDim;
         subPts = Kokkos::subview(pts, std::make_pair(0,compDim), Kokkos::ALL());
@@ -308,6 +308,45 @@ void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
         });
     }
 }
+
+template<typename MemorySpace>
+std::shared_ptr<ConditionalMapBase<MemorySpace>> TriangularMap<MemorySpace>::Slice(int a, int b) {
+        std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
+        // TODO: Handle empty case
+        if( a < 0 || a >= b || b > this->outputDim ){
+            throw std::runtime_error("TriangularMap::Slice: 0 <= a < b <= outputDim must be satisfied.");
+        }
+        int accum_a = 0;
+        int k_a = 0;
+        //TODO: Check that this is correct
+        while(accum_a < a){
+            k_a++;
+            accum_a += this->comps_[k_a]->outputDim;
+        }
+        if(a != accum_a){
+            accum_a -= this->comps_[k_a]->outputDim;
+        }
+        int accum_b = 0;
+        int k_b = k_a;
+        //TODO: Check that this is correct
+        while(accum_b < b){
+            k_b++;
+            accum_b += this->comps_[k_b]->outputDim;
+        }
+        if(b != accum_b){
+            accum_b -= this->comps_[k_b]->outputDim;
+        }
+        if(k_a == k_b){
+            components.push_back(this->comps_[k_a]->Slice(a-accum_a, b-accum_b));
+        } else {
+            components.push_back(this->comps_[k_a]->Slice(a-accum_a, this->comps_[k_a]->outputDim));
+            for(int k = k_a+1; k < k_b; k++){
+                components.push_back(this->comps_[k]);
+            }
+            components.push_back(this->comps_[k_b]->Slice(0, b-accum_b));
+        }
+        return std::make_shared<TriangularMap<MemorySpace>>(components);
+    }
 
 // Explicit template instantiation
 template class mpart::TriangularMap<Kokkos::HostSpace>;

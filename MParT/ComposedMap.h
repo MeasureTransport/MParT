@@ -100,6 +100,8 @@ public:
     void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                       StridedMatrix<const double, MemorySpace> const& sens,
                       StridedMatrix<double, MemorySpace>              output) override;
+
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) override;
 private:
 
     unsigned int maxChecks_;

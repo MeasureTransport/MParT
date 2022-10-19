@@ -219,6 +219,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
 
     }
 
+    /*
     SECTION("Slice"){
         int sliceBegin = 1;
         int sliceEnd = 3;
@@ -235,6 +236,6 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
             for(unsigned int j=0; j<numSamps; ++j)
                 CHECK( out(i,j) == Approx(outBlock(0,j)).epsilon(1e-6));
         }
-    }
+    }*/
 
 }

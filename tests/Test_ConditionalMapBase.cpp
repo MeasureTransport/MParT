@@ -8,18 +8,22 @@ using MemorySpace = Kokkos::HostSpace;
 
 class MyIdentityMap : public ConditionalMapBase<MemorySpace>{
 public:
-    MyIdentityMap(unsigned int dim, unsigned int numCoeffs) : ConditionalMapBase(dim,dim,numCoeffs){};
+    MyIdentityMap(unsigned int dim, unsigned int numCoeffs, unsigned int dimOut = 0) : ConditionalMapBase(dim,!dimOut? dim : dimOut,numCoeffs){};
 
     virtual ~MyIdentityMap() = default;
 
     virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                              StridedMatrix<double, MemorySpace>              output) override{Kokkos::deep_copy(output,pts);};
+                              StridedMatrix<double, MemorySpace>              output) override{
+                                int a = this->inputDim - this->outputDim;
+                                auto pts_view = Kokkos::subview(pts, std::make_pair(a, int(this->inputDim)), Kokkos::ALL());
+                                Kokkos::deep_copy(output,pts_view);
+                            };
 
-    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override
     {
-        assert(false);  
+        assert(false);
     }
 
     virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const&,
@@ -32,24 +36,29 @@ public:
                              StridedMatrix<const double, MemorySpace> const& r,
                              StridedMatrix<double, MemorySpace>              output) override{Kokkos::deep_copy(output,r);};
 
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override
     {
-        assert(false);  
-    }
-
-
-    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                             StridedMatrix<double, MemorySpace>              output) override
-    {   
         assert(false);
     }
 
-    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+
+    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                              StridedMatrix<double, MemorySpace>              output) override
-    {   
+    {
         assert(false);
+    }
+
+    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                             StridedMatrix<double, MemorySpace>              output) override
+    {
+        assert(false);
+    }
+
+    // Only creates a slice of the tail of the input
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) override{
+        return std::make_shared<MyIdentityMap>(this->inputDim, 0, b-a);
     }
 };
 
@@ -241,5 +250,47 @@ TEST_CASE( "Testing inverse evaluation of an identity conditional map", "[Condit
             }
         }
     }
+}
 
+
+TEST_CASE( "Testing slicing evaluation of an identity conditional map", "[ConditionalMapBaseSlice]" ) {
+    unsigned int dim = 7;
+    unsigned int numPts = 5;
+    MyIdentityMap map(dim,0);
+
+    int a = 2;
+    int b = 5;
+    std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mapSlice = map.Slice(a,b);
+
+    int sliceOutdim = b-a;
+
+    CHECK(map.inputDim == dim);
+    CHECK(map.outputDim == dim);
+
+    CHECK(mapSlice->inputDim == dim);
+    CHECK(mapSlice->outputDim == sliceOutdim);
+
+    SECTION("Using Kokkos"){
+
+        Kokkos::View<double**, Kokkos::HostSpace> pts("pts", dim, numPts);
+
+        for(unsigned int i=0; i<dim; ++i){
+            for(unsigned int j=0; j<numPts; ++j){
+                pts(i,j) = i;
+            }
+        }
+
+        Kokkos::View<double**, Kokkos::HostSpace> output = mapSlice->Evaluate(pts);
+
+        REQUIRE(output.extent(0)==sliceOutdim);
+        REQUIRE(output.extent(1)==numPts);
+
+        int idx_start = map.inputDim - (b-a);
+
+        for(unsigned int i=0; i<sliceOutdim; ++i){
+            for(unsigned int j=0; j<numPts; ++j){
+                CHECK(output(i,j) == idx_start+i);
+            }
+        }
+    }
 }

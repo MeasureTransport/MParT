@@ -3,13 +3,13 @@
 
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Initialization.h"
- 
+
 
 using namespace mpart;
 
 template<typename MemorySpace>
-AffineMap<MemorySpace>::AffineMap(StridedVector<double,MemorySpace> b) : ConditionalMapBase<MemorySpace>(b.size(),b.size(),0), 
-                                                                  b_(b), 
+AffineMap<MemorySpace>::AffineMap(StridedVector<double,MemorySpace> b) : ConditionalMapBase<MemorySpace>(b.size(),b.size(),0),
+                                                                  b_(b),
                                                                   logDet_(0.0)
 {}
 
@@ -27,7 +27,7 @@ AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A,
                                   StridedVector<double,MemorySpace> b) : ConditionalMapBase<MemorySpace>(A.extent(1),A.extent(0),0),
                                                                   A_(A),
                                                                   b_(b)
-{   
+{
     assert(A_.extent(0)<=A_.extent(1));
     assert(A_.extent(0) == b_.extent(0));
     Factorize();
@@ -86,7 +86,7 @@ void AffineMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpace
     }else{
         outLeft = output;
     }
-    
+
     // Bias part
     if(b_.size()>0){
 
@@ -94,7 +94,7 @@ void AffineMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpace
 
         // After this for loop, we will have out = r - b
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
-            outLeft(i,j) = r(i,j) - b_(i); 
+            outLeft(i,j) = r(i,j) - b_(i);
         });
 
     }else{
@@ -110,7 +110,7 @@ void AffineMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpace
         // If the matrix is rectangular, treat it as the lower part of a block triangular matrix
         // The value of x1 contains the compute inverse for the first block
         if(nrows != ncols){
-            
+
             StridedMatrix<const double, MemorySpace> xsub = Kokkos::subview(x1, std::make_pair(0,ncols-nrows), Kokkos::ALL());
             StridedMatrix<const double, MemorySpace> Asub = Kokkos::subview(A_, Kokkos::ALL(), std::make_pair(0,ncols-nrows));
 
@@ -124,13 +124,13 @@ void AffineMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpace
         if(copyOut)
             Kokkos::deep_copy(output, outLeft);
     }
-    
+
 }
 
 
 
 template<typename MemorySpace>
-void AffineMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+void AffineMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                          StridedMatrix<double, MemorySpace>              output)
 {
     return;
@@ -146,7 +146,7 @@ void AffineMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpac
     }else{
         Kokkos::deep_copy(output, pts);
     }
-    
+
     // Bias part
     if(b_.size()>0){
 
@@ -160,22 +160,22 @@ void AffineMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpac
 }
 
 template<typename MemorySpace>
-void AffineMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+void AffineMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                            StridedMatrix<const double, MemorySpace> const& sens,
                                            StridedMatrix<double, MemorySpace>              output)
 {
     return;
 }
 
-template<typename MemorySpace> 
-void AffineMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+template<typename MemorySpace>
+void AffineMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                          StridedMatrix<double, MemorySpace>              output)
 {
     return;
 }
 
 template<typename MemorySpace>
-void AffineMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+void AffineMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                           StridedMatrix<const double, MemorySpace> const& sens,
                                           StridedMatrix<double, MemorySpace>              output)
 {
@@ -187,8 +187,16 @@ void AffineMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpac
     }
 }
 
+template<typename MemorySpace>
+std::shared_ptr<ConditionalMapBase<MemorySpace>> AffineMap<MemorySpace>::Slice(int a, int b) {
+    StridedMatrix<double, MemorySpace> A_new;
+    StridedVector<double, MemorySpace> b_new;
+    if(A_.extent(0) > 0) A_new = Kokkos::subview(A_, Kokkos::ALL(), std::make_pair(a,b));
+    if(b_.size() > 0) b_new = Kokkos::subview(b_, std::make_pair(a,b));
+    return std::make_shared<AffineMap<MemorySpace>>(A_new, b_new);
+}
 
 template class mpart::AffineMap<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)
     template class mpart::AffineMap<mpart::DeviceSpace>;
-#endif 
+#endif

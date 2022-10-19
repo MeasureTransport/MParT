@@ -1077,6 +1077,11 @@ public:
         assert(it<maxIts);
         return 0.5*(xub+xlb);
     }
+
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) override {
+        assert(a == 0 && b == 1);
+        return std::shared_ptr<MonotoneComponent<ExpansionType, PosFuncType, QuadratureType, MemorySpace>>(this);
+    }
 private:
     ExpansionType expansion_;
     QuadratureType quad_;
