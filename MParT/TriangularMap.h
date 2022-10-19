@@ -65,15 +65,9 @@ public:
      *          the number of outputs of each component is 1.
      * @param a The first component block to take
      * @param b The index AFTER the last component block to take
-     * @return A shared pointer to a new TriangularMap object containing the subsection of the map.
+     * @return A shared pointer to a new ConditionalMapBase object containing the subsection of the map.
      */
-    std::shared_ptr<TriangularMap<MemorySpace>> BlockSlice(int a, int b) {
-        std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
-        for(int k = a; k < b; k++){
-            components.push_back(this->comps_[k]);
-        }
-        return std::make_shared<TriangularMap<MemorySpace>>(components);
-    }
+    virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> BlockSlice(int a, int b);
 
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}
 

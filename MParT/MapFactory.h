@@ -62,7 +62,7 @@ namespace mpart{
             @param options Additional options that will be passed on to CreateComponent to construct each MonotoneComponent.
          */
         template<typename MemorySpace>
-        std::shared_ptr<TriangularMap<MemorySpace>> CreateTriangular(unsigned int inputDim,
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateTriangular(unsigned int inputDim,
                                                                           unsigned int outputDim,
                                                                           unsigned int totalOrder,
                                                                           MapOptions options = MapOptions());

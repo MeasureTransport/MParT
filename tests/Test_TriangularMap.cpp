@@ -219,7 +219,6 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
 
     }
 
-    /*
     SECTION("Slice"){
         int sliceBegin = 1;
         int sliceEnd = 3;
@@ -228,12 +227,19 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents", "[TriangularMap_
         REQUIRE(slice->outputDim == sliceEnd-sliceBegin);
 
         auto outSlice = slice->Evaluate(in);
+
         // Just test the evaluation
         for(unsigned int i=sliceBegin; i<sliceEnd; ++i){
-            for(unsigned int j=0; j<numSamps; ++j){
-                CHECK(outSlice(i-sliceBegin,j) == Approx(out(i,j)));
-            }
+            auto outBlock = blocks.at(i)->Evaluate(Kokkos::subview(in, std::make_pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
+
+            REQUIRE(outBlock.extent(1)==numSamps);
+            REQUIRE(outBlock.extent(0)==1);
+            for(unsigned int j=0; j<numSamps; ++j)
+                CHECK( outSlice(i-sliceBegin,j) == Approx(outBlock(0,j)).epsilon(1e-6));
         }
-    }*/
+
+        // This is used for testing the gradient
+        auto tmapSlice = std::dynamic_pointer_cast<TriangularMap<Kokkos::HostSpace>>(slice);
+    }
 
 }
