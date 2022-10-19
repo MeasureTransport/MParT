@@ -3,7 +3,7 @@ name: external-lib-tests
 on:
   push:
     branches:
-      - dannys4/issue50
+      - main
   pull_request: {}
 
 jobs:
@@ -27,6 +27,7 @@ jobs:
         with:
           repository: kokkos/kokkos
           path: kokkos
+          ref: '3.6.01'
 
       - name: Install Kokkos
         run: |

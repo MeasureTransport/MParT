@@ -319,7 +319,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> TriangularMap<MemorySpace>::Sli
         int accum_a = 0;
         int k_a = 0;
         //TODO: Check that this is correct
-        while(accum_a < a){
+        while(accum_a < a && k_a < this->comps_.size()-1){
             k_a++;
             accum_a += this->comps_[k_a]->outputDim;
         }
@@ -329,7 +329,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> TriangularMap<MemorySpace>::Sli
         int accum_b = 0;
         int k_b = k_a;
         //TODO: Check that this is correct
-        while(accum_b < b){
+        while(accum_b < b && k_b < this->comps_.size()-1){
             k_b++;
             accum_b += this->comps_[k_b]->outputDim;
         }
