@@ -7,6 +7,8 @@
 #include "MParT/MapFactory.h"
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/TriangularMap.h"
+#include "MParT/ComposedMap.h"
+#include "MParT/AffineMap.h"
 #include <Eigen/Dense>
 
 
@@ -37,6 +39,23 @@ public:
   ConditionalMapMex(unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder, MapOptions opts){
     map_ptr = MapFactory::CreateTriangular<MemorySpace>(inputDim,outputDim,totalOrder,opts);
   }
+
+  ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> triMaps,std::string typeMap){
+    map_ptr = std::make_shared<ComposedMap<MemorySpace>>(triMaps);
+  }
+
+  ConditionalMapMex(StridedMatrix<double,MemorySpace> A, StridedVector<double,MemorySpace> b){
+    map_ptr = std::make_shared<AffineMap<MemorySpace>>(A,b);
+  }
+
+  ConditionalMapMex(StridedMatrix<double,MemorySpace> A){
+    map_ptr = std::make_shared<AffineMap<MemorySpace>>(A);
+  }
+
+  ConditionalMapMex(StridedVector<double,MemorySpace> b){
+    map_ptr = std::make_shared<AffineMap<MemorySpace>>(b);
+  }
+
 }; //end class
 
 class ParameterizedFunctionMex {       // The class
@@ -75,6 +94,58 @@ MEX_DEFINE(ConditionalMap_newTriMap) (int nlhs, mxArray* plhs[],
       blocks.at(i) = condMap.map_ptr;
     }
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(blocks)));
+}
+
+MEX_DEFINE(ConditionalMap_newComposedMap) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+
+  std::vector<intptr_t> list_id = input.get<std::vector<intptr_t>>(0);
+  unsigned int numMaps = list_id.size();
+  
+  std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> TriMaps(numMaps);
+  for(unsigned int i=0;i<numMaps;++i){
+      const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(list_id.at(i)); 
+      TriMaps.at(i) = condMap.map_ptr;
+    }
+  std::string typeMap = "composed";
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(TriMaps,typeMap)));
+}
+
+MEX_DEFINE(ConditionalMap_newAffineMapAb) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+
+  auto A = MexToKokkos2d(prhs[0]);
+  auto b = MexToKokkos1d(prhs[1]);
+
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(A,b)));
+}
+
+MEX_DEFINE(ConditionalMap_newAffineMapA) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+
+  auto A = MexToKokkos2d(prhs[0]);
+
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(A)));
+}
+
+MEX_DEFINE(ConditionalMap_newAffineMapb) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+  
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+
+  auto b = MexToKokkos1d(prhs[0]);
+
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(b)));
 }
 
 MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],

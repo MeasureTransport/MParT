@@ -13,7 +13,6 @@ using namespace mexplus;
 
 
 // Instance manager for MultiIndexSet
-// To do: bind functions using MultiIndex objects
 //template class mexplus::Session<MultiIndex>;
 template class mexplus::Session<MultiIndexSet>;
 template class mexplus::Session<FixedMultiIndexSet<Kokkos::HostSpace>>;
