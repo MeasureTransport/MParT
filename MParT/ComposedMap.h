@@ -34,7 +34,7 @@ public:
     /** @brief Construct a block triangular map from a collection of other ConditionalMapBase objects.
 
     @param maps A vector of ConditionalMapBase objects defining each \f$T_k\f$ in the composition. Note: each map must be square (i.e., have equal input and output dimension).
-    @param maxChecks The maximum number of checkpoints to use during gradient computations.  If maxChecks==1, then no checkpointing will be utilized and all forward states will be recomputed.  If maxChecks==components.size(), then all states will be stored and reused during the backward pass.  This is the most efficient option, but can require an intractable amount of memory for high-dimensional or deep parameterizations.   The default value is -1, which will set the maximum number of checkpoints to be equal to the number of layers (i.e., map.size()). 
+    @param maxChecks The maximum number of checkpoints to use during gradient computations.  If maxChecks==1, then no checkpointing will be utilized and all forward states will be recomputed.  If maxChecks==components.size(), then all states will be stored and reused during the backward pass.  This is the most efficient option, but can require an intractable amount of memory for high-dimensional or deep parameterizations.   The default value is -1, which will set the maximum number of checkpoints to be equal to the number of layers (i.e., map.size()).
     */
     ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& maps,
                 int maxChecks=-1);
@@ -50,11 +50,11 @@ public:
                   start at index \f$\sum_{j=1}^{k-1} C_j\f$.
     */
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
-    virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+    void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
     #if defined(MPART_ENABLE_GPU)
-    virtual void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
-    #endif 
-    
+    void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
+    #endif
+
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return maps_.at(i);}
 
     /** @brief Computes the log determinant of the Jacobian matrix of this map.
@@ -64,8 +64,8 @@ public:
     @param output A vector with length equal to the number of columns in pts containing the log determinant of the Jacobian.  This
                   vector should be correctly allocated and sized before calling this function.
     */
-    virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                    StridedVector<double, MemorySpace>              output) override;
+    void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                            StridedVector<double, MemorySpace>              output) override;
 
 
     /** @brief Evaluates the map.
@@ -79,27 +79,27 @@ public:
                       StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
-                             StridedMatrix<const double, MemorySpace> const& r,
-                             StridedMatrix<double, MemorySpace>              output) override;
+    void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+                     StridedMatrix<const double, MemorySpace> const& r,
+                     StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                               StridedMatrix<const double, MemorySpace> const& sens,
-                               StridedMatrix<double, MemorySpace>              output) override;
+    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                       StridedMatrix<const double, MemorySpace> const& sens,
+                       StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                             StridedMatrix<double, MemorySpace>              output) override;
+    void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                     StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                             StridedMatrix<double, MemorySpace>              output) override;
+    void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                     StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                            StridedMatrix<const double, MemorySpace> const& sens,
-                            StridedMatrix<double, MemorySpace>              output) override;
+    void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                      StridedMatrix<const double, MemorySpace> const& sens,
+                      StridedMatrix<double, MemorySpace>              output) override;
 private:
 
     unsigned int maxChecks_;
@@ -109,21 +109,21 @@ private:
     class Checkpointer {
     public:
 
-        Checkpointer(unsigned int maxSaves, 
+        Checkpointer(unsigned int maxSaves,
                      StridedMatrix<const double, MemorySpace> initialPts,
                      std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>& comps);
 
-        /** Returns the input to a layer in the composed map. 
-        
-        Stores checkpoints along the way to assist in backwards passes to compute gradients.  
+        /** Returns the input to a layer in the composed map.
+
+        Stores checkpoints along the way to assist in backwards passes to compute gradients.
         @param[in] layerInd The index of the layer we want the input to.
-        @return A kokkos view containing the input to layer layerInd.  
+        @return A kokkos view containing the input to layer layerInd.
         */
         Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> GetLayerInput(unsigned int layerInd);
 
     protected:
 
-        /** Given the current state of the checkpoints and a need to evaluate the input to layer layerInd, this 
+        /** Given the current state of the checkpoints and a need to evaluate the input to layer layerInd, this
             function computes the next layer input that should be checkpointed.
             @param[in] layerInd The index of the layer that we eventually want to get the input for.
             @return An integer specifying the next layer index that should be checkpointed in a forward pass.
@@ -131,7 +131,7 @@ private:
         int GetNextCheckpoint(unsigned int layerInd) const;
 
         const unsigned int maxSaves_;
-        
+
         Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> workspace1_;
         Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> workspace2_;
         std::deque<Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>> checkpoints_;

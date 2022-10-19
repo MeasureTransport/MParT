@@ -23,8 +23,8 @@ public:
     */
     AffineMap(StridedVector<double,MemorySpace> b);
 
-    /** Constructs a linear map that only scales the input.  Note that the matrix A must be invertible. 
-    \f[ y = Ax\f] 
+    /** Constructs a linear map that only scales the input.  Note that the matrix A must be invertible.
+    \f[ y = Ax\f]
     */
     AffineMap(StridedMatrix<double,MemorySpace> A);
 
@@ -35,35 +35,35 @@ public:
 
     virtual ~AffineMap() = default;
 
-    virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                    StridedVector<double, MemorySpace>              output) override;
-    
-    virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
-                             StridedMatrix<const double, MemorySpace> const& r,
-                             StridedMatrix<double, MemorySpace>              output) override;
+    void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                            StridedVector<double, MemorySpace>              output) override;
 
-    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                             StridedMatrix<double, MemorySpace>              output) override;
+    void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+                     StridedMatrix<const double, MemorySpace> const& r,
+                     StridedMatrix<double, MemorySpace>              output) override;
 
-    virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                              StridedMatrix<double, MemorySpace>              output) override;
+    void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                     StridedMatrix<double, MemorySpace>              output) override;
 
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                               StridedMatrix<const double, MemorySpace> const& sens,
-                               StridedMatrix<double, MemorySpace>              output) override;
-    
-    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                              StridedMatrix<const double, MemorySpace> const& sens,
-                              StridedMatrix<double, MemorySpace>              output) override;
+    void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                      StridedMatrix<double, MemorySpace>              output) override;
 
-    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                             StridedMatrix<double, MemorySpace>              output) override;
+    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                       StridedMatrix<const double, MemorySpace> const& sens,
+                       StridedMatrix<double, MemorySpace>              output) override;
+
+    void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                      StridedMatrix<const double, MemorySpace> const& sens,
+                      StridedMatrix<double, MemorySpace>              output) override;
+
+    void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                     StridedMatrix<double, MemorySpace>              output) override;
 
     /** Computes an LU factorization of the matrix A_ */
     void Factorize();
 
 protected:
-    
+
     StridedMatrix<double,MemorySpace> A_;
     StridedVector<double,MemorySpace> b_;
 
