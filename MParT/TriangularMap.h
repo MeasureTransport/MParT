@@ -57,18 +57,7 @@ public:
     virtual void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
     #endif
 
-    /** @brief Returns a subsection of the map according to index of outputs
-     * @details This function returns a subsection (or "slice") of the map defined by some contiguous subset of the components, python-style indices.
-     *          If the \f$j\f$th component has \f$M_j\f$ outputs, and \f$S_n=\sum_{j=1}^nM_j\f$, then the slice \f$(a,b)\f$ will find the indices
-     *          \f$k_a,k_b\f$ such that \f$S_{k_a} \leq a < S_{k_a+1}\f$ and, similarly, \f$S_{k_b}\leq b < S_{k_b+1}\f$. Then, we recursively slice
-     *          the components \f$k_a,k_b\f$ such that, setting \f$T_{k_a}^\prime := T_{k_a}(x)[a-S_{k_a}:S_{k_a+1}]\f$ and \f$T_{k_b}^\prime := T_{k_b}(x)[0:b-S_{k_b}]\f$,
-     *          the returned map is block triangular and defined by T_{a:b}(x) = [T_{k_a}^\prime(x), T_{k_a+1}(x), \ldots, T_{k_b-1}(x), T_{k_b}^\prime(x)]. Further, the
-     *          returned map will have the same number of inputs as the original map and the number of outputs will be \f$b-a\f$.
-     * @param a The first output index to take
-     * @param b The index AFTER the last output index to take
-     * @return A shared pointer to a new TriangularMap object containing the subsection of the map.
-     */
-    std::shared_ptr<TriangularMap<MemorySpace>> Slice(int a, int b) const {
+    virtual std::shared_ptr<TriangularMap<MemorySpace>> Slice(int a, int b) const override {
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
         // TODO: Handle empty case
         if( a < 0 || a >= b || b > this->GetNumOutputs() ){

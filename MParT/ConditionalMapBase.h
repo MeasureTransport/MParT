@@ -18,7 +18,7 @@ namespace mpart {
       Let \f$r\in\mathbb{R}^M\f$ denote the map output, \f$r=T(x_2; x_1)\f$.  The conditional maps implemented by children of this
       class guarantee that for fixed \f$x_1\f$, the conditional mapping from \f$x_1 \rightarrow r\f$ is invertible and the
       Jacobian matrix with respect to \f$x_2\f$, \f$\nabla_{x_2} T\f$, is positive definite.
-     
+
      @see mpart::MapFactory
      */
     template<typename MemorySpace>
@@ -28,7 +28,7 @@ namespace mpart {
     public:
 
         /**
-         @brief Construct a new Conditional Map Base object. 
+         @brief Construct a new Conditional Map Base object.
          @details Typically the ConditionalMapBase class is not constructed directly.  The preferred way of creating a ConditionalMapBase object is through factory methods in the mpart::MapFactory namespace.
          @param inDim The dimension \f$N\f$ of the input to this map.
          @param outDim The dimension \f$M\f$ of the output from this map.
@@ -37,8 +37,8 @@ namespace mpart {
         ConditionalMapBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs) : ParameterizedFunctionBase<MemorySpace>(inDim, outDim, nCoeffs){};
 
         virtual ~ConditionalMapBase() = default;
-        
-        /** For Monotone parameterizations that are based on a non-monotone base function, this function will return the base function.  If the monotone parameterization is 
+
+        /** For Monotone parameterizations that are based on a non-monotone base function, this function will return the base function.  If the monotone parameterization is
             not constructed from a non-monotone base, then this function will return a nullptr.
         */
         virtual std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> GetBaseFunction(){return nullptr;};
@@ -73,14 +73,14 @@ namespace mpart {
 
 
         /** @brief Computes the inverse of the map.
-            @details The ConditionalMapBase class defines invertible functions \f$T:\mathbb{R}^{d_{in}}\rightarrow\mathbb{R}^{d_{out}}\f$ 
+            @details The ConditionalMapBase class defines invertible functions \f$T:\mathbb{R}^{d_{in}}\rightarrow\mathbb{R}^{d_{out}}\f$
             where the input dimension \f$d_{in}\geq d_{out}\f$.  An input \f$x\in\mathbb{R}^{d_{in}}\f$ can then be split
-            into two parts \f$x=[x_1,x_2]\f$, where \f$x_1\in\mathbb{R}^{d_{in}-d_{out}}\f$ represents the "extra" inputs 
+            into two parts \f$x=[x_1,x_2]\f$, where \f$x_1\in\mathbb{R}^{d_{in}-d_{out}}\f$ represents the "extra" inputs
             and \f$x_2\in\mathbb{R}^{d_{out}}\f$ has the same size as the map output.  This function computes the second block \f$x_2\f$
             of the input given the first block \f$x_1\f$ and a vector \f$r=T(x_1,x_2)\f$.
-            
+
             @param x1 A \f$d_{in}-d_{out}\times N\f$ or \f$d_{in}\times N\f$ matrix containing \f$N\f$ values of the first input block:
-            \f$\{x_1^{(1)},\ldots x_1^{(N)}\}\f$.  If \f$d_{in}\f$ rows are given, then the last \f$d_{out}\f$ rows may be used as an initial 
+            \f$\{x_1^{(1)},\ldots x_1^{(N)}\}\f$.  If \f$d_{in}\f$ rows are given, then the last \f$d_{out}\f$ rows may be used as an initial
             guess for \f$x_2\f$ by certain solvers.
             @param r A \f$d_{out}\times N\f$ matrix containing \f$N\f$ values of the map output: \f$\{r^{(1)},\ldots, r^{(N)}\}\f$.
             @return A \f$d_{out} \times N\f$ matrix containing the computed values of \f$\{x_2^{(1)},\ldots,x_2^{(N)}\}\f$.
@@ -92,13 +92,13 @@ namespace mpart {
         /** Inverse function with conversion between general view type and const strided matrix. */
         template<typename ViewType1, typename ViewType2>
         StridedMatrix<double, typename ViewType1::memory_space> Inverse(ViewType1 x,  ViewType2 r){
-            StridedMatrix<const double, typename ViewType1::memory_space> newx(x); 
-            StridedMatrix<const double, typename ViewType2::memory_space> newr(r); 
+            StridedMatrix<const double, typename ViewType1::memory_space> newx(x);
+            StridedMatrix<const double, typename ViewType2::memory_space> newr(r);
             return this->Inverse(newx,newr);
         }
 
         /** Inverse function with conversion between eigen matrix and Kokkos view. */
-        Eigen::RowMatrixXd Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1, 
+        Eigen::RowMatrixXd Inverse(Eigen::Ref<const Eigen::RowMatrixXd> const& x1,
                                    Eigen::Ref<const Eigen::RowMatrixXd> const& r);
 
 
@@ -109,10 +109,10 @@ namespace mpart {
         /**
            @brief Computes the gradient of the log determinant with respect to the map coefficients.
            @details For a map \f$T(x; w) : \mathbb{R}^N \rightarrow \mathbb{R}^M\f$ parameterized by coefficients \f$w\in\mathbb{R}^K\f$,
-           this function computes 
+           this function computes
            \f[
             \nabla_w \det{\nabla_x T(x_i; w)},
-          \f] 
+          \f]
            at multiple points \f$x_i\f$.
            @param pts A collection of points where we want to evaluate the gradient.  Each column corresponds to a point.
            @return A matrix containing the coefficient gradient at each input point.  The \f$i^{th}\f$ column  contains \f$\nabla_w \det{\nabla_x T(x_i; w)}\f$.
@@ -123,14 +123,14 @@ namespace mpart {
         /** Include conversion between general view type and Strided matrix. */
         template<typename ViewType>
         StridedMatrix<double, typename ViewType::memory_space> LogDeterminantCoeffGrad(ViewType pts){
-            StridedMatrix<const double, typename ViewType::memory_space> newpts(pts); 
+            StridedMatrix<const double, typename ViewType::memory_space> newpts(pts);
             return  this->LogDeterminantCoeffGrad(newpts);
         }
 
         /** Evaluation with additional conversion of Eigen matrix to Kokkos unmanaged view. */
         Eigen::RowMatrixXd LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+        virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                  StridedMatrix<double, MemorySpace>              output) = 0;
 
 
@@ -140,16 +140,17 @@ namespace mpart {
         /** Include conversion between general view type and Strided matrix. */
         template<typename ViewType>
         StridedMatrix<double, typename ViewType::memory_space> LogDeterminantInputGrad(ViewType pts){
-            StridedMatrix<const double, typename ViewType::memory_space> newpts(pts); 
+            StridedMatrix<const double, typename ViewType::memory_space> newpts(pts);
             return  this->LogDeterminantInputGrad(newpts);
         }
 
         /** Evaluation with additional conversion of Eigen matrix to Kokkos unmanaged view. */
         Eigen::RowMatrixXd LogDeterminantInputGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts);
 
-        virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+        virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                  StridedMatrix<double, MemorySpace>              output) = 0;
 
+        virtual void Slice(int a, int b) = 0;
     }; // class ConditionalMapBase<MemorySpace>
 }
 
