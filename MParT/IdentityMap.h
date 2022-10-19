@@ -13,8 +13,8 @@ namespace mpart{
 
 /**
  @brief Provides a definition of the identity map.
- @details 
-This class defines the identity map \f$I:\mathbb{R}^N\rightarrow \mathbb{R}^M\f$, i.e., a map such that \f$I(x_{1:N-M},x_{N-M:N}) = x_{N-M:N}\f$ 
+ @details
+This class defines the identity map \f$I:\mathbb{R}^N\rightarrow \mathbb{R}^M\f$, i.e., a map such that \f$I(x_{1:N-M},x_{N-M:N}) = x_{N-M:N}\f$
 
 
  */
@@ -32,31 +32,30 @@ public:
 
 
     void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                      StridedMatrix<double, MemorySpace>              output);
+                      StridedMatrix<double, MemorySpace>              output) override;
 
     void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
                      StridedMatrix<const double, MemorySpace> const& r,
-                     StridedMatrix<double, MemorySpace>              output);
+                     StridedMatrix<double, MemorySpace>              output) override;
 
 
     void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                            StridedVector<double, MemorySpace>              output);
+                            StridedVector<double, MemorySpace>              output) override;
 
-    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                        StridedMatrix<const double, MemorySpace> const& sens,
-                       StridedMatrix<double, MemorySpace>              output);
-    
-    
-    void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                       StridedMatrix<double, MemorySpace>              output) override;
+
+    void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                        StridedMatrix<const double, MemorySpace> const& sens,
-                       StridedMatrix<double, MemorySpace>              output);
+                       StridedMatrix<double, MemorySpace>              output) override;
 
 
-    void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                     StridedMatrix<double, MemorySpace>              output);
+    void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                     StridedMatrix<double, MemorySpace>              output) override;
 
-    void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
-                                     StridedMatrix<double, MemorySpace>              output);
+    void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                     StridedMatrix<double, MemorySpace>              output) override;
 
 }; // class IdentityMap
 

@@ -150,7 +150,7 @@ namespace mpart {
         virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                  StridedMatrix<double, MemorySpace>              output) = 0;
 
-        virtual void Slice(int a, int b) = 0;
+        virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) = 0;
     }; // class ConditionalMapBase<MemorySpace>
 }
 

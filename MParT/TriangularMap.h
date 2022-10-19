@@ -150,25 +150,25 @@ public:
     @param r The map output \f$r_{1:M}\f$ to invert.
     @param output A matrix with \f$M\f$ rows to store the computed map inverse \f$x_{N-M+1:M}\f$.
     */
-    virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
-                             StridedMatrix<const double, MemorySpace> const& r,
-                             StridedMatrix<double, MemorySpace>              output) override;
+    void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+                     StridedMatrix<const double, MemorySpace> const& r,
+                     StridedMatrix<double, MemorySpace>              output) override;
 
 
     virtual void InverseInplace(StridedMatrix<double, MemorySpace>              x1,
                                 StridedMatrix<const double, MemorySpace> const& r);
 
 
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                               StridedMatrix<const double, MemorySpace> const& sens,
-                               StridedMatrix<double, MemorySpace>              output) override;
+    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                       StridedMatrix<const double, MemorySpace> const& sens,
+                       StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                             StridedMatrix<double, MemorySpace>              output) override;
+    void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                     StridedMatrix<double, MemorySpace>              output) override;
 
-    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                             StridedMatrix<double, MemorySpace>              output) override;
+    void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                     StridedMatrix<double, MemorySpace>              output) override;
 private:
 
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;
