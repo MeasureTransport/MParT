@@ -50,11 +50,11 @@ public:
                   start at index \f$\sum_{j=1}^{k-1} C_j\f$.
     */
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
-    virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
-    virtual void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+    void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+    void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
     #if defined(MPART_ENABLE_GPU)
-    virtual void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
-    virtual void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
+    void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
+    void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
     #endif
 
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}
@@ -66,8 +66,8 @@ public:
     @param output A vector with length equal to the number of columns in pts containing the log determinant of the Jacobian.  This
                   vector should be correctly allocated and sized before calling this function.
     */
-    virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                    StridedVector<double, MemorySpace>              output) override;
+    void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                            StridedVector<double, MemorySpace>              output) override;
 
 
     /** @brief Evaluates the map.
@@ -80,9 +80,9 @@ public:
     void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                       StridedMatrix<double, MemorySpace>              output) override;
 
-    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                              StridedMatrix<const double, MemorySpace> const& sens,
-                              StridedMatrix<double, MemorySpace>              output) override;
+    void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                      StridedMatrix<const double, MemorySpace> const& sens,
+                      StridedMatrix<double, MemorySpace>              output) override;
 
     /** @brief Evaluates the map inverse.
 
