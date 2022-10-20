@@ -23,7 +23,7 @@ SummarizedMap<MemorySpace>::SummarizedMap(std::shared_ptr<ParameterizedFunctionB
 
     if(map_->inputDim != summaryFunction->outputDim + 1){
         std::stringstream msg;
-        msg << "SummarizedMap: input dimension of map component must be 1 + output dimension of summaryFunction, but was given map->inputDim" << map_->inputDim << " and summaryFunction->outputDim + 1" << summaryFunction_->outputDim + 1 << ".";
+        msg << "SummarizedMap: input dimension of map component must be 1 + output dimension of summaryFunction, but was given map->inputDim = " << map_->inputDim << " and summaryFunction->outputDim + 1 = " << summaryFunction_->outputDim + 1 << ".";
         throw std::invalid_argument(msg.str());
     }
 }
