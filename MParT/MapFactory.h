@@ -77,7 +77,16 @@ namespace mpart{
                                                                                 FixedMultiIndexSet<MemorySpace> const& mset,
                                                                                 MapOptions options = MapOptions());
 
-
+        // /**
+        // @brief Constructs a (generally) non-monotone multivariate expansion.
+        // @param outputDim The output dimension of the expansion.  Each output will be defined by the same multiindex set but will have different coefficients.
+        // @param mset The multiindex set specifying which terms should be used in the multivariate expansion.
+        // @param options Options specifying the 1d basis functions used in the parameterization.
+        // */
+        // template<typename MemorySpace>
+        // std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSingleEntryMap(unsigned int dim,
+        //                                                                              unsigned int activeInd,
+        //                                                                              std::shared_ptr<ConditionalMapBase<MemorySpace>> &comp);
 
         /** This struct is used to map the options to functions that can create a map component with types corresponding 
             to the options.
