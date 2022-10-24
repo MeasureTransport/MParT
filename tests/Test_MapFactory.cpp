@@ -157,7 +157,37 @@ TEST_CASE( "Testing factory method for triangular map", "[MapFactoryTriangular]"
     REQUIRE(map != nullptr);
 }
 
-TEST_CASE( "Testing factory method for single entry map", "[MapFactorySingleEntryMap]" ) {
+TEST_CASE( "Testing factory method for single entry map, activeInd = 1", "[MapFactorySingleEntryMap 1]" ) {
+
+    MapOptions options;
+    options.basisType = BasisTypes::ProbabilistHermite;
+    unsigned int dim = 7;
+    unsigned int activeInd = 1;
+    unsigned int maxDegree = 5;
+    FixedMultiIndexSet<MemorySpace> mset(activeInd, maxDegree);
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> comp = MapFactory::CreateComponent<MemorySpace>(mset, options);
+
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateSingleEntryMap<MemorySpace>(dim, activeInd, comp);
+
+    REQUIRE(map != nullptr);
+}
+
+TEST_CASE( "Testing factory method for single entry map, activeInd = dim", "[MapFactorySingleEntryMap 2]" ) {
+
+    MapOptions options;
+    options.basisType = BasisTypes::ProbabilistHermite;
+    unsigned int dim = 7;
+    unsigned int activeInd = dim;
+    unsigned int maxDegree = 5;
+    FixedMultiIndexSet<MemorySpace> mset(activeInd, maxDegree);
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> comp = MapFactory::CreateComponent<MemorySpace>(mset, options);
+
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateSingleEntryMap<MemorySpace>(dim, activeInd, comp);
+
+    REQUIRE(map != nullptr);
+}
+
+TEST_CASE( "Testing factory method for single entry map, 1 < activeInd < dim", "[MapFactorySingleEntryMap 3]" ) {
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;

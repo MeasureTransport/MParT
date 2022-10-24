@@ -19,6 +19,10 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
     // CreateTriangular
     m.def(isDevice? "dCreateTriangular" : "CreateTriangular", &MapFactory::CreateTriangular<MemorySpace>);
 
+    // CreateSingleEntryMap
+    m.def(isDevice? "dCreateSingleEntryMap" : "CreateSingleEntryMap", &MapFactory::CreateSingleEntryMap<MemorySpace>);
+
+
 }
 
 template void mpart::binding::MapFactoryWrapper<Kokkos::HostSpace>(py::module&);
