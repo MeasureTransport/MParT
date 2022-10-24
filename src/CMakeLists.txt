@@ -37,5 +37,5 @@ target_sources(mpart
     ComposedMap.cpp
     IdentityMap.cpp
     SummarizedMap.cpp
-    SingleEntryMap.cpp
+    # SingleEntryMap.cpp
 )

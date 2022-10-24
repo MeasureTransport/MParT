@@ -76,7 +76,6 @@ SingleEntryMap<MemorySpace>::SingleEntryMap(const unsigned int dim, const unsign
 
     }
     
-
     map_(map);
 }
 
