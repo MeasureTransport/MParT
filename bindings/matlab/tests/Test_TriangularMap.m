@@ -1,6 +1,6 @@
 clear
 
-addpath(genpath('.'));
+addpath(genpath('../../../'));
 
 KokkosInitialize(8);
 
@@ -35,3 +35,29 @@ disp('GetBaseFunction:')
 parFunc = map1FromTri.GetBaseFunction();
 parFunc.SetCoeffs(map1FromTri.Coeffs);
 disp(parFunc.Evaluate(randn(1,10)))
+
+
+% Test construction with different dimensions
+
+opts=MapOptions;
+maxDegree = 2;
+
+numBlocks = 3;
+dim1 = 2;
+dim2 = 4;
+dim3 = 3;
+dim = dim1 + dim2 + dim3;
+
+M1 = CreateTriangular(dim1,dim1,maxDegree,opts);
+M2 = CreateTriangular(dim1+dim2,dim2,maxDegree,opts);
+M3 = CreateTriangular(dim1+dim2+dim3,dim3,maxDegree,opts);
+
+triMap = TriangularMap([M1 M2 M3]);
+
+triMap.SetCoeffs(randn(dim,triMap.numCoeffs));
+
+disp(['Num coeffs triMap: ',num2str(triMap.numCoeffs)])
+disp(['Sum coeffs maps: ',num2str(M1.numCoeffs+M2.numCoeffs+M3.numCoeffs)])
+
+Y=triMap.Evaluate(randn(dim,10));
+
