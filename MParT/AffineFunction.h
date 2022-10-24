@@ -22,31 +22,31 @@ public:
     */
     AffineFunction(StridedVector<double,MemorySpace> b);
 
-    /** Constructs a linear function that only scales the input. 
-    \f[ y = Ax\f] 
+    /** Constructs a linear function that only scales the input.
+    \f[ y = Ax\f]
     */
     AffineFunction(StridedMatrix<double,MemorySpace> A);
 
-    /** Constructs an affine function that scales and shifts the input. 
+    /** Constructs an affine function that scales and shifts the input.
     \f[ y = Ax + b \f]
     */
     AffineFunction(StridedMatrix<double,MemorySpace> A, StridedVector<double,MemorySpace> b);
 
     virtual ~AffineFunction() = default;
 
-    virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                              StridedMatrix<double, MemorySpace>              output) override;
+    void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                      StridedMatrix<double, MemorySpace>              output) override;
 
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                               StridedMatrix<const double, MemorySpace> const& sens,
-                               StridedMatrix<double, MemorySpace>              output) override;
-    
-    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                              StridedMatrix<const double, MemorySpace> const& sens,
-                              StridedMatrix<double, MemorySpace>              output) override;
+    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                       StridedMatrix<const double, MemorySpace> const& sens,
+                       StridedMatrix<double, MemorySpace>              output) override;
+
+    void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                      StridedMatrix<const double, MemorySpace> const& sens,
+                      StridedMatrix<double, MemorySpace>              output) override;
 
 protected:
-    
+
     StridedMatrix<double,MemorySpace> A_;
     StridedVector<double,MemorySpace> b_;
 
