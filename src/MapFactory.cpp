@@ -41,7 +41,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateSingle
         throw std::invalid_argument(msg.str());
     }
 
-    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> output;
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
     // Construct map using TriangularMap constructor
     
     if(activeInd == 1){  // special case if activeInd = 1, map is of form [T_1; Id]
@@ -169,8 +169,10 @@ std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::Creat
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateComponent<Kokkos::HostSpace>(FixedMultiIndexSet<Kokkos::HostSpace> const&, MapOptions);
 template std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> mpart::MapFactory::CreateExpansion<Kokkos::HostSpace>(unsigned int, FixedMultiIndexSet<Kokkos::HostSpace> const&, MapOptions);
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateTriangular<Kokkos::HostSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
+template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateSingleEntryMap(unsigned int, unsigned int, std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> const&);
 #if defined(MPART_ENABLE_GPU)
-    template std::shared_ptr<ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>> mpart::MapFactory::CreateComponent<Kokkos::DefaultExecutionSpace::memory_space>(FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> const&, MapOptions);
-    template std::shared_ptr<ParameterizedFunctionBase<Kokkos::DefaultExecutionSpace::memory_space>> mpart::MapFactory::CreateExpansion<Kokkos::DefaultExecutionSpace::memory_space>(unsigned int, FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> const&, MapOptions);
-    template std::shared_ptr<ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>> mpart::MapFactory::CreateTriangular<Kokkos::DefaultExecutionSpace::memory_space>(unsigned int, unsigned int, unsigned int, MapOptions);
+    template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateComponent<DeviceSpace>(FixedMultiIndexSet<DeviceSpace> const&, MapOptions);
+    template std::shared_ptr<ParameterizedFunctionBase<DeviceSpace>> mpart::MapFactory::CreateExpansion<DeviceSpace>(unsigned int, FixedMultiIndexSet<DeviceSpace> const&, MapOptions);
+    template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateTriangular<DeviceSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
+    template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateSingleEntryMap(unsigned int, unsigned int, std::shared_ptr<ConditionalMapBase<DeviceSpace>> const&);
 #endif
