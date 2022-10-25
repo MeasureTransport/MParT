@@ -32,6 +32,12 @@ template<typename MemorySpace>
 void TriangularMapWrapper(pybind11::module &m);
 
 template<typename MemorySpace>
+void ComposedMapWrapper(pybind11::module &m);
+
+template<typename MemorySpace>
+void SummarizedMapWrapper(pybind11::module &m);
+
+template<typename MemorySpace>
 void ParameterizedFunctionBaseWrapper(pybind11::module &m);
 
 template<typename MemorySpace>

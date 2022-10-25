@@ -53,7 +53,7 @@ public:
                                     StridedVector<double, MemorySpace>              output) override;
 
 
-    void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+    virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                       StridedMatrix<double, MemorySpace>              output) override;
 
     virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  

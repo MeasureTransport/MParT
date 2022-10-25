@@ -6,6 +6,8 @@ set(PYTHON_BINDING_SOURCES
   src/MapOptions.cpp
   src/ConditionalMapBase.cpp
   src/TriangularMap.cpp
+  src/ComposedMap.cpp
+  src/SummarizedMap.cpp
   src/MapFactory.cpp
   src/ParameterizedFunctionBase.cpp
   src/AffineMap.cpp

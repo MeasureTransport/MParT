@@ -23,8 +23,9 @@ def test_numCoeffs():
 
 
 def test_CoeffsMap():
-    triangular.SetCoeffs(np.zeros(triangular.numCoeffs))
-    assert triangular.CoeffMap().tolist() == [0,0,0,0,0]
+    coeffs = np.random.randn(triangular.numCoeffs)
+    triangular.SetCoeffs(coeffs)
+    assert np.all(triangular.CoeffMap() == coeffs)
 
 
 def test_Evaluate():

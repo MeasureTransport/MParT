@@ -65,7 +65,6 @@ def test_CreateComponent_quadTypes():
     # assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
 
 
-
 def test_CreateTriangular():
     triangular = mpart.CreateTriangular(2,2,2,opts)
     assert triangular.numCoeffs == 2 + 7 
@@ -74,6 +73,26 @@ def test_CreateTriangular():
 def test_CreateSingleEntryMap_1():
     dim = 7
     activeInd = 1
+
+    mset_csemap = mpart.MultiIndexSet.CreateTotalOrder(activeInd, 3, noneLim)  
+    component = mpart.CreateComponent(mset_csemap.fix(True), opts)
+
+    single_entry_map = mpart.CreateSingleEntryMap(dim, activeInd, component)
+    assert single_entry_map.numCoeffs == component.numCoeffs
+
+def test_CreateSingleEntryMap_2():
+    dim = 7
+    activeInd = 7
+
+    mset_csemap = mpart.MultiIndexSet.CreateTotalOrder(activeInd, 3, noneLim)  
+    component = mpart.CreateComponent(mset_csemap.fix(True), opts)
+
+    single_entry_map = mpart.CreateSingleEntryMap(dim, activeInd, component)
+    assert single_entry_map.numCoeffs == component.numCoeffs
+
+def test_CreateSingleEntryMap_3():
+    dim = 7
+    activeInd = 4
 
     mset_csemap = mpart.MultiIndexSet.CreateTotalOrder(activeInd, 3, noneLim)  
     component = mpart.CreateComponent(mset_csemap.fix(True), opts)
