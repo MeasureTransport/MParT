@@ -35,16 +35,20 @@ void SummarizedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpa
 {
     // SetCoeffs for the component (not the summary function)
     std::cout << "start SetCoeffs" << std::endl;
+
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
     std::cout << "called SetCoeffs of CondMapBase" << std::endl;
     std::cout << "num coeffs of map_" << std::endl;
+    
     std::cout << map_->numCoeffs << std::endl;
     std::cout << "num coeffs of this->savedCoeffs" << std::endl;
     std::cout << this->savedCoeffs.size() << std::endl;
+    
     map_->WrapCoeffs(this->savedCoeffs);
     std::cout << "called WrapCoeffs of component" << std::endl;
 
-    
+    // // why not this?
+    // map_->SetCoeffs(coeffs);
 }
 
 template<typename MemorySpace>

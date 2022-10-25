@@ -78,7 +78,7 @@ public:
 private:
 
     std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const& summaryFunction_;
-    std::shared_ptr<ConditionalMapBase<MemorySpace>> const& map_;
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> const & map_;
 
 
 }; // class SummarizedMap
