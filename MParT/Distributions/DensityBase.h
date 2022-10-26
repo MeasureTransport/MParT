@@ -9,14 +9,14 @@
 #include <Eigen/Core>
 
 namespace mpart {
-    
+
     template <typename MemorySpace>
     class DensityBase {
-    
+
     public:
-    
+
     DensityBase(unsigned int dim) : dimension(dim) {};
-    
+
     virtual ~DensityBase() = default;
 
     /**
