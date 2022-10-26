@@ -7,10 +7,10 @@
 using namespace mpart;
 
 template<typename MemorySpace>
-SummarizedMap<MemorySpace>::SummarizedMap(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const& summaryFunction, 
-                                          std::shared_ptr<ConditionalMapBase<MemorySpace>> const& map) : 
+SummarizedMap<MemorySpace>::SummarizedMap(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const& summaryFunction,
+                                          std::shared_ptr<ConditionalMapBase<MemorySpace>> const& map) :
                                           ConditionalMapBase<MemorySpace>(summaryFunction->inputDim + 1, map->outputDim, map->numCoeffs),
-                                          summaryFunction_(summaryFunction), 
+                                          summaryFunction_(summaryFunction),
                                           map_(map)
 {
 
@@ -26,6 +26,7 @@ SummarizedMap<MemorySpace>::SummarizedMap(std::shared_ptr<ParameterizedFunctionB
         msg << "SummarizedMap: input dimension of map component must be 1 + output dimension of summaryFunction, but was given map->inputDim = " << map_->inputDim << " and summaryFunction->outputDim + 1 = " << summaryFunction_->outputDim + 1 << ".";
         throw std::invalid_argument(msg.str());
     }
+    std::cout << "constructor: map_.get() = " << map_.get() << std::endl;
 }
 
 
@@ -39,11 +40,11 @@ void SummarizedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpa
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
     std::cout << "called SetCoeffs of CondMapBase" << std::endl;
     std::cout << "num coeffs of map_" << std::endl;
-    
+
     std::cout << map_->numCoeffs << std::endl;
     std::cout << "num coeffs of this->savedCoeffs" << std::endl;
     std::cout << this->savedCoeffs.size() << std::endl;
-    
+
     map_->WrapCoeffs(this->savedCoeffs);
     std::cout << "called WrapCoeffs of component" << std::endl;
 
@@ -81,7 +82,7 @@ void SummarizedMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::Defaul
 template<typename MemorySpace>
 void SummarizedMap<MemorySpace>::SummarizePts(StridedMatrix<const double, MemorySpace> const& pts,
                                               StridedMatrix<double, MemorySpace>              output)
-{   
+{
     // Split pts into the part that is summarized and the part that is not
 
     StridedMatrix<const double, MemorySpace> ptsToSummarize = Kokkos::subview(pts, std::make_pair(0, int(summaryFunction_->inputDim)), Kokkos::ALL());
@@ -95,7 +96,7 @@ void SummarizedMap<MemorySpace>::SummarizePts(StridedMatrix<const double, Memory
     Kokkos::deep_copy(outputSummary, summary);
 
     // Copy non summarized pts
-    Kokkos::View<double**, MemorySpace> outputAfterSummary = Kokkos::subview(output, std::make_pair(int(summaryFunction_->outputDim),int(summaryFunction_->outputDim+1)), Kokkos::ALL());        
+    Kokkos::View<double**, MemorySpace> outputAfterSummary = Kokkos::subview(output, std::make_pair(int(summaryFunction_->outputDim),int(summaryFunction_->outputDim+1)), Kokkos::ALL());
     Kokkos::deep_copy(outputAfterSummary, ptsAfterSummary);
 
 }
@@ -104,7 +105,7 @@ void SummarizedMap<MemorySpace>::SummarizePts(StridedMatrix<const double, Memory
 template<typename MemorySpace>
 void SummarizedMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                     StridedVector<double, MemorySpace>              output)
-{   
+{
 
     // Create a view to hold summarized pts
     Kokkos::View<double**, MemorySpace> summarizedPts("summarizedPts", map_->inputDim, pts.extent(1));
@@ -130,7 +131,7 @@ void SummarizedMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, Memory
 
     // Evaluate map
     map_->EvaluateImpl(summarizedPts, output);
-    
+
 }
 
 template<typename MemorySpace>
@@ -142,7 +143,7 @@ void SummarizedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemoryS
     // Create a view to hold pts to summarize
     StridedMatrix<const double, MemorySpace> ptsToSummarize = Kokkos::subview(x1, std::make_pair(0, int(summaryFunction_->inputDim)), Kokkos::ALL());
 
-    // // Evaluate summary function 
+    // // Evaluate summary function
     Kokkos::View<double**, MemorySpace> summary = summaryFunction_->Evaluate(ptsToSummarize);
 
     // Invert map
@@ -160,22 +161,22 @@ void SummarizedMap<MemorySpace>::GradientImpl(StridedMatrix<const double, Memory
     // Create a view to hold summarized pts
     Kokkos::View<double**, MemorySpace> summarizedPts("summarizedPts", map_->inputDim, pts.extent(1));
 
-    // Summarize the pts 
+    // Summarize the pts
     this->SummarizePts(pts, summarizedPts);
 
     // Create a view for the gradient of map_ wrt s(x_1) and x_2
     Kokkos::View<double**, MemorySpace> outputForSummaryAndX2("outputForSummaryAndX2", map_->inputDim, pts.extent(1));
-    
+
     // GradientImpl of map
     map_->GradientImpl(summarizedPts, sens, outputForSummaryAndX2);
 
     // Split outputForSummaryAndX2 into summary and x2 parts
     Kokkos::View<double**, MemorySpace> outputForSummary = Kokkos::subview(outputForSummaryAndX2, std::make_pair(0,int(summaryFunction_->outputDim)), Kokkos::ALL());
     Kokkos::View<double**, MemorySpace> outputForX2 = Kokkos::subview(outputForSummaryAndX2, std::make_pair(int(summaryFunction_->outputDim),int(summaryFunction_->outputDim+1)), Kokkos::ALL());
-    
+
     // Create a view for the gradient of map_ wrt x_1
     Kokkos::View<double**, MemorySpace> outputForX1("outputForX1", summaryFunction_->inputDim, pts.extent(1));
-    
+
     // GradientImpl of summary using outputForSummary as the sens. vectors (from chain-rule)
     StridedMatrix<const double, MemorySpace>  x1 = Kokkos::subview(pts, std::make_pair(0,int(summaryFunction_->inputDim)), Kokkos::ALL());
     summaryFunction_->GradientImpl(x1, outputForSummary, outputForX1);
@@ -184,7 +185,7 @@ void SummarizedMap<MemorySpace>::GradientImpl(StridedMatrix<const double, Memory
     Kokkos::View<double**, MemorySpace> outputSubX1 = Kokkos::subview(output, std::make_pair(0,int(summaryFunction_->inputDim)), Kokkos::ALL());
     Kokkos::deep_copy(outputSubX1, outputForX1);
 
-    Kokkos::View<double**, MemorySpace> outputSubX2 = Kokkos::subview(output, std::make_pair(int(summaryFunction_->inputDim),int(summaryFunction_->inputDim+1)), Kokkos::ALL());        
+    Kokkos::View<double**, MemorySpace> outputSubX2 = Kokkos::subview(output, std::make_pair(int(summaryFunction_->inputDim),int(summaryFunction_->inputDim+1)), Kokkos::ALL());
     Kokkos::deep_copy(outputSubX2, outputForX2);
 
 
@@ -203,7 +204,7 @@ void SummarizedMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, Memor
 
     // CoeffGradImpl of map
     map_->CoeffGradImpl(summarizedPts, sens, output);
-     
+
 }
 
 template<typename MemorySpace>
@@ -218,7 +219,7 @@ void SummarizedMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const
 
     // CoeffGradImpl of map
     map_->LogDeterminantCoeffGradImpl(summarizedPts, output);
-    
+
 }
 
 template<typename MemorySpace>
@@ -229,19 +230,19 @@ void SummarizedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
     // Create a view to hold summarized pts
     Kokkos::View<double**, MemorySpace> summarizedPts("summarizedPts", map_->inputDim, pts.extent(1));
 
-    // Summarize the pts 
+    // Summarize the pts
     this->SummarizePts(pts, summarizedPts);
 
     // Create a view for the gradient of map_ wrt s(x_1) and x_2
     Kokkos::View<double**, MemorySpace> outputForSummaryAndX2("outputForSummaryAndX2", map_->inputDim, pts.extent(1));
-  
+
     // GradientImpl of map
     map_->LogDeterminantInputGradImpl(summarizedPts, outputForSummaryAndX2);
 
     // Split outputForSummaryAndX2 into summary and x2 parts
     Kokkos::View<double**, MemorySpace> outputForSummary = Kokkos::subview(outputForSummaryAndX2, std::make_pair(0,int(summaryFunction_->outputDim)), Kokkos::ALL());
     Kokkos::View<double**, MemorySpace> outputForX2 = Kokkos::subview(outputForSummaryAndX2, std::make_pair(int(summaryFunction_->outputDim),int(summaryFunction_->outputDim+1)), Kokkos::ALL());
-    
+
     // Create a view for the gradient of map_ wrt x_1
     Kokkos::View<double**, MemorySpace> outputForX1("outputForX1", summaryFunction_->inputDim, pts.extent(1));
 
@@ -253,8 +254,8 @@ void SummarizedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
     Kokkos::View<double**, MemorySpace> outputSubX1 = Kokkos::subview(output, std::make_pair(0,int(summaryFunction_->inputDim)), Kokkos::ALL());
     Kokkos::deep_copy(outputSubX1, outputForX1);
 
-    Kokkos::View<double**, MemorySpace> outputSubX2 = Kokkos::subview(output, std::make_pair(int(summaryFunction_->inputDim),int(summaryFunction_->inputDim+1)), Kokkos::ALL());        
-    Kokkos::deep_copy(outputSubX2, outputForX2);    
+    Kokkos::View<double**, MemorySpace> outputSubX2 = Kokkos::subview(output, std::make_pair(int(summaryFunction_->inputDim),int(summaryFunction_->inputDim+1)), Kokkos::ALL());
+    Kokkos::deep_copy(outputSubX2, outputForX2);
 }
 
 // Explicit template instantiation

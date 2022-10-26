@@ -16,7 +16,7 @@ namespace mpart{
  @details
 This class defines a map \f$T:\mathbb{R}^N\rightarrow \mathbb{R}^M\f$ with the block triangular structure
 \f[
-T(x_1,x_2) = T'(s(x_1),x_2) 
+T(x_1,x_2) = T'(s(x_1),x_2)
 \f]
 where \f$s:\mathbb{R}^{N_1} \to \mathbb{R}^{r}\f$, where \f$ r< N_1 \f$.
 
@@ -24,7 +24,7 @@ where \f$s:\mathbb{R}^{N_1} \to \mathbb{R}^{r}\f$, where \f$ r< N_1 \f$.
  */
 template<typename MemorySpace>
 class SummarizedMap : public ConditionalMapBase<MemorySpace>{
-        
+
 public:
 
     /** @brief Construct a block triangular map from a collection of other ConditionalMapBase objects.
@@ -42,8 +42,8 @@ public:
     #if defined(MPART_ENABLE_GPU)
     virtual void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
     virtual void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
-    #endif 
-    
+    #endif
+
     void SummarizePts(StridedMatrix<const double, MemorySpace> const& pts,
                                     StridedMatrix<double, MemorySpace>              output);
 
@@ -56,25 +56,27 @@ public:
     virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                       StridedMatrix<double, MemorySpace>              output) override;
 
-    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                               StridedMatrix<const double, MemorySpace> const& sens,
                               StridedMatrix<double, MemorySpace>              output) override;
-    
+
     virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
                              StridedMatrix<const double, MemorySpace> const& r,
                              StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                StridedMatrix<const double, MemorySpace> const& sens,
                                StridedMatrix<double, MemorySpace>              output) override;
 
 
-    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                              StridedMatrix<double, MemorySpace>              output) override;
-    
-    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+
+    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                              StridedMatrix<double, MemorySpace>              output) override;
+
+    void print_map_ptr() { std::cout << "print_map_ptr: map_.get() = " << map_.get() << std::endl; }
 private:
 
     std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const& summaryFunction_;
