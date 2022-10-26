@@ -15,7 +15,7 @@ option(MPART_JULIA "Build julia bindings with CxxWrap.jl" ON)
 option(MPART_FETCH_DEPS "If CMake should be allowed to fetch and build external dependencies that weren't found." ON)
 
 ##############################################################
-# Installation path configuration 
+# Installation path configuration
 Include(SetInstallPaths)
 
 ##############################################################
@@ -85,7 +85,7 @@ if(NOT Kokkos_FOUND)
         FetchContent_Declare(
             kokkos
             GIT_REPOSITORY https://github.com/kokkos/kokkos
-            GIT_TAG 3.5.00
+            GIT_TAG 3.7.00
             GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(kokkos)
@@ -161,7 +161,7 @@ if(MPART_JULIA)
     message(WARNING "Requested Julia bindings but CMake could not find Julia executable.  Setting MPART_JULIA=OFF.")
   else()
 
-    # Get a hint for the location of JlCxx 
+    # Get a hint for the location of JlCxx
     get_filename_component(PARENT_DIR ${Julia_LIBRARY_DIR} DIRECTORY)
 
     # Use JlCxx_DIR to tell where CxxWrap is located
