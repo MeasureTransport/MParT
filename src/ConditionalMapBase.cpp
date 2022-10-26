@@ -40,27 +40,27 @@ Kokkos::View<double*, mpart::DeviceSpace> ConditionalMapBase<mpart::DeviceSpace>
 template<>
 template<>
 Kokkos::View<double*, Kokkos::HostSpace> ConditionalMapBase<mpart::DeviceSpace>::LogDeterminant(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
-{   
+{
     return ToHost( this->LogDeterminant( ToDevice<mpart::DeviceSpace>(pts) ));
 }
 
 template<>
 template<>
 Kokkos::View<double*, mpart::DeviceSpace> ConditionalMapBase<Kokkos::HostSpace>::LogDeterminant(StridedMatrix<const double, mpart::DeviceSpace> const& pts)
-{   
+{
     return ToDevice<mpart::DeviceSpace>( this->LogDeterminant( ToHost(pts) ));
 }
 
 template<>
 Eigen::VectorXd ConditionalMapBase<mpart::DeviceSpace>::LogDeterminant(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
-{   
+{
     StridedMatrix<const double,Kokkos::HostSpace> pts_view = ConstRowMatToKokkos<double,Kokkos::HostSpace>(pts);
     Kokkos::View<double*, Kokkos::HostSpace> outView = ToHost( this->LogDeterminant( ToDevice<mpart::DeviceSpace>(pts_view) ));
     return KokkosToVec<double>(outView);
 }
 
 
-#endif 
+#endif
 
 template<>
 template<>
@@ -138,7 +138,7 @@ Eigen::RowMatrixXd ConditionalMapBase<mpart::DeviceSpace>::Inverse(Eigen::Ref<co
     return KokkosToMat( ToHost( Inverse(xView, rView) ));
 }
 
-#endif 
+#endif
 
 template<>
 template<>
@@ -148,6 +148,11 @@ StridedMatrix<double, Kokkos::HostSpace> ConditionalMapBase<Kokkos::HostSpace>::
     Kokkos::View<double**, Kokkos::HostSpace> output("LogDeterminantCoeffGrad", this->numCoeffs, pts.extent(1));
     LogDeterminantCoeffGradImpl(pts,output);
     return output;
+}
+
+template<typename MemorySpace>
+std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) {
+    return std::shared_ptr<ConditionalMapBase<MemorySpace>>(this->SliceImpl(a,b));
 }
 
 template<>
@@ -177,10 +182,10 @@ template<>
 template<>
 StridedMatrix<double, Kokkos::HostSpace> ConditionalMapBase<mpart::DeviceSpace>::LogDeterminantCoeffGrad(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
 {
-    // Copy the points to the device space 
+    // Copy the points to the device space
     StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace>(pts);
 
-    // Evaluate on the device space 
+    // Evaluate on the device space
     StridedMatrix<double, mpart::DeviceSpace> evals_device = this->LogDeterminantCoeffGrad(pts_device);
 
     // Copy back to the host space
@@ -191,10 +196,10 @@ template<>
 template<>
 StridedMatrix<double, mpart::DeviceSpace> ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantCoeffGrad(StridedMatrix<const double, mpart::DeviceSpace> const& pts)
 {
-    // Copy the points to the host 
+    // Copy the points to the host
     StridedMatrix<const double, Kokkos::HostSpace> pts_host = ToHost(pts);
 
-    // Evaluate on the host 
+    // Evaluate on the host
     StridedMatrix<double, Kokkos::HostSpace> evals_host = this->LogDeterminantCoeffGrad(pts_host);
 
     // Copy back to the device
@@ -254,10 +259,10 @@ template<>
 template<>
 StridedMatrix<double, Kokkos::HostSpace> ConditionalMapBase<mpart::DeviceSpace>::LogDeterminantInputGrad(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
 {
-    // Copy the points to the device space 
+    // Copy the points to the device space
     StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace,const double>(pts);
 
-    // Evaluate on the device space 
+    // Evaluate on the device space
     StridedMatrix<double, mpart::DeviceSpace> evals_device = this->LogDeterminantInputGrad(pts_device);
 
     // Copy back to the host space
@@ -268,10 +273,10 @@ template<>
 template<>
 StridedMatrix<double, mpart::DeviceSpace> ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantInputGrad(StridedMatrix<const double, mpart::DeviceSpace> const& pts)
 {
-    // Copy the points to the host 
+    // Copy the points to the host
     StridedMatrix<const double, Kokkos::HostSpace> pts_host = ToHost(pts);
 
-    // Evaluate on the host 
+    // Evaluate on the host
     StridedMatrix<double, Kokkos::HostSpace> evals_host = this->LogDeterminantInputGrad(pts_host);
 
     // Copy back to the device
