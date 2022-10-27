@@ -2,6 +2,7 @@
 #define MPART_GaussianDistribution_H
 
 #include "MParT/Distributions/Distribution.h"
+#include "MParT/Utilities/LinearAlgebra.h"
 #include <Kokkos_Core.hpp>
 
 namespace mpart {
@@ -16,7 +17,13 @@ class GaussianDistribution: Distribution<MemorySpace> {
 
     private:
 
-    static constexpr double tau = 2*Kokkos::Experimental::pi_v<double>;
+#if (KOKKOS_VERSION / 10000 == 3) && (KOKKOS_VERSION / 100 % 100 < 7)
+    const auto& kk_log = Kokkos::Experimental::log;
+#else
+    const auto& kk_log = Kokkos::log;
+#endif // KOKKOS_VERSION
+
+    static const double logtau_ = kk_log(2*Kokkos::Experimental::pi_v<double>);
 
     void Factorize(StridedMatrix<double, MemorySpace> Cov) {
         covLU_.compute(Cov);

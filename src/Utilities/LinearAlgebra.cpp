@@ -7,7 +7,7 @@ using namespace mpart;
 
 
 template<>
-void mpart::dgemm(double                                     alpha, 
+void mpart::dgemm(double                                     alpha,
                   TransposeObject<Kokkos::HostSpace>         A,
                   TransposeObject<Kokkos::HostSpace>         B,
                   double                                     beta,
@@ -59,7 +59,7 @@ void PartialPivLU<Kokkos::HostSpace>::compute(Kokkos::View<const double**,Kokkos
 
 template<>
 void PartialPivLU<Kokkos::HostSpace>::solveInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> x)
-{   
+{
     auto eigX = KokkosToMat(x);
     eigX = (luSolver_->permutationP() * eigX).eval();
     luSolver_->matrixLU().template triangularView<Eigen::UnitLower>().solveInPlace(eigX);
@@ -70,7 +70,7 @@ void PartialPivLU<Kokkos::HostSpace>::solveInPlace(Kokkos::View<double**,Kokkos:
 template<>
 double PartialPivLU<Kokkos::HostSpace>::determinant() const
 {
-    assert(isComputed); 
+    assert(isComputed);
     return luSolver_->determinant();
 }
 
@@ -79,17 +79,17 @@ double PartialPivLU<Kokkos::HostSpace>::determinant() const
 #if defined(MPART_ENABLE_GPU)
 
 template<>
-void mpart::dgemm(double                             alpha, 
+void mpart::dgemm(double                             alpha,
            TransposeObject<mpart::DeviceSpace>       A,
            TransposeObject<mpart::DeviceSpace>       B,
            double                                    beta,
            StridedMatrix<double, mpart::DeviceSpace> C)
-{   
+{
     // Versions of A,B, and C with the column major layout expected by cublas
     StridedMatrix<const double, mpart::DeviceSpace> ALeft;
     StridedMatrix<const double, mpart::DeviceSpace> BLeft;
     StridedMatrix<double, mpart::DeviceSpace> CLeft;
-    
+
     // Make sure the ptsLeft array is column major
     if(A.view.stride_0()==1){
         ALeft = A.view;
@@ -106,7 +106,7 @@ void mpart::dgemm(double                             alpha,
         Kokkos::deep_copy(temp, B.view);
         BLeft = temp;
     }
-    
+
     bool copyOut = false;
     if(C.stride_0()==1){
         CLeft = C;
@@ -115,14 +115,14 @@ void mpart::dgemm(double                             alpha,
         Kokkos::deep_copy(CLeft, C);
         copyOut = true;
     }
-    
+
     int ldA = ALeft.stride_1(); // Spacing between columns int A
     int ldB = BLeft.stride_1(); // Spacing between columns int B
     int ldC = CLeft.stride_1(); // Spacing between columns int C
 
     // Perform the matrix multiplication
     cublasStatus_t info =  cublasDgemm(GetInitializeStatusObject().GetCublasHandle(),
-                                       A.isTransposed ? CUBLAS_OP_T : CUBLAS_OP_N, 
+                                       A.isTransposed ? CUBLAS_OP_T : CUBLAS_OP_N,
                                        B.isTransposed ? CUBLAS_OP_T : CUBLAS_OP_N,
                                        A.rows(), B.cols(), A.cols(),
                                        &alpha,
@@ -130,7 +130,7 @@ void mpart::dgemm(double                             alpha,
                                        BLeft.data(), ldB,
                                        &beta,
                                        CLeft.data(), ldC);
-    
+
     // The layouts didn't match, so we have to copy back
     if(copyOut)
         Kokkos::deep_copy(C, CLeft);
@@ -159,17 +159,17 @@ void PartialPivLU<mpart::DeviceSpace>::compute(Kokkos::View<const double**,Kokko
     // Set up cuSolver options
     cusolverDnCreateParams(&params);
     cusolverDnSetAdvOptions(params, CUSOLVERDN_GETRF, CUSOLVER_ALG_0);
-    
+
     size_t d_workSize, h_workSize;
-    cusolverDnXgetrf_bufferSize(GetInitializeStatusObject().GetCusolverHandle(), 
+    cusolverDnXgetrf_bufferSize(GetInitializeStatusObject().GetCusolverHandle(),
                                 params,
                                 LU_.extent(0),
-                                LU_.extent(1), 
-                                CUDA_R_64F, 
+                                LU_.extent(1),
+                                CUDA_R_64F,
                                 LU_.data(),
-                                ldLU, 
-                                CUDA_R_64F, 
-                                &d_workSize, 
+                                ldLU,
+                                CUDA_R_64F,
+                                &d_workSize,
                                 &h_workSize);
 
 
@@ -177,20 +177,20 @@ void PartialPivLU<mpart::DeviceSpace>::compute(Kokkos::View<const double**,Kokko
     Kokkos::View<double*, Kokkos::HostSpace> h_workspace("LU Workspace", h_workSize);
     Kokkos::View<int*, mpart::DeviceSpace> d_info("Info",1);
 
-    cusolverDnXgetrf(GetInitializeStatusObject().GetCusolverHandle(), 
-                     params, 
-                     LU_.extent(0), 
-                     LU_.extent(1), 
+    cusolverDnXgetrf(GetInitializeStatusObject().GetCusolverHandle(),
+                     params,
+                     LU_.extent(0),
+                     LU_.extent(1),
                      CUDA_R_64F,
-                     LU_.data(), ldLU, 
+                     LU_.data(), ldLU,
                      pivots_.data(),
-                     CUDA_R_64F, 
+                     CUDA_R_64F,
                      d_workspace.data(),
-                     d_workSize, 
-                     h_workspace.data(), 
+                     d_workSize,
+                     h_workspace.data(),
                      h_workSize,
                      d_info.data());
-    
+
     info = ToHost(d_info)(0);
 
     // Error handling
@@ -209,7 +209,7 @@ void PartialPivLU<mpart::DeviceSpace>::compute(Kokkos::View<const double**,Kokko
 
 template<>
 void PartialPivLU<mpart::DeviceSpace>::solveInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
-{   
+{
     assert(isComputed);
 
     int ldX = x.stride_1();
@@ -218,18 +218,18 @@ void PartialPivLU<mpart::DeviceSpace>::solveInPlace(Kokkos::View<double**,Kokkos
     int info;
     Kokkos::View<int*, mpart::DeviceSpace> d_info("Info", 1);
 
-    cusolverDnXgetrs(GetInitializeStatusObject().GetCusolverHandle(), 
-                     params, 
-                     CUBLAS_OP_N, 
-                     LU_.extent(0), 
+    cusolverDnXgetrs(GetInitializeStatusObject().GetCusolverHandle(),
+                     params,
+                     CUBLAS_OP_N,
+                     LU_.extent(0),
                      x.extent(1),
-                     CUDA_R_64F, 
-                     LU_.data(), 
-                     ldLU, 
+                     CUDA_R_64F,
+                     LU_.data(),
+                     ldLU,
                      pivots_.data(),
-                     CUDA_R_64F, 
-                     x.data(), 
-                     ldX, 
+                     CUDA_R_64F,
+                     x.data(),
+                     ldX,
                      d_info.data());
     info = ToHost(d_info)(0);
 
@@ -245,7 +245,7 @@ void PartialPivLU<mpart::DeviceSpace>::solveInPlace(Kokkos::View<double**,Kokkos
 template<>
 double PartialPivLU<mpart::DeviceSpace>::determinant() const
 {
-    assert(isComputed); 
+    assert(isComputed);
     double det = 1.0;
     Kokkos::parallel_reduce(LU_.extent(0), KOKKOS_CLASS_LAMBDA (const int& i, double& lprod) {
         lprod *= LU_(i,i);
