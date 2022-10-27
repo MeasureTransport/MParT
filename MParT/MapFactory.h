@@ -47,23 +47,36 @@ namespace mpart{
                                                                          MapOptions options = MapOptions());
 
         /**
-            @brief Constructs a triangular map with MonotoneComponents for each block.  A total order multiindex
-                   set is used to define the MonotoneComponent.
+            @brief 
 
-            @details For more control over the individual components, consider constructing components with
-                     MapFactory::CreateComponent function and then manually constructing and instance of the
-                     TriangularMap class.
-            @param inputDim The dimension of the input to this map.  Will be the number of inputs passed to
-                            the last component of the triangular map.
-            @param outputDim The output dimension of the map.  Note that this must be less than or equal to
-                             the input dimension.
-            @param totalOrder The total order used to define the parameterization of each MonotoneComponent.
-            @param options Additional options that will be passed on to CreateComponent to construct each MonotoneComponent.
+            @details 
+            @param dim The dimension of the map.
+            @param activeInd The index of the component to be non-identity.
+            @param comp The component placed the activeInd.
+
          */
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSingleEntryMap(unsigned int dim,
                                                                               unsigned int activeInd,
                                                                               std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
+
+    
+                /**
+            @brief 
+
+            @details 
+            @param dim The dimension of the map.
+            @param activeInd The index of the component to be non-identity.
+            @param summaryMatrix A matrix of dimensions r x activeInd-1 used to make an AffineFunction for the summary function
+            @param options Additional options that will be passed on to CreateComponent to construct the MonotoneComponent at the active index.
+
+         */
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateAffineLRCMap(unsigned int dim,
+                                                                            unsigned int activeInd,
+                                                                            Kokkos::View<double**, MemorySpace> summaryMatrix,
+                                                                            unsigned int maxDegree,
+                                                                            MapOptions options = MapOptions());
 
                                                                                   /**
             @brief Constructs a triangular map with MonotoneComponents for each block.  A total order multiindex
@@ -79,6 +92,8 @@ namespace mpart{
             @param totalOrder The total order used to define the parameterization of each MonotoneComponent.
             @param options Additional options that will be passed on to CreateComponent to construct each MonotoneComponent.
          */
+
+        
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateTriangular(unsigned int inputDim,
                                                                           unsigned int outputDim,

@@ -99,3 +99,18 @@ def test_CreateSingleEntryMap_3():
 
     single_entry_map = mpart.CreateSingleEntryMap(dim, activeInd, component)
     assert single_entry_map.numCoeffs == component.numCoeffs
+
+
+
+def test_CreateAffineLRCMap():
+
+    print("starting test")
+    dim = 10
+    activeInd = 6
+    lrcRank = 2
+    maxDegrees = 2
+
+    print("set const ints")
+
+    summaryMatrix = np.random.randn(lrcRank, activeInd-1)
+    map = mpart.CreateAffineLRCMap(dim, activeInd, np.asfortranarray(summaryMatrix), maxDegrees, opts)
