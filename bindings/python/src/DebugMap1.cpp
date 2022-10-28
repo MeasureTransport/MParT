@@ -19,7 +19,7 @@ void mpart::binding::DebugMapWrapper(py::module &m)
 
     // DebugMap
     py::class_<DebugMap<MemorySpace>, ConditionalMapBase<MemorySpace>, std::shared_ptr<DebugMap<MemorySpace>>>(m, tName.c_str())
-        .def(py::init<std::shared_ptr<ParameterizedFunctionBase<MemorySpace>>, std::shared_ptr<ConditionalMapBase<MemorySpace>>>())
+        .def(py::init<std::shared_ptr<ConditionalMapBase<MemorySpace>>>())
         .def("print_ptr", &DebugMap<MemorySpace>::print_ptr)
         ;
 
