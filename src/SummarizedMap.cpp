@@ -7,7 +7,7 @@
 using namespace mpart;
 
 template<typename MemorySpace>
-SummarizedMap<MemorySpace>::SummarizedMap(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const& summary, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& component) : ConditionalMapBase<MemorySpace>(component->inputDim, component->outputDim, component->numCoeffs),
+SummarizedMap<MemorySpace>::SummarizedMap(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const& summary, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& component) : ConditionalMapBase<MemorySpace>(summary->inputDim + 1, component->outputDim, component->numCoeffs),
                         sumFunc_(summary), comp_(component)
 {
 
