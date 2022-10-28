@@ -23,6 +23,7 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
     // CreateSingleEntryMap
     m.def(isDevice? "dCreateSingleEntryMap" : "CreateSingleEntryMap", &MapFactory::CreateSingleEntryMap<MemorySpace>);
 
+    m.def(isDevice? "dCreateSummarizedMap" : "CreateSummarizedMap", &MapFactory::CreateSummarizedMap<MemorySpace>);
     // CreateSingleEntryMap
     m.def("CreateAffineLRCMap", [] (unsigned int dim,
                                     unsigned int activeInd,
