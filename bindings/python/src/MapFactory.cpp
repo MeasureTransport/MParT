@@ -22,7 +22,7 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
     // CreateSingleEntryMap
     m.def(isDevice? "dCreateSingleEntryMap" : "CreateSingleEntryMap", &MapFactory::CreateSingleEntryMap<MemorySpace>);
 
-
+    m.def(isDevice? "dCreateSummarizedMap" : "CreateSummarizedMap", &MapFactory::CreateSummarizedMap<MemorySpace>);
 }
 
 template void mpart::binding::MapFactoryWrapper<Kokkos::HostSpace>(py::module&);
