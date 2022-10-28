@@ -17,7 +17,8 @@ PYBIND11_MODULE(pympart, m) {
     TriangularMapWrapper<Kokkos::HostSpace>(m);
     ComposedMapWrapper<Kokkos::HostSpace>(m);
     SummarizedMapWrapper<Kokkos::HostSpace>(m);
-    DebugMapWrapper<Kokkos::HostSpace>(m);
+    // DebugMapWrapper<Kokkos::HostSpace>(m);
+
     MapFactoryWrapper<Kokkos::HostSpace>(m);
 
 

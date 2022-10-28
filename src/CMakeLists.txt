@@ -15,7 +15,7 @@ target_sources(mpart
     IdentityMap.cpp
     ComposedMap.cpp
     SummarizedMap.cpp
-    DebugMap.cpp
+    # DebugMap.cpp
     AffineMap.cpp
     AffineFunction.cpp
     MapFactory.cpp

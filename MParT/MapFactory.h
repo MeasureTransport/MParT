@@ -5,7 +5,7 @@
 
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/SummarizedMap.h"
-#include "MParT/DebugMap.h"
+//#include "MParT/DebugMap.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
 #include <math.h>

@@ -20,7 +20,7 @@ void mpart::binding::SummarizedMapWrapper(py::module &m)
     // SummarizedMap
     py::class_<SummarizedMap<MemorySpace>, ConditionalMapBase<MemorySpace>, std::shared_ptr<SummarizedMap<MemorySpace>>>(m, tName.c_str())
         .def(py::init<std::shared_ptr<ParameterizedFunctionBase<MemorySpace>>, std::shared_ptr<ConditionalMapBase<MemorySpace>>>())
-        .def("print_map_ptr", &SummarizedMap<MemorySpace>::print_map_ptr)
+        .def("print_ptr", &SummarizedMap<MemorySpace>::print_ptr)
         ;
 
 }

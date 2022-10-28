@@ -10,7 +10,7 @@ set(PYTHON_BINDING_SOURCES
   src/TriangularMap.cpp
   src/ComposedMap.cpp
   src/SummarizedMap.cpp
-  src/DebugMap.cpp
+  # src/DebugMap.cpp
   src/MapFactory.cpp
 
   
