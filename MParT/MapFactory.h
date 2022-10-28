@@ -5,6 +5,7 @@
 
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/SummarizedMap.h"
+#include "MParT/DebugMap.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
 #include <math.h>
@@ -115,6 +116,11 @@ namespace mpart{
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSummarizedMap(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const &func,
                                                                             std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp) { return std::make_shared<SummarizedMap<MemorySpace>>(func, comp); }
+
+
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateDebugMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp) { return std::make_shared<DebugMap<MemorySpace>>(comp); }
+
 
         // /**
         // @brief Constructs a (generally) non-monotone multivariate expansion.

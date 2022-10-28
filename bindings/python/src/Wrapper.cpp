@@ -12,12 +12,14 @@ PYBIND11_MODULE(pympart, m) {
 
     ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(m);
     ConditionalMapBaseWrapper<Kokkos::HostSpace>(m);
+    AffineMapWrapperHost(m);
+    AffineFunctionWrapperHost(m);
     TriangularMapWrapper<Kokkos::HostSpace>(m);
     ComposedMapWrapper<Kokkos::HostSpace>(m);
     SummarizedMapWrapper<Kokkos::HostSpace>(m);
+    DebugMapWrapper<Kokkos::HostSpace>(m);
     MapFactoryWrapper<Kokkos::HostSpace>(m);
-    AffineMapWrapperHost(m);
-    AffineFunctionWrapperHost(m);
+
 
 
 #if defined(MPART_ENABLE_GPU)

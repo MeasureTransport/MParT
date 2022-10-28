@@ -101,16 +101,23 @@ def test_CreateSingleEntryMap_3():
     assert single_entry_map.numCoeffs == component.numCoeffs
 
 
+def test_CreateDebugMap():
+    activeInd = 4
+    mset_csemap = mpart.MultiIndexSet.CreateTotalOrder(activeInd, 3, noneLim)  
+    component = mpart.CreateComponent(mset_csemap.fix(True), opts)
 
-def test_CreateAffineLRCMap():
+    debug_map = mpart.CreateDebugMap(component)
+    assert debug_map.numCoeffs == component.numCoeffs
 
-    print("starting test")
-    dim = 10
-    activeInd = 6
-    lrcRank = 2
-    maxDegrees = 2
+# def test_CreateAffineLRCMap():
 
-    print("set const ints")
+#     print("starting test")
+#     dim = 10
+#     activeInd = 6
+#     lrcRank = 2
+#     maxDegrees = 2
 
-    summaryMatrix = np.random.randn(lrcRank, activeInd-1)
-    map = mpart.CreateAffineLRCMap(dim, activeInd, np.asfortranarray(summaryMatrix), maxDegrees, opts)
+#     print("set const ints")
+
+#     summaryMatrix = np.random.randn(lrcRank, activeInd-1)
+#     map = mpart.CreateAffineLRCMap(dim, activeInd, np.asfortranarray(summaryMatrix), maxDegrees, opts)
