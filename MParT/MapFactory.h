@@ -118,8 +118,8 @@ namespace mpart{
                                                                             std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp) { return std::make_shared<SummarizedMap<MemorySpace>>(func, comp); }
 
 
-        template<typename MemorySpace>
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateDebugMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp) { return std::make_shared<DebugMap<MemorySpace>>(comp); }
+        // template<typename MemorySpace>
+        // std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateDebugMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp) { return std::make_shared<DebugMap<MemorySpace>>(comp); }
 
 
         // /**
