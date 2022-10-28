@@ -36,4 +36,6 @@ target_sources(mpart
     Initialization.cpp
     ComposedMap.cpp
     IdentityMap.cpp
+
+    MapIO.cpp
 )

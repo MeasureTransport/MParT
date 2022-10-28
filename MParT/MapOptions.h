@@ -93,7 +93,33 @@ namespace mpart{
 
         /** If orthogonal polynomial basis functions should be normalized. */
         bool basisNorm = true;
-    }; 
+    };
+
+
+std::ostream& operator<<(std::ostream& os, MapOptions const& options) {
+    int btype = static_cast<int>(options.basisType);
+    int ptype = static_cast<int>(options.posFuncType);
+    int qtype = static_cast<int>(options.quadType);
+
+    os << btype << " " options.basisLB << " " << options.basisUB << ptype << " "
+        << qtype << " " << " " << options.quadAbsTol << " " << options.quadRelTol <<
+        " " << options.quadMaxSub << " " << options.quadMinSub << " " <<
+        options.quadPts << " " << options.contDeriv << " " << options.basisNorm;
+    return os;
+}
+
+std::istream& operator>>(std::istream& is, MapOptions& options) {
+    int btype, ptype, qtype;
+    is >> btype >> options.basisLB >> options.basisUB >> ptype >>
+        qtype >> options.quadAbsTol >> options.quadRelTol >>
+        options.quadMaxSub >> options.quadMinSub >> options.quadPts >>
+        options.contDeriv >> options.basisNorm;
+    options.basisType = static_cast<BasisTypes>(btype);
+    options.posFuncType = static_cast<PosFuncTyps>(ptype);
+    options.quadType = static_cast<QuadTypes>(qtype);
+    return is;
+}
+
 };
 
 

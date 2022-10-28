@@ -625,6 +625,29 @@ namespace mpart{
         return KokkosToMat(view);
     }
 
+    template<typename T>
+    std::ostream& VectorPrint(std::ostream& os, StridedVector<T, Kokkos::HostSpace> const& vec) {
+        os << vec.extent(0) << " " << vec.stride(0) << " ";
+        for(unsigned int i=0; i<vec.extent(0); ++i)
+            os << vec(i) << " ";
+        return os;
+    }
+
+    template<typename T>
+    std::istream& VectorRead(std::istream& is, StridedVector<T, Kokkos::HostSpace>& vec) {
+        unsigned int n, s;
+        is >> n >> s;
+        if(vec.stride(0) != s)
+            std::cerr << "Warning: Stride mismatch in StridedVector read" << std::endl;
+        
+        Kokkos::resize(vec, n);
+        
+        for(unsigned int i=0; i<n; ++i)
+            is >> vec(i);
+        
+        return is;
+    }
+
 }
 
 #endif  // #ifndef ARRAYCONVERSIONS_H

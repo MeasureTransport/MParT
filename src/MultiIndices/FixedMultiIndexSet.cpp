@@ -261,36 +261,78 @@ int FixedMultiIndexSet<MemorySpace>::MultiToIndex(std::vector<unsigned int> cons
 }
 
 template<typename MemorySpace>
-void FixedMultiIndexSet<MemorySpace>::Print() const
+std::ostream& FixedMultiIndexSet<MemorySpace>::Print(std::ostream& os, bool printFull=false) const
 {
+    if(printFull) os << "Full FixedMultiIndexSet:";
+    else          os << "Compressed FixedMultiIndexSet:";
+    os << "\n";
+
     if(isCompressed){
-        std::cout << "Starts:\n";
-        for(unsigned int i=0; i<nzStarts.extent(0); ++i)
-            std::cout << nzStarts(i) << "  ";
-        std::cout << std::endl;
+        os << "Compressed form:\n";
+        os << "Starts:\n";
+        VectorPrint(os, nzStarts);
+        os << "\n";
 
-        std::cout << "\nDims:\n";
-        for(unsigned int i=0; i<nzDims.extent(0); ++i)
-            std::cout << nzDims(i) << "  ";
-        std::cout << std::endl;
+        os << "\nDims:\n";
+        VectorPrint(os, nzDims);
+        os << "\n";
 
-        std::cout << "\nOrders:\n";
-        for(unsigned int i=0; i<nzOrders.extent(0); ++i)
-            std::cout << nzOrders(i) << "  ";
-        std::cout << std::endl;
+        os << "\nOrders:\n";
+        VectorPrint(os, nzOrders);
+        os << "\n";
     }
+    if(printFull){
+        os << "\nMultis:\n";
+        std::vector<unsigned int> multi;
+        for(unsigned int term=0; term<nzStarts.extent(0)-1; ++term){
+            multi = IndexToMulti(term);
 
-    std::cout << "\nMultis:\n";
-    std::vector<unsigned int> multi;
-    for(unsigned int term=0; term<nzStarts.extent(0)-1; ++term){
-        multi = IndexToMulti(term);
+            for(auto& m : multi)
+                os << m << "  ";
 
-        for(auto& m : multi)
-            std::cout << m << "  ";
-
-        std::cout << std::endl;
+            os << "\n";
+        }
     }
+    return os;
+}
 
+template<typename MemorySpace>
+std::istream& FixedMultiIndexSet<MemorySpace>::Read(std::istream& is)
+{
+    std::string line;
+    std::getline(is, line);
+    if(line != "Compressed FixedMultiIndexSet:"){
+        std::cerr << "Error:  Expected 'Compressed FixedMultiIndexSet:' but got '" << line << "'\n";
+        return is;
+    }
+    std::getline(is, line);
+    if(line != "Compressed form:"){
+        std::cerr << "Error:  Expected 'Compressed form:' but got '" << line << "'\n";
+        return is;
+    }
+    std::getline(is, line);
+    if(line != "Starts:"){
+        std::cerr << "Error:  Expected 'Starts:' but got '" << line << "'\n";
+        return is;
+    }
+    VectorRead(is, nzStarts);
+    std::getline(is, line);
+    std::getline(is, line);
+    if(line != "Dims:"){
+        std::cerr << "Error:  Expected 'Dims:' but got '" << line << "'\n";
+        return is;
+    }
+    VectorRead(is, nzDims);
+    std::getline(is, line);
+    std::getline(is, line);
+    if(line != "Orders:"){
+        std::cerr << "Error:  Expected 'Orders:' but got '" << line << "'\n";
+        return is;
+    }
+    VectorRead(is, nzOrders);
+    std::getline(is, line);
+    CalculateMaxDegrees();
+    return is;
 }
 
 template<typename MemorySpace>

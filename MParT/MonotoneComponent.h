@@ -1077,6 +1077,11 @@ public:
         assert(it<maxIts);
         return 0.5*(xub+xlb);
     }
+
+    std::ostream& Print(std::ostream& os) const {
+        int etype = 
+    }
+
 private:
     ExpansionType expansion_;
     QuadratureType quad_;

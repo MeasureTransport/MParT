@@ -46,7 +46,9 @@ public:
     // Returns the linear index of a given multiindex.  Returns -1 if not found.
     int MultiToIndex(std::vector<unsigned int> const& multi) const;
 
-    void Print() const;
+    std::ostream& Print(std::ostream& os, bool printFull) const;
+
+    std::istream& Read(std::istream& is);
 
     KOKKOS_INLINE_FUNCTION unsigned int Length() const{
         return dim;
@@ -102,6 +104,16 @@ private:
 
 
 }; // class MultiIndexSet
+
+template<typename MemorySpace>
+std::ostream& operator<<(std::ostream& os, FixedMultiIndexSet<MemorySpace> const& mset) {
+    return mset.Print(os);
+}
+
+template<typename MemorySpace>
+std::istream& operator>>(std::istream& is, FixedMultiIndexSet<MemorySpace>& mset) {
+    return mset.Read(is);
+}
 
 } // namespace mpart
 
