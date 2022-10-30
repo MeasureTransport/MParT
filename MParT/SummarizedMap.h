@@ -93,8 +93,8 @@ public:
     void print_ptr() { std::cout << "print_ptr(): comp_.get() = " << comp_.get() << std::endl; std::cout << "print_ptr(): sumFunc_.get() = " << sumFunc_.get() << std::endl; }
 private:
  
-    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> sumFunc_;
-    std::shared_ptr<ConditionalMapBase<MemorySpace>> comp_;
+    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const sumFunc_;
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> const comp_;
     
 
 
