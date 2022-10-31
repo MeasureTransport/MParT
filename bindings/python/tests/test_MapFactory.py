@@ -52,17 +52,17 @@ def test_CreateComponent_quadTypes():
     assert component.numCoeffs == 4
     assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
 
-    # # ClenshawCurtis
-    # opts.quadType = mpart.QuadTypes.ClenshawCurtis
-    # component = mpart.CreateComponent(mset.fix(True), opts)
-    # assert component.numCoeffs == 4
-    # assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
+    # ClenshawCurtis
+    opts.quadType = mpart.QuadTypes.ClenshawCurtis
+    component = mpart.CreateComponent(mset.fix(True), opts)
+    assert component.numCoeffs == 4
+    assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
 
-    # # AdaptiveClenshawCurtis
-    # opts.quadType = mpart.QuadTypes.AdaptiveClenshawCurtis
-    # component = mpart.CreateComponent(mset.fix(True), opts)
-    # assert component.numCoeffs == 4
-    # assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
+    # AdaptiveClenshawCurtis
+    opts.quadType = mpart.QuadTypes.AdaptiveClenshawCurtis
+    component = mpart.CreateComponent(mset.fix(True), opts)
+    assert component.numCoeffs == 4
+    assert np.all(component.CoeffMap() == [0.,0.,0.,0.])
 
 
 def test_CreateTriangular():
@@ -102,18 +102,6 @@ def test_CreateSingleEntryMap_3():
 
 
 
-def test_CreateAffineLRCMap():
-
-    print("starting test")
-    dim = 10
-    activeInd = 6
-    lrcRank = 2
-    maxDegrees = 2
-
-    print("set const ints")
-
-    summaryMatrix = np.random.randn(lrcRank, activeInd-1)
-    map = mpart.CreateAffineLRCMap(dim, activeInd, np.asfortranarray(summaryMatrix), maxDegrees, opts)
 
 
     
