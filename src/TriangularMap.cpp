@@ -33,7 +33,7 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
         }
     }
 
-    std::cout << "constructor: comps_.at(0).get() = " << comps_.at(0).get() << std::endl; 
+    // std::cout << "constructor: comps_.at(0).get() = " << comps_.at(0).get() << std::endl; 
 }
 
 template<typename MemorySpace>

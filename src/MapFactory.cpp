@@ -105,7 +105,6 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateAffine
                                                                     MapOptions options)
 {
 
-    std::cout << "CreateAffineLRCMap" << std::endl;
 
     // multiindex set for component 
     unsigned int lrcRank = summaryMatrix.extent(0);

@@ -11,8 +11,8 @@ SummarizedMap<MemorySpace>::SummarizedMap(std::shared_ptr<ParameterizedFunctionB
                         sumFunc_(summary), comp_(component)
 {
 
-    std::cout << "constructor: comp_.get() = " << comp_.get() << std::endl;
-    std::cout << "constructor: sumFunc_.get() = " << sumFunc_.get() << std::endl; 
+    // std::cout << "constructor: comp_.get() = " << comp_.get() << std::endl;
+    // std::cout << "constructor: sumFunc_.get() = " << sumFunc_.get() << std::endl; 
 
     // Check the dimension of sumFunc_ is compatible with dimension of component
     if(comp_->outputDim != 1){
@@ -34,7 +34,7 @@ void SummarizedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpa
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
-    comp_->SetCoeffs(coeffs);
+    comp_->WrapCoeffs(coeffs);
 }
 
 template<typename MemorySpace>
