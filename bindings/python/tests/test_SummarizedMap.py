@@ -6,7 +6,7 @@ import numpy as np
 
 noneLim = mpart.NoneLim()
 opts = mpart.MapOptions()
-maxDegree = 1
+maxDegree = 2
 dim = 7
 lrcRank = 2
 summary_mat = np.random.randn(lrcRank, dim-1)
