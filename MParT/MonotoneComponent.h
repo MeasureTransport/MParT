@@ -63,24 +63,24 @@ public:
     virtual std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> GetBaseFunction() override{return std::make_shared<MultivariateExpansion<typename ExpansionType::BasisType, typename ExpansionType::KokkosSpace>>(1,expansion_);};
 
     /** Override the ConditionalMapBase Evaluate function. */
-    virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                              StridedMatrix<double, MemorySpace>              output) override
+    void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                      StridedMatrix<double, MemorySpace>              output) override
     {
         StridedVector<double,MemorySpace> outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
         EvaluateImpl(pts, this->savedCoeffs, outputSlice);
     }
 
-    virtual void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
-                             StridedMatrix<const double, MemorySpace> const& r,
-                             StridedMatrix<double, MemorySpace>              output) override
+    void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+                     StridedMatrix<const double, MemorySpace> const& r,
+                     StridedMatrix<double, MemorySpace>              output) override
     {
         auto rSlice = Kokkos::subview(r,0,Kokkos::ALL());
         auto outputSlice = Kokkos::subview(output, 0, Kokkos::ALL());
         InverseImpl(x1, rSlice, this->savedCoeffs, outputSlice);
     }
 
-    virtual void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                    StridedVector<double,MemorySpace>               output) override
+    void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                            StridedVector<double,MemorySpace>               output) override
     {
         // First, get the diagonal derivative
         if(useContDeriv_){
@@ -101,9 +101,9 @@ public:
         });
     }
 
-    virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                              StridedMatrix<const double, MemorySpace> const& sens,
-                              StridedMatrix<double, MemorySpace>              output) override
+    void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                      StridedMatrix<const double, MemorySpace> const& sens,
+                      StridedMatrix<double, MemorySpace>              output) override
     {
         assert(sens.extent(0)==this->outputDim);
         assert(sens.extent(1)==pts.extent(1));
@@ -122,10 +122,10 @@ public:
                 output(i,ptInd) *= sens(0,ptInd);
         });
     }
-    
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                               StridedMatrix<const double, MemorySpace> const& sens,
-                               StridedMatrix<double, MemorySpace>              output) override
+
+    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                       StridedMatrix<const double, MemorySpace> const& sens,
+                       StridedMatrix<double, MemorySpace>              output) override
     {
         assert(sens.extent(0)==this->outputDim);
         assert(sens.extent(1)==pts.extent(1));
@@ -146,8 +146,8 @@ public:
     }
 
 
-    virtual void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                             StridedMatrix<double, MemorySpace>              output) override
+    void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                     StridedMatrix<double, MemorySpace>              output) override
     {
         Kokkos::View<double*,MemorySpace> derivs("Diagonal Derivative", pts.extent(1));
 
@@ -169,8 +169,8 @@ public:
         });
     }
 
-    virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                             StridedMatrix<double, MemorySpace>              output) override
+    void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                     StridedMatrix<double, MemorySpace>              output) override
     {
         Kokkos::View<double*,MemorySpace> derivs("Diagonal Derivative", pts.extent(1));
 
@@ -387,7 +387,7 @@ public:
         };
 
         auto policy = GetCachedRangePolicy<ExecutionSpace>(numPts, cacheBytes, functor);
-        
+
         // Paralel loop over each point computing x_D = T^{-1}(x_1,...,x_{D-1},y_D) for that point
         Kokkos::parallel_for(policy, functor);
     }
@@ -474,7 +474,7 @@ public:
             }
         };
 
-        
+
         // Paralel loop over each point computing T(x_1,...,x_D) for that point
         auto policy = GetCachedRangePolicy<ExecutionSpace>(numPts, cacheBytes, functor);
         Kokkos::parallel_for(policy, functor);
@@ -638,7 +638,7 @@ public:
         auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
             unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
-            
+
             if(ptInd<numPts){
                 // Create a subview containing only the current point
                 auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
@@ -713,7 +713,7 @@ public:
         auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
             unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
-            
+
             if(ptInd<numPts){
                 // Create a subview containing only the current point
                 auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
@@ -742,7 +742,7 @@ public:
                 for(unsigned int d=0; d<dim_-1; ++d){
                     jacView(d) += integral(d+1);
                 }
-                
+
                 jacView(dim_-1) = integral(dim_);
 
             }
@@ -771,7 +771,7 @@ public:
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
         auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
-        
+
         auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
             // The index of the for loop
@@ -824,7 +824,7 @@ public:
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
         auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
-        
+
         auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
             // The index of the for loop
@@ -879,7 +879,7 @@ public:
 
         // Create a policy with enough scratch memory to cache the polynomial evaluations
         auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize+workspaceSize+2*numTerms+1);
-        
+
         auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
             unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();

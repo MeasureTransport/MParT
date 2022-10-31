@@ -132,21 +132,26 @@ Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> ComposedMap<MemorySpace>
 
 
 template<typename MemorySpace>
-ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components,
-                                      int maxChecks) : ConditionalMapBase<MemorySpace>(components.front()->inputDim, 
-                                                                                       components.front()->inputDim,
-                                                                                       std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
-                                                        maps_(components),
-                                                        maxChecks_((maxChecks<=0) ? components.size() : maxChecks)
+ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& maps,
+                                      int maxChecks) : ConditionalMapBase<MemorySpace>(maps.front()->inputDim, 
+                                                                                       maps.front()->inputDim,
+                                                                                       std::accumulate(maps.begin(), maps.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
+                                                        maps_(maps),
+                                                        maxChecks_((maxChecks<=0) ? maps.size() : maxChecks)
 {
 
     // Check the sizes of all the inputs
     for(unsigned int i=0; i<maps_.size()-1; ++i){
-        if(maps_.at(i)->outputDim != maps_.at(i+1)->inputDim){
+        if(maps_.at(i)->inputDim != maps_.at(i)->outputDim || maps_.at(i)->outputDim != maps_.at(i+1)->inputDim){
             std::stringstream msg;
-            msg << "In ComposedMap constructor, the output dimension (" << maps_.at(i)->outputDim << ") of component " << i << " is not equal to the input dimension (" << maps_.at(i+1)->inputDim << ").";
+            msg << "In ComposedMap constructor, each map in the composition must be square. Output dimension (" << maps_.at(i)->outputDim << ") of component " << i << " is not equal to the input dimension (" << maps_.at(i)->inputDim << ").";
             throw std::invalid_argument(msg.str());
         }
+    }
+    if(maps_.at(maps_.size()-1)->inputDim != maps_.at(maps_.size()-1)->outputDim){
+        std::stringstream msg;
+        msg << "In ComposedMap constructor, each map in the composition must be square. Output dimension (" << maps_.at(maps_.size()-1)->outputDim << ") of component " << maps_.size()-1 << " is not equal to the input dimension (" << maps_.at(maps_.size()-1)->inputDim << ").";
+        throw std::invalid_argument(msg.str());
     }
 }
 
@@ -156,7 +161,7 @@ void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
 
-    // Now create subviews for each of the components
+    // Now create subviews for each of the maps
     unsigned int cumNumCoeffs = 0;
     for(unsigned int i=0; i<maps_.size(); ++i){
         assert(cumNumCoeffs+maps_.at(i)->numCoeffs <= this->savedCoeffs.size());
@@ -174,7 +179,7 @@ void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::DefaultEx
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
 
-    // Now create subviews for each of the components
+    // Now create subviews for each of the maps
     unsigned int cumNumCoeffs = 0;
     for(unsigned int i=0; i<maps_.size(); ++i){
         assert(cumNumCoeffs+maps_.at(i)->numCoeffs <= this->savedCoeffs.size());
@@ -425,6 +430,6 @@ void ComposedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const d
 
 // Explicit template instantiation
 template class mpart::ComposedMap<Kokkos::HostSpace>;
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
-    template class mpart::ComposedMap<Kokkos::DefaultExecutionSpace::memory_space>;
+#if defined(MPART_ENABLE_GPU)
+    template class mpart::ComposedMap<DeviceSpace>;
 #endif
