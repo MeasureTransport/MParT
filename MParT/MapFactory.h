@@ -36,7 +36,7 @@ namespace mpart{
     auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(inDim, outDim, totalOrder, options);
 
      @endcode
-     
+
      */
     namespace MapFactory{
 
@@ -49,9 +49,12 @@ namespace mpart{
                                                                          MapOptions options = MapOptions());
 
         /**
-            @brief 
+            @brief Creates a square triangular map that is an identity in all but one output dimension
 
-            @details 
+            @details Given a dimension \f$d\f$, an active index \f$i\f$, and a real-valued map \f$f:\mathbb{R}^d\rightarrow\mathbb{R}\f$,
+            this function creates a map \f$T:\mathbb{R}^d\rightarrow\mathbb{R}^d\f$ such that \f$T_j(x) = x_j\f$ for all \f$j\neq i\f$ and
+            \f$T_i(x) = f(x)\f$.
+
             @param dim The dimension of the map.
             @param activeInd The index of the component to be non-identity.
             @param comp The component placed the activeInd.
@@ -62,11 +65,11 @@ namespace mpart{
                                                                               unsigned int activeInd,
                                                                               std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
-    
-                /**
-            @brief 
 
-            @details 
+                /**
+            @brief
+
+            @details
             @param dim The dimension of the map.
             @param activeInd The index of the component to be non-identity.
             @param summaryMatrix A matrix of dimensions r x activeInd-1 used to make an AffineFunction for the summary function
@@ -94,8 +97,6 @@ namespace mpart{
             @param totalOrder The total order used to define the parameterization of each MonotoneComponent.
             @param options Additional options that will be passed on to CreateComponent to construct each MonotoneComponent.
          */
-
-        
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateTriangular(unsigned int inputDim,
                                                                           unsigned int outputDim,
@@ -133,7 +134,7 @@ namespace mpart{
                                                                                      unsigned int activeInd,
                                                                                      std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
-        /** This struct is used to map the options to functions that can create a map component with types corresponding 
+        /** This struct is used to map the options to functions that can create a map component with types corresponding
             to the options.
         */
         template<typename MemorySpace>
@@ -152,14 +153,14 @@ namespace mpart{
                 auto iter = factoryMap->find(optionsKey);
                 if(iter == factoryMap->end())
                     throw std::runtime_error("Could not find registered factory method for given MapOptions.");
-                
+
                 return iter->second;
             }
 
             static std::shared_ptr<FactoryMapType> GetFactoryMap()
             {
                 static std::shared_ptr<FactoryMapType> map;
-                if( !map ) 
+                if( !map )
                     map = std::make_shared<FactoryMapType>();
                 return map;
             }
