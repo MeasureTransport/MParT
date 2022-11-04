@@ -18,7 +18,7 @@ using namespace mpart;
 template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateComponent(FixedMultiIndexSet<MemorySpace> const& mset,
                                                            MapOptions                                   opts)
-{   
+{
     return CompFactoryImpl<MemorySpace>::GetFactoryFunction(opts)(mset,opts);
 }
 
@@ -45,12 +45,12 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateSingle
 
     std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
     // Construct map using TriangularMap constructor
-    
+
     if(activeInd == 1){  // special case if activeInd = 1, map is of form [T_1; Id]
 
         // Bottom identity map
         std::shared_ptr<ConditionalMapBase<MemorySpace>> botIdMap = std::make_shared<IdentityMap<Kokkos::HostSpace>>(dim, dim-activeInd);
-        
+
         // fill a vector of components with identity, active component, identity
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks(2);
         blocks.at(0) = comp;
@@ -77,10 +77,10 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateSingle
 
         // Top identity map
         std::shared_ptr<ConditionalMapBase<MemorySpace>> topIdMap = std::make_shared<IdentityMap<Kokkos::HostSpace>>(activeInd-1, activeInd-1);
-        
+
         // Bottom identity map
         std::shared_ptr<ConditionalMapBase<MemorySpace>> botIdMap = std::make_shared<IdentityMap<Kokkos::HostSpace>>(dim, dim-activeInd);
-        
+
         // fill a vector of components with identity, active component, identity
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks(3);
         blocks.at(0) = topIdMap;
@@ -106,12 +106,12 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateAffine
 {
 
 
-    // multiindex set for component 
+    // multiindex set for component
     unsigned int lrcRank = summaryMatrix.extent(0);
     FixedMultiIndexSet<MemorySpace> mset(lrcRank+1, maxDegree);
 
     // Create the summarizedMap component with affine summary function
-    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> affineFunc = std::make_shared<AffineFunction<Kokkos::HostSpace>>(summaryMatrix);    
+    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> affineFunc = std::make_shared<AffineFunction<Kokkos::HostSpace>>(summaryMatrix);
     std::shared_ptr<ConditionalMapBase<MemorySpace>> comp = MapFactory::CreateComponent<Kokkos::HostSpace>(mset, options);
     std::shared_ptr<ConditionalMapBase<MemorySpace>> sumMap = std::make_shared<SummarizedMap<MemorySpace>>(affineFunc, comp);
 
@@ -145,14 +145,14 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriang
 
 
 template<typename MemorySpace>
-std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::CreateExpansion(unsigned int outputDim, 
+std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::CreateExpansion(unsigned int outputDim,
                                                                                            FixedMultiIndexSet<MemorySpace> const& mset,
                                                                                            MapOptions                                   opts)
 {
     std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> output;
 
     if(opts.basisType==BasisTypes::ProbabilistHermite){
-        
+
         if(isinf(opts.basisLB) && isinf(opts.basisUB)){
             ProbabilistHermite basis1d(opts.basisNorm);
             output = std::make_shared<MultivariateExpansion<ProbabilistHermite, MemorySpace>>(outputDim, mset, basis1d);
@@ -204,5 +204,5 @@ template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactor
     template std::shared_ptr<ParameterizedFunctionBase<DeviceSpace>> mpart::MapFactory::CreateExpansion<DeviceSpace>(unsigned int, FixedMultiIndexSet<DeviceSpace> const&, MapOptions);
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateTriangular<DeviceSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateSingleEntryMap(unsigned int, unsigned int, std::shared_ptr<ConditionalMapBase<DeviceSpace>> const&);
-    template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateAffineLRCMap(unsigned int, unsigned int, Kokkos::View<double**, Kokkos::DeviceSpace>, unsigned int, MapOptions);
+    template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateAffineLRCMap(unsigned int, unsigned int, Kokkos::View<double**, DeviceSpace>, unsigned int, MapOptions);
 #endif

@@ -10,10 +10,6 @@ template<typename MemorySpace>
 SummarizedMap<MemorySpace>::SummarizedMap(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const& summary, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& component) : ConditionalMapBase<MemorySpace>(summary->inputDim + 1, component->outputDim, component->numCoeffs),
                         sumFunc_(summary), comp_(component)
 {
-
-    // std::cout << "constructor: comp_.get() = " << comp_.get() << std::endl;
-    // std::cout << "constructor: sumFunc_.get() = " << sumFunc_.get() << std::endl; 
-
     // Check the dimension of sumFunc_ is compatible with dimension of component
     if(comp_->outputDim != 1){
         std::stringstream msg;
@@ -97,7 +93,7 @@ void SummarizedMap<MemorySpace>::SummarizePts(StridedMatrix<const double, Memory
 template<typename MemorySpace>
 void SummarizedMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                     StridedVector<double, MemorySpace>              output)
-{   
+{
 
     // Create a view to hold summarized pts
     Kokkos::View<double**, MemorySpace> summarizedPts("summarizedPts", comp_->inputDim, pts.extent(1));
@@ -137,7 +133,7 @@ void SummarizedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemoryS
     Kokkos::View<double**, MemorySpace> summary = sumFunc_->Evaluate(ptsToSummarize);
 
     // Invert map
-    comp_->InverseImpl(summary, r, output); 
+    comp_->InverseImpl(summary, r, output);
 }
 
 
@@ -248,5 +244,5 @@ void SummarizedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
 // Explicit template instantiation
 template class mpart::SummarizedMap<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)
-    template class mpart::SummarizedMap<Kokkos::DefaultExecutionSpace::memory_space>;
+    template class mpart::SummarizedMap<DeviceSpace>;
 #endif
