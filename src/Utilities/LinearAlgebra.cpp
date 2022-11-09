@@ -97,6 +97,16 @@ void Cholesky<Kokkos::HostSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::La
     cholSolver_->matrixL().solveInPlace(eigX);
 }
 
+template<>
+Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> Cholesky<Kokkos::HostSpace>::multiplyL(Kokkos::View<const double**,Kokkos::LayoutLeft,Kokkos::HostSpace> x)
+{
+    Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> y("y", x.extent(0),x.extent(1));
+    auto eigX = KokkosToMat(x);
+    auto eigY = KokkosToMat(y);
+    eigY.noalias() = cholSolver_->matrixL() * eigX;
+    return y;
+}
+
 template<typename MemorySpace>
 Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> Cholesky<MemorySpace>::solve(StridedMatrix<const double, MemorySpace> x)
 {
@@ -404,7 +414,6 @@ void Cholesky<mpart::DeviceSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::L
     int ldX = x.stride_1();
     int ldLLT = LLT_.stride_1();
 
-    Kokkos::View<int*, mpart::DeviceSpace> d_info("Info", 1);
     const double alpha = 1.;
 
     cublasStatus_t st = cublasDtrsm(GetInitializeStatusObject().GetCublasHandle(),
@@ -423,7 +432,39 @@ void Cholesky<mpart::DeviceSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::L
     // Error checking
     if(st != CUBLAS_STATUS_SUCCESS){
         std::stringstream msg;
-        msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrsm. Faile with status " << st << ".";
+        msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrsm. Failed with status " << st << ".";
+        throw std::runtime_error(msg.str());
+    }
+}
+
+template<>
+Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> Cholesky<mpart::DeviceSpace>::multiplyL(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
+{
+    assert(isComputed);
+
+    Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> y("y", x.extent(0), x.extent(1));
+
+    int ldX = x.stride_1();
+    int ldY = y.stride_1();
+    int ldLLT = LLT_.stride_1();
+
+    const double alpha = 1.;
+
+    cublasStatus_t st = cublasDtrsm(GetInitializeStatusObject().GetCublasHandle(),
+        CUBLAS_SIDE_LEFT,
+        uplo,
+        CUBLAS_OP_N,
+        CUBLAS_DIAG_NON_UNIT,
+        LLT_.extent(0), x.extent(1),
+        &alpha,
+        LLT_.data(), ldLLT,
+        x.data(), ldX
+        y.data(), ldY);
+
+    // Error checking
+    if(st != CUBLAS_STATUS_SUCCESS){
+        std::stringstream msg;
+        msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrmm. Failed with status " << st << ".";
         throw std::runtime_error(msg.str());
     }
 }

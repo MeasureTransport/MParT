@@ -294,9 +294,12 @@ public:
     /** Returns a view containing \f$A^{-1}x\f$. */
     Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> solve(StridedMatrix<const double,MemorySpace> x);
 
-    /** Computes \f$L^{-1}x\f$ and stores the results in x.
+    /** Computes \f$L^{-1}B\f$ and stores the results in B.
     */
-    void solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> x);
+    void solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> B);
+
+    /** Computes \f$LX\f$ and stores the results in X*/
+    Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> multiplyL(Kokkos::View<const double**,Kokkos::LayoutLeft,MemorySpace> X);
 
     /** Returns the determinant of the matrix A based on its LU factorization. */
     double determinant() const;

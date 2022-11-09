@@ -1,4 +1,4 @@
-target_sources(mpart 
+target_sources(mpart
     PRIVATE
     MultiIndices/MultiIndex.cpp
     MultiIndices/MultiIndexLimiter.cpp
@@ -7,8 +7,12 @@ target_sources(mpart
     MultiIndices/MultiIndexNeighborhood.cpp
 
     Utilities/Miscellaneous.cpp
-    Utilities/LinearAlgebra.cpp 
-    
+    Utilities/LinearAlgebra.cpp
+
+    # Distributions/DistributionBase.cpp
+    # Distributions/SampleGenerator.cpp
+    # Distributions/GaussianDistribution.cpp
+
     ParameterizedFunctionBase.cpp
     ConditionalMapBase.cpp
     TriangularMap.cpp
@@ -16,7 +20,7 @@ target_sources(mpart
 
     AffineMap.cpp
     AffineFunction.cpp
-    
+
     MapFactoryImpl1.cpp
     MapFactoryImpl2.cpp
     MapFactoryImpl3.cpp

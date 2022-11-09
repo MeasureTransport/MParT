@@ -230,6 +230,16 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
             }
         }
     }
+    SECTION("Multiply Cholesky L") {
+        Cholesky<Kokkos::HostSpace> Achol(constA);
+        auto C = Achol.multiplyL(B);
+        auto eigZ = (eigA.llt().matrixL() * eigB).eval();
+        for(unsigned int j=0; j<C.extent(1); ++j){
+            for(unsigned int i=0; i<C.extent(0); ++i){
+                CHECK(C(i,j) == Approx(eigZ(i,j)).epsilon(1e-14).margin(1e-14));
+            }
+        }
+    }
     SECTION("Solve Cholesky out of place") {
         Cholesky<Kokkos::HostSpace> Achol(constA);
         auto C = Achol.solve(B);
