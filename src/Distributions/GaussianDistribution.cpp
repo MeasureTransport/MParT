@@ -124,3 +124,8 @@ void GaussianDistribution<MemorySpace>::SampleImpl(StridedMatrix<double, MemoryS
         }
     }
 }
+
+template struct GaussianDistribution<Kokkos::HostSpace>;
+#ifdef MPART_ENABLE_GPU
+template struct GaussianDistribution<mpart::DeviceSpace>;
+#endif

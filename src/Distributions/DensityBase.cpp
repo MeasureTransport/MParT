@@ -5,23 +5,23 @@ using namespace mpart;
 template<>
 Eigen::VectorXd DensityBase<Kokkos::HostSpace>::LogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts) {
     // Allocate output
-    Eigen::VectorXd out(pts.cols());
+    Eigen::VectorXd output(pts.cols());
     StridedMatrix<const double, Kokkos::HostSpace> ptsView = ConstRowMatToKokkos<double, Kokkos::HostSpace>(pts);
     StridedVector<double, Kokkos::HostSpace> outView = VecToKokkos<double, Kokkos::HostSpace>(output);
     // Call the LogDensity function
-    auto output_kokkos = LogDensityImpl(ptsView, outView);
+    LogDensityImpl(ptsView, outView);
 
-    return out;
+    return output;
 }
 
 template<>
 Eigen::RowMatrixXd DensityBase<Kokkos::HostSpace>::GradLogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts) {
     // Allocate output
-    Eigen::RowMatrixXd out(dimension, pts.cols());
+    Eigen::RowMatrixXd output(dimension, pts.cols());
     StridedMatrix<const double, Kokkos::HostSpace> ptsView = ConstRowMatToKokkos<double, Kokkos::HostSpace>(pts);
-    StridedMatrix<double, Kokkos::HostSpace> outView = RowMatToKokkos<double, Kokkos::HostSpace>(output);
+    StridedMatrix<double, Kokkos::HostSpace> outView = MatToKokkos<double, Kokkos::HostSpace>(output);
     // Call the LogDensity function
-    auto output_kokkos = GradLogDensityImpl(ptsView, outView);
+    GradLogDensityImpl(ptsView, outView);
 
-    return out;
+    return output;
 }

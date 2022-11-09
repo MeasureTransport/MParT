@@ -101,7 +101,7 @@ template<>
 Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> Cholesky<Kokkos::HostSpace>::multiplyL(Kokkos::View<const double**,Kokkos::LayoutLeft,Kokkos::HostSpace> x)
 {
     Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> y("y", x.extent(0),x.extent(1));
-    auto eigX = KokkosToMat(x);
+    auto eigX = ConstKokkosToMat(x);
     auto eigY = KokkosToMat(y);
     eigY.noalias() = cholSolver_->matrixL() * eigX;
     return y;

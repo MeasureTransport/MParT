@@ -1,9 +1,9 @@
 #ifndef MPART_GaussianDistribution_H
 #define MPART_GaussianDistribution_H
 
+#include <Kokkos_Core.hpp>
 #include "MParT/Distributions/Distribution.h"
 #include "MParT/Utilities/LinearAlgebra.h"
-#include <Kokkos_Core.hpp>
 
 namespace mpart {
 

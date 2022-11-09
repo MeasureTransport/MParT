@@ -10,7 +10,7 @@ template<typename MemorySpace>
 class SampleGenerator {
     public:
     const unsigned int dim_;
-    using PoolType = Kokkos::Random_XorShift64_Pool<MemoryToExecution<MemorySpace>::Space>;
+    using PoolType = typename Kokkos::Random_XorShift64_Pool<MemoryToExecution<MemorySpace>::Space>;
     SampleGenerator(unsigned int dim) : dim_(dim), rand_pool() {};
 
     virtual ~SampleGenerator() = default;
