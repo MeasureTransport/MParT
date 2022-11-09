@@ -66,7 +66,6 @@ void PartialPivLU<Kokkos::HostSpace>::solveInPlace(Kokkos::View<double**,Kokkos:
     luSolver_->matrixLU().template triangularView<Eigen::Upper>().solveInPlace(eigX);
 }
 
-
 template<>
 double PartialPivLU<Kokkos::HostSpace>::determinant() const
 {
@@ -74,7 +73,46 @@ double PartialPivLU<Kokkos::HostSpace>::determinant() const
     return luSolver_->determinant();
 }
 
+template<>
+void Cholesky<Kokkos::HostSpace>::compute(Kokkos::View<const double**,Kokkos::LayoutLeft,Kokkos::HostSpace> A)
+{
+    auto eigA = ConstKokkosToMat(A);
+    // Use eigen to compute the Cholesky decomposition in place
+    cholSolver_ = std::make_shared<Eigen::LLT<Eigen::MatrixXd>>(eigA);
+    isComputed = true;
+}
 
+template<>
+void Cholesky<Kokkos::HostSpace>::solveInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> x)
+{
+    auto eigX = KokkosToMat(x);
+    cholSolver_->matrixL().solveInPlace(eigX);
+    cholSolver_->matrixU().solveInPlace(eigX);
+}
+
+template<>
+void Cholesky<Kokkos::HostSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> x)
+{
+    auto eigX = KokkosToMat(x);
+    cholSolver_->matrixL().solveInPlace(eigX);
+}
+
+template<typename MemorySpace>
+Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> Cholesky<MemorySpace>::solve(StridedMatrix<const double, MemorySpace> x)
+{
+    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> output("solution", x.extent(0),x.extent(1));
+    Kokkos::deep_copy(output, x);
+    solveInPlace(output);
+    return output;
+}
+
+template<>
+double Cholesky<Kokkos::HostSpace>::determinant() const
+{
+    assert(isComputed);
+    double sqrt_det = cholSolver_->matrixL().determinant();
+    return sqrt_det*sqrt_det;
+}
 
 #if defined(MPART_ENABLE_GPU)
 
@@ -252,6 +290,155 @@ double PartialPivLU<mpart::DeviceSpace>::determinant() const
     },Kokkos::Prod<double>(det));
 
     return det;
+}
+//
+
+template<>
+void Cholesky<mpart::DeviceSpace>::compute(Kokkos::View<const double**,Kokkos::LayoutLeft,mpart::DeviceSpace> A)
+{
+
+    ldA = A.stride_1();
+
+    int nrows = A.extent(0);
+    int ncols = A.extent(1);
+    assert(nrows==ncols);
+
+    // Resize the space for storing the LU factorization
+    LLT_ = Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace>("LLT", A.extent(0), A.extent(0));
+
+    int ldLLT = LLT_.stride_1();
+    int info;
+
+    // Copy the right block of the matrix A_ into LU_
+    Kokkos::deep_copy(LLT_, A);
+
+    // Set up cuSolver options
+    cusolverDnCreateParams(&params);
+    cusolverDnSetAdvOptions(params, CUSOLVERDN_GETRF, CUSOLVER_ALG_0);
+
+    size_t d_workSize, h_workSize;
+    cusolverDnXpotrf_bufferSize(GetInitializeStatusObject().GetCusolverHandle(),
+                                params,
+                                uplo,
+                                LLT_.extent(0),
+                                CUDA_R_64F,
+                                LLT_.data(),
+                                ldLLT,
+                                CUDA_R_64F,
+                                &d_workSize,
+                                &h_workSize);
+
+
+    Kokkos::View<double*, mpart::DeviceSpace> d_workspace("LLT Workspace", d_workSize);
+    Kokkos::View<double*, Kokkos::HostSpace> h_workspace("LLT Workspace", h_workSize);
+    Kokkos::View<int*, mpart::DeviceSpace> d_info("Info",1);
+
+    cusolverDnXpotrf(GetInitializeStatusObject().GetCusolverHandle(),
+                     params,
+                     uplo,
+                     LLT_.extent(0),
+                     CUDA_R_64F,
+                     LLT_.data(),
+                     ldLLT,
+                     CUDA_R_64F,
+                     d_workspace.data(),
+                     d_workSize,
+                     h_workspace.data(),
+                     h_workSize,
+                     d_info.data());
+
+    info = ToHost(d_info)(0);
+
+    // Error handling
+    if(info<0){
+        std::stringstream msg;
+        msg << "In Cholesky<mpart::DeviceSpace>::compute: Argument " << -info << " to cusolverDnDgetrf had an illegal value or memory allocation failed.  Could not compute factorization.";
+        throw std::runtime_error(msg.str());
+    }else if(info>0){
+        std::stringstream msg;
+        msg << "In Cholesky<mpart::DeviceSpace>::compute: The " << info << " diagonal entry of the matrix U is exactly zero.  The right block of matrix A is singular.";
+        throw std::runtime_error(msg.str());
+    }else{
+        isComputed = true;
+    }
+}
+
+template<>
+void Cholesky<mpart::DeviceSpace>::solveInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
+{
+    assert(isComputed);
+
+    int ldX = x.stride_1();
+    int ldLLT = LLT_.stride_1();
+
+    int info;
+    Kokkos::View<int*, mpart::DeviceSpace> d_info("Info", 1);
+
+    cusolverDnXpotrs(GetInitializeStatusObject().GetCusolverHandle(),
+                     params,
+                     uplo,
+                     LLT_.extent(0),
+                     x.extent(1),
+                     CUDA_R_64F,
+                     LLT_.data(),
+                     ldLU,
+                     CUDA_R_64F,
+                     x.data(),
+                     ldX,
+                     d_info.data());
+    info = ToHost(d_info)(0);
+
+    // Error checking
+    if(info!=0){
+        std::stringstream msg;
+        msg << "Cholesky<mpart::DeviceSpace>::solveInPlace: Could not compute inverse with cusolverDnXgetrs.  Argument " << -info << " to cusolverDnXgetrs had a bad value.";
+        throw std::runtime_error(msg.str());
+    }
+}
+
+template<>
+void Cholesky<mpart::DeviceSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
+{
+    assert(isComputed);
+
+    int ldX = x.stride_1();
+    int ldLLT = LLT_.stride_1();
+
+    int info;
+    Kokkos::View<int*, mpart::DeviceSpace> d_info("Info", 1);
+    const double alpha = 1.;
+
+    cublasStatus_t st = cublasDtrsm(GetInitializeStatusObject().GetCublasHandle(),
+        CUBLAS_SIDE_LEFT,
+        uplo,
+        CUBLAS_OP_N,
+        CUBLAS_DIAG_NON_UNIT,
+        LLT_.extent(0),
+        x.extent(1),
+        &alpha,
+        LLT_.data(),
+        ldLLT,
+        x.data(),
+        ldX);
+
+    // Error checking
+    if(st != CUBLAS_STATUS_SUCCESS){
+        std::stringstream msg;
+        msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrsm. Faile with status " << st << ".";
+        throw std::runtime_error(msg.str());
+    }
+}
+
+
+template<>
+double Cholesky<mpart::DeviceSpace>::determinant() const
+{
+    assert(isComputed);
+    double det = 1.0;
+    Kokkos::parallel_reduce(LLT_.extent(0), KOKKOS_CLASS_LAMBDA (const int& i, double& lprod) {
+        lprod *= LLT_(i,i);
+    },Kokkos::Prod<double>(det));
+    return det*det;
 }
 
 

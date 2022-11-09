@@ -282,7 +282,7 @@ public:
     Cholesky() {};
     Cholesky(Kokkos::View<const double**,Kokkos::LayoutLeft,MemorySpace> A){ compute(A);};
 
-    /** Computes the LU factorization of a matrix A */
+    /** Computes the Cholesky factorization of a matrix A */
     void compute(Kokkos::View<const double**,Kokkos::LayoutLeft,MemorySpace> A);
 
     /** Computes \f$A^{-1}x\f$ and stores the results in x.
@@ -296,10 +296,6 @@ public:
     */
     void solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> x);
 
-    /** Returns a view containing \f$A^{-1}x\f$. */
-    Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> solveL(StridedMatrix<const double,MemorySpace> x);
-
-
     /** Returns the determinant of the matrix A based on its LU factorization. */
     double determinant() const;
 
@@ -307,14 +303,14 @@ private:
 
     bool isComputed;
 
-    std::shared_ptr<Eigen::PartialPivLU<Eigen::MatrixXd>> luSolver_;
+    std::shared_ptr<Eigen::LLT<Eigen::MatrixXd>> cholSolver_;
 
 // Information used by cusolver getrf and getrs routines
 #if defined(MPART_ENABLE_GPU)
     cusolverDnParams_t params;
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> LU_;
-    Kokkos::View<int64_t*, MemorySpace> pivots_;
+    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> LLT_;
     int ldA;
+    static const cublasFillMode_t uplo = CUBLAS_FILL_MODE_LOWER;
 #endif
 
 };

@@ -14,6 +14,7 @@ class GaussianDistribution: Distribution<MemorySpace> {
     GaussianDistribution(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar);
     GaussianDistribution(StridedMatrix<double, MemorySpace> covar);
     GaussianDistribution(StridedVector<double, MemorySpace> mean);
+    GaussianDistribution();
 
     private:
 
@@ -26,12 +27,13 @@ class GaussianDistribution: Distribution<MemorySpace> {
     static const double logtau_ = kk_log(2*Kokkos::Experimental::pi_v<double>);
 
     void Factorize(StridedMatrix<double, MemorySpace> Cov) {
-        covLU_.compute(Cov);
-        logDetCov_ = log(luSolver_.determinant());
+        covChol_.compute(Cov);
+        logDetCov_ = log(covChol_.determinant());
     }
 
     StridedVector<double, MemorySpace> mean_;
-    mpart::PartialPivLU<MemorySpace> covLU_;
+    mpart::Cholesky<MemorySpace> covChol_;
     bool idCov_ = false;
+    unsigned int dim_ = 0;
     double logDetCov_;
 }
