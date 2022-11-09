@@ -443,6 +443,8 @@ double Cholesky<mpart::DeviceSpace>::determinant() const
 
 
 template struct mpart::PartialPivLU<mpart::DeviceSpace>;
+template struct mpart::Cholesky<mpart::DeviceSpace>;
 #endif
 
 template struct mpart::PartialPivLU<Kokkos::HostSpace>;
+template struct mpart::Cholesky<Kokkos::HostSpace>;

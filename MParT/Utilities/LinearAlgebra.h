@@ -2,6 +2,8 @@
 #define MPART_LINEARALGEBRA_H
 
 #include <Kokkos_Core.hpp>
+#include <Eigen/LU>
+#include <Eigen/Cholesky>
 
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Utilities/GPUtils.h"
