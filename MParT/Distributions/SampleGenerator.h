@@ -1,7 +1,10 @@
 #ifndef MPART_SampleGenerator_H
 #define MPART_SampleGenerator_H
 
+#include "Kokkos_Random.hpp"
+
 #include "MParT/Utilities/EigenTypes.h"
+#include "MParT/Utilities/KokkosSpaceMappings.h"
 #include "MParT/Utilities/ArrayConversions.h"
 
 namespace mpart {
@@ -9,8 +12,7 @@ namespace mpart {
 template<typename MemorySpace>
 class SampleGenerator {
     public:
-    const unsigned int dim_;
-    using PoolType = typename Kokkos::Random_XorShift64_Pool<MemoryToExecution<MemorySpace>::Space>;
+    
     SampleGenerator(unsigned int dim) : dim_(dim), rand_pool() {};
 
     virtual ~SampleGenerator() = default;
@@ -28,7 +30,7 @@ class SampleGenerator {
      * @return StridedMatrix<double, MemorySpace> The samples from this generator
      */
     StridedMatrix<double, MemorySpace> Sample(unsigned int N) {
-        StridedMatrix<double, MemorySpace> output(N, dimension);
+        StridedMatrix<double, MemorySpace> output(N, dim_);
         SampleImpl(output);
         return output;
     };
@@ -39,10 +41,12 @@ class SampleGenerator {
 
     /** Sample function with conversion from Kokkos to Eigen (and possibly copy to/from device). */
     // Eigen::RowMatrixXd SampleEigen(unsigned int N);
-
+    const unsigned int dim_;
+    using PoolType = typename Kokkos::Random_XorShift64_Pool<typename MemoryToExecution<MemorySpace>::Space>;
+    
     private:
     PoolType rand_pool;
-}
+};
 
 } // namespace mpart
 #endif //MPART_SampleGenerator_H

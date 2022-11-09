@@ -299,7 +299,7 @@ public:
     void solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> B);
 
     /** Computes \f$LX\f$ and stores the results in X*/
-    Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> multiplyL(Kokkos::View<const double**,Kokkos::LayoutLeft,MemorySpace> X);
+    Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> multiplyL(Kokkos::View<const double**,Kokkos::LayoutLeft,MemorySpace> X);
 
     /** Returns the determinant of the matrix A based on its LU factorization. */
     double determinant() const;

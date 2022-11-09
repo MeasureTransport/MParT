@@ -438,7 +438,7 @@ void Cholesky<mpart::DeviceSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::L
 }
 
 template<>
-Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> Cholesky<mpart::DeviceSpace>::multiplyL(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
+Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> Cholesky<mpart::DeviceSpace>::multiplyL(Kokkos::View<const double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
 {
     assert(isComputed);
 
@@ -446,20 +446,18 @@ Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> Cholesky<mpart::Dev
 
     int ldX = x.stride_1();
     int ldY = y.stride_1();
-    int ldLLT = LLT_.stride_1();
 
     const double alpha = 1.;
 
-    cublasStatus_t st = cublasDtrsm(GetInitializeStatusObject().GetCublasHandle(),
-        CUBLAS_SIDE_LEFT,
-        uplo,
-        CUBLAS_OP_N,
-        CUBLAS_DIAG_NON_UNIT,
+    cublasStatus_t st = cublasDtrmm(GetInitializeStatusObject().GetCublasHandle(),
+        CUBLAS_SIDE_LEFT, uplo,
+        CUBLAS_OP_N, CUBLAS_DIAG_NON_UNIT,
         LLT_.extent(0), x.extent(1),
         &alpha,
-        LLT_.data(), ldLLT,
-        x.data(), ldX
-        y.data(), ldY);
+        LLT_.data(), ldA,
+        x.data(), ldX,
+        y.data(), ldY
+    );
 
     // Error checking
     if(st != CUBLAS_STATUS_SUCCESS){
@@ -467,6 +465,7 @@ Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> Cholesky<mpart::Dev
         msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrmm. Failed with status " << st << ".";
         throw std::runtime_error(msg.str());
     }
+    return y;
 }
 
 

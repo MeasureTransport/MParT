@@ -17,7 +17,7 @@ Eigen::VectorXd DensityBase<Kokkos::HostSpace>::LogDensity(Eigen::Ref<const Eige
 template<>
 Eigen::RowMatrixXd DensityBase<Kokkos::HostSpace>::GradLogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts) {
     // Allocate output
-    Eigen::RowMatrixXd output(dimension, pts.cols());
+    Eigen::RowMatrixXd output(pts.rows(), pts.cols());
     StridedMatrix<const double, Kokkos::HostSpace> ptsView = ConstRowMatToKokkos<double, Kokkos::HostSpace>(pts);
     StridedMatrix<double, Kokkos::HostSpace> outView = MatToKokkos<double, Kokkos::HostSpace>(output);
     // Call the LogDensity function

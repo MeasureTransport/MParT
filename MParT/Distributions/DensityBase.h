@@ -15,7 +15,7 @@ namespace mpart {
 
     public:
 
-    DensityBase(unsigned int dim) : dimension(dim) {};
+    DensityBase() {};
 
     virtual ~DensityBase() = default;
 
@@ -56,8 +56,6 @@ namespace mpart {
      */
     template<typename AnyMemorySpace>
     StridedMatrix<double, AnyMemorySpace> GradLogDensity(StridedMatrix<const double, AnyMemorySpace> const &X);
-
-    const unsigned int dimension;
 
     private:
 

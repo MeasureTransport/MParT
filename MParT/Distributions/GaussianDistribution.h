@@ -8,27 +8,30 @@
 namespace mpart {
 
 template<typename MemorySpace>
-class GaussianDistribution: Distribution<MemorySpace> {
+class GaussianSamplerDensity {
     public:
 
-    GaussianDistribution(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar);
-    GaussianDistribution(StridedMatrix<double, MemorySpace> covar);
-    GaussianDistribution(StridedVector<double, MemorySpace> mean);
-    GaussianDistribution();
+    GaussianSamplerDensity() = delete;
+    GaussianSamplerDensity(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar);
+    GaussianSamplerDensity(StridedMatrix<double, MemorySpace> covar);
+    GaussianSamplerDensity(StridedVector<double, MemorySpace> mean);
+    GaussianSamplerDensity(unsigned int dim);
+
+    void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> &output);
+    void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output);
+    void SampleImpl(StridedMatrix<double, MemorySpace> output);
 
     private:
 
 #if (KOKKOS_VERSION / 10000 == 3) && (KOKKOS_VERSION / 100 % 100 < 7)
-    const auto& kk_log = Kokkos::Experimental::log;
+    const double logtau_ = std::log(2*Kokkos::Experimental::pi_v<double>);
 #else
-    const auto& kk_log = Kokkos::log;
+    const double logtau_ = std::log(2*Kokkos::numbers::pi_v<double>);
 #endif // KOKKOS_VERSION
-
-    static const double logtau_ = kk_log(2*Kokkos::Experimental::pi_v<double>);
 
     void Factorize(StridedMatrix<double, MemorySpace> Cov) {
         covChol_.compute(Cov);
-        logDetCov_ = log(covChol_.determinant());
+        logDetCov_ = std::log(covChol_.determinant());
     }
 
     StridedVector<double, MemorySpace> mean_;
@@ -36,4 +39,11 @@ class GaussianDistribution: Distribution<MemorySpace> {
     bool idCov_ = false;
     unsigned int dim_ = 0;
     double logDetCov_;
-}
+};
+
+template<typename MemorySpace>
+using GaussianDistribution = Distribution<MemorySpace, GaussianSamplerDensity<MemorySpace>, GaussianSamplerDensity<MemorySpace>>;
+
+} // namespace mpart
+
+#endif //MPART_GaussianDistribution_H
