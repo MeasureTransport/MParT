@@ -381,7 +381,7 @@ void Cholesky<mpart::DeviceSpace>::solveInPlace(Kokkos::View<double**,Kokkos::La
                      x.extent(1),
                      CUDA_R_64F,
                      LLT_.data(),
-                     ldLU,
+                     ldLLT,
                      CUDA_R_64F,
                      x.data(),
                      ldX,
@@ -404,7 +404,6 @@ void Cholesky<mpart::DeviceSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::L
     int ldX = x.stride_1();
     int ldLLT = LLT_.stride_1();
 
-    int info;
     Kokkos::View<int*, mpart::DeviceSpace> d_info("Info", 1);
     const double alpha = 1.;
 
