@@ -28,11 +28,12 @@ void GaussianDistribution<MemorySpace>::LogDensityImpl(StridedMatrix<const doubl
         throw std::runtime_error("GaussianDistribution::LogDensityImpl: The number of rows in pts must match the dimension of the distribution.");
     }
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
+    diff = StridedMatrix<double, MemorySpace>("diff", M, N);
+
     if(mean_.extent(0) == 0){
-        diff = pts;
+        Kokkos::deep_copy(diff, pts);
     }
     else {
-        diff = StridedMatrix<double, MemorySpace>("diff", M, N);
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
             diff(i,j) = pts(i,j) - mean_(i);
         });
@@ -52,5 +53,24 @@ void GaussianDistribution<MemorySpace>::LogDensityImpl(StridedMatrix<const doubl
 }
 
 void GaussianDistribution<MemorySpace>::GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
+    // Compute the gradient of the log density
+    int M = pts.extent(0);
+    int N = pts.extent(1);
+    if(dim_ != 0 && M != dim_) {
+        throw std::runtime_error("GaussianDistribution::GradLogDensityImpl: The number of rows in pts must match the dimension of the distribution.");
+    }
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
 
+    if(mean_.extent(0) == 0){
+        Kokkos::deep_copy(output, pts);
+    }
+    else {
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
+            output(i,j) = pts(i,j) - mean_(i);
+        });
+    }
+
+    if(!idCov_) {
+        covChol_.solveInPlace(output);
+    }
 }
