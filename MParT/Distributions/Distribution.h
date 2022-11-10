@@ -51,7 +51,7 @@ class Distribution{
 template<typename MemorySpace, template<typename> typename DensitySampler, typename... T>
 Distribution<MemorySpace, DensitySampler<MemorySpace>, DensitySampler<MemorySpace>> CreateDistribution(T... args) {
     auto dist = std::make_shared<DensitySampler<MemorySpace>>(args...);
-    return Distribution<MemorySpace, DensitySampler, DensitySampler>(dist, dist);
+    return Distribution<MemorySpace, DensitySampler<MemorySpace>, DensitySampler<MemorySpace>>(dist, dist);
 }
 
 } // namespace mpart

@@ -185,7 +185,7 @@ Eigen::RowMatrixXd ParameterizedFunctionBase<mpart::DeviceSpace>::Gradient(Eigen
 
 
 template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs){
+void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs){
 
     // If coefficients already exist, make sure the sizes match
     if(this->savedCoeffs.is_allocated()){
@@ -205,10 +205,8 @@ void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kok
     Kokkos::deep_copy(this->savedCoeffs, coeffs);
 }
 
-
-
 template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs){
+void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs){
 
     if(coeffs.size() != numCoeffs){
         std::stringstream msg;
@@ -220,40 +218,19 @@ void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Ko
 
 #if defined(MPART_ENABLE_GPU)
 
-template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs)
+template<>
+void ParameterizedFunctionBase<mpart::DeviceSpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
 {
-
-    // If coefficients already exist, make sure the sizes match
-    if(this->savedCoeffs.is_allocated()){
-        if(coeffs.size() != numCoeffs){
-            std::stringstream msg;
-            msg << "Error in ParameterizedFunctionBase<MemorySpace>::SetCoeffs.  Expected coefficient vector with size " << numCoeffs << ", but new coefficients have size " << coeffs.size() << ".";
-            throw std::invalid_argument(msg.str());
-        }
-
-        if(this->savedCoeffs.size() != numCoeffs)
-            Kokkos::resize(this->savedCoeffs, numCoeffs);
-    }else{
-
-        this->savedCoeffs = Kokkos::View<double*, MemorySpace>("ParameterizedFunctionBase<MemorySpace> Coefficients", coeffs.size());
-    }
-
-    Kokkos::deep_copy(this->savedCoeffs, coeffs);
+    // Copy the coefficients to the device
+    Kokkos::View<double*, mpart::DeviceSpace> coeffs_device = ToDevice<mpart::DeviceSpace>(coeffs);
+    this->SetCoeffs(coeffs_device);
 }
 
-
-template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs)
-{
-
-    if(coeffs.size() != numCoeffs){
-        std::stringstream msg;
-        msg << "Error in ParameterizedFunctionBase<MemorySpace>::WrapCoeffs.  Expected coefficient vector with size " << numCoeffs << ", but new coefficients have size " << coeffs.size() << ".";
-        throw std::invalid_argument(msg.str());
-    }
-    
-    this->savedCoeffs = coeffs;
+template<>
+void ParameterizedFunctionBase<Kokkos::HostSpace>::SetCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) {
+    // Copy the coefficients to the host
+    Kokkos::View<double*, Kokkos::HostSpace> coeffs_host = ToHost(coeffs);
+    this->SetCoeffs(coeffs_host);
 }
 #endif
 
@@ -264,9 +241,14 @@ void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Eigen::Ref<Eigen::VectorX
 }
 
 template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs)
+void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs) {
+    CheckDeviceMismatch("WrapCoeffs(Eigen::Ref<Eigen::VectorXd");
+}
+
+template<>
+void ParameterizedFunctionBase<Kokkos::HostSpace>::WrapCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs)
 {
-     WrapCoeffs(Kokkos::View<double*,MemorySpace>(VecToKokkos<double,MemorySpace>(coeffs)));
+     WrapCoeffs(Kokkos::View<double*,Kokkos::HostSpace>(VecToKokkos<double,Kokkos::HostSpace>(coeffs)));
 }
 
 template<>

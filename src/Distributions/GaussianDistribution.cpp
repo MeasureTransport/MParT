@@ -27,7 +27,7 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
         throw std::runtime_error("GaussianDistribution::LogDensityImpl: The number of rows in pts must match the dimension of the distribution.");
     }
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
-    StridedMatrix<double, MemorySpace> diff ("diff", M, N);
+    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> diff ("diff", M, N);
 
     if(mean_.extent(0) == 0){
         Kokkos::deep_copy(diff, pts);
@@ -85,20 +85,19 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
         throw std::runtime_error("GaussianDistribution::SampleImpl: The number of rows in output must match the dimension of the distribution.");
     }
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
-
     // If the covariance is the identity, we can just sample from a shifted normal
     if(idCov_) {
         // If dim_ is 0, the distribution is the standard normal
         if(dim_ == 0) {
             Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
-                PoolType::generator_type rgen = rand_pool.get_state();
+                typename PoolType::generator_type rgen = rand_pool.get_state();
                 output(i,j) = rgen.normal();
             });
         }
         // Otherwise, we sample from the mean-shifted normal
         else {
             Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
-                PoolType::generator_type rgen = rand_pool.get_state();
+                typename PoolType::generator_type rgen = rand_pool.get_state();
                 output(i,j) = rgen.normal() + mean_(i);
             });
         }
@@ -107,9 +106,9 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
     else {
         // Sample from the standard normal
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(int i, int j) {
-            PoolType::generator_type rgen = rand_pool.get_state();
+            typename PoolType::generator_type rgen = rand_pool.get_state();
             output(i,j) = rgen.normal();
-        };
+        });
         // Transform by the Cholesky factor
         auto mul = covChol_.multiplyL(output);
         // Add the mean (if nonzero)

@@ -38,7 +38,7 @@ class GaussianSamplerDensity {
         rand_pool = PoolType(seed);
     }
 
-    using PoolType = typename Kokkos::Random_XorShift64_Pool<typename MemoryToExecution<MemorySpace>::Space>;
+    using PoolType = Kokkos::Random_XorShift64_Pool<typename MemoryToExecution<MemorySpace>::Space>;
 
     private:
     PoolType rand_pool;
