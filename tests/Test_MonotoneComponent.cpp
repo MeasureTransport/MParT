@@ -767,11 +767,9 @@ TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[M
     }
 }
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
 
 TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
-
-    typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
 
     const double testTol = 1e-7;
 

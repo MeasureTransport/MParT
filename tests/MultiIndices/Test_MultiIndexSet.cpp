@@ -60,7 +60,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class with anisotropic degrees", "[An
 }
 
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
 
 TEST_CASE( "Testing the FixedMultiIndexSet class copy to device", "[FixedMultiIndexSet]" ) {
 
@@ -69,7 +69,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class copy to device", "[FixedMultiIn
 
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim,maxOrder);
 
-    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> deviceSet = mset.ToDevice<Kokkos::DefaultExecutionSpace::memory_space>();
+    FixedMultiIndexSet<DeviceSpace> deviceSet = mset.ToDevice<DeviceSpace>();
 
 }
 #endif

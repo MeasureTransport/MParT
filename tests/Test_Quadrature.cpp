@@ -320,12 +320,11 @@ TEST_CASE( "Testing Adaptive Simpson Integration", "[AdaptiveSimpson]" ) {
 
 
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
 
 
 TEST_CASE( "Testing CC Quadrature on device", "[ClenshawCurtisDevice]" ) {
 
-    typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
     typedef typename MemoryToExecution<DeviceSpace>::Space ExecutionSpace;
 
     // Set parameters for adaptive quadrature algorithm

@@ -35,7 +35,7 @@ TEST_CASE( "Testing soft plus function.", "[SofPlus]" ) {
 }
 
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
 
 TEST_CASE( "Testing soft plus function on device.", "[SofPlusDevice]" ) {
     const double floatTol = 1e-15;
@@ -48,11 +48,11 @@ TEST_CASE( "Testing soft plus function on device.", "[SofPlusDevice]" ) {
     xs_host(3) = 0.1;
     xs_host(4) = 1.0;
 
-    auto xs_device = ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(xs_host);
+    auto xs_device = ToDevice<mpart::DeviceSpace>(xs_host);
 
-    Kokkos::View<double*,Kokkos::DefaultExecutionSpace::memory_space> ys_device("ys_device", xs_host.extent(0));
-    Kokkos::View<double*,Kokkos::DefaultExecutionSpace::memory_space> deriv_device("deriv_device", xs_host.extent(0));
-    
+    Kokkos::View<double*,mpart::DeviceSpace> ys_device("ys_device", xs_host.extent(0));
+    Kokkos::View<double*,mpart::DeviceSpace> deriv_device("deriv_device", xs_host.extent(0));
+
     Kokkos::parallel_for(xs_host.size(), KOKKOS_LAMBDA(const size_t ind){
         ys_device(ind) = SoftPlus::Evaluate(xs_device(ind));
         deriv_device(ind) = SoftPlus::Derivative(xs_device(ind));
@@ -66,4 +66,4 @@ TEST_CASE( "Testing soft plus function on device.", "[SofPlusDevice]" ) {
         CHECK(deriv_host(i) == Approx(SoftPlus::Derivative(xs_host(i))).epsilon(floatTol) );
     }
 }
-#endif 
+#endif

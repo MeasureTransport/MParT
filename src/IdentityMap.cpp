@@ -96,6 +96,6 @@ void IdentityMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const d
 
 // Explicit template instantiation
 template class mpart::IdentityMap<Kokkos::HostSpace>;
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
     template class mpart::IdentityMap<Kokkos::DefaultExecutionSpace::memory_space>;
 #endif

@@ -230,7 +230,7 @@ TEST_CASE( "Testing Physicist Hermite polynomials", "[PhysicistHermite]" ) {
 }
 
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
 
 TEST_CASE( "Device Hermite polynomial evaluation", "[PhysicistHermiteDevice]" ) {
 
@@ -248,9 +248,9 @@ TEST_CASE( "Device Hermite polynomial evaluation", "[PhysicistHermiteDevice]" ) 
     xs_host(3) = 0.1;
     xs_host(4) = 1.0;
 
-    auto xs_device = ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(xs_host);
+    auto xs_device = ToDevice<mpart::DeviceSpace>(xs_host);
 
-    Kokkos::View<double*,Kokkos::DefaultExecutionSpace::memory_space> ys_device("evals", xs.size());
+    Kokkos::View<double*,mpart::DeviceSpace> ys_device("evals", xs.size());
 
     for(unsigned int p=0; p<10; ++p){
         Kokkos::parallel_for(xs.size(), KOKKOS_LAMBDA(const size_t ind){

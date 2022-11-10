@@ -150,7 +150,7 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
 }
 
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
 
 TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWorkerDevice]") {
 
