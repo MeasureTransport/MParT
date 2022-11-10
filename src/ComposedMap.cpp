@@ -155,24 +155,6 @@ ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMap
     }
 }
 
-template<typename MemorySpace, typename MemorySpace2>
-void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace2> coeffD)
-{
-    Kokkos::View<double*, MemorySpace> coeffs = ToHost(coeffD);
-    // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
-    ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
-
-    // Now create subviews for each of the maps
-    unsigned int cumNumCoeffs = 0;
-    for(unsigned int i=0; i<maps_.size(); ++i){
-        assert(cumNumCoeffs+maps_.at(i)->numCoeffs <= this->savedCoeffs.size());
-
-        maps_.at(i)->WrapCoeffs(Kokkos::subview(this->savedCoeffs,
-            std::make_pair(cumNumCoeffs, cumNumCoeffs+maps_.at(i)->numCoeffs)));
-        cumNumCoeffs += maps_.at(i)->numCoeffs;
-    }
-}
-
 template<typename MemorySpace>
 void ComposedMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                   StridedVector<double, MemorySpace>              output)

@@ -49,7 +49,7 @@ public:
                   then this vector should have length \f$\sum_{k=1}^K C_i\f$ and the coefficients for component \f$k\f$ should
                   start at index \f$\sum_{j=1}^{k-1} C_j\f$.
     */
-    using ConditionalMapBase<MemorySpace>::SetCoeffs;
+    using ParameterizedFunctionBase<MemorySpace>::SetCoeffs;
     void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
     void WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
 

@@ -49,11 +49,8 @@ public:
                   then this vector should have length \f$\sum_{k=1}^K C_i\f$ and the coefficients for component \f$k\f$ should
                   start at index \f$\sum_{j=1}^{k-1} C_j\f$.
     */
-    using ConditionalMapBase<MemorySpace>::SetCoeffs;
-    void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
-    #if defined(MPART_ENABLE_GPU)
-    void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
-    #endif
+    using ParameterizedFunctionBase<MemorySpace>::SetCoeffs;
+    void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
 
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return maps_.at(i);}
 
