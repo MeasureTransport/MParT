@@ -34,6 +34,14 @@ class GaussianSamplerDensity {
         logDetCov_ = std::log(covChol_.determinant());
     }
 
+    void SetSeed(unsigned int seed) {
+        rand_pool = PoolType(seed);
+    }
+
+    using PoolType = typename Kokkos::Random_XorShift64_Pool<typename MemoryToExecution<MemorySpace>::Space>;
+
+    private:
+    PoolType rand_pool;
     StridedVector<double, MemorySpace> mean_;
     mpart::Cholesky<MemorySpace> covChol_;
     bool idCov_ = false;
