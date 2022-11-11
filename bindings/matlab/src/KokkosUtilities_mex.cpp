@@ -13,8 +13,8 @@ MEX_DEFINE(Kokkos_Initialize) (int nlhs, mxArray* plhs[],
                                int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 0);
-  Kokkos::InitArguments args;
-  args.num_threads = input.get<int>(0);
+  Kokkos::InitializationSettings args ();
+  args.set_num_threads(input.get<int>(0));
   mpart::Initialize(args);
 }
 

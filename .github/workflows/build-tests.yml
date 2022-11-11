@@ -21,7 +21,7 @@ jobs:
           cmake -DKokkos_ENABLE_THREADS=ON -DKokkos_ENABLE_SERIAL=ON ../
 
       - name: Build
-        run: cd build; make
+        run: cd build; make -j2
 
       - name: Run Tests
         run: cd build; ./RunTests --kokkos-threads=2 --reporter junit -o test-results.xml
