@@ -39,7 +39,7 @@ jobs:
                 -DKokkos_CXX_STANDARD=17   \
                 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/KOKKOS_INSTALL/ \
                 ../
-          sudo make install
+          sudo make -j2 install
 
       - name: Install Eigen, Catch2, Pybind11
         shell: bash -l {0}
@@ -54,7 +54,7 @@ jobs:
 
       - name: Build MParT
         shell: bash -l {0}
-        run: cd $GITHUB_WORKSPACE/mpart/build; make
+        run: cd $GITHUB_WORKSPACE/mpart/build; make -j2
 
       - name: Run Tests
         shell: bash -l {0}
