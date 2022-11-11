@@ -27,6 +27,7 @@ jobs:
         with:
           repository: kokkos/kokkos
           path: kokkos
+          ref: '3.7.00'
 
       - name: Install Kokkos
         run: |
