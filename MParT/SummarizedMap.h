@@ -12,19 +12,14 @@
 namespace mpart{
 
 /**
- @brief Provides a definition of block lower triangular transport maps.
+ @brief Provides a definition for a map with 'summary structure'.
  @details
-This class defines a map \f$T:\mathbb{R}^N\rightarrow \mathbb{R}^M\f$ with the block triangular structure
+This class defines a map \f$T:\mathbb{R}^N\rightarrow \mathbb{R} \f$ with the summary structure
 \f[
-T(x) = \left[\begin{array}{l} T_1(x_{1:N_1})\\ \vdots \\ T_k(x_{1:N_2})\\ \vdots T_K(x_{1:N}) \end{array} \right],
+T(x) = \tilde{T}(s(x_{< N}), x_N)
 \f]
-where each component \f$T_i(x_{1:N_i}):\mathbb{R}^{N_i}\rightarrow \mathbb{R}^{M_i}\f$ is a function depending on
-the first \f$N_i\f$ inputs and returning \f$M_i\f$ outputs.  Note that this function must be invertible in the last
-\f$M_i\f$ input arguments.  For example, it must be possible to solve \f$T_i(x_1:{N_i-M_i}, x_{N_i-M_i:N_i}) = r\f$
-for \f$x_{N_i-M_i:N_i}\f$ given a vector \f$r\in\mathbb{R}^{M_i}\f$ and previous components \f$x_1:{N_i-M_i}\f$.
+where the function \f$s:\mathbb{R}^{N-1}\rightarrow \mathbb{R}^{r}\f$ is a function that summarizes the leading \f$N-1\f$ inputs (\f$ x_{< N} \f$).
 
-This block triangular form is analogous to a block triangular matrix where each \f$M_i\timesM_i\f$ diagonal block
-is positive definite.
 
  */
 template<typename MemorySpace>
@@ -32,23 +27,22 @@ class SummarizedMap : public ConditionalMapBase<MemorySpace>{
         
 public:
 
-    /** @brief Construct a block triangular map from a collection of other ConditionalMapBase objects.
+    /** @brief Constructs a map with 'summary structure'.
 
-    @param components A vector of ConditionalMapBase objects defining each \f$T_k\f$ in the block triangular map.
-                      To maintain the correct block structure, the dimensions of the components must satisfy \f$N_k = N_{k-1}+M_{k}\f$.
+    @details Constructs a map \f$T:\mathbb{R}^N\rightarrow \mathbb{R} \f$ with the summary structure
+\f[
+T(x) = \tilde{T}(s(x_{< N}), x_N)
+\f]
+where the function \f$s:\mathbb{R}^{N-1}\rightarrow \mathbb{R}^{r}\f$ is a function that summarizes the leading \f$N-1\f$ inputs (\f$ x_{< N} \f$).
+
+    @param summary A ParameterizedFunctionBase object that defines the summary function \f$ s \f$.
+    @param component ConditionalMapBase object defining the component \f$\tilde{T}\f$.
+
     */
     SummarizedMap(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const& summary, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& component);
 
     virtual ~SummarizedMap() = default;
 
-    /** @brief Sets the coefficients for all components of the map.
-
-    @details This function will copy the provided coeffs vectors into the savedCoeffs object in the SummarizedMap class.   To avoid
-    duplicating the coefficients, the savedCoeffs member variable for each component will then be set to a subview of this vector.
-    @param coeffs A vector containing coefficients for all components.  If component \f$k\f$ is defined by \f$C_k\f$ coefficients,
-                  then this vector should have length \f$\sum_{k=1}^K C_i\f$ and the coefficients for component \f$k\f$ should
-                  start at index \f$\sum_{j=1}^{k-1} C_j\f$.
-    */
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
     virtual void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
     virtual void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
@@ -90,7 +84,6 @@ public:
                                              StridedMatrix<double, MemorySpace>              output) override;
 
 
-    void print_ptr() { std::cout << "print_ptr(): comp_.get() = " << comp_.get() << std::endl; std::cout << "print_ptr(): sumFunc_.get() = " << sumFunc_.get() << std::endl; }
 private:
  
     std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const sumFunc_;

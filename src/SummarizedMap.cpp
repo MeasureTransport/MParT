@@ -11,9 +11,6 @@ SummarizedMap<MemorySpace>::SummarizedMap(std::shared_ptr<ParameterizedFunctionB
                         sumFunc_(summary), comp_(component)
 {
 
-    // std::cout << "constructor: comp_.get() = " << comp_.get() << std::endl;
-    // std::cout << "constructor: sumFunc_.get() = " << sumFunc_.get() << std::endl; 
-
     // Check the dimension of sumFunc_ is compatible with dimension of component
     if(comp_->outputDim != 1){
         std::stringstream msg;

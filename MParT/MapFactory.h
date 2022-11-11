@@ -49,12 +49,16 @@ namespace mpart{
                                                                          MapOptions options = MapOptions());
 
         /**
-            @brief 
+        @brief Constructs a map that is the identity for all but 1 entry
 
-            @details 
-            @param dim The dimension of the map.
-            @param activeInd The index of the component to be non-identity.
-            @param comp The component placed the activeInd.
+        @details Constructs a map that is the identity for all but 1 entry, i.e., a map of the form
+        \f[
+        T(x) = \left[\begin{array}{l} x_{<i}\\ c_i(x_{\le i}) \\ x_{>i} \end{array} \right],
+        \f]
+        where \f$i\f$ is the index of the active component (activeInd), and \f$c\f$ is the component (comp).
+        @param dim The dimension of the map.
+        @param activeInd The index of the component to be non-identity.
+        @param comp The component placed the activeInd.
 
          */
         template<typename MemorySpace>
@@ -63,23 +67,7 @@ namespace mpart{
                                                                               std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
     
-                /**
-            @brief 
-
-            @details 
-            @param dim The dimension of the map.
-            @param activeInd The index of the component to be non-identity.
-            @param summaryMatrix A matrix of dimensions r x activeInd-1 used to make an AffineFunction for the summary function
-            @param options Additional options that will be passed on to CreateComponent to construct the MonotoneComponent at the active index.
-
-         */
-        template<typename MemorySpace>
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateAffineLRCMap(unsigned int dim,
-                                                                            unsigned int activeInd,
-                                                                            Kokkos::View<double**, MemorySpace> summaryMatrix,
-                                                                            unsigned int maxDegree,
-                                                                            MapOptions options = MapOptions());
-
+                
                                                                                   /**
             @brief Constructs a triangular map with MonotoneComponents for each block.  A total order multiindex
                    set is used to define the MonotoneComponent.
@@ -113,25 +101,6 @@ namespace mpart{
                                                                                 FixedMultiIndexSet<MemorySpace> const& mset,
                                                                                 MapOptions options = MapOptions());
 
-        template<typename MemorySpace>
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSummarizedMap(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> const &func,
-                                                                            std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp) { return std::make_shared<SummarizedMap<MemorySpace>>(func, comp); }
-
-
-        // template<typename MemorySpace>
-        // std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateDebugMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp) { return std::make_shared<DebugMap<MemorySpace>>(comp); }
-
-
-        /**
-        @brief Constructs a (generally) non-monotone multivariate expansion.
-        @param outputDim The output dimension of the expansion.  Each output will be defined by the same multiindex set but will have different coefficients.
-        @param mset The multiindex set specifying which terms should be used in the multivariate expansion.
-        @param options Options specifying the 1d basis functions used in the parameterization.
-        */
-        template<typename MemorySpace>
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSingleEntryMap(unsigned int dim,
-                                                                                     unsigned int activeInd,
-                                                                                     std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
         /** This struct is used to map the options to functions that can create a map component with types corresponding 
             to the options.

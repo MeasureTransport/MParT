@@ -117,7 +117,6 @@ public:
                                              StridedMatrix<double, MemorySpace>              output) override;
 
 
-    void print_ptr() { std::cout << "print_ptr(): comps_.at(0).get() = " << comps_.at(0).get() << std::endl; }
 private:
  
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;
