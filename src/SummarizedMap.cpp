@@ -94,7 +94,7 @@ void SummarizedMap<MemorySpace>::SummarizePts(StridedMatrix<const double, Memory
 template<typename MemorySpace>
 void SummarizedMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                     StridedVector<double, MemorySpace>              output)
-{   
+{
 
     // Create a view to hold summarized pts
     Kokkos::View<double**, MemorySpace> summarizedPts("summarizedPts", comp_->inputDim, pts.extent(1));
@@ -134,7 +134,7 @@ void SummarizedMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemoryS
     Kokkos::View<double**, MemorySpace> summary = sumFunc_->Evaluate(ptsToSummarize);
 
     // Invert map
-    comp_->InverseImpl(summary, r, output); 
+    comp_->InverseImpl(summary, r, output);
 }
 
 
@@ -245,5 +245,5 @@ void SummarizedMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
 // Explicit template instantiation
 template class mpart::SummarizedMap<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)
-    template class mpart::SummarizedMap<Kokkos::DefaultExecutionSpace::memory_space>;
+    template class mpart::SummarizedMap<DeviceSpace>;
 #endif
