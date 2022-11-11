@@ -184,15 +184,16 @@ The following cmake command can be used to compile Kokkos with the CUDA backend 
         -DCMAKE_INSTALL_PREFIX=</new/kokkos/install/path> \
         -DBUILD_SHARED_LIBS=ON                            \
         -DKokkos_ENABLE_SERIAL=OFF                        \
-        -DKokkos_ENABLE_OPENMP=ON                         \
+        -DKokkos_ENABLE_THREADS=ON                        \
         -DKokkos_ENABLE_CUDA=ON                           \
-        -DKokkos_ARCH_VOLTA70=ON                          \
         -DKokkos_ENABLE_CUDA_LAMBDA=ON                    \
-        -DKokkos_CUDA_DIR=<cuda/install/path>             \
-        -DKokkos_CXX_STANDARD=17                          \
+        -DCMAKE_CXX_STANDARD=17                           \
     ../
 
 Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the compute resource uses that Kokkos supports. If you aren't sure, try omitting this as Kokkos has some machinery to detect such architecture.
+
+.. tip::
+    If Kokkos may not be able to find your GPU information automatically, consider including :code:`-DKokkos_ARCH_<ARCH><VERSION>=ON` where :code:`<ARCH>` and :code:`<VERSION>` are determined by `the Kokkos documentation <https://kokkos.github.io/kokkos-core-wiki/keywords.html?highlight=volta70#architecture-keywords>`_. If Kokkos cannot find CUDA, or you wish to use a particular version, use :code:`-DKokkos_CUDA_DIR=/your/cuda/path`.
 
 .. tip::
     If you're getting an error about C++ standards, try using a new version of your compiler; :code:`g++`, for example, does not support the flag :code:`--std=c++17` below version 8. For more details, see `this issue <https://github.com/kokkos/kokkos/issues/5157>`_ in Kokkos.
