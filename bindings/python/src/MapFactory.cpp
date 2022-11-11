@@ -22,23 +22,7 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
 
     // CreateSingleEntryMap
     m.def(isDevice? "dCreateSingleEntryMap" : "CreateSingleEntryMap", &MapFactory::CreateSingleEntryMap<MemorySpace>);
-
-    m.def(isDevice? "dCreateSummarizedMap" : "CreateSummarizedMap", &MapFactory::CreateSummarizedMap<MemorySpace>);
-
-    m.def("CreateAffineLRCMap", [] (unsigned int dim,
-                                    unsigned int activeInd,
-                                    Eigen::Ref<Eigen::MatrixXd> const& summaryMatrix,
-                                    unsigned int maxDegree,
-                                    MapOptions options)
-        {
-            
-            Kokkos::View<double**, MemorySpace> summaryMatrixView = MatToKokkos<double, MemorySpace>(summaryMatrix);
-            std::shared_ptr<ConditionalMapBase<MemorySpace>> lrcMap = MapFactory::CreateAffineLRCMap(dim, activeInd, summaryMatrixView, maxDegree, options);
-
-            return lrcMap;
-        });
 }
-
 template void mpart::binding::MapFactoryWrapper<Kokkos::HostSpace>(py::module&);
 #if defined(MPART_ENABLE_GPU)
 template void mpart::binding::MapFactoryWrapper<mpart::DeviceSpace>(py::module&);

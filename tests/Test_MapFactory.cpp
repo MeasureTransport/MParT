@@ -203,24 +203,3 @@ TEST_CASE( "Testing factory method for single entry map, 1 < activeInd < dim", "
 }
 
 
-TEST_CASE( "Testing factory method for CreateAffineLRCMap single entry map", "[CreateAffineLRCMap]" ) {
-
-    MapOptions options;
-    options.basisType = BasisTypes::ProbabilistHermite;
-    options.basisNorm = false;
-
-    unsigned int maxDegree = 2;
-    unsigned int dim = 10;
-    unsigned int lrcRank = 2;
-    unsigned int activeInd = 6;
-
-    // make an affine function
-    Eigen::RowMatrixXd A = Eigen::RowMatrixXd::Random(lrcRank, activeInd-1);
-    Kokkos::View<double**, MemorySpace> viewA(A.data(), lrcRank, activeInd-1);
-    
-
-    std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateAffineLRCMap(dim, activeInd, viewA, maxDegree, options);
-
-    REQUIRE(map != nullptr);
-}
-

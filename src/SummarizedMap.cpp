@@ -75,12 +75,12 @@ void SummarizedMap<MemorySpace>::SummarizePts(StridedMatrix<const double, Memory
     StridedMatrix<const double, MemorySpace> ptsToSummarize = Kokkos::subview(pts, std::make_pair(0, int(sumFunc_->inputDim)), Kokkos::ALL());
     StridedMatrix<const double, MemorySpace> ptsAfterSummary = Kokkos::subview(pts, std::make_pair(int(sumFunc_->inputDim), int(sumFunc_->inputDim+1)), Kokkos::ALL());
 
-    // Evaluate summary function
-    Kokkos::View<double**, MemorySpace> summary = sumFunc_->Evaluate(ptsToSummarize);
 
     // Copy summarized pts
     Kokkos::View<double**, MemorySpace> outputSummary = Kokkos::subview(output, std::make_pair(0,int(sumFunc_->outputDim)), Kokkos::ALL());
-    Kokkos::deep_copy(outputSummary, summary);
+    
+    // Evaluate summary function
+    sumFunc_->EvaluateImpl(ptsToSummarize, outputSummary);
 
     // Copy non summarized pts
     Kokkos::View<double**, MemorySpace> outputAfterSummary = Kokkos::subview(output, std::make_pair(int(sumFunc_->outputDim),int(sumFunc_->outputDim+1)), Kokkos::ALL());
