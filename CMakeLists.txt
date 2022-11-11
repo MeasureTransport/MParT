@@ -12,10 +12,11 @@ Include(FetchContent)
 option(MPART_PYTHON "Build python bindings with pybind11" ON)
 option(MPART_MATLAB "Build matlab bindings with pybind11" ON)
 option(MPART_JULIA "Build julia bindings with CxxWrap.jl" ON)
+option(MPART_BUILD_SERIALIZE "Build serialization library" ON)
 option(MPART_FETCH_DEPS "If CMake should be allowed to fetch and build external dependencies that weren't found." ON)
 
 ##############################################################
-# Installation path configuration 
+# Installation path configuration
 Include(SetInstallPaths)
 
 ##############################################################
@@ -161,7 +162,7 @@ if(MPART_JULIA)
     message(WARNING "Requested Julia bindings but CMake could not find Julia executable.  Setting MPART_JULIA=OFF.")
   else()
 
-    # Get a hint for the location of JlCxx 
+    # Get a hint for the location of JlCxx
     get_filename_component(PARENT_DIR ${Julia_LIBRARY_DIR} DIRECTORY)
 
     # Use JlCxx_DIR to tell where CxxWrap is located
@@ -185,6 +186,31 @@ if(MPART_JULIA)
     endif()
   endif()
 
+endif()
+
+if(MPART_BUILD_SERIALIZE)
+  find_package(cereal)
+  if(NOT cereal_FOUND)
+    if(MPART_FETCH_DEPS)
+      message(STATUS "Could not find cereal. Fetching source.")
+
+      FetchContent_Declare(
+          cereal
+          GIT_REPOSITORY https://github.com/USCiLab/cereal
+          GIT_TAG        v1.3.2
+          GIT_SHALLOW TRUE
+      )
+
+      FetchContent_MakeAvailable(cereal)
+
+    else()
+      set(MPART_BUILD_SERIALIZE OFF)
+      message(FATAL_ERROR "Could not find cereal library and MPART_FETCH_DEPS=OFF; setting MPART_BUILD_SERIALIZE=OFF." )
+
+    endif()
+  else()
+    message(STATUS "Found cereal!")
+  endif()
 endif()
 
 ##############################################################
