@@ -59,21 +59,39 @@ TEST_CASE( "SummarizedMap", "[SummarizedMap_MonotoneComponent]" ) {
         }
     }
 
+    Kokkos::View<double**, Kokkos::HostSpace> inToSummarize("Map Input until dim - 1", dim - 1, numSamps);
+    for(unsigned int i=0; i<dim - 1; ++i){
+        for(unsigned int j=0; j<numSamps; ++j){
+            inToSummarize(i,j) = double(i)/dim + double(j)/numSamps;
+        }
+    }
+
     sumMap->SetCoeffs(coeffs);
     Kokkos::View<double**, Kokkos::HostSpace> out = sumMap->Evaluate(in);
     
-    // SECTION("Evaluation"){
+    SECTION("Evaluation"){
 
-    //     for(unsigned int i=0; i<numBlocks; ++i){
-            
-    //         auto outBlock = blocks.at(i)->Evaluate(Kokkos::subview(in, std::make_pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
+        
+        Kokkos::View<double**, Kokkos::HostSpace> summary = affineFunc->Evaluate(inToSummarize);
+        Kokkos::View<double**, Kokkos::HostSpace> summaryAndLastDimOfIn("summaryAndLastDimOfIn",lrcRank + 1,numSamps);
 
-    //         REQUIRE(outBlock.extent(1)==numSamps);
-    //         REQUIRE(outBlock.extent(0)==1);
-    //         for(unsigned int j=0; j<numSamps; ++j)
-    //             CHECK( out(i,j) == Approx(outBlock(0,j)).epsilon(1e-6));
-    //     }
-    // }
+        for(unsigned int i=0; i<lrcRank; ++i){
+            for(unsigned int j=0; j<numSamps; ++j){
+                summaryAndLastDimOfIn(i,j) = summary(i,j);
+            }
+        }
+
+        for(unsigned int j=0; j<numSamps; ++j){
+            summaryAndLastDimOfIn(lrcRank, j) = in(dim-1,j);
+        }
+
+        Kokkos::View<double**, Kokkos::HostSpace> out_ = comp->Evaluate(summaryAndLastDimOfIn);
+
+        for(unsigned int i=0; i<out.extent(0); ++i){
+            for(unsigned int j=0; j<numSamps; ++j)
+                CHECK( out(i,j) == Approx(out_(i,j)).margin(1e-4));
+        }
+    }
 
 
     SECTION("Inverse"){
@@ -86,23 +104,27 @@ TEST_CASE( "SummarizedMap", "[SummarizedMap_MonotoneComponent]" ) {
         }
     }
 
-    // SECTION("LogDeterminant"){
-    //     auto logDet = sumMap->LogDeterminant(in);
+    SECTION("LogDeterminant"){
 
-    //     REQUIRE(logDet.extent(0)==numSamps);
-    //     Kokkos::View<double*, Kokkos::HostSpace> truth("True Log Det", numSamps);
+        Kokkos::View<double*, Kokkos::HostSpace> logDet = sumMap->LogDeterminant(in);
+        Kokkos::View<double**, Kokkos::HostSpace> summary = affineFunc->Evaluate(inToSummarize);
+        Kokkos::View<double**, Kokkos::HostSpace> summaryAndLastDimOfIn("summaryAndLastDimOfIn",lrcRank + 1,numSamps);
 
-    //     for(unsigned int i=0; i<numBlocks; ++i){
-    //         auto blockLogDet = blocks.at(i)->LogDeterminant(Kokkos::subview(in, std::make_pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
+        for(unsigned int i=0; i<lrcRank; ++i){
+            for(unsigned int j=0; j<numSamps; ++j)
+                summaryAndLastDimOfIn(i,j) = summary(i,j);
+        }
 
-    //         for(unsigned int j=0; j<numSamps; ++j)
-    //             truth(j) += blockLogDet(j);
-    //     }
+        for(unsigned int j=0; j<numSamps; ++j)
+            summaryAndLastDimOfIn(lrcRank, j) = in(dim-1,j);
+        
 
-    //     for(unsigned int j=0; j<numSamps; ++j)
-    //         CHECK(logDet(j) == Approx(truth(j)).epsilon(1e-10));
+        Kokkos::View<double*, Kokkos::HostSpace> logDet_ = comp->LogDeterminant(summaryAndLastDimOfIn);
 
-    // }
+        for(unsigned int j=0; j<numSamps; ++j)
+            CHECK( logDet(j) == Approx(logDet_(j)).margin(1e-4));
+
+    }
 
     SECTION("CoeffGrad"){
 
