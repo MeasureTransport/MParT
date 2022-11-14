@@ -66,23 +66,6 @@ namespace mpart{
                                                                               std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
 
-                /**
-            @brief
-
-            @details
-            @param dim The dimension of the map.
-            @param activeInd The index of the component to be non-identity.
-            @param summaryMatrix A matrix of dimensions r x activeInd-1 used to make an AffineFunction for the summary function
-            @param options Additional options that will be passed on to CreateComponent to construct the MonotoneComponent at the active index.
-
-         */
-        template<typename MemorySpace>
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateAffineLRCMap(unsigned int dim,
-                                                                            unsigned int activeInd,
-                                                                            Kokkos::View<double**, MemorySpace> summaryMatrix,
-                                                                            unsigned int maxDegree,
-                                                                            MapOptions options = MapOptions());
-
                                                                                   /**
             @brief Constructs a triangular map with MonotoneComponents for each block.  A total order multiindex
                    set is used to define the MonotoneComponent.
