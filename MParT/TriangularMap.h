@@ -111,10 +111,12 @@ public:
 
 
     void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                     StridedMatrix<double, MemorySpace>              output) override;
+                                             StridedMatrix<double, MemorySpace>              output) override;
 
     void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                     StridedMatrix<double, MemorySpace>              output) override;
+                                             StridedMatrix<double, MemorySpace>              output) override;
+
+
 private:
 
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;

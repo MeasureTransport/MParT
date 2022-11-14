@@ -165,7 +165,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
 
         .def("MaxDegrees", [] (const FixedMultiIndexSet<Kokkos::HostSpace> &set)
         {
-            auto maxDegrees = set.MaxDegrees(); // auto finds the type, but harder to read (because you don't tell reader the type)
+            auto maxDegrees = set.MaxDegrees(); 
             Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> maxDegreesEigen(maxDegrees.extent(0));
             for (unsigned int i = 0; i < maxDegrees.extent(0); i++)
             {

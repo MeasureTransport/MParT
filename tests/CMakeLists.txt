@@ -1,4 +1,4 @@
-set (TEST_SOURCES 
+set (TEST_SOURCES
      tests/RunTests.cpp
 
      tests/MultiIndices/Test_MultiIndex.cpp
@@ -20,5 +20,6 @@ set (TEST_SOURCES
      tests/Test_LinearAlgebra.cpp
      tests/Test_AffineFunction.cpp
      tests/Test_IdentityMap.cpp
+     tests/Test_SummarizedMap.cpp
      #tests/Test_TensorProductFunction.cpp
-PARENT_SCOPE) 
+PARENT_SCOPE)
