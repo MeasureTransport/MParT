@@ -16,8 +16,9 @@ AffineFunction<MemorySpace>::AffineFunction(StridedVector<double,MemorySpace> b)
 
 template<typename MemorySpace>
 AffineFunction<MemorySpace>::AffineFunction(StridedMatrix<double,MemorySpace> A) : ParameterizedFunctionBase<MemorySpace>(A.extent(1),A.extent(0),0),
-                                                                  A_(A)
+                                                                                   A_(A)
 {
+    Kokkos::deep_copy(A_, A);
     assert(A_.extent(0)<=A_.extent(1));
 }
 

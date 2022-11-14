@@ -42,7 +42,9 @@ void mpart::binding::AffineFunctionWrapperHost(py::module &m)
         .def(py::init( [](Eigen::Ref<Eigen::MatrixXd> const& A)
         {
             return new AffineFunction<Kokkos::HostSpace>(MatToKokkos<double, Kokkos::HostSpace>(A));
-        }));
+        }))
+        .def("print_Aij", &AffineFunction<Kokkos::HostSpace>::print_Aij)
+        .def("print_ptr_A", &AffineFunction<Kokkos::HostSpace>::print_ptr_A);
 }
 
 #if defined(MPART_ENABLE_GPU)
