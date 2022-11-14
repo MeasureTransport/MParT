@@ -5,10 +5,14 @@ set(PYTHON_BINDING_SOURCES
   src/MultiIndex.cpp
   src/MapOptions.cpp
   src/ConditionalMapBase.cpp
-  src/TriangularMap.cpp
-  src/MapFactory.cpp
   src/ParameterizedFunctionBase.cpp
   src/AffineMap.cpp
+  src/TriangularMap.cpp
+  src/ComposedMap.cpp
+  src/SummarizedMap.cpp
+  # src/DebugMap.cpp
+  src/MapFactory.cpp
+
   
   ../common/src/CommonUtilities.cpp
 )
