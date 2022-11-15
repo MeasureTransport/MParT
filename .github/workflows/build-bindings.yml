@@ -19,7 +19,7 @@ jobs:
 
       - name: Setup Julia
         run: |
-          julia -e "using Pkg; Pkg.install([\"CxxWrap\",\"TestReports\"])"
+          julia -e "using Pkg; Pkg.add([\"CxxWrap\",\"TestReports\"])"
           export GITHUB_JULIA_PATH=$(julia -e "bindir = Sys.BINDIR; spl = split(bindir,\"/\"); julia_idx = findfirst(==(\".julia\"),spl); println(join(spl[1:julia_idx],\"/\"))")
           echo $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nmpart=' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo $GITHUB_WORKSPACE                                 >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
