@@ -17,6 +17,9 @@ jobs:
           python-version: "3.8"
           activate-environment: "test"
 
+      - name: TEMPORARY
+        run: julia -e "println(Sys.BINDIR)"
+
       - name: Setup Julia
         run: |
           julia -e "using Pkg; Pkg.add([\"CxxWrap\",\"TestReports\"])"
