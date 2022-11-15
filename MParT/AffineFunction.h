@@ -46,8 +46,6 @@ public:
                       StridedMatrix<double, MemorySpace>              output) override;
 
 
-    void print_Aij(int i, int j) { std::cout << "A(" << i << "," << j << ") = " << A_(i,j) << std::endl; }
-    void print_ptr_A() { std::cout << "ptr A = " << A_.data() << std::endl; }
 
 
 protected:
