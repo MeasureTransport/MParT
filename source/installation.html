@@ -394,7 +394,7 @@ mkdir build
 <span class="nb">cd</span> build
 cmake                                               <span class="se">\</span>
   -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;  <span class="se">\</span>
-  -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON                        <span class="se">\</span>
+  -DKokkos_ENABLE_THREADS<span class="o">=</span>ON                        <span class="se">\</span>
 ..
 make install
 </pre></div>
@@ -406,7 +406,7 @@ make install
   -DKokkos_ROOT<span class="o">=</span>&lt;your/kokkos/install/root&gt;          <span class="se">\</span>
   -DEigen3_ROOT<span class="o">=</span>&lt;your/eigen3/install/root&gt;          <span class="se">\</span>
   -DCatch2_ROOT<span class="o">=</span>&lt;your/catch2/install/root&gt;          <span class="se">\</span>
-  -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON                        <span class="se">\</span>
+  -DKokkos_ENABLE_THREADS<span class="o">=</span>ON                        <span class="se">\</span>
   -DKokkos_ENABLE_SERIAL<span class="o">=</span>ON                         <span class="se">\</span>
 ..
 </pre></div>
@@ -416,14 +416,14 @@ make install
 <p>Note that if you do not wish to compile bindings for Python, Julia, or Matlab, you can turn off binding compilation by setting the <code class="code docutils literal notranslate"><span class="pre">MPART_&lt;language&gt;=OFF</span></code> variable during CMake configuration.  For a default build with only the core c++ library, you can use</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span> cmake                                              <span class="se">\</span>
   -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;  <span class="se">\</span>
-  -DKokkos_ENABLE_PTHREAD<span class="o">=</span>ON                        <span class="se">\</span>
+  -DKokkos_ENABLE_THREADS<span class="o">=</span>ON                        <span class="se">\</span>
   -DMPART_PYTHON<span class="o">=</span>OFF                                <span class="se">\</span>
   -DMPART_MATLAB<span class="o">=</span>OFF                                <span class="se">\</span>
   -DMPART_JULIA<span class="o">=</span>OFF                                 <span class="se">\</span>
 ..
 </pre></div>
 </div>
-<p>MParT is built on Kokkos, which provides a single interface to many different multithreading capabilities like pthreads, OpenMP, CUDA, and OpenCL.   A list of available backends can be found on the [Kokkos wiki](<a class="github reference external" href="https://github.com/kokkos/kokkos/blob/master/BUILD.md#device-backends">kokkos/kokkos</a>).   The <cite>Kokkos_ENABLE_PTHREAD</cite> option in the CMake configuration above can be changed to reflect different choices in device backends.   The OSX-provided clang compiler does not support OpenMP, so <cite>PTHREAD</cite> is a natural choice for CPU-based multithreading on OSX.   However, you may find that OpenMP has slightly better performance with other compilers and operating systems.</p>
+<p>MParT is built on Kokkos, which provides a single interface to many different multithreading capabilities like pthreads, OpenMP, CUDA, and OpenCL.   A list of available backends can be found on the [Kokkos wiki](<a class="github reference external" href="https://github.com/kokkos/kokkos/blob/master/BUILD.md#device-backends">kokkos/kokkos</a>).   The <cite>Kokkos_ENABLE_THREADS</cite> option in the CMake configuration above can be changed to reflect different choices in device backends.   The OSX-provided clang compiler does not support OpenMP, so <cite>PTHREAD</cite> is a natural choice for CPU-based multithreading on OSX.   However, you may find that OpenMP has slightly better performance with other compilers and operating systems.</p>
 <section id="tests">
 <h2>Tests<a class="headerlink" href="#tests" title="Permalink to this heading">#</a></h2>
 <p>The command <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code> will also create a test executable called <code class="code docutils literal notranslate"><span class="pre">RunTests</span></code> in the <code class="code docutils literal notranslate"><span class="pre">build</span></code> directory.  The tests can be run with:</p>
@@ -510,16 +510,18 @@ cmake <span class="se">\</span>
     -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;/new/kokkos/install/path&gt; <span class="se">\</span>
     -DBUILD_SHARED_LIBS<span class="o">=</span>ON                            <span class="se">\</span>
     -DKokkos_ENABLE_SERIAL<span class="o">=</span>OFF                        <span class="se">\</span>
-    -DKokkos_ENABLE_OPENMP<span class="o">=</span>ON                         <span class="se">\</span>
+    -DKokkos_ENABLE_THREADS<span class="o">=</span>ON                        <span class="se">\</span>
     -DKokkos_ENABLE_CUDA<span class="o">=</span>ON                           <span class="se">\</span>
-    -DKokkos_ARCH_VOLTA70<span class="o">=</span>ON                          <span class="se">\</span>
     -DKokkos_ENABLE_CUDA_LAMBDA<span class="o">=</span>ON                    <span class="se">\</span>
-    -DKokkos_CUDA_DIR<span class="o">=</span>&lt;cuda/install/path&gt;             <span class="se">\</span>
-    -DKokkos_CXX_STANDARD<span class="o">=</span><span class="m">17</span>                          <span class="se">\</span>
+    -DCMAKE_CXX_STANDARD<span class="o">=</span><span class="m">17</span>                           <span class="se">\</span>
 ../
 </pre></div>
 </div>
 <p>Replace the <code class="code docutils literal notranslate"><span class="pre">Kokkos_ARCH_VOLTA70</span></code> as needed with whatever other arch the compute resource uses that Kokkos supports. If you aren’t sure, try omitting this as Kokkos has some machinery to detect such architecture.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>If Kokkos may not be able to find your GPU information automatically, consider including <code class="code docutils literal notranslate"><span class="pre">-DKokkos_ARCH_&lt;ARCH&gt;&lt;VERSION&gt;=ON</span></code> where <code class="code docutils literal notranslate"><span class="pre">&lt;ARCH&gt;</span></code> and <code class="code docutils literal notranslate"><span class="pre">&lt;VERSION&gt;</span></code> are determined by <a class="reference external" href="https://kokkos.github.io/kokkos-core-wiki/keywords.html?highlight=volta70#architecture-keywords">the Kokkos documentation</a>. If Kokkos cannot find CUDA, or you wish to use a particular version, use <code class="code docutils literal notranslate"><span class="pre">-DKokkos_CUDA_DIR=/your/cuda/path</span></code>.</p>
+</div>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>If you’re getting an error about C++ standards, try using a new version of your compiler; <code class="code docutils literal notranslate"><span class="pre">g++</span></code>, for example, does not support the flag <code class="code docutils literal notranslate"><span class="pre">--std=c++17</span></code> below version 8. For more details, see <a class="reference external" href="https://github.com/kokkos/kokkos/issues/5157">this issue</a> in Kokkos.</p>
