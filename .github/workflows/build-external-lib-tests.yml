@@ -3,7 +3,7 @@ name: external-lib-tests
 on:
   push:
     branches:
-      - dannys4/issue50
+      - main
   pull_request: {}
 
 jobs:

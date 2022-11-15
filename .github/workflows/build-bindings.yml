@@ -1,0 +1,91 @@
+name: binding-tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+jobs:
+  build-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: "3.8"
+          activate-environment: "test"
+
+      - name: Setup Julia
+        run: |
+          julia -e "using Pkg; Pkg.install([\"CxxWrap\",\"TestReports\"])"
+          export GITHUB_JULIA_PATH=$(julia -e "bindir = Sys.BINDIR; spl = split(bindir,\"/\"); julia_idx = findfirst(==(\".julia\"),spl); println(join(spl[1:julia_idx],\"/\"))")
+          echo $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nmpart=' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+          echo $GITHUB_WORKSPACE                                 >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+          echo "/MPART_INSTALL"                                  >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+
+      - name: Checkout MParT
+        uses: actions/checkout@v3
+        with:
+          path: mpart
+
+      - name: Checkout Kokkos
+        uses: actions/checkout@v3
+        with:
+          repository: kokkos/kokkos
+          path: kokkos
+          ref: '3.7.00'
+
+      - name: Install Kokkos
+        run: |
+          cd $GITHUB_WORKSPACE/kokkos
+          mkdir build && cd build
+          cmake -DKokkos_ENABLE_THREADS=ON \
+                -DBUILD_SHARED_LIBS=ON     \
+                -DKokkos_ENABLE_SERIAL=ON  \
+                -DCMAKE_CXX_STANDARD=17    \
+                -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/KOKKOS_INSTALL/ \
+                ../
+          sudo make -j2 install
+
+      - name: Install Eigen, Catch2, Pybind11
+        shell: bash -l {0}
+        run: conda install -c conda-forge -y eigen catch2 pybind11 pytest
+
+      - name: Configure MParT
+        shell: bash -l {0}
+        run: |
+          cd $GITHUB_WORKSPACE/mpart
+          mkdir build && cd build
+          cmake -DKokkos_DIR=$GITHUB_WORKSPACE/KOKKOS_INSTALL/lib/cmake/Kokkos \
+                -DMPART_FETCH_DEPS=OFF \
+                -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/MPART_INSTALL/ \
+                ../
+
+      - name: Build MParT
+        shell: bash -l {0}
+        run: cd $GITHUB_WORKSPACE/mpart/build; make -j2
+
+      - name: Run C++ Tests
+        shell: bash -l {0}
+        run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests --kokkos-threads=2 --reporter junit -o $GITHUB_WORKSPACE/test-results-bindings.xml
+
+      - name: Run Python Tests
+        shell: bash -l {0}
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE/MPART_INSTALL/python
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/MPART_INSTALL/python:$GITHUB_WORKSPACE/MPART_INSTALL/lib
+          pytest $GITHUB_WORKSPACE/mpart/bindings/python/tests -v --junitxml="$GITHUB_WORKSPACE/test-results-python.xml"
+
+      - name: Run Julia Tests
+        shell: bash -l {0}
+        run: |
+          julia -e "using Pkg; Pkg.add(\"MParT\"); using TestReports; TestReports.test(\"MParT\",logfilepath=joinpath(ENV[\"GITHUB_WORKSPACE\"],\"test-results-julia.xml\"]))"
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        if: always()
+        with:
+          check_name: "Test Results with Externally Built Libraries"
+          files: ${{ github.workspace }}/test-results-*.xml
