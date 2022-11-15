@@ -18,7 +18,9 @@ jobs:
           activate-environment: "test"
 
       - name: TEMPORARY
-        run: julia -e "println(Sys.BINDIR)"
+        run: |
+        export JULIA_VERSION=$(julia -e "println(Sys.BINDIR)" | awk '{print $NF}')
+        ls /usr/local/julia$JULIA_VERSION
 
       - name: Setup Julia
         run: |
