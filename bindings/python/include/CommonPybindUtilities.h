@@ -46,6 +46,12 @@ void SummarizedMapWrapper(pybind11::module &m);
 template<typename MemorySpace>
 void MapFactoryWrapper(pybind11::module &m);
 
+template<typename MemorySpace>
+void SerializeWrapper(pybind11::module &m);
+
+template<typename MemorySpace>
+void DeserializeWrapper(pybind11::module &m);
+
 void AffineMapWrapperHost(pybind11::module &m);
 void AffineMapWrapperDevice(pybind11::module &m);
 void AffineFunctionWrapperHost(pybind11::module &m);

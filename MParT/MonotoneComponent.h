@@ -1077,6 +1077,7 @@ public:
         assert(it<maxIts);
         return 0.5*(xub+xlb);
     }
+
 private:
     ExpansionType expansion_;
     QuadratureType quad_;
