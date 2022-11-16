@@ -10,6 +10,14 @@ jobs:
   build-tests:
     runs-on: ubuntu-latest
     steps:
+
+      - name: TEMPORARY conda install location
+        shell: bash -l {0}
+        run: |
+          export CONDA_EXE=$(which conda)
+          export CONDA_ROOT=${CONDA_EXE%bin*}
+          echo $CONDA_ROOT
+
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -38,14 +46,23 @@ jobs:
         with:
           path: mpart
 
-      - name: Checkout Kokkos
+      - name: Cache Kokkos
+        uses: actions/cache@v1.0.3
+        id: cache-kokkos
+        with:
+          path: "${{ github.workspace }}/KOKKOS_INSTALL"
+          key: kokkos3.7.00
+
+      - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
+        name: Checkout Kokkos
         uses: actions/checkout@v3
         with:
           repository: kokkos/kokkos
           path: kokkos
           ref: '3.7.00'
 
-      - name: Install Kokkos
+      - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
+        name: Install Kokkos
         run: |
           cd $GITHUB_WORKSPACE/kokkos
           mkdir build && cd build
@@ -89,7 +106,7 @@ jobs:
       - name: Run Julia Tests
         shell: bash -l {0}
         run: |
-          julia -e "using Pkg; Pkg.add(\"MParT\"); using TestReports; TestReports.test(\"MParT\",logfilepath=joinpath(ENV[\"GITHUB_WORKSPACE\"],\"test-results-julia.xml\"]))"
+          julia -e "using Pkg; Pkg.add(\"MParT\"); using TestReports; TestReports.test(\"MParT\",logfilepath=joinpath(ENV[\"GITHUB_WORKSPACE\"],\"test-results-julia.xml\"))"
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
