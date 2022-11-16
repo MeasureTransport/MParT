@@ -11,12 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Store Date
+        shell: bash -l {0}
+        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
       - name: Cache Conda Deps
         uses: actions/cache@v3
         id: cache-conda
         with:
           path: "~/conda_pkgs_dir"
-          key: conda-${{ hashFiles('.github/environment.yml') }}-${{ env.DATE }}
+          key: conda-${{ hashFiles('**/environment.yml') }}-${{ env.DATE }}
 
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
@@ -24,15 +28,6 @@ jobs:
           auto-update-conda: true
           python-version: "3.8"
           activate-environment: "test"
-
-      - name: TEMPORARY conda install location
-        shell: bash -l {0}
-        run: |
-          export CONDA_EXE=$(which conda)
-          export CONDA_ROOT=${CONDA_EXE%bin*}
-          echo "CONDA_ROOT=$CONDA_ROOT" >> $GITHUB_ENV
-          echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
-          echo $CONDA_ROOT
 
       - name: TEMPORARY Julia path
         run: julia -e "println(DEPOT_PATH[1])"
