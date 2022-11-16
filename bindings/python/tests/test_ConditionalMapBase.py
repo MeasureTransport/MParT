@@ -37,6 +37,6 @@ def test_Inverse():
     coeffs = np.random.randn(component.numCoeffs)
     component.SetCoeffs(coeffs)
     y = component.Evaluate(x)
-    x_ = component.Inverse(x,y)
+    x_ = component.Inverse(np.zeros((1,num_samples)),y)
     assert np.allclose(x_, x[-1,:], atol=1E-3)
 
