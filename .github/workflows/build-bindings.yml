@@ -122,7 +122,7 @@ jobs:
       - name: Setup Matlab Tests
         continue-on-error: true
         run: |
-          sed -i "1s|^|addpath(\'$GITHUB_WORKSPACE/MPART_INSTALL\')\n|" $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
+          sed -i "1s|^|addpath(genpath(\'$GITHUB_WORKSPACE/MPART_INSTALL\'))\n|" $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
           cat $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
 
       - name: Run Matlab Tests
