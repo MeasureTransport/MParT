@@ -124,7 +124,7 @@ jobs:
         continue-on-error: true
         uses: matlab-actions/run-command@v1
         with:
-          command: addpath('$GITHUB_WORKSPACE/mpart/bindings/matlab/tests/'), runtests
+          command: addpath('${{ github.workspace }}/mpart/bindings/matlab/tests/'), runtests
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
