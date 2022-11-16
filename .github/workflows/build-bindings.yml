@@ -24,9 +24,9 @@ jobs:
         run: |
           julia -e "using Pkg; Pkg.add([\"CxxWrap\",\"TestReports\"])"
           export GITHUB_JULIA_PATH=$(julia -e "println(DEPOT_PATH[1])")
-          echo $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nmpart=' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
-          echo $GITHUB_WORKSPACE                                 >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
-          echo "/MPART_INSTALL"                                  >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+          echo -n $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nmpart=' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+          echo -n $GITHUB_WORKSPACE                                 >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+          echo -n "/MPART_INSTALL"                                  >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
 
       - name: TEMPORARY Julia artifacts
         run: |
