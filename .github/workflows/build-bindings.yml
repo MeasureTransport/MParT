@@ -28,8 +28,10 @@ jobs:
           echo $GITHUB_WORKSPACE                                 >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo "/MPART_INSTALL"                                  >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
 
-      - name: Julia artifacts
-        run: cat $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+      - name: TEMPORARY Julia artifacts
+        run: |
+          export GITHUB_JULIA_PATH=$(julia -e "println(DEPOT_PATH[1])")
+          cat $GITHUB_JULIA_PATH/artifacts/Overrides.toml
 
       - name: Checkout MParT
         uses: actions/checkout@v3
