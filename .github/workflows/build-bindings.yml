@@ -17,6 +17,9 @@ jobs:
           python-version: "3.8"
           activate-environment: "test"
 
+      - name: TEMPORARY: Julia path
+        run: julia -e "println(DEPOT_PATH[1])"
+
       - name: Setup Julia
         run: |
           julia -e "using Pkg; Pkg.add([\"CxxWrap\",\"TestReports\"])"
@@ -24,6 +27,9 @@ jobs:
           echo $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nmpart=' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo $GITHUB_WORKSPACE                                 >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo "/MPART_INSTALL"                                  >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+
+      - name: Julia artifacts
+        run: cat $GITHUB_JULIA_PATH/artifacts/Overrides.toml
 
       - name: Checkout MParT
         uses: actions/checkout@v3
