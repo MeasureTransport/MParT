@@ -17,7 +17,7 @@ jobs:
           python-version: "3.8"
           activate-environment: "test"
 
-      - name: TEMPORARY: Julia path
+      - name: TEMPORARY Julia path
         run: julia -e "println(DEPOT_PATH[1])"
 
       - name: Setup Julia
