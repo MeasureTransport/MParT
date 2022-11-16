@@ -96,10 +96,12 @@ jobs:
         run: cd $GITHUB_WORKSPACE/mpart/build; make -j2 install
 
       - name: Run C++ Tests
+        continue-on-error: true
         shell: bash -l {0}
         run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests --kokkos-threads=2 --reporter junit -o $GITHUB_WORKSPACE/test-results-bindings.xml
 
       - name: Run Python Tests
+        continue-on-error: true
         shell: bash -l {0}
         run: |
           export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE/MPART_INSTALL/python
@@ -107,12 +109,13 @@ jobs:
           pytest $GITHUB_WORKSPACE/mpart/bindings/python/tests -v --junitxml="$GITHUB_WORKSPACE/test-results-python.xml"
 
       - name: Run Julia Tests
+        continue-on-error: true
         shell: bash -l {0}
         run: |
           julia -e "using Pkg; Pkg.add(\"MParT\"); using TestReports; TestReports.test(\"MParT\",logfilepath=joinpath(ENV[\"GITHUB_WORKSPACE\"],\"test-results-julia.xml\"))"
 
       - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           check_name: "Test Results with Externally Built Libraries"
