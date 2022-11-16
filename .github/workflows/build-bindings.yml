@@ -23,6 +23,8 @@ jobs:
         run: |
           export CONDA_EXE=$(which conda)
           export CONDA_ROOT=${CONDA_EXE%bin*}
+          echo "CONDA_ROOT=$CONDA_ROOT" >> $GITHUB_ENV
+          echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
           echo $CONDA_ROOT
 
       - name: TEMPORARY Julia path
@@ -77,9 +79,17 @@ jobs:
                 ../
           sudo make -j2 install
 
-      - name: Install Eigen, Catch2, Pybind11
+      - name: Cache Conda Deps
+        uses: actions/cache@v3
+        id: cache-conda
+        with:
+          path: "${{ env.CONDA_ROOT }}/pkgs"
+          key: conda-${{ hashFiles('**/environment.yml') }}-${{ env.DATE }}
+
+      - if: ${{steps.cache-conda.outputs.cache-hit != 'true'}}
+        name: Install Conda Dependencies
         shell: bash -l {0}
-        run: conda install -c conda-forge -y eigen catch2 pybind11 pytest numpy
+        run: conda env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
 
       - name: Configure MParT
         shell: bash -l {0}
@@ -112,7 +122,7 @@ jobs:
       - name: Setup Matlab Tests
         continue-on-error: true
         run: |
-          sed -i '1s|^|addpath(\'$GITHUB_WORKSPACE/MPART_INSTALL\')\n|' $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
+          sed -i '1s|^|addpath\(\'$GITHUB_WORKSPACE/MPART_INSTALL\'\)\n|' $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
           cat $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
 
       - name: Run Matlab Tests
