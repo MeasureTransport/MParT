@@ -11,19 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: TEMPORARY conda install location
-        shell: bash -l {0}
-        run: |
-          export CONDA_EXE=$(which conda)
-          export CONDA_ROOT=${CONDA_EXE%bin*}
-          echo $CONDA_ROOT
-
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
           python-version: "3.8"
           activate-environment: "test"
+
+      - name: TEMPORARY conda install location
+        shell: bash -l {0}
+        run: |
+          export CONDA_EXE=$(which conda)
+          export CONDA_ROOT=${CONDA_EXE%bin*}
+          echo $CONDA_ROOT
 
       - name: TEMPORARY Julia path
         run: julia -e "println(DEPOT_PATH[1])"
