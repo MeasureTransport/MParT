@@ -81,8 +81,7 @@ jobs:
                 ../
           sudo make -j2 install
 
-      - if: ${{steps.cache-conda.outputs.cache-hit != 'true'}}
-        name: Install Conda Dependencies
+      - name: Install Conda Dependencies
         shell: bash -l {0}
         run: conda env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
 
