@@ -95,11 +95,6 @@ jobs:
         shell: bash -l {0}
         run: cd $GITHUB_WORKSPACE/mpart/build; make -j2 install
 
-      - name: Run C++ Tests
-        continue-on-error: true
-        shell: bash -l {0}
-        run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests --kokkos-threads=2 --reporter junit -o $GITHUB_WORKSPACE/test-results-bindings.xml
-
       - name: Run Python Tests
         continue-on-error: true
         shell: bash -l {0}
@@ -112,7 +107,19 @@ jobs:
         continue-on-error: true
         shell: bash -l {0}
         run: |
-          julia -e "using Pkg; Pkg.add(url=\"https://github.com/MeasureTransport/MParT.jl\"); using TestReports; TestReports.test(\"MParT\",logfilepath=joinpath(ENV[\"GITHUB_WORKSPACE\"],\"test-results-julia.xml\"))"
+          julia -e "using Pkg; Pkg.add(url=\"https://github.com/MeasureTransport/MParT.jl\"); using TestReports; TestReports.test(\"MParT\",logfilepath=ENV[\"GITHUB_WORKSPACE\"], logfilename=\"test-results-julia.xml\")"
+
+      - name: Setup Matlab Tests
+        continue-on-error: true
+        run: |
+          sed -i '1s|^|addpath(\'$GITHUB_WORKSPACE/MPART_INSTALL\')\n|' $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
+          cat $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
+
+      - name: Run Matlab Tests
+        continue-on-error: true
+        uses: matlab-actions/run-command@v1
+        with:
+          command: $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
