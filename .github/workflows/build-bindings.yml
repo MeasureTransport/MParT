@@ -112,11 +112,11 @@ jobs:
         continue-on-error: true
         shell: bash -l {0}
         run: |
-          julia -e "using Pkg; Pkg.add(url\"https://github.com/MeasureTransport/MParT.jl\"); using TestReports; TestReports.test(\"MParT\",logfilepath=joinpath(ENV[\"GITHUB_WORKSPACE\"],\"test-results-julia.xml\"))"
+          julia -e "using Pkg; Pkg.add(url=\"https://github.com/MeasureTransport/MParT.jl\"); using TestReports; TestReports.test(\"MParT\",logfilepath=joinpath(ENV[\"GITHUB_WORKSPACE\"],\"test-results-julia.xml\"))"
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           check_name: "Test Results with Bindings"
-          junit-files: ${{ github.workspace }}/test-results-*.xml
+          junit_files: ${{ github.workspace }}/test-results-*.xml
