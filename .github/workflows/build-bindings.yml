@@ -17,15 +17,10 @@ jobs:
           python-version: "3.8"
           activate-environment: "test"
 
-      - name: TEMPORARY
-        run: |
-          export JULIA_VERSION=$(julia -v | awk '{print $NF}')
-          ls /usr/local/julia$JULIA_VERSION
-
       - name: Setup Julia
         run: |
           julia -e "using Pkg; Pkg.add([\"CxxWrap\",\"TestReports\"])"
-          export GITHUB_JULIA_PATH=$(julia -e "bindir = Sys.BINDIR; spl = split(bindir,\"/\"); julia_idx = findfirst(==(\".julia\"),spl); println(join(spl[1:julia_idx],\"/\"))")
+          export GITHUB_JULIA_PATH=$(julia -e "println(DEPOT_PATH[1])")
           echo $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nmpart=' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo $GITHUB_WORKSPACE                                 >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo "/MPART_INSTALL"                                  >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
