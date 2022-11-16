@@ -11,6 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Cache Conda Deps
+        uses: actions/cache@v3
+        id: cache-conda
+        with:
+          path: "~/conda_pkgs_dir"
+          key: conda-${{ hashFiles('.github/environment.yml') }}-${{ env.DATE }}
+
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -79,13 +86,6 @@ jobs:
                 ../
           sudo make -j2 install
 
-      - name: Cache Conda Deps
-        uses: actions/cache@v3
-        id: cache-conda
-        with:
-          path: "${{ env.CONDA_ROOT }}/pkgs"
-          key: conda-${{ hashFiles('**/environment.yml') }}-${{ env.DATE }}
-
       - if: ${{steps.cache-conda.outputs.cache-hit != 'true'}}
         name: Install Conda Dependencies
         shell: bash -l {0}
@@ -129,7 +129,7 @@ jobs:
         continue-on-error: true
         uses: matlab-actions/run-command@v1
         with:
-          command: $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests
+          command: addpath('$GITHUB_WORKSPACE/mpart/bindings/matlab/tests/'), runtests
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
