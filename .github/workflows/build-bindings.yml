@@ -73,7 +73,7 @@ jobs:
 
       - name: Build MParT
         shell: bash -l {0}
-        run: cd $GITHUB_WORKSPACE/mpart/build; make -j2
+        run: cd $GITHUB_WORKSPACE/mpart/build; make -j2 install
 
       - name: Run C++ Tests
         shell: bash -l {0}
