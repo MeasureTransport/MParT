@@ -10,20 +10,23 @@ jobs:
   build-tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Store Date
+        shell: bash -l {0}
+        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - name: Cache Conda Deps
+        uses: actions/cache@v3
+        id: cache-conda
+        with:
+          path: "~/conda_pkgs_dir"
+          key: conda-${{ hashFiles('**/environment.yml') }}-${{ env.DATE }}
+
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
           python-version: "3.8"
           activate-environment: "test"
-
-      - name: Initialize Conda Variables
-        shell: bash -l {0}
-        run: |
-          export CONDA_EXE=$(which conda)
-          export CONDA_ROOT=${CONDA_EXE%bin*}
-          echo "CONDA_ROOT=$CONDA_ROOT" >> $GITHUB_ENV
-          echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
       - name: Checkout MParT
         uses: actions/checkout@v3
@@ -58,15 +61,7 @@ jobs:
                 ../
           sudo make -j2 install
 
-      - name: Cache Conda Deps
-        uses: actions/cache@v3
-        id: cache-conda
-        with:
-          path: "${{ env.CONDA_ROOT }}/pkgs"
-          key: conda-${{ hashFiles('**/environment.yml') }}-${{ env.DATE }}
-
-      - if: ${{steps.cache-conda.outputs.cache-hit != 'true'}}
-        name: Install Conda Dependencies
+      - name: Install Conda Dependencies
         shell: bash -l {0}
         run: conda env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
 
@@ -90,4 +85,4 @@ jobs:
         if: always()
         with:
           check_name: "Test Results with Externally Built Libraries"
-          files: ${{ github.workspace }}/mpart/build/test-results-external.xml
+          junit_files: ${{ github.workspace }}/mpart/build/test-results-external.xml

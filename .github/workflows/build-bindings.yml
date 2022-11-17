@@ -29,9 +29,6 @@ jobs:
           python-version: "3.8"
           activate-environment: "test"
 
-      - name: TEMPORARY Julia path
-        run: julia -e "println(DEPOT_PATH[1])"
-
       - name: Setup Julia
         run: |
           julia -e "using Pkg; Pkg.add([\"CxxWrap\",\"TestReports\"])"
@@ -39,11 +36,6 @@ jobs:
           echo -n $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nMParT = \"' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo -n $GITHUB_WORKSPACE                                     >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo -n "/MPART_INSTALL\""                                    >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
-
-      - name: TEMPORARY Julia artifacts
-        run: |
-          export GITHUB_JULIA_PATH=$(julia -e "println(DEPOT_PATH[1])")
-          cat $GITHUB_JULIA_PATH/artifacts/Overrides.toml
 
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1
