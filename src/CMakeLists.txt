@@ -12,10 +12,13 @@ target_sources(mpart
     ParameterizedFunctionBase.cpp
     ConditionalMapBase.cpp
     TriangularMap.cpp
-    MapFactory.cpp
-
+    IdentityMap.cpp
+    ComposedMap.cpp
+    SummarizedMap.cpp
+    # DebugMap.cpp
     AffineMap.cpp
     AffineFunction.cpp
+    MapFactory.cpp
 
     MapFactoryImpl1.cpp
     MapFactoryImpl2.cpp
@@ -34,6 +37,4 @@ target_sources(mpart
     MapFactoryImpl15.cpp
 
     Initialization.cpp
-    ComposedMap.cpp
-    IdentityMap.cpp
 )

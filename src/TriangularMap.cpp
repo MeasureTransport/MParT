@@ -71,7 +71,7 @@ void TriangularMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, MemorySpace> c
 template<typename MemorySpace>
 void TriangularMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                     StridedVector<double, MemorySpace>              output)
-{   
+{
     // Evaluate the log determinant for the first component
     StridedMatrix<const double, MemorySpace> subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(0)->inputDim)), Kokkos::ALL());
     comps_.at(0)->LogDeterminantImpl(subPts, output);
@@ -165,8 +165,8 @@ void TriangularMap<MemorySpace>::GradientImpl(StridedMatrix<const double, Memory
     StridedMatrix<const double, MemorySpace> subPts;
     StridedMatrix<const double, MemorySpace> subSens;
 
-    
-    
+
+
     Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0,pts.extent(1));
     unsigned int dim = pts.extent(0);
     Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& ptInd){
@@ -174,7 +174,7 @@ void TriangularMap<MemorySpace>::GradientImpl(StridedMatrix<const double, Memory
             output(d,ptInd) = 0.0;
     });
     Kokkos::fence();
-    
+
     int startOutDim = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
 
@@ -209,14 +209,19 @@ void TriangularMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, Memor
     int startParamDim = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
 
-        subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
-        subSens = Kokkos::subview(sens, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
+        if(comps_.at(i)->numCoeffs != 0){
 
-        subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
-        comps_.at(i)->CoeffGradImpl(subPts, subSens, subOut);
+            subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
+            subSens = Kokkos::subview(sens, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
+
+            subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
+            comps_.at(i)->CoeffGradImpl(subPts, subSens, subOut);
+
+            
+            startParamDim += comps_.at(i)->numCoeffs;
+        }
 
         startOutDim += comps_.at(i)->outputDim;
-        startParamDim += comps_.at(i)->numCoeffs;
     }
 }
 
@@ -230,13 +235,15 @@ void TriangularMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const
 
     int startParamDim = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
+        if(comps_.at(i)->numCoeffs != 0){
 
-        subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
+            subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
 
-        subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
-        comps_.at(i)->LogDeterminantCoeffGradImpl(subPts, subOut);
+            subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
+            comps_.at(i)->LogDeterminantCoeffGradImpl(subPts, subOut);
 
-        startParamDim += comps_.at(i)->numCoeffs;
+            startParamDim += comps_.at(i)->numCoeffs;
+        }
     }
 }
 
@@ -244,7 +251,7 @@ template<typename MemorySpace>
 void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                              StridedMatrix<double, MemorySpace>              output)
 {
-    // Initialize the output to zero 
+    // Initialize the output to zero
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> zeroPolicy({0, 0}, {output.extent(0), output.extent(1)});
     Kokkos::parallel_for(zeroPolicy, KOKKOS_LAMBDA(const int& i, const int& j) {
         output(i,j) = 0.0;
@@ -254,10 +261,10 @@ void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
     StridedMatrix<const double, MemorySpace> subPts;
     StridedMatrix<double, MemorySpace> subOut;
 
-    int numPts = pts.extent(1);    
+    int numPts = pts.extent(1);
     Kokkos::View<double**,MemorySpace> compGrad("Component Gradient", this->inputDim, numPts);
     Kokkos::View<double**,MemorySpace> subGrad;
-    
+
     for(unsigned int i=0; i<comps_.size(); ++i){
         int compDim = comps_.at(i)->inputDim;
         subPts = Kokkos::subview(pts, std::make_pair(0,compDim), Kokkos::ALL());

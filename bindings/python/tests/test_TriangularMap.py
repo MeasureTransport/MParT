@@ -23,8 +23,9 @@ def test_numCoeffs():
 
 
 def test_CoeffsMap():
-    triangular.SetCoeffs(np.zeros(triangular.numCoeffs))
-    assert triangular.CoeffMap().tolist() == [0,0,0,0,0]
+    coeffs = np.random.randn(triangular.numCoeffs)
+    triangular.SetCoeffs(coeffs)
+    assert np.all(triangular.CoeffMap() == coeffs)
 
 
 def test_Evaluate():
@@ -38,5 +39,5 @@ def test_Inverse():
     coeffs = np.random.randn(triangular.numCoeffs)
     triangular.SetCoeffs(coeffs)
     y = triangular.Evaluate(x)
-    x_ = triangular.Inverse(np.zeros((0,num_samples)),y)
+    x_ = triangular.Inverse(np.zeros((1,num_samples)),y)
     assert np.allclose(x_, x, atol=1E-3)
