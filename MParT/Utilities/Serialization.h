@@ -12,10 +12,10 @@ namespace cereal {
     std::enable_if_t<traits::is_output_serializable<BinaryData<ScalarType>, Archive>::value, void> save(
         Archive &ar, mpart::StridedVector<ScalarType, MemorySpace> const &vec) {
 
-        mpart::StridedVector<ScalarType,Kokkos::HostSpace> vec_h = ToHost(vec);
+        mpart::StridedVector<ScalarType,Kokkos::HostSpace> vec_h = vec;
         unsigned int sz = vec_h.extent(0);
         ar(sz);
-        ar(binary_data(vec_h.data(), sz * sizeof(ScalarType)));
+        ar(binary_data(vec_h.data(), sz * sizeof(std::remove_cv_t<ScalarType>)));
     }
 
     template<class Archive, class ScalarType, class MemorySpace>
@@ -24,12 +24,13 @@ namespace cereal {
 
         unsigned int sz;
         ar(sz);
-        mpart::StridedVector<ScalarType,Kokkos::HostSpace> vec_h ("vec_h", sz);
+        Kokkos::View<ScalarType*,Kokkos::HostSpace> vec_h ("vec_h", sz);
         ar(binary_data(vec_h.data(), sz * sizeof(ScalarType)));
         if(std::is_same<MemorySpace,Kokkos::HostSpace>::value) {
             vec = std::move(vec_h);
         } else {
-            vec = std::move(ToDevice(vec_h));
+            throw std::runtime_error("Cannot deserialize to device memory");
+            // vec = std::move(mpart::ToDevice(vec_h));
         }
     }
 
@@ -40,7 +41,7 @@ namespace cereal {
         unsigned int m = mat.extent(0);
         unsigned int n = mat.extent(1);
         ar(m,n);
-        mpart::StridedMatrix<ScalarType,Kokkos::HostSpace> mat_h = ToHost(mat);
+        mpart::StridedMatrix<ScalarType,Kokkos::HostSpace> mat_h = mat;
         ar(binary_data(mat_h.data(), m * n * sizeof(ScalarType)));
     }
 
@@ -55,7 +56,8 @@ namespace cereal {
         if(std::is_same<MemorySpace,Kokkos::HostSpace>::value) {
             mat = std::move(mat_h);
         } else {
-            mat = std::move(ToDevice(mat_h));
+            throw std::runtime_error("Cannot deserialize to device memory");
+            // mat = std::move(mpart::ToDevice(mat_h));
         }
     }
 }

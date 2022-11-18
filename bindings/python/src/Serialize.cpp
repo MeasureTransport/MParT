@@ -19,7 +19,8 @@ void mpart::binding::SerializeWrapper(py::module &m)
         std::ofstream os(filename);
         cereal::BinaryOutputArchive archive(os);
         archive(obj.inputDim, obj.outputDim, obj.numCoeffs);
-        save(archive, obj.Coeffs());
+        StridedVector<const double,MemorySpace> coeffs = obj.Coeffs();
+        save(archive, coeffs);
     });
 }
 
@@ -32,7 +33,7 @@ void mpart::binding::DeserializeWrapper(py::module &m)
         cereal::BinaryInputArchive archive(is);
         unsigned int inputDim, outputDim, numCoeffs;
         archive(inputDim, outputDim, numCoeffs);
-        Kokkos::View<double*, MemorySpace> coeffs("Map coeffs", numCoeffs);
+        StridedVector<double, MemorySpace> coeffs = Kokkos::View<double*, MemorySpace>("Map coeffs", numCoeffs);
         load(archive, coeffs);
         return coeffs;
     });
