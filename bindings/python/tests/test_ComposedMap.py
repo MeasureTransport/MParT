@@ -27,7 +27,7 @@ def test_numCoeffs():
     assert composed_map.numCoeffs == numCoeffs
 
 def test_CoeffsMap():
-    
+
     coeffs = np.random.randn(composed_map.numCoeffs)
     composed_map.SetCoeffs(coeffs)
     assert np.all(composed_map.CoeffMap() == coeffs)
@@ -39,9 +39,9 @@ def test_Evaluate():
 
 def test_LogDeterminant():
     assert composed_map.LogDeterminant(x).shape == (num_samples,)
-    
+
 def test_Inverse():
 
     y = composed_map.Evaluate(x)
-    x_ = composed_map.Inverse(np.zeros((0,num_samples)),y)
+    x_ = composed_map.Inverse(np.zeros((1,num_samples)),y)
     assert np.allclose(x_, x, atol=1E-3)
