@@ -10,3 +10,4 @@ dependencies:
   - numpy
   - eigen >=3.3.9
   - pybind11 >=2.10
+  - cereal >= 1.3
