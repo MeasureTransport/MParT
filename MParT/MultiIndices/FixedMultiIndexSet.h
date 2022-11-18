@@ -17,7 +17,9 @@ template<typename MemorySpace=Kokkos::HostSpace>
 class FixedMultiIndexSet
 {
 public:
+    #if defined(MPART_HAS_CEREAL)
     friend class cereal::access;
+    #endif // MPART_HAS_CEREAL
 
     /** @brief Construct a fixed multiindex set in dense form.
 
