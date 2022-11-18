@@ -6,12 +6,18 @@
 
 #include <Kokkos_Core.hpp>
 
+#if defined(MPART_HAS_CEREAL)
+#include <cereal/access.hpp> // For load_and_construct
+#include "MParT/Utilities/Serialization.h"
+#endif // MPART_HAS_CEREAL
+
 namespace mpart{
 
 template<typename MemorySpace=Kokkos::HostSpace>
 class FixedMultiIndexSet
 {
 public:
+    friend class cereal::access;
 
     /** @brief Construct a fixed multiindex set in dense form.
 
@@ -67,6 +73,34 @@ public:
     template<typename OtherMemorySpace>
     FixedMultiIndexSet<OtherMemorySpace> ToDevice();
 
+    #if defined(MPART_HAS_CEREAL)
+    template<class Archive>
+    void serialize(Archive & ar) const
+    {
+        ar(dim);
+        cereal::save<unsigned int, MemorySpace>(ar, nzStarts);
+        cereal::save<unsigned int, MemorySpace>(ar, nzDims);
+        cereal::save<unsigned int, MemorySpace>(ar, nzOrders);
+        cereal::save<unsigned int, MemorySpace>(ar, maxDegrees);
+    }
+
+    template<class Archive>
+    static void load_and_construct(Archive & ar, cereal::construct<FixedMultiIndexSet<MemorySpace>> & construct)
+    {
+        unsigned int dim;
+        Kokkos::View<unsigned int*, MemorySpace> nzStarts;
+        Kokkos::View<unsigned int*, MemorySpace> nzDims;
+        Kokkos::View<unsigned int*, MemorySpace> nzOrders;
+        Kokkos::View<unsigned int*, MemorySpace> maxDegrees;
+        ar(dim);
+        cereal::load<unsigned int, MemorySpace>(ar, nzStarts);
+        cereal::load<unsigned int, MemorySpace>(ar, nzDims);
+        cereal::load<unsigned int, MemorySpace>(ar, nzOrders);
+        cereal::load<unsigned int, MemorySpace>(ar, maxDegrees);
+        construct(dim, nzStarts, nzDims, nzOrders, maxDegrees);
+    }
+
+    #endif // MPART_HAS_CEREAL
 
     Kokkos::View<unsigned int*, MemorySpace> nzStarts;
     Kokkos::View<unsigned int*, MemorySpace> nzDims;
@@ -98,8 +132,16 @@ private:
                         unsigned int &currTerm,
                         unsigned int &currNz);
 
-
-
+    FixedMultiIndexSet(unsigned int                             _dim,
+                       Kokkos::View<unsigned int*, MemorySpace> _nzStarts,
+                       Kokkos::View<unsigned int*, MemorySpace> _nzDims,
+                       Kokkos::View<unsigned int*, MemorySpace> _nzOrders,
+                       Kokkos::View<unsigned int*, MemorySpace> _maxDegrees): dim(_dim),
+                                                                              isCompressed(true),
+                                                                              nzStarts(_nzStarts),
+                                                                              nzDims(_nzDims),
+                                                                              nzOrders(_nzOrders),
+                                                                              maxDegrees(_maxDegrees) {}
 
 }; // class MultiIndexSet
 

@@ -8,19 +8,19 @@
 #include "MParT/Utilities/ArrayConversions.h"
 
 namespace cereal {
-    template <class Archive, class ScalarType, class MemorySpace>
+    template <typename ScalarType, typename MemorySpace, typename Archive>
     std::enable_if_t<traits::is_output_serializable<BinaryData<ScalarType>, Archive>::value, void> save(
-        Archive &ar, mpart::StridedVector<ScalarType, MemorySpace> const &vec) {
+        Archive &ar, Kokkos::View<ScalarType*, MemorySpace> const &vec) {
 
-        mpart::StridedVector<ScalarType,Kokkos::HostSpace> vec_h = vec;
+        Kokkos::View<ScalarType*,Kokkos::HostSpace> vec_h = vec;
         unsigned int sz = vec_h.extent(0);
         ar(sz);
         ar(binary_data(vec_h.data(), sz * sizeof(std::remove_cv_t<ScalarType>)));
     }
 
-    template<class Archive, class ScalarType, class MemorySpace>
+    template<typename ScalarType, typename MemorySpace, typename Archive>
     std::enable_if_t<traits::is_input_serializable<BinaryData<ScalarType>, Archive>::value, void> load(
-        Archive &ar, mpart::StridedVector<ScalarType, MemorySpace> &vec) {
+        Archive &ar, Kokkos::View<ScalarType*, MemorySpace> &vec) {
 
         unsigned int sz;
         ar(sz);
@@ -34,24 +34,24 @@ namespace cereal {
         }
     }
 
-    template <class Archive, class ScalarType, class MemorySpace>
+    template <typename ScalarType, typename MemorySpace, typename Archive>
     std::enable_if_t<traits::is_output_serializable<BinaryData<ScalarType>, Archive>::value, void> save(
-        Archive &ar, mpart::StridedMatrix<ScalarType, MemorySpace> const &mat) {
+        Archive &ar, Kokkos::View<ScalarType**, MemorySpace> const &mat) {
 
         unsigned int m = mat.extent(0);
         unsigned int n = mat.extent(1);
         ar(m,n);
-        mpart::StridedMatrix<ScalarType,Kokkos::HostSpace> mat_h = mat;
+        Kokkos::View<ScalarType**,Kokkos::HostSpace> mat_h = mat;
         ar(binary_data(mat_h.data(), m * n * sizeof(ScalarType)));
     }
 
-    template<class Archive, class ScalarType, class MemorySpace>
+    template<typename ScalarType, typename MemorySpace, typename Archive>
     std::enable_if_t<traits::is_input_serializable<BinaryData<ScalarType>, Archive>::value, void> load(
-        Archive &ar, mpart::StridedMatrix<ScalarType, MemorySpace> &mat) {
+        Archive &ar, Kokkos::View<ScalarType**, MemorySpace> &mat) {
 
         unsigned int m,n;
         ar(m,n);
-        mpart::StridedMatrix<ScalarType,Kokkos::HostSpace> mat_h ("mat_h", m, n);
+        Kokkos::View<ScalarType**,Kokkos::HostSpace> mat_h ("mat_h", m, n);
         ar(binary_data(mat_h.data(), m * n * sizeof(ScalarType)));
         if(std::is_same<MemorySpace,Kokkos::HostSpace>::value) {
             mat = std::move(mat_h);

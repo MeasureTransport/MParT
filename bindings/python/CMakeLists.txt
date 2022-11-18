@@ -19,7 +19,7 @@ set(PYTHON_BINDING_SOURCES
 
 if(MPART_ARCHIVE)
   set(PYTHON_BINDING_SOURCES ${PYTHON_BINDING_SOURCES}
-    src/Serialize.cpp
+    src/Serialization.cpp
   )
 endif()
 
