@@ -4,7 +4,6 @@
 #include <numeric>
 #include <cstdarg>
 #include <Kokkos_Core.hpp>
-#include <Kokkos_Layout.hpp>
 #include <Eigen/Core>
 #include "MParT/Utilities/ArrayConversions.h"
 #include "jlcxx/jlcxx.hpp"

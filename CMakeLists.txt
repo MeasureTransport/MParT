@@ -84,7 +84,7 @@ if(NOT Kokkos_FOUND)
         FetchContent_Declare(
             kokkos
             GIT_REPOSITORY https://github.com/kokkos/kokkos
-            GIT_TAG 3.5.00
+            GIT_TAG 3.7.00
             GIT_SHALLOW TRUE
         )
         FetchContent_MakeAvailable(kokkos)
@@ -168,7 +168,7 @@ if(MPART_JULIA)
         endif()
 
         find_package(JlCxx)
-
+        
         if(NOT JlCxx_FOUND)
             set(MPART_JULIA OFF)
             message(WARNING "Requested Julia bindings but CMake could not find JlCxx package.  Setting MPART_JULIA=OFF.")
