@@ -25,7 +25,7 @@ jobs:
         id: cache-conda
         with:
           path: "~/conda_pkgs_dir"
-          key: conda-${{ hashFiles('.github/environment.yml') }}-${{ env.DATE }}
+          key: conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
 
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
