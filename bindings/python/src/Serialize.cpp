@@ -4,36 +4,37 @@
 
 #include "CommonPybindUtilities.h"
 #include "MParT/ParameterizedFunctionBase.h"
+#include "MParT/Utilities/Serialization.h"
 
 
 namespace py = pybind11;
+using namespace mpart;
 using namespace mpart::binding;
-
-template<typename T>
-void SerializeWrapperType(py::module &m) {
-    m.def("Serialize", [](T const &obj, std::string const &filename) {
-        std::ofstream os(filename);
-        cereal::BinaryOutputArchive archive(os);
-        archive(obj);
-    });
-}
 
 template<typename MemorySpace>
 void mpart::binding::SerializeWrapper(py::module &m)
 {
-    SerializeWrapperType<ParameterizedFunctionBase<MemorySpace>>(m);
+    m.def(std::is_same_v<MemorySpace, Kokkos::HostSpace> ? "SerializeParameterFunctionBase" : "dSerializeParameterFunctionBase",
+    [](ParameterizedFunctionBase<MemorySpace> const &obj, std::string const &filename) {
+        std::ofstream os(filename);
+        cereal::BinaryOutputArchive archive(os);
+        archive(obj.inputDim, obj.outputDim, obj.numCoeffs);
+        save(archive, obj.Coeffs());
+    });
 }
 
 template<typename MemorySpace>
 void mpart::binding::DeserializeWrapper(py::module &m)
 {
-    std::string suffix = std::is_same_v<MemorySpace, Kokkos::HostSpace> ? "" : "Device";
-    m.def("DeserializeParameterizedFunctionBase" + suffix, [](std::string const &filename) {
+    m.def(std::is_same_v<MemorySpace, Kokkos::HostSpace> ? "DeserializeMapCoeffs" : "dDeserializeMapCoeffs",
+    [](std::string const &filename) {
         std::ifstream is(filename);
         cereal::BinaryInputArchive archive(is);
-        mpart::ParameterizedFunctionBase<Kokkos::HostSpace> map;
-        archive(map);
-        return map;
+        unsigned int inputDim, outputDim, numCoeffs;
+        archive(inputDim, outputDim, numCoeffs);
+        Kokkos::View<double*, MemorySpace> coeffs("Map coeffs", numCoeffs);
+        load(archive, coeffs);
+        return coeffs;
     });
 }
 

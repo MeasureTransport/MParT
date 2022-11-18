@@ -1,3 +1,6 @@
+#ifndef MPART_SERIALIZATION_H
+#define MPART_SERIALIZATION_H
+
 #include <cereal/types/base_class.hpp>
 #include <cereal/archives/binary.hpp>
 #include <Kokkos_Core.hpp>
@@ -56,3 +59,5 @@ namespace cereal {
         }
     }
 }
+
+#endif // MPART_SERIALIZATION_H
