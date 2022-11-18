@@ -3,13 +3,24 @@ name: external-lib-tests
 on:
   push:
     branches:
-      - dannys4/issue50
+      - main
   pull_request: {}
 
 jobs:
   build-tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Store Date
+        shell: bash -l {0}
+        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - name: Cache Conda Deps
+        uses: actions/cache@v3
+        id: cache-conda
+        with:
+          path: "~/conda_pkgs_dir"
+          key: conda-${{ hashFiles('**/environment.yml') }}-${{ env.DATE }}
+
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
@@ -22,27 +33,37 @@ jobs:
         with:
           path: mpart
 
-      - name: Checkout Kokkos
+      - name: Cache Kokkos
+        uses: actions/cache@v3
+        id: cache-kokkos
+        with:
+          path: "${{ github.workspace }}/KOKKOS_INSTALL"
+          key: kokkos3.7.00
+
+      - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
+        name: Checkout Kokkos
         uses: actions/checkout@v3
         with:
           repository: kokkos/kokkos
           path: kokkos
+          ref: '3.7.00'
 
-      - name: Install Kokkos
+      - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
+        name: Install Kokkos
         run: |
           cd $GITHUB_WORKSPACE/kokkos
           mkdir build && cd build
           cmake -DKokkos_ENABLE_THREADS=ON \
                 -DBUILD_SHARED_LIBS=ON     \
                 -DKokkos_ENABLE_SERIAL=ON  \
-                -DKokkos_CXX_STANDARD=17   \
+                -DCMAKE_CXX_STANDARD=17    \
                 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/KOKKOS_INSTALL/ \
                 ../
-          sudo make install
+          sudo make -j2 install
 
-      - name: Install Eigen, Catch2, Pybind11
+      - name: Install Conda Dependencies
         shell: bash -l {0}
-        run: conda install -c conda-forge -y eigen catch2 pybind11
+        run: conda env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
 
       - name: Configure MParT
         shell: bash -l {0}
@@ -53,15 +74,15 @@ jobs:
 
       - name: Build MParT
         shell: bash -l {0}
-        run: cd $GITHUB_WORKSPACE/mpart/build; make
+        run: cd $GITHUB_WORKSPACE/mpart/build; make -j2
 
       - name: Run Tests
         shell: bash -l {0}
         run: cd $GITHUB_WORKSPACE/mpart/build; ./RunTests --kokkos-threads=2 --reporter junit -o test-results-external.xml
 
       - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           check_name: "Test Results with Externally Built Libraries"
-          files: ${{ github.workspace }}/mpart/build/test-results-external.xml
+          junit_files: ${{ github.workspace }}/mpart/build/test-results-external.xml

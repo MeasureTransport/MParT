@@ -2,7 +2,6 @@
 #define ARRAYCONVERSIONS_H
 
 #include <Kokkos_Core.hpp>
-#include <Kokkos_Layout.hpp>
 #include <Eigen/Core>
 
 #include "GPUtils.h"

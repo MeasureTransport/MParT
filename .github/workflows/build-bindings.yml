@@ -1,0 +1,125 @@
+name: binding-tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request: {}
+
+jobs:
+  build-tests:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Store Date
+        shell: bash -l {0}
+        run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - name: Cache Conda Deps
+        uses: actions/cache@v3
+        id: cache-conda
+        with:
+          path: "~/conda_pkgs_dir"
+          key: conda-${{ hashFiles('**/environment.yml') }}-${{ env.DATE }}
+
+      - name: Use Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: "3.8"
+          activate-environment: "test"
+
+      - name: Setup Julia
+        run: |
+          julia -e "using Pkg; Pkg.add([\"CxxWrap\",\"TestReports\"])"
+          export GITHUB_JULIA_PATH=$(julia -e "println(DEPOT_PATH[1])")
+          echo -n $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nMParT = \"' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+          echo -n $GITHUB_WORKSPACE                                     >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+          echo -n "/MPART_INSTALL\""                                    >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v1
+
+      - name: Checkout MParT
+        uses: actions/checkout@v3
+        with:
+          path: mpart
+
+      - name: Cache Kokkos
+        uses: actions/cache@v3
+        id: cache-kokkos
+        with:
+          path: "${{ github.workspace }}/KOKKOS_INSTALL"
+          key: kokkos3.7.00
+
+      - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
+        name: Checkout Kokkos
+        uses: actions/checkout@v3
+        with:
+          repository: kokkos/kokkos
+          path: kokkos
+          ref: '3.7.00'
+
+      - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
+        name: Install Kokkos
+        run: |
+          cd $GITHUB_WORKSPACE/kokkos
+          mkdir build && cd build
+          cmake -DKokkos_ENABLE_THREADS=ON \
+                -DBUILD_SHARED_LIBS=ON     \
+                -DKokkos_ENABLE_SERIAL=ON  \
+                -DCMAKE_CXX_STANDARD=17    \
+                -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/KOKKOS_INSTALL/ \
+                ../
+          sudo make -j2 install
+
+      - name: Install Conda Dependencies
+        shell: bash -l {0}
+        run: conda env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
+
+      - name: Configure MParT
+        shell: bash -l {0}
+        run: |
+          cd $GITHUB_WORKSPACE/mpart
+          mkdir build && cd build
+          cmake -DKokkos_DIR=$GITHUB_WORKSPACE/KOKKOS_INSTALL/lib/cmake/Kokkos \
+                -DMPART_FETCH_DEPS=OFF \
+                -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/MPART_INSTALL/ \
+                ../
+
+      - name: Build MParT
+        shell: bash -l {0}
+        run: cd $GITHUB_WORKSPACE/mpart/build; make -j2 install
+
+      - name: Run Python Tests
+        continue-on-error: true
+        shell: bash -l {0}
+        run: |
+          export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE/MPART_INSTALL/python
+          export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/MPART_INSTALL/python:$GITHUB_WORKSPACE/MPART_INSTALL/lib
+          pytest $GITHUB_WORKSPACE/mpart/bindings/python/tests -v --junitxml="$GITHUB_WORKSPACE/test-results-python.xml"
+
+      - name: Run Julia Tests
+        continue-on-error: true
+        shell: bash -l {0}
+        run: |
+          julia -e "using Pkg; Pkg.add(url=\"https://github.com/MeasureTransport/MParT.jl\"); using TestReports; TestReports.test(\"MParT\",logfilepath=ENV[\"GITHUB_WORKSPACE\"], logfilename=\"test-results-julia.xml\")"
+
+      - name: Setup Matlab Tests
+        continue-on-error: true
+        run: |
+          sed -i "1s|^|addpath(genpath(\'$GITHUB_WORKSPACE/MPART_INSTALL\'))\n|" $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
+          cat $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
+
+      - name: Run Matlab Tests
+        continue-on-error: true
+        uses: matlab-actions/run-command@v1
+        with:
+          command: addpath('${{ github.workspace }}/mpart/bindings/matlab/tests/'), runtests
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          check_name: "Test Results with Bindings"
+          junit_files: ${{ github.workspace }}/test-results-*.xml

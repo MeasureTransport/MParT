@@ -245,14 +245,19 @@ void TriangularMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, Memor
     int startParamDim = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
 
-        subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
-        subSens = Kokkos::subview(sens, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
+        if(comps_.at(i)->numCoeffs != 0){
 
-        subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
-        comps_.at(i)->CoeffGradImpl(subPts, subSens, subOut);
+            subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
+            subSens = Kokkos::subview(sens, std::make_pair(startOutDim,int(startOutDim+comps_.at(i)->outputDim)), Kokkos::ALL());
+
+            subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
+            comps_.at(i)->CoeffGradImpl(subPts, subSens, subOut);
+
+            
+            startParamDim += comps_.at(i)->numCoeffs;
+        }
 
         startOutDim += comps_.at(i)->outputDim;
-        startParamDim += comps_.at(i)->numCoeffs;
     }
 }
 
@@ -266,13 +271,15 @@ void TriangularMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const
 
     int startParamDim = 0;
     for(unsigned int i=0; i<comps_.size(); ++i){
+        if(comps_.at(i)->numCoeffs != 0){
 
-        subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
+            subPts = Kokkos::subview(pts, std::make_pair(0,int(comps_.at(i)->inputDim)), Kokkos::ALL());
 
-        subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
-        comps_.at(i)->LogDeterminantCoeffGradImpl(subPts, subOut);
+            subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
+            comps_.at(i)->LogDeterminantCoeffGradImpl(subPts, subOut);
 
-        startParamDim += comps_.at(i)->numCoeffs;
+            startParamDim += comps_.at(i)->numCoeffs;
+        }
     }
 }
 

@@ -7,14 +7,14 @@ RUN --mount=type=cache,target=/opt/conda/pkgs conda env create -f MParT_/.docker
 
 SHELL ["conda", "run", "-n", "mpart", "/bin/bash", "-c"]
 
-RUN git clone https://github.com/kokkos/kokkos.git && \
+RUN git clone --depth=1 --branch 3.7.00 https://github.com/kokkos/kokkos.git && \
     mkdir kokkos/build && \
     cd kokkos/build && \
     cmake \
           -DKokkos_ENABLE_SERIAL=ON \
           -DKokkos_ENABLE_OPENMP=ON \
           -DBUILD_SHARED_LIBS=ON    \
-          -DKokkos_CXX_STANDARD=17  \
+          -DCMAKE_CXX_STANDARD=17   \
           ../ && \
     make -j$(nproc) && \
     make install && \
@@ -46,4 +46,4 @@ RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib' >> ~/.bashrc &
     echo 'export PYTHONPATH=$PYTHONPATH:/usr/local/python' >> ~/.bashrc && \
     echo 'export OMP_PROC_BIND=spread' >> ~/.bashrc && \
     echo 'export OMP_PLACES=threads' >> ~/.bashrc && \
-    echo 'export KOKKOS_NUM_THREADS=`nproc`' >> ~/.bashrc 
+    echo 'export KOKKOS_NUM_THREADS=`nproc`' >> ~/.bashrc
