@@ -1078,6 +1078,13 @@ public:
         return 0.5*(xub+xlb);
     }
 
+    /** Give access to the underlying FixedMultiIndexSet
+     * @return The FixedMultiIndexSet
+     */
+    FixedMultiIndexSet<MemorySpace> GetMultiIndexSet() const {
+        return expansion_.GetMultiIndexSet();
+    }
+
 private:
     ExpansionType expansion_;
     QuadratureType quad_;

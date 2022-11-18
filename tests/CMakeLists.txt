@@ -23,3 +23,9 @@ set (TEST_SOURCES
      tests/Test_SummarizedMap.cpp
      #tests/Test_TensorProductFunction.cpp
 PARENT_SCOPE)
+
+if (MPART_ARCHIVE)
+     set (TEST_SOURCES ${TEST_SOURCES}
+          tests/Test_Serialization.cpp
+     )
+endif ()
