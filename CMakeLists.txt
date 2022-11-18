@@ -168,7 +168,7 @@ if(MPART_JULIA)
         endif()
 
         find_package(JlCxx)
-        
+
         if(NOT JlCxx_FOUND)
             set(MPART_JULIA OFF)
             message(WARNING "Requested Julia bindings but CMake could not find JlCxx package.  Setting MPART_JULIA=OFF.")
@@ -198,18 +198,20 @@ if(MPART_ARCHIVE)
             )
             set(JUST_INSTALL_CEREAL ON)
             FetchContent_MakeAvailable(cereal)
+            include_directories(${cereal_SOURCE_DIR}/include)
         else()
             set(MPART_ARCHIVE OFF)
             message(FATAL_ERROR "Could not find cereal library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install cereal itself.")
         endif()
     else()
+        include_directories(${cereal_INCLUDE_DIR})
         message(STATUS "Found cereal!")
     endif()
 endif()
 
 if(MPART_ARCHIVE)
     add_definitions(-DMPART_HAS_CEREAL)
-    include_directories(${cereal_INCLUDE_DIR})
+
 endif()
 
 # #############################################################
