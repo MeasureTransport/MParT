@@ -7,6 +7,7 @@
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/ParameterizedFunctionBase.h"
 #include "MParT/Utilities/Serialization.h"
+#include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/MapOptions.h"
 
 
@@ -17,7 +18,7 @@ using namespace mpart::binding;
 template<typename MemorySpace>
 void mpart::binding::SerializeWrapper(py::module &m)
 {
-    m.def(std::is_same_v<MemorySpace, Kokkos::HostSpace> ? "SerializeParameterizedFunctionBase" : "dSerializeParameterizedFunctionBase",
+    m.def(std::is_same_v<MemorySpace, Kokkos::HostSpace> ? "SerializeMapCoeffs" : "dSerializeMapCoeffs",
     [](ParameterizedFunctionBase<MemorySpace> const &obj, std::string const &filename) {
         std::ofstream os(filename);
         cereal::BinaryOutputArchive archive(os);
@@ -50,7 +51,7 @@ void mpart::binding::DeserializeWrapper(py::module &m)
         archive(inputDim, outputDim, numCoeffs);
         Kokkos::View<double*, MemorySpace> coeffs ("Map coeffs", numCoeffs);
         load(archive, coeffs);
-        return coeffs;
+        return KokkosToVec(coeffs);
     });
 
     m.def(std::is_same_v<MemorySpace, Kokkos::HostSpace> ? "DeserializeFixedMultiIndexSet" : "dDeserializeFixedMultiIndexSet",
