@@ -11,6 +11,7 @@ option(MPART_PYTHON "Build python bindings with pybind11" ON)
 option(MPART_MATLAB "Build matlab bindings with pybind11" ON)
 option(MPART_JULIA "Build julia bindings with CxxWrap.jl" ON)
 option(MPART_FETCH_DEPS "If CMake should be allowed to fetch and build external dependencies that weren't found." ON)
+option(MPART_ARCHIVE "If MParT should build with support to serialize data using the cereal library" ON)
 
 # #############################################################
 # Installation path configuration
