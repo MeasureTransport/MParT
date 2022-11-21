@@ -2,6 +2,7 @@
 #include <cereal/types/memory.hpp>
 #include <fstream>
 #include <pybind11/pybind11.h>
+#include <pybind11/eigen.h>
 
 #include "CommonPybindUtilities.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
@@ -15,19 +16,19 @@ namespace py = pybind11;
 using namespace mpart;
 using namespace mpart::binding;
 
-template<typename MemorySpace>
-void mpart::binding::SerializeWrapper(py::module &m)
+template<>
+void mpart::binding::SerializeWrapper<Kokkos::HostSpace>(py::module &m)
 {
-    m.def(std::is_same_v<MemorySpace, Kokkos::HostSpace> ? "SerializeMapCoeffs" : "dSerializeMapCoeffs",
-    [](ParameterizedFunctionBase<MemorySpace> const &obj, std::string const &filename) {
+    m.def("SerializeMapCoeffs",
+    [](ParameterizedFunctionBase<Kokkos::HostSpace> const &obj, std::string const &filename) {
         std::ofstream os(filename);
         cereal::BinaryOutputArchive archive(os);
         archive(obj.inputDim, obj.outputDim, obj.numCoeffs);
         save(archive, obj.Coeffs());
     });
 
-    m.def(std::is_same_v<MemorySpace, Kokkos::HostSpace> ? "SerializeFixedMultiIndexSet" : "dSerializeFixedMultiIndexSet",
-    [](std::shared_ptr<FixedMultiIndexSet<MemorySpace>> const &obj, std::string const &filename) {
+    m.def("SerializeFixedMultiIndexSet",
+    [](std::shared_ptr<FixedMultiIndexSet<Kokkos::HostSpace>> const &obj, std::string const &filename) {
         std::ofstream os(filename);
         cereal::BinaryOutputArchive archive(os);
         archive(obj);
@@ -40,25 +41,25 @@ void mpart::binding::SerializeWrapper(py::module &m)
     });
 }
 
-template<typename MemorySpace>
-void mpart::binding::DeserializeWrapper(py::module &m)
+template<>
+void mpart::binding::DeserializeWrapper<Kokkos::HostSpace>(py::module &m)
 {
-    m.def(std::is_same_v<MemorySpace, Kokkos::HostSpace> ? "DeserializeMapCoeffs" : "dDeserializeMapCoeffs",
+    m.def("DeserializeMapCoeffs",
     [](std::string const &filename) {
         std::ifstream is(filename);
         cereal::BinaryInputArchive archive(is);
         unsigned int inputDim, outputDim, numCoeffs;
         archive(inputDim, outputDim, numCoeffs);
-        Kokkos::View<double*, MemorySpace> coeffs ("Map coeffs", numCoeffs);
+        Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Map coeffs", numCoeffs);
         load(archive, coeffs);
-        return KokkosToVec(coeffs);
+        return CopyKokkosToVec(coeffs);
     });
 
-    m.def(std::is_same_v<MemorySpace, Kokkos::HostSpace> ? "DeserializeFixedMultiIndexSet" : "dDeserializeFixedMultiIndexSet",
+    m.def("DeserializeFixedMultiIndexSet",
     [](std::string const &filename) {
         std::ifstream is(filename);
         cereal::BinaryInputArchive archive(is);
-        std::shared_ptr<FixedMultiIndexSet<MemorySpace>> obj {nullptr};
+        std::shared_ptr<FixedMultiIndexSet<Kokkos::HostSpace>> obj {nullptr};
         archive(obj);
         return obj;
     });
@@ -71,11 +72,3 @@ void mpart::binding::DeserializeWrapper(py::module &m)
         return obj;
     });
 }
-
-
-template void mpart::binding::SerializeWrapper<Kokkos::HostSpace>(py::module&);
-template void mpart::binding::DeserializeWrapper<Kokkos::HostSpace>(py::module&);
-#if defined(MPART_ENABLE_GPU)
-template void mpart::binding::SerializeWrapper<mpart::DeviceSpace>(py::module&);
-template void mpart::binding::DeserializeWrapper<mpart::DeviceSpace>(py::module&);
-#endif // MPART_ENABLE_GPU

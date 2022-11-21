@@ -198,20 +198,20 @@ if(MPART_ARCHIVE)
             )
             set(JUST_INSTALL_CEREAL ON)
             FetchContent_MakeAvailable(cereal)
-            include_directories(${cereal_SOURCE_DIR}/include)
         else()
             set(MPART_ARCHIVE OFF)
             message(FATAL_ERROR "Could not find cereal library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install cereal itself.")
         endif()
     else()
-        include_directories(${cereal_INCLUDE_DIR})
         message(STATUS "Found cereal!")
     endif()
 endif()
 
 if(MPART_ARCHIVE)
     add_definitions(-DMPART_HAS_CEREAL)
-
+    set(CEREAL_LIBRARIES cereal::cereal)
+else()
+    set(CEREAL_LIBRARIES "")
 endif()
 
 # #############################################################
@@ -219,7 +219,8 @@ endif()
 add_library(mpart "")
 add_library(MParT::mpart ALIAS mpart)
 
-target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES})
+
+target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES} ${CEREAL_LIBRARIES})
 
 target_include_directories(mpart
     PUBLIC
@@ -281,7 +282,7 @@ if(MPART_BUILD_TESTS)
     # Define test sources
     add_subdirectory(tests)
     add_executable(RunTests ${TEST_SOURCES})
-    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES})
+    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES} ${CEREAL_LIBRARIES})
 endif()
 
 add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)

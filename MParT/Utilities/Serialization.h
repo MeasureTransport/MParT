@@ -9,7 +9,7 @@
 
 namespace cereal {
     template <typename ScalarType, typename MemorySpace, typename Archive>
-    std::enable_if_t<traits::is_output_serializable<BinaryData<ScalarType>, Archive>::value, void> save(
+    std::enable_if_t<traits::is_output_serializable<BinaryData<ScalarType>, Archive>::value && std::is_same_v<MemorySpace, Kokkos::HostSpace>, void> save(
         Archive &ar, Kokkos::View<ScalarType*, MemorySpace> const &vec) {
 
         Kokkos::View<ScalarType*,Kokkos::HostSpace> vec_h = vec;
@@ -19,23 +19,18 @@ namespace cereal {
     }
 
     template<typename ScalarType, typename MemorySpace, typename Archive>
-    std::enable_if_t<traits::is_input_serializable<BinaryData<ScalarType>, Archive>::value, void> load(
+    std::enable_if_t<traits::is_input_serializable<BinaryData<ScalarType>, Archive>::value && std::is_same_v<MemorySpace, Kokkos::HostSpace>, void> load(
         Archive &ar, Kokkos::View<ScalarType*, MemorySpace> &vec) {
 
         unsigned int sz;
         ar(sz);
         Kokkos::View<ScalarType*,Kokkos::HostSpace> vec_h ("vec_h", sz);
         ar(binary_data(vec_h.data(), sz * sizeof(ScalarType)));
-        if(std::is_same<MemorySpace,Kokkos::HostSpace>::value) {
-            vec = std::move(vec_h);
-        } else {
-            throw std::runtime_error("Cannot deserialize to device memory");
-            // vec = std::move(mpart::ToDevice(vec_h));
-        }
+        vec = std::move(vec_h);
     }
 
     template <typename ScalarType, typename MemorySpace, typename Archive>
-    std::enable_if_t<traits::is_output_serializable<BinaryData<ScalarType>, Archive>::value, void> save(
+    std::enable_if_t<traits::is_output_serializable<BinaryData<ScalarType>, Archive>::value && std::is_same_v<MemorySpace, Kokkos::HostSpace>, void> save(
         Archive &ar, Kokkos::View<ScalarType**, MemorySpace> const &mat) {
 
         unsigned int m = mat.extent(0);
@@ -46,19 +41,14 @@ namespace cereal {
     }
 
     template<typename ScalarType, typename MemorySpace, typename Archive>
-    std::enable_if_t<traits::is_input_serializable<BinaryData<ScalarType>, Archive>::value, void> load(
+    std::enable_if_t<traits::is_input_serializable<BinaryData<ScalarType>, Archive>::value && std::is_same_v<MemorySpace, Kokkos::HostSpace>, void> load(
         Archive &ar, Kokkos::View<ScalarType**, MemorySpace> &mat) {
 
         unsigned int m,n;
         ar(m,n);
         Kokkos::View<ScalarType**,Kokkos::HostSpace> mat_h ("mat_h", m, n);
         ar(binary_data(mat_h.data(), m * n * sizeof(ScalarType)));
-        if(std::is_same<MemorySpace,Kokkos::HostSpace>::value) {
-            mat = std::move(mat_h);
-        } else {
-            throw std::runtime_error("Cannot deserialize to device memory");
-            // mat = std::move(mpart::ToDevice(mat_h));
-        }
+        mat = std::move(mat_h);
     }
 }
 
