@@ -80,10 +80,10 @@ public:
     void serialize(Archive & ar) const
     {
         ar(dim);
-        cereal::save<unsigned int, MemorySpace>(ar, nzStarts);
-        cereal::save<unsigned int, MemorySpace>(ar, nzDims);
-        cereal::save<unsigned int, MemorySpace>(ar, nzOrders);
-        cereal::save<unsigned int, MemorySpace>(ar, maxDegrees);
+        cereal::save(ar, nzStarts);
+        cereal::save(ar, nzDims);
+        cereal::save(ar, nzOrders);
+        cereal::save(ar, maxDegrees);
     }
 
     template<class Archive>
@@ -95,10 +95,10 @@ public:
         Kokkos::View<unsigned int*, MemorySpace> nzOrders;
         Kokkos::View<unsigned int*, MemorySpace> maxDegrees;
         ar(dim);
-        cereal::load<unsigned int, MemorySpace>(ar, nzStarts);
-        cereal::load<unsigned int, MemorySpace>(ar, nzDims);
-        cereal::load<unsigned int, MemorySpace>(ar, nzOrders);
-        cereal::load<unsigned int, MemorySpace>(ar, maxDegrees);
+        cereal::load(ar, nzStarts);
+        cereal::load(ar, nzDims);
+        cereal::load(ar, nzOrders);
+        cereal::load(ar, maxDegrees);
         construct(dim, nzStarts, nzDims, nzOrders, maxDegrees);
     }
 

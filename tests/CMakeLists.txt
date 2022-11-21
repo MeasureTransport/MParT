@@ -25,7 +25,5 @@ set (TEST_SOURCES
 PARENT_SCOPE)
 
 if (MPART_ARCHIVE)
-     set (TEST_SOURCES ${TEST_SOURCES}
-          tests/Test_Serialization.cpp
-     )
+     set (TEST_SOURCES ${TEST_SOURCES}  tests/Test_Serialization.cpp PARENT_SCOPE)
 endif ()

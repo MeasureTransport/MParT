@@ -281,6 +281,7 @@ endif()
 if(MPART_BUILD_TESTS)
     # Define test sources
     add_subdirectory(tests)
+    message(STATUS ${TEST_SOURCES})
     add_executable(RunTests ${TEST_SOURCES})
     target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES} ${CEREAL_LIBRARIES})
 endif()
