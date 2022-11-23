@@ -7,11 +7,6 @@
 
 #include "MParT/Utilities/ArrayConversions.h"
 
-template<typename What, typename ... Args>
-struct is_present {
-    static constexpr bool value {(std::is_same_v<What, Args> || ...)};
-};
-
 namespace cereal {
     template <typename ScalarType, typename Archive, typename... Traits>
     std::enable_if_t<traits::is_output_serializable<BinaryData<ScalarType>, Archive>::value && (std::is_same_v<Traits, Kokkos::HostSpace> || ...), void> save(

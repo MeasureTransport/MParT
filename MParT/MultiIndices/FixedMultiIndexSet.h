@@ -76,8 +76,9 @@ public:
     FixedMultiIndexSet<OtherMemorySpace> ToDevice();
 
     #if defined(MPART_HAS_CEREAL)
+
     template<class Archive>
-    void serialize(Archive & ar) const
+    void save(Archive & ar) const
     {
         ar(dim);
         cereal::save(ar, nzStarts);
@@ -87,19 +88,14 @@ public:
     }
 
     template<class Archive>
-    static void load_and_construct(Archive & ar, cereal::construct<FixedMultiIndexSet<MemorySpace>> & construct)
+    void load(Archive & ar)
     {
-        unsigned int dim;
-        Kokkos::View<unsigned int*, MemorySpace> nzStarts;
-        Kokkos::View<unsigned int*, MemorySpace> nzDims;
-        Kokkos::View<unsigned int*, MemorySpace> nzOrders;
-        Kokkos::View<unsigned int*, MemorySpace> maxDegrees;
         ar(dim);
+        isCompressed = true;
         cereal::load(ar, nzStarts);
         cereal::load(ar, nzDims);
         cereal::load(ar, nzOrders);
         cereal::load(ar, maxDegrees);
-        construct(dim, nzStarts, nzDims, nzOrders, maxDegrees);
     }
 
     #endif // MPART_HAS_CEREAL

@@ -28,7 +28,7 @@ void mpart::binding::SerializeWrapper<Kokkos::HostSpace>(py::module &m)
     });
 
     m.def("SerializeFixedMultiIndexSet",
-    [](std::shared_ptr<FixedMultiIndexSet<Kokkos::HostSpace>> const &obj, std::string const &filename) {
+    [](FixedMultiIndexSet<Kokkos::HostSpace> const &obj, std::string const &filename) {
         std::ofstream os(filename);
         cereal::BinaryOutputArchive archive(os);
         archive(obj);
@@ -59,7 +59,7 @@ void mpart::binding::DeserializeWrapper<Kokkos::HostSpace>(py::module &m)
     [](std::string const &filename) {
         std::ifstream is(filename);
         cereal::BinaryInputArchive archive(is);
-        std::shared_ptr<FixedMultiIndexSet<Kokkos::HostSpace>> obj {nullptr};
+        FixedMultiIndexSet<Kokkos::HostSpace> obj (1,1);
         archive(obj);
         return obj;
     });
