@@ -23,7 +23,7 @@ void mpart::binding::SerializeWrapper<Kokkos::HostSpace>(py::module &m)
     [](ParameterizedFunctionBase<Kokkos::HostSpace> const &obj, std::string const &filename) {
         std::ofstream os(filename);
         cereal::BinaryOutputArchive archive(os);
-        archive(obj.inputDim, obj.outputDim, obj.numCoeffs);
+        archive(obj.inputDim, obj.outputDim);
         save(archive, obj.Coeffs());
     });
 
@@ -52,7 +52,7 @@ void mpart::binding::DeserializeWrapper<Kokkos::HostSpace>(py::module &m)
         archive(inputDim, outputDim, numCoeffs);
         Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Map coeffs", numCoeffs);
         load(archive, coeffs);
-        return CopyKokkosToVec(coeffs);
+        return std::make_tuple(inputDim, outputDim, CopyKokkosToVec(coeffs));
     });
 
     m.def("DeserializeFixedMultiIndexSet",

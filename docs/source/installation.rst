@@ -44,7 +44,7 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
 
 This will compile the main c++ :code:`mpart` library as well as any other language bindings that can be automatically configured.  If you are compiling on a multicore machine, you can use :code:`make -j N_JOBS install`, where :code:`N_JOBS` is the number of processes the computer can compile with in parallel.
 
-This installation should also automatically install and build Kokkos, Eigen, and Catch2, assuming they aren't installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:
+This installation should also automatically install and build Kokkos, Eigen, Cereal, Pybind11, and Catch2, assuming they aren't installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:
 
 .. code-block:: bash
 
@@ -52,16 +52,16 @@ This installation should also automatically install and build Kokkos, Eigen, and
      -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
      -DKokkos_ROOT=<your/kokkos/install/root>          \
      -DEigen3_ROOT=<your/eigen3/install/root>          \
-     -DCatch2_ROOT=<your/catch2/install/root>          \
+     -Dcereal_ROOT=<your/cereal/install/root>          \
      -DKokkos_ENABLE_THREADS=ON                        \
      -DKokkos_ENABLE_SERIAL=ON                         \
    ..
 
-Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, and Catch2 with libraries you don't already have using these :code:`X_ROOT` flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version >=3.13. Further, it has been tested with Kokkos 3.6.0, Eigen 3.4.0, Pybind11 2.9.2, and Catch2 3.0.0-preview3 (there are some issues encountered when compiling MParT with Catch2 3.0.1).
+Feel free to mix and match previous installations of Eigen, Cereal, Kokkos, Pybind11, and Catch2 with libraries you don't already have using these :code:`X_ROOT` flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version >=3.13. Further, it has been tested with Kokkos 3.7.0, Eigen 3.4.0, Pybind11 2.9.2, Cereal 1.3.2, and Catch2 3.1.0 (there have been some issues encountered when compiling MParT with Catch2 3.0.1).
 
 You can force MParT to use previously installed versions of the dependencies by setting :code:`MPART_FETCH_DEPS=OFF`.  The default value of :code:`MPART_FETCH_DEPS=ON` will allow MParT to download and locally install any external dependencies using CMake's :code:`FetchContent` directive.
 
-Note that if you do not wish to compile bindings for Python, Julia, or Matlab, you can turn off binding compilation by setting the :code:`MPART_<language>=OFF` variable during CMake configuration.  For a default build with only the core c++ library, you can use
+Note that if you do not wish to compile bindings for Python, Julia, or Matlab, you can turn off binding compilation by setting the :code:`MPART_<language>=OFF` variable during CMake configuration. For a default build with only the core c++ library, and without requiring the Cereal library, you can use
 
 .. code-block:: bash
 
@@ -71,10 +71,11 @@ Note that if you do not wish to compile bindings for Python, Julia, or Matlab, y
      -DMPART_PYTHON=OFF                                \
      -DMPART_MATLAB=OFF                                \
      -DMPART_JULIA=OFF                                 \
+     -DMPART_ARCHIVE=OFF
    ..
 
 
-MParT is built on Kokkos, which provides a single interface to many different multithreading capabilities like pthreads, OpenMP, CUDA, and OpenCL.   A list of available backends can be found on the [Kokkos wiki](https://github.com/kokkos/kokkos/blob/master/BUILD.md#device-backends).   The `Kokkos_ENABLE_THREADS` option in the CMake configuration above can be changed to reflect different choices in device backends.   The OSX-provided clang compiler does not support OpenMP, so `PTHREAD` is a natural choice for CPU-based multithreading on OSX.   However, you may find that OpenMP has slightly better performance with other compilers and operating systems.
+MParT is built on Kokkos, which provides a single interface to many different multithreading capabilities like threads, OpenMP, CUDA, and OpenCL.   A list of available backends can be found on the [Kokkos wiki](https://github.com/kokkos/kokkos/blob/master/BUILD.md#device-backends).   The :code:`Kokkos_ENABLE_THREADS` option in the CMake configuration above can be changed to reflect different choices in device backends.   The OSX-provided clang compiler does not support OpenMP, so :code:`THREADS` is a natural choice for CPU-based multithreading on OSX.   However, you may find that OpenMP has slightly better performance with other compilers and operating systems.
 
 Tests
 ---------

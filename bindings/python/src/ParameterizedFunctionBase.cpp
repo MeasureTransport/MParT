@@ -6,6 +6,10 @@
 #include <Kokkos_Core.hpp>
 #include <pybind11/pybind11.h>
 
+#if defined(MPART_HAS_CEREAL)
+#include <fstream>
+#endif
+
 namespace py = pybind11;
 using namespace mpart::binding;
 
@@ -22,6 +26,14 @@ void mpart::binding::ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(py::mod
         .def_readonly("numCoeffs", &ParameterizedFunctionBase<Kokkos::HostSpace>::numCoeffs)
         .def_readonly("inputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::inputDim)
         .def_readonly("outputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::outputDim)
+        #if defined(MPART_HAS_CEREAL)
+        .def("Serialize", [](ParameterizedFunctionBase<Kokkos::HostSpace> const &obj, std::string const &filename){
+            std::ofstream os(filename);
+            cereal::BinaryOutputArchive archive(os);
+            archive(obj.inputDim, obj.outputDim, obj.numCoeffs);
+            archive(obj.Coeffs());
+        })
+        #endif
         ;
 }
 
