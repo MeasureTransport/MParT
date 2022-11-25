@@ -189,7 +189,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
             return mset;
         })
         .def("Deserialize", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset, std::string const &filename){
-            std::ifstream os(filename);
+            std::ofstream os(filename);
             cereal::BinaryOutputArchive oarchive(os);
             oarchive(mset);
             return mset;
