@@ -81,10 +81,10 @@ public:
     void save(Archive & ar) const
     {
         ar(dim);
-        cereal::save(ar, nzStarts);
-        cereal::save(ar, nzDims);
-        cereal::save(ar, nzOrders);
-        cereal::save(ar, maxDegrees);
+        cereal::save<unsigned int>(ar, nzStarts);
+        cereal::save<unsigned int>(ar, nzDims);
+        cereal::save<unsigned int>(ar, nzOrders);
+        cereal::save<unsigned int>(ar, maxDegrees);
     }
 
     template<class Archive>

@@ -183,17 +183,17 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
 
 #if defined(MPART_HAS_CEREAL)
         .def("Serialize", [](FixedMultiIndexSet<Kokkos::HostSpace> const &mset, std::string const &filename){
+            std::ofstream os(filename);
+            cereal::BinaryOutputArchive oarchive(os);
+            oarchive(mset);
+            return mset;
+        })
+        .def("Deserialize", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset, std::string const &filename){
             std::ifstream is(filename);
             cereal::BinaryInputArchive iarchive(is);
             iarchive(mset);
             return mset;
         })
-        .def("Deserialize", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset, std::string const &filename){
-            std::ofstream os(filename);
-            cereal::BinaryOutputArchive oarchive(os);
-            oarchive(mset);
-            return mset;
-        }
 #endif // MPART_HAS_CEREAL
 #if defined(MPART_ENABLE_GPU)
         .def("ToDevice", &FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<mpart::DeviceSpace>)
