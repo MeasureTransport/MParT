@@ -21,8 +21,9 @@ PYBIND11_MODULE(pympart, m) {
 
     MapFactoryWrapper<Kokkos::HostSpace>(m);
 
-    SerializeWrapper<Kokkos::HostSpace>(m);
+#if defined(MPART_HAS_CEREAL)
     DeserializeWrapper<Kokkos::HostSpace>(m);
+#endif // MPART_HAS_CEREAL
 
 #if defined(MPART_ENABLE_GPU)
     ParameterizedFunctionBaseWrapper<mpart::DeviceSpace>(m);

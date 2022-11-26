@@ -69,7 +69,7 @@ MParT supports the ability to serialize/archive objects when installed with the 
 
                 # Create FixedMultiIndexSet and map component
                 multis = np.array([[0],[1]])
-                mset= mt.MultiIndexSet(multis1)
+                mset= mt.MultiIndexSet(multis)
                 fixed_mset = mset.fix(True)
 
                 component = mt.CreateComponent(fixed_mset, options)
