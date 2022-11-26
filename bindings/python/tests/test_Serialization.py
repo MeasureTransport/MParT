@@ -62,7 +62,7 @@ def test_serialization():
     fixed_mset_s.Deserialize(foldername + "fmset.mt")
     inputDim_s, outputDim_s, coeffs_s = mt.DeserializeMap(foldername + "comp.mt")
     component_s = mt.CreateComponent(fixed_mset_s, options_s)
-    component_s.SetCoeffs(coeffs)
+    component_s.SetCoeffs(coeffs_s)
 
     assert (fixed_mset_s.MaxDegrees() == fixed_mset.MaxDegrees()).all()
     assert options_s.basisType == options.basisType
@@ -79,4 +79,4 @@ def test_serialization():
     assert options_s.contDeriv == options.contDeriv
     assert component_s.inputDim == inputDim_s
     assert component_s.outputDim == outputDim_s
-    assert (component_s.CoeffMap() == coeffs_s).all()
+    assert (component_s.CoeffMap() == coeffs).all()
