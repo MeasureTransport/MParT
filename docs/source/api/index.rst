@@ -19,3 +19,4 @@ API Reference
    multivariateexpansionworker
    templateconcepts
    utilities/initialization
+   utilities/serialization

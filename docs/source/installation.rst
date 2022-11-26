@@ -74,8 +74,9 @@ Note that if you do not wish to compile bindings for Python, Julia, or Matlab, y
      -DMPART_ARCHIVE=OFF
    ..
 
+See more details on MParT serialization, powered by the Cereal library, in the :doc:`serialization <api/utilities/serialization>` section.
 
-MParT is built on Kokkos, which provides a single interface to many different multithreading capabilities like threads, OpenMP, CUDA, and OpenCL.   A list of available backends can be found on the [Kokkos wiki](https://github.com/kokkos/kokkos/blob/master/BUILD.md#device-backends).   The :code:`Kokkos_ENABLE_THREADS` option in the CMake configuration above can be changed to reflect different choices in device backends.   The OSX-provided clang compiler does not support OpenMP, so :code:`THREADS` is a natural choice for CPU-based multithreading on OSX.   However, you may find that OpenMP has slightly better performance with other compilers and operating systems.
+MParT is built on Kokkos, which provides a single interface to many different multithreading capabilities like threads, OpenMP, CUDA, and OpenCL.   A list of available backends can be found on the `Kokkos wiki <https://github.com/kokkos/kokkos/blob/master/BUILD.md#device-backends>`_.   The :code:`Kokkos_ENABLE_THREADS` option in the CMake configuration above can be changed to reflect different choices in device backends.   The OSX-provided clang compiler does not support OpenMP, so :code:`THREADS` is a natural choice for CPU-based multithreading on OSX.   However, you may find that OpenMP has slightly better performance with other compilers and operating systems.
 
 Tests
 ---------
