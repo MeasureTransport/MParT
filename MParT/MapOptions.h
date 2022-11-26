@@ -26,7 +26,7 @@ namespace mpart{
     };
 
     /** @brief struct to hold options used by the MapFactory methods to construct monotone components and triangular maps.
-        @details 
+        @details
 
         ### Usage:
         Note that all options are optional.
@@ -42,32 +42,32 @@ namespace mpart{
         opts.quadPts = 5;
         @endcode
     */
-    struct MapOptions 
-    {   
+    struct MapOptions
+    {
         /** The type of 1d basis function used to define the multivariate expansion. */
         BasisTypes basisType = BasisTypes::ProbabilistHermite;
 
         /** Linearization bounds for the 1d basis function. The basis function is linearized outside [lb,ub] */
         double basisLB = -std::numeric_limits<double>::infinity();
         double basisUB =  std::numeric_limits<double>::infinity();
-        
 
-        /** The type of positive bijector used inside the monotonicity-guaranteeing integral 
-            formulation. 
+
+        /** The type of positive bijector used inside the monotonicity-guaranteeing integral
+            formulation.
         */
         PosFuncTypes posFuncType = PosFuncTypes::SoftPlus;
 
         /** The type of quadrature rule to use. */
         QuadTypes quadType = QuadTypes::AdaptiveSimpson;
 
-        
-        /** The absolute tolerance used by adaptive quadrature rules like AdaptiveSimpson and 
-            AdaptiveClenshawCurtis. 
+
+        /** The absolute tolerance used by adaptive quadrature rules like AdaptiveSimpson and
+            AdaptiveClenshawCurtis.
         */
         double quadAbsTol = 1e-6;
 
-        /** The relative tolerance used by adaptive quadrature rules like AdaptiveSimpson 
-            and AdaptiveClenshawCurtis. 
+        /** The relative tolerance used by adaptive quadrature rules like AdaptiveSimpson
+            and AdaptiveClenshawCurtis.
         */
         double quadRelTol = 1e-6;
 
@@ -79,22 +79,30 @@ namespace mpart{
 
 
         /** The number of quadrature points used in fixed rules like the Clenshaw Curtis rule.
-            Also defines the base level used in the adaptive Clenshaw-Curtis rule. 
+            Also defines the base level used in the adaptive Clenshaw-Curtis rule.
         */
         unsigned int quadPts = 5;
 
-        /** Specifies whether the derivative of the integral defining a monotone component 
+        /** Specifies whether the derivative of the integral defining a monotone component
             is used or if the derivative of the quadrature-based approximation of the integral
             is used.  See :ref:`diag_deriv_section` for more details.  If true, the integral
             is differentiated directly.  If false, the numerical approximation to the integral
-            is differentiated. 
+            is differentiated.
         */
         bool contDeriv = true;
 
         /** If orthogonal polynomial basis functions should be normalized. */
         bool basisNorm = true;
-    }; 
+
+        #if defined(MPART_HAS_CEREAL)
+        template<class Archive>
+        void serialize(Archive &archive)
+        {
+            archive( basisType, basisLB, basisUB, posFuncType, quadType, quadAbsTol, quadRelTol, quadMaxSub, quadMinSub, quadPts, contDeriv, basisNorm );
+        }
+        #endif // MPART_HAS_CEREAL
+    };
 };
 
 
-#endif 
+#endif

@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "MParT/Utilities/ArrayConversions.h"
+
 namespace mpart{
 namespace binding{
 

@@ -6,6 +6,11 @@
 #include <Kokkos_Core.hpp>
 #include <pybind11/pybind11.h>
 
+#if defined(MPART_HAS_CEREAL)
+#include "MParT/Utilities/Serialization.h"
+#include <fstream>
+#endif // MPART_HAS_CEREAL
+
 namespace py = pybind11;
 using namespace mpart::binding;
 
@@ -43,6 +48,20 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     .def_readwrite("quadMaxSub", &MapOptions::quadMaxSub)
     .def_readwrite("quadMinSub", &MapOptions::quadMinSub)
     .def_readwrite("quadPts", &MapOptions::quadPts)
-    .def_readwrite("contDeriv", &MapOptions::contDeriv);
-    
+    .def_readwrite("contDeriv", &MapOptions::contDeriv)
+    #if defined(MPART_HAS_CEREAL)
+    .def("Serialize", [](MapOptions const &opts, std::string const &filename){
+        std::ofstream os (filename);
+        cereal::BinaryOutputArchive oarchive(os);
+        oarchive(opts);
+    })
+    .def("Deserialize", [](MapOptions &opts, std::string const &filename){
+        std::ifstream is(filename);
+        cereal::BinaryInputArchive iarchive(is);
+        iarchive(opts);
+        return opts;
+    })
+    #endif // MPART_HAS_CEREAL
+    ;
+
 }

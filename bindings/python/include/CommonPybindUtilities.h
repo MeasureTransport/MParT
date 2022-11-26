@@ -46,6 +46,11 @@ void SummarizedMapWrapper(pybind11::module &m);
 template<typename MemorySpace>
 void MapFactoryWrapper(pybind11::module &m);
 
+#if defined(MPART_HAS_CEREAL)
+template<typename MemorySpace>
+void DeserializeWrapper(pybind11::module &m);
+#endif // MPART_HAS_CEREAL
+
 void AffineMapWrapperHost(pybind11::module &m);
 void AffineMapWrapperDevice(pybind11::module &m);
 void AffineFunctionWrapperHost(pybind11::module &m);

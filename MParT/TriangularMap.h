@@ -116,6 +116,13 @@ public:
     void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                              StridedMatrix<double, MemorySpace>              output) override;
 
+#if defined(MPART_HAS_CEREAL)
+    template<class Archive>
+    void serialize(Archive & archive)
+    {
+        archive(cereal::base_class<ConditionalMapBase<MemorySpace>>(this), comps_);
+    }
+#endif // MPART_HAS_CEREAL
 
 private:
 

@@ -1,3 +1,10 @@
+
+if (MPART_ARCHIVE)
+     set (SERIALIZE_FILES tests/Test_Serialization.cpp)
+else()
+     set (SERIALIZE_FILES "")
+endif ()
+
 set (TEST_SOURCES
      tests/RunTests.cpp
 
@@ -22,4 +29,6 @@ set (TEST_SOURCES
      tests/Test_IdentityMap.cpp
      tests/Test_SummarizedMap.cpp
      #tests/Test_TensorProductFunction.cpp
+
+     ${SERIALIZE_FILES}
 PARENT_SCOPE)
