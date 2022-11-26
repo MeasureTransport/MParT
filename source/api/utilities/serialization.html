@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Initialization Helpers &#8212; MParT  documentation</title>
+    <title>Serialization &#8212; MParT  documentation</title>
   
   
   
@@ -41,11 +41,11 @@
     <script src="../../../_static/sphinx_highlight.js"></script>
     <script src="../../../_static/design-tabs.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'source/api/utilities/initialization';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'source/api/utilities/serialization';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Serialization" href="serialization.html" />
-    <link rel="prev" title="Parameterized Function Concept" href="../concepts/parameterizedfunction.html" />
+    <link rel="next" title="Community" href="../../development/index.html" />
+    <link rel="prev" title="Initialization Helpers" href="initialization.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="docsearch:language" content="en">
   </head>
@@ -385,8 +385,8 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Initialization Helpers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="serialization.html">Serialization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="initialization.html">Initialization Helpers</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Serialization</a></li>
 </ul>
 
   </div>
@@ -418,50 +418,102 @@
             
             <article class="bd-article" role="main">
               
-  <section id="initialization-helpers">
-<h1>Initialization Helpers<a class="headerlink" href="#initialization-helpers" title="Permalink to this heading">#</a></h1>
-<dl>
-<dt class="sig sig-object cpp">
-<span class="target" id="group___initialization_helpers"></span><em><span class="pre">group</span></em> <span class="sig-name descname"><span class="pre">InitializationHelpers</span></span></dt>
-<dd><p><div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&quot;MParT/Initialization.h&quot;</span><span class="cp"></span>
+  <section id="serialization">
+<h1>Serialization<a class="headerlink" href="#serialization" title="Permalink to this heading">#</a></h1>
+<p>MParT supports the ability to serialize/archive objects when installed with the <code class="code docutils literal notranslate"><span class="pre">MPART_ARCHIVE</span></code> cmake configuration option, powered by the cereal C++ serialization library. One example of using this to save would be to do</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-0">
+C++</label><div class="sd-tab-content docutils">
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;MParT/Utilities/Serialization.h&gt;</span><span class="cp"></span>
+<span class="k">using</span><span class="w"> </span><span class="k">namespace</span><span class="w"> </span><span class="nn">mpart</span><span class="p">;</span><span class="w"></span>
 
-<span class="kt">int</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">argc</span><span class="p">,</span><span class="w"> </span><span class="kt">char</span><span class="o">*</span><span class="w"> </span><span class="n">argv</span><span class="p">[]</span><span class="w"> </span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
-<span class="w">  </span><span class="n">mpart</span><span class="o">::</span><span class="n">Initialize</span><span class="p">(</span><span class="n">argc</span><span class="p">,</span><span class="n">argv</span><span class="p">);</span><span class="w"></span>
+<span class="kt">void</span><span class="w"> </span><span class="nf">SerializeComponent</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">inputDim</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">maxOrder</span><span class="p">,</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">filename</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Create MapOptions</span>
+<span class="w">    </span><span class="n">MapOptions</span><span class="w"> </span><span class="n">options</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">options</span><span class="p">.</span><span class="n">basisType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">BasisTypes</span><span class="o">::</span><span class="n">ProbabilistHermite</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">options</span><span class="p">.</span><span class="n">basisNorm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w"></span>
 
-<span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="c1">// Create FixedMultiIndexSet and map component</span>
+<span class="w">    </span><span class="n">FixedMultiIndexSet</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mset</span><span class="w"> </span><span class="p">(</span><span class="n">inputDim</span><span class="p">,</span><span class="w"> </span><span class="n">maxOrder</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">comp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MapFactory</span><span class="o">::</span><span class="n">CreateComponent</span><span class="p">(</span><span class="n">mset</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">coeffs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">comp</span><span class="o">-&gt;</span><span class="n">Coeffs</span><span class="p">();</span><span class="w"></span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">coeffs</span><span class="p">.</span><span class="n">extent</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"></span>
+<span class="w">        </span><span class="n">coeffs</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="c1">// Serialize objects</span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">ofstream</span><span class="w"> </span><span class="n">os</span><span class="p">(</span><span class="n">filename</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">cereal</span><span class="o">::</span><span class="n">BinaryOutputArchive</span><span class="w"> </span><span class="n">archive</span><span class="p">(</span><span class="n">os</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">archive</span><span class="p">(</span><span class="n">options</span><span class="p">,</span><span class="w"> </span><span class="n">mset</span><span class="p">,</span><span class="w"> </span><span class="n">comp</span><span class="o">-&gt;</span><span class="n">Coeffs</span><span class="p">());</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="n">ConditionalMapBase</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">DeserializeComponent</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">filename</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">ifstream</span><span class="w"> </span><span class="nf">is</span><span class="p">(</span><span class="n">filename</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">cereal</span><span class="o">::</span><span class="n">BinaryInputArchive</span><span class="w"> </span><span class="nf">archive</span><span class="p">(</span><span class="n">is</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">MapOptions</span><span class="w"> </span><span class="n">options</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">FixedMultiIndexSet</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">mset</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// No default constructor</span>
+<span class="w">    </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">View</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">HostSpace</span><span class="o">&gt;</span><span class="w"> </span><span class="n">coeffs</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">archive</span><span class="p">(</span><span class="n">options</span><span class="p">,</span><span class="w"> </span><span class="n">mset</span><span class="p">,</span><span class="w"> </span><span class="n">coeffs</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">comp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">MapFactory</span><span class="o">::</span><span class="n">CreateComponent</span><span class="p">(</span><span class="n">mset</span><span class="p">,</span><span class="w"> </span><span class="n">options</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="n">comp</span><span class="o">-&gt;</span><span class="n">WrapCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">comp</span><span class="p">;</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+
+<span class="kt">int</span><span class="w"> </span><span class="n">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">inputDim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">maxOrder</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="w"> </span><span class="n">filename</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;component.mt&quot;</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">SerializeComponent</span><span class="p">(</span><span class="n">inputDim</span><span class="p">,</span><span class="w"> </span><span class="n">maxOrder</span><span class="p">,</span><span class="w"> </span><span class="n">filename</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="k">auto</span><span class="w"> </span><span class="n">comp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DeserializeComponent</span><span class="p">(</span><span class="n">filename</span><span class="p">);</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
 </pre></div>
 </div>
- </p>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv48Finalizev">
-<span class="target" id="group___initialization_helpers_1ga109f7da58db68815962f0e79e302e015"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Finalize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv48Finalizev" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Call Kokkos::Finalize. </p>
-<p>the <a class="reference internal" href="#group___initialization_helpers_1ga20d4342302d36d142f3e404637505f75"><span class="std std-ref">mpart::Initialize</span></a> function will set add this function to the <code class="docutils literal notranslate"><span class="pre">atexit</span></code> list so that it is called at program termination. </p>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I0DpE10InitializevR12FirstArgTypeDp9Arguments">
-<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FirstArgType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Arguments</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="group___initialization_helpers_1ga20d4342302d36d142f3e404637505f75"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Initialize</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0DpE10InitializevR12FirstArgTypeDp9Arguments" title="Initialize::FirstArgType"><span class="n"><span class="pre">FirstArgType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">arg1</span></span>, <a class="reference internal" href="#_CPPv4I0DpE10InitializevR12FirstArgTypeDp9Arguments" title="Initialize::Arguments"><span class="n"><span class="pre">Arguments</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">args</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpE10InitializevR12FirstArgTypeDp9Arguments" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Calls Kokkos::initialize if it hasn’t been called yet. </p>
-<p>This function provides a thin wrapper around the Kokkos::initialize function that can be called multiple times without error. This function also adds Kokkos::finalize to <code class="docutils literal notranslate"><span class="pre">atexit</span></code> so that manually calling Kokkos::finalize is not necessary. </p>
-<p>Note that Kokkos::initialize can only be called once and this function will print a warning message if called multiple times. The warning indicates that any changes to Kokkos parameters, like <code class="docutils literal notranslate"><span class="pre">--kokkos-threads</span></code> in subsequent calls will have no impact. Only the parameters passed the to the first <a class="reference internal" href="#group___initialization_helpers_1ga20d4342302d36d142f3e404637505f75"><span class="std std-ref">mpart::Initialize</span></a> call will be used.</p>
-<p>The warning messages can be silenced by setting the <code class="docutils literal notranslate"><span class="pre">MPART_WARNINGS</span></code> environment variable to <code class="docutils literal notranslate"><span class="pre">OFF</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>Arguments</strong> – </p>
-</dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>args</strong> – Parameters to be passed on to Kokkos::initialize. </p>
-</dd>
-</dl>
-</dd></dl>
-
 </div>
-</dd></dl>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+</input><label class="sd-tab-label" for="sd-tab-item-1">
+Python</label><div class="sd-tab-content docutils">
+<p>In Python, you can only serialize one object per file.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mpart</span> <span class="k">as</span> <span class="nn">mt</span>
 
+<span class="k">def</span> <span class="nf">SerializeComponent</span><span class="p">(</span><span class="n">inputDim</span><span class="p">,</span> <span class="n">maxOrder</span><span class="p">):</span>
+    <span class="c1"># Create MapOptions</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">MapOptions</span><span class="p">()</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">basisType</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">BasisTypes</span><span class="o">.</span><span class="n">ProbabilistHermite</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">basisNorm</span> <span class="o">=</span> <span class="kc">False</span><span class="p">;</span>
+
+    <span class="c1"># Create FixedMultiIndexSet and map component</span>
+    <span class="n">multis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">],[</span><span class="mi">1</span><span class="p">]])</span>
+    <span class="n">mset</span><span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">MultiIndexSet</span><span class="p">(</span><span class="n">multis</span><span class="p">)</span>
+    <span class="n">fixed_mset</span> <span class="o">=</span> <span class="n">mset</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">component</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixed_mset</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="n">CoeffMap</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)):</span>
+        <span class="n">coeffs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Serialize objects</span>
+    <span class="n">fixed_mset</span><span class="o">.</span><span class="n">Serialize</span><span class="p">(</span><span class="s2">&quot;fmset.mt&quot;</span><span class="p">)</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">Serialize</span><span class="p">(</span><span class="s2">&quot;opts.mt&quot;</span><span class="p">)</span>
+    <span class="n">component</span><span class="o">.</span><span class="n">Serialize</span><span class="p">(</span><span class="s2">&quot;comp.mt&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">DeserializeComponent</span><span class="p">():</span>
+    <span class="c1"># Deserialize the FixedMultiIndexSet</span>
+    <span class="c1"># Note that we need to construct the object before calling Deserialize</span>
+    <span class="n">fixed_mset</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">MultiIndexSet</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">]]))</span><span class="o">.</span><span class="n">fix</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">fixed_mset</span><span class="o">.</span><span class="n">Deserialize</span><span class="p">(</span><span class="s2">&quot;fmset.mt&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Deserialize the MapOptions</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">MapOptions</span><span class="p">()</span>
+    <span class="n">options</span><span class="o">.</span><span class="n">Deserialize</span><span class="p">(</span><span class="s2">&quot;opts.mt&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Deserialize the Map Coefficients and construct the component</span>
+    <span class="n">inputDim</span><span class="p">,</span> <span class="n">outputDim</span><span class="p">,</span> <span class="n">coeffs</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">DeserializeMap</span><span class="p">(</span><span class="s2">&quot;comp.mt&quot;</span><span class="p">)</span>
+    <span class="n">component</span> <span class="o">=</span> <span class="n">mt</span><span class="o">.</span><span class="n">CreateComponent</span><span class="p">(</span><span class="n">fixed_mset</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+    <span class="n">component</span><span class="o">.</span><span class="n">SetCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 
 
@@ -472,17 +524,17 @@
             <footer class="bd-footer-article">
                 <!-- Previous / next buttons -->
 <div class='prev-next-area'>
-  <a class='left-prev' id="prev-link" href="../concepts/parameterizedfunction.html" title="previous page">
+  <a class='left-prev' id="prev-link" href="initialization.html" title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
           <p class="prev-next-subtitle">previous</p>
-          <p class="prev-next-title">Parameterized Function Concept</p>
+          <p class="prev-next-title">Initialization Helpers</p>
       </div>
   </a>
-  <a class='right-next' id="next-link" href="serialization.html" title="next page">
+  <a class='right-next' id="next-link" href="../../development/index.html" title="next page">
   <div class="prev-next-info">
       <p class="prev-next-subtitle">next</p>
-      <p class="prev-next-title">Serialization</p>
+      <p class="prev-next-title">Community</p>
   </div>
   <i class="fa-solid fa-angle-right"></i>
   </a>
@@ -507,7 +559,7 @@
 <div class="toc-item">
   
 <div class="tocsection sourcelink">
-    <a href="../../../_sources/source/api/utilities/initialization.rst.txt">
+    <a href="../../../_sources/source/api/utilities/serialization.rst.txt">
         <i class="fa-solid fa-file-lines"></i> Show Source
     </a>
 </div>
