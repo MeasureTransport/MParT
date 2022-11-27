@@ -13,6 +13,14 @@ namespace mpart{
             out *= i;
         return out;
     }
+
+    /** Computes log_2(x) */
+    KOKKOS_INLINE_FUNCTION unsigned int Log2(unsigned int x)
+    {
+        unsigned int out = 0;
+        while(x >>= 1) ++out;
+        return out;
+    }
 }
 
-#endif 
+#endif

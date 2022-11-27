@@ -1,5 +1,5 @@
-#ifndef ORTHOGONALPOLYNOMIAL_H
-#define ORTHOGONALPOLYNOMIAL_H
+#ifndef MPART_ORTHOGONALPOLYNOMIAL_H
+#define MPART_ORTHOGONALPOLYNOMIAL_H
 
 #include <Kokkos_Core.hpp>
 #include <cmath>
@@ -33,7 +33,7 @@ public:
 
         if(normalize_){
             for(unsigned int order=0; order<=maxOrder; ++order){
-                output[order] /= this->Normalization(order); 
+                output[order] /= this->Normalization(order);
             }
         }
     }
