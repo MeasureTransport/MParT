@@ -367,6 +367,19 @@ MEX_DEFINE(ConditionalMap_LogDeterminantCoeffGrad) (int nlhs, mxArray* plhs[],
   condMap.map_ptr->LogDeterminantCoeffGradImpl(pts,out);
 }
 
+MEX_DEFINE(ConditionalMap_LogDeterminantInputGrad) (int nlhs, mxArray* plhs[],
+                 int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 3);
+  OutputArguments output(nlhs, plhs, 0);
+
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+
+  auto pts = MexToKokkos2d(prhs[1]);
+  auto out = MexToKokkos2d(prhs[2]);
+  
+  condMap.map_ptr->LogDeterminantInputGradImpl(pts,out);
+}
+
 } // namespace
 
 MEX_DISPATCH // Don't forget to add this if MEX_DEFINE() is used.
