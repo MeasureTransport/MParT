@@ -38,7 +38,7 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
    cd build
    cmake                                               \
      -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
-     -DKokkos_ENABLE_THREADS=ON                        \
+     -DKokkos_ENABLE_PTHREAD=ON                        \
    ..
    make install
 
@@ -53,7 +53,7 @@ This installation should also automatically install and build Kokkos, Eigen, Cer
      -DKokkos_ROOT=<your/kokkos/install/root>          \
      -DEigen3_ROOT=<your/eigen3/install/root>          \
      -Dcereal_ROOT=<your/cereal/install/root>          \
-     -DKokkos_ENABLE_THREADS=ON                        \
+     -DKokkos_ENABLE_PTHREAD=ON                        \
      -DKokkos_ENABLE_SERIAL=ON                         \
    ..
 
@@ -67,7 +67,7 @@ Note that if you do not wish to compile bindings for Python, Julia, or Matlab, y
 
     cmake                                              \
      -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
-     -DKokkos_ENABLE_THREADS=ON                        \
+     -DKokkos_ENABLE_PTHREAD=ON                        \
      -DMPART_PYTHON=OFF                                \
      -DMPART_MATLAB=OFF                                \
      -DMPART_JULIA=OFF                                 \
