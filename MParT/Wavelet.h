@@ -3,33 +3,28 @@
 
 #include <Kokkos_Core.hpp>
 #include <cmath>
-
 #include "MParT/Utilities/MathFunctions.h"
 
 namespace mpart {
 // Assume wavelet has support on [a,b].
 // Assume data is represented on [c,d].
-// Initial shift s_1 = c-a
-// Initial scale s_2 = (d-c)/(b-a)
-// p_{l,q}(x;s_1,s_2) = (2^l/2)*psi(2^l*(x-s_1)*s_2-q)
+// Initial scale (s_2) and shift (s_1) are to map [c,d] to [a,b].
+// p_{l,q}(x;s_1,s_2) = (2^l/2)*psi(2^l*(x*s_2-s_1)-q)
 // where psi is the mother wavelet function.
+// Order of a wavelet is d = 2^l+q
 template<class Mixer>
 class Wavelet: public Mixer {
 
 public:
-    Wavelet(double c, double d): shift_(c-Mixer::a), scale_((d-c)/(Mixer::b-Mixer::a)) {
-        std::cerr << "a = " << Mixer::a << ", b = " << Mixer::b << ", c = " << c << ", d = " << d << std::endl;
-        std::cerr << "shift_ = " << shift_ << std::endl;
-        std::cerr << "scale_ = " << scale_ << std::endl;
-    }
+    Wavelet(double c, double d): scale_((Mixer::b-Mixer::a)/(d-c)), shift_(c*(Mixer::b-Mixer::a)/(d-c)-Mixer::a) {}
 
     /* Evaluates all wavelets up to a specified order. */
     KOKKOS_FUNCTION void EvaluateAll(double*              output,
                                     unsigned int         maxOrder,
                                     double               x) const
     {
-        x -= shift_;
         x *= scale_;
+        x -= shift_;
         if(x > Mixer::b || x < Mixer::a) {
             std::fill(output, output+maxOrder, 0.);
             return;
@@ -45,7 +40,6 @@ public:
         for(unsigned int l=1; l<=L; ++l)
         {
             unsigned int Q_l = l == L ? Q+1 : two_power_ell;
-            // std::cerr << "l = " << l << ", Q_l = " << Q_l << ", outscale = " << outscale << std::endl;
             for(unsigned int q=0; q < Q_l; ++q)
             {
                 output[idx] = outscale*this->psi(x-q);
@@ -66,8 +60,8 @@ public:
                              unsigned int maxDegree,
                              double       x) const
     {
-        x -= shift_;
         x *= scale_;
+        x -= shift_;
         if(x > Mixer::b || x < Mixer::a) {
             std::fill(vals, vals+maxDegree, 0.);
             std::fill(derivs, derivs+maxDegree, 0.);
@@ -109,8 +103,8 @@ public:
                              unsigned int maxDegree,
                              double       x) const
     {
-        x -= shift_;
         x *= scale_;
+        x -= shift_;
         if(x > Mixer::b || x < Mixer::a) {
             std::fill(vals, vals+maxDegree, 0.);
             std::fill(derivs, derivs+maxDegree, 0.);
@@ -152,8 +146,8 @@ public:
 
     KOKKOS_INLINE_FUNCTION double Evaluate(unsigned int order, double x) const
     {
-        x -= shift_;
         x *= scale_;
+        x -= shift_;
         if(x > Mixer::b || x < Mixer::a) {
             return 0.;
         }
@@ -168,6 +162,8 @@ public:
 
     KOKKOS_INLINE_FUNCTION double Derivative(unsigned int order, double x) const
     {
+        x *= scale_;
+        x -= shift_;
         if(x > Mixer::b || x < Mixer::a) {
             return 0.;
         }
@@ -175,8 +171,6 @@ public:
         MaxOrder(order, ell, q);
         unsigned int sqrtscale = 1 << (3*ell/2);
         unsigned int inscale = 1 << ell;
-        x -= shift_;
-        x *= scale_;
         double val = scale_*sqrtscale*this->psi_derivative(inscale*x - q);
         if(ell % 2 == 1) val *= M_SQRT2;
         return val;
@@ -184,6 +178,8 @@ public:
 
     KOKKOS_INLINE_FUNCTION double SecondDerivative(unsigned int order, double x) const
     {
+        x *= scale_;
+        x -= shift_;
         if(x > Mixer::b || x < Mixer::a) {
             return 0.;
         }
@@ -191,8 +187,6 @@ public:
         MaxOrder(order, ell, q);
         unsigned int sqrtscale = 1 << (5*ell/2);
         unsigned int inscale = 1 << ell;
-        x -= shift_;
-        x *= scale_;
         double val = scale_*scale_*sqrtscale*this->psi_second_derivative(inscale*x - q);
         if(ell % 2 == 1) val *= M_SQRT2;
         return val;
@@ -211,8 +205,7 @@ protected:
 KOKKOS_INLINE_FUNCTION double psi(double x) const
 {
     double x_sq_frac = (x*x)/sigma_sq;
-    double ret = normalization*exp(-x_sq_frac/2)*(1-x_sq_frac);
-    return ret;
+    return normalization*exp(-x_sq_frac/2)*(1-x_sq_frac);
 }
 KOKKOS_INLINE_FUNCTION double psi_derivative(double x) const
 {
@@ -231,7 +224,7 @@ private:
 static double constexpr sigma_sqrt = 1.;
 static double constexpr sigma = sigma_sqrt*sigma_sqrt;
 static double constexpr sigma_sq = sigma*sigma;
-static double constexpr normalization = 3/(2*sqrt_3_v*quartroot_pi_v);
+static double constexpr normalization = 8/(3*sqrt_3_v*quartroot_pi_v);
 }; // namespace mpart
 
 using RickerWavelet = Wavelet<RickerWaveletMixer>;
