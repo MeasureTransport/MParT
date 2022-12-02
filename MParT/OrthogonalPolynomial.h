@@ -293,7 +293,7 @@ protected:
     KOKKOS_INLINE_FUNCTION double phi1_deriv(double) const{return 1.0;};
 };
 
-typedef OrthogonalPolynomial<ProbabilistHermiteMixer> ProbabilistHermite;
+using ProbabilistHermite = OrthogonalPolynomial<ProbabilistHermiteMixer>;
 
 
 class PhysicistHermiteMixer{
@@ -311,7 +311,7 @@ protected:
     KOKKOS_INLINE_FUNCTION double phi1_deriv(double) const {return 2.0;};
 };
 
-typedef OrthogonalPolynomial<PhysicistHermiteMixer> PhysicistHermite;
+using PhysicistHermite = OrthogonalPolynomial<PhysicistHermiteMixer>;
 
 
 } // namespace mpart

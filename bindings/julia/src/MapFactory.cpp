@@ -7,4 +7,10 @@ void mpart::binding::MapFactoryWrapper(jlcxx::Module &mod) {
 
     // CreateTriangular
     mod.method("CreateTriangular", &MapFactory::CreateTriangular<Kokkos::HostSpace>);
+
+    // CreateSingleEntryMap
+    mod.method("CreateSingleEntryMap", &MapFactory::CreateSingleEntryMap<Kokkos::HostSpace>);
+
+    // CreateExpansion
+    mod.method("CreateExpansion", &MapFactory::CreateExpansion<Kokkos::HostSpace>);
 }

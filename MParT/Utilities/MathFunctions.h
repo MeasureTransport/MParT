@@ -21,6 +21,9 @@ namespace mpart{
         while(x >>= 1) ++out;
         return out;
     }
+
+    constexpr double quartroot_pi_v = 1.772454211850187330531040021040;
+    constexpr double sqrt_3_v =       1.732050807568877293527446341506;
 }
 
 #endif
