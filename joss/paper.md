@@ -30,7 +30,7 @@ authors:
     affiliation: 2
   - name: Henning Bonart
     orcid: 0000-0002-5026-4499
-    affiliation: 2
+    affiliation: 2,3
   - name: Youssef Marzouk 
     orcid: 0000-0001-8242-3290
     affiliation: 2
@@ -39,6 +39,8 @@ affiliations:
    index: 1
  - name: Massachusetts Institute of Technology, USA
    index: 2
+ - name: Technische Universität Darmstadt, Darmstadt, Germany
+   index: 3
 date: 22 July 2022
 bibliography: paper.bib
 ---
