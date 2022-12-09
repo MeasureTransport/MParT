@@ -7,19 +7,26 @@
 using namespace mpart;
 
 template<typename MemorySpace>
-TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components) : ConditionalMapBase<MemorySpace>(components.back()->inputDim,
+TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components, bool moveCoeffs) : ConditionalMapBase<MemorySpace>(components.back()->inputDim,
                         std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->outputDim; }),
                         std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
                         comps_(components)
 {
+    
 
     // Check the sizes of all the inputs
+    
     for(unsigned int i=0; i<comps_.size(); ++i){
         if(comps_.at(i)->outputDim > comps_.at(i)->inputDim){
             std::stringstream msg;
             msg << "In TriangularMap constructor, the output dimension (" << comps_.at(i)->outputDim << ") of component " << i << " is greater than the input dimension (" << comps_.at(i)->inputDim << ").";
             throw std::invalid_argument(msg.str());
         }
+
+
+
+        
+
     }
 
     for(unsigned int i=1; i<comps_.size(); ++i){
@@ -32,7 +39,32 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
             throw std::invalid_argument(msg.str());
         }
     }
+
+
+    //
+    if(moveCoeffs){
+
+        Kokkos::View<double*,MemorySpace> coeffs("coeffs", this->numCoeffs);
+        unsigned int cumNumCoeffs = 0;
+        
+        for(unsigned int i=0; i<comps_.size(); ++i){
+
+            if(!comps_.at(i)->CheckCoefficients()){
+                std::stringstream msg;
+                msg << "In TriangularMap constructor, moveCoeffs set to true, but component " << i <<" doesn't have coeffs set";
+                throw std::invalid_argument(msg.str());
+            }
+
+            Kokkos::View<double*,MemorySpace> subCoeffs = Kokkos::subview(coeffs, std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs));
+            Kokkos::deep_copy(subCoeffs, comps_.at(i)->Coeffs());
+            cumNumCoeffs += comps_.at(i)->numCoeffs;
+        }
+
+        this->WrapCoeffs(coeffs);
+    }
 }
+
+
 
 template<typename MemorySpace>
 void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
