@@ -15,7 +15,7 @@ authors:
   - name: Matthew Parno
     orcid: 0000-0002-9419-2693
     corresponding: true
-    affiliation: 1
+    affiliation: 1,4
   - name: Paul-Baptiste Rubio
     orcid: 0000-0002-9765-1162
     affiliation: 2
@@ -30,15 +30,19 @@ authors:
     affiliation: 2
   - name: Henning Bonart
     orcid: 0000-0002-5026-4499
-    affiliation: 2
+    affiliation: 2,3
   - name: Youssef Marzouk 
     orcid: 0000-0001-8242-3290
     affiliation: 2
 affiliations:
- - name: Dartmouth College, USA
+ - name: Dartmouth College, Hanover, NH USA
    index: 1
- - name: Massachusetts Institute of Technology, USA
+ - name: Massachusetts Institute of Technology, Cambridge, MA USA
    index: 2
+ - name: Technische Universität Darmstadt, Darmstadt, Germany
+   index: 3
+ - name: Solea Energy, Overland Park, KS USA
+   index: 4
 date: 22 July 2022
 bibliography: paper.bib
 ---
