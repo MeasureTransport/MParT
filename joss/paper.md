@@ -15,7 +15,7 @@ authors:
   - name: Matthew Parno
     orcid: 0000-0002-9419-2693
     corresponding: true
-    affiliation: 1,4
+    affiliation: "1, 4"
   - name: Paul-Baptiste Rubio
     orcid: 0000-0002-9765-1162
     affiliation: 2
@@ -30,7 +30,7 @@ authors:
     affiliation: 2
   - name: Henning Bonart
     orcid: 0000-0002-5026-4499
-    affiliation: 2,3
+    affiliation: "2, 3"
   - name: Youssef Marzouk 
     orcid: 0000-0001-8242-3290
     affiliation: 2
