@@ -40,13 +40,14 @@ public:
         for(unsigned int l=1; l<=L; ++l)
         {
             unsigned int Q_l = l == L ? Q+1 : two_power_ell;
+
             for(unsigned int q=0; q < Q_l; ++q)
             {
-                output[idx] = outscale*this->psi(x-q);
+                output[idx] = outscale*this->psi(x-(Mixer::a + (2*q+1)*(Mixer::b-Mixer::a)/(2*two_power_ell)));
                 ++idx;
             }
             x *= 2;
-            outscale *= 2;
+            outscale *= M_SQRT2;
             two_power_ell *= 2;
         }
     }
@@ -155,7 +156,7 @@ public:
         MaxOrder(order, ell, q);
         unsigned int sqrtscale = 1 << (ell/2);
         unsigned int inscale = 1 << ell;
-        double val = sqrtscale*this->psi(inscale*x - q);
+        double val = sqrtscale*this->psi(inscale*x - (Mixer::a + (2*q+1)*(Mixer::b-Mixer::a)/(2*inscale)));
         if(ell % 2 == 1) val *= M_SQRT2;
         return val;
     }
