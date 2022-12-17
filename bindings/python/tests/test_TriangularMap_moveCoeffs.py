@@ -23,14 +23,8 @@ num_samples = 100
 x = np.random.randn(2,num_samples)
 
 
-
 def test_numCoeffs():
     assert triangular.numCoeffs == 2 + 3
-
-
-# def test_CoeffsMap():
-
-#     assert np.all(triangular.CoeffMap() == coeffs)
 
 
 def test_Evaluate():
