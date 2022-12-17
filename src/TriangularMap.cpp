@@ -23,10 +23,6 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
             throw std::invalid_argument(msg.str());
         }
 
-
-
-        
-
     }
 
     for(unsigned int i=1; i<comps_.size(); ++i){
@@ -41,7 +37,7 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
     }
 
 
-    //
+    // if moveCoeffs is set to true, we check if each component's coeffs are set, and then copy them into the new triangular map's coeffs
     if(moveCoeffs){
 
         Kokkos::View<double*,MemorySpace> coeffs("coeffs", this->numCoeffs);

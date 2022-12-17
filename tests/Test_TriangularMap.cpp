@@ -259,7 +259,8 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
     CHECK(triMap->inputDim == numBlocks+extraInputs);
     CHECK(triMap->numCoeffs == coeffSize);
 
-        
+    Kokkos::View<double*,Kokkos::HostSpace> coeffs(triMap->Coeffs().data(), triMap->numCoeffs);
+
     SECTION("Coefficients"){
 
 
@@ -267,15 +268,14 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
         unsigned int cumCoeffInd = 0;
         for(unsigned int i=0; i<numBlocks; ++i){
             for(unsigned int j=0; j<blocks.at(i)->numCoeffs; ++j){
-                CHECK(blocks.at(i)->Coeffs()(j) == triMap->Coeffs()(cumCoeffInd)); // Values of coefficients should be equal
+                CHECK(blocks.at(i)->Coeffs()(j) == coeffs(cumCoeffInd)); // Values of coefficients should be equal
                 CHECK(blocks.at(i)->Coeffs()(j) == coeffs_.at(i)(j)); 
-                CHECK(&blocks.at(i)->Coeffs()(j) == &triMap->Coeffs()(cumCoeffInd)); // Memory location should also be the same (no copy)
+                CHECK(&blocks.at(i)->Coeffs()(j) == &coeffs(cumCoeffInd)); // Memory location should also be the same (no copy)
                 cumCoeffInd++;
             }
         }
     }
 
-    Kokkos::View<double*,Kokkos::HostSpace> coeffs(triMap->Coeffs().data(), triMap->numCoeffs);
 
     unsigned int numSamps = 10;
     Kokkos::View<double**, Kokkos::HostSpace> in("Map Input", numBlocks+extraInputs, numSamps);

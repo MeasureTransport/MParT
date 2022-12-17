@@ -36,8 +36,7 @@ public:
     @param maps A vector of ConditionalMapBase objects defining each \f$T_k\f$ in the composition. Note: each map must be square (i.e., have equal input and output dimension).
     @param maxChecks The maximum number of checkpoints to use during gradient computations.  If maxChecks==1, then no checkpointing will be utilized and all forward states will be recomputed.  If maxChecks==components.size(), then all states will be stored and reused during the backward pass.  This is the most efficient option, but can require an intractable amount of memory for high-dimensional or deep parameterizations.   The default value is -1, which will set the maximum number of checkpoints to be equal to the number of layers (i.e., map.size()).
     */
-    ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& maps,
-                int maxChecks=-1);
+    ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& maps, bool moveCoeffs=false, int maxChecks=-1);
 
     virtual ~ComposedMap() = default;
 
@@ -51,8 +50,10 @@ public:
     */
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
     void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+    void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
     #if defined(MPART_ENABLE_GPU)
     void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
+    void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
     #endif
 
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return maps_.at(i);}
