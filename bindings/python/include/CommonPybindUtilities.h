@@ -40,6 +40,9 @@ void ComposedMapWrapper(pybind11::module &m);
 template<typename MemorySpace>
 void SummarizedMapWrapper(pybind11::module &m);
 
+template<typename MemorySpace>
+void IdentityMapWrapper(pybind11::module &m);
+
 // template<typename MemorySpace>
 // void DebugMapWrapper(pybind11::module &m);
 
