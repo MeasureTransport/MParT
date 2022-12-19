@@ -64,7 +64,7 @@ namespace mpart{
         R = (Q<0) ? P : 1.0 - P;
 
         if (R < 0) {
-            PPND7 = std::NaN;
+            PPND7 = std::nan("0");
         }
         R = std::sqrt(-std::log(R));
         if (R < SPLIT2) {

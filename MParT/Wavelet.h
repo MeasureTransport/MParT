@@ -25,10 +25,10 @@ public:
     {
         x *= scale_;
         x -= shift_;
-        if(x > Mixer::b || x < Mixer::a) {
-            std::fill(output, output+maxOrder, 0.);
-            return;
-        }
+        // if(x > Mixer::b || x < Mixer::a) {
+        //     std::fill(output, output+maxOrder, 0.);
+        //     return;
+        // }
         unsigned int L,Q;
         MaxOrder(maxOrder, L, Q);
         unsigned int idx = 2;
@@ -43,7 +43,8 @@ public:
 
             for(unsigned int q=0; q < Q_l; ++q)
             {
-                output[idx] = outscale*this->psi(x-(Mixer::a + (2*q+1)*(Mixer::b-Mixer::a)/(2*two_power_ell)));
+                double shift_q = Mixer::calculate_shift(two_power_ell, q);
+                output[idx] = outscale*this->psi(x-shift_q);
                 ++idx;
             }
             x *= 2;
@@ -63,11 +64,11 @@ public:
     {
         x *= scale_;
         x -= shift_;
-        if(x > Mixer::b || x < Mixer::a) {
-            std::fill(vals, vals+maxDegree, 0.);
-            std::fill(derivs, derivs+maxDegree, 0.);
-            return;
-        }
+        // if(x > Mixer::b || x < Mixer::a) {
+        //     std::fill(vals, vals+maxDegree, 0.);
+        //     std::fill(derivs, derivs+maxDegree, 0.);
+        //     return;
+        // }
         unsigned int L,Q;
         MaxOrder(maxDegree, L, Q);
         unsigned int idx = 2;
@@ -85,8 +86,9 @@ public:
             unsigned int Q_l = l == L ? Q+1 : two_power_ell;
             for(unsigned int q=0; q < Q_l; ++q)
             {
-                vals[idx] = outscale*this->psi(x-q);
-                derivs[idx] = outscale_deriv*this->psi_derivative(x-q);
+                double shift_q = Mixer::calculate_shift(two_power_ell, q);
+                vals[idx] = outscale*this->psi(x-shift_q);
+                derivs[idx] = outscale_deriv*this->psi_derivative(x-shift_q);
                 ++idx;
             }
             x *= 2;
@@ -106,12 +108,12 @@ public:
     {
         x *= scale_;
         x -= shift_;
-        if(x > Mixer::b || x < Mixer::a) {
-            std::fill(vals, vals+maxDegree, 0.);
-            std::fill(derivs, derivs+maxDegree, 0.);
-            std::fill(derivs2, derivs2+maxDegree, 0.);
-            return;
-        }
+        // if(x > Mixer::b || x < Mixer::a) {
+        //     std::fill(vals, vals+maxDegree, 0.);
+        //     std::fill(derivs, derivs+maxDegree, 0.);
+        //     std::fill(derivs2, derivs2+maxDegree, 0.);
+        //     return;
+        // }
         unsigned int L,Q;
         MaxOrder(maxDegree, L, Q);
         unsigned int idx = 2;
@@ -133,9 +135,10 @@ public:
             unsigned int Q_l = l == L ? Q+1 : two_power_ell;
             for(unsigned int q=0; q < Q_l; ++q)
             {
-                vals[idx] = outscale*this->psi(x-q);
-                derivs[idx] = outscale_deriv*this->psi_derivative(x-q);
-                derivs2[idx] = outscale_deriv2*this->psi_second_derivative(x-q);
+                double shift_q = Mixer::calculate_shift(two_power_ell, q);
+                vals[idx] = outscale*this->psi(x-shift_q);
+                derivs[idx] = outscale_deriv*this->psi_derivative(x-shift_q);
+                derivs2[idx] = outscale_deriv2*this->psi_second_derivative(x-shift_q);
                 ++idx;
             }
             x *= 2;
@@ -149,14 +152,14 @@ public:
     {
         x *= scale_;
         x -= shift_;
-        if(x > Mixer::b || x < Mixer::a) {
-            return 0.;
-        }
+        // if(x > Mixer::b || x < Mixer::a) {
+        //     return 0.;
+        // }
         unsigned int ell,q;
         MaxOrder(order, ell, q);
         unsigned int sqrtscale = 1 << (ell/2);
         unsigned int inscale = 1 << ell;
-        double val = sqrtscale*this->psi(inscale*x - (Mixer::a + (2*q+1)*(Mixer::b-Mixer::a)/(2*inscale)));
+        double val = sqrtscale*this->psi(inscale*x - Mixer::calculate_shift(inscale, q));
         if(ell % 2 == 1) val *= M_SQRT2;
         return val;
     }
@@ -165,14 +168,14 @@ public:
     {
         x *= scale_;
         x -= shift_;
-        if(x > Mixer::b || x < Mixer::a) {
-            return 0.;
-        }
+        // if(x > Mixer::b || x < Mixer::a) {
+        //     return 0.;
+        // }
         unsigned int ell,q;
         MaxOrder(order, ell, q);
         unsigned int sqrtscale = 1 << (3*ell/2);
         unsigned int inscale = 1 << ell;
-        double val = scale_*sqrtscale*this->psi_derivative(inscale*x - q);
+        double val = scale_*sqrtscale*this->psi_derivative(inscale*x - Mixer::calculate_shift(inscale, q));
         if(ell % 2 == 1) val *= M_SQRT2;
         return val;
     }
@@ -181,14 +184,14 @@ public:
     {
         x *= scale_;
         x -= shift_;
-        if(x > Mixer::b || x < Mixer::a) {
-            return 0.;
-        }
+        // if(x > Mixer::b || x < Mixer::a) {
+        //     return 0.;
+        // }
         unsigned int ell,q;
         MaxOrder(order, ell, q);
         unsigned int sqrtscale = 1 << (5*ell/2);
         unsigned int inscale = 1 << ell;
-        double val = scale_*scale_*sqrtscale*this->psi_second_derivative(inscale*x - q);
+        double val = scale_*scale_*sqrtscale*this->psi_second_derivative(inscale*x - Mixer::calculate_shift(inscale, q));
         if(ell % 2 == 1) val *= M_SQRT2;
         return val;
     }
@@ -217,6 +220,13 @@ KOKKOS_INLINE_FUNCTION double psi_second_derivative(double x) const
 {
     double x_sq_frac = (x*x)/sigma_sq;
     return normalization*exp(-x_sq_frac/2)*(3 - 6*x_sq_frac/sigma_sq + x_sq_frac*x_sq_frac)/sigma_sq;
+}
+KOKKOS_INLINE_FUNCTION double calculate_shift(unsigned int scale, unsigned int q) const {
+    double lambda = (1+2*((double) q))/(2*((double) scale));
+    // When data is in [a,b]
+    return a + lambda*(b-a);
+    // When data is normally distributed
+    // return NormalQuantile(lambda);
 }
 static double constexpr a = -6.;
 static double constexpr b = 6.;
