@@ -34,6 +34,7 @@ public:
     /** @brief Construct a block triangular map from a collection of other ConditionalMapBase objects.
 
     @param maps A vector of ConditionalMapBase objects defining each \f$T_k\f$ in the composition. Note: each map must be square (i.e., have equal input and output dimension).
+    @param moveCoeffs Whether you want this ComposedMap object to be responsible for the coefficients already in maps. If true, the new object will take ownership of all coefficient vectors within maps. If false, the new object will not have any coefficients set.
     @param maxChecks The maximum number of checkpoints to use during gradient computations.  If maxChecks==1, then no checkpointing will be utilized and all forward states will be recomputed.  If maxChecks==components.size(), then all states will be stored and reused during the backward pass.  This is the most efficient option, but can require an intractable amount of memory for high-dimensional or deep parameterizations.   The default value is -1, which will set the maximum number of checkpoints to be equal to the number of layers (i.e., map.size()).
     */
     ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& maps, bool moveCoeffs=false, int maxChecks=-1);
