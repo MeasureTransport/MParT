@@ -18,7 +18,7 @@ void mpart::binding::ComposedMapWrapper(py::module &m)
 
     // ComposedMap
     py::class_<ComposedMap<MemorySpace>, ConditionalMapBase<MemorySpace>, std::shared_ptr<ComposedMap<MemorySpace>>>(m, tName.c_str())
-        .def(py::init<std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>,int>())
+        .def(py::init<std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>,bool,int>(), py::arg("maps"), py::arg("moveCoeffs") = false, py::arg("maxChecks")=-1)
         ;
 
 }
