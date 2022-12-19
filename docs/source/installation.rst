@@ -59,6 +59,9 @@ This installation should also automatically install and build Kokkos, Eigen, Cer
 
 Feel free to mix and match previous installations of Eigen, Cereal, Kokkos, Pybind11, and Catch2 with libraries you don't already have using these :code:`X_ROOT` flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version >=3.13. Further, it has been tested with Kokkos 3.7.0, Eigen 3.4.0, Pybind11 2.9.2, Cereal 1.3.2, and Catch2 3.1.0 (there have been some issues encountered when compiling MParT with Catch2 3.0.1).
 
+.. tip::
+    If you are using Kokkos <3.7.0, you will need to use the :code:`Kokkos_ENABLE_PTHREAD` flag instead of :code:`Kokkos_ENABLE_THREADS` in the CMake configuration.
+
 You can force MParT to use previously installed versions of the dependencies by setting :code:`MPART_FETCH_DEPS=OFF`.  The default value of :code:`MPART_FETCH_DEPS=ON` will allow MParT to download and locally install any external dependencies using CMake's :code:`FetchContent` directive.
 
 Note that if you do not wish to compile bindings for Python, Julia, or Matlab, you can turn off binding compilation by setting the :code:`MPART_<language>=OFF` variable during CMake configuration. For a default build with only the core c++ library, and without requiring the Cereal library, you can use
