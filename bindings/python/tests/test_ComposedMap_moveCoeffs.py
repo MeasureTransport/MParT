@@ -9,28 +9,29 @@ dim = 2
 maxOrder = 1
 
 maps = []
+coeffs_ = []
 numCoeffs = 0
 for i in range(num_maps):
     map = mpart.CreateTriangular(dim,dim,maxOrder,opts)
+    coeffs = np.random.randn(map.numCoeffs)
+    map.SetCoeffs(coeffs)
     maps.append(map)
+    coeffs_.append(coeffs)
     numCoeffs += map.numCoeffs
 
 
-composed_map = mpart.ComposedMap(maps, num_maps)
-composed_map.SetCoeffs(np.random.randn(composed_map.numCoeffs))
+moveCoeffs = True
+composed_map = mpart.ComposedMap(maps, moveCoeffs, num_maps)
+all_coeffs = np.hstack(coeffs_).flatten()
 
 num_samples = 100
-x = np.random.randn(dim,num_samples)
-
+x = np.random.randn(dim, num_samples)
 
 def test_numCoeffs():
     assert composed_map.numCoeffs == numCoeffs
 
 def test_CoeffsMap():
-
-    coeffs = np.random.randn(composed_map.numCoeffs)
-    composed_map.SetCoeffs(coeffs)
-    assert np.all(composed_map.CoeffMap() == coeffs)
+    assert np.all(composed_map.CoeffMap() == all_coeffs)
 
 
 def test_Evaluate():
@@ -39,7 +40,6 @@ def test_Evaluate():
     for map_ in maps:
         x_ = map_.Evaluate(x_)
     assert np.all(composed_map.Evaluate(x) == x_)
-    
 
 
 def test_LogDeterminant():
