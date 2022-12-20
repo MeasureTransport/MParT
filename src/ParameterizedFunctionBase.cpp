@@ -329,12 +329,11 @@ Eigen::RowMatrixXd ParameterizedFunctionBase<mpart::DeviceSpace>::CoeffGrad(Eige
 
 
 #endif
-
 template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::CheckCoefficients(std::string const& functionName) const
+bool ParameterizedFunctionBase<MemorySpace>::CheckCoefficients() const
 {
     if(this->numCoeffs==0)
-        return;
+        return true;
 
     bool good = true;
 
@@ -343,6 +342,17 @@ void ParameterizedFunctionBase<MemorySpace>::CheckCoefficients(std::string const
     }else if(this->savedCoeffs.size()!=this->numCoeffs){
         good = false;
     }
+
+    return good;
+
+}
+
+
+template<typename MemorySpace>
+void ParameterizedFunctionBase<MemorySpace>::CheckCoefficients(std::string const& functionName) const
+{
+
+    bool good = CheckCoefficients();
 
     if(!good){
         std::stringstream msg;

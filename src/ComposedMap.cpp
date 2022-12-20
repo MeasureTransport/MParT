@@ -132,9 +132,8 @@ Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> ComposedMap<MemorySpace>
 
 
 template<typename MemorySpace>
-ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& maps,
-                                      int maxChecks) : ConditionalMapBase<MemorySpace>(maps.front()->inputDim,
-                                                                                       maps.front()->inputDim,
+ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& maps, bool moveCoeffs,
+                                      int maxChecks) : ConditionalMapBase<MemorySpace>(maps.front()->inputDim, 
                                                                                        std::accumulate(maps.begin(), maps.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
                                                         maps_(maps),
                                                         maxChecks_((maxChecks<=0) ? maps.size() : maxChecks)
@@ -152,6 +151,28 @@ ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMap
         std::stringstream msg;
         msg << "In ComposedMap constructor, each map in the composition must be square. Output dimension (" << maps_.at(maps_.size()-1)->outputDim << ") of component " << maps_.size()-1 << " is not equal to the input dimension (" << maps_.at(maps_.size()-1)->inputDim << ").";
         throw std::invalid_argument(msg.str());
+    }
+
+    // if moveCoeffs is set to true, we check if each map's coeffs are set, and then copy them into the new composed map's coeffs
+    if(moveCoeffs){
+
+        Kokkos::View<double*,MemorySpace> coeffs("coeffs", this->numCoeffs);
+        unsigned int cumNumCoeffs = 0;
+        
+        for(unsigned int i=0; i<maps_.size(); ++i){
+
+            if(!maps_.at(i)->CheckCoefficients()){
+                std::stringstream msg;
+                msg << "In ComposedMap constructor, moveCoeffs set to true, but map " << i <<" doesn't have coeffs set";
+                throw std::invalid_argument(msg.str());
+            }
+
+            Kokkos::View<double*,MemorySpace> subCoeffs = Kokkos::subview(coeffs, std::make_pair(cumNumCoeffs, cumNumCoeffs+maps_.at(i)->numCoeffs));
+            Kokkos::deep_copy(subCoeffs, maps_.at(i)->Coeffs());
+            cumNumCoeffs += maps_.at(i)->numCoeffs;
+        }
+
+        this->WrapCoeffs(coeffs);
     }
 }
 
