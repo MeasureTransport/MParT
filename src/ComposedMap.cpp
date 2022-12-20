@@ -133,7 +133,8 @@ Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> ComposedMap<MemorySpace>
 
 template<typename MemorySpace>
 ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& maps, bool moveCoeffs,
-                                      int maxChecks) : ConditionalMapBase<MemorySpace>(maps.front()->inputDim, 
+                                      int maxChecks) : ConditionalMapBase<MemorySpace>(maps.front()->inputDim,
+                                                                                       maps.front()->inputDim,
                                                                                        std::accumulate(maps.begin(), maps.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
                                                         maps_(maps),
                                                         maxChecks_((maxChecks<=0) ? maps.size() : maxChecks)
@@ -158,7 +159,7 @@ ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMap
 
         Kokkos::View<double*,MemorySpace> coeffs("coeffs", this->numCoeffs);
         unsigned int cumNumCoeffs = 0;
-        
+
         for(unsigned int i=0; i<maps_.size(); ++i){
 
             if(!maps_.at(i)->CheckCoefficients()){
