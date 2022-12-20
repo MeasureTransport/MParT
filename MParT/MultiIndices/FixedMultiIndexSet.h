@@ -6,12 +6,20 @@
 
 #include <Kokkos_Core.hpp>
 
+#if defined(MPART_HAS_CEREAL)
+#include <cereal/access.hpp> // For load_and_construct
+#include "MParT/Utilities/Serialization.h"
+#endif // MPART_HAS_CEREAL
+
 namespace mpart{
 
 template<typename MemorySpace=Kokkos::HostSpace>
 class FixedMultiIndexSet
 {
 public:
+    #if defined(MPART_HAS_CEREAL)
+    friend class cereal::access;
+    #endif // MPART_HAS_CEREAL
 
     /** @brief Construct a fixed multiindex set in dense form.
 
@@ -67,6 +75,30 @@ public:
     template<typename OtherMemorySpace>
     FixedMultiIndexSet<OtherMemorySpace> ToDevice();
 
+    #if defined(MPART_HAS_CEREAL)
+
+    template<class Archive>
+    void save(Archive & ar) const
+    {
+        ar(dim);
+        cereal::save<unsigned int>(ar, nzStarts);
+        cereal::save<unsigned int>(ar, nzDims);
+        cereal::save<unsigned int>(ar, nzOrders);
+        cereal::save<unsigned int>(ar, maxDegrees);
+    }
+
+    template<class Archive>
+    void load(Archive & ar)
+    {
+        ar(dim);
+        isCompressed = true;
+        cereal::load(ar, nzStarts);
+        cereal::load(ar, nzDims);
+        cereal::load(ar, nzOrders);
+        cereal::load(ar, maxDegrees);
+    }
+
+    #endif // MPART_HAS_CEREAL
 
     Kokkos::View<unsigned int*, MemorySpace> nzStarts;
     Kokkos::View<unsigned int*, MemorySpace> nzDims;
@@ -98,8 +130,16 @@ private:
                         unsigned int &currTerm,
                         unsigned int &currNz);
 
-
-
+    FixedMultiIndexSet(unsigned int                             _dim,
+                       Kokkos::View<unsigned int*, MemorySpace> _nzStarts,
+                       Kokkos::View<unsigned int*, MemorySpace> _nzDims,
+                       Kokkos::View<unsigned int*, MemorySpace> _nzOrders,
+                       Kokkos::View<unsigned int*, MemorySpace> _maxDegrees): dim(_dim),
+                                                                              isCompressed(true),
+                                                                              nzStarts(_nzStarts),
+                                                                              nzDims(_nzDims),
+                                                                              nzOrders(_nzOrders),
+                                                                              maxDegrees(_maxDegrees) {}
 
 }; // class MultiIndexSet
 

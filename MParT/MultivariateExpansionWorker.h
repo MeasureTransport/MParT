@@ -16,7 +16,7 @@ namespace mpart{
 template<typename MemorySpace>
 struct MultivariateExpansionMaxDegreeFunctor {
 
-    MultivariateExpansionMaxDegreeFunctor(unsigned int dim, Kokkos::View<unsigned int*, MemorySpace> startPos, Kokkos::View<const unsigned int*, MemorySpace> maxDegreesIn) : dim(dim), startPos(startPos), maxDegrees(maxDegreesIn) 
+    MultivariateExpansionMaxDegreeFunctor(unsigned int dim, Kokkos::View<unsigned int*, MemorySpace> startPos, Kokkos::View<const unsigned int*, MemorySpace> maxDegreesIn) : dim(dim), startPos(startPos), maxDegrees(maxDegreesIn)
     {
     };
 
@@ -138,7 +138,7 @@ public:
                                     PointType const& pt,
                                     DerivativeFlags::DerivativeType derivType) const
     {
-        // Fill in first derivative information if needed 
+        // Fill in first derivative information if needed
         if((derivType == DerivativeFlags::Input)||(derivType==DerivativeFlags::MixedInput)){
             for(unsigned int d=0; d<dim_-1; ++d)
                 basis1d_.EvaluateDerivatives(&polyCache[startPos_(d)],&polyCache[startPos_(d+dim_)], maxDegrees_(d), pt(d));
@@ -278,7 +278,7 @@ public:
             double termVal = 1.0;
             for(unsigned int i=multiSet_.nzStarts(termInd); i<multiSet_.nzStarts(termInd+1); ++i)
                     termVal *= polyCache[startPos_(multiSet_.nzDims(i)) + multiSet_.nzOrders(i)];
-                    
+
             f += termVal*coeffs(termInd);
             grad(termInd) = termVal;
         }
@@ -286,10 +286,10 @@ public:
         return f;
     }
 
-    /** Computes the gradient \f$\nabla_x f(x_{1:d})\f$ with respect to the input \f$x\f$. 
+    /** Computes the gradient \f$\nabla_x f(x_{1:d})\f$ with respect to the input \f$x\f$.
         @param polyCache[in] Cache vector that has been set up by calling both FillCache1 and FillCache2 with `DerivativeFlags::Input`
         @param coeffs[in] Vector of coefficients.  Must have parentheses access operator.
-        @param grad[out] Preallocated vector to hold the gradient. 
+        @param grad[out] Preallocated vector to hold the gradient.
         @return The value of $f(x_{1:d})$.
     */
     template<typename CoeffVecType, typename GradVecType>
@@ -299,7 +299,7 @@ public:
         double f = 0.0;
 
         for(int wrt=-1; wrt<int(dim_); ++wrt){
-            
+
             if(wrt>=0){
                 grad(wrt) = 0;
             }
@@ -328,10 +328,10 @@ public:
         return f;
     }
 
-    /** Computes the gradient of the diagonal derivative \f$\nabla_x \partial_d f(x_{1:d})\f$ with respect to the input \f$x\f$. 
+    /** Computes the gradient of the diagonal derivative \f$\nabla_x \partial_d f(x_{1:d})\f$ with respect to the input \f$x\f$.
         @param polyCache[in] Cache vector that has been set up by calling both FillCache1 and FillCache2 with `DerivativeFlags::MixedInput`
         @param coeffs[in] Vector of coefficients.  Must have parentheses access operator.
-        @param grad[out] Preallocated vector to hold the gradient. 
+        @param grad[out] Preallocated vector to hold the gradient.
         @return The value of $\partial_d f(x_{1:d})$.
     */
     template<typename CoeffVecType, typename GradVecType>
@@ -357,7 +357,7 @@ public:
                     if(multiSet_.nzDims(i)==dim_-1){
                         posInd = (wrt==int(dim_-1)) ? (2*dim_) : (2*dim_-1);
                         termVal *= polyCache[startPos_(posInd) + multiSet_.nzOrders(i)];
-                        
+
                         hasDeriv2 = true;
                         if(wrt==(dim_-1))
                             hasDeriv1 = true;
@@ -371,7 +371,7 @@ public:
                 }
 
                 // Multiply by the coefficients to get the contribution to the output
-                if(hasDeriv1 && hasDeriv2){    
+                if(hasDeriv1 && hasDeriv2){
                     grad(wrt) += termVal*coeffs(termInd);
                 }else if((wrt<0) && hasDeriv2){
                     df += termVal*coeffs(termInd);
@@ -381,10 +381,10 @@ public:
         return df;
     }
 
-    /** Computes the gradient of the diagonal derivative \f$\nabla_w \partial_d f(x_1:d; w)\f$ with respect to the parameters. 
+    /** Computes the gradient of the diagonal derivative \f$\nabla_w \partial_d f(x_1:d; w)\f$ with respect to the parameters.
         @param polyCache[in] Cache vector that has been set up by calling both FillCache1 and FillCache2 with `DerivativeFlags::Mixed`
         @param coeffs[in] Vector of coefficients.  Must have parentheses access operator.
-        @param grad[out] Preallocated vector to hold the gradient. 
+        @param grad[out] Preallocated vector to hold the gradient.
         @return The value of $\partial_d f(x_{1:d})$.
     */
     template<typename CoeffVecType, typename GradVecType>
@@ -427,7 +427,10 @@ public:
         return df;
     }
 
-
+    /** Allows access to the Fixed MultiIndex Set
+     * @return The Fixed MultiIndex Set
+     */
+    FixedMultiIndexSet<MemorySpace> GetMultiIndexSet() const { return multiSet_; }
 
 private:
 

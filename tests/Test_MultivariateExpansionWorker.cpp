@@ -13,7 +13,7 @@ using namespace Catch;
 TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]") {
 
     unsigned int dim = 3;
-    unsigned int maxDegree = 3; 
+    unsigned int maxDegree = 3;
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
     ProbabilistHermite poly1d;
@@ -22,14 +22,14 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
     unsigned int cacheSize = expansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(2*dim+1));
 
-    // Allocate some memory for the cache 
+    // Allocate some memory for the cache
     std::vector<double> cache(cacheSize);
     Kokkos::View<double*,Kokkos::HostSpace> pt("Point", dim);
     pt(0) = 0.2;
     pt(1) = 0.1;
     pt(2) = 0.345;
-    
-    // Fill in the cache the first d-1 components of the cache  
+
+    // Fill in the cache the first d-1 components of the cache
     expansion.FillCache1(&cache[0], pt, DerivativeFlags::None);
     for(unsigned int d=0; d<dim-1;++d){
         for(unsigned int i=0; i<maxDegree+1; ++i){
@@ -43,16 +43,16 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
         CHECK(cache[i + (dim-1)*(maxDegree+1)] == Approx( poly1d.Evaluate(i,pt(dim-1))).epsilon(1e-15) );
     }
 
-    // Evaluate the expansion using the cache 
+    // Evaluate the expansion using the cache
     Eigen::VectorXd coeffsEig = Eigen::VectorXd::Random(mset.Size());
     Kokkos::View<double*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> coeffs(coeffsEig.data(), coeffsEig.size());
     double f = expansion.Evaluate(&cache[0], coeffs);
 
-    
+
     // Now fill in the last part of the cache for a gradient evaluation
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
     double df = expansion.DiagonalDerivative(&cache[0], coeffs,1);
-    
+
     // Compare with a finite difference approximation of the derivative
     double fdStep = 1e-5;
     expansion.FillCache2(&cache[0], pt, pt(dim-1)+fdStep, DerivativeFlags::None);
@@ -62,19 +62,19 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
     // Compute the second derivative
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal2);
     double d2f = expansion.DiagonalDerivative(&cache[0], coeffs,2);
-    
-    // Check with a finite difference second derivative 
+
+    // Check with a finite difference second derivative
     expansion.FillCache2(&cache[0], pt, pt(dim-1)+fdStep, DerivativeFlags::Diagonal);
     double df2 = expansion.DiagonalDerivative(&cache[0], coeffs,1);
     CHECK( d2f == Approx((df2-df)/fdStep).epsilon(1e-4));
 
 
-    // Coefficient derivatives 
+    // Coefficient derivatives
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
-    
+
     Eigen::VectorXd gradEig = -1.0*Eigen::VectorXd::Ones(mset.Size());
     Kokkos::View<double*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> grad(gradEig.data(), gradEig.size());
-    
+
     f2 = expansion.CoeffDerivative(&cache[0], coeffs, grad);
     CHECK(f2==Approx(f).epsilon(1e-15));
 
@@ -84,7 +84,7 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
 
     Eigen::VectorXd coeffs2Eig = coeffsEig + fdStep * stepDir;
     Kokkos::View<double*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> coeffs2(coeffs2Eig.data(), coeffs2Eig.size());
-    
+
     f2 = expansion.Evaluate(&cache[0], coeffs2);
 
     CHECK( gradEig.dot(stepDir) == Approx((f2-f)/fdStep).epsilon(1e-4));
@@ -96,7 +96,7 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
     df2 = expansion.DiagonalDerivative(&cache[0], coeffs2, 1);
     CHECK( gradEig.dot(stepDir) == Approx((df2-df)/fdStep).epsilon(1e-4));
 
-    
+
     // Mixed second derivatives (grad of d2f wrt coeffs)
     double d2f2 = expansion.MixedCoeffDerivative(&cache[0], coeffs, 2, grad);
     CHECK(d2f2==Approx(d2f).epsilon(1e-15));
@@ -105,10 +105,10 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
     CHECK( gradEig.dot(stepDir) == Approx((d2f2-d2f)/fdStep).epsilon(1e-4));
 
     SECTION("Input Derivatives"){
-        // Check input derivatives 
+        // Check input derivatives
         expansion.FillCache1(&cache[0], pt, DerivativeFlags::Input);
         expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Input);
-            
+
         Kokkos::View<double*,Kokkos::HostSpace> inGrad("Input Gradient", dim);
         double eval = expansion.Evaluate(&cache[0], coeffs);
         double eval2 = expansion.InputDerivative(&cache[0], coeffs, inGrad);
@@ -118,19 +118,19 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
             pt(wrt) += fdStep;
             expansion.FillCache1(&cache[0], pt, DerivativeFlags::None);
             expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::None);
-            
+
             eval2 = expansion.Evaluate(&cache[0], coeffs);
 
             CHECK(inGrad(wrt) == Approx((eval2-eval)/fdStep).epsilon(1e-4));
             pt(wrt) -= fdStep;
-        }    
+        }
     }
 
     SECTION("Mixed Input Derivatives"){
-        // Check input derivatives 
+        // Check input derivatives
         expansion.FillCache1(&cache[0], pt, DerivativeFlags::MixedInput);
         expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::MixedInput);
-            
+
         Kokkos::View<double*,Kokkos::HostSpace> inGrad("Input Gradient", dim);
         double df = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
         double df2 = expansion.MixedInputDerivative(&cache[0], coeffs, inGrad);
@@ -140,12 +140,23 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
             pt(wrt) += fdStep;
             expansion.FillCache1(&cache[0], pt, DerivativeFlags::Diagonal);
             expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
-            
+
             df2 = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
 
             CHECK(inGrad(wrt) == Approx((df2-df)/fdStep).epsilon(1e-4));
             pt(wrt) -= fdStep;
-        }    
+        }
+    }
+
+    SECTION("Retrieve Fixed Mset"){
+        FixedMultiIndexSet<Kokkos::HostSpace> mset2 = expansion.GetMultiIndexSet();
+        CHECK(mset2.Size() == mset.Size());
+        auto mset_max_degrees = mset.MaxDegrees();
+        auto mset2_max_degrees = mset2.MaxDegrees();
+        CHECK(mset_max_degrees.size() == mset2_max_degrees.size());
+        for(unsigned int i=0; i<mset_max_degrees.size(); ++i){
+            CHECK(mset_max_degrees[i] == mset2_max_degrees[i]);
+        }
     }
 }
 
@@ -157,7 +168,7 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWo
     typedef Kokkos::DefaultExecutionSpace::memory_space DeviceSpace;
 
     unsigned int dim = 3;
-    unsigned int maxDegree = 3; 
+    unsigned int maxDegree = 3;
     FixedMultiIndexSet<Kokkos::HostSpace> hset(dim,maxDegree);
     FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice<DeviceSpace>(); // Create a total order limited fixed multindex set
 
@@ -167,10 +178,10 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWo
     unsigned int cacheSize = hexpansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(2*dim+1));
 
-    // Allocate some memory for the cache 
+    // Allocate some memory for the cache
     Kokkos::View<double*, Kokkos::HostSpace> hcache("host cache", cacheSize);
     Kokkos::View<double*, Kokkos::HostSpace> hcache2("host copy of device cache", cacheSize);
-    
+
     Kokkos::View<double*, DeviceSpace> dcache("device cache", cacheSize);
 
     Kokkos::View<double*,Kokkos::HostSpace> hpt("host point", dim);
@@ -178,9 +189,9 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWo
         hpt(i) = double(i)/dim;
     Kokkos::View<double*,DeviceSpace> dpt = ToDevice<DeviceSpace>(hpt);
 
-    // Fill in the cache with the first d-1 components of the cache  
+    // Fill in the cache with the first d-1 components of the cache
     hexpansion.FillCache1(hcache.data(), hpt, DerivativeFlags::None);
-    
+
     // Run the fill cache funciton, using a parallel_for loop to ensure it's run on the device
     Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
         dexpansion.FillCache1(dcache.data(), dpt, DerivativeFlags::None);
@@ -198,4 +209,4 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWo
     }
 }
 
-#endif 
+#endif

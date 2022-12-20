@@ -15,6 +15,13 @@
 
 #include <pybind11/pybind11.h>
 
+
+#if defined(MPART_HAS_CEREAL)
+#include "MParT/Utilities/Serialization.h"
+#include <fstream>
+#endif // MPART_HAS_CEREAL
+
+
 namespace py = pybind11;
 using namespace mpart::binding;
 
@@ -138,7 +145,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         ;
 
 
-    
+
     //==========================================================================================================
     //FixedMultiIndexSet
 
@@ -165,7 +172,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
 
         .def("MaxDegrees", [] (const FixedMultiIndexSet<Kokkos::HostSpace> &set)
         {
-            auto maxDegrees = set.MaxDegrees(); 
+            auto maxDegrees = set.MaxDegrees();
             Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> maxDegreesEigen(maxDegrees.extent(0));
             for (unsigned int i = 0; i < maxDegrees.extent(0); i++)
             {
@@ -173,10 +180,25 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
             }
             return maxDegreesEigen;
         })
+
+#if defined(MPART_HAS_CEREAL)
+        .def("Serialize", [](FixedMultiIndexSet<Kokkos::HostSpace> const &mset, std::string const &filename){
+            std::ofstream os(filename);
+            cereal::BinaryOutputArchive oarchive(os);
+            oarchive(mset);
+            return mset;
+        })
+        .def("Deserialize", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset, std::string const &filename){
+            std::ifstream is(filename);
+            cereal::BinaryInputArchive iarchive(is);
+            iarchive(mset);
+            return mset;
+        })
+#endif // MPART_HAS_CEREAL
 #if defined(MPART_ENABLE_GPU)
         .def("ToDevice", &FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<mpart::DeviceSpace>)
-    ;
+        ;
     py::class_<FixedMultiIndexSet<mpart::DeviceSpace>, std::shared_ptr<FixedMultiIndexSet<mpart::DeviceSpace>>>(m, "dFixedMultiIndexSet")
-#endif // defined(MPART_ENABLE_GPU)
+#endif // MPART_ENABLE_GPU
     ;
 }
