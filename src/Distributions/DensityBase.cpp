@@ -25,3 +25,25 @@ Eigen::RowMatrixXd DensityBase<Kokkos::HostSpace>::GradLogDensity(Eigen::Ref<con
 
     return output;
 }
+
+template<>
+template<>
+StridedVector<double, Kokkos::HostSpace> DensityBase<Kokkos::HostSpace>::LogDensity<Kokkos::HostSpace>(StridedMatrix<const double, Kokkos::HostSpace> const &X) {
+    // Allocate output
+    Kokkos::View<double*, Kokkos::HostSpace> output("output", X.extent(1));
+    // Call the LogDensity function
+    LogDensityImpl(X, output);
+
+    return output;
+}
+
+template<>
+template<>
+StridedMatrix<double, Kokkos::HostSpace> DensityBase<Kokkos::HostSpace>::GradLogDensity<Kokkos::HostSpace>(StridedMatrix<const double, Kokkos::HostSpace> const &X) {
+    // Allocate output
+    Kokkos::View<double**, Kokkos::HostSpace> output("output", X.extent(0), X.extent(1));
+    // Call the LogDensity function
+    GradLogDensityImpl(X, output);
+
+    return output;
+}
