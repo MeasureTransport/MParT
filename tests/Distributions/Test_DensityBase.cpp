@@ -1,19 +1,3 @@
-/**
-virtual void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> &output) = 0;
-
-// LogDensity function with conversion from Eigen to Kokkos (and possibly copy to/from device).
-Eigen::VectorXd LogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts);
-
-template<typename AnyMemorySpace>
-StridedVector<double, AnyMemorySpace> LogDensity(StridedMatrix<const double, AnyMemorySpace> const &X);
-
-virtual void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> &output) = 0;
-
-Eigen::RowMatrixXd GradLogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts);
-
-template<typename AnyMemorySpace>
-StridedMatrix<double, AnyMemorySpace> GradLogDensity(StridedMatrix<const double, AnyMemorySpace> const &X);
-*/
 #include <catch2/catch_all.hpp>
 
 #include "MParT/Utilities/ArrayConversions.h"
