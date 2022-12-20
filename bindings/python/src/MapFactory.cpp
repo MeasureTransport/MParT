@@ -1,5 +1,6 @@
 #include "CommonPybindUtilities.h"
 #include "MParT/MapFactory.h"
+#include "MParT/ConditionalMapBase.h"
 #include <pybind11/stl.h>
 #include <pybind11/eigen.h>
 
@@ -19,8 +20,9 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
     // CreateTriangular
     m.def(isDevice? "dCreateTriangular" : "CreateTriangular", &MapFactory::CreateTriangular<MemorySpace>);
 
+    // CreateSingleEntryMap
+    m.def(isDevice? "dCreateSingleEntryMap" : "CreateSingleEntryMap", &MapFactory::CreateSingleEntryMap<MemorySpace>);
 }
-
 template void mpart::binding::MapFactoryWrapper<Kokkos::HostSpace>(py::module&);
 #if defined(MPART_ENABLE_GPU)
 template void mpart::binding::MapFactoryWrapper<mpart::DeviceSpace>(py::module&);

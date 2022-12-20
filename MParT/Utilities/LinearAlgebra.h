@@ -272,7 +272,7 @@ private:
 
 };
 
-/** Mimics the interface of the Eigen::PartialPivLU class, but using Kokkos::Views and CUBLAS/CUSOLVER linear algebra.
+/** Mimics the interface of the Eigen::LLT class, but using Kokkos::Views and CUBLAS/CUSOLVER linear algebra.
 
 Note that the layout of the matrices used in this class is important.  Cublas expects column major (layout left).
 */
@@ -319,7 +319,6 @@ private:
 #endif
 
 };
-
 
 } // namespace mpart
 

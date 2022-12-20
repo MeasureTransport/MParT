@@ -5,17 +5,28 @@ set(PYTHON_BINDING_SOURCES
   src/MultiIndex.cpp
   src/MapOptions.cpp
   src/ConditionalMapBase.cpp
-  src/TriangularMap.cpp
-  src/MapFactory.cpp
   src/ParameterizedFunctionBase.cpp
   src/AffineMap.cpp
-  
+  src/TriangularMap.cpp
+  src/ComposedMap.cpp
+  src/SummarizedMap.cpp
+  # src/DebugMap.cpp
+  src/MapFactory.cpp
+
+
   ../common/src/CommonUtilities.cpp
 )
 
+if(MPART_ARCHIVE)
+  set(PYTHON_BINDING_SOURCES ${PYTHON_BINDING_SOURCES}
+    src/Serialization.cpp
+  )
+endif()
+
 include_directories(./include ../common/include)
 pybind11_add_module(pympart SHARED NO_EXTRAS ${PYTHON_BINDING_SOURCES})
-target_link_libraries(pympart PRIVATE mpart Kokkos::kokkos Eigen3::Eigen)
+
+target_link_libraries(pympart PRIVATE mpart Kokkos::kokkos Eigen3::Eigen ${CEREAL_LIBRARIES})
 
 # Add an installation target for the python bindings
 install(TARGETS pympart DESTINATION "${PYTHON_INSTALL_PREFIX}/mpart")

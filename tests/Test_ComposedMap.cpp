@@ -249,7 +249,7 @@ TEST_CASE( "Testing 2 layer composed map", "[ShallowComposedMap]" ) {
 }
 
 
-TEST_CASE( "Testing 10 layer composed map", "[DeepComposedMap]" ) {
+TEST_CASE( "Testing 8 layer composed map", "[DeepComposedMap]" ) {
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
@@ -358,44 +358,100 @@ TEST_CASE( "Testing 10 layer composed map", "[DeepComposedMap]" ) {
     }
 
 
-    // SECTION("Input Gradient"){
+    SECTION("Input Gradient"){
 
-    //     Kokkos::View<double**,Kokkos::HostSpace> sens("Sensitivities", composedMap->outputDim, numSamps);
-    //     for(unsigned int j=0; j<numSamps; ++j){
-    //         for(unsigned int i=0; i<composedMap->outputDim; ++i){
-    //             sens(i,j) = 1.0 + 0.1*i + j;
-    //         }
-    //     }
+        Kokkos::View<double**,Kokkos::HostSpace> sens("Sensitivities", composedMap->outputDim, numSamps);
+        for(unsigned int j=0; j<numSamps; ++j){
+            for(unsigned int i=0; i<composedMap->outputDim; ++i){
+                sens(i,j) = 1.0 + 0.1*i + j;
+            }
+        }
 
-    //     Kokkos::View<double**,Kokkos::HostSpace> evals = composedMap->Evaluate(in);
-    //     Kokkos::View<double**,Kokkos::HostSpace> evals2;
+        Kokkos::View<double**,Kokkos::HostSpace> evals = composedMap->Evaluate(in);
+        Kokkos::View<double**,Kokkos::HostSpace> evals2;
 
-    //     Kokkos::View<double**,Kokkos::HostSpace> inputGrad = composedMap->Gradient(in, sens);
+        Kokkos::View<double**,Kokkos::HostSpace> inputGrad = composedMap->Gradient(in, sens);
 
-    //     REQUIRE(inputGrad.extent(0)==composedMap->inputDim);
-    //     REQUIRE(inputGrad.extent(1)==numSamps);
+        REQUIRE(inputGrad.extent(0)==composedMap->inputDim);
+        REQUIRE(inputGrad.extent(1)==numSamps);
 
-    //     // Compare with finite differences
-    //     double fdstep = 1e-5;
-    //     for(unsigned int i=0; i<composedMap->inputDim; ++i){
-    //         for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
-    //             in(i,ptInd) += fdstep;
+        // Compare with finite differences
+        double fdstep = 1e-5;
+        for(unsigned int i=0; i<composedMap->inputDim; ++i){
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
+                in(i,ptInd) += fdstep;
 
-    //         evals2 = composedMap->Evaluate(in);
+            evals2 = composedMap->Evaluate(in);
 
-    //         for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
                 
-    //             double fdDeriv = 0.0;
-    //             for(unsigned int j=0; j<composedMap->outputDim; ++j)
-    //                 fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
+                double fdDeriv = 0.0;
+                for(unsigned int j=0; j<composedMap->outputDim; ++j)
+                    fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-    //             CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
-    //         }
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
+            }
 
-    //         for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
-    //             in(i,ptInd) -= fdstep;
-    //     }
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
+                in(i,ptInd) -= fdstep;
+        }
         
-    // }
+    }
+
+    SECTION("LogDeterminantCoeffGrad"){
+
+        Kokkos::View<double**,Kokkos::HostSpace> detGrad = composedMap->LogDeterminantCoeffGrad(in);
+        REQUIRE(detGrad.extent(0)==composedMap->numCoeffs);
+        REQUIRE(detGrad.extent(1)==numSamps);
+        
+        Kokkos::View<double*,Kokkos::HostSpace> logDet = composedMap->LogDeterminant(in);
+        Kokkos::View<double*,Kokkos::HostSpace> logDet2;
+
+        // Compare with finite differences
+        double fdstep = 1e-5;
+        for(unsigned int i=0; i<composedMap->numCoeffs; ++i){
+            coeffs(i) += fdstep;
+
+            composedMap->SetCoeffs(coeffs);
+            logDet2 = composedMap->LogDeterminant(in);
+
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-3)); 
+                
+            }
+            coeffs(i) -= fdstep;
+        }
+
+    }
+
+
+    SECTION("LogDeterminantInputGrad"){
+
+        Kokkos::View<double**,Kokkos::HostSpace> detGrad = composedMap->LogDeterminantInputGrad(in);
+        REQUIRE(detGrad.extent(0)==composedMap->inputDim);
+        REQUIRE(detGrad.extent(1)==numSamps);
+        
+        
+        Kokkos::View<double*,Kokkos::HostSpace> logDet = composedMap->LogDeterminant(in);
+        Kokkos::View<double*,Kokkos::HostSpace> logDet2;
+
+        // Compare with finite differences
+        double fdstep = 1e-6;
+        for(unsigned int i=0; i<composedMap->inputDim; ++i){
+
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
+                in(i,ptInd) += fdstep;
+
+            logDet2 = composedMap->LogDeterminant(in);
+
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-3)); 
+            }
+
+            for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
+                in(i,ptInd) -= fdstep;
+        }
+
+    }
 
 }
