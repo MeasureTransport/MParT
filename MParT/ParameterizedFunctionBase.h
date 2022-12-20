@@ -59,7 +59,6 @@ namespace mpart {
         virtual void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs);
 
         #if defined(MPART_ENABLE_GPU)
-        virtual void SetCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs);
         virtual void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs);
         #endif
 
