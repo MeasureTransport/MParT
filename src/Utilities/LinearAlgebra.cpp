@@ -306,7 +306,187 @@ double PartialPivLU<mpart::DeviceSpace>::determinant() const
 }
 
 
+template<>
+void Cholesky<mpart::DeviceSpace>::compute(Kokkos::View<const double**,Kokkos::LayoutLeft,mpart::DeviceSpace> A)
+{
+
+    ldA = A.stride_1();
+
+    int nrows = A.extent(0);
+    int ncols = A.extent(1);
+    assert(nrows==ncols);
+
+    // Resize the space for storing the LU factorization
+    LLT_ = Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace>("LLT", A.extent(0), A.extent(0));
+
+    int ldLLT = LLT_.stride_1();
+    int info;
+
+    // Copy the right block of the matrix A_ into LU_
+    Kokkos::deep_copy(LLT_, A);
+
+    // Set up cuSolver options
+    cusolverDnCreateParams(&params);
+    cusolverDnSetAdvOptions(params, CUSOLVERDN_GETRF, CUSOLVER_ALG_0);
+
+    size_t d_workSize, h_workSize;
+    cusolverDnXpotrf_bufferSize(GetInitializeStatusObject().GetCusolverHandle(),
+                                params,
+                                uplo,
+                                LLT_.extent(0),
+                                CUDA_R_64F,
+                                LLT_.data(),
+                                ldLLT,
+                                CUDA_R_64F,
+                                &d_workSize,
+                                &h_workSize);
+
+
+    Kokkos::View<double*, mpart::DeviceSpace> d_workspace("LLT Workspace", d_workSize);
+    Kokkos::View<double*, Kokkos::HostSpace> h_workspace("LLT Workspace", h_workSize);
+    Kokkos::View<int*, mpart::DeviceSpace> d_info("Info",1);
+
+    cusolverDnXpotrf(GetInitializeStatusObject().GetCusolverHandle(),
+                     params,
+                     uplo,
+                     LLT_.extent(0),
+                     CUDA_R_64F,
+                     LLT_.data(),
+                     ldLLT,
+                     CUDA_R_64F,
+                     d_workspace.data(),
+                     d_workSize,
+                     h_workspace.data(),
+                     h_workSize,
+                     d_info.data());
+
+    info = ToHost(d_info)(0);
+
+    // Error handling
+    if(info<0){
+        std::stringstream msg;
+        msg << "In Cholesky<mpart::DeviceSpace>::compute: Argument " << -info << " to cusolverDnDgetrf had an illegal value or memory allocation failed.  Could not compute factorization.";
+        throw std::runtime_error(msg.str());
+    }else if(info>0){
+        std::stringstream msg;
+        msg << "In Cholesky<mpart::DeviceSpace>::compute: The " << info << " diagonal entry of the matrix U is exactly zero.  The right block of matrix A is singular.";
+        throw std::runtime_error(msg.str());
+    }else{
+        isComputed = true;
+    }
+}
+
+template<>
+void Cholesky<mpart::DeviceSpace>::solveInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
+{
+    assert(isComputed);
+
+    int ldX = x.stride_1();
+    int ldLLT = LLT_.stride_1();
+
+    int info;
+    Kokkos::View<int*, mpart::DeviceSpace> d_info("Info", 1);
+
+    cusolverDnXpotrs(GetInitializeStatusObject().GetCusolverHandle(),
+                     params,
+                     uplo,
+                     LLT_.extent(0),
+                     x.extent(1),
+                     CUDA_R_64F,
+                     LLT_.data(),
+                     ldLLT,
+                     CUDA_R_64F,
+                     x.data(),
+                     ldX,
+                     d_info.data());
+    info = ToHost(d_info)(0);
+
+    // Error checking
+    if(info!=0){
+        std::stringstream msg;
+        msg << "Cholesky<mpart::DeviceSpace>::solveInPlace: Could not compute inverse with cusolverDnXgetrs.  Argument " << -info << " to cusolverDnXgetrs had a bad value.";
+        throw std::runtime_error(msg.str());
+    }
+}
+
+template<>
+void Cholesky<mpart::DeviceSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
+{
+    assert(isComputed);
+
+    int ldX = x.stride_1();
+    int ldLLT = LLT_.stride_1();
+
+    const double alpha = 1.;
+
+    cublasStatus_t st = cublasDtrsm(GetInitializeStatusObject().GetCublasHandle(),
+        CUBLAS_SIDE_LEFT,
+        uplo,
+        CUBLAS_OP_N,
+        CUBLAS_DIAG_NON_UNIT,
+        LLT_.extent(0),
+        x.extent(1),
+        &alpha,
+        LLT_.data(),
+        ldLLT,
+        x.data(),
+        ldX);
+
+    // Error checking
+    if(st != CUBLAS_STATUS_SUCCESS){
+        std::stringstream msg;
+        msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrsm. Failed with status " << st << ".";
+        throw std::runtime_error(msg.str());
+    }
+}
+
+template<>
+Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> Cholesky<mpart::DeviceSpace>::multiplyL(Kokkos::View<const double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
+{
+    assert(isComputed);
+
+    Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> y("y", x.extent(0), x.extent(1));
+
+    int ldX = x.stride_1();
+    int ldY = y.stride_1();
+
+    const double alpha = 1.;
+
+    cublasStatus_t st = cublasDtrmm(GetInitializeStatusObject().GetCublasHandle(),
+        CUBLAS_SIDE_LEFT, uplo,
+        CUBLAS_OP_N, CUBLAS_DIAG_NON_UNIT,
+        LLT_.extent(0), x.extent(1),
+        &alpha,
+        LLT_.data(), ldA,
+        x.data(), ldX,
+        y.data(), ldY
+    );
+
+    // Error checking
+    if(st != CUBLAS_STATUS_SUCCESS){
+        std::stringstream msg;
+        msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrmm. Failed with status " << st << ".";
+        throw std::runtime_error(msg.str());
+    }
+    return y;
+}
+
+
+template<>
+double Cholesky<mpart::DeviceSpace>::determinant() const
+{
+    assert(isComputed);
+    double det = 1.0;
+    Kokkos::parallel_reduce(LLT_.extent(0), KOKKOS_CLASS_LAMBDA (const int& i, double& lprod) {
+        lprod *= LLT_(i,i);
+    },Kokkos::Prod<double>(det));
+    return det*det;
+}
+
+
 template struct mpart::PartialPivLU<mpart::DeviceSpace>;
+template struct mpart::Cholesky<mpart::DeviceSpace>;
 #endif
 
 template struct mpart::PartialPivLU<Kokkos::HostSpace>;
+template struct mpart::Cholesky<Kokkos::HostSpace>;
