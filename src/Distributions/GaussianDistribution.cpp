@@ -19,7 +19,7 @@ template<typename MemorySpace>
 GaussianSamplerDensity<MemorySpace>::GaussianSamplerDensity(unsigned int dim): dim_(dim), idCov_(true) {}
 
 template<typename MemorySpace>
-void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> &output) {
+void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) {
     // Compute the log density
     int M = pts.extent(0);
     int N = pts.extent(1);

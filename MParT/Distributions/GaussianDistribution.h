@@ -17,7 +17,7 @@ class GaussianSamplerDensity {
     GaussianSamplerDensity(StridedVector<double, MemorySpace> mean);
     GaussianSamplerDensity(unsigned int dim);
 
-    void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> &output);
+    void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output);
     void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output);
     void SampleImpl(StridedMatrix<double, MemorySpace> output);
 

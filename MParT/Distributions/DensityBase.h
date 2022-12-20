@@ -24,7 +24,7 @@ namespace mpart {
      * @param pts The points where we want to evaluate the log density.
      * @param output The output log density values.
      */
-    virtual void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> &output) = 0;
+    virtual void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) = 0;
 
     /** LogDensity function with conversion from Eigen to Kokkos (and possibly copy to/from device). */
     Eigen::VectorXd LogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts);
@@ -43,7 +43,7 @@ namespace mpart {
      * @param pts The points where we want to evaluate the gradient of the log density.
      * @param output The matrix where we want to store the gradient of the log density.
      */
-    virtual void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> &output) = 0;
+    virtual void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) = 0;
 
     /** LogDensity function with conversion from Eigen to Kokkos (and possibly copy to/from device). */
     Eigen::RowMatrixXd GradLogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts);
@@ -56,8 +56,6 @@ namespace mpart {
      */
     template<typename AnyMemorySpace>
     StridedMatrix<double, AnyMemorySpace> GradLogDensity(StridedMatrix<const double, AnyMemorySpace> const &X);
-
-    private:
 
     };
 }
