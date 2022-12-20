@@ -148,6 +148,11 @@ methods
     MParT_('ConditionalMap_LogDeterminantCoeffGrad',this.id_,pts,result);
   end
 
+  function result = LogDeterminantInputGrad(this,pts)
+    result = zeros(this.inputDim, size(pts,2));
+    MParT_('ConditionalMap_LogDeterminantInputGrad',this.id_,pts,result);
+  end
+
   function result = get_id(this)
     result = this.id_;
   end
