@@ -23,7 +23,7 @@ class GaussianSamplerDensity {
 
     private:
 
-#if (KOKKOS_VERSION / 10000 == 3) && (KOKKOS_VERSION / 100 % 100 < 7)
+#if (KOKKOS_VERSION / 10000 < 4)
     const double logtau_ = std::log(2*Kokkos::Experimental::pi_v<double>);
 #else
     const double logtau_ = std::log(2*Kokkos::numbers::pi_v<double>);
