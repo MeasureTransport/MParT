@@ -43,14 +43,20 @@ public:
 
     /** @brief Sets the coefficients for all components of the map.
 
-    @details This function will copy the provided coeffs vectors into the savedCoeffs object in the ComposedMap class.   To avoid
-    duplicating the coefficients, the savedCoeffs member variable for each component will then be set to a subview of this vector.
-    @param coeffs A vector containing coefficients for all components.  If component \f$k\f$ is defined by \f$C_k\f$ coefficients,
+        @details This function will copy the provided coeffs vectors into the savedCoeffs object in the ComposedMap class.   To avoid
+        duplicating the coefficients, the savedCoeffs member variable for each component will then be set to a subview of this vector.
+        @param coeffs A vector containing coefficients for all components.  If component \f$k\f$ is defined by \f$C_k\f$ coefficients,
                   then this vector should have length \f$\sum_{k=1}^K C_i\f$ and the coefficients for component \f$k\f$ should
                   start at index \f$\sum_{j=1}^{k-1} C_j\f$.
     */
-    using ParameterizedFunctionBase<MemorySpace>::SetCoeffs;
-    void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
+    using ConditionalMapBase<MemorySpace>::SetCoeffs;
+    void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+    void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+
+    #if defined(MPART_ENABLE_GPU)
+    void SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
+    void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
+    #endif
 
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return maps_.at(i);}
 

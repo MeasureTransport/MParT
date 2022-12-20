@@ -206,7 +206,7 @@ void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<double*, Mem
 }
 
 template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs){
+void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs){
 
     if(coeffs.size() != numCoeffs){
         std::stringstream msg;
