@@ -1,6 +1,5 @@
 #include<algorithm>
 #include <catch2/catch_all.hpp>
-#include <Kokkos_Random.hpp>
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Distributions/SampleGenerator.h"
 
@@ -8,35 +7,22 @@ using namespace mpart;
 using namespace Catch;
 
 
-template<class GeneratorPool>
-struct uniform_gen_functor{
-    using rnd_type = typename GeneratorPool::generator_type;
-    GeneratorPool rand_pool;
-    StridedMatrix<double, Kokkos::HostSpace> output;
-
-    uniform_gen_functor(GeneratorPool rand_pool_, StridedMatrix<double, Kokkos::HostSpace> output_) : rand_pool(rand_pool_), output(output_) {}
-
-    KOKKOS_INLINE_FUNCTION
-    void operator()(const int& j) const {
-        rnd_type rgen = rand_pool.get_state();
-        output(0,j) = Kokkos::rand<rnd_type, double>::draw(rgen);
-    }
-};
-
-// Uniform generator on [0,1]
+// Uniform generator on [0,2]
 class UniformGenerator {
 public:
 
 using PoolType = Kokkos::Random_XorShift64_Pool<Kokkos::DefaultExecutionSpace>;
 PoolType rand_pool;
 
-UniformGenerator(): rand_pool() {}
+// Set a given seed for this test
+UniformGenerator(): rand_pool(160258) {}
 
 void SampleImpl(Kokkos::View<double**, Kokkos::HostSpace> output) {
     unsigned int N = output.extent(1);
     Kokkos::parallel_for("uniform generator", N, KOKKOS_LAMBDA(const int& j) {
         typename PoolType::generator_type rgen = rand_pool.get_state();
-        output(0,j) = rgen.drand();
+        output(0,j) = 2*rgen.drand();
+        rand_pool.free_state(rgen);
     });
 }
 };
@@ -50,13 +36,23 @@ TEST_CASE( "Testing SampleGenerator", "[SampleGenerator]") {
     SECTION("SampleImpl") {
         Kokkos::View<double**, Kokkos::HostSpace> output ("output", 1, N_pts);
         generator->SampleImpl(output);
-        auto vec_view = Kokkos::subview(output, 0, Kokkos::ALL());
         std::vector<int> idx (N_pts);
         std::iota(idx.begin(), idx.end(), 0);
-        std::sort(idx.begin(), idx.end(), [&vec_view](int i1, int i2) {return vec_view(i1) < vec_view(i2);});
+        std::sort(idx.begin(), idx.end(), [&output](int i1, int i2) {return output(0,i1) < output(0,i2);});
+
+        // Need to take inverse permutation to get correct ordering for exact CDF calculation
+        std::vector<int> inv_idx (N_pts);
         for(unsigned int j = 0; j < N_pts; ++j) {
-            double ecdf_j = ((double)idx[j])/((double)N_pts);
-            REQUIRE(ecdf_j == Approx(output(0,j)/2.0).epsilon(1e-3));
+            inv_idx[idx[j]] = j;
         }
+
+        // Calculate mean L1 distance between empirical CDF and uniform CDF
+        double diff = 0.;
+        for(unsigned int j = 0; j < N_pts; ++j) {
+            double ecdf_j = 2*static_cast<double>(inv_idx[j])/static_cast<double>(N_pts);
+            diff += std::abs(ecdf_j - output(0,j));
+        }
+        diff /= N_pts;
+        REQUIRE(diff == Approx(0.).epsilon(1e-2).margin(1e-2));
     }
 }

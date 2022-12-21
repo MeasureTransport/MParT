@@ -1,7 +1,7 @@
 #ifndef MPART_SampleGenerator_H
 #define MPART_SampleGenerator_H
 
-#include "Kokkos_Random.hpp"
+#include <Kokkos_Random.hpp>
 
 #include "MParT/Utilities/EigenTypes.h"
 #include "MParT/Utilities/KokkosSpaceMappings.h"
