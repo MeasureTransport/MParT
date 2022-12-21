@@ -12,8 +12,10 @@ namespace mpart {
 template<typename MemorySpace>
 class SampleGenerator {
     public:
-    
-    SampleGenerator(unsigned int dim) : dim_(dim), rand_pool() {};
+
+    SampleGenerator(unsigned int dim) : dim_(dim), rand_pool() {
+
+    };
 
     virtual ~SampleGenerator() = default;
 
@@ -21,7 +23,7 @@ class SampleGenerator {
      * @brief Generates a sample from the generator.
      * @param output The matrix where we want to store the samples.
      */
-    virtual void SampleImpl(StridedMatrix<double, MemorySpace> output);
+    virtual void SampleImpl(StridedMatrix<double, MemorySpace> output) = 0;
 
     /**
      * @brief Generates a samples from the generator.
@@ -43,8 +45,8 @@ class SampleGenerator {
     // Eigen::RowMatrixXd SampleEigen(unsigned int N);
     const unsigned int dim_;
     using PoolType = typename Kokkos::Random_XorShift64_Pool<typename MemoryToExecution<MemorySpace>::Space>;
-    
-    private:
+
+    protected:
     PoolType rand_pool;
 };
 
