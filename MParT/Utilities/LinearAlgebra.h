@@ -296,7 +296,7 @@ public:
 
     /** Computes \f$L^{-1}B\f$ and stores the results in B.
     */
-    void solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> B);
+    void solveInPlaceL(Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> B);
 
     /** Computes \f$LX\f$ and stores the results in X*/
     Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> multiplyL(Kokkos::View<const double**,Kokkos::LayoutLeft,MemorySpace> X);
