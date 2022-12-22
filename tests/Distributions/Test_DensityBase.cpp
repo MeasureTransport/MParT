@@ -1,37 +1,6 @@
-#include <catch2/catch_all.hpp>
-
-#include "MParT/Utilities/ArrayConversions.h"
-#include "MParT/Distributions/DensityBase.h"
-
-using namespace mpart;
-using namespace Catch;
-
-// Uniform density on [0,e]^2
-class UniformDensity : public DensityBase<Kokkos::HostSpace> {
-
-public:
-void LogDensityImpl(StridedMatrix<const double, Kokkos::HostSpace> const &pts, StridedVector<double, Kokkos::HostSpace> output) override {
-    double euler = std::exp(1.0);
-    unsigned int N = pts.extent(1);
-    Kokkos::parallel_for( "uniform log density", N, KOKKOS_LAMBDA (const int& j) {
-        bool in_bounds1 = (pts(0, j) >= 0.0) && (pts(0, j) <= euler);
-        bool in_bounds2 = (pts(1, j) >= 0.0) && (pts(1, j) <= euler);
-        output(j) = in_bounds1 && in_bounds2 ? -2 : -std::numeric_limits<double>::infinity();
-    });
-}
-
-void GradLogDensityImpl(StridedMatrix<const double, Kokkos::HostSpace> const &pts, StridedMatrix<double, Kokkos::HostSpace> output) override {
-    unsigned int N = pts.extent(1);
-    Kokkos::parallel_for( "uniform grad log density", N, KOKKOS_LAMBDA (const int& j) {
-        output(0,j) = 0.;
-        output(1,j) = 0.;
-    });
-}
-
-};
-
+#include "Test_Distributions_Common.h"
 TEST_CASE( "Testing Custom Uniform Density", "[UniformDensity]" ) {
-    auto density = std::make_shared<UniformDensity>();
+    auto density = std::make_shared<UniformDensity<Kokkos::HostSpace>>();
     unsigned int N_pts = 20;
     int a = -5; int b = 5;
     Kokkos::View<double**, Kokkos::HostSpace> pts ("pts", 2, N_pts);

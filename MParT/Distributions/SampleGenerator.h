@@ -1,6 +1,7 @@
 #ifndef MPART_SampleGenerator_H
 #define MPART_SampleGenerator_H
 
+#include <time.h>
 #include <Kokkos_Random.hpp>
 
 #include "MParT/Utilities/EigenTypes.h"
@@ -13,9 +14,7 @@ template<typename MemorySpace>
 class SampleGenerator {
     public:
 
-    SampleGenerator(unsigned int dim) : dim_(dim), rand_pool() {
-
-    };
+    SampleGenerator(unsigned int dim, unsigned int seed = time(NULL)) : dim_(dim), rand_pool(seed) {};
 
     virtual ~SampleGenerator() = default;
 
