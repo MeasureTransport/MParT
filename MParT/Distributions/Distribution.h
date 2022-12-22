@@ -6,11 +6,11 @@
 
 namespace mpart {
 
-template<typename MemorySpace, typename Sampler, typename Density>
+template<typename MemorySpace>
 class Distribution{
     public:
     Distribution() = delete;
-    Distribution(std::shared_ptr<Sampler> sampler, std::shared_ptr<Density> density): sampler_(sampler), density_(density), dim_(sampler.dim_) {
+    Distribution(std::shared_ptr<SampleGenerator<MemorySpace>> sampler, std::shared_ptr<DensityBase<MemorySpace>> density): sampler_(sampler), density_(density), dim_(sampler.dim_) {
         if(sampler_->dim_ != density_->dim_) {
             throw std::runtime_error("Dimension mismatch between sampler and density.");
         }
@@ -44,14 +44,14 @@ class Distribution{
 
     const unsigned int dim_;
     private:
-    std::shared_ptr<Sampler> sampler_;
-    std::shared_ptr<Density> density_;
+    std::shared_ptr<SampleGenerator<MemorySpace>> sampler_;
+    std::shared_ptr<DensityBase<MemorySpace>> density_;
 };
 
 template<typename MemorySpace, template<typename> typename DensitySampler, typename... T>
 Distribution<MemorySpace, DensitySampler<MemorySpace>, DensitySampler<MemorySpace>> CreateDistribution(T... args) {
     auto dist = std::make_shared<DensitySampler<MemorySpace>>(args...);
-    return Distribution<MemorySpace, DensitySampler<MemorySpace>, DensitySampler<MemorySpace>>(dist, dist);
+    return Distribution<MemorySpace>(dist, dist);
 }
 
 } // namespace mpart

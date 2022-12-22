@@ -51,6 +51,3 @@ void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, Str
     });
 }
 };
-
-template<typename MemorySpace>
-using UniformDistribution = Distribution<MemorySpace, UniformGenerator<MemorySpace>, UniformDensity<MemorySpace>>;
