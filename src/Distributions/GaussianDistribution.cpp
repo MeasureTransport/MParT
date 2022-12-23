@@ -3,23 +3,23 @@
 using namespace mpart;
 
 template<typename MemorySpace>
-GaussianSamplerDensity<MemorySpace>::GaussianSamplerDensity(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar): mean_(mean), dim_(mean.extent(0)) {
+GaussianDistribution<MemorySpace>::GaussianDistribution(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar): mean_(mean), dim_(mean.extent(0)) {
     Factorize(covar);
 }
 
 template<typename MemorySpace>
-GaussianSamplerDensity<MemorySpace>::GaussianSamplerDensity(StridedMatrix<double, MemorySpace> covar): dim_(covar.extent(0)) {
+GaussianDistribution<MemorySpace>::GaussianDistribution(StridedMatrix<double, MemorySpace> covar): dim_(covar.extent(0)) {
     Factorize(covar);
 }
 
 template<typename MemorySpace>
-GaussianSamplerDensity<MemorySpace>::GaussianSamplerDensity(StridedVector<double, MemorySpace> mean): dim_(mean.extent(0)), mean_(mean), idCov_(true) {}
+GaussianDistribution<MemorySpace>::GaussianDistribution(StridedVector<double, MemorySpace> mean): dim_(mean.extent(0)), mean_(mean), idCov_(true) {}
 
 template<typename MemorySpace>
-GaussianSamplerDensity<MemorySpace>::GaussianSamplerDensity(unsigned int dim): dim_(dim), idCov_(true) {}
+GaussianDistribution<MemorySpace>::GaussianDistribution(unsigned int dim): dim_(dim), idCov_(true) {}
 
 template<typename MemorySpace>
-void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) {
+void GaussianDistribution<MemorySpace>::LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) override {
     // Compute the log density
     int M = pts.extent(0);
     int N = pts.extent(1);
@@ -52,7 +52,7 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
 }
 
 template<typename MemorySpace>
-void GaussianSamplerDensity<MemorySpace>::GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
+void GaussianDistribution<MemorySpace>::GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override {
     // Compute the gradient of the log density
     int M = pts.extent(0);
     int N = pts.extent(1);
@@ -76,7 +76,7 @@ void GaussianSamplerDensity<MemorySpace>::GradLogDensityImpl(StridedMatrix<const
 }
 
 template<typename MemorySpace>
-void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, MemorySpace> output) {
+void GaussianDistribution<MemorySpace>::SampleImpl(StridedMatrix<double, MemorySpace> output) override {
     // Sample from the distribution
     int M = output.extent(0);
     int N = output.extent(1);
@@ -123,7 +123,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
     }
 }
 
-template struct GaussianSamplerDensity<Kokkos::HostSpace>;
+template struct GaussianDistribution<Kokkos::HostSpace>;
 #ifdef MPART_ENABLE_GPU
-template struct GaussianSamplerDensity<mpart::DeviceSpace>;
+template struct GaussianDistribution<mpart::DeviceSpace>;
 #endif

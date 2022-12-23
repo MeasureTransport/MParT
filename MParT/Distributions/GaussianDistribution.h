@@ -8,18 +8,14 @@
 namespace mpart {
 
 template<typename MemorySpace>
-class GaussianSamplerDensity {
+class GaussianDistribution: Distribution<MemorySpace> {
     public:
 
-    GaussianSamplerDensity() = delete;
-    GaussianSamplerDensity(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar);
-    GaussianSamplerDensity(StridedMatrix<double, MemorySpace> covar);
-    GaussianSamplerDensity(StridedVector<double, MemorySpace> mean);
-    GaussianSamplerDensity(unsigned int dim);
-
-    void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output);
-    void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output);
-    void SampleImpl(StridedMatrix<double, MemorySpace> output);
+    GaussianDistribution() = delete;
+    GaussianDistribution(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar);
+    GaussianDistribution(StridedMatrix<double, MemorySpace> covar);
+    GaussianDistribution(StridedVector<double, MemorySpace> mean);
+    GaussianDistribution(unsigned int dim);
 
     private:
 
@@ -40,23 +36,13 @@ class GaussianSamplerDensity {
         logDetCov_ = std::log(covChol_.determinant());
     }
 
-    void SetSeed(unsigned int seed) {
-        rand_pool = PoolType(seed);
-    }
-
-    using PoolType = Kokkos::Random_XorShift64_Pool<typename MemoryToExecution<MemorySpace>::Space>;
-
     private:
-    PoolType rand_pool;
     StridedVector<double, MemorySpace> mean_;
     mpart::Cholesky<MemorySpace> covChol_;
     bool idCov_ = false;
     unsigned int dim_ = 0;
     double logDetCov_;
 };
-
-template<typename MemorySpace>
-using GaussianDistribution = Distribution<MemorySpace, GaussianSamplerDensity<MemorySpace>, GaussianSamplerDensity<MemorySpace>>;
 
 } // namespace mpart
 

@@ -42,11 +42,11 @@ class SampleGenerator {
 
     /** Sample function with conversion from Kokkos to Eigen (and possibly copy to/from device). */
     // Eigen::RowMatrixXd SampleEigen(unsigned int N);
-    const unsigned int dim_;
     using PoolType = typename Kokkos::Random_XorShift64_Pool<typename MemoryToExecution<MemorySpace>::Space>;
 
     protected:
     PoolType rand_pool;
+    const unsigned int dim_;
 };
 
 } // namespace mpart
