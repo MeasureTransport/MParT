@@ -17,6 +17,10 @@ class GaussianDistribution: Distribution<MemorySpace> {
     GaussianDistribution(StridedVector<double, MemorySpace> mean);
     GaussianDistribution(unsigned int dim);
 
+    void SampleImpl(StridedMatrix<double, MemorySpace> output) override;
+    void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override;
+    void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) override;
+
     private:
 
 #if (KOKKOS_VERSION / 10000 < 4)
