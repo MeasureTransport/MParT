@@ -17,6 +17,7 @@ PYBIND11_MODULE(pympart, m) {
     TriangularMapWrapper<Kokkos::HostSpace>(m);
     ComposedMapWrapper<Kokkos::HostSpace>(m);
     SummarizedMapWrapper<Kokkos::HostSpace>(m);
+    IdentityMapWrapper<Kokkos::HostSpace>(m);
     // DebugMapWrapper<Kokkos::HostSpace>(m);
 
     MapFactoryWrapper<Kokkos::HostSpace>(m);
@@ -32,6 +33,7 @@ PYBIND11_MODULE(pympart, m) {
     MapFactoryWrapper<mpart::DeviceSpace>(m);
     AffineMapWrapperDevice(m);
     AffineFunctionWrapperDevice(m);
+    IdentityMapWrapper<Kokkos::DeviceSpace>(m);
     SerializeWrapper<mpart::DeviceSpace>(m);
     DeserializeWrapper<mpart::DeviceSpace>(m);
 #endif

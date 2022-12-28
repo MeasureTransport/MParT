@@ -173,7 +173,10 @@ namespace mpart {
                                    StridedMatrix<const double, MemorySpace> const& sens,
                                    StridedMatrix<double, MemorySpace>              output) = 0;
 
+        /** Checks to see if the coefficients have been initialized yet, returns true if so, false if not */
+        bool CheckCoefficients() const;
 
+        
         const unsigned int inputDim; /// The total dimension of the input N+M
         const unsigned int outputDim; /// The output dimension M
         const unsigned int numCoeffs; /// The number of coefficients used to parameterize this map.
@@ -193,6 +196,8 @@ namespace mpart {
         @param functionName The name of the host-only function (e.g., "Evaluate(Eigen::RowMatrixXd const& pts)")
          */
         void CheckDeviceMismatch(std::string functionName) const;
+
+
 
         /** Checks to see if the coefficients have been initialized yet. If not, an exception is thrown. */
         void CheckCoefficients(std::string const& functionName) const;
