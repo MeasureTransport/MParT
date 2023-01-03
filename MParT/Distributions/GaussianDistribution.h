@@ -12,9 +12,34 @@ class GaussianDistribution: Distribution<MemorySpace> {
     public:
 
     GaussianDistribution() = delete;
+
+    /**
+     * @brief Construct a new Gaussian Distribution object with custom mean and covariance
+     *
+     * @param mean the mean of the distribution
+     * @param covar a covariance matrix for the distribution
+     */
     GaussianDistribution(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar);
+
+    /**
+     * @brief Construct a new Gaussian Distribution object with zero mean and custom covariance
+     *
+     * @param covar a covariance matrix for the distribution
+     */
     GaussianDistribution(StridedMatrix<double, MemorySpace> covar);
+
+    /**
+     * @brief Construct a new Gaussian Distribution object with custom mean and identity covariance
+     *
+     * @param mean the mean of the distribution
+     */
     GaussianDistribution(StridedVector<double, MemorySpace> mean);
+
+    /**
+     * @brief Construct a new Gaussian Distribution object representing standard Normal (zero mean, id covariance matrix)
+     *
+     * @param dim dimension of the distribution
+     */
     GaussianDistribution(unsigned int dim);
 
     void SampleImpl(StridedMatrix<double, MemorySpace> output) override;
