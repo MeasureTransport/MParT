@@ -8,7 +8,7 @@
 namespace mpart {
 
 template<typename MemorySpace>
-class GaussianDistribution: Distribution<MemorySpace> {
+class GaussianDistribution: public SampleGenerator<MemorySpace>, public DensityBase<MemorySpace> {
     public:
 
     GaussianDistribution() = delete;

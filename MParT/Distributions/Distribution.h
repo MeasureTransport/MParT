@@ -6,18 +6,22 @@
 
 namespace mpart {
 
-template<typename MemorySpace>
-class Distribution: public SampleGenerator<MemorySpace>, public DensityBase<MemorySpace> {
+template<typename MemorySpace, typename SamplerType, typename DensityType>
+class Distribution {
     public:
     Distribution() = delete;
-    Distribution(int dim_): SampleGenerator<MemorySpace>(dim_), DensityBase<MemorySpace>(dim_) {}
-    Distribution(SampleGenerator<MemorySpace> &sampler, DensityBase<MemorySpace> &density): SampleGenerator<MemorySpace>(sampler), DensityBase<MemorySpace>(density) {
+    Distribution(std::shared_ptr<SamplerType> sampler, std::shared_ptr<DensityType> density): sampler_(sampler), density_(density) {
         if(sampler->dim_ != density->dim_) {
             throw std::runtime_error("Dimension mismatch between sampler and density.");
         }
     };
 
     virtual ~Distribution() = default;
+
+    private:
+    std::shared_ptr<SamplerType> sampler_;
+    std::shared_ptr<DensityType> density_;
+
 };
 
 } // namespace mpart

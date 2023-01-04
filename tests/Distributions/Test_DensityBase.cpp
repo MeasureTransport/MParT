@@ -1,6 +1,6 @@
 #include "Test_Distributions_Common.h"
 TEST_CASE( "Testing Custom Uniform Density", "[UniformDensity]" ) {
-    auto density = std::make_shared<UniformDensity<Kokkos::HostSpace>>();
+    auto density = std::make_shared<UniformDensity<Kokkos::HostSpace>>(2);
     unsigned int N_pts = 20;
     int a = -5; int b = 5;
     Kokkos::View<double**, Kokkos::HostSpace> pts ("pts", 2, N_pts);

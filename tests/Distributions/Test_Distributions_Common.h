@@ -13,7 +13,6 @@ using namespace Catch;
 template<typename MemorySpace>
 class UniformSampler: public SampleGenerator<MemorySpace> {
 public:
-
 // Set a given seed for this test
 UniformSampler(int dim): SampleGenerator<MemorySpace>(dim, 160258) {}
 
@@ -31,8 +30,8 @@ void SampleImpl(StridedMatrix<double, MemorySpace> output) {
 // Uniform density on [0,e]^2
 template <typename MemorySpace>
 class UniformDensity : public DensityBase<MemorySpace> {
-
 public:
+UniformDensity(int dim): DensityBase<MemorySpace>(dim) {}
 void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) override {
     double euler = std::exp(1.0);
     unsigned int N = pts.extent(1);
@@ -51,3 +50,6 @@ void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, Str
     });
 }
 };
+
+template<typename MemorySpace>
+using UniformDistribution = Distribution<MemorySpace, UniformSampler<MemorySpace>, UniformDensity<MemorySpace>>;

@@ -44,9 +44,10 @@ class SampleGenerator {
     // Eigen::RowMatrixXd SampleEigen(unsigned int N);
     using PoolType = typename Kokkos::Random_XorShift64_Pool<typename MemoryToExecution<MemorySpace>::Space>;
 
+    const unsigned int dim_;
+
     protected:
     PoolType rand_pool;
-    const unsigned int dim_;
 };
 
 } // namespace mpart
