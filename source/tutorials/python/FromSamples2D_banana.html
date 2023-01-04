@@ -777,7 +777,7 @@ x_2 - x_1^2
 
 <span class="c1"># Negative log likelihood objective</span>
 <span class="k">def</span> <span class="nf">obj</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">tri_map</span><span class="p">,</span><span class="n">x</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Evaluates the log-likelihood of the samples using the map-induced density. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Evaluates the log-likelihood of the samples using the map-induced density. &quot;&quot;&quot;</span>
     <span class="n">num_points</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">tri_map</span><span class="o">.</span><span class="n">SetCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
 
@@ -790,7 +790,7 @@ x_2 - x_1^2
     <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rho_of_map_of_x</span> <span class="o">+</span> <span class="n">log_det</span><span class="p">)</span><span class="o">/</span><span class="n">num_points</span>
 
 <span class="k">def</span> <span class="nf">grad_obj</span><span class="p">(</span><span class="n">coeffs</span><span class="p">,</span> <span class="n">tri_map</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Returns the gradient of the log-likelihood objective wrt the map parameters. &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Returns the gradient of the log-likelihood objective wrt the map parameters. &quot;&quot;&quot;</span>
     <span class="n">num_points</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">tri_map</span><span class="o">.</span><span class="n">SetCoeffs</span><span class="p">(</span><span class="n">coeffs</span><span class="p">)</span>
 

@@ -378,7 +378,7 @@
 <div class="sd-card-title sd-font-weight-bold docutils">
 Install with Conda</div>
 <p class="sd-card-text">It is possible to install the main c++ MParT library and its python wrapper via <a class="reference external" href="https://anaconda.org/conda-forge/mpart">conda-forge</a>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge mpart
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>mpart
 </pre></div>
 </div>
 <p class="sd-card-text">Matlab, and CUDA are currently only supported when compiling from source.</p>
@@ -389,8 +389,8 @@ Install with Conda</div>
 <div class="sd-card-title sd-font-weight-bold docutils">
 Install with Julia</div>
 <p class="sd-card-text">It is also possible to install MParT with Julia bindings using the Julia package manager:</p>
-<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Pkg</span><span class="w"></span>
-<span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;MParT&quot;</span><span class="p">)</span><span class="w"></span>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Pkg</span>
+<span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;MParT&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p class="sd-card-text">Julia-specific documentation is hosted <a class="reference external" href="https://measuretransport.github.io/MParT.jl/dev/">here</a>.</p>
@@ -401,25 +401,25 @@ Install with Julia</div>
 <span id="compiling-source"></span><h1>Compiling from Source<a class="headerlink" href="#compiling-from-source" title="Permalink to this heading">#</a></h1>
 <p>The MParT source code can be obtained in the <a class="reference external" href="https://github.com/MeasureTransport/MParT">MeasureTransport/MParT</a> repository on Github.</p>
 <p>MParT uses CMake to handle dependencies and compiler configurations.   A basic build of MParT that should work on most operating systems can be obtained with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> &lt;/path/to/MParT&gt;
-mkdir build
-<span class="nb">cd</span> build
-cmake                                               <span class="se">\</span>
-  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;  <span class="se">\</span>
-  -DKokkos_ENABLE_THREADS<span class="o">=</span>ON                        <span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>&lt;/path/to/MParT&gt;
+mkdir<span class="w"> </span>build
+<span class="nb">cd</span><span class="w"> </span>build
+cmake<span class="w">                                               </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;<span class="w">  </span><span class="se">\</span>
+<span class="w">  </span>-DKokkos_ENABLE_THREADS<span class="o">=</span>ON<span class="w">                        </span><span class="se">\</span>
 ..
-make install
+make<span class="w"> </span>install
 </pre></div>
 </div>
 <p>This will compile the main c++ <code class="code docutils literal notranslate"><span class="pre">mpart</span></code> library as well as any other language bindings that can be automatically configured.  If you are compiling on a multicore machine, you can use <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">-j</span> <span class="pre">N_JOBS</span> <span class="pre">install</span></code>, where <code class="code docutils literal notranslate"><span class="pre">N_JOBS</span></code> is the number of processes the computer can compile with in parallel.</p>
 <p>This installation should also automatically install and build Kokkos, Eigen, Cereal, Pybind11, and Catch2, assuming they aren’t installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span> cmake                                              <span class="se">\</span>
-  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;  <span class="se">\</span>
-  -DKokkos_ROOT<span class="o">=</span>&lt;your/kokkos/install/root&gt;          <span class="se">\</span>
-  -DEigen3_ROOT<span class="o">=</span>&lt;your/eigen3/install/root&gt;          <span class="se">\</span>
-  -Dcereal_ROOT<span class="o">=</span>&lt;your/cereal/install/root&gt;          <span class="se">\</span>
-  -DKokkos_ENABLE_THREADS<span class="o">=</span>ON                        <span class="se">\</span>
-  -DKokkos_ENABLE_SERIAL<span class="o">=</span>ON                         <span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>cmake<span class="w">                                              </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;<span class="w">  </span><span class="se">\</span>
+<span class="w">  </span>-DKokkos_ROOT<span class="o">=</span>&lt;your/kokkos/install/root&gt;<span class="w">          </span><span class="se">\</span>
+<span class="w">  </span>-DEigen3_ROOT<span class="o">=</span>&lt;your/eigen3/install/root&gt;<span class="w">          </span><span class="se">\</span>
+<span class="w">  </span>-Dcereal_ROOT<span class="o">=</span>&lt;your/cereal/install/root&gt;<span class="w">          </span><span class="se">\</span>
+<span class="w">  </span>-DKokkos_ENABLE_THREADS<span class="o">=</span>ON<span class="w">                        </span><span class="se">\</span>
+<span class="w">  </span>-DKokkos_ENABLE_SERIAL<span class="o">=</span>ON<span class="w">                         </span><span class="se">\</span>
 ..
 </pre></div>
 </div>
@@ -430,13 +430,13 @@ make install
 </div>
 <p>You can force MParT to use previously installed versions of the dependencies by setting <code class="code docutils literal notranslate"><span class="pre">MPART_FETCH_DEPS=OFF</span></code>.  The default value of <code class="code docutils literal notranslate"><span class="pre">MPART_FETCH_DEPS=ON</span></code> will allow MParT to download and locally install any external dependencies using CMake’s <code class="code docutils literal notranslate"><span class="pre">FetchContent</span></code> directive.</p>
 <p>Note that if you do not wish to compile bindings for Python, Julia, or Matlab, you can turn off binding compilation by setting the <code class="code docutils literal notranslate"><span class="pre">MPART_&lt;language&gt;=OFF</span></code> variable during CMake configuration. For a default build with only the core c++ library, and without requiring the Cereal library, you can use</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span> cmake                                              <span class="se">\</span>
-  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;  <span class="se">\</span>
-  -DKokkos_ENABLE_THREADS<span class="o">=</span>ON                        <span class="se">\</span>
-  -DMPART_PYTHON<span class="o">=</span>OFF                                <span class="se">\</span>
-  -DMPART_MATLAB<span class="o">=</span>OFF                                <span class="se">\</span>
-  -DMPART_JULIA<span class="o">=</span>OFF                                 <span class="se">\</span>
-  -DMPART_ARCHIVE<span class="o">=</span>OFF
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="w"> </span>cmake<span class="w">                                              </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;<span class="w">  </span><span class="se">\</span>
+<span class="w">  </span>-DKokkos_ENABLE_THREADS<span class="o">=</span>ON<span class="w">                        </span><span class="se">\</span>
+<span class="w">  </span>-DMPART_PYTHON<span class="o">=</span>OFF<span class="w">                                </span><span class="se">\</span>
+<span class="w">  </span>-DMPART_MATLAB<span class="o">=</span>OFF<span class="w">                                </span><span class="se">\</span>
+<span class="w">  </span>-DMPART_JULIA<span class="o">=</span>OFF<span class="w">                                 </span><span class="se">\</span>
+<span class="w">  </span>-DMPART_ARCHIVE<span class="o">=</span>OFF
 ..
 </pre></div>
 </div>
@@ -460,16 +460,16 @@ make install
 <input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-0">
 MacOS</label><div class="sd-tab-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/MParT/install/path&gt;/python
-<span class="nb">export</span> <span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/MParT/install/path&gt;/lib:&lt;your/MParT/install/path&gt;/python
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/MParT/install/path&gt;/python
+<span class="nb">export</span><span class="w"> </span><span class="nv">DYLD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$DYLD_LIBRARY_PATH</span>:&lt;your/MParT/install/path&gt;/lib:&lt;your/MParT/install/path&gt;/python
 </pre></div>
 </div>
 </div>
 <input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
 </input><label class="sd-tab-label" for="sd-tab-item-1">
 Linux</label><div class="sd-tab-content docutils">
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/MParT/install/path&gt;/python
-<span class="nb">export</span> <span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;your/MParT/install/path&gt;/lib:&lt;your/MParT/install/path&gt;/python
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PYTHONPATH</span>:&lt;your/MParT/install/path&gt;/python
+<span class="nb">export</span><span class="w"> </span><span class="nv">LD_LIBRARY_PATH</span><span class="o">=</span><span class="nv">$LD_LIBRARY_PATH</span>:&lt;your/MParT/install/path&gt;/lib:&lt;your/MParT/install/path&gt;/python
 </pre></div>
 </div>
 </div>
@@ -500,13 +500,13 @@ Linux</label><div class="sd-tab-content docutils">
 <section id="julia-source-installation">
 <span id="compiling-julia"></span><h2>Julia Source Installation<a class="headerlink" href="#julia-source-installation" title="Permalink to this heading">#</a></h2>
 <p>By default, MParT will look for Julia during configuration and will attempt to build the Julia bindings if the Julia <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code> package is installed.   To install <code class="code docutils literal notranslate"><span class="pre">CxxWrap</span></code>, run the following command in your Julia prompt:</p>
-<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="n">Pkg</span><span class="p">;</span><span class="w"> </span><span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;CxxWrap&quot;</span><span class="p">)</span><span class="w"></span>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">import</span><span class="w"> </span><span class="n">Pkg</span><span class="p">;</span><span class="w"> </span><span class="n">Pkg</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s">&quot;CxxWrap&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>To prevent the Julia bindings from being compiled, even if Julia and CxxWrap are installed, set <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=OFF</span></code> during the CMake configuration.</p>
 <p>Once MParT is installed with Julia bindings (i.e. <code class="code docutils literal notranslate"><span class="pre">MPART_JULIA=ON</span></code>) into <code class="code docutils literal notranslate"><span class="pre">/your/MParT/install/path</span></code> (an equivalent path to <code class="code docutils literal notranslate"><span class="pre">CMAKE_INSTALL_PREFIX</span></code>), you can use MParT in Julia with a few more steps. First, add <code class="code docutils literal notranslate"><span class="pre">MParT.jl</span></code>, which holds the Julia interface for MParT, via <code class="code docutils literal notranslate"><span class="pre">using</span> <span class="pre">Pkg;</span> <span class="pre">Pkg.add(&quot;MParT&quot;)</span></code> in the Julia REPL. Then, create a file <code class="code docutils literal notranslate"><span class="pre">~/.julia/artifacts/Overrides.toml</span></code> with the following lines</p>
-<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bee5971c-294f-5168-9fcd-9fb3c811d495]</span><span class="w"></span>
-<span class="n">MParT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/your/MParT/install/path&quot;</span><span class="w"></span>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[bee5971c-294f-5168-9fcd-9fb3c811d495]</span>
+<span class="n">MParT</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;/your/MParT/install/path&quot;</span>
 </pre></div>
 </div>
 <p>Make sure that this file includes a full installation path from root! At this point, you should be able to open up a REPL and type <code class="code docutils literal notranslate"><span class="pre">using</span> <span class="pre">MParT</span></code> and get going with any of the provided examples. If you want to develop MParT’s bindings on the Julia-side, then use <code class="code docutils literal notranslate"><span class="pre">using</span> <span class="pre">Pkg;</span> <span class="pre">Pkg.develop(&quot;MParT&quot;)</span></code> instead of <code class="code docutils literal notranslate"><span class="pre">Pkg.add(&quot;MParT&quot;)</span></code> to install the package.</p>
@@ -521,17 +521,17 @@ Linux</label><div class="sd-tab-content docutils">
 <h3>Building the Kokkos Dependency<a class="headerlink" href="#building-the-kokkos-dependency" title="Permalink to this heading">#</a></h3>
 <p>To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides.  Because of this, MParT cannot use an internal build of Kokkos and Kokkos must therefore be compiled (or otherwise installed) manually.</p>
 <p>The following cmake command can be used to compile Kokkos with the CUDA backend enabled and with all options required by MParT.  Kokkos source code can be obtained from the <a class="reference external" href="https://github.com/kokkos/kokkos">kokkos/kokkos</a> repository on Github.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> &lt;path/to/kokkos&gt;
-mkdir build
-<span class="nb">cd</span> build
-cmake <span class="se">\</span>
-    -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;/new/kokkos/install/path&gt; <span class="se">\</span>
-    -DBUILD_SHARED_LIBS<span class="o">=</span>ON                            <span class="se">\</span>
-    -DKokkos_ENABLE_SERIAL<span class="o">=</span>OFF                        <span class="se">\</span>
-    -DKokkos_ENABLE_THREADS<span class="o">=</span>ON                        <span class="se">\</span>
-    -DKokkos_ENABLE_CUDA<span class="o">=</span>ON                           <span class="se">\</span>
-    -DKokkos_ENABLE_CUDA_LAMBDA<span class="o">=</span>ON                    <span class="se">\</span>
-    -DCMAKE_CXX_STANDARD<span class="o">=</span><span class="m">17</span>                           <span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>&lt;path/to/kokkos&gt;
+mkdir<span class="w"> </span>build
+<span class="nb">cd</span><span class="w"> </span>build
+cmake<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;/new/kokkos/install/path&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DBUILD_SHARED_LIBS<span class="o">=</span>ON<span class="w">                            </span><span class="se">\</span>
+<span class="w">    </span>-DKokkos_ENABLE_SERIAL<span class="o">=</span>OFF<span class="w">                        </span><span class="se">\</span>
+<span class="w">    </span>-DKokkos_ENABLE_THREADS<span class="o">=</span>ON<span class="w">                        </span><span class="se">\</span>
+<span class="w">    </span>-DKokkos_ENABLE_CUDA<span class="o">=</span>ON<span class="w">                           </span><span class="se">\</span>
+<span class="w">    </span>-DKokkos_ENABLE_CUDA_LAMBDA<span class="o">=</span>ON<span class="w">                    </span><span class="se">\</span>
+<span class="w">    </span>-DCMAKE_CXX_STANDARD<span class="o">=</span><span class="m">17</span><span class="w">                           </span><span class="se">\</span>
 ../
 </pre></div>
 </div>
@@ -549,35 +549,35 @@ cmake <span class="se">\</span>
 <h3>Installing cublas and cusolver<a class="headerlink" href="#installing-cublas-and-cusolver" title="Permalink to this heading">#</a></h3>
 <p>MParT uses the CUBLAS and CUSOLVER components of the <a class="reference external" href="https://developer.nvidia.com/cuda-toolkit">NVIDIA CUDA Toolkit</a> for GPU-accelerated linear algebra.</p>
 <p>NVIDIA’s <a class="reference external" href="https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html">Cuda installation guide</a> provides detailed instructions on how to install CUDA.   For Debian-based x86_64 systems, we have been able to successfully install cuda, cublas, and cusparse for CUDA 11.4 using the command below.  Notice the installation of <code class="code docutils literal notranslate"><span class="pre">*-dev</span></code> packages, which are required to obtain the necessary header files.  Similar commands may be useful on other systems.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span> <span class="nv">CUDA_VERSION</span><span class="o">=</span><span class="m">11</span>.4
-<span class="nb">export</span> <span class="nv">CUDA_COMPAT_VERSION</span><span class="o">=</span><span class="m">470</span>.129.06-1
-<span class="nb">export</span> <span class="nv">CUDA_CUDART_VERSION</span><span class="o">=</span><span class="m">11</span>.4.148-1
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">CUDA_VERSION</span><span class="o">=</span><span class="m">11</span>.4
+<span class="nb">export</span><span class="w"> </span><span class="nv">CUDA_COMPAT_VERSION</span><span class="o">=</span><span class="m">470</span>.129.06-1
+<span class="nb">export</span><span class="w"> </span><span class="nv">CUDA_CUDART_VERSION</span><span class="o">=</span><span class="m">11</span>.4.148-1
 
-curl -sL <span class="s2">&quot;https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub&quot;</span> <span class="p">|</span> apt-key add -
-<span class="nb">echo</span> <span class="s2">&quot;deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /&quot;</span> &gt; /etc/apt/sources.list.d/cuda.list
-sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
+curl<span class="w"> </span>-sL<span class="w"> </span><span class="s2">&quot;https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>apt-key<span class="w"> </span>add<span class="w"> </span>-
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>/etc/apt/sources.list.d/cuda.list
+sudo<span class="w"> </span>apt-key<span class="w"> </span>adv<span class="w"> </span>--keyserver<span class="w"> </span>keyserver.ubuntu.com<span class="w"> </span>--recv-keys<span class="w"> </span>A4B469963BF863CC
 
-sudo apt-get -yq update
-sudo apt-get -yq install --no-install-recommends <span class="se">\</span>
-    cuda-compat-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span><span class="o">=</span><span class="si">${</span><span class="nv">CUDA_COMPAT_VERSION</span><span class="si">}</span> <span class="se">\</span>
-    cuda-cudart-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span><span class="o">=</span><span class="si">${</span><span class="nv">CUDA_CUDART_VERSION</span><span class="si">}</span> <span class="se">\</span>
-    libcublas-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span> <span class="se">\</span>
-    libcublas-dev-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span> <span class="se">\</span>
-    libcusolver-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span> <span class="se">\</span>
-    libcusolver-dev-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span>
+sudo<span class="w"> </span>apt-get<span class="w"> </span>-yq<span class="w"> </span>update
+sudo<span class="w"> </span>apt-get<span class="w"> </span>-yq<span class="w"> </span>install<span class="w"> </span>--no-install-recommends<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>cuda-compat-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span><span class="o">=</span><span class="si">${</span><span class="nv">CUDA_COMPAT_VERSION</span><span class="si">}</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>cuda-cudart-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span><span class="o">=</span><span class="si">${</span><span class="nv">CUDA_CUDART_VERSION</span><span class="si">}</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>libcublas-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>libcublas-dev-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>libcusolver-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>libcusolver-dev-<span class="si">${</span><span class="nv">CUDA_VERSION</span><span class="p">/./-</span><span class="si">}</span>
 </pre></div>
 </div>
 </section>
 <section id="building-mpart">
 <h3>Building MParT<a class="headerlink" href="#building-mpart" title="Permalink to this heading">#</a></h3>
 <p>Using the above documentation on building with an external install of Kokkos, we can then configure MParT from the <code class="code docutils literal notranslate"><span class="pre">build</span></code> directory using the following command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> &lt;path/to/MParT&gt;
-mkdir build
-<span class="nb">cd</span> build
-cmake <span class="se">\</span>
-    -DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;                 <span class="se">\</span>
-    -DKokkos_ROOT<span class="o">=</span>&lt;/new/kokkos/install/path&gt;                         <span class="se">\</span>
-    -DCMAKE_CXX_COMPILER<span class="o">=</span>&lt;/new/kokkos/install/path&gt;/bin/nvcc_wrapper <span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>&lt;path/to/MParT&gt;
+mkdir<span class="w"> </span>build
+<span class="nb">cd</span><span class="w"> </span>build
+cmake<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>&lt;your/MParT/install/path&gt;<span class="w">                 </span><span class="se">\</span>
+<span class="w">    </span>-DKokkos_ROOT<span class="o">=</span>&lt;/new/kokkos/install/path&gt;<span class="w">                         </span><span class="se">\</span>
+<span class="w">    </span>-DCMAKE_CXX_COMPILER<span class="o">=</span>&lt;/new/kokkos/install/path&gt;/bin/nvcc_wrapper<span class="w"> </span><span class="se">\</span>
 ..
 </pre></div>
 </div>

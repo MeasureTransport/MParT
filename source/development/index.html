@@ -395,19 +395,19 @@ If you want to influence the direction and focus of the project consider becomin
 <section id="building-the-documentation">
 <h2>Building the Documentation<a class="headerlink" href="#building-the-documentation" title="Permalink to this heading">#</a></h2>
 <p>MParT’s documentation uses a combination of <a class="reference external" href="https://www.sphinx-doc.org/en/master/">sphinx</a> and <a class="reference external" href="https://doxygen.nl/">doxygen</a> through the <a class="reference external" href="https://breathe.readthedocs.io/en/latest/">breathe</a> package.  It also depends on rendering the tutorials in the <a class="reference external" href="https://github.com/MeasureTransport/MParT-examples">MParT-examples</a> repository.  To build the documentation locally, you’ll need to install these packages and a few other extensions.  In particular, make sure doxygen, sphinx, sphinx-design, breathe, nbsphinx, jupytext, and the pydata-sphinx-theme are installed.  This is easily done with conda and pip:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda install -c conda-forge doxygen sphinx sphinx-design breathe pydata-sphinx-theme nbsphinx jupytext
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>doxygen<span class="w"> </span>sphinx<span class="w"> </span>sphinx-design<span class="w"> </span>breathe<span class="w"> </span>pydata-sphinx-theme<span class="w"> </span>nbsphinx<span class="w"> </span>jupytext
 </pre></div>
 </div>
 <p>Then, after configuring MParT with CMake, you build the documentation with <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">sphinx</span></code>. The entire process might look like</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/MeasureTransport/MParT.git
-mkdir MParT/build <span class="o">&amp;&amp;</span> <span class="nb">cd</span> MParT/build
-cmake -DCMAKE_INSTALL_PREFIX<span class="o">=</span>~/Installations/MParT -DMPART_PYTHON<span class="o">=</span>ON ..
-make sphinx
-make install
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/MeasureTransport/MParT.git
+mkdir<span class="w"> </span>MParT/build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>MParT/build
+cmake<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>~/Installations/MParT<span class="w"> </span>-DMPART_PYTHON<span class="o">=</span>ON<span class="w"> </span>..
+make<span class="w"> </span>sphinx
+make<span class="w"> </span>install
 </pre></div>
 </div>
 <p>Open the sphinx output</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>open docs/sphinx/index.html
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>open<span class="w"> </span>docs/sphinx/index.html
 </pre></div>
 </div>
 <div class="admonition tip">
@@ -418,16 +418,16 @@ make install
 <h3>Controlling Tutorial Documentation<a class="headerlink" href="#controlling-tutorial-documentation" title="Permalink to this heading">#</a></h3>
 <p>The <span class="xref std std-ref">_tutorials</span> page relies on examples in the <a class="reference external" href="https://github.com/MeasureTransport/MParT-examples">MParT-examples</a> repository.   MParT’s CMake scripts can interact with this repository in three ways: (1) via a local copy of the repository, (2) by temporarily cloning the repository when <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">sphinx</span></code> is called, and (3) extracting the examples from the <a class="reference external" href="https://quay.io/repository/measuretransport/mpart_examples">mpart_examples docker image</a> on quay.io.   This last option has the advantage that the python examples can be executed and the any output or plots produced by the example can be included in the example.   It is also possible to skip all attempts at including the examples in the documentation by setting <code class="code docutils literal notranslate"><span class="pre">MPART_BUILD_EXAMPLES=OFF</span></code> in your CMake configuration.</p>
 <p>To use a local copy of <code class="code docutils literal notranslate"><span class="pre">MParT-examples</span></code>, define the CMake <code class="code docutils literal notranslate"><span class="pre">MPART_EXAMPLES_DIR</span></code> variable.  For example:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake <span class="se">\</span>
-  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>~/Installations/MPART <span class="se">\</span>
-  -DMPART_EXAMPLES_DIR<span class="o">=</span>/path/to/MParT-examples <span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>~/Installations/MPART<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DMPART_EXAMPLES_DIR<span class="o">=</span>/path/to/MParT-examples<span class="w"> </span><span class="se">\</span>
 ..
 </pre></div>
 </div>
 <p>If you do not set <code class="code docutils literal notranslate"><span class="pre">MPART_EXAMPLES_DIR</span></code>, the examples will be pulled from Github.   To extract the examples from the docker image, set the <code class="code docutils literal notranslate"><span class="pre">MPART_DOCKER_EXAMPLES</span></code> option to <code class="code docutils literal notranslate"><span class="pre">ON</span></code>.  For example,</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake <span class="se">\</span>
-  -DCMAKE_INSTALL_PREFIX<span class="o">=</span>~/Installations/MPART <span class="se">\</span>
-  -DMPART_DOCKER_EXAMPLES<span class="o">=</span>ON <span class="se">\</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cmake<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>~/Installations/MPART<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-DMPART_DOCKER_EXAMPLES<span class="o">=</span>ON<span class="w"> </span><span class="se">\</span>
 ..
 </pre></div>
 </div>
