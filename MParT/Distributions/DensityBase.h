@@ -57,6 +57,9 @@ namespace mpart {
     template<typename AnyMemorySpace>
     StridedMatrix<double, AnyMemorySpace> GradLogDensity(StridedMatrix<const double, AnyMemorySpace> const &X);
 
+    virtual unsigned int Dim() const { return dim_; }
+
+    protected:
     const unsigned int dim_;
     };
 }

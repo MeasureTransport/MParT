@@ -3,7 +3,7 @@
 TEST_CASE( "Testing Distribution Class" , "[DistributionClass]") {
     auto sampler = std::make_shared<UniformSampler<Kokkos::HostSpace>>(2);
     auto density = std::make_shared<UniformDensity<Kokkos::HostSpace>>(2);
-    auto distribution = UniformDistribution<Kokkos::HostSpace>(*sampler, *density);
+    auto distribution = UniformDistribution<Kokkos::HostSpace>(sampler, density);
     distribution.SetSeed(42);
     unsigned int N_samp = 5000;
     unsigned int N_bins = 50;

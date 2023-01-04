@@ -16,6 +16,7 @@ set (TEST_SOURCES
      tests/Distributions/Test_DensityBase.cpp
      tests/Distributions/Test_SampleGenerator.cpp
      tests/Distributions/Test_Distribution.cpp
+     tests/Distributions/Test_GaussianDistribution.cpp
 
      tests/Test_OrthogonalPolynomials.cpp
      tests/Test_HermiteFunctions.cpp

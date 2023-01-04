@@ -46,6 +46,8 @@ class GaussianSamplerDensity: public SampleGenerator<MemorySpace>, public Densit
     void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override;
     void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) override;
 
+    unsigned int Dim() const override { return dim_; };
+
     protected:
     using GeneratorType = typename SampleGenerator<MemorySpace>::PoolType::generator_type;
     using SampleGenerator<MemorySpace>::rand_pool;
@@ -78,7 +80,7 @@ class GaussianSamplerDensity: public SampleGenerator<MemorySpace>, public Densit
 };
 
 template<typename MemorySpace>
-using GaussianDistribution = Distribution<GaussianSamplerDensity<MemorySpace>, GaussianSamplerDensity<MemorySpace>>;
+using GaussianDistribution = Distribution<MemorySpace, GaussianSamplerDensity<MemorySpace>, GaussianSamplerDensity<MemorySpace>>;
 
 } // namespace mpart
 
