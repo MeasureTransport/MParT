@@ -1,5 +1,5 @@
-#ifndef MPART_GaussianDistribution_H
-#define MPART_GaussianDistribution_H
+#ifndef MPART_GaussianSamplerDensity_H
+#define MPART_GaussianSamplerDensity_H
 
 #include <Kokkos_Core.hpp>
 #include "MParT/Distributions/Distribution.h"
@@ -8,10 +8,10 @@
 namespace mpart {
 
 template<typename MemorySpace>
-class GaussianDistribution: public SampleGenerator<MemorySpace>, public DensityBase<MemorySpace> {
+class GaussianSamplerDensity: public SampleGenerator<MemorySpace>, public DensityBase<MemorySpace> {
     public:
 
-    GaussianDistribution() = delete;
+    GaussianSamplerDensity() = delete;
 
     /**
      * @brief Construct a new Gaussian Distribution object with custom mean and covariance
@@ -19,28 +19,28 @@ class GaussianDistribution: public SampleGenerator<MemorySpace>, public DensityB
      * @param mean the mean of the distribution
      * @param covar a covariance matrix for the distribution
      */
-    GaussianDistribution(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar);
+    GaussianSamplerDensity(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar);
 
     /**
      * @brief Construct a new Gaussian Distribution object with zero mean and custom covariance
      *
      * @param covar a covariance matrix for the distribution
      */
-    GaussianDistribution(StridedMatrix<double, MemorySpace> covar);
+    GaussianSamplerDensity(StridedMatrix<double, MemorySpace> covar);
 
     /**
      * @brief Construct a new Gaussian Distribution object with custom mean and identity covariance
      *
      * @param mean the mean of the distribution
      */
-    GaussianDistribution(StridedVector<double, MemorySpace> mean);
+    GaussianSamplerDensity(StridedVector<double, MemorySpace> mean);
 
     /**
      * @brief Construct a new Gaussian Distribution object representing standard Normal (zero mean, id covariance matrix)
      *
      * @param dim dimension of the distribution
      */
-    GaussianDistribution(unsigned int dim);
+    GaussianSamplerDensity(unsigned int dim);
 
     void SampleImpl(StridedMatrix<double, MemorySpace> output) override;
     void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override;
@@ -79,4 +79,4 @@ class GaussianDistribution: public SampleGenerator<MemorySpace>, public DensityB
 
 } // namespace mpart
 
-#endif //MPART_GaussianDistribution_H
+#endif //MPART_GaussianSamplerDensity_H

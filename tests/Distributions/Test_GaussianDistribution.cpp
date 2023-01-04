@@ -1,7 +1,7 @@
 #include<algorithm>
 #include <catch2/catch_all.hpp>
 #include "MParT/Utilities/ArrayConversions.h"
-#include "MParT/Distributions/GaussianDistribution.h"
+#include "MParT/Distributions/GaussianSamplerDensity.h"
 
 
 TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {

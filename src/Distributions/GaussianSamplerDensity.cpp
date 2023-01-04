@@ -1,30 +1,30 @@
-#include "MParT/Distributions/GaussianDistribution.h"
+#include "MParT/Distributions/GaussianSamplerDensity.h"
 
 using namespace mpart;
 
 template<typename MemorySpace>
-GaussianDistribution<MemorySpace>::GaussianDistribution(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar): Distribution<MemorySpace>(mean.extent(0)), mean_(mean) {
+GaussianSamplerDensity<MemorySpace>::GaussianSamplerDensity(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar): SampleGenerator<MemorySpace>(mean.extent(0)), DensityBase<MemorySpace>(mean.extent(0)), mean_(mean) {
     Factorize(covar);
 }
 
 template<typename MemorySpace>
-GaussianDistribution<MemorySpace>::GaussianDistribution(StridedMatrix<double, MemorySpace> covar): Distribution<MemorySpace>(covar.extent(0)) {
+GaussianSamplerDensity<MemorySpace>::GaussianSamplerDensity(StridedMatrix<double, MemorySpace> covar): SampleGenerator<MemorySpace>(covar.extent(0)), DensityBase<MemorySpace>(covar.extent(0)) {
     Factorize(covar);
 }
 
 template<typename MemorySpace>
-GaussianDistribution<MemorySpace>::GaussianDistribution(StridedVector<double, MemorySpace> mean): Distribution<MemorySpace>(mean.extent(0)), mean_(mean), idCov_(true) {}
+GaussianSamplerDensity<MemorySpace>::GaussianSamplerDensity(StridedVector<double, MemorySpace> mean): SampleGenerator<MemorySpace>(mean.extent(0)), DensityBase<MemorySpace>(mean.extent(0)), mean_(mean), idCov_(true) {}
 
 template<typename MemorySpace>
-GaussianDistribution<MemorySpace>::GaussianDistribution(unsigned int dim): Distribution<MemorySpace>(dim), idCov_(true) {}
+GaussianSamplerDensity<MemorySpace>::GaussianSamplerDensity(unsigned int dim): SampleGenerator<MemorySpace>(dim), DensityBase<MemorySpace>(dim), idCov_(true) {}
 
 template<typename MemorySpace>
-void GaussianDistribution<MemorySpace>::LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) {
+void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) {
     // Compute the log density
     int M = pts.extent(0);
     int N = pts.extent(1);
     if(M != dim_) {
-        throw std::runtime_error("GaussianDistribution::LogDensityImpl: The number of rows in pts must match the dimension of the distribution.");
+        throw std::runtime_error("GaussianSamplerDensity::LogDensityImpl: The number of rows in pts must match the dimension of the distribution.");
     }
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> diff ("diff", M, N);
@@ -52,12 +52,12 @@ void GaussianDistribution<MemorySpace>::LogDensityImpl(StridedMatrix<const doubl
 }
 
 template<typename MemorySpace>
-void GaussianDistribution<MemorySpace>::GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
+void GaussianSamplerDensity<MemorySpace>::GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
     // Compute the gradient of the log density
     int M = pts.extent(0);
     int N = pts.extent(1);
     if(M != dim_) {
-        throw std::runtime_error("GaussianDistribution::GradLogDensityImpl: The number of rows in pts must match the dimension of the distribution.");
+        throw std::runtime_error("GaussianSamplerDensity::GradLogDensityImpl: The number of rows in pts must match the dimension of the distribution.");
     }
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
 
@@ -76,13 +76,13 @@ void GaussianDistribution<MemorySpace>::GradLogDensityImpl(StridedMatrix<const d
 }
 
 template<typename MemorySpace>
-void GaussianDistribution<MemorySpace>::SampleImpl(StridedMatrix<double, MemorySpace> output) {
+void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, MemorySpace> output) {
     // Sample from the distribution
     int M = output.extent(0);
     int N = output.extent(1);
     // Check dimensions
     if(M != dim_) {
-        throw std::runtime_error("GaussianDistribution::SampleImpl: The number of rows in output must match the dimension of the distribution.");
+        throw std::runtime_error("GaussianSamplerDensity::SampleImpl: The number of rows in output must match the dimension of the distribution.");
     }
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
     // If the covariance is the identity, we can just sample from a shifted normal
@@ -126,7 +126,7 @@ void GaussianDistribution<MemorySpace>::SampleImpl(StridedMatrix<double, MemoryS
     }
 }
 
-template struct GaussianDistribution<Kokkos::HostSpace>;
+template struct GaussianSamplerDensity<Kokkos::HostSpace>;
 #ifdef MPART_ENABLE_GPU
-template struct GaussianDistribution<mpart::DeviceSpace>;
+template struct GaussianSamplerDensity<mpart::DeviceSpace>;
 #endif
