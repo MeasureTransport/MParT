@@ -7,20 +7,18 @@
 namespace mpart {
 
 template<typename MemorySpace, typename SamplerType, typename DensityType>
-class Distribution {
+class Distribution: public SamplerType, public DensityType {
     public:
     Distribution() = delete;
-    Distribution(std::shared_ptr<SamplerType> sampler, std::shared_ptr<DensityType> density): sampler_(sampler), density_(density) {
-        if(sampler->dim_ != density->dim_) {
+    Distribution(SamplerType &sampler, DensityType &density): SamplerType(sampler), DensityType(density) {
+        if(sampler.dim_ != density.dim_) {
             throw std::runtime_error("Dimension mismatch between sampler and density.");
         }
     };
 
     virtual ~Distribution() = default;
 
-    private:
-    std::shared_ptr<SamplerType> sampler_;
-    std::shared_ptr<DensityType> density_;
+    unsigned int Dim() const { return SamplerType::dim_; };
 
 };
 

@@ -77,6 +77,9 @@ class GaussianSamplerDensity: public SampleGenerator<MemorySpace>, public Densit
     double logDetCov_;
 };
 
+template<typename MemorySpace>
+using GaussianDistribution = Distribution<GaussianSamplerDensity<MemorySpace>, GaussianSamplerDensity<MemorySpace>>;
+
 } // namespace mpart
 
 #endif //MPART_GaussianSamplerDensity_H

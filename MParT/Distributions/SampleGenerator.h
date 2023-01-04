@@ -30,14 +30,14 @@ class SampleGenerator {
      * @param N The number of Samples from this generator
      * @return StridedMatrix<double, MemorySpace> The samples from this generator
      */
-    StridedMatrix<double, MemorySpace> Sample(unsigned int N) {
-        StridedMatrix<double, MemorySpace> output(N, dim_);
+    Kokkos::View<double**, MemorySpace> Sample(unsigned int N) {
+        Kokkos::View<double**, MemorySpace> output("output", dim_, N);
         SampleImpl(output);
         return output;
     };
 
     void SetSeed(unsigned int seed) {
-        rand_pool = Kokkos::Random_XorShift64_Pool<MemorySpace>(seed);
+        rand_pool = PoolType(seed);
     }
 
     /** Sample function with conversion from Kokkos to Eigen (and possibly copy to/from device). */
