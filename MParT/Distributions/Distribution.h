@@ -7,11 +7,12 @@
 namespace mpart {
 
 template<typename MemorySpace>
-class Distribution: public SampleGenerator, public Density {
+class Distribution: public SampleGenerator<MemorySpace>, public DensityBase<MemorySpace> {
     public:
     Distribution() = delete;
-    Distribution(SampleGenerator<MemorySpace> &sampler, DensityBase<MemorySpace> &density): SampleGenerator(sampler), DensityBase(density) {
-        if(sampler_->dim_ != density_->dim_) {
+    Distribution(int dim_): SampleGenerator<MemorySpace>(dim_), DensityBase<MemorySpace>(dim_) {}
+    Distribution(SampleGenerator<MemorySpace> &sampler, DensityBase<MemorySpace> &density): SampleGenerator<MemorySpace>(sampler), DensityBase<MemorySpace>(density) {
+        if(sampler->dim_ != density->dim_) {
             throw std::runtime_error("Dimension mismatch between sampler and density.");
         }
     };

@@ -46,6 +46,11 @@ class GaussianDistribution: Distribution<MemorySpace> {
     void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override;
     void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) override;
 
+    protected:
+    using GeneratorType = typename SampleGenerator<MemorySpace>::PoolType::generator_type;
+    using SampleGenerator<MemorySpace>::rand_pool;
+    using SampleGenerator<MemorySpace>::dim_;
+
     private:
 
 #if (KOKKOS_VERSION / 10000 < 4)
@@ -69,7 +74,6 @@ class GaussianDistribution: Distribution<MemorySpace> {
     StridedVector<double, MemorySpace> mean_;
     mpart::Cholesky<MemorySpace> covChol_;
     bool idCov_ = false;
-    unsigned int dim_ = 0;
     double logDetCov_;
 };
 

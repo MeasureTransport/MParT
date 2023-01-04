@@ -3,23 +3,23 @@
 using namespace mpart;
 
 template<typename MemorySpace>
-GaussianDistribution<MemorySpace>::GaussianDistribution(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar): mean_(mean), dim_(mean.extent(0)) {
+GaussianDistribution<MemorySpace>::GaussianDistribution(StridedVector<double, MemorySpace> mean, StridedMatrix<double, MemorySpace> covar): Distribution<MemorySpace>(mean.extent(0)), mean_(mean) {
     Factorize(covar);
 }
 
 template<typename MemorySpace>
-GaussianDistribution<MemorySpace>::GaussianDistribution(StridedMatrix<double, MemorySpace> covar): dim_(covar.extent(0)) {
+GaussianDistribution<MemorySpace>::GaussianDistribution(StridedMatrix<double, MemorySpace> covar): Distribution<MemorySpace>(covar.extent(0)) {
     Factorize(covar);
 }
 
 template<typename MemorySpace>
-GaussianDistribution<MemorySpace>::GaussianDistribution(StridedVector<double, MemorySpace> mean): dim_(mean.extent(0)), mean_(mean), idCov_(true) {}
+GaussianDistribution<MemorySpace>::GaussianDistribution(StridedVector<double, MemorySpace> mean): Distribution<MemorySpace>(mean.extent(0)), mean_(mean), idCov_(true) {}
 
 template<typename MemorySpace>
-GaussianDistribution<MemorySpace>::GaussianDistribution(unsigned int dim): dim_(dim), idCov_(true) {}
+GaussianDistribution<MemorySpace>::GaussianDistribution(unsigned int dim): Distribution<MemorySpace>(dim), idCov_(true) {}
 
 template<typename MemorySpace>
-void GaussianDistribution<MemorySpace>::LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) override {
+void GaussianDistribution<MemorySpace>::LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) {
     // Compute the log density
     int M = pts.extent(0);
     int N = pts.extent(1);
@@ -52,7 +52,7 @@ void GaussianDistribution<MemorySpace>::LogDensityImpl(StridedMatrix<const doubl
 }
 
 template<typename MemorySpace>
-void GaussianDistribution<MemorySpace>::GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override {
+void GaussianDistribution<MemorySpace>::GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
     // Compute the gradient of the log density
     int M = pts.extent(0);
     int N = pts.extent(1);
@@ -76,7 +76,7 @@ void GaussianDistribution<MemorySpace>::GradLogDensityImpl(StridedMatrix<const d
 }
 
 template<typename MemorySpace>
-void GaussianDistribution<MemorySpace>::SampleImpl(StridedMatrix<double, MemorySpace> output) override {
+void GaussianDistribution<MemorySpace>::SampleImpl(StridedMatrix<double, MemorySpace> output) {
     // Sample from the distribution
     int M = output.extent(0);
     int N = output.extent(1);
@@ -90,15 +90,17 @@ void GaussianDistribution<MemorySpace>::SampleImpl(StridedMatrix<double, MemoryS
         // If dim_ is 0, the distribution is the standard normal
         if(dim_ == 0) {
             Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
-                typename PoolType::generator_type rgen = rand_pool.get_state();
+                GeneratorType rgen = rand_pool.get_state();
                 output(i,j) = rgen.normal();
+                rand_pool.free_state(rgen);
             });
         }
         // Otherwise, we sample from the mean-shifted normal
         else {
             Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
-                typename PoolType::generator_type rgen = rand_pool.get_state();
+                GeneratorType rgen = rand_pool.get_state();
                 output(i,j) = rgen.normal() + mean_(i);
+                rand_pool.free_state(rgen);
             });
         }
     }
@@ -106,8 +108,9 @@ void GaussianDistribution<MemorySpace>::SampleImpl(StridedMatrix<double, MemoryS
     else {
         // Sample from the standard normal
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(int i, int j) {
-            typename PoolType::generator_type rgen = rand_pool.get_state();
+            GeneratorType rgen = rand_pool.get_state();
             output(i,j) = rgen.normal();
+            rand_pool.free_state(rgen);
         });
         // Transform by the Cholesky factor
         auto mul = covChol_.multiplyL(output);

@@ -11,11 +11,11 @@ using namespace Catch;
 // Uniform generator on [0,e]^N
 // TODO: Test on GPU
 template<typename MemorySpace>
-class UniformGenerator: public SampleGenerator<MemorySpace> {
+class UniformSampler: public SampleGenerator<MemorySpace> {
 public:
 
 // Set a given seed for this test
-UniformGenerator(int dim): SampleGenerator<MemorySpace>(dim, 160258) {}
+UniformSampler(int dim): SampleGenerator<MemorySpace>(dim, 160258) {}
 
 void SampleImpl(StridedMatrix<double, MemorySpace> output) {
     double euler = std::exp(1.);

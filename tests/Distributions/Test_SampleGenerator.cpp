@@ -4,7 +4,7 @@ TEST_CASE( "Testing SampleGenerator", "[SampleGenerator]") {
 // Sample 1000 points
 // Check empirical CDF against uniform CDF
 // assert the difference is less than something
-    auto generator = std::make_shared<UniformGenerator<Kokkos::HostSpace>>(1);
+    auto generator = std::make_shared<UniformSampler<Kokkos::HostSpace>>(1);
     unsigned int N_pts = 1000;
     double eps_N = 1e-3 + 1. /std::sqrt(N_pts); // 1/sqrt(N_pts) + epsilon
     SECTION("SampleImpl") {
