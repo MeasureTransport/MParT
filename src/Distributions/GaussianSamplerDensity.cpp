@@ -89,7 +89,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
     if(idCov_) {
         // If dim_ is 0, the distribution is the standard normal
         if(mean_.extent(0) == 0) {
-            Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
+            Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
                 GeneratorType rgen = rand_pool.get_state();
                 output(i,j) = rgen.normal();
                 rand_pool.free_state(rgen);
@@ -97,7 +97,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
         }
         // Otherwise, we sample from the mean-shifted normal
         else {
-            Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
+            Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
                 GeneratorType rgen = rand_pool.get_state();
                 output(i,j) = rgen.normal() + mean_(i);
                 rand_pool.free_state(rgen);
@@ -107,7 +107,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
     // Otherwise, we assume dense covariance
     else {
         // Sample from the standard normal
-        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(int i, int j) {
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
             GeneratorType rgen = rand_pool.get_state();
             output(i,j) = rgen.normal();
             rand_pool.free_state(rgen);
@@ -119,7 +119,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
             Kokkos::deep_copy(output, mul);
         }
         else {
-            Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
+            Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
                 output(i,j) = mul(i,j) + mean_(i);
             });
         }
