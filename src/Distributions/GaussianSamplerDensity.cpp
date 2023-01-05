@@ -39,7 +39,7 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
     }
 
     if(!idCov_) {
-        covChol_.solveLInPlace(diff);
+        covChol_.solveInPlaceL(diff);
     }
 
     Kokkos::parallel_for( "log terms", N, KOKKOS_LAMBDA (const int& j) {

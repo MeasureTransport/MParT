@@ -407,7 +407,7 @@ void Cholesky<mpart::DeviceSpace>::solveInPlace(Kokkos::View<double**,Kokkos::La
 }
 
 template<>
-void Cholesky<mpart::DeviceSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
+void Cholesky<mpart::DeviceSpace>::solveInPlaceL(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
 {
     assert(isComputed);
 
@@ -432,7 +432,7 @@ void Cholesky<mpart::DeviceSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::L
     // Error checking
     if(st != CUBLAS_STATUS_SUCCESS){
         std::stringstream msg;
-        msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrsm. Failed with status " << st << ".";
+        msg << "Cholesky<mpart::DeviceSpace>::solveInPlaceL: Could not solve with cublasDtrsm. Failed with status " << st << ".";
         throw std::runtime_error(msg.str());
     }
 }
@@ -462,7 +462,7 @@ Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> Cholesky<mpart::Dev
     // Error checking
     if(st != CUBLAS_STATUS_SUCCESS){
         std::stringstream msg;
-        msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrmm. Failed with status " << st << ".";
+        msg << "Cholesky<mpart::DeviceSpace>::solveInPlaceL: Could not solve with cublasDtrmm. Failed with status " << st << ".";
         throw std::runtime_error(msg.str());
     }
     return y;
