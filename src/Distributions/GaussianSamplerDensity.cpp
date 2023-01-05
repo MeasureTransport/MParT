@@ -62,11 +62,13 @@ void GaussianSamplerDensity<MemorySpace>::GradLogDensityImpl(StridedMatrix<const
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
 
     if(mean_.extent(0) == 0){
-        Kokkos::deep_copy(output, pts);
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
+            output(i,j) = -pts(i,j);
+        });
     }
     else {
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
-            output(i,j) = pts(i,j) - mean_(i);
+            output(i,j) = -pts(i,j) + mean_(i);
         });
     }
 
