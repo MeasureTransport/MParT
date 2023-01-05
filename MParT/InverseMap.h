@@ -37,11 +37,11 @@ void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                     StridedMatrix<const double, MemorySpace> const& sens,
                     StridedMatrix<double, MemorySpace>              output) override;
 
-// I have no idea :/
+// Negative of forward logdet coeff grad
 void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                     StridedMatrix<double, MemorySpace>              output) override;
 
-// I have no idea :/
+// Negative of forward logdet input grad
 void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                     StridedMatrix<double, MemorySpace>              output) override;
 
