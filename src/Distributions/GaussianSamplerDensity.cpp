@@ -75,8 +75,11 @@ void GaussianSamplerDensity<MemorySpace>::GradLogDensityImpl(StridedMatrix<const
     }
 }
 
+
+// Currently this requires that output be a LayoutLeft view
 template<typename MemorySpace>
-void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, MemorySpace> output) {
+void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, MemorySpace> output_) {
+    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> output = output_;
     // Sample from the distribution
     int M = output.extent(0);
     int N = output.extent(1);

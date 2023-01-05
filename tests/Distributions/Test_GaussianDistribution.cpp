@@ -87,14 +87,16 @@ void TestGaussianLogPDF(StridedMatrix<double, Kokkos::HostSpace> samples, Stride
 
 TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
     unsigned int dim = 3;
-    unsigned int N_samp = 1000;
+    unsigned int N_samp = 5000;
     double covar_diag_val = 4.0;
     double abs_margin = 1e-6;
 
     SECTION( "Default Covariance, Default mean" ) {
         GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(dim);
-        StridedMatrix<double, Kokkos::HostSpace> samples = dist.Sample(N_samp);
-        StridedVector<double, Kokkos::HostSpace> samples_pdf = dist.LogDensity(samples);
+        Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
+        Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
+        dist.SampleImpl(samples);
+        dist.LogDensityImpl(samples, samples_pdf);
         TestStandardNormalSamples(samples);
         TestGaussianLogPDF(samples, samples_pdf, 0., abs_margin);
     }
@@ -105,8 +107,10 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
 
     SECTION( "Default Covariance, unit mean in all dimensions" ) {
         GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(mean);
-        StridedMatrix<double, Kokkos::HostSpace> samples = dist.Sample(N_samp);
-        StridedVector<double, Kokkos::HostSpace> samples_pdf = dist.LogDensity(samples);
+        Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
+        Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
+        dist.SampleImpl(samples);
+        dist.LogDensityImpl(samples, samples_pdf);
         Kokkos::parallel_for(dim, KOKKOS_LAMBDA(const int i) {
             for(int j = 0; j < N_samp; j++) {
                 samples(i, j) -= 1.0;
@@ -124,11 +128,13 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
 
     SECTION( "Diagonal Covariance, Default mean" ) {
         GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(covar);
-        StridedMatrix<double, Kokkos::HostSpace> samples = dist.Sample(N_samp);
-        StridedVector<double, Kokkos::HostSpace> samples_pdf = dist.LogDensity(samples);
+        Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
+        Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
+        dist.SampleImpl(samples);
+        dist.LogDensityImpl(samples, samples_pdf);
         policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {dim, N_samp});
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i, const int j) {
-            samples(i, j) /= 2.;
+            samples(i, j) /= std::sqrt(covar_diag_val);
         });
         TestStandardNormalSamples(samples);
         TestGaussianLogPDF(samples, samples_pdf, dim*std::log(covar_diag_val), abs_margin);
@@ -136,12 +142,14 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
 
     SECTION( "Diagonal Covariance, unit mean in all dimensions" ) {
         GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(mean, covar);
-        StridedMatrix<double, Kokkos::HostSpace> samples = dist.Sample(N_samp);
-        StridedVector<double, Kokkos::HostSpace> samples_pdf = dist.LogDensity(samples);
+        Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
+        Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
+        dist.SampleImpl(samples);
+        dist.LogDensityImpl(samples, samples_pdf);
         policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {dim, N_samp});
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i, const int j) {
-            samples(i, j) /= 2.;
             samples(i, j) -= 1.0;
+            samples(i, j) /= std::sqrt(covar_diag_val);
         });
         TestStandardNormalSamples(samples);
         TestGaussianLogPDF(samples, samples_pdf, dim*std::log(covar_diag_val), abs_margin);

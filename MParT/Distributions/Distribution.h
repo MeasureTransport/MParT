@@ -27,13 +27,22 @@ class Distribution{
     StridedMatrix<double, MemorySpace> Sample(unsigned int N) {
         return sampler_->Sample(N);
     };
+    void SampleImpl(StridedMatrix<double, MemorySpace> output) {
+        sampler_->SampleImpl(output);
+    };
 
     StridedVector<double, MemorySpace> LogDensity(StridedMatrix<const double, MemorySpace> const &pts) {
         return density_->LogDensity(pts);
     };
+    void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) {
+        density_->LogDensityImpl(pts, output);
+    };
 
     StridedMatrix<double, MemorySpace> GradLogDensity(StridedMatrix<const double, MemorySpace> const &pts) {
         return density_->GradLogDensity(pts);
+    };
+    void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
+        density_->GradLogDensityImpl(pts, output);
     };
 
     private:
