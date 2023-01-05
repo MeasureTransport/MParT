@@ -88,7 +88,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
     // If the covariance is the identity, we can just sample from a shifted normal
     if(idCov_) {
         // If dim_ is 0, the distribution is the standard normal
-        if(dim_ == 0) {
+        if(mean_.extent(0) == 0) {
             Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
                 GeneratorType rgen = rand_pool.get_state();
                 output(i,j) = rgen.normal();
