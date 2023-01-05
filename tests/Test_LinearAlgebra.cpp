@@ -223,7 +223,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> C("C", 3, 2);
         Kokkos::deep_copy(C, B);
         Cholesky<Kokkos::HostSpace> Achol(constA);
-        Achol.solveLInPlace(C);
+        Achol.solveInPlaceL(C);
         for(unsigned int j=0; j<C.extent(1); ++j){
             for(unsigned int i=0; i<C.extent(0); ++i){
                 CHECK(C(i,j) == Approx(eigY(i,j)).epsilon(1e-14).margin(1e-14));
@@ -442,7 +442,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
         Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace> C_d("C", 3, 2);
         Kokkos::deep_copy(C_d, B_d);
         Cholesky<Kokkos::HostSpace> Achol_d(constA_d);
-        Achol_d.solveLInPlace(C_d);
+        Achol_d.solveInPlaceL(C_d);
         auto C_h = ToHost(C_d);
         for(unsigned int j=0; j<C_h.extent(1); ++j){
             for(unsigned int i=0; i<C_h.extent(0); ++i){

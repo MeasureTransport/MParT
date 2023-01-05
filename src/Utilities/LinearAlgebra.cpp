@@ -91,7 +91,7 @@ void Cholesky<Kokkos::HostSpace>::solveInPlace(Kokkos::View<double**,Kokkos::Lay
 }
 
 template<>
-void Cholesky<Kokkos::HostSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> x)
+void Cholesky<Kokkos::HostSpace>::solveInPlaceL(Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> x)
 {
     auto eigX = KokkosToMat(x);
     cholSolver_->matrixL().solveInPlace(eigX);
@@ -491,7 +491,7 @@ void Cholesky<mpart::DeviceSpace>::compute(Kokkos::View<const double**,Kokkos::L
     int ncols = A.extent(1);
     assert(nrows==ncols);
 
-    // Resize the space for storing the LU factorization
+    // Resize the space for storing the LLT factorization
     LLT_ = Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace>("LLT", A.extent(0), A.extent(0));
 
     int ldLLT = LLT_.stride_1();
@@ -585,7 +585,7 @@ void Cholesky<mpart::DeviceSpace>::solveInPlace(Kokkos::View<double**,Kokkos::La
 }
 
 template<>
-void Cholesky<mpart::DeviceSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
+void Cholesky<mpart::DeviceSpace>::solveInPlaceL(Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> x)
 {
     assert(isComputed);
 
@@ -610,7 +610,7 @@ void Cholesky<mpart::DeviceSpace>::solveLInPlace(Kokkos::View<double**,Kokkos::L
     // Error checking
     if(st != CUBLAS_STATUS_SUCCESS){
         std::stringstream msg;
-        msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrsm. Failed with status " << st << ".";
+        msg << "Cholesky<mpart::DeviceSpace>::solveInPlaceL: Could not solve with cublasDtrsm. Failed with status " << st << ".";
         throw std::runtime_error(msg.str());
     }
 }
@@ -640,7 +640,7 @@ Kokkos::View<double**,Kokkos::LayoutLeft,mpart::DeviceSpace> Cholesky<mpart::Dev
     // Error checking
     if(st != CUBLAS_STATUS_SUCCESS){
         std::stringstream msg;
-        msg << "Cholesky<mpart::DeviceSpace>::solveLInPlace: Could not solve with cublasDtrmm. Failed with status " << st << ".";
+        msg << "Cholesky<mpart::DeviceSpace>::solveInPlaceL: Could not solve with cublasDtrmm. Failed with status " << st << ".";
         throw std::runtime_error(msg.str());
     }
     return y;
