@@ -35,7 +35,7 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
     auto density = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(dim);
 
     // Create the pullback and pushforward densities
-    PullbackDensity<Kokkos::HostSpace> pullback (map, density);
+    PullbackDensity<Kokkos::HostSpace> pullback {map, density};
     PushforwardDensity<Kokkos::HostSpace> pushforward {map, density};
 
     // Set the seed and create samples to test the densities
@@ -50,6 +50,16 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
     auto logPullbackDensitySample = pullback.LogDensity(samples);
     auto logPushforwardDensitySample = pushforward.LogDensity(samples);
 
+    // Calculate the pullback and pushforward log density at the samples
+    auto gradLogPullbackDensitySample = pullback.GradLogDensity(samples);
+    bool gradLogPushforwardExists = true;
+    try {
+        pushforward.GradLogDensity(samples);
+    } catch (std::runtime_error& e) {
+        gradLogPushforwardExists = false;
+    }
+    REQUIRE(gradLogPushforwardExists == false);
+
     // Evaluate the map and its inverse at the samples for the analytical calculation
     auto pullbackEvalSample = map->Evaluate(samples);
     Kokkos::View<double**, Kokkos::HostSpace> nullPrefix ("null prefix", 0, N_samp);
@@ -57,12 +67,15 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
 
     // Calculate the pullback and pushforward density error
     Kokkos::parallel_for("TestTransportDensity", N_samp, KOKKOS_LAMBDA(const int i) {
-        // Take the norm of the pullback and pushforward evaluations
         double sampleNormPullback = 0.0;
         double sampleNormPushforward = 0.0;
         for(int j = 0; j < dim; j++) {
+            // Take the L2 norm of the pullback and pushforward evaluations
             sampleNormPullback += pullbackEvalSample(j, i)*pullbackEvalSample(j, i);
             sampleNormPushforward += pushforwardEvalSample(j, i)*pushforwardEvalSample(j, i);
+
+            // Check the gradient of the pullback and pushforward density
+            gradLogPullbackDensitySample(j, i) -= -pullbackEvalSample(j, i)*diag_el;
         }
 
         // Calculate the pullback and pushforward density error inplace
@@ -77,6 +90,10 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
     double max_pullback_err = *std::max_element(logPullbackDensitySample.data(), logPullbackDensitySample.data()+N_samp);
     double max_pushforward_err = *std::max_element(logPushforwardDensitySample.data(), logPushforwardDensitySample.data()+N_samp);
 
+    // Check the maximum gradient error
+    double max_pullback_grad_err = *std::max_element(gradLogPullbackDensitySample.data(), gradLogPullbackDensitySample.data()+N_samp*dim);
+
     REQUIRE(max_pullback_err < 1e-6);
     REQUIRE(max_pushforward_err < 1e-6);
+    REQUIRE(max_pullback_grad_err < 1e-6);
 }
