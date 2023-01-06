@@ -14,6 +14,7 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
     unsigned int dim = 2;
     unsigned int N_samp = 1000;
 
+    // Form the affine map T(x) = 2*x + [1,1]
     double diag_el = 2.0;
     Kokkos::View<double**, Kokkos::HostSpace> A("A", dim, dim);
     Kokkos::View<double*, Kokkos::HostSpace> b("b", dim);
@@ -23,24 +24,39 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
             A(i, j) = ((double) i == j)*diag_el;
         }
     }
+    // Create the log determinant of the map T analytically
     double logdet = 0.;
     for(int i = 0; i < dim; i++) {
         logdet += std::log(diag_el);
     }
+
+    // Create the map and density to use
     auto map = std::make_shared<AffineMap<Kokkos::HostSpace>>(A, b);
     auto density = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(dim);
+
+    // Create the pullback and pushforward densities
     PullbackDensity<Kokkos::HostSpace> pullback (map, density);
     PushforwardDensity<Kokkos::HostSpace> pushforward {map, density};
+
+    // Set the seed and create samples to test the densities
     density->SetSeed(0);
     StridedMatrix<const double, Kokkos::HostSpace> samples = density->Sample(N_samp);
+
+    // Initialize the constants for the density calculation
     double offset = -0.9189385332046727; // -log(2*pi)/2
     offset *= dim;
+
+    // Calculate the pullback and pushforward density at the samples
     auto logPullbackDensitySample = pullback.LogDensity(samples);
     auto logPushforwardDensitySample = pushforward.LogDensity(samples);
+
+    // Evaluate the map and its inverse at the samples for the analytical calculation
     auto pullbackEvalSample = map->Evaluate(samples);
     Kokkos::View<double**, Kokkos::HostSpace> nullPrefix ("null prefix", 0, N_samp);
     auto pushforwardEvalSample = map->Inverse(nullPrefix, samples);
-    Kokkos::parallel_for("TestPullbackDensity", N_samp, KOKKOS_LAMBDA(const int i) {
+
+    // Calculate the pullback and pushforward density error
+    Kokkos::parallel_for("TestTransportDensity", N_samp, KOKKOS_LAMBDA(const int i) {
         // Take the norm of the pullback and pushforward evaluations
         double sampleNormPullback = 0.0;
         double sampleNormPushforward = 0.0;
@@ -56,6 +72,8 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         logPushforwardDensitySample(i) -= -0.5*sampleNormPushforward + offset + logdet;
         logPushforwardDensitySample(i) = std::abs(logPushforwardDensitySample(i));
     });
+
+    // Check the maximum error
     double max_pullback_err = *std::max_element(logPullbackDensitySample.data(), logPullbackDensitySample.data()+N_samp);
     double max_pushforward_err = *std::max_element(logPushforwardDensitySample.data(), logPushforwardDensitySample.data()+N_samp);
 
