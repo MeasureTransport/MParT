@@ -41,14 +41,14 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
     unsigned int seed = 162849;
 
     SECTION( "Default Covariance, Default mean" ) {
-        GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(dim);
+        auto dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(dim);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
         Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_gradpdf ("sample grad pdf", dim, N_samp);
-        dist.SetSeed(seed);
-        dist.SampleImpl(samples);
-        dist.LogDensityImpl(samples, samples_pdf);
-        dist.GradLogDensityImpl(samples, samples_gradpdf);
+        dist->SetSeed(seed);
+        dist->SampleImpl(samples);
+        dist->LogDensityImpl(samples, samples_pdf);
+        dist->GradLogDensityImpl(samples, samples_gradpdf);
         TestStandardNormalSamples(samples);
         TestGaussianLogPDF(samples, samples_pdf, samples_gradpdf, 0., 1., abs_margin);
     }
@@ -58,14 +58,14 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
     std::fill(mean.data(), mean.data()+dim, 1.0);
 
     SECTION( "Default Covariance, unit mean in all dimensions" ) {
-        GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(mean);
+        auto dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(mean);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
         Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_gradpdf ("sample grad pdf", dim, N_samp);
-        dist.SetSeed(seed);
-        dist.SampleImpl(samples);
-        dist.LogDensityImpl(samples, samples_pdf);
-        dist.GradLogDensityImpl(samples, samples_gradpdf);
+        dist->SetSeed(seed);
+        dist->SampleImpl(samples);
+        dist->LogDensityImpl(samples, samples_pdf);
+        dist->GradLogDensityImpl(samples, samples_gradpdf);
         Kokkos::parallel_for(dim, KOKKOS_LAMBDA(const int i) {
             for(int j = 0; j < N_samp; j++) {
                 samples(i, j) -= 1.0;
@@ -82,14 +82,14 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
     });
 
     SECTION( "Diagonal Covariance, Default mean" ) {
-        GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(covar);
+        auto dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(covar);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
         Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_gradpdf ("sample grad pdf", dim, N_samp);
-        dist.SetSeed(seed);
-        dist.SampleImpl(samples);
-        dist.LogDensityImpl(samples, samples_pdf);
-        dist.GradLogDensityImpl(samples, samples_gradpdf);
+        dist->SetSeed(seed);
+        dist->SampleImpl(samples);
+        dist->LogDensityImpl(samples, samples_pdf);
+        dist->GradLogDensityImpl(samples, samples_gradpdf);
         policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {dim, N_samp});
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i, const int j) {
             samples(i, j) /= std::sqrt(covar_diag_val);
@@ -99,14 +99,14 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
     }
 
     SECTION( "Diagonal Covariance, unit mean in all dimensions" ) {
-        GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(mean, covar);
+        auto dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(mean, covar);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
         Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_gradpdf ("sample grad pdf", dim, N_samp);
-        dist.SetSeed(seed);
-        dist.SampleImpl(samples);
-        dist.LogDensityImpl(samples, samples_pdf);
-        dist.GradLogDensityImpl(samples, samples_gradpdf);
+        dist->SetSeed(seed);
+        dist->SampleImpl(samples);
+        dist->LogDensityImpl(samples, samples_pdf);
+        dist->GradLogDensityImpl(samples, samples_gradpdf);
         policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {dim, N_samp});
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i, const int j) {
             samples(i, j) -= 1.0;
