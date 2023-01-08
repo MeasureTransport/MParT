@@ -21,6 +21,11 @@ class PullbackSampler: public SampleGenerator<MemorySpace> {
         map_->InverseImpl(prefix_null, pts, output);
     };
 
+    void SetSeed(unsigned int seed) override {
+        SampleGenerator<MemorySpace>::SetSeed(seed);
+        reference_->SetSeed(seed);
+    }
+
     private:
     std::shared_ptr<ConditionalMapBase<MemorySpace>> map_;
     std::shared_ptr<SampleGenerator<MemorySpace>> reference_;

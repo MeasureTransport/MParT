@@ -36,7 +36,7 @@ class SampleGenerator {
         return output;
     };
 
-    void SetSeed(unsigned int seed) {
+    virtual void SetSeed(unsigned int seed) {
         rand_pool = PoolType(seed);
     }
 
