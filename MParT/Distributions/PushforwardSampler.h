@@ -11,7 +11,8 @@ class PushforwardSampler: public SampleGenerator<MemorySpace> {
 
     public:
     PushforwardSampler() = delete;
-    PushforwardSampler(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<SampleGenerator<MemorySpace>> reference): map_(map), reference_(reference) {};
+    PushforwardSampler(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<SampleGenerator<MemorySpace>> reference):
+    SampleGenerator<MemorySpace>(reference->Dim()), map_(map), reference_(reference) {};
 
     void SampleImpl(StridedMatrix<double, MemorySpace> output) override {
         unsigned int N = output.extent(1);

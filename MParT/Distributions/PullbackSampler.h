@@ -1,17 +1,18 @@
 #ifndef MPART_PULLBACKSAMPLER_H
 #define MPART_PULLBACKSAMPLER_H
 
-#include "MParT/Distributions/SamplerGenerator.h"
+#include "MParT/Distributions/SampleGenerator.h"
 #include "MParT/ConditionalMapBase.h"
 
 namespace mpart {
 
 template<typename MemorySpace>
-class PullbackSampler: public SamplerGenerator<MemorySpace> {
+class PullbackSampler: public SampleGenerator<MemorySpace> {
 
     public:
     PullbackSampler() = delete;
-    PullbackSampler(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<SamplerGenerator<MemorySpace>> reference): map_(map), reference_(reference) {};
+    PullbackSampler(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<SampleGenerator<MemorySpace>> reference):
+    SampleGenerator<MemorySpace>(reference->Dim()), map_(map), reference_(reference) {};
 
     void SampleImpl(StridedMatrix<double, MemorySpace> output) override {
         unsigned int N = output.extent(1);
@@ -22,7 +23,7 @@ class PullbackSampler: public SamplerGenerator<MemorySpace> {
 
     private:
     std::shared_ptr<ConditionalMapBase<MemorySpace>> map_;
-    std::shared_ptr<SamplerGenerator<MemorySpace>> reference_;
+    std::shared_ptr<SampleGenerator<MemorySpace>> reference_;
 };
 
 } // namespace mpart
