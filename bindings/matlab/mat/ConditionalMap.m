@@ -27,6 +27,12 @@ methods
         if(isstring(varargin{2}))
           if(varargin{2}=="id")
             this.id_=varargin{1};
+          elseif(varargin{2}=="compose")
+            this.id_=MParT_('ConditionalMap_newComposedMap', varargin{1});
+          elseif(varargin{2}=="A")
+            this.id_=MParT_('ConditionalMap_newAffineMapA', varargin{1});
+          elseif(varargin{2}=="b")
+            this.id_=MParT_('ConditionalMap_newAffineMapb', varargin{1});
           end
         else
           mset = varargin{1};
@@ -49,9 +55,15 @@ methods
               input_str=[input_str,')'];
               this.id_ = eval(input_str);
           else
-              error("Wrong input argument");
+              error("Wrong input arguments");
           end
         end
+    elseif(nargin==3)
+      if(varargin{3}=="Ab")
+          this.id_=MParT_('ConditionalMap_newAffineMapAb', varargin{1},varargin{2});
+      else
+        error("Wrong input arguments");
+      end
     elseif(nargin==4)
       inputDim = varargin{1};
       outputDim = varargin{2};
@@ -134,6 +146,11 @@ methods
   function result = LogDeterminantCoeffGrad(this,pts)
     result = zeros(this.numCoeffs, size(pts,2));
     MParT_('ConditionalMap_LogDeterminantCoeffGrad',this.id_,pts,result);
+  end
+
+  function result = LogDeterminantInputGrad(this,pts)
+    result = zeros(this.inputDim, size(pts,2));
+    MParT_('ConditionalMap_LogDeterminantInputGrad',this.id_,pts,result);
   end
 
   function result = get_id(this)

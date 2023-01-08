@@ -1082,6 +1082,14 @@ public:
         assert(a == 0 && b == 1);
         return std::shared_ptr<MonotoneComponent<ExpansionType, PosFuncType, QuadratureType, MemorySpace>>(this);
     }
+
+    /** Give access to the underlying FixedMultiIndexSet
+     * @return The FixedMultiIndexSet
+     */
+    FixedMultiIndexSet<MemorySpace> GetMultiIndexSet() const {
+        return expansion_.GetMultiIndexSet();
+    }
+
 private:
     ExpansionType expansion_;
     QuadratureType quad_;

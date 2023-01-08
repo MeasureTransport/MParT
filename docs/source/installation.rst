@@ -38,13 +38,13 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
    cd build
    cmake                                               \
      -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
-     -DKokkos_ENABLE_PTHREAD=ON                        \
+     -DKokkos_ENABLE_THREADS=ON                        \
    ..
    make install
 
 This will compile the main c++ :code:`mpart` library as well as any other language bindings that can be automatically configured.  If you are compiling on a multicore machine, you can use :code:`make -j N_JOBS install`, where :code:`N_JOBS` is the number of processes the computer can compile with in parallel.
 
-This installation should also automatically install and build Kokkos, Eigen, and Catch2, assuming they aren't installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:
+This installation should also automatically install and build Kokkos, Eigen, Cereal, Pybind11, and Catch2, assuming they aren't installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:
 
 .. code-block:: bash
 
@@ -52,29 +52,34 @@ This installation should also automatically install and build Kokkos, Eigen, and
      -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
      -DKokkos_ROOT=<your/kokkos/install/root>          \
      -DEigen3_ROOT=<your/eigen3/install/root>          \
-     -DCatch2_ROOT=<your/catch2/install/root>          \
-     -DKokkos_ENABLE_PTHREAD=ON                        \
+     -Dcereal_ROOT=<your/cereal/install/root>          \
+     -DKokkos_ENABLE_THREADS=ON                        \
      -DKokkos_ENABLE_SERIAL=ON                         \
    ..
 
-Feel free to mix and match previous installations of Eigen, Kokkos, Pybind11, and Catch2 with libraries you don't already have using these :code:`X_ROOT` flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version >=3.13. Further, it has been tested with Kokkos 3.6.0, Eigen 3.4.0, Pybind11 2.9.2, and Catch2 3.0.0-preview3 (there are some issues encountered when compiling MParT with Catch2 3.0.1).
+Feel free to mix and match previous installations of Eigen, Cereal, Kokkos, Pybind11, and Catch2 with libraries you don't already have using these :code:`X_ROOT` flags. Note that Catch2 and Kokkos in this example will need to be compiled with shared libraries. MParT has not been tested with all versions of all dependencies, but it does require CMake version >=3.13. Further, it has been tested with Kokkos 3.7.0, Eigen 3.4.0, Pybind11 2.9.2, Cereal 1.3.2, and Catch2 3.1.0 (there have been some issues encountered when compiling MParT with Catch2 3.0.1).
+
+.. tip::
+    If you are using Kokkos <3.7.0, you will need to use the :code:`Kokkos_ENABLE_PTHREAD` flag instead of :code:`Kokkos_ENABLE_THREADS` in the CMake configuration.
 
 You can force MParT to use previously installed versions of the dependencies by setting :code:`MPART_FETCH_DEPS=OFF`.  The default value of :code:`MPART_FETCH_DEPS=ON` will allow MParT to download and locally install any external dependencies using CMake's :code:`FetchContent` directive.
 
-Note that if you do not wish to compile bindings for Python, Julia, or Matlab, you can turn off binding compilation by setting the :code:`MPART_<language>=OFF` variable during CMake configuration.  For a default build with only the core c++ library, you can use
+Note that if you do not wish to compile bindings for Python, Julia, or Matlab, you can turn off binding compilation by setting the :code:`MPART_<language>=OFF` variable during CMake configuration. For a default build with only the core c++ library, and without requiring the Cereal library, you can use
 
 .. code-block:: bash
 
     cmake                                              \
      -DCMAKE_INSTALL_PREFIX=<your/MParT/install/path>  \
-     -DKokkos_ENABLE_PTHREAD=ON                        \
+     -DKokkos_ENABLE_THREADS=ON                        \
      -DMPART_PYTHON=OFF                                \
      -DMPART_MATLAB=OFF                                \
      -DMPART_JULIA=OFF                                 \
+     -DMPART_ARCHIVE=OFF
    ..
 
+See more details on MParT serialization, powered by the Cereal library, in the :doc:`serialization <api/utilities/serialization>` section.
 
-MParT is built on Kokkos, which provides a single interface to many different multithreading capabilities like pthreads, OpenMP, CUDA, and OpenCL.   A list of available backends can be found on the [Kokkos wiki](https://github.com/kokkos/kokkos/blob/master/BUILD.md#device-backends).   The `Kokkos_ENABLE_PTHREAD` option in the CMake configuration above can be changed to reflect different choices in device backends.   The OSX-provided clang compiler does not support OpenMP, so `PTHREAD` is a natural choice for CPU-based multithreading on OSX.   However, you may find that OpenMP has slightly better performance with other compilers and operating systems.
+MParT is built on Kokkos, which provides a single interface to many different multithreading capabilities like threads, OpenMP, CUDA, and OpenCL.   A list of available backends can be found on the `Kokkos wiki <https://github.com/kokkos/kokkos/blob/master/BUILD.md#device-backends>`_.   The :code:`Kokkos_ENABLE_THREADS` option in the CMake configuration above can be changed to reflect different choices in device backends.   The OSX-provided clang compiler does not support OpenMP, so :code:`THREADS` is a natural choice for CPU-based multithreading on OSX.   However, you may find that OpenMP has slightly better performance with other compilers and operating systems.
 
 Tests
 ---------
@@ -169,7 +174,7 @@ Make sure that this file includes a full installation path from root! At this po
 Compiling with CUDA Support
 ----------------------------
 
-Building the Kokkos Dependency 
+Building the Kokkos Dependency
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 To support a GPU at the moment, you need a few special requirements. Due to the way that Kokkos handles GPU code, MParT must be compiled using a special wrapper around NVCC that Kokkos provides.  Because of this, MParT cannot use an internal build of Kokkos and Kokkos must therefore be compiled (or otherwise installed) manually.
 
@@ -184,37 +189,38 @@ The following cmake command can be used to compile Kokkos with the CUDA backend 
         -DCMAKE_INSTALL_PREFIX=</new/kokkos/install/path> \
         -DBUILD_SHARED_LIBS=ON                            \
         -DKokkos_ENABLE_SERIAL=OFF                        \
-        -DKokkos_ENABLE_OPENMP=ON                         \
+        -DKokkos_ENABLE_THREADS=ON                        \
         -DKokkos_ENABLE_CUDA=ON                           \
-        -DKokkos_ARCH_VOLTA70=ON                          \
         -DKokkos_ENABLE_CUDA_LAMBDA=ON                    \
-        -DKokkos_CUDA_DIR=<cuda/install/path>             \
-        -DKokkos_CXX_STANDARD=17                          \
+        -DCMAKE_CXX_STANDARD=17                           \
     ../
 
 Replace the :code:`Kokkos_ARCH_VOLTA70` as needed with whatever other arch the compute resource uses that Kokkos supports. If you aren't sure, try omitting this as Kokkos has some machinery to detect such architecture.
 
 .. tip::
+    If Kokkos may not be able to find your GPU information automatically, consider including :code:`-DKokkos_ARCH_<ARCH><VERSION>=ON` where :code:`<ARCH>` and :code:`<VERSION>` are determined by `the Kokkos documentation <https://kokkos.github.io/kokkos-core-wiki/keywords.html?highlight=volta70#architecture-keywords>`_. If Kokkos cannot find CUDA, or you wish to use a particular version, use :code:`-DKokkos_CUDA_DIR=/your/cuda/path`.
+
+.. tip::
     If you're getting an error about C++ standards, try using a new version of your compiler; :code:`g++`, for example, does not support the flag :code:`--std=c++17` below version 8. For more details, see `this issue <https://github.com/kokkos/kokkos/issues/5157>`_ in Kokkos.
 
-Installing cublas and cusolver 
+Installing cublas and cusolver
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-MParT uses the CUBLAS and CUSOLVER components of the `NVIDIA CUDA Toolkit <https://developer.nvidia.com/cuda-toolkit>`_ for GPU-accelerated linear algebra.   
+MParT uses the CUBLAS and CUSOLVER components of the `NVIDIA CUDA Toolkit <https://developer.nvidia.com/cuda-toolkit>`_ for GPU-accelerated linear algebra.
 
 NVIDIA's `Cuda installation guide <https://docs.nvidia.com/cuda/cuda-installation-guide-linux/index.html>`_ provides detailed instructions on how to install CUDA.   For Debian-based x86_64 systems, we have been able to successfully install cuda, cublas, and cusparse for CUDA 11.4 using the command below.  Notice the installation of :code:`*-dev` packages, which are required to obtain the necessary header files.  Similar commands may be useful on other systems.
 
-.. code-block:: bash 
+.. code-block:: bash
 
     export CUDA_VERSION=11.4
     export CUDA_COMPAT_VERSION=470.129.06-1
     export CUDA_CUDART_VERSION=11.4.148-1
 
-    curl -sL "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub" | apt-key add - 
-    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /" > /etc/apt/sources.list.d/cuda.list 
-    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC 
-    
-    sudo apt-get -yq update 
+    curl -sL "https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub" | apt-key add -
+    echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /" > /etc/apt/sources.list.d/cuda.list
+    sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
+
+    sudo apt-get -yq update
     sudo apt-get -yq install --no-install-recommends \
         cuda-compat-${CUDA_VERSION/./-}=${CUDA_COMPAT_VERSION} \
         cuda-cudart-${CUDA_VERSION/./-}=${CUDA_CUDART_VERSION} \

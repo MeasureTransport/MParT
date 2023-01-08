@@ -62,10 +62,10 @@ template<>
 template<>
 StridedMatrix<double, Kokkos::HostSpace> ParameterizedFunctionBase<mpart::DeviceSpace>::Evaluate(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
 {
-    // Copy the points to the device space 
+    // Copy the points to the device space
     StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace>(pts);
 
-    // Evaluate on the device space 
+    // Evaluate on the device space
     StridedMatrix<double, mpart::DeviceSpace> evals_device = this->Evaluate(pts_device);
 
     // Copy back to the host space
@@ -97,7 +97,7 @@ Eigen::RowMatrixXd ParameterizedFunctionBase<mpart::DeviceSpace>::Evaluate(Eigen
     return KokkosToMat( ToHost(this->Evaluate(ptsView)));
 }
 
-#endif 
+#endif
 
 
 
@@ -142,10 +142,10 @@ template<>
 template<>
 StridedMatrix<double, Kokkos::HostSpace> ParameterizedFunctionBase<mpart::DeviceSpace>::Gradient(StridedMatrix<const double, Kokkos::HostSpace> const& pts, StridedMatrix<const double, Kokkos::HostSpace> const& sens)
 {
-    // Copy the points to the device space 
+    // Copy the points to the device space
     StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace>(pts);
     StridedMatrix<const double, mpart::DeviceSpace> sens_device = ToDevice<mpart::DeviceSpace>(sens);
-    // Evaluate on the device space 
+    // Evaluate on the device space
     StridedMatrix<double, mpart::DeviceSpace> evals_device = this->Gradient(pts_device, sens_device);
 
     // Copy back to the host space
@@ -176,11 +176,11 @@ Eigen::RowMatrixXd ParameterizedFunctionBase<mpart::DeviceSpace>::Gradient(Eigen
     Eigen::RowMatrixXd output(outputDim, pts.cols());
     StridedMatrix<const double, mpart::DeviceSpace> ptsView = ToDevice<mpart::DeviceSpace>( ConstRowMatToKokkos<double,Kokkos::HostSpace>(pts));
     StridedMatrix<const double, mpart::DeviceSpace> sensView = ToDevice<mpart::DeviceSpace>( ConstRowMatToKokkos<double,Kokkos::HostSpace>(sens));
-    
+
     return KokkosToMat( ToHost(this->Gradient(ptsView, sensView)));
 }
 
-#endif 
+#endif
 
 
 
@@ -252,7 +252,7 @@ void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, mp
         msg << "Error in ParameterizedFunctionBase<MemorySpace>::WrapCoeffs.  Expected coefficient vector with size " << numCoeffs << ", but new coefficients have size " << coeffs.size() << ".";
         throw std::invalid_argument(msg.str());
     }
-    
+
     this->savedCoeffs = coeffs;
 }
 #endif
@@ -339,13 +339,12 @@ Eigen::RowMatrixXd ParameterizedFunctionBase<mpart::DeviceSpace>::CoeffGrad(Eige
 }
 
 
-#endif 
-
+#endif
 template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::CheckCoefficients(std::string const& functionName) const
+bool ParameterizedFunctionBase<MemorySpace>::CheckCoefficients() const
 {
     if(this->numCoeffs==0)
-        return;
+        return true;
 
     bool good = true;
 
@@ -354,6 +353,17 @@ void ParameterizedFunctionBase<MemorySpace>::CheckCoefficients(std::string const
     }else if(this->savedCoeffs.size()!=this->numCoeffs){
         good = false;
     }
+
+    return good;
+
+}
+
+
+template<typename MemorySpace>
+void ParameterizedFunctionBase<MemorySpace>::CheckCoefficients(std::string const& functionName) const
+{
+
+    bool good = CheckCoefficients();
 
     if(!good){
         std::stringstream msg;

@@ -1,4 +1,11 @@
-set (TEST_SOURCES 
+
+if (MPART_ARCHIVE)
+     set (SERIALIZE_FILES tests/Test_Serialization.cpp)
+else()
+     set (SERIALIZE_FILES "")
+endif ()
+
+set (TEST_SOURCES
      tests/RunTests.cpp
 
      tests/MultiIndices/Test_MultiIndex.cpp
@@ -20,5 +27,8 @@ set (TEST_SOURCES
      tests/Test_LinearAlgebra.cpp
      tests/Test_AffineFunction.cpp
      tests/Test_IdentityMap.cpp
+     tests/Test_SummarizedMap.cpp
      #tests/Test_TensorProductFunction.cpp
-PARENT_SCOPE) 
+
+     ${SERIALIZE_FILES}
+PARENT_SCOPE)

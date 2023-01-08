@@ -2,6 +2,8 @@
 #define MPART_LINEARALGEBRA_H
 
 #include <Kokkos_Core.hpp>
+#include <Eigen/LU>
+#include <Eigen/Cholesky>
 
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Utilities/GPUtils.h"
@@ -11,7 +13,7 @@
 #include <cuda_runtime.h>
 #include <cublas_v2.h>
 #include <cusolverDn.h>
-#endif 
+#endif
 
 namespace mpart{
 
@@ -20,11 +22,11 @@ namespace mpart{
  x += y
  */
 template<typename... Traits1, typename... Traits2>
-void AddInPlace(Kokkos::View<double*, Traits1...> x, 
+void AddInPlace(Kokkos::View<double*, Traits1...> x,
                 Kokkos::View<const double*, Traits2...> y)
-{   
+{
     assert(x.extent(0)==y.extent(0));
-    
+
     using ExecSpace = typename MemoryToExecution<typename Kokkos::View<double*, Traits1...>::memory_space>::Space;
     Kokkos::RangePolicy<ExecSpace> policy(0, x.extent(0));
 
@@ -46,7 +48,7 @@ void AddInPlace(Kokkos::View<double*, Traits1...> x,
  x += y
  */
 template<typename... Traits1, typename... Traits2>
-void AddInPlace(Kokkos::View<double**, Traits1...> x, 
+void AddInPlace(Kokkos::View<double**, Traits1...> x,
                 Kokkos::View<const double**, Traits2...> y)
 {
     assert(x.extent(0)==y.extent(0));
@@ -70,10 +72,10 @@ void AddInPlace(Kokkos::View<double**, Traits1...> x,
 }
 
 /**
-z = x + y 
+z = x + y
 */
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space> operator+(Kokkos::View<const ScalarType*, Traits1...> x, 
+Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space> operator+(Kokkos::View<const ScalarType*, Traits1...> x,
                                                  Kokkos::View<const ScalarType*, Traits2...> y)
 {
     Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space> z("x+y", x.extent(0));
@@ -82,7 +84,7 @@ Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory
     return z;
 }
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memory_space> operator+(Kokkos::View<const ScalarType**, Traits1...> x, 
+Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memory_space> operator+(Kokkos::View<const ScalarType**, Traits1...> x,
                                                   Kokkos::View<const ScalarType**, Traits2...> y)
 {
     Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memory_space> z("x+y", x.extent(0), y.extent(1));
@@ -91,7 +93,7 @@ Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memo
     return z;
 }
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space> operator+(Kokkos::View<ScalarType*, Traits1...> x, 
+Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space> operator+(Kokkos::View<ScalarType*, Traits1...> x,
                                                  Kokkos::View<ScalarType*, Traits2...> y)
 {
     Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space> z("x+y", x.extent(0));
@@ -100,7 +102,7 @@ Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory
     return z;
 }
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memory_space> operator+(Kokkos::View<ScalarType**, Traits1...> x, 
+Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memory_space> operator+(Kokkos::View<ScalarType**, Traits1...> x,
                                                   Kokkos::View<ScalarType**, Traits2...> y)
 {
     Kokkos::View<ScalarType**, Traits1...> z("x+y", x.extent(0), y.extent(1));
@@ -111,28 +113,28 @@ Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memo
 
 
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space>& operator+=(Kokkos::View<ScalarType*, Traits1...>& x, 
+Kokkos::View<ScalarType*, typename Kokkos::View<ScalarType*, Traits1...>::memory_space>& operator+=(Kokkos::View<ScalarType*, Traits1...>& x,
                                                                                                     Kokkos::View<const ScalarType*, Traits2...> const& y)
 {
     mpart::AddInPlace(x,y);
     return x;
 }
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memory_space>& operator+=(Kokkos::View<ScalarType**, Traits1...>& x, 
+Kokkos::View<ScalarType**, typename Kokkos::View<ScalarType**, Traits1...>::memory_space>& operator+=(Kokkos::View<ScalarType**, Traits1...>& x,
                                                                                                       Kokkos::View<const ScalarType**, Traits2...> const& y)
 {
     mpart::AddInPlace(x,y);
     return x;
 }
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType*, Traits1...>& operator+=(Kokkos::View<ScalarType*, Traits1...>& x, 
+Kokkos::View<ScalarType*, Traits1...>& operator+=(Kokkos::View<ScalarType*, Traits1...>& x,
                                                   Kokkos::View<ScalarType*, Traits2...> const& y)
 {
     mpart::AddInPlace(x,Kokkos::View<const ScalarType*, Traits2...>(y));
     return x;
 }
 template<typename ScalarType, typename... Traits1, typename... Traits2>
-Kokkos::View<ScalarType**, Traits1...>& operator+=(Kokkos::View<ScalarType**, Traits1...>& x, 
+Kokkos::View<ScalarType**, Traits1...>& operator+=(Kokkos::View<ScalarType**, Traits1...>& x,
                                                    Kokkos::View<ScalarType**, Traits2...> const& y)
 {
     mpart::AddInPlace(x,Kokkos::View<const ScalarType**, Traits2...>(y));
@@ -143,14 +145,14 @@ Kokkos::View<ScalarType**, Traits1...>& operator+=(Kokkos::View<ScalarType**, Tr
 
 /**
  * @brief Wrapper around a Kokkos view also storing a bool indicating whether the view should be transposed in matrix multiplications.
- * 
+ *
  * @tparam MemorySpace
  */
 template<typename MemorySpace>
 struct TransposeObject{
 
-    TransposeObject(StridedMatrix<const double, MemorySpace> viewIn, 
-                    bool isTransposedIn=false) : isTransposed(isTransposedIn), 
+    TransposeObject(StridedMatrix<const double, MemorySpace> viewIn,
+                    bool isTransposedIn=false) : isTransposed(isTransposedIn),
                                                  view(viewIn){};
 
     bool isTransposed;
@@ -170,21 +172,21 @@ TransposeObject<MemorySpace> transpose(TransposeObject<MemorySpace> tview){retur
 
 /** Performs the matrix multiplication of two matrix A and B. */
 template<typename... Traits1, typename... Traits2>
-StridedMatrix<typename Kokkos::View<Traits1...>::non_const_value_type, typename Kokkos::View<Traits1...>::memory_space> operator*(Kokkos::View<Traits1...> A, 
+StridedMatrix<typename Kokkos::View<Traits1...>::non_const_value_type, typename Kokkos::View<Traits1...>::memory_space> operator*(Kokkos::View<Traits1...> A,
                                              Kokkos::View<Traits2...> B)
 {
     return TransposeObject<typename Kokkos::View<Traits1...>::memory_space>(A) * TransposeObject<typename Kokkos::View<Traits2...>::memory_space>(B);
 }
 
 template<typename MemorySpace, typename... Traits1>
-StridedMatrix<double, MemorySpace> operator*(TransposeObject<MemorySpace> A, 
+StridedMatrix<double, MemorySpace> operator*(TransposeObject<MemorySpace> A,
                                              Kokkos::View<Traits1...> B)
 {
     return A * TransposeObject<MemorySpace>(B);
 }
 
 template<typename MemorySpace, typename... Traits1>
-StridedMatrix<double, MemorySpace> operator*(Kokkos::View<Traits1...> A, 
+StridedMatrix<double, MemorySpace> operator*(Kokkos::View<Traits1...> A,
                                              TransposeObject<MemorySpace> B)
 {
     return TransposeObject<MemorySpace>(A) * B;
@@ -192,13 +194,13 @@ StridedMatrix<double, MemorySpace> operator*(Kokkos::View<Traits1...> A,
 
 
 template<typename MemorySpace, typename... Traits1, typename... Traits2>
-void dgemm(double                              alpha, 
+void dgemm(double                              alpha,
            Kokkos::View<Traits1...>            A,
            Kokkos::View<Traits2...>            B,
            double                              beta,
            StridedMatrix<double, MemorySpace>  C)
 {
-    dgemm<MemorySpace>(alpha, 
+    dgemm<MemorySpace>(alpha,
                        TransposeObject<MemorySpace>(StridedMatrix<const double, typename Kokkos::View<Traits1...>::memory_space>(A),false),
                        TransposeObject<MemorySpace>(StridedMatrix<const double, typename Kokkos::View<Traits2...>::memory_space>(B),false),
                        beta,
@@ -210,7 +212,7 @@ void dgemm(double                              alpha,
     The matrix C must be preallocated.
 */
 template<typename MemorySpace>
-void dgemm(double                              alpha, 
+void dgemm(double                              alpha,
            TransposeObject<MemorySpace>        A,
            TransposeObject<MemorySpace>        B,
            double                              beta,
@@ -219,7 +221,7 @@ void dgemm(double                              alpha,
 /** Returns C = A*B, or A^T*B or A^T*B^T or A*B^T
 */
 template<typename MemorySpace>
-StridedMatrix<double, MemorySpace> operator*(TransposeObject<MemorySpace> A, 
+StridedMatrix<double, MemorySpace> operator*(TransposeObject<MemorySpace> A,
                                              TransposeObject<MemorySpace> B)
 {
     assert(A.cols() == B.rows());
@@ -255,7 +257,7 @@ public:
     double determinant() const;
 
 private:
-    
+
     bool isComputed;
 
     std::shared_ptr<Eigen::PartialPivLU<Eigen::MatrixXd>> luSolver_;
@@ -270,6 +272,53 @@ private:
 
 };
 
+/** Mimics the interface of the Eigen::LLT class, but using Kokkos::Views and CUBLAS/CUSOLVER linear algebra.
+
+Note that the layout of the matrices used in this class is important.  Cublas expects column major (layout left).
+*/
+template<typename MemorySpace>
+class Cholesky
+{
+public:
+
+    Cholesky() {};
+    Cholesky(Kokkos::View<const double**,Kokkos::LayoutLeft,MemorySpace> A){ compute(A);};
+
+    /** Computes the Cholesky factorization of a matrix A */
+    void compute(Kokkos::View<const double**,Kokkos::LayoutLeft,MemorySpace> A);
+
+    /** Computes \f$A^{-1}x\f$ and stores the results in x.
+    */
+    void solveInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> x);
+
+    /** Returns a view containing \f$A^{-1}x\f$. */
+    Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> solve(StridedMatrix<const double,MemorySpace> x);
+
+    /** Computes \f$L^{-1}B\f$ and stores the results in B.
+    */
+    void solveInPlaceL(Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> B);
+
+    /** Computes \f$LX\f$ and stores the results in X*/
+    Kokkos::View<double**,Kokkos::LayoutLeft,MemorySpace> multiplyL(Kokkos::View<const double**,Kokkos::LayoutLeft,MemorySpace> X);
+
+    /** Returns the determinant of the matrix A based on its LU factorization. */
+    double determinant() const;
+
+private:
+
+    bool isComputed;
+
+    std::shared_ptr<Eigen::LLT<Eigen::MatrixXd>> cholSolver_;
+
+// Information used by cusolver getrf and getrs routines
+#if defined(MPART_ENABLE_GPU)
+    cusolverDnParams_t params;
+    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> LLT_;
+    int ldA;
+    static const cublasFillMode_t uplo = CUBLAS_FILL_MODE_LOWER;
+#endif
+
+};
 
 } // namespace mpart
 

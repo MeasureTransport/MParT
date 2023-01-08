@@ -9,14 +9,17 @@ using namespace mpart;
 
 template<typename MemorySpace>
 AffineMap<MemorySpace>::AffineMap(StridedVector<double,MemorySpace> b) : ConditionalMapBase<MemorySpace>(b.size(),b.size(),0),
-                                                                  b_(b),
+                                                                  b_("b",b.layout()),
                                                                   logDet_(0.0)
-{}
+{
+    Kokkos::deep_copy(b_, b);
+}
 
 template<typename MemorySpace>
 AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A) : ConditionalMapBase<MemorySpace>(A.extent(1),A.extent(0),0),
-                                                                  A_(A)
+                                                                  A_("A", A.layout())
 {
+    Kokkos::deep_copy(A_, A);
     assert(A_.extent(0)<=A_.extent(1));
     Factorize();
 }
@@ -25,9 +28,11 @@ AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A) : Conditi
 template<typename MemorySpace>
 AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A,
                                   StridedVector<double,MemorySpace> b) : ConditionalMapBase<MemorySpace>(A.extent(1),A.extent(0),0),
-                                                                  A_(A),
-                                                                  b_(b)
+                                                                  A_("A", A.layout()),
+                                                                  b_("b",b.layout())
 {
+    Kokkos::deep_copy(A_, A);
+    Kokkos::deep_copy(b_, b);
     assert(A_.extent(0)<=A_.extent(1));
     assert(A_.extent(0) == b_.extent(0));
     Factorize();

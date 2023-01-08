@@ -12,10 +12,19 @@ PYBIND11_MODULE(pympart, m) {
 
     ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(m);
     ConditionalMapBaseWrapper<Kokkos::HostSpace>(m);
-    TriangularMapWrapper<Kokkos::HostSpace>(m);
-    MapFactoryWrapper<Kokkos::HostSpace>(m);
     AffineMapWrapperHost(m);
     AffineFunctionWrapperHost(m);
+    TriangularMapWrapper<Kokkos::HostSpace>(m);
+    ComposedMapWrapper<Kokkos::HostSpace>(m);
+    SummarizedMapWrapper<Kokkos::HostSpace>(m);
+    IdentityMapWrapper<Kokkos::HostSpace>(m);
+    // DebugMapWrapper<Kokkos::HostSpace>(m);
+
+    MapFactoryWrapper<Kokkos::HostSpace>(m);
+
+#if defined(MPART_HAS_CEREAL)
+    DeserializeWrapper<Kokkos::HostSpace>(m);
+#endif // MPART_HAS_CEREAL
 
 #if defined(MPART_ENABLE_GPU)
     ParameterizedFunctionBaseWrapper<mpart::DeviceSpace>(m);
@@ -24,5 +33,8 @@ PYBIND11_MODULE(pympart, m) {
     MapFactoryWrapper<mpart::DeviceSpace>(m);
     AffineMapWrapperDevice(m);
     AffineFunctionWrapperDevice(m);
+    IdentityMapWrapper<Kokkos::DeviceSpace>(m);
+    SerializeWrapper<mpart::DeviceSpace>(m);
+    DeserializeWrapper<mpart::DeviceSpace>(m);
 #endif
 }

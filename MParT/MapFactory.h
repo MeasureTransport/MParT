@@ -5,6 +5,8 @@
 
 #include "MParT/ConditionalMapBase.h"
 #include "MParT/TriangularMap.h"
+#include "MParT/SummarizedMap.h"
+//#include "MParT/DebugMap.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
 #include <math.h>
@@ -48,6 +50,24 @@ namespace mpart{
                                                                          MapOptions options = MapOptions());
 
         /**
+            @brief Creates a square triangular map that is an identity in all but one output dimension
+
+            @details Given a dimension \f$d\f$, an active index \f$i\f$, and a real-valued map \f$f:\mathbb{R}^d\rightarrow\mathbb{R}\f$,
+            this function creates a map \f$T:\mathbb{R}^d\rightarrow\mathbb{R}^d\f$ such that \f$T_j(x) = x_j\f$ for all \f$j\neq i\f$ and
+            \f$T_i(x) = f(x)\f$.
+
+            @param dim The dimension of the map.
+            @param activeInd The index of the component to be non-identity.
+            @param comp The component placed the activeInd.
+
+         */
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSingleEntryMap(unsigned int dim,
+                                                                              unsigned int activeInd,
+                                                                              std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
+
+
+                                                                                  /**
             @brief Constructs a triangular map with MonotoneComponents for each block.  A total order multiindex
                    set is used to define the MonotoneComponent.
 
@@ -79,6 +99,21 @@ namespace mpart{
                                                                                 MapOptions options = MapOptions());
 
 
+
+        // template<typename MemorySpace>
+        // std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateDebugMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp) { return std::make_shared<DebugMap<MemorySpace>>(comp); }
+
+
+        /**
+        @brief Constructs a (generally) non-monotone multivariate expansion.
+        @param outputDim The output dimension of the expansion.  Each output will be defined by the same multiindex set but will have different coefficients.
+        @param mset The multiindex set specifying which terms should be used in the multivariate expansion.
+        @param options Options specifying the 1d basis functions used in the parameterization.
+        */
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSingleEntryMap(unsigned int dim,
+                                                                                     unsigned int activeInd,
+                                                                                     std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
         /** This struct is used to map the options to functions that can create a map component with types corresponding
             to the options.

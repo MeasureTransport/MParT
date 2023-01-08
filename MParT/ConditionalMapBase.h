@@ -153,6 +153,12 @@ namespace mpart {
         std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b);
 
         virtual ConditionalMapBase<MemorySpace> SliceImpl(int a, int b);
+#if defined(MPART_HAS_CEREAL)
+        template<typename Archive>
+        void serialize(Archive& ar) {
+            ar(cereal::base_class<ParameterizedFunctionBase<MemorySpace>>(this));
+        }
+#endif // MPART_HAS_CEREAL
     }; // class ConditionalMapBase<MemorySpace>
 }
 

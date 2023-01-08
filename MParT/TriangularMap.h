@@ -36,8 +36,11 @@ public:
 
     @param components A vector of ConditionalMapBase objects defining each \f$T_k\f$ in the block triangular map.
                       To maintain the correct block structure, the dimensions of the components must satisfy \f$N_k = N_{k-1}+M_{k}\f$.
+    @param moveCoeffs A boolean to choose whether to keep the coefficients from the maps in `components` or make new ones. If true,
+                      the new object takes ownership of all the coefficients vectors within all the maps in `components` (changing the coefficients
+                      in the new map will then change the coefficients in the original maps). If false, no coefficients are copied or created.
     */
-    TriangularMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components);
+    TriangularMap(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> const& components, bool moveCoeffs=false);
 
     virtual ~TriangularMap() = default;
 
@@ -123,10 +126,19 @@ public:
 
 
     void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                     StridedMatrix<double, MemorySpace>              output) override;
+                                             StridedMatrix<double, MemorySpace>              output) override;
 
     void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                     StridedMatrix<double, MemorySpace>              output) override;
+                                             StridedMatrix<double, MemorySpace>              output) override;
+
+#if defined(MPART_HAS_CEREAL)
+    template<class Archive>
+    void serialize(Archive & archive)
+    {
+        archive(cereal::base_class<ConditionalMapBase<MemorySpace>>(this), comps_);
+    }
+#endif // MPART_HAS_CEREAL
+
 private:
 
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps_;

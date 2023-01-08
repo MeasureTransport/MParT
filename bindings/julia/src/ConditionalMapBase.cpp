@@ -25,6 +25,13 @@ void mpart::binding::ConditionalMapBaseWrapper(jlcxx::Module &mod) {
             map.LogDeterminantCoeffGradImpl(JuliaToKokkos(pts), JuliaToKokkos(output));
             return output;
         })
+        .method("LogDeterminantInputGrad", [](ConditionalMapBase<Kokkos::HostSpace>& map, jlcxx::ArrayRef<double,2> pts){
+            unsigned int numPts = size(pts,1);
+            unsigned int numInputs = map.inputDim;
+            jlcxx::ArrayRef<double,2> output = jlMalloc<double>(numInputs, numPts);
+            map.LogDeterminantInputGradImpl(JuliaToKokkos(pts), JuliaToKokkos(output));
+            return output;
+        })
         .method("Inverse", [](ConditionalMapBase<Kokkos::HostSpace> &map, jlcxx::ArrayRef<double,2> x1, jlcxx::ArrayRef<double,2> r) {
             unsigned int numPts = size(r,1);
             unsigned int outputDim = map.outputDim;
