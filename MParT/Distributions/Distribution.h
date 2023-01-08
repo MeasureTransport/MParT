@@ -45,6 +45,9 @@ class Distribution{
         density_->GradLogDensityImpl(pts, output);
     };
 
+    std::shared_ptr<SamplerType> GetSampler() const { return sampler_; };
+    std::shared_ptr<DensityType> GetDensity() const { return density_; };
+
     private:
     std::shared_ptr<SamplerType> sampler_;
     std::shared_ptr<DensityType> density_;
