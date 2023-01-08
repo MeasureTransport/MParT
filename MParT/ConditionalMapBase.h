@@ -150,9 +150,8 @@ namespace mpart {
         virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                  StridedMatrix<double, MemorySpace>              output) = 0;
 
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b);
+        virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) = 0;
 
-        virtual ConditionalMapBase<MemorySpace> SliceImpl(int a, int b);
 #if defined(MPART_HAS_CEREAL)
         template<typename Archive>
         void serialize(Archive& ar) {

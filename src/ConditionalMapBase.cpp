@@ -150,11 +150,6 @@ StridedMatrix<double, Kokkos::HostSpace> ConditionalMapBase<Kokkos::HostSpace>::
     return output;
 }
 
-template<typename MemorySpace>
-std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) {
-    return std::shared_ptr<ConditionalMapBase<MemorySpace>>(this->SliceImpl(a,b));
-}
-
 template<>
 Eigen::RowMatrixXd ConditionalMapBase<Kokkos::HostSpace>::LogDeterminantCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const& pts)
 {
