@@ -54,12 +54,12 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         auto logPushforwardDensitySample = pushforward.LogDensity(samples);
 
         // Calculate the pullback and pushforward log density at the samples
-        auto gradLogPullbackDensitySample = pullback.GradLogDensity(samples);
+        auto gradLogPullbackDensitySample = pullback.LogDensityInputGrad(samples);
 
-        // Ensure that Pushforward::GradLogDensity throws an error
+        // Ensure that Pushforward::LogDensityInputGrad throws an error
         bool gradLogPushforwardExists = true;
         try {
-            pushforward.GradLogDensity(samples);
+            pushforward.LogDensityInputGrad(samples);
         } catch (std::runtime_error& e) {
             gradLogPushforwardExists = false;
         }
@@ -123,16 +123,16 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         Kokkos::View<double**, Kokkos::HostSpace> nullPrefix ("null prefix", 0, N_samp);
         StridedMatrix<const double, Kokkos::HostSpace> pullbackSamples = map->Inverse(nullPrefix, samples);
 
-        // Get appropriate density for the samples plus implemented CoeffGradLogDensity
+        // Get appropriate density for the samples plus implemented LogDensityCoeffGrad
         auto samplesDensity = pullback.LogDensity(pullbackSamples);
-        StridedMatrix<double, Kokkos::HostSpace> coeffGrad = pullback.CoeffGradLogDensity(pullbackSamples);
+        StridedMatrix<double, Kokkos::HostSpace> coeffGrad = pullback.LogDensityCoeffGrad(pullbackSamples);
 
         // Perform first order forward finite difference
         double fdstep = 1e-5;
         for(int i = 0; i < map->numCoeffs; i++) {
             map->Coeffs()(i) += fdstep;
             auto logDensityPerturb = pullback.LogDensity(pullbackSamples);
-            Kokkos::parallel_for("TestCoeffGradLogDensity", N_samp, KOKKOS_LAMBDA(const int j) {
+            Kokkos::parallel_for("Test LogDensityCoeffGrad", N_samp, KOKKOS_LAMBDA(const int j) {
                 logDensityPerturb(j) -= samplesDensity(j);
                 logDensityPerturb(j) /= fdstep;
                 logDensityPerturb(j) -= coeffGrad(i, j);

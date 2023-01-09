@@ -30,8 +30,8 @@ class PushforwardDensity: public DensityBase<MemorySpace> {
         output += logJacobian;
     };
 
-    void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override {
-        throw std::runtime_error("GradLogDensity not implemented for PushforwardDensity");
+    void LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override {
+        throw std::runtime_error("LogDensityInputGrad not implemented for PushforwardDensity");
     };
 
     private:

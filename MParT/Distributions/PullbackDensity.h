@@ -17,13 +17,13 @@ class PullbackDensity: public DensityBase<MemorySpace> {
 
     void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) override;
 
-    void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override;
+    void LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override;
 
-    void CoeffGradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output);
+    void LogDensityCoeffGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output);
 
-    StridedMatrix<double, MemorySpace> CoeffGradLogDensity(StridedMatrix<const double, MemorySpace> const &pts);
+    StridedMatrix<double, MemorySpace> LogDensityCoeffGrad(StridedMatrix<const double, MemorySpace> const &pts);
 
-    Eigen::RowMatrixXd CoeffGradLogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts);
+    Eigen::RowMatrixXd LogDensityCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const &pts);
 
     private:
     std::shared_ptr<ConditionalMapBase<MemorySpace>> map_;

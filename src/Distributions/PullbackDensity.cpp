@@ -22,38 +22,38 @@ void PullbackDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const double, Me
 }
 
 template<typename MemorySpace>
-void PullbackDensity<MemorySpace>::GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
+void PullbackDensity<MemorySpace>::LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
     StridedMatrix<const double, MemorySpace> mappedPts = map_->Evaluate(pts);
-    StridedMatrix<double, MemorySpace> sens_map = reference_->GradLogDensity(mappedPts);
+    StridedMatrix<double, MemorySpace> sens_map = reference_->LogDensityInputGrad(mappedPts);
     map_->GradientImpl(pts, sens_map, output);
     StridedMatrix<double, MemorySpace> gradLogJacobian = map_->LogDeterminantInputGrad(pts);
     output += gradLogJacobian;
 }
 
 template<typename MemorySpace>
-void PullbackDensity<MemorySpace>::CoeffGradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
+void PullbackDensity<MemorySpace>::LogDensityCoeffGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
     StridedMatrix<const double, MemorySpace> mappedPts = map_->Evaluate(pts);
-    StridedMatrix<double, MemorySpace> sens_map = reference_->GradLogDensity(mappedPts);
+    StridedMatrix<double, MemorySpace> sens_map = reference_->LogDensityInputGrad(mappedPts);
     map_->CoeffGradImpl(pts, sens_map, output);
     StridedMatrix<double, MemorySpace> gradLogJacobian = map_->LogDeterminantCoeffGrad(pts);
     output += gradLogJacobian;
 }
 
 template<typename MemorySpace>
-StridedMatrix<double, MemorySpace> PullbackDensity<MemorySpace>::CoeffGradLogDensity(StridedMatrix<const double, MemorySpace> const &pts) {
-    Kokkos::View<double**, MemorySpace> output("CoeffGradLogDensity", map_->numCoeffs, pts.extent(1));
-    CoeffGradLogDensityImpl(pts, output);
+StridedMatrix<double, MemorySpace> PullbackDensity<MemorySpace>::LogDensityCoeffGrad(StridedMatrix<const double, MemorySpace> const &pts) {
+    Kokkos::View<double**, MemorySpace> output("LogDensityCoeffGrad", map_->numCoeffs, pts.extent(1));
+    LogDensityCoeffGradImpl(pts, output);
     return output;
 }
 
 template<>
-Eigen::RowMatrixXd PullbackDensity<Kokkos::HostSpace>::CoeffGradLogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts) {
+Eigen::RowMatrixXd PullbackDensity<Kokkos::HostSpace>::LogDensityCoeffGrad(Eigen::Ref<const Eigen::RowMatrixXd> const &pts) {
     // Allocate output
     Eigen::RowMatrixXd output(pts.rows(), pts.cols());
     StridedMatrix<const double, Kokkos::HostSpace> ptsView = ConstRowMatToKokkos<double, Kokkos::HostSpace>(pts);
     StridedMatrix<double, Kokkos::HostSpace> outView = MatToKokkos<double, Kokkos::HostSpace>(output);
     // Call the LogDensity function
-    GradLogDensityImpl(ptsView, outView);
+    LogDensityInputGradImpl(ptsView, outView);
     return output;
 }
 
