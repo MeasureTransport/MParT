@@ -196,7 +196,7 @@ template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> AffineMap<MemorySpace>::Slice(int a, int b) {
     StridedMatrix<double, MemorySpace> A_new;
     StridedVector<double, MemorySpace> b_new;
-    if(A_.extent(0) > 0) A_new = Kokkos::subview(A_, Kokkos::ALL(), std::make_pair(a,b));
+    if(A_.extent(0) > 0) A_new = Kokkos::subview(A_, std::make_pair(a,b), Kokkos::ALL());
     if(b_.size() > 0) b_new = Kokkos::subview(b_, std::make_pair(a,b));
     return std::make_shared<AffineMap<MemorySpace>>(A_new, b_new);
 }

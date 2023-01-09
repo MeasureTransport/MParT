@@ -9,7 +9,7 @@ using namespace Catch;
 TEST_CASE( "Testing Shift-only AffineMap", "[ShiftMap]" ) {
 
     Kokkos::View<double*, Kokkos::HostSpace> b("b", 2);
-    
+
     b(0) = 1.0;
     b(1) = 2.0;
 
@@ -46,7 +46,7 @@ TEST_CASE( "Testing Shift-only AffineMap", "[ShiftMap]" ) {
 TEST_CASE( "Testing Linear-only AffineMap", "[LinearMap]" ) {
 
     Kokkos::View<double**, Kokkos::HostSpace> A("A", 2,2);
-    
+
     A(0,0) = 2.0;
     A(1,0) = 1.0;
     A(0,1) = 1.0;
@@ -85,8 +85,8 @@ TEST_CASE( "Testing Linear-only AffineMap", "[LinearMap]" ) {
 TEST_CASE( "Testing Rectangular AffineMap", "[RectangularLinearMap]" ) {
 
     Kokkos::View<double**, Kokkos::HostSpace> A("A", 2,3);
-    
-    /* 
+
+    /*
      A = [[2.0, 3.0, 1.0],
           [1.0, 1.0, 4.0]]
     */
@@ -96,7 +96,7 @@ TEST_CASE( "Testing Rectangular AffineMap", "[RectangularLinearMap]" ) {
     A(1,1) = 1.0;
     A(0,2) = 1.0;
     A(1,2) = 4.0;
-    
+
 
 
     auto map = std::make_shared<AffineMap<Kokkos::HostSpace>>(A);
@@ -139,7 +139,7 @@ TEST_CASE( "Testing Full AffineMap", "[FullAffineMap]" ) {
 
     Kokkos::View<double**, Kokkos::HostSpace> A("A", 2,2);
     Kokkos::View<double*, Kokkos::HostSpace> b("b", 2);
-    
+
     A(0,0) = 2.0;
     A(1,0) = 1.0;
     A(0,1) = 1.0;
@@ -178,13 +178,70 @@ TEST_CASE( "Testing Full AffineMap", "[FullAffineMap]" ) {
 
 }
 
+TEST_CASE( "Testing AffineMap::Slice", "[AffineMapSlice]" ) {
+    Kokkos::View<double**, Kokkos::HostSpace> A("A", 3,3);
+    Kokkos::View<double*, Kokkos::HostSpace> b("b", 3);
+    std::fill(A.data(), A.data()+A.extent(0)*A.extent(1), 0.0);
+
+    A(0,0) = 2.0;
+    A(1,0) = 1.0;
+    A(0,1) = 1.0;
+    A(1,1) = 4.0;
+    A(0,2) = 1.0;
+    A(1,2) = 4.0;
+
+    A(2,0) = 2.0;
+    A(2,1) = 1.0;
+    A(2,2) = 3.0;
+
+    b(0) = 1.0;
+    b(1) = 2.0;
+    b(2) = 3.0;
+
+    auto map = std::make_shared<AffineMap<Kokkos::HostSpace>>(A,b);
+    auto slice = map->Slice(0,2);
+    REQUIRE(slice->inputDim==3);
+    REQUIRE(slice->outputDim==2);
+
+    unsigned int numPts = 3;
+    Kokkos::View<double**, Kokkos::HostSpace> pts("Point", A.extent(1), numPts);
+    for(unsigned int i=0; i<numPts; ++i){
+        for(unsigned int d=0; d<A.extent(0);++d)
+            pts(d,i) = double(i)/double(numPts-1);
+    }
+
+    // Check to make sure the log determinant is constant and what it should be
+    Kokkos::View<double*, Kokkos::HostSpace> logDet = slice->LogDeterminant(pts);
+    for(unsigned int i=0; i<numPts; ++i){
+        CHECK(logDet(i) == Approx(std::log(A(0,1)*A(1,2)-A(0,2)*A(1,1))).epsilon(1e-14));
+    }
+
+    // Test the forward evaluation
+    Kokkos::View<double**, Kokkos::HostSpace> evals = slice->Evaluate(pts);
+    REQUIRE(evals.extent(0)==2);
+    REQUIRE(evals.extent(1)==pts.extent(1));
+
+    Kokkos::View<double**, Kokkos::HostSpace> pts2 = slice->Inverse(pts, evals);
+    REQUIRE(pts2.extent(0)==2);
+    REQUIRE(pts2.extent(1)==pts.extent(1));
+
+    for(unsigned int i=0; i<numPts; ++i){
+        double trueOut1 = A(0,0)*pts(0,i) + A(0,1)*pts(1,i) + A(0,2)*pts(2,i);
+        double trueOut2 = A(1,0)*pts(0,i) + A(1,1)*pts(1,i) + A(1,2)*pts(2,i);
+        CHECK(evals(0,i)==Approx(trueOut1).epsilon(1e-14));
+        CHECK(evals(1,i)==Approx(trueOut2).epsilon(1e-14));
+        CHECK(pts2(0,i)==Approx(pts(1,i)).epsilon(1e-14));
+        CHECK(pts2(1,i)==Approx(pts(2,i)).epsilon(1e-14));
+    }
+}
+
 
 #if defined(MPART_ENABLE_GPU)
 
 TEST_CASE( "Testing Shift-only AffineMap on Device", "[DeviceShiftMap]" ) {
 
     Kokkos::View<double*, Kokkos::HostSpace> hb("b", 2);
-    
+
     hb(0) = 1.0;
     hb(1) = 2.0;
 
@@ -193,7 +250,7 @@ TEST_CASE( "Testing Shift-only AffineMap on Device", "[DeviceShiftMap]" ) {
 
     auto map = std::make_shared<AffineMap<mpart::DeviceSpace>>(db);
 
-    
+
     unsigned int numPts = 10;
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> hpts("Point", 2, numPts);
     for(unsigned int i=0; i<numPts; ++i){
@@ -230,7 +287,7 @@ TEST_CASE( "Testing Shift-only AffineMap on Device", "[DeviceShiftMap]" ) {
 TEST_CASE( "Testing Linear-only AffineMap on Device", "[DeviceLinearMap]" ) {
 
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> hA("A", 2,2);
-    
+
     hA(0,0) = 2.0;
     hA(1,0) = 1.0;
     hA(0,1) = 1.0;
@@ -263,7 +320,7 @@ TEST_CASE( "Testing Linear-only AffineMap on Device", "[DeviceLinearMap]" ) {
 
     auto dpts2 = map->Inverse(dpts, devals);
     auto hpts2 = ToHost(dpts2);
-    
+
     for(unsigned int i=0; i<numPts; ++i){
         double trueOut1 = hA(0,0)*hpts(0,i) + hA(0,1)*hpts(1,i);
         double trueOut2 = hA(1,0)*hpts(0,i) + hA(1,1)*hpts(1,i);
@@ -279,8 +336,8 @@ TEST_CASE( "Testing Linear-only AffineMap on Device", "[DeviceLinearMap]" ) {
 TEST_CASE( "Testing Rectangular AffineMap on Device", "[DeviceRectangularLinearMap]" ) {
 
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> hA("A", 2,3);
-    
-    /* 
+
+    /*
      A = [[2.0, 3.0, 1.0],
           [1.0, 1.0, 4.0]]
     */
@@ -290,7 +347,7 @@ TEST_CASE( "Testing Rectangular AffineMap on Device", "[DeviceRectangularLinearM
     hA(1,1) = 1.0;
     hA(0,2) = 1.0;
     hA(1,2) = 4.0;
-    
+
     auto dA = ToDevice<mpart::DeviceSpace>(hA);
     auto map = std::make_shared<AffineMap<mpart::DeviceSpace>>(dA);
 
@@ -338,7 +395,7 @@ TEST_CASE( "Testing Full AffineMap on Device", "[DeviceFullAffineMap]" ) {
 
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> hA("A", 2,2);
     Kokkos::View<double*, Kokkos::HostSpace> hb("b", 2);
-    
+
     hA(0,0) = 2.0;
     hA(1,0) = 1.0;
     hA(0,1) = 1.0;
@@ -349,7 +406,7 @@ TEST_CASE( "Testing Full AffineMap on Device", "[DeviceFullAffineMap]" ) {
 
     auto dA = ToDevice<mpart::DeviceSpace>(hA);
     auto db = ToDevice<mpart::DeviceSpace>(hb);
-    
+
     auto map = std::make_shared<AffineMap<mpart::DeviceSpace>>(dA,db);
 
     unsigned int numPts = 10;
@@ -374,7 +431,7 @@ TEST_CASE( "Testing Full AffineMap on Device", "[DeviceFullAffineMap]" ) {
 
     auto dpts2 = map->Inverse(dpts, devals);
     auto hpts2 = ToHost(dpts2);
-    
+
     for(unsigned int i=0; i<numPts; ++i){
         double trueOut1 = hA(0,0)*hpts(0,i) + hA(0,1)*hpts(1,i) + hb(0);
         double trueOut2 = hA(1,0)*hpts(0,i) + hA(1,1)*hpts(1,i) + hb(1);
@@ -387,4 +444,4 @@ TEST_CASE( "Testing Full AffineMap on Device", "[DeviceFullAffineMap]" ) {
 }
 
 
-#endif 
+#endif
