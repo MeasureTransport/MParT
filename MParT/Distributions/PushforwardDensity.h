@@ -15,12 +15,12 @@ class PushforwardDensity: public DensityBase<MemorySpace> {
     PushforwardDensity(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<DensityBase<MemorySpace>> reference):
         DensityBase<MemorySpace>(reference->Dim()), map_(map), reference_(reference) {
         if (map_->inputDim != reference_->Dim()) {
-            throw std::runtime_error("PushforwardDensity: map output dimension does not match reference density dimension");
+            throw std::invalid_argument("PushforwardDensity: map output dimension does not match reference density dimension");
         }
         if (map_->outputDim != map_->inputDim) {
-            throw std::runtime_error("PushforwardDensity: map input dimension does not match map output dimension");
+            throw std::invalid_argument("PushforwardDensity: map input dimension does not match map output dimension");
         }
-    };
+    }
 
     void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) override {
         Kokkos::View<double**, MemorySpace> prefix_null("prefix_null", 0, pts.extent(1));

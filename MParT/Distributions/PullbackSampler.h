@@ -12,7 +12,14 @@ class PullbackSampler: public SampleGenerator<MemorySpace> {
     public:
     PullbackSampler() = delete;
     PullbackSampler(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<SampleGenerator<MemorySpace>> reference):
-    SampleGenerator<MemorySpace>(reference->Dim()), map_(map), reference_(reference) {};
+    SampleGenerator<MemorySpace>(reference->Dim()), map_(map), reference_(reference) {
+        if (map_->outputDim != reference_->Dim()) {
+            throw std::invalid_argument("PullbackSampler: map output dimension does not match reference sampler dimension");
+        }
+        if (map_->inputDim != map_->outputDim) {
+            throw std::invalid_argument("PullbackSampler: map input dimension does not match map output dimension");
+        }
+    }
 
     void SampleImpl(StridedMatrix<double, MemorySpace> output) override {
         unsigned int N = output.extent(1);
