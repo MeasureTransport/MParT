@@ -47,7 +47,7 @@ TEST_CASE( "Testing Distribution Class" , "[DistributionClass]") {
     double exp_grad_log_density = 0.;
     StridedMatrix<const double, Kokkos::HostSpace> const_samples = samples;
     auto density_samps = distribution.LogDensity(const_samples);
-    auto grad_density_samps = distribution.GradLogDensity(const_samples);
+    auto grad_density_samps = distribution.LogDensityInputGrad(const_samples);
     double max_dev_log_density = 0.;
     double max_dev_grad_log_density = 0.;
     for(int i = 0; i < N_samp; i++) {

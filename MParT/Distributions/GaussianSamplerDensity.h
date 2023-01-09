@@ -43,7 +43,7 @@ class GaussianSamplerDensity: public SampleGenerator<MemorySpace>, public Densit
     GaussianSamplerDensity(unsigned int dim);
 
     void SampleImpl(StridedMatrix<double, MemorySpace> output) override;
-    void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override;
+    void LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override;
     void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) override;
 
     unsigned int Dim() const override { return dim_; };

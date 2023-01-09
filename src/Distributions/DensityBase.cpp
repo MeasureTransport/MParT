@@ -15,13 +15,13 @@ Eigen::VectorXd DensityBase<Kokkos::HostSpace>::LogDensity(Eigen::Ref<const Eige
 }
 
 template<>
-Eigen::RowMatrixXd DensityBase<Kokkos::HostSpace>::GradLogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts) {
+Eigen::RowMatrixXd DensityBase<Kokkos::HostSpace>::LogDensityInputGrad(Eigen::Ref<const Eigen::RowMatrixXd> const &pts) {
     // Allocate output
     Eigen::RowMatrixXd output(pts.rows(), pts.cols());
     StridedMatrix<const double, Kokkos::HostSpace> ptsView = ConstRowMatToKokkos<double, Kokkos::HostSpace>(pts);
     StridedMatrix<double, Kokkos::HostSpace> outView = MatToKokkos<double, Kokkos::HostSpace>(output);
     // Call the LogDensity function
-    GradLogDensityImpl(ptsView, outView);
+    LogDensityInputGradImpl(ptsView, outView);
 
     return output;
 }
@@ -39,11 +39,11 @@ StridedVector<double, Kokkos::HostSpace> DensityBase<Kokkos::HostSpace>::LogDens
 
 template<>
 template<>
-StridedMatrix<double, Kokkos::HostSpace> DensityBase<Kokkos::HostSpace>::GradLogDensity<Kokkos::HostSpace>(StridedMatrix<const double, Kokkos::HostSpace> const &X) {
+StridedMatrix<double, Kokkos::HostSpace> DensityBase<Kokkos::HostSpace>::LogDensityInputGrad<Kokkos::HostSpace>(StridedMatrix<const double, Kokkos::HostSpace> const &X) {
     // Allocate output
     Kokkos::View<double**, Kokkos::HostSpace> output("output", X.extent(0), X.extent(1));
     // Call the LogDensity function
-    GradLogDensityImpl(X, output);
+    LogDensityInputGradImpl(X, output);
 
     return output;
 }
