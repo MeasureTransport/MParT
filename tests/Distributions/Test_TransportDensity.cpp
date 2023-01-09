@@ -122,20 +122,24 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         StridedMatrix<const double, Kokkos::HostSpace> samples = density->Sample(N_samp);
         Kokkos::View<double**, Kokkos::HostSpace> nullPrefix ("null prefix", 0, N_samp);
         StridedMatrix<const double, Kokkos::HostSpace> pullbackSamples = map->Inverse(nullPrefix, samples);
+
+        // Get appropriate density for the samples plus implemented CoeffGradLogDensity
         auto samplesDensity = pullback.LogDensity(pullbackSamples);
         StridedMatrix<double, Kokkos::HostSpace> coeffGrad = pullback.CoeffGradLogDensity(pullbackSamples);
-        double perturb = 1e-5;
+
+        // Perform first order forward finite difference
+        double fdstep = 1e-5;
         for(int i = 0; i < map->numCoeffs; i++) {
-            map->Coeffs()(i) += perturb;
+            map->Coeffs()(i) += fdstep;
             auto logDensityPerturb = pullback.LogDensity(pullbackSamples);
             Kokkos::parallel_for("TestCoeffGradLogDensity", N_samp, KOKKOS_LAMBDA(const int j) {
                 logDensityPerturb(j) -= samplesDensity(j);
-                logDensityPerturb(j) /= perturb;
+                logDensityPerturb(j) /= fdstep;
                 logDensityPerturb(j) -= coeffGrad(i, j);
                 logDensityPerturb(j) = std::abs(logDensityPerturb(j));
             });
             double max_err = *std::max_element(logDensityPerturb.data(), logDensityPerturb.data()+N_samp);
-            REQUIRE(max_err < std::sqrt(perturb));
+            REQUIRE(max_err < std::sqrt(fdstep));
             map->Coeffs()(i) = (double) (i + 1);
         }
     }
