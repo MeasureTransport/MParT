@@ -349,8 +349,17 @@ template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> TriangularMap<MemorySpace>::Slice(int a, int b) {
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
     // TODO: Handle empty case
-    if( a < 0 || a >= b || b > this->outputDim )
+    if( a < 0 || a >= b || b > this->outputDim ) {
         throw std::invalid_argument("TriangularMap::Slice: 0 <= a < b <= outputDim must be satisfied.");
+    }
+    // Special cases if the slice is at the end of the map
+    if( b <= this->comps_[0]->outputDim) {
+        return this->comps_[0]->Slice(a, b);
+    }
+    if( a >= this->outputDim - this->comps_[this->comps_.size()-1]->outputDim) {
+        unsigned int rest_of_output = this->outputDim - this->comps_[this->comps_.size()-1]->outputDim;
+        return this->comps_[this->comps_.size()-1]->Slice(a - rest_of_output, b - rest_of_output);
+    }
 
     int accum_a = 0; // Accumulated output dimension before a
     int k_a = 0; // Index of component containing a
@@ -372,8 +381,6 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> TriangularMap<MemorySpace>::Sli
         k_b++;
     }
 
-    std::cerr << "a = " << a << ", accum_a = " << accum_a << ", k_a = " << k_a << std::endl;
-    std::cerr << "b = " << b << ", accum_b = " << accum_b << ", k_b = " << k_b << std::endl;
     if(k_a == k_b){
         components.push_back(this->comps_[k_a]->Slice(a-accum_a, b-accum_b));
     } else {
