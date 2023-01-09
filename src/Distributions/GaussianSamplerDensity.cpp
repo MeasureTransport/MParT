@@ -52,12 +52,12 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
 }
 
 template<typename MemorySpace>
-void GaussianSamplerDensity<MemorySpace>::GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
+void GaussianSamplerDensity<MemorySpace>::LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
     // Compute the gradient of the log density
     int M = pts.extent(0);
     int N = pts.extent(1);
     if(M != dim_) {
-        throw std::runtime_error("GaussianSamplerDensity::GradLogDensityImpl: The number of rows in pts must match the dimension of the distribution.");
+        throw std::runtime_error("GaussianSamplerDensity::LogDensityInputGradImpl: The number of rows in pts must match the dimension of the distribution.");
     }
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
 

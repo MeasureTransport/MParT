@@ -42,7 +42,7 @@ void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, Strided
     });
 }
 
-void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override {
+void LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override {
     unsigned int N = pts.extent(1);
     Kokkos::parallel_for( "uniform grad log density", N, KOKKOS_LAMBDA (const int& j) {
         output(0,j) = 0.;

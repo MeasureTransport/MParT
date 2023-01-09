@@ -38,11 +38,11 @@ class Distribution{
         density_->LogDensityImpl(pts, output);
     };
 
-    StridedMatrix<double, MemorySpace> GradLogDensity(StridedMatrix<const double, MemorySpace> const &pts) {
-        return density_->GradLogDensity(pts);
+    StridedMatrix<double, MemorySpace> LogDensityInputGrad(StridedMatrix<const double, MemorySpace> const &pts) {
+        return density_->LogDensityInputGrad(pts);
     };
-    void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
-        density_->GradLogDensityImpl(pts, output);
+    void LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) {
+        density_->LogDensityInputGradImpl(pts, output);
     };
 
     private:
