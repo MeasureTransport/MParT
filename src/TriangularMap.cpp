@@ -12,10 +12,10 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
                         std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
                         comps_(components)
 {
-    
+
 
     // Check the sizes of all the inputs
-    
+
     for(unsigned int i=0; i<comps_.size(); ++i){
         if(comps_.at(i)->outputDim > comps_.at(i)->inputDim){
             std::stringstream msg;
@@ -42,7 +42,7 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
 
         Kokkos::View<double*,MemorySpace> coeffs("coeffs", this->numCoeffs);
         unsigned int cumNumCoeffs = 0;
-        
+
         for(unsigned int i=0; i<comps_.size(); ++i){
 
             if(!comps_.at(i)->CheckCoefficients()){
@@ -281,7 +281,7 @@ void TriangularMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, Memor
             subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
             comps_.at(i)->CoeffGradImpl(subPts, subSens, subOut);
 
-            
+
             startParamDim += comps_.at(i)->numCoeffs;
         }
 
@@ -350,10 +350,10 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> TriangularMap<MemorySpace>::Sli
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
     // TODO: Handle empty case
     if( a < 0 || a >= b || b > this->outputDim )
-        throw std::runtime_error("TriangularMap::Slice: 0 <= a < b <= outputDim must be satisfied.");
+        throw std::invalid_argument("TriangularMap::Slice: 0 <= a < b <= outputDim must be satisfied.");
 
-    int accum_a = 0;
-    int k_a = 0;
+    int accum_a = 0; // Accumulated output dimension before a
+    int k_a = 0; // Index of component containing a
     //TODO: Check that this is correct
     while(k_a < this->comps_.size()){
         if(accum_a + this->comps_[k_a]->outputDim > a)
@@ -362,8 +362,8 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> TriangularMap<MemorySpace>::Sli
         k_a++;
     }
 
-    int accum_b = accum_a;
-    int k_b = k_a;
+    int accum_b = accum_a; // Accumulated output dimension before b
+    int k_b = k_a; // Index of component containing b
     //TODO: Check that this is correct
     while(k_b < this->comps_.size()){
         if(accum_b + this->comps_[k_b]->outputDim >= b)

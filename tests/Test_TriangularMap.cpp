@@ -902,22 +902,20 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
 
     SECTION("Slice"){
         int sliceBegin = 1;
-        int sliceEnd = 3;
+        int sliceEnd = 5;
         unsigned int extraInputs = 2;
         auto slice = triMap->Slice(sliceBegin, sliceEnd);
-        REQUIRE(slice->inputDim == triMap->inputDim);
+        REQUIRE(slice->inputDim == sliceEnd);
         REQUIRE(slice->outputDim == sliceEnd-sliceBegin);
 
         auto outSlice = slice->Evaluate(in);
+        auto outFull = triMap->Evaluate(in);
 
         // Just test the evaluation
         for(unsigned int i=sliceBegin; i<sliceEnd; ++i){
-            auto outBlock = blocks.at(i)->Evaluate(Kokkos::subview(in, std::make_pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
-
-            REQUIRE(outBlock.extent(1)==numSamps);
-            REQUIRE(outBlock.extent(0)==1);
-            for(unsigned int j=0; j<numSamps; ++j)
-                CHECK( outSlice(i-sliceBegin,j) == Approx(outBlock(0,j)).epsilon(1e-6));
+            for(unsigned int j=0; j<numSamps; ++j) {
+                CHECK( outSlice(i-sliceBegin,j) == Approx(outFull(i,j)).epsilon(1e-6));
+            }
         }
 
         // This is used for testing the gradient

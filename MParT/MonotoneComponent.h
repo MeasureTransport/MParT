@@ -1082,7 +1082,7 @@ public:
 
     std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) override {
         assert(a == 0 && b == 1);
-        return shared_from_this();
+        return MonotoneComponent<ExpansionType, PosFuncType, QuadratureType, MemorySpace>::shared_from_this();
     }
 
     /** Give access to the underlying FixedMultiIndexSet
