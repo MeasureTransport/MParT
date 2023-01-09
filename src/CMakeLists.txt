@@ -12,6 +12,7 @@ target_sources(mpart
     Distributions/DensityBase.cpp
     Distributions/SampleGenerator.cpp
     Distributions/GaussianSamplerDensity.cpp
+    Distributions/PullbackDensity.cpp
 
     ParameterizedFunctionBase.cpp
     ConditionalMapBase.cpp
