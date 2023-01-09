@@ -903,6 +903,7 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
     SECTION("Slice"){
         int sliceBegin = 1;
         int sliceEnd = 3;
+        unsigned int extraInputs = 2;
         auto slice = triMap->Slice(sliceBegin, sliceEnd);
         REQUIRE(slice->inputDim == triMap->inputDim);
         REQUIRE(slice->outputDim == sliceEnd-sliceBegin);
