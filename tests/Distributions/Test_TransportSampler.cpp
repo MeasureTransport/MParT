@@ -32,7 +32,7 @@ TEST_CASE( "Testing Pullback/Pushforward sampling", "[PullbackPushforwardSampler
     auto map = std::make_shared<AffineMap<Kokkos::HostSpace>>(A, b);
     auto density = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(dim);
 
-    SECTION("Testing pullback density") {
+    SECTION("PullbackSampler") {
         PullbackSampler<Kokkos::HostSpace> pullback {map, density};
 
         // Set the seed and create samples to test the densities
@@ -49,7 +49,7 @@ TEST_CASE( "Testing Pullback/Pushforward sampling", "[PullbackPushforwardSampler
 
         TestStandardNormalSamples(pullbackSamples);
     }
-    SECTION("Testing the pushforward samples") {
+    SECTION("PushforwardSampler") {
         // Create the pushforward sampler
         PushforwardSampler<Kokkos::HostSpace> pushforward {map, density};
 

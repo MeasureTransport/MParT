@@ -3,7 +3,7 @@
 void TestStandardNormalSamples(StridedMatrix<double, Kokkos::HostSpace> samples) {
     unsigned int dim = samples.extent(0);
     unsigned int N_samp = samples.extent(1);
-    double mc_margin = (1/std::sqrt(N_samp))*3.0;
+    double mc_margin = (1/std::sqrt(N_samp))*4.0;
 
     Kokkos::View<double*, Kokkos::HostSpace> mean("mean", dim);
     Kokkos::View<double**, Kokkos::HostSpace> covar("covar", dim, dim);

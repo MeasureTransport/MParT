@@ -32,7 +32,7 @@ class PullbackDensity: public DensityBase<MemorySpace> {
     void GradLogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override {
         StridedMatrix<const double, MemorySpace> mappedPts = map_->Evaluate(pts);
         StridedMatrix<double, MemorySpace> sens_map = reference_->GradLogDensity(mappedPts);
-        map_->GradientImpl(mappedPts, sens_map, output);
+        map_->GradientImpl(pts, sens_map, output);
         StridedMatrix<double, MemorySpace> gradLogJacobian = map_->LogDeterminantInputGrad(pts);
         output += gradLogJacobian;
     };

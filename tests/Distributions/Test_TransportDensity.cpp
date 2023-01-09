@@ -52,6 +52,8 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
 
     // Calculate the pullback and pushforward log density at the samples
     auto gradLogPullbackDensitySample = pullback.GradLogDensity(samples);
+
+    // Ensure that Pushforward::GradLogDensity throws an error
     bool gradLogPushforwardExists = true;
     try {
         pushforward.GradLogDensity(samples);
