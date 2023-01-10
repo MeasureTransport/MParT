@@ -124,7 +124,7 @@ if(NOT Eigen3_FOUND)
         message(FATAL_ERROR "Could not find Eigen3 library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install Eigen3 itself.")
     endif()
 else()
-    message(STATUS "Found Eigen!")
+    message(STATUS "Found Eigen: ${Eigen_DIR}")
 endif()
 
 # Add pybind11 if necessary
@@ -147,7 +147,7 @@ if(MPART_PYTHON)
         endif()
 
     else()
-        message(STATUS "Found pybind11!")
+        message(STATUS "Found pybind11: ${pybind11_DIR}")
     endif()
 endif()
 
@@ -204,7 +204,7 @@ if(MPART_ARCHIVE)
             message(FATAL_ERROR "Could not find cereal library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install cereal itself.")
         endif()
     else()
-        message(STATUS "Found cereal!")
+        message(STATUS "Found cereal: ${cereal_DIR}")
     endif()
 endif()
 
@@ -217,32 +217,32 @@ endif()
 
 # Add NLopt if necessary
 if(MPART_OPT)
-    find_package(nlopt)
+    find_package(NLopt)
 
-    if(NOT nlopt_FOUND)
+    if(NOT NLopt_FOUND)
         if(${MPART_FETCH_DEPS})
             message(STATUS "Could not find NLopt. Fetching source.")
 
             FetchContent_Declare(
-                NLOPT
+                NLopt
                 GIT_REPOSITORY https://github.com/stevengj/nlopt/
                 GIT_TAG v2.7.1
                 GIT_SHALLOW TRUE
             )
-            FetchContent_MakeAvailable(nlopt)
-            add_library(nlopt::nlopt ALIAS nlopt)
+            FetchContent_MakeAvailable(NLopt)
+            add_library(NLopt::nlopt ALIAS nlopt)
         else()
             set(MPART_OPT OFF)
             message(FATAL_ERROR "Could not find NLopt library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install NLopt itself.")
         endif()
     else()
-        message(STATUS "Found NLopt!")
+        message(STATUS "Found NLopt: ${NLopt_DIR}")
     endif()
 endif()
 
 if(MPART_OPT)
     add_definitions(-DMPART_HAS_NLOPT)
-    set(EXT_LIBRARIES ${EXT_LIBRARIES} nlopt::nlopt)
+    set(EXT_LIBRARIES ${EXT_LIBRARIES} NLopt::nlopt)
 endif()
 
 # #############################################################
@@ -305,7 +305,7 @@ if(MPART_BUILD_TESTS)
         endif()
 
     else()
-        message(STATUS "Found Catch2!")
+        message(STATUS "Found Catch2: ${Catch2_DIR}")
     endif()
 endif()
 
