@@ -217,19 +217,20 @@ endif()
 
 # Add NLopt if necessary
 if(MPART_OPT)
-    find_package(NLopt)
+    find_package(nlopt)
 
-    if(NOT NLopt_FOUND)
+    if(NOT nlopt_FOUND)
         if(${MPART_FETCH_DEPS})
             message(STATUS "Could not find NLopt. Fetching source.")
 
             FetchContent_Declare(
-                cereal
+                NLOPT
                 GIT_REPOSITORY https://github.com/stevengj/nlopt/
                 GIT_TAG v2.7.1
                 GIT_SHALLOW TRUE
             )
             FetchContent_MakeAvailable(nlopt)
+            add_library(nlopt::nlopt ALIAS nlopt)
         else()
             set(MPART_OPT OFF)
             message(FATAL_ERROR "Could not find NLopt library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install NLopt itself.")
@@ -241,7 +242,7 @@ endif()
 
 if(MPART_OPT)
     add_definitions(-DMPART_HAS_NLOPT)
-    set(EXT_LIBRARIES "${EXT_LIBRARIES} nlopt::nlopt")
+    set(EXT_LIBRARIES ${EXT_LIBRARIES} nlopt::nlopt)
 endif()
 
 # #############################################################
