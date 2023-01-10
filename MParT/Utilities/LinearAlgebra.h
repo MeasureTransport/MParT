@@ -235,8 +235,8 @@ StridedMatrix<double, MemorySpace> operator*(TransposeObject<MemorySpace> A,
 // Performs alpha*A*[1,...,1]
 template<typename MemorySpace>
 struct ReduceColumn {
-    using value_type = double*;
-    using size_type = Kokkos::View<double**, MemorySpace>::size_type;
+    using value_type = double[];
+    using size_type = typename Kokkos::View<double**, MemorySpace>::size_type;
 
     // Keep track of the row count, m
     size_type value_count;
@@ -246,7 +246,7 @@ struct ReduceColumn {
 
     ReduceColumn(Kokkos::View<double**, MemorySpace> A, double alpha): value_count(A.extent(0)), A_(A), alpha_(alpha) {}
 
-    KOKKOS_INLINE_FUNCTION void opterator()(const size_type j, value_type sum) const {
+    KOKKOS_INLINE_FUNCTION void operator()(const size_type j, value_type sum) const {
         for(size_type i=0; i<value_count; ++i)
             sum[i] += A_(i,j)*alpha_;
     }

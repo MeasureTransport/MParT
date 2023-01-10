@@ -139,6 +139,29 @@ TEST_CASE( "Testing Linear Mat-Mat product", "[LinearAlgebra_MatMat]" ) {
     }
 }
 
+TEST_CASE( "Testing ReduceColumn", "ReduceColumn" ) {
+    int N = 23;
+    Kokkos::View<double**, Kokkos::HostSpace> A("A", 3, N);
+    double ref_avg = ((double) (N+1)) / 2.0;
+    for(int i = 0; i < N; i++) {
+        A(0,i) = i+1;
+        A(1,i) = N-i;
+        A(2,i) = ref_avg;
+    }
+    ReduceColumn rc (A, 1.0);
+    Kokkos::View<double*, Kokkos::HostSpace> avg("avg", 3);
+    Kokkos::parallel_reduce(N, rc, avg.data());
+    CHECK(avg[0] == Approx(N*ref_avg).epsilon(1e-14).margin(1e-14));
+    CHECK(avg[1] == Approx(N*ref_avg).epsilon(1e-14).margin(1e-14));
+    CHECK(avg[2] == Approx(N*ref_avg).epsilon(1e-14).margin(1e-14));
+
+    rc = ReduceColumn(A, -1.0/((double) N));
+    Kokkos::parallel_reduce(N, rc, avg.data());
+    CHECK(avg[0] == Approx(-ref_avg).epsilon(1e-14).margin(1e-14));
+    CHECK(avg[1] == Approx(-ref_avg).epsilon(1e-14).margin(1e-14));
+    CHECK(avg[2] == Approx(-ref_avg).epsilon(1e-14).margin(1e-14));
+}
+
 TEST_CASE( "Testing LU Factorization", "LinearAlgebra_LU" ) {
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> A("A", 3, 3);
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> B("B", 3, 2);
