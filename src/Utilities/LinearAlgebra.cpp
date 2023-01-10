@@ -66,14 +66,12 @@ void PartialPivLU<Kokkos::HostSpace>::solveInPlace(Kokkos::View<double**,Kokkos:
     luSolver_->matrixLU().template triangularView<Eigen::Upper>().solveInPlace(eigX);
 }
 
-
 template<>
 double PartialPivLU<Kokkos::HostSpace>::determinant() const
 {
     assert(isComputed);
     return luSolver_->determinant();
 }
-
 
 template<>
 void Cholesky<Kokkos::HostSpace>::compute(Kokkos::View<const double**,Kokkos::LayoutLeft,Kokkos::HostSpace> A)
@@ -125,7 +123,6 @@ double Cholesky<Kokkos::HostSpace>::determinant() const
     double sqrt_det = cholSolver_->matrixL().determinant();
     return sqrt_det*sqrt_det;
 }
-
 
 #if defined(MPART_ENABLE_GPU)
 
@@ -304,7 +301,6 @@ double PartialPivLU<mpart::DeviceSpace>::determinant() const
 
     return det;
 }
-
 
 template<>
 void Cholesky<mpart::DeviceSpace>::compute(Kokkos::View<const double**,Kokkos::LayoutLeft,mpart::DeviceSpace> A)

@@ -9,6 +9,11 @@ target_sources(mpart
     Utilities/Miscellaneous.cpp
     Utilities/LinearAlgebra.cpp
 
+    Distributions/DensityBase.cpp
+    Distributions/SampleGenerator.cpp
+    Distributions/GaussianSamplerDensity.cpp
+    Distributions/PullbackDensity.cpp
+
     ParameterizedFunctionBase.cpp
     ConditionalMapBase.cpp
     TriangularMap.cpp
