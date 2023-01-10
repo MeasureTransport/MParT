@@ -12,6 +12,7 @@ option(MPART_MATLAB "Build matlab bindings with pybind11" ON)
 option(MPART_JULIA "Build julia bindings with CxxWrap.jl" ON)
 option(MPART_FETCH_DEPS "If CMake should be allowed to fetch and build external dependencies that weren't found." ON)
 option(MPART_ARCHIVE "If MParT should build with support to serialize data using the cereal library" ON)
+option(MPART_OPT "Build MParT with NLopt optimization library" ON)
 
 # #############################################################
 # Installation path configuration
@@ -209,9 +210,38 @@ endif()
 
 if(MPART_ARCHIVE)
     add_definitions(-DMPART_HAS_CEREAL)
-    set(CEREAL_LIBRARIES cereal::cereal)
+    set(EXT_LIBRARIES cereal::cereal)
 else()
-    set(CEREAL_LIBRARIES "")
+    set(EXT_LIBRARIES "")
+endif()
+
+# Add NLopt if necessary
+if(MPART_OPT)
+    find_package(NLopt)
+
+    if(NOT NLopt_FOUND)
+        if(${MPART_FETCH_DEPS})
+            message(STATUS "Could not find NLopt. Fetching source.")
+
+            FetchContent_Declare(
+                cereal
+                GIT_REPOSITORY https://github.com/stevengj/nlopt/
+                GIT_TAG v2.7.1
+                GIT_SHALLOW TRUE
+            )
+            FetchContent_MakeAvailable(nlopt)
+        else()
+            set(MPART_OPT OFF)
+            message(FATAL_ERROR "Could not find NLopt library and MPART_FETCH_DEPS=OFF, so CMake will not attempt to fetch and install NLopt itself.")
+        endif()
+    else()
+        message(STATUS "Found NLopt!")
+    endif()
+endif()
+
+if(MPART_OPT)
+    add_definitions(-DMPART_HAS_NLOPT)
+    set(EXT_LIBRARIES "${EXT_LIBRARIES} nlopt::nlopt")
 endif()
 
 # #############################################################
@@ -220,7 +250,7 @@ add_library(mpart "")
 add_library(MParT::mpart ALIAS mpart)
 
 
-target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES} ${CEREAL_LIBRARIES})
+target_link_libraries(mpart PRIVATE Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES} ${EXT_LIBRARIES})
 
 target_include_directories(mpart
     PUBLIC
@@ -282,7 +312,7 @@ if(MPART_BUILD_TESTS)
     # Define test sources
     add_subdirectory(tests)
     add_executable(RunTests ${TEST_SOURCES})
-    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES} ${CEREAL_LIBRARIES})
+    target_link_libraries(RunTests PRIVATE mpart Catch2::Catch2 Kokkos::kokkos Eigen3::Eigen ${CUDA_LIBRARIES} ${EXT_LIBRARIES})
 endif()
 
 add_executable(PrintKokkosInfo tests/KokkosInfo.cpp)
