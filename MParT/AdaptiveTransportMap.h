@@ -7,6 +7,7 @@
 #include "Utilities/MathFunctions.h"
 #include "MultiIndex/MultiIndexSet.h"
 #include "MapOptions.h"
+#include "MapFactory.h"
 
 namespace mpart {
 double negativeLogLikelihood(const std::vector<double> &coeffs, std::vector<double> &grad, void *data);
