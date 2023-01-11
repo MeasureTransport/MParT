@@ -101,7 +101,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std:
     std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mapTmp;
     // Initialize the optimization objective
     ATMObjective<MemorySpace> objective(train_x, test_x, map, options);
-    std::vector<double> coeffMap = KokkosToVec(map->Coeffs());
+    std::vector<double> coeffMap = KokkosToStd(map->Coeffs());
 
     // Setup optimization
     nlopt::opt opt = SetupOptimization(coeffMap.size(), options);
@@ -140,6 +140,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std:
         std::vector<double> gradCoeff (mapTmp->Coeffs().extent(0));
         std::vector<double> coeffView = KokkosToStd(mapTmp->Coeffs());
         objective.Gradient(coeffView, gradCoeff);
+
         // Find the largest gradient value, calculate which output and multiindex it corresponds to
         int maxIdx = std::distance(gradCoeff.begin(), std::max_element(gradCoeff.begin(), gradCoeff.end(), largestAbs));
         int maxIdxBlock = 0;
@@ -156,6 +157,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std:
         unsigned int idxNew = multis_rm[maxIdxBlock][maxIdx];
         MultiIndex multiNew = mset_temp[maxIdxBlock].at(idxNew);
         mset[maxIdxBlock] += multiNew;
+
         // Create a new map with the larger MultiIndexSet in component maxIdxBlock
         std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> newComp = CreateComponent(mset[maxIdxBlock].Fix(true), options);
         Kokkos::View<double*, Kokkos::HostSpace> oldCoeffs = mapBlocks[maxIdxBlock]->Coeffs().data();
@@ -164,35 +166,47 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std:
         std::fill(newCoeffs.data() + mset_sizes[maxIdxBlock], newCoeffs.data() + newCoeffs.extent(0), 0.);
         mapBlocks[maxIdxBlock] = newComp;
         map = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocks, true);
+
+        // Train a map with the new MultiIndex
         objective->SetMap(map);
-        coeffMap = KokkosToVec(map->Coeffs());
+        coeffMap = KokkosToStd(map->Coeffs());
         double train_error;
         opt.optimize(coeffMap, train_error);
+        // Get the testing error and assess the best map
         double test_error = objective->TestError();
         if(test_error < bestError) {
             bestError = test_error;
             for(int i = 0; i < outputDim; i++) {
                 mset_best[i] = mset[i];
             }
+            // Reset the patience if we find a new best map
             currPatience = 0;
         } else {
             currPatience++;
         }
 
+        // Print the current iteration results if verbose
         if(options::verbose) {
             std::cout << "Iteration " << currSz << " complete. Train error: " << train_error << " Test error: " << test_error << std::endl;
         }
     }
+    // Create the "best" map components based on the best MultiIndexSets
     for(int i = 0; i < outputDim; i++) {
         mapBlocks[i] = CreateComponent(mset_best[i].Fix(true), options);
         mset0[i] = mset_best[i];
-        std::fill(mapBlocks[i]->Coeffs().data(), mapBlocks[i]->Coeffs().data() + mset_best[i].Size(), 0.);
+        // Initialize coeffs as zero
+        Kokkos::View<double*, MemorySpace> coeffs_i = mapBlocks[i]->Coeffs();
+        std::fill(coeffs_i.data(), coeffs_i.data() + coeffs_i.extent(0), 0.);
     }
+
+    // Create the "best" map and optimize it
     map = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocks, true);
     objective->SetMap(map);
-    coeffMap = KokkosToVec(map->Coeffs());
+    coeffMap = KokkosToStd(map->Coeffs());
     double train_error;
     opt.optimize(coeffMap, train_error);
+
+    // Get the testing error, printing information if verbose
     double test_error = objective->TestError();
     if(options::verbose) {
         std::cout << "Final map with " << coeffMap.size() << " terms trains with error: " << train_error << std::endl;
