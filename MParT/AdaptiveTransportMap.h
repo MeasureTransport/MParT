@@ -12,7 +12,7 @@
 namespace mpart {
 double negativeLogLikelihood(const std::vector<double> &coeffs, std::vector<double> &grad, void *data);
 
-enum class ReferenceTypes {
+enum class DensityTypes {
     StandardGaussian
 };
 
@@ -21,7 +21,7 @@ enum class ReferenceTypes {
 struct ATMOptions: public MapOptions {
     int maxPatience = 10;
     int maxTerms = 10;
-    ReferenceTypes referenceType = ReferenceTypes::StandardGaussian;
+    ReferenceTypes densityType = ReferenceTypes::StandardGaussian;
     nlopt::algorithm alg = nlopt::LD_LBFGS;
     double opt_stopval = 0.;
     double opt_ftol_rel = 0.;
@@ -35,12 +35,16 @@ template<typename MemorySpace>
 class ATMObjective {
     public:
     ATMObjective() = delete;
-    ATMObjective(StridedMatrix<double, MemorySpace> x, std::shared_ptr<ConditionalMapBase<MemorySpace>> map, ATMOptions options)
+    ATMObjective(StridedMatrix<double, MemorySpace> x, StridedMatrix<double, MemorySpace> x_train, std::shared_ptr<ConditionalMapBase<MemorySpace>> map, ATMOptions options)
 
     double operator()(const std::vector<double> &coeffs, std::vector<double> &grad);
+    void Gradient(const std::vector<double> &coeffs, std::vector<double> &grad);
+    void SetMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) {map_ = map;}
+    double TestError(const std::vector<double> &coeffs);
 
     private:
     StridedMatrix<double, MemorySpace> x_;
+    StridedMatrix<double, MemorySpace> x_train_
     std::shared_ptr<ConditionalMapBase<MemorySpace>> map_;
     ATMOptions options_;
 };
