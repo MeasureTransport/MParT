@@ -2,12 +2,15 @@
 #define MPART_ADAPTIVETRANSPORTMAP_H
 
 #include <vector>
-#include <nlopt/nlopt.hpp>
+#include <nlopt.hpp>
 #include "Utilities/ArrayConversions.h"
 #include "Utilities/MathFunctions.h"
-#include "MultiIndex/MultiIndexSet.h"
+#include "MultiIndices/MultiIndexSet.h"
 #include "MapOptions.h"
+#include "TriangularMap.h"
 #include "MapFactory.h"
+#include "Distributions/PullbackDensity.h"
+#include "Distributions/GaussianSamplerDensity.h"
 
 namespace mpart {
 double negativeLogLikelihood(const std::vector<double> &coeffs, std::vector<double> &grad, void *data);
@@ -20,9 +23,9 @@ enum class DensityTypes {
 // 0. indicates that MParT uses the optimization's default value
 struct ATMOptions: public MapOptions {
     int maxPatience = 10;
-    int maxTerms = 10;
-    ReferenceTypes densityType = ReferenceTypes::StandardGaussian;
-    nlopt::algorithm alg = nlopt::LD_LBFGS;
+    int maxSize = 10;
+    DensityTypes densityType = DensityTypes::StandardGaussian;
+    nlopt::algorithm opt_alg = nlopt::LD_LBFGS;
     double opt_stopval = 0.;
     double opt_ftol_rel = 0.;
     double opt_xtol_rel = 0.;
@@ -35,7 +38,15 @@ template<typename MemorySpace>
 class ATMObjective {
     public:
     ATMObjective() = delete;
-    ATMObjective(StridedMatrix<double, MemorySpace> x, StridedMatrix<double, MemorySpace> x_train, std::shared_ptr<ConditionalMapBase<MemorySpace>> map, ATMOptions options)
+    ATMObjective(StridedMatrix<double, MemorySpace> x,
+                 StridedMatrix<double, MemorySpace> x_test,
+                 std::shared_ptr<ConditionalMapBase<MemorySpace>> map,
+                 ATMOptions options = ATMOptions()):
+                 x_(x), x_test_(x_test), map_(map), options_(options) {
+        if(options.densityType != DensityTypes::StandardGaussian) {
+            throw std::invalid_argument("ATMObjective<Kokkos::HostSpace>::ATMObjective: Currently only accepts Gaussian density");
+        }
+    }
 
     double operator()(const std::vector<double> &coeffs, std::vector<double> &grad);
     void Gradient(const std::vector<double> &coeffs, std::vector<double> &grad);
@@ -43,21 +54,21 @@ class ATMObjective {
     double TestError(const std::vector<double> &coeffs);
 
     private:
-    StridedMatrix<double, MemorySpace> x_;
-    StridedMatrix<double, MemorySpace> x_train_
+    StridedMatrix<const double, MemorySpace> x_;
+    StridedMatrix<const double, MemorySpace> x_test_;
     std::shared_ptr<ConditionalMapBase<MemorySpace>> map_;
     ATMOptions options_;
 };
 
 template<typename MemorySpace>
-std::shared_ptr<ConditionalMapBase<MemorySpace>> AdaptiveTransportMap(MultiIndexSet &mset0, StridedMatrix<double, MemorySpace> train_x, StridedMatrix<double, MemorySpace> test_x, ATMOptions options);
+std::shared_ptr<ConditionalMapBase<MemorySpace>> AdaptiveTransportMap(std::vector<MultiIndexSet> &mset0, StridedMatrix<double, MemorySpace> train_x, StridedMatrix<double, MemorySpace> test_x, ATMOptions options);
 
-template<typename MemorySpace>
-std::shared_ptr<ConditionalMapBase<MemorySpace>> AdaptiveTransportMap(StridedMatrix<double, MemorySpace> train_x, StridedMatrix<double, MemorySpace> test_x, ATMOptions options = ATMOptions()) {
-    unsigned int dim = train_x.extent(0);
-    MultiIndexSet mset0 = MultiIndexSet::CreateTotalOrder(dim, 0);
-    return AdaptiveTransportMap(mset0, train_x, test_x, options);
-}
+// template<typename MemorySpace>
+// std::shared_ptr<ConditionalMapBase<MemorySpace>> AdaptiveTransportMap(StridedMatrix<double, MemorySpace> train_x, StridedMatrix<double, MemorySpace> test_x, ATMOptions options = ATMOptions()) {
+//     unsigned int dim = train_x.extent(0);
+//     MultiIndexSet mset0 = MultiIndexSet::CreateTotalOrder(dim, 0);
+//     return AdaptiveTransportMap(mset0, train_x, test_x, options);
+// }
 
 }
 

@@ -241,10 +241,10 @@ struct ReduceColumn {
     // Keep track of the row count, m
     size_type value_count;
 
-    Kokkos::View<double**, MemorySpace> A_;
+    StridedMatrix<const double, MemorySpace> A_;
     double alpha_;
 
-    ReduceColumn(Kokkos::View<double**, MemorySpace> A, double alpha): value_count(A.extent(0)), A_(A), alpha_(alpha) {}
+    ReduceColumn(StridedMatrix<double, MemorySpace> A, double alpha): value_count(A.extent(0)), A_(A), alpha_(alpha) {}
 
     KOKKOS_INLINE_FUNCTION void operator()(const size_type j, value_type sum) const {
         for(size_type i=0; i<value_count; ++i)

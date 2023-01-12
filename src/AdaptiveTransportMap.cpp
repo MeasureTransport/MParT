@@ -3,57 +3,54 @@
 using namespace mpart;
 
 template<>
-ATMObjective<Kokkos::HostSpace>::ATMObjective(StridedMatrix<double, Kokkos::HostSpace> x,
-    StridedMatrix<double, Kokkos::HostSpace> x_train,
-    std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map,
-    ATMOptions options = ATMOptions()):
-    x_(x), x_train_(x_train), map_(map), options_(options) {
-    if(options.densityType != DensityTypes::StandardGaussian) {
-        throw std::invalid_argument("ATMObjective<Kokkos::HostSpace>::ATMObjective: Currently only accepts Gaussian density")
-    }
-}
-
-template<>
 double ATMObjective<Kokkos::HostSpace>::operator()(const std::vector<double> &coeffs, std::vector<double> &grad) {
     const unsigned int N_samps = x_.extent(1);
-    StridedVector<double, Kokkos::HostSpace> coeffView = VecToKokkos(coeffs);
+    StridedVector<double, Kokkos::HostSpace> coeffView = ConstVecToKokkos<double, Kokkos::HostSpace>(coeffs);
+    StridedVector<double, Kokkos::HostSpace> gradView = ConstVecToKokkos<double, Kokkos::HostSpace>(grad);
 
-    std::shared_ptr<GaussianSamplerDensity<Kokkos::HostSpace>> density = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(x_.extent(0));
+    // Rest of function is agnostic of MemorySpace, so keep it generic
+    using MemorySpace = Kokkos::HostSpace;
+    std::shared_ptr<GaussianSamplerDensity<MemorySpace>> density = std::make_shared<GaussianSamplerDensity<MemorySpace>>(x_.extent(0));
     map_->WrapCoeffs(coeffView);
     PullbackDensity<MemorySpace> pullback {map_, density};
-    StridedVector<double, Kokkos::HostSpace> densityX = pullback.LogDensity(x_);
-    StridedMatrix<double, Kokkos::HostSpace> densityGradX = pullback.LogDensityCoeffGrad(x_);
+    StridedVector<double, MemorySpace> densityX = pullback.LogDensity(x_);
+    StridedMatrix<double, MemorySpace> densityGradX = pullback.LogDensityCoeffGrad(x_);
     double sumDensity = 0.;
     Kokkos::parallel_reduce ("Sum Negative Log Likelihood", N_samps, KOKKOS_LAMBDA (const int i, double &sum) {
         sum -= densityX(i);
     }, sumDensity);
     ReduceColumn rc(densityGradX, -1.0/((double) N_samps));
-    Kokkos::parallel_reduce(N_samps, rc, grad.data());
+    Kokkos::parallel_reduce(N_samps, rc, gradView.data());
     return sumDensity/N_samps;
 }
 
 template<>
 void ATMObjective<Kokkos::HostSpace>::Gradient(const std::vector<double> &coeffs, std::vector<double> &grad) {
     const unsigned int N_samps = x_.extent(1);
-    StridedVector<double, Kokkos::HostSpace> coeffView = VecToKokkos(coeffs);
+    StridedVector<double, Kokkos::HostSpace> coeffView = ConstVecToKokkos<double, Kokkos::HostSpace>(coeffs);
+    StridedVector<double, Kokkos::HostSpace> gradView = ConstVecToKokkos<double, Kokkos::HostSpace>(grad);
 
-    std::shared_ptr<GaussianSamplerDensity<Kokkos::HostSpace>> density = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(x_.extent(0));
+    // Rest of function is agnostic of MemorySpace, so keep it generic
+    using MemorySpace = Kokkos::HostSpace;
+    std::shared_ptr<GaussianSamplerDensity<MemorySpace>> density = std::make_shared<GaussianSamplerDensity<MemorySpace>>(x_.extent(0));
     map_->WrapCoeffs(coeffView);
-    PullbackDensity<MemorySpace> pullback {map_, reference};
-    StridedMatrix<double, Kokkos::HostSpace> densityGradX = pullback.LogDensityCoeffGrad(x_);
+    PullbackDensity<MemorySpace> pullback {map_, density};
+    StridedMatrix<double, MemorySpace> densityGradX = pullback.LogDensityCoeffGrad(x_);
     ReduceColumn rc(densityGradX, -1.0/((double) N_samps));
-    Kokkos::parallel_reduce(N_samps, rc, grad.data());
+    Kokkos::parallel_reduce(N_samps, rc, gradView.data());
 }
 
 template<>
 double ATMObjective<Kokkos::HostSpace>::TestError(const std::vector<double> &coeffs) {
     const unsigned int N_samps = x_.extent(1);
-    StridedVector<double, Kokkos::HostSpace> coeffView = VecToKokkos(coeffs);
+    StridedVector<double, Kokkos::HostSpace> coeffView = ConstVecToKokkos<double, Kokkos::HostSpace>(coeffs);
 
-    std::shared_ptr<GaussianSamplerDensity<Kokkos::HostSpace>> density = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(x_test_.extent(0));
+    // Rest of function is agnostic of MemorySpace, so keep it generic
+    using MemorySpace = Kokkos::HostSpace;
+    std::shared_ptr<GaussianSamplerDensity<MemorySpace>> density = std::make_shared<GaussianSamplerDensity<MemorySpace>>(x_test_.extent(0));
     map_->WrapCoeffs(coeffView);
     PullbackDensity<MemorySpace> pullback {map_, density};
-    StridedVector<double, Kokkos::HostSpace> densityX = pullback.LogDensity(x_test_);
+    StridedVector<double, MemorySpace> densityX = pullback.LogDensity(x_test_);
     double sumDensity = 0.;
     Kokkos::parallel_reduce ("Sum Negative Log Likelihood, Test", N_samps, KOKKOS_LAMBDA (const int i, double &sum) {
         sum -= densityX(i);
@@ -62,14 +59,14 @@ double ATMObjective<Kokkos::HostSpace>::TestError(const std::vector<double> &coe
 }
 
 nlopt::opt SetupOptimization(unsigned int dim, ATMOptions options) {
-    nlopt::opt opt(options::opt_alg, dim);
-    opt.set_min_objective(objective, nullptr);
+    nlopt::opt opt(options.opt_alg, dim);
     // TODO: Set all the optimization options here
-    if(options::opt_xtol_rel > 0)
-        opt.set_xtol_rel(options::opt_xtol_rel);
+    if(options.opt_xtol_rel > 0)
+        opt.set_xtol_rel(options.opt_xtol_rel);
 
     // TODO: Print out all of the optimization settings here if verbose
-    if(options::verbose){ }
+    if(options.verbose){ }
+    return opt;
 }
 
 // Used for calculating the best location
@@ -77,9 +74,14 @@ bool largestAbs(double a, double b) {
     return std::abs(a) < std::abs(b);
 }
 
+double nlopt_objective(const std::vector<double> &coeffs, std::vector<double> &grad, void *data) {
+    ATMObjective<Kokkos::HostSpace> *obj = (ATMObjective<Kokkos::HostSpace> *) data;
+    return obj->operator()(coeffs, grad);
+};
+
 template<>
-std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std::vector<MultiIndexSet> &mset0,
-                StridedMatrix<double, MemorySpace> train_x, StridedMatrix<double, MemorySpace> test_x,
+std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportMap(std::vector<MultiIndexSet> &mset0,
+                StridedMatrix<double, Kokkos::HostSpace> train_x, StridedMatrix<double, Kokkos::HostSpace> test_x,
                 ATMOptions options) {
     // Dimensions
     unsigned int inputDim = train_x.extent(0);
@@ -88,11 +90,12 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std:
     // Setup initial map
     std::vector<unsigned int> mset_sizes (outputDim);
     unsigned int currSz = 0;
+    unsigned int currPatience = 0;
     std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> mapBlocks (outputDim);
     std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> mapBlocksTmp (outputDim);
     for(int i = 0; i < outputDim; i++) {
         mset_sizes[i] = mset0[i].Size();
-        mapBlocks[i] = CreateComponent(mset0[i].Fix(true), options);
+        mapBlocks[i] = MapFactory::CreateComponent(mset0[i].Fix(true), options);
         currSz += mset_sizes[i];
     }
     // Create initial map
@@ -100,30 +103,33 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std:
     // Create a tmp map
     std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mapTmp;
     // Initialize the optimization objective
-    ATMObjective<MemorySpace> objective(train_x, test_x, map, options);
+    ATMObjective<Kokkos::HostSpace> objective(train_x, test_x, map, options);
     std::vector<double> coeffMap = KokkosToStd(map->Coeffs());
 
     // Setup optimization
     nlopt::opt opt = SetupOptimization(coeffMap.size(), options);
+    opt.set_min_objective(nlopt_objective, (void*) &objective);
 
     // Train initial map
     double bestError;
     opt.optimize(coeffMap, bestError);
 
-    if(options::verbose)
-        std::cout << "Initial map trained with error: " << initMapError << std::endl;
+    if(options.verbose)
+        std::cout << "Initial map trained with error: " << bestError << std::endl;
 
     // Setup Multiindex info for training
     std::vector<std::vector<unsigned int>> multis_rm (outputDim);
-    std::vector<MultiIndexSet> mset_best(outputDim);
+    MultiIndexSet msetDefault = MultiIndexSet::CreateTotalOrder(inputDim, 0);
+    std::vector<MultiIndexSet> mset_tmp(outputDim, msetDefault);
+    std::vector<MultiIndexSet> mset_best(outputDim, msetDefault);
 
     while(currSz < options.maxSize && currPatience < options.maxPatience) {
         for(int i = 0; i < outputDim; i++) {
             // Expand the current map
-            MultiIndex mset_temp = mset[i];
-            multis_rm[i] = mset_temp.Expand();
+            mset_tmp[i] = mset0[i];
+            multis_rm[i] = mset_tmp[i].Expand();
             // Create a component with the expanded multiindexset
-            std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> comp_i = CreateComponent(mset_temp.Fix(), options);
+            std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> comp_i = MapFactory::CreateComponent(mset_tmp[i].Fix(), options);
             // Copy the old coefficients from the current map to the new component
             double* map_coeff_i = mapBlocks[i]->Coeffs().data();
             double* comp_coeff_i = comp_i->Coeffs().data();
@@ -136,7 +142,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std:
         // Create a temporary map
         mapTmp = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocksTmp, true);
         // Calculate the gradient of the map with expanded margins
-        objective->SetMap(mapTmp);
+        objective.SetMap(mapTmp);
         std::vector<double> gradCoeff (mapTmp->Coeffs().extent(0));
         std::vector<double> coeffView = KokkosToStd(mapTmp->Coeffs());
         objective.Gradient(coeffView, gradCoeff);
@@ -155,12 +161,11 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std:
         }
         // Add the multiindex with largest gradient to the map
         unsigned int idxNew = multis_rm[maxIdxBlock][maxIdx];
-        MultiIndex multiNew = mset_temp[maxIdxBlock].at(idxNew);
-        mset[maxIdxBlock] += multiNew;
+        mset0[maxIdxBlock] += mset_tmp[maxIdxBlock][idxNew];
 
         // Create a new map with the larger MultiIndexSet in component maxIdxBlock
-        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> newComp = CreateComponent(mset[maxIdxBlock].Fix(true), options);
-        Kokkos::View<double*, Kokkos::HostSpace> oldCoeffs = mapBlocks[maxIdxBlock]->Coeffs().data();
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> newComp = MapFactory::CreateComponent(mset0[maxIdxBlock].Fix(true), options);
+        Kokkos::View<double*, Kokkos::HostSpace> oldCoeffs = mapBlocks[maxIdxBlock]->Coeffs();
         Kokkos::View<double*, Kokkos::HostSpace> newCoeffs = newComp->Coeffs();
         std::copy(oldCoeffs.data(), oldCoeffs.data() + mset_sizes[maxIdxBlock], newCoeffs.data());
         std::fill(newCoeffs.data() + mset_sizes[maxIdxBlock], newCoeffs.data() + newCoeffs.extent(0), 0.);
@@ -168,16 +173,16 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std:
         map = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocks, true);
 
         // Train a map with the new MultiIndex
-        objective->SetMap(map);
+        objective.SetMap(map);
         coeffMap = KokkosToStd(map->Coeffs());
         double train_error;
         opt.optimize(coeffMap, train_error);
         // Get the testing error and assess the best map
-        double test_error = objective->TestError();
+        double test_error = objective.TestError(coeffMap);
         if(test_error < bestError) {
             bestError = test_error;
             for(int i = 0; i < outputDim; i++) {
-                mset_best[i] = mset[i];
+                mset_best[i] = mset0[i];
             }
             // Reset the patience if we find a new best map
             currPatience = 0;
@@ -186,29 +191,29 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> AdaptiveTransportMap(std:
         }
 
         // Print the current iteration results if verbose
-        if(options::verbose) {
+        if(options.verbose) {
             std::cout << "Iteration " << currSz << " complete. Train error: " << train_error << " Test error: " << test_error << std::endl;
         }
     }
     // Create the "best" map components based on the best MultiIndexSets
     for(int i = 0; i < outputDim; i++) {
-        mapBlocks[i] = CreateComponent(mset_best[i].Fix(true), options);
+        mapBlocks[i] = MapFactory::CreateComponent(mset_best[i].Fix(true), options);
         mset0[i] = mset_best[i];
         // Initialize coeffs as zero
-        Kokkos::View<double*, MemorySpace> coeffs_i = mapBlocks[i]->Coeffs();
+        Kokkos::View<double*, Kokkos::HostSpace> coeffs_i = mapBlocks[i]->Coeffs();
         std::fill(coeffs_i.data(), coeffs_i.data() + coeffs_i.extent(0), 0.);
     }
 
     // Create the "best" map and optimize it
     map = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocks, true);
-    objective->SetMap(map);
+    objective.SetMap(map);
     coeffMap = KokkosToStd(map->Coeffs());
     double train_error;
     opt.optimize(coeffMap, train_error);
 
     // Get the testing error, printing information if verbose
-    double test_error = objective->TestError();
-    if(options::verbose) {
+    double test_error = objective.TestError(coeffMap);
+    if(options.verbose) {
         std::cout << "Final map with " << coeffMap.size() << " terms trains with error: " << train_error << std::endl;
     }
     return map;

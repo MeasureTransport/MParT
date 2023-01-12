@@ -141,7 +141,7 @@ TEST_CASE( "Testing Linear Mat-Mat product", "[LinearAlgebra_MatMat]" ) {
 
 TEST_CASE( "Testing ReduceColumn", "ReduceColumn" ) {
     int N = 23;
-    Kokkos::View<double**, Kokkos::HostSpace> A("A", 3, N);
+    StridedMatrix<double, Kokkos::HostSpace> A = Kokkos::View<double**, Kokkos::HostSpace>("A", 3, N);
     double ref_avg = ((double) (N+1)) / 2.0;
     for(int i = 0; i < N; i++) {
         A(0,i) = i+1;
