@@ -20,6 +20,9 @@ double ATMObjective<Kokkos::HostSpace>::operator()(unsigned int n, const double*
     }, sumDensity);
     ReduceColumn rc(densityGradX, -1.0/((double) N_samps));
     Kokkos::parallel_reduce(N_samps, rc, grad);
+    double gradNorm = 0.;
+    Kokkos::parallel_reduce(n, KOKKOS_LAMBDA(const int i, double &norm_){norm_ += std::abs(grad[i]);}, gradNorm);
+    std::cout << "gradNorm = " << gradNorm << std::endl;
     return sumDensity/N_samps;
 }
 
@@ -57,11 +60,25 @@ double ATMObjective<Kokkos::HostSpace>::TestError(StridedVector<const double, Ko
 nlopt::opt SetupOptimization(unsigned int dim, ATMOptions options) {
     nlopt::opt opt(options.opt_alg.c_str(), dim);
     // TODO: Set all the optimization options here
-    if(options.opt_xtol_rel > 0)
-        opt.set_xtol_rel(options.opt_xtol_rel);
+    opt.set_stopval(options.opt_stopval);
+    opt.set_xtol_rel(options.opt_xtol_rel);
+    opt.set_ftol_rel(options.opt_ftol_rel);
+    opt.set_ftol_abs(options.opt_ftol_abs);
+    opt.set_maxeval(options.opt_maxeval);
+    opt.set_maxtime(options.opt_maxtime);
 
     // TODO: Print out all of the optimization settings here if verbose
-    if(options.verbose){ }
+    if(options.verbose){
+        std::cout << "Optimization Settings:\n";
+        std::cout << "Algorithm: " << opt.get_algorithm_name() << "\n";
+        std::cout << "Optimization dimension:" << opt.get_dimension() << "\n";
+        std::cout << "Optimization stopval:" << opt.get_stopval() << "\n";
+        std::cout << "Max f evaluations: " << opt.get_maxeval() << "\n";
+        std::cout << "Maximum time: " << opt.get_maxtime() << "\n";
+        std::cout << "Relative x Tolerance: " << opt.get_xtol_rel() << "\n";
+        std::cout << "Relative f Tolerance: " << opt.get_ftol_rel() << "\n";
+        std::cout << "Absolute f Tolerance: " << opt.get_ftol_abs() << "\n";
+    }
     return opt;
 }
 
@@ -92,23 +109,28 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
     // Create initial map
     std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocks);
     Kokkos::View<double*, Kokkos::HostSpace> mapCoeffs ("mapCoeffs", map->numCoeffs);
+    Kokkos::parallel_for("Initialize Map Coeffs", map->numCoeffs, KOKKOS_LAMBDA (const int i) {
+        mapCoeffs(i) = 1.;
+    });
     map->WrapCoeffs(mapCoeffs);
-    // Create a tmp map
-    std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mapTmp;
     // Initialize the optimization objective
-    ATMObjective<Kokkos::HostSpace> objective(train_x, test_x, map, options);
+    ATMObjective<Kokkos::HostSpace> objective {train_x, test_x, map, options};
 
     // Setup optimization
     nlopt::opt opt = SetupOptimization(map->numCoeffs, options);
     opt.set_min_objective(objective);
 
     // Train initial map
-    double bestError;
+    double error;
     std::vector<double> mapCoeffsStd = KokkosToStd(map->Coeffs());
-    opt.optimize(mapCoeffsStd, bestError);
+    nlopt::result res = opt.optimize(mapCoeffsStd, error);
+    double bestError = objective.TestError(map->Coeffs());
 
-    if(options.verbose)
-        std::cout << "Initial map trained with error: " << bestError << std::endl;
+    if(options.verbose) {
+        std::cout << "Initial map trained with error: " << error << ", test error: " << bestError;
+        std::cout << " in " << opt.get_numevals() << " function evaluations" << std::endl;
+        std::cout << "Optimization returns message " << res << std::endl;
+    }
 
     // Setup Multiindex info for training
     std::vector<std::vector<unsigned int>> multis_rm (outputDim);
@@ -126,6 +148,8 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
             // Expand the current map
             mset_tmp[i] = mset0[i];
             multis_rm[i] = mset_tmp[i].Expand();
+            std::cout << "mset0[" << i << "].Size() = " << mset0[i].Size() << "\n";
+            std::cout << "mset_tmp[" << i << "].Size() = " << mset_tmp[i].Size() << std::endl;
             // Create a component with the expanded multiindexset
             std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> comp_i = MapFactory::CreateComponent(mset_tmp[i].Fix(), options);
             // Copy the old coefficients from the current map to the new component
@@ -138,27 +162,41 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
             mapBlocksTmp[i] = comp_i;
         }
         // Create a temporary map
-        mapTmp = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocksTmp, true);
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mapTmp = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocksTmp, true);
         // Calculate the gradient of the map with expanded margins
         objective.SetMap(mapTmp);
         std::vector<double> gradCoeff (mapTmp->Coeffs().extent(0));
         objective.Gradient(mapTmp->numCoeffs, mapTmp->Coeffs().data(), gradCoeff.data());
 
         // Find the largest gradient value, calculate which output and multiindex it corresponds to
-        int maxIdx = std::distance(gradCoeff.begin(), std::max_element(gradCoeff.begin(), gradCoeff.end(), largestAbs));
-        int maxIdxBlock = 0;
-        int maxIdxBlockOffset = 0;
-        for(int i = 0; i < outputDim; i++) {
-            if(maxIdx < mset_sizes[i]) {
-                maxIdxBlock = i;
-                break;
+        unsigned int maxIdx = 0;
+        unsigned int maxIdxBlock = 0;
+        double maxVal = 0.;
+        int coeffIdx = 0;
+        for(int output = 0; output < outputDim; output++) {
+            for(int i = 0; i < multis_rm[output].size(); i++) {
+                unsigned int idx = multis_rm[output][i];
+                double gradVal = std::abs(gradCoeff[coeffIdx + idx]);
+                if(gradVal > maxVal) {
+                    maxVal = gradVal;
+                    maxIdx = idx;
+                    maxIdxBlock = output;
+                }
             }
-            maxIdxBlockOffset += mset_sizes[i];
-            maxIdx -= mset_sizes[i];
+            coeffIdx += mset_tmp[output].Size();
         }
         // Add the multiindex with largest gradient to the map
-        unsigned int idxNew = multis_rm[maxIdxBlock][maxIdx];
-        mset0[maxIdxBlock] += mset_tmp[maxIdxBlock][idxNew];
+        std::cerr << "Before: mset0[" << maxIdxBlock << "].Size() = " << mset0[maxIdxBlock].Size() << ", mset_sizes[" << maxIdxBlock << "] = " << mset_sizes[maxIdxBlock] << "\n";
+        mset0[maxIdxBlock] += mset_tmp[maxIdxBlock][maxIdx];
+        std::cerr << "After: mset0[" << maxIdxBlock << "].Size() = " << mset0[maxIdxBlock].Size() << std::endl;
+        mset_sizes[maxIdxBlock]++;
+        currSz++;
+        if(mset0[maxIdxBlock].Size() != mset_sizes[maxIdxBlock]) {
+            std::cerr << mset_tmp[maxIdxBlock][maxIdx] << "\n";
+            std::stringstream ss_err;
+            ss_err << "mset0[maxIdxBlock].Size() = " << mset0[maxIdxBlock].Size() << ", mset_sizes[maxIdxBlock] = " << mset_sizes[maxIdxBlock];
+            throw std::runtime_error(ss_err.str());
+        }
 
         // Create a new map with the larger MultiIndexSet in component maxIdxBlock
         std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> newComp = MapFactory::CreateComponent(mset0[maxIdxBlock].Fix(true), options);
@@ -191,9 +229,9 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
 
         // Print the current iteration results if verbose
         if(options.verbose) {
-            std::cout << "Iteration " << currSz << " complete. Train error: " << train_error << " Test error: " << test_error << std::endl;
+            std::cout << "Iteration " << currSz << " complete. Train error: " << train_error << " Test error: " << test_error << "\n";
+            std::cout << "Trained using " << opt.get_numevals() << " function evaluations" << std::endl;
         }
-        currSz++;
     }
     // Create the "best" map components based on the best MultiIndexSets
     for(int i = 0; i < outputDim; i++) {
@@ -208,13 +246,27 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
     map = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocks, true);
     objective.SetMap(map);
     double train_error;
+    opt = SetupOptimization(map->numCoeffs, options);
+    opt.set_min_objective(objective);
     mapCoeffsStd = KokkosToStd(map->Coeffs());
     opt.optimize(mapCoeffsStd, train_error);
 
     // Get the testing error, printing information if verbose
     double test_error = objective.TestError(map->Coeffs());
     if(options.verbose) {
-        std::cout << "Final map with " << map->numCoeffs << " terms trains with error: " << train_error << std::endl;
+        std::cout << "Final map has " << map->numCoeffs << " terms.\n";
+        std::cout << "Training error: " << train_error << ", Testing error: " << test_error << "\n";
+        std::cout << "Visualization of MultiIndexSets-- ";
+        for(int i = 0; i < outputDim; i++) {
+            std::cout << "mset " << i << ":\n";
+            if(mset0[i].Size() == 1) {
+                std::cout << "0";
+            } else {
+                mset0[i].Visualize();
+            }
+            std::cout << "\n";
+        }
+        std::cout << std::endl;
     }
     return map;
 }

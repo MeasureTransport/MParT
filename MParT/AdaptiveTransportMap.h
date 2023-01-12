@@ -26,11 +26,12 @@ struct ATMOptions: public MapOptions {
     int maxSize = 10;
     DensityTypes densityType = DensityTypes::StandardGaussian;
     std::string opt_alg = "LD_LBFGS";
-    double opt_stopval = 0.;
-    double opt_ftol_rel = 0.;
-    double opt_xtol_rel = 0.;
-    int opt_maxeval = 0;
-    double opt_maxtime = 0.;
+    double opt_stopval = -std::numeric_limits<double>::infinity();
+    double opt_ftol_rel = 1e-3;
+    double opt_ftol_abs = 1e-3;
+    double opt_xtol_rel = 1e-4;
+    int opt_maxeval = 10;
+    double opt_maxtime = 100.;
     bool verbose = false;
 };
 
