@@ -44,7 +44,7 @@ where the function \f$s:\mathbb{R}^{N-1}\rightarrow \mathbb{R}^{r}\f$ is a funct
     virtual ~SummarizedMap() = default;
 
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
-    void SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+    void SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs) override;
     void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
     #if defined(MPART_ENABLE_GPU)
     void SetCoeffs(Kokkos::View<double*, DeviceSpace> coeffs) override;

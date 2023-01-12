@@ -185,7 +185,7 @@ Eigen::RowMatrixXd ParameterizedFunctionBase<mpart::DeviceSpace>::Gradient(Eigen
 
 
 template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs){
+void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs){
 
     // If coefficients already exist, make sure the sizes match
     if(this->savedCoeffs.is_allocated()){

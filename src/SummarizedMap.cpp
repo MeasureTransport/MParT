@@ -27,11 +27,11 @@ SummarizedMap<MemorySpace>::SummarizedMap(std::shared_ptr<ParameterizedFunctionB
 }
 
 template<typename MemorySpace>
-void SummarizedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+void SummarizedMap<MemorySpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
-    comp_->WrapCoeffs(coeffs);
+    comp_->WrapCoeffs(this->savedCoeffs);
 }
 
 template<typename MemorySpace>
@@ -78,7 +78,7 @@ void SummarizedMap<MemorySpace>::SummarizePts(StridedMatrix<const double, Memory
 
     // Copy summarized pts
     Kokkos::View<double**, MemorySpace> outputSummary = Kokkos::subview(output, std::make_pair(0,int(sumFunc_->outputDim)), Kokkos::ALL());
-    
+
     // Evaluate summary function
     sumFunc_->EvaluateImpl(ptsToSummarize, outputSummary);
 
@@ -162,7 +162,7 @@ void SummarizedMap<MemorySpace>::GradientImpl(StridedMatrix<const double, Memory
 
     // GradientImpl of summary using outputForSummary as the sens. vectors (from chain-rule)
     StridedMatrix<const double, MemorySpace>  x1 = Kokkos::subview(pts, std::make_pair(0,int(sumFunc_->inputDim)), Kokkos::ALL());
-    
+
     // Copy results over to the output
     Kokkos::View<double**, MemorySpace> outputSubX1 = Kokkos::subview(output, std::make_pair(0,int(sumFunc_->inputDim)), Kokkos::ALL());
     sumFunc_->GradientImpl(x1, outputForSummary, outputSubX1);

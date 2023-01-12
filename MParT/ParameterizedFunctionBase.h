@@ -44,7 +44,7 @@ namespace mpart {
             @detail Performs a deep copy of the input coefficients to the internally stored coefficients.
             @param coeffs A view containing the coefficients to copy.
         */
-       virtual void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs);
+       virtual void SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs);
 
        #if defined(MPART_ENABLE_GPU)
        void SetCoeffs(Kokkos::View<double*, std::conditional_t<std::is_same_v<MemorySpace,Kokkos::HostSpace>,mpart::DeviceSpace,Kokkos::HostSpace>> coeffs);
@@ -180,7 +180,7 @@ namespace mpart {
         /** Checks to see if the coefficients have been initialized yet, returns true if so, false if not */
         bool CheckCoefficients() const;
 
-        
+
         const unsigned int inputDim; /// The total dimension of the input N+M
         const unsigned int outputDim; /// The output dimension M
         const unsigned int numCoeffs; /// The number of coefficients used to parameterize this map.

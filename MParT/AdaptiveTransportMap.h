@@ -25,7 +25,7 @@ struct ATMOptions: public MapOptions {
     int maxPatience = 10;
     int maxSize = 10;
     DensityTypes densityType = DensityTypes::StandardGaussian;
-    nlopt::algorithm opt_alg = nlopt::LD_LBFGS;
+    std::string opt_alg = "LD_LBFGS";
     double opt_stopval = 0.;
     double opt_ftol_rel = 0.;
     double opt_xtol_rel = 0.;
@@ -48,10 +48,10 @@ class ATMObjective {
         }
     }
 
-    double operator()(const std::vector<double> &coeffs, std::vector<double> &grad);
-    void Gradient(const std::vector<double> &coeffs, std::vector<double> &grad);
+    double operator()(unsigned int n, const double* coeffs, double* grad);
+    void Gradient(unsigned int n, const double* coeffs, double* grad);
     void SetMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) {map_ = map;}
-    double TestError(const std::vector<double> &coeffs);
+    double TestError(StridedVector<const double, MemorySpace> coeffView);
 
     private:
     StridedMatrix<const double, MemorySpace> x_;
