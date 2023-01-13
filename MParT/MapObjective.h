@@ -1,7 +1,10 @@
 #ifndef MPART_MAPOBJECTIVE_H
 #define MPART_MAPOBJECTIVE_H
 
+#include "ConditionalMapBase.h"
+#include "Distributions/PullbackDensity.h"
 #include "Utilities/ArrayConversions.h"
+#include "Utilities/LinearAlgebra.h"
 
 namespace mpart {
 template<typename MemorySpace>
@@ -30,8 +33,8 @@ class MapObjective {
 template<typename MemorySpace>
 class KLObjective: public MapObjective<MemorySpace> {
     public:
-    KLObjective(StridedMatrix<const double, MemorySpace> train, std::shared_ptr<DensityBase<MemorySpace>> density): MapObjective(train), density_(density) {}
-    KLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test, std::shared_ptr<DensityBase<MemorySpace>> density): MapObjective(train, test), density_(density) {}
+    KLObjective(StridedMatrix<const double, MemorySpace> train, std::shared_ptr<DensityBase<MemorySpace>> density): MapObjective<MemorySpace>(train), density_(density) {}
+    KLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test, std::shared_ptr<DensityBase<MemorySpace>> density): MapObjective<MemorySpace>(train, test), density_(density) {}
 
     protected:
     double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) override;
@@ -40,7 +43,7 @@ class KLObjective: public MapObjective<MemorySpace> {
 
     private:
     std::shared_ptr<DensityBase<MemorySpace>> density_;
-}
+};
 
 } // namespace mpart
 

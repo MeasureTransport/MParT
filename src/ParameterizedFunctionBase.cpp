@@ -185,7 +185,7 @@ Eigen::RowMatrixXd ParameterizedFunctionBase<mpart::DeviceSpace>::Gradient(Eigen
 
 
 template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs){
+void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs){
 
     // If coefficients already exist, make sure the sizes match
     if(this->savedCoeffs.is_allocated()){
@@ -219,7 +219,7 @@ void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Ko
 #if defined(MPART_ENABLE_GPU)
 
 template<>
-void ParameterizedFunctionBase<mpart::DeviceSpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+void ParameterizedFunctionBase<mpart::DeviceSpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs)
 {
     // Copy the coefficients to the device
     Kokkos::View<double*, mpart::DeviceSpace> coeffs_device = ToDevice<mpart::DeviceSpace>(coeffs);

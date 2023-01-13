@@ -41,5 +41,7 @@ target_sources(mpart
     MapFactoryImpl14.cpp
     MapFactoryImpl15.cpp
 
+    MapObjective.cpp
+    TrainMap.cpp
     Initialization.cpp
 )

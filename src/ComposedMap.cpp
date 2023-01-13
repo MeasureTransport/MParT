@@ -178,7 +178,7 @@ ComposedMap<MemorySpace>::ComposedMap(std::vector<std::shared_ptr<ConditionalMap
 }
 
 template<typename MemorySpace>
-void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
@@ -213,7 +213,7 @@ void ComposedMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpac
 
 #if defined(MPART_ENABLE_GPU)
 template<typename MemorySpace>
-void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs)
+void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);

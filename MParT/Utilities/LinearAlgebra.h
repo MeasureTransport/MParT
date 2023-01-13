@@ -231,6 +231,39 @@ StridedMatrix<double, MemorySpace> operator*(TransposeObject<MemorySpace> A,
 }
 
 
+// This struct allows you to reduce the columns of a mxn matrix
+// Performs alpha*A*[1,...,1]
+template<typename MemorySpace>
+struct ReduceColumn {
+    using value_type = double[];
+    using size_type = typename Kokkos::View<double**, MemorySpace>::size_type;
+
+    // Keep track of the row count, m
+    size_type value_count;
+
+    StridedMatrix<const double, MemorySpace> A_;
+    double alpha_;
+
+    ReduceColumn(StridedMatrix<double, MemorySpace> A, double alpha): value_count(A.extent(0)), A_(A), alpha_(alpha) {}
+
+    KOKKOS_INLINE_FUNCTION void operator()(const size_type j, value_type sum) const {
+        for(size_type i=0; i<value_count; ++i)
+            sum[i] += A_(i,j)*alpha_;
+    }
+
+    KOKKOS_INLINE_FUNCTION void join (volatile value_type dst, const volatile value_type src) const {
+        for (size_type i = 0; i < value_count; ++i) {
+            dst[i] += src[i];
+        }
+    }
+
+    KOKKOS_INLINE_FUNCTION void init (value_type sum) const {
+        for (size_type i = 0; i < value_count; ++i) {
+            sum[i] = 0.0;
+        }
+    }
+};
+
 /** Mimics the interface of the Eigen::PartialPivLU class, but using Kokkos::Views and CUBLAS/CUSOLVER linear algebra.
 
 Note that the layout of the matrices used in this class is important.  Cublas expects column major (layout left).
