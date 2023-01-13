@@ -49,7 +49,7 @@ void IdentityMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpa
 
 
 template<typename MemorySpace>
-void IdentityMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+void IdentityMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                StridedMatrix<const double, MemorySpace> const& sens,
                                                StridedMatrix<double, MemorySpace>              output)
 {
@@ -57,7 +57,7 @@ void IdentityMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
 }
 
 template<typename MemorySpace>
-void IdentityMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+void IdentityMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                             StridedMatrix<const double, MemorySpace> const& sens,
                             StridedMatrix<double, MemorySpace>              output)
 {
@@ -77,21 +77,29 @@ void IdentityMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySp
 }
 
 template<typename MemorySpace>
-void IdentityMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+void IdentityMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                              StridedMatrix<double, MemorySpace>              output)
 {
     assert(false);
 }
 
 template<typename MemorySpace>
-void IdentityMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts, 
+void IdentityMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                             StridedMatrix<double, MemorySpace>              output)
-{   
+{
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> zeroPolicy({0, 0}, {output.extent(0), output.extent(1)});
     Kokkos::parallel_for(zeroPolicy, KOKKOS_LAMBDA(const int& i, const int& j) {
         output(i,j) = 0.0;
     });
 
+}
+
+template<typename MemorySpace>
+std::shared_ptr<ConditionalMapBase<MemorySpace>> IdentityMap<MemorySpace>::Slice(int a, int b) {
+    assert(a >= 0);
+    assert(b <= this->outputDim);
+    assert(a < b);
+    return std::make_shared<IdentityMap<MemorySpace>>(this->inputDim, b-a);
 }
 
 // Explicit template instantiation

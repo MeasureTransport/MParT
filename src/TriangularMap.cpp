@@ -12,10 +12,10 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
                         std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
                         comps_(components)
 {
-    
+
 
     // Check the sizes of all the inputs
-    
+
     for(unsigned int i=0; i<comps_.size(); ++i){
         if(comps_.at(i)->outputDim > comps_.at(i)->inputDim){
             std::stringstream msg;
@@ -42,7 +42,7 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
 
         Kokkos::View<double*,MemorySpace> coeffs("coeffs", this->numCoeffs);
         unsigned int cumNumCoeffs = 0;
-        
+
         for(unsigned int i=0; i<comps_.size(); ++i){
 
             if(!comps_.at(i)->CheckCoefficients()){
@@ -281,7 +281,7 @@ void TriangularMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, Memor
             subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
             comps_.at(i)->CoeffGradImpl(subPts, subSens, subOut);
 
-            
+
             startParamDim += comps_.at(i)->numCoeffs;
         }
 
@@ -343,6 +343,63 @@ void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
             output(i,j) += subGrad(i,j);
         });
     }
+}
+
+template<typename MemorySpace>
+std::shared_ptr<ConditionalMapBase<MemorySpace>> TriangularMap<MemorySpace>::Slice(int a, int b) {
+    std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
+    // TODO: Handle empty case
+    if( a < 0 || a >= b || b > this->outputDim ) {
+        throw std::invalid_argument("TriangularMap::Slice: 0 <= a < b <= outputDim must be satisfied.");
+    }
+    // Special cases if the slice is at the end of the map
+    if( b <= this->comps_[0]->outputDim) {
+        return this->comps_[0]->Slice(a, b);
+    }
+    if( a >= this->outputDim - this->comps_[this->comps_.size()-1]->outputDim) {
+        unsigned int rest_of_output = this->outputDim - this->comps_[this->comps_.size()-1]->outputDim;
+        return this->comps_[this->comps_.size()-1]->Slice(a - rest_of_output, b - rest_of_output);
+    }
+
+    int accum_a = 0; // Accumulated output dimension before a
+    int k_a = 0; // Index of component containing a
+    //TODO: Check that this is correct
+    while(k_a < this->comps_.size()){
+        if(accum_a + this->comps_[k_a]->outputDim > a)
+            break;
+        accum_a += this->comps_[k_a]->outputDim;
+        k_a++;
+    }
+
+    int accum_b = accum_a; // Accumulated output dimension before b
+    int k_b = k_a; // Index of component containing b
+    //TODO: Check that this is correct
+    while(k_b < this->comps_.size()){
+        if(accum_b + this->comps_[k_b]->outputDim >= b)
+            break;
+        accum_b += this->comps_[k_b]->outputDim;
+        k_b++;
+    }
+
+    if(k_a == k_b){
+        components.push_back(this->comps_[k_a]->Slice(a-accum_a, b-accum_b));
+    } else {
+        components = std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>(this->comps_.begin()+k_a, this->comps_.begin()+k_b+1);
+        components[0] = this->comps_[k_a]->Slice(a-accum_a, this->comps_[k_a]->outputDim);
+        components[components.size()-1] = this->comps_[k_b]->Slice(0, b-accum_b);
+    }
+    auto output = std::make_shared<TriangularMap<MemorySpace>>(components);
+    output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
+    return output;
+}
+
+template<typename MemorySpace>
+std::shared_ptr<ConditionalMapBase<MemorySpace>> TriangularMap<MemorySpace>::BlockSlice(int a, int b) {
+    std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> components;
+    for(int k = a; k < b; k++){
+        components.push_back(this->comps_[k]);
+    }
+    return std::make_shared<TriangularMap<MemorySpace>>(components);
 }
 
 // Explicit template instantiation

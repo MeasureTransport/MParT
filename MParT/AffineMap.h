@@ -59,6 +59,8 @@ public:
     void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                      StridedMatrix<double, MemorySpace>              output) override;
 
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) override;
+
     /** Computes an LU factorization of the matrix A_ */
     void Factorize();
 

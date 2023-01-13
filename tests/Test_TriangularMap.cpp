@@ -12,7 +12,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=fa
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
     options.basisNorm = false;
-    
+
     unsigned int numBlocks = 3;
     unsigned int maxDegree = 2;
     unsigned int extraInputs = 1;
@@ -27,7 +27,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=fa
         blocks.at(i) = MapFactory::CreateComponent<MemorySpace>(mset, options);
     }
 
-    std::shared_ptr<ConditionalMapBase<MemorySpace>> triMap = std::make_shared<TriangularMap<MemorySpace>>(blocks);
+    std::shared_ptr<TriangularMap<MemorySpace>> triMap = std::make_shared<TriangularMap<MemorySpace>>(blocks);
 
     CHECK(triMap->outputDim == numBlocks);
     CHECK(triMap->inputDim == numBlocks+extraInputs);
@@ -37,9 +37,9 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=fa
     Kokkos::View<double*,Kokkos::HostSpace> coeffs("Coefficients", triMap->numCoeffs);
     for(unsigned int i=0; i<triMap->numCoeffs; ++i)
         coeffs(i) = 0.1*(i+1);
-        
+
     SECTION("Coefficients"){
-        
+
         // Set the coefficients of the triangular map
         triMap->SetCoeffs(coeffs);
 
@@ -65,11 +65,11 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=fa
 
     triMap->SetCoeffs(coeffs);
     auto out = triMap->Evaluate(in);
-    
+
     SECTION("Evaluation"){
 
         for(unsigned int i=0; i<numBlocks; ++i){
-            
+
             auto outBlock = blocks.at(i)->Evaluate(Kokkos::subview(in, std::make_pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
 
             REQUIRE(outBlock.extent(1)==numSamps);
@@ -134,16 +134,16 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=fa
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
+                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3));
             }
             coeffs(i) -= fdstep;
         }
-        
+
     }
 
 
@@ -173,18 +173,18 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=fa
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3));
             }
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
                 in(i,ptInd) -= fdstep;
         }
-        
+
     }
 
     SECTION("LogDeterminantCoeffGrad"){
@@ -199,7 +199,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=fa
         Kokkos::View<double**,Kokkos::HostSpace> detGrad = triMap->LogDeterminantCoeffGrad(in);
         REQUIRE(detGrad.extent(0)==triMap->numCoeffs);
         REQUIRE(detGrad.extent(1)==numSamps);
-        
+
         Kokkos::View<double*,Kokkos::HostSpace> logDet = triMap->LogDeterminant(in);
         Kokkos::View<double*,Kokkos::HostSpace> logDet2;
 
@@ -212,8 +212,8 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=fa
             logDet2 = triMap->LogDeterminant(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
-                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-4)); 
-            
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-4));
+
             coeffs(i) -= fdstep;
         }
 
@@ -226,7 +226,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
     options.basisNorm = false;
-    
+
     unsigned int numBlocks = 3;
     unsigned int maxDegree = 2;
     unsigned int extraInputs = 1;
@@ -238,7 +238,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks(numBlocks);
     std::vector<Kokkos::View<double*,Kokkos::HostSpace>> coeffs_(numBlocks);
     for(unsigned int i=0;i<numBlocks;++i){
-        
+
         FixedMultiIndexSet<MemorySpace> mset(i+extraInputs+1,maxDegree);
         coeffSize += mset.Size();
 
@@ -248,9 +248,9 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
 
         for(unsigned int j=0; j<blocks.at(i)->numCoeffs; ++j)
             coeffs_.at(i)(j) = 0.1*(j+1);
-        
+
         blocks.at(i)->SetCoeffs(coeffs_.at(i));
-        
+
     }
     bool moveCoeffs=true;
     std::shared_ptr<ConditionalMapBase<MemorySpace>> triMap = std::make_shared<TriangularMap<MemorySpace>>(blocks, moveCoeffs);
@@ -269,7 +269,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
         for(unsigned int i=0; i<numBlocks; ++i){
             for(unsigned int j=0; j<blocks.at(i)->numCoeffs; ++j){
                 CHECK(blocks.at(i)->Coeffs()(j) == coeffs(cumCoeffInd)); // Values of coefficients should be equal
-                CHECK(blocks.at(i)->Coeffs()(j) == coeffs_.at(i)(j)); 
+                CHECK(blocks.at(i)->Coeffs()(j) == coeffs_.at(i)(j));
                 CHECK(&blocks.at(i)->Coeffs()(j) == &coeffs(cumCoeffInd)); // Memory location should also be the same (no copy)
                 cumCoeffInd++;
             }
@@ -286,13 +286,13 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
     }
 
 
-    
+
     auto out = triMap->Evaluate(in);
-    
+
     SECTION("Evaluation"){
 
         for(unsigned int i=0; i<numBlocks; ++i){
-            
+
             auto outBlock = blocks.at(i)->Evaluate(Kokkos::subview(in, std::make_pair(0,int(i+1+extraInputs)), Kokkos::ALL()));
 
             REQUIRE(outBlock.extent(1)==numSamps);
@@ -357,16 +357,16 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
+                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3));
             }
             coeffs(i) -= fdstep;
         }
-        
+
     }
 
 
@@ -396,18 +396,18 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3));
             }
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
                 in(i,ptInd) -= fdstep;
         }
-        
+
     }
 
     SECTION("LogDeterminantCoeffGrad"){
@@ -422,7 +422,7 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
         Kokkos::View<double**,Kokkos::HostSpace> detGrad = triMap->LogDeterminantCoeffGrad(in);
         REQUIRE(detGrad.extent(0)==triMap->numCoeffs);
         REQUIRE(detGrad.extent(1)==numSamps);
-        
+
         Kokkos::View<double*,Kokkos::HostSpace> logDet = triMap->LogDeterminant(in);
         Kokkos::View<double*,Kokkos::HostSpace> logDet2;
 
@@ -435,8 +435,8 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=tr
             logDet2 = triMap->LogDeterminant(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
-                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-4)); 
-            
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-4));
+
             coeffs(i) -= fdstep;
         }
 
@@ -477,9 +477,9 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
     Kokkos::View<double*,Kokkos::HostSpace> coeffs("Coefficients", triMap->numCoeffs);
     for(unsigned int i=0; i<triMap->numCoeffs; ++i)
         coeffs(i) = 0.1*(i+1);
-        
+
     SECTION("Coefficients"){
-        
+
         // Set the coefficients of the triangular map
         triMap->SetCoeffs(coeffs);
 
@@ -505,18 +505,18 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
 
     triMap->SetCoeffs(coeffs);
     auto out = triMap->Evaluate(in);
-    
+
     SECTION("Evaluation"){
 
         unsigned int start = 0;
 
         for(unsigned int b=0; b<numBlocks; ++b){
-            
+
             auto subIn = Kokkos::subview(in, std::make_pair(0, int(blocks.at(b)->inputDim)), Kokkos::ALL());
             auto subOut = Kokkos::subview(out, std::make_pair(int(start), int(start + blocks.at(b)->outputDim)), Kokkos::ALL());
 
             auto outBlock = blocks.at(b)->Evaluate(subIn);
-            
+
             REQUIRE(outBlock.extent(1)==subOut.extent(1));
             REQUIRE(outBlock.extent(0)==subOut.extent(0));
 
@@ -584,16 +584,16 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
+                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3));
             }
             coeffs(i) -= fdstep;
         }
-        
+
     }
 
 
@@ -623,18 +623,18 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3));
             }
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
                 in(i,ptInd) -= fdstep;
         }
-        
+
     }
 
     SECTION("LogDeterminantCoeffGrad"){
@@ -649,7 +649,7 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
         Kokkos::View<double**,Kokkos::HostSpace> detGrad = triMap->LogDeterminantCoeffGrad(in);
         REQUIRE(detGrad.extent(0)==triMap->numCoeffs);
         REQUIRE(detGrad.extent(1)==numSamps);
-        
+
         Kokkos::View<double*,Kokkos::HostSpace> logDet = triMap->LogDeterminant(in);
         Kokkos::View<double*,Kokkos::HostSpace> logDet2;
 
@@ -662,8 +662,8 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
             logDet2 = triMap->LogDeterminant(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
-                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).epsilon(1e-4)); 
-            
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).epsilon(1e-4));
+
             coeffs(i) -= fdstep;
         }
 
@@ -710,16 +710,16 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
     CHECK(triMap->numCoeffs == coeffSize);
 
 
-        
+
     SECTION("Coefficients"){
-        
+
 
         // Now make sure that the coefficients of each block were set
         unsigned int cumCoeffInd = 0;
         for(unsigned int i=0; i<numBlocks; ++i){
             for(unsigned int j=0; j<blocks.at(i)->numCoeffs; ++j){
                 CHECK(blocks.at(i)->Coeffs()(j) == triMap->Coeffs()(cumCoeffInd)); // Values of coefficients should be equal
-                CHECK(blocks.at(i)->Coeffs()(j) == coeffs_.at(i)(j)); 
+                CHECK(blocks.at(i)->Coeffs()(j) == coeffs_.at(i)(j));
                 CHECK(&blocks.at(i)->Coeffs()(j) == &triMap->Coeffs()(cumCoeffInd)); // Memory location should also be the same (no copy)
                 cumCoeffInd++;
             }
@@ -736,18 +736,18 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
     }
 
     auto out = triMap->Evaluate(in);
-    
+
     SECTION("Evaluation"){
 
         unsigned int start = 0;
 
         for(unsigned int b=0; b<numBlocks; ++b){
-            
+
             auto subIn = Kokkos::subview(in, std::make_pair(0, int(blocks.at(b)->inputDim)), Kokkos::ALL());
             auto subOut = Kokkos::subview(out, std::make_pair(int(start), int(start + blocks.at(b)->outputDim)), Kokkos::ALL());
 
             auto outBlock = blocks.at(b)->Evaluate(subIn);
-            
+
             REQUIRE(outBlock.extent(1)==subOut.extent(1));
             REQUIRE(outBlock.extent(0)==subOut.extent(0));
 
@@ -815,16 +815,16 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
+                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3));
             }
             coeffs(i) -= fdstep;
         }
-        
+
     }
 
 
@@ -854,18 +854,18 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3));
             }
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
                 in(i,ptInd) -= fdstep;
         }
-        
+
     }
 
     SECTION("LogDeterminantCoeffGrad"){
@@ -880,7 +880,7 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
         Kokkos::View<double**,Kokkos::HostSpace> detGrad = triMap->LogDeterminantCoeffGrad(in);
         REQUIRE(detGrad.extent(0)==triMap->numCoeffs);
         REQUIRE(detGrad.extent(1)==numSamps);
-        
+
         Kokkos::View<double*,Kokkos::HostSpace> logDet = triMap->LogDeterminant(in);
         Kokkos::View<double*,Kokkos::HostSpace> logDet2;
 
@@ -893,16 +893,36 @@ TEST_CASE( "Testing TriangularMap made from smaller TriangularMaps with moveCoef
             logDet2 = triMap->LogDeterminant(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
-                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).epsilon(1e-4)); 
-            
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).epsilon(1e-4));
+
             coeffs(i) -= fdstep;
         }
 
     }
 
+    SECTION("Slice"){
+        int sliceBegin = 1;
+        int sliceEnd = 5;
+        unsigned int extraInputs = 2;
+        auto slice = triMap->Slice(sliceBegin, sliceEnd);
+        REQUIRE(slice->inputDim == sliceEnd);
+        REQUIRE(slice->outputDim == sliceEnd-sliceBegin);
+
+        auto outSlice = slice->Evaluate(in);
+        auto outFull = triMap->Evaluate(in);
+
+        // Just test the evaluation
+        for(unsigned int i=sliceBegin; i<sliceEnd; ++i){
+            for(unsigned int j=0; j<numSamps; ++j) {
+                CHECK( outSlice(i-sliceBegin,j) == Approx(outFull(i,j)).epsilon(1e-6));
+            }
+        }
+
+        // This is used for testing the gradient
+        auto tmapSlice = std::dynamic_pointer_cast<TriangularMap<Kokkos::HostSpace>>(slice);
+    }
+
 }
-
-
 
 TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[TriangularMap_CreateSingleEntryMap]" ) {
 
@@ -925,9 +945,9 @@ TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[Triangular
     Kokkos::View<double*,Kokkos::HostSpace> coeffs("Coefficients", triMap->numCoeffs);
     for(unsigned int i=0; i<triMap->numCoeffs; ++i)
         coeffs(i) = 0.1*(i+1);
-        
+
     SECTION("Coefficients"){
-        
+
         // Set the coefficients of the triangular map
         triMap->SetCoeffs(coeffs);
 
@@ -937,7 +957,7 @@ TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[Triangular
                 CHECK(comp->Coeffs()(i) == triMap->Coeffs()(i)); // Values of coefficients should be equal
                 CHECK(&comp->Coeffs()(i) == &triMap->Coeffs()(i)); // Memory location should also be the same (no copy)
         }
-        
+
     }
 
     unsigned int numSamps = 10;
@@ -950,7 +970,7 @@ TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[Triangular
 
     triMap->SetCoeffs(coeffs);
     auto out = triMap->Evaluate(in);
-    
+
     SECTION("Evaluation"){
 
         unsigned int start = 0;
@@ -991,9 +1011,9 @@ TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[Triangular
     }
 
     SECTION("LogDeterminant"){
-        
+
         auto inTopAndMid = Kokkos::subview(in, std::make_pair(0, int(activeInd)), Kokkos::ALL());
-        
+
         auto logDet = triMap->LogDeterminant(in);
         auto logDet_ = comp->LogDeterminant(inTopAndMid);
 
@@ -1030,16 +1050,16 @@ TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[Triangular
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
+                CHECK( coeffGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3));
             }
             coeffs(i) -= fdstep;
         }
-        
+
     }
 
 
@@ -1069,18 +1089,18 @@ TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[Triangular
             evals2 = triMap->Evaluate(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd){
-                
+
                 double fdDeriv = 0.0;
                 for(unsigned int j=0; j<triMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3)); 
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).margin(1e-3));
             }
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
                 in(i,ptInd) -= fdstep;
         }
-        
+
     }
 
     SECTION("LogDeterminantCoeffGrad"){
@@ -1095,7 +1115,7 @@ TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[Triangular
         Kokkos::View<double**,Kokkos::HostSpace> detGrad = triMap->LogDeterminantCoeffGrad(in);
         REQUIRE(detGrad.extent(0)==triMap->numCoeffs);
         REQUIRE(detGrad.extent(1)==numSamps);
-        
+
         Kokkos::View<double*,Kokkos::HostSpace> logDet = triMap->LogDeterminant(in);
         Kokkos::View<double*,Kokkos::HostSpace> logDet2;
 
@@ -1108,8 +1128,8 @@ TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[Triangular
             logDet2 = triMap->LogDeterminant(in);
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)
-                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-4)); 
-            
+                CHECK( detGrad(i,ptInd) == Approx((logDet2(ptInd)-logDet(ptInd))/fdstep).margin(1e-4));
+
             coeffs(i) -= fdstep;
         }
 

@@ -39,6 +39,7 @@ void mpart::binding::ConditionalMapBaseWrapper(jlcxx::Module &mod) {
             map.InverseImpl(JuliaToKokkos(x1), JuliaToKokkos(r), JuliaToKokkos(output));
             return output;
         })
+        .method("Slice", [](ConditionalMapBase<Kokkos::HostSpace>& map, int begin, int end){ return map.Slice(begin-1, end); })
         ;
     jlcxx::stl::apply_stl<ConditionalMapBase<Kokkos::HostSpace>*>(mod);
 }

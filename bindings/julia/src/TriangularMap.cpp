@@ -14,6 +14,6 @@ void mpart::binding::TriangularMapWrapper(jlcxx::Module &mod) {
        .method("InverseInplace", [](TriangularMap<Kokkos::HostSpace> &map, jlcxx::ArrayRef<double,2> x, jlcxx::ArrayRef<double,2> r){
             map.InverseInplace(JuliaToKokkos(x), JuliaToKokkos(r));
        })
-       .method("GetComponent", &TriangularMap<Kokkos::HostSpace>::GetComponent)
+       .method("GetComponent", [](TriangularMap<Kokkos::HostSpace>& map, int i){ return map.GetComponent(i-1); })
     ;
 }

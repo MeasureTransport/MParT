@@ -60,6 +60,18 @@ public:
     void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
     #endif
 
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) override;
+
+    /** @brief Returns a subsection of the map according to index of components
+     * @details This function returns a subsection (or "slice") of a block triangular map by simply just taking a subset of the blocks.
+     *          The returned map will have the same number of inputs as the original map, and this is equivalent to {@link #Slice Slice} when
+     *          the number of outputs of each component is 1.
+     * @param a The first component block to take
+     * @param b The index AFTER the last component block to take
+     * @return A shared pointer to a new ConditionalMapBase object containing the subsection of the map.
+     */
+    virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> BlockSlice(int a, int b);
+
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}
 
     /** @brief Computes the log determinant of the Jacobian matrix of this map.

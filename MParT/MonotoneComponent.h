@@ -1,6 +1,8 @@
 #ifndef MPART_MONOTONECOMPONENT_H
 #define MPART_MONOTONECOMPONENT_H
 
+#include <memory>
+
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
 
@@ -37,7 +39,7 @@ $$
 @tparam QuadratureType A class defining the integration scheme used to approximate \f$\int_0^{x_N}  g\left( \frac{\partial f}{\partial x_d}(x_1,x_2,..., x_{N-1}, t) \right) dt\f$.  The type must have a function `Integrate(f,lb,ub)` that accepts a functor `f`, a double lower bound `lb`, a double upper bound `ub`, and returns a double with an estimate of the integral.   The MParT::AdaptiveSimpson and MParT::RecursiveQuadrature classes provide this interface.
 */
 template<class ExpansionType, class PosFuncType, class QuadratureType, typename MemorySpace>
-class MonotoneComponent : public ConditionalMapBase<MemorySpace>
+class MonotoneComponent : public ConditionalMapBase<MemorySpace>, public std::enable_shared_from_this<MonotoneComponent<ExpansionType, PosFuncType, QuadratureType, MemorySpace>>
 {
 
 public:
@@ -1076,6 +1078,11 @@ public:
 
         assert(it<maxIts);
         return 0.5*(xub+xlb);
+    }
+
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> Slice(int a, int b) override {
+        assert(a == 0 && b == 1);
+        return MonotoneComponent<ExpansionType, PosFuncType, QuadratureType, MemorySpace>::shared_from_this();
     }
 
     /** Give access to the underlying FixedMultiIndexSet

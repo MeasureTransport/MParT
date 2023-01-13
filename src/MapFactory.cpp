@@ -100,9 +100,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateSingle
 
 template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriangular(unsigned int inputDim,
-                                                                         unsigned int outputDim,
-                                                                         unsigned int totalOrder,
-                                                                         MapOptions options)
+                                                                                     unsigned int outputDim,
+                                                                                     unsigned int totalOrder,
+                                                                                     MapOptions options)
 {
 
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps(outputDim);

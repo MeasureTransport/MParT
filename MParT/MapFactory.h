@@ -4,6 +4,7 @@
 #include "MParT/MapOptions.h"
 
 #include "MParT/ConditionalMapBase.h"
+#include "MParT/TriangularMap.h"
 #include "MParT/SummarizedMap.h"
 //#include "MParT/DebugMap.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
