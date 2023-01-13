@@ -12,7 +12,7 @@ void TestStandardNormalSamples(StridedMatrix<double, Kokkos::HostSpace> samples)
     unsigned int N_samp = samples.extent(1);
     double mc_margin = (1/std::sqrt(N_samp))*10.0;
 
-    GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(dim);
+    Distribution<Kokkos::HostSpace> dist = CreateGaussianDistribution<Kokkos::HostSpace>(dim);
     Kokkos::View<double*, Kokkos::HostSpace> mean("mean", dim);
     Kokkos::View<double**, Kokkos::HostSpace> covar("covar", dim, dim);
     std::fill(mean.data(), mean.data()+dim, 0.0);
@@ -96,7 +96,7 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
     double abs_margin = 1e-6;
 
     SECTION( "Default Covariance, Default mean" ) {
-        GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(dim);
+        Distribution<Kokkos::HostSpace> dist = CreateGaussianDistribution<Kokkos::HostSpace>(dim);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
         Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_gradpdf ("sample grad pdf", dim, N_samp);
@@ -112,7 +112,7 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
     std::fill(mean.data(), mean.data()+dim, 1.0);
 
     SECTION( "Default Covariance, unit mean in all dimensions" ) {
-        GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(mean);
+        Distribution<Kokkos::HostSpace> dist = CreateGaussianDistribution<Kokkos::HostSpace>(mean);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
         Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_gradpdf ("sample grad pdf", dim, N_samp);
@@ -135,7 +135,7 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
     });
 
     SECTION( "Diagonal Covariance, Default mean" ) {
-        GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(covar);
+        Distribution<Kokkos::HostSpace> dist = CreateGaussianDistribution<Kokkos::HostSpace>(covar);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
         Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_gradpdf ("sample grad pdf", dim, N_samp);
@@ -151,7 +151,7 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
     }
 
     SECTION( "Diagonal Covariance, unit mean in all dimensions" ) {
-        GaussianDistribution<Kokkos::HostSpace> dist = CreateDistribution<Kokkos::HostSpace, GaussianSamplerDensity<Kokkos::HostSpace>>(mean, covar);
+        Distribution<Kokkos::HostSpace> dist = CreateGaussianDistribution<Kokkos::HostSpace>(mean, covar);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
         Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_gradpdf ("sample grad pdf", dim, N_samp);

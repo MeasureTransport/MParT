@@ -50,6 +50,3 @@ void LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts
     });
 }
 };
-
-template<typename MemorySpace>
-using UniformDistribution = Distribution<MemorySpace, UniformSampler<MemorySpace>, UniformDensity<MemorySpace>>;

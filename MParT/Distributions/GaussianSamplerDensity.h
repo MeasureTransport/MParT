@@ -79,8 +79,10 @@ class GaussianSamplerDensity: public SampleGenerator<MemorySpace>, public Densit
     double logDetCov_;
 };
 
-template<typename MemorySpace>
-using GaussianDistribution = Distribution<MemorySpace, GaussianSamplerDensity<MemorySpace>, GaussianSamplerDensity<MemorySpace>>;
+template<typename MemorySpace, typename... T>
+Distribution<MemorySpace> CreateGaussianDistribution(T... args) {
+    return CreateDistribution<MemorySpace,GaussianSamplerDensity<MemorySpace>>(args...);
+}
 
 } // namespace mpart
 
