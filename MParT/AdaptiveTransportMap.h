@@ -52,7 +52,7 @@ class ATMObjective {
     double operator()(unsigned int n, const double* coeffs, double* grad);
     void Gradient(unsigned int n, const double* coeffs, double* grad);
     void SetMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) {map_ = map;}
-    double TestError(StridedVector<const double, MemorySpace> coeffView);
+    double TestError(std::vector<double> &coeffView);
 
     private:
     StridedMatrix<const double, MemorySpace> x_;

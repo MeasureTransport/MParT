@@ -8,9 +8,6 @@ PullbackDensity<MemorySpace>::PullbackDensity(std::shared_ptr<ConditionalMapBase
     if (map_->outputDim != reference_->Dim()) {
         throw std::invalid_argument("PullbackDensity: map output dimension does not match reference density dimension");
     }
-    if (map_->inputDim != map_->outputDim) {
-        throw std::invalid_argument("PullbackDensity: map input dimension does not match map output dimension");
-    }
 }
 
 template<typename MemorySpace>

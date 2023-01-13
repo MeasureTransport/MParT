@@ -9,7 +9,7 @@ double ATMObjective<Kokkos::HostSpace>::operator()(unsigned int n, const double*
 
     // Rest of function is agnostic of MemorySpace, so keep it generic
     using MemorySpace = Kokkos::HostSpace;
-    std::shared_ptr<GaussianSamplerDensity<MemorySpace>> density = std::make_shared<GaussianSamplerDensity<MemorySpace>>(x_.extent(0));
+    std::shared_ptr<GaussianSamplerDensity<MemorySpace>> density = std::make_shared<GaussianSamplerDensity<MemorySpace>>(map_->outputDim);
     map_->SetCoeffs(coeffView);
     PullbackDensity<MemorySpace> pullback {map_, density};
     StridedVector<double, MemorySpace> densityX = pullback.LogDensity(x_);
@@ -42,7 +42,9 @@ void ATMObjective<Kokkos::HostSpace>::Gradient(unsigned int n, const double* coe
 }
 
 template<>
-double ATMObjective<Kokkos::HostSpace>::TestError(StridedVector<const double, Kokkos::HostSpace> coeffView) {
+double ATMObjective<Kokkos::HostSpace>::TestError(std::vector<double> &coeffVec) {
+
+    StridedVector<const double, Kokkos::HostSpace> coeffView = VecToKokkos<double, Kokkos::HostSpace>(coeffVec);
     const unsigned int N_samps = x_.extent(1);
     // Rest of function is agnostic of MemorySpace, so keep it generic
     using MemorySpace = Kokkos::HostSpace;
@@ -122,9 +124,9 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
 
     // Train initial map
     double error;
-    std::vector<double> mapCoeffsStd = KokkosToStd(map->Coeffs());
+    std::vector<double> mapCoeffsStd (map->numCoeffs);
     nlopt::result res = opt.optimize(mapCoeffsStd, error);
-    double bestError = objective.TestError(map->Coeffs());
+    double bestError = objective.TestError(mapCoeffsStd);
 
     if(options.verbose) {
         std::cout << "Initial map trained with error: " << error << ", test error: " << bestError;
@@ -215,7 +217,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         opt.set_min_objective(objective);
         opt.optimize(mapCoeffsStd, train_error);
         // Get the testing error and assess the best map
-        double test_error = objective.TestError(map->Coeffs());
+        double test_error = objective.TestError(mapCoeffsStd);
         if(test_error < bestError) {
             bestError = test_error;
             for(int i = 0; i < outputDim; i++) {
@@ -252,7 +254,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
     opt.optimize(mapCoeffsStd, train_error);
 
     // Get the testing error, printing information if verbose
-    double test_error = objective.TestError(map->Coeffs());
+    double test_error = objective.TestError(mapCoeffsStd);
     if(options.verbose) {
         std::cout << "Final map has " << map->numCoeffs << " terms.\n";
         std::cout << "Training error: " << train_error << ", Testing error: " << test_error << "\n";

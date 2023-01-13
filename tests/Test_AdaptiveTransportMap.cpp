@@ -29,3 +29,32 @@ void ATM() {
     StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
     auto atm = AdaptiveTransportMap(mset0, trainSamps, testSamps, opts);
 }
+
+void TestNLL() {
+    unsigned int dim = 2;
+    unsigned int numPts = 3;
+    Kokkos::View<double**, Kokkos::HostSpace> x("x", dim, numPts);
+    for(int i = 0; i < dim; i++) {
+        for(int j = 0; j < numPts; j++) {
+            x(i,j) = dim*j + i + 1;
+        }
+    }
+
+    ATMOptions opts;
+    opts.basisType = BasisTypes::ProbabilistHermite;
+    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, 1);
+    auto comp = MapFactory::CreateComponent(mset.Fix(true), opts);
+    Kokkos::View<double*, Kokkos::HostSpace> coeffs("coeffs", comp->numCoeffs);
+    Kokkos::parallel_for("init coeffs", comp->numCoeffs, KOKKOS_LAMBDA(const unsigned int i) {
+        coeffs(i) = 1;
+    });
+    StridedMatrix<double, Kokkos::HostSpace> xStrided = x;
+    ATMObjective obj {xStrided, xStrided, comp, opts};
+    std::vector<double> grad(comp->numCoeffs);
+    double nll = obj(comp->numCoeffs, coeffs.data(), grad.data());
+    std::cout << "nll = " << nll << "\n";
+    for(int i = 0; i < comp->numCoeffs; i++) {
+        std::cout << "grad[ " << i << "] = " << grad[i] << "\n";
+    }
+    std::cout << std::endl;
+}
