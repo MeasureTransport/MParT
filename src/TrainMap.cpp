@@ -1,5 +1,6 @@
 #include "MParT/TrainMap.h"
 
+using namespace mpart;
 
 nlopt::opt SetupOptimization(unsigned int dim, TrainOptions options) {
     nlopt::opt opt(options.opt_alg.c_str(), dim);
@@ -26,9 +27,11 @@ nlopt::opt SetupOptimization(unsigned int dim, TrainOptions options) {
     return opt;
 }
 
-void TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective, TrainOptions options) {
+template<typename ObjectiveType>
+void mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options) {
     nlopt::opt opt = SetupOptimization(map->numCoeffs, options);
-    opt.set_min_objective(objective->GetOptimizationObjective(map), objective.get());
+    nlopt::functor_type functor = std::bind(objective, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, map);
+    opt.set_min_objective(functor);
     double error;
     std::vector<double> mapCoeffsStd (map->numCoeffs);
     nlopt::result res = opt.optimize(mapCoeffsStd, error);
@@ -39,3 +42,6 @@ void TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, std::s
         std::cout << "Optimization error: " << error << "\n";
     }
 }
+
+template void mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, KLObjective<Kokkos::HostSpace> &objective, TrainOptions options);
+

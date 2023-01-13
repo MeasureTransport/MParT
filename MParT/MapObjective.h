@@ -18,11 +18,11 @@ class MapObjective {
     MapObjective(StridedMatrix<const double, MemorySpace> train): train_(train) {}
     MapObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test): train_(train), test_(test) {}
 
-    virtual std::function<double(unsigned int, const double*, double*)> GetOptimizationObjective(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
+    double operator()(unsigned int n, const double* x, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 
-    double TestError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
+    double TestError();
 
-    StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
+    StridedVector<double, MemorySpace> TrainCoeffGrad();
 
     protected:
     virtual double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) = 0;

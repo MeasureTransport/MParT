@@ -17,7 +17,8 @@ struct TrainOptions {
     bool verbose = false;
 };
 
-void TrainMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<MapObjective<MemorySpace>> objective, TrainOptions options = TrainOptions());
+template<typename ObjectiveType>
+void mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options);
 
 } // namespace mpart
 
