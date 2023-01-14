@@ -20,9 +20,9 @@ class MapObjective {
 
     double operator()(unsigned int n, const double* x, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 
-    double TestError();
+    double TestError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 
-    StridedVector<double, MemorySpace> TrainCoeffGrad();
+    StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 
     protected:
     virtual double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) = 0;

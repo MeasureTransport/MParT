@@ -1,14 +1,13 @@
 #include "MParT/MapObjective.h"
 using namespace mpart;
 
-template<>
-template<>
-double MapObjective<Kokkos::HostSpace>::operator()(unsigned int n, const double* coeffs, double* grad, std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map) {
+template<typename MemorySpace>
+double MapObjective<MemorySpace>::operator()(unsigned int n, const double* coeffs, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) {
 
-    StridedVector<const double, Kokkos::HostSpace> coeffView = ToConstKokkos<double,Kokkos::HostSpace>(coeffs, n);
-    StridedVector<double, Kokkos::HostSpace> gradView = ToKokkos<double,Kokkos::HostSpace>(grad, n);
+    StridedVector<const double, MemorySpace> coeffView = ToConstKokkos<double,MemorySpace>(coeffs, n);
+    StridedVector<double, MemorySpace> gradView = ToKokkos<double,MemorySpace>(grad, n);
     map->SetCoeffs(coeffView);
-    return ObjectivePlusCoeffGradImpl(train_, gradView);
+    return ObjectivePlusCoeffGradImpl(train_, gradView, map);
 }
 
 template<typename MemorySpace>
@@ -21,8 +20,9 @@ double MapObjective<MemorySpace>::TestError(std::shared_ptr<ConditionalMapBase<M
 
 template<typename MemorySpace>
 StridedVector<double, MemorySpace> MapObjective<MemorySpace>::TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) {
-    Kokkos::View<double, MemorySpace> grad("trainCoeffGrad", map->numCoeffs);
-    CoeffGradImpl(train_, grad);
+    Kokkos::View<double*, MemorySpace> grad("trainCoeffGrad", map->numCoeffs);
+    CoeffGradImpl(train_, grad, map);
+    return grad;
 }
 
 template<typename MemorySpace>

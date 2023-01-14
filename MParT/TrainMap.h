@@ -18,7 +18,7 @@ struct TrainOptions {
 };
 
 template<typename ObjectiveType>
-void mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options);
+void TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options);
 
 } // namespace mpart
 

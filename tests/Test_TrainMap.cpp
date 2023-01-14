@@ -3,6 +3,10 @@
 #include "MParT/MapFactory.h"
 #include "MParT/MapObjective.h"
 #include "MParT/TrainMap.h"
+#include "MParT/Distributions/GaussianSamplerDensity.h"
+
+using namespace mpart;
+using namespace Catch;
 
 TEST_CASE("Test_TrainMap", "[Test_TrainMap]") {
     unsigned int seed = 155829;
@@ -19,12 +23,13 @@ TEST_CASE("Test_TrainMap", "[Test_TrainMap]") {
     });
     StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
     StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
-    auto obj = std::make_shared<KLObjective<Kokkos::HostSpace>>(trainSamps, testSamps, sampler);
+    KLObjective<Kokkos::HostSpace> obj {trainSamps, testSamps, sampler};
 
     MapOptions map_options;
     map_options.basisType = BasisTypes::ProbabilistHermite;
-    auto map = MapFactory::CreateTriangularMap<Kokkos::HostSpace>(dim, dim, 2, map_options);
+    auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(dim, dim, 2, map_options);
     TrainOptions train_options;
     train_options.verbose = true;
     TrainMap(map, obj, train_options);
+    std::cout << "Test error: " << obj.TestError(map) << std::endl;
 }
