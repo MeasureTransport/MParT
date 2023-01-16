@@ -5,6 +5,9 @@
 #include "MParT/TrainMap.h"
 #include "MParT/Distributions/GaussianSamplerDensity.h"
 
+// For testing the normality of the pushforward
+#include "Distributions/Test_Distributions_Common.h"
+
 using namespace mpart;
 using namespace Catch;
 
@@ -29,7 +32,13 @@ TEST_CASE("Test_TrainMap", "[Test_TrainMap]") {
     map_options.basisType = BasisTypes::ProbabilistHermite;
     auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(dim, dim, 2, map_options);
     TrainOptions train_options;
+    train_options.opt_maxeval = 50;
+    train_options.opt_ftol_rel = 1e-16;
+    train_options.opt_ftol_abs = 1e-16;
+    train_options.opt_xtol_rel = 1e-16;
     train_options.verbose = true;
     TrainMap(map, obj, train_options);
-    std::cout << "Test error: " << obj.TestError(map) << std::endl;
+    Kokkos::View<double**, Kokkos::HostSpace> null_prefix ("null_prefix", 0, testPts);
+    auto pushforward_samples = map->Inverse(null_prefix, testSamps);
+    TestStandardNormalSamples(testSamps);
 }
