@@ -1,7 +1,5 @@
 #include <catch2/catch_all.hpp>
 
-#include "MParT/MultiIndices/MultiIndexSet.h"
-#include "MParT/TriangularMap.h"
 #include "MParT/MapFactory.h"
 #include "MParT/MapObjective.h"
 #include "MParT/TrainMap.h"
@@ -13,21 +11,7 @@
 using namespace mpart;
 using namespace Catch;
 
-#include <fstream>
-void SaveSamples(std::string fname, StridedMatrix<double, Kokkos::HostSpace> samps, std::string file_dir = "/home/dannys4/misc/mpart_trainMap/") {
-    std::ofstream file {file_dir + fname, std::ios::out};
-    for(int i = 0; i < samps.extent(0); i++) {
-        for(int j = 0; j < samps.extent(1)-1; j++) {
-            file << samps(i,j) << ",";
-        }
-        file << samps(i,samps.extent(1)-1) << "\n";
-    }
-    file << std::endl;
-    std::cout << "Saved " << fname << " to " << file_dir + fname << std::endl;
-}
-
-
-TEST_CASE("Test_TrainMap", "[Test_TrainMap]") {
+TEST_CASE("Test_TrainMap", "[TrainMap]") {
     unsigned int seed = 42;
     unsigned int dim = 2;
     unsigned int numPts = 20000;
@@ -51,6 +35,8 @@ TEST_CASE("Test_TrainMap", "[Test_TrainMap]") {
 
     TrainOptions train_options;
     train_options.verbose = false;
+    Kokkos::Timer timer {};
+    timer.reset();
     TrainMap(map, obj, train_options);
     auto pullback_samples = map->Evaluate(testSamps);
     TestStandardNormalSamples(pullback_samples);
