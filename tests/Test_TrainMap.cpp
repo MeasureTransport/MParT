@@ -1,5 +1,7 @@
 #include <catch2/catch_all.hpp>
 
+#include "MParT/MultiIndices/MultiIndexSet.h"
+#include "MParT/TriangularMap.h"
 #include "MParT/MapFactory.h"
 #include "MParT/MapObjective.h"
 #include "MParT/TrainMap.h"
@@ -11,8 +13,22 @@
 using namespace mpart;
 using namespace Catch;
 
+#include <fstream>
+void SaveSamples(std::string fname, StridedMatrix<double, Kokkos::HostSpace> samps, std::string file_dir = "/home/dannys4/misc/mpart_trainMap/") {
+    std::ofstream file {file_dir + fname, std::ios::out};
+    for(int i = 0; i < samps.extent(0); i++) {
+        for(int j = 0; j < samps.extent(1)-1; j++) {
+            file << samps(i,j) << ",";
+        }
+        file << samps(i,samps.extent(1)-1) << "\n";
+    }
+    file << std::endl;
+    std::cout << "Saved " << fname << " to " << file_dir + fname << std::endl;
+}
+
+
 TEST_CASE("Test_TrainMap", "[Test_TrainMap]") {
-    unsigned int seed = 155829;
+    unsigned int seed = 42;
     unsigned int dim = 2;
     unsigned int numPts = 20000;
     unsigned int testPts = numPts / 5;
@@ -20,6 +36,7 @@ TEST_CASE("Test_TrainMap", "[Test_TrainMap]") {
     sampler->SetSeed(seed);
     auto samples = sampler->Sample(numPts);
     Kokkos::View<double**, Kokkos::HostSpace> targetSamps("targetSamps", 2, numPts);
+    double max = 0;
     Kokkos::parallel_for("Banana", numPts, KOKKOS_LAMBDA(const unsigned int i) {
         targetSamps(0,i) = samples(0,i);
         targetSamps(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
@@ -31,14 +48,10 @@ TEST_CASE("Test_TrainMap", "[Test_TrainMap]") {
     MapOptions map_options;
     map_options.basisType = BasisTypes::ProbabilistHermite;
     auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(dim, dim, 2, map_options);
+
     TrainOptions train_options;
-    train_options.opt_maxeval = 50;
-    train_options.opt_ftol_rel = 1e-16;
-    train_options.opt_ftol_abs = 1e-16;
-    train_options.opt_xtol_rel = 1e-16;
-    train_options.verbose = true;
+    train_options.verbose = false;
     TrainMap(map, obj, train_options);
-    Kokkos::View<double**, Kokkos::HostSpace> null_prefix ("null_prefix", 0, testPts);
-    auto pushforward_samples = map->Inverse(null_prefix, testSamps);
-    TestStandardNormalSamples(testSamps);
+    auto pullback_samples = map->Evaluate(testSamps);
+    TestStandardNormalSamples(pullback_samples);
 }

@@ -20,19 +20,6 @@ void TestStandardNormalSamples(StridedMatrix<double, Kokkos::HostSpace> samples)
     }
 
     // Check that the mean is zero and the covariance is the identity matrix
-    std::cerr << "Mean: \n";
-    for(int i = 0; i < dim; i++) {
-        std::cerr << mean(i) << " ";
-    }
-    std::cerr << "\nCovariance: \n";
-    for(int i = 0; i < dim; i++) {
-        for(int j = 0; j < dim; j++) {
-            std::cerr << covar(i, j) - mean(i)*mean(j) << " ";
-        }
-        std::cerr << "\n";
-    }
-    std::cerr << std::endl;
-
     for(int i = 0; i < dim; i++) {
         REQUIRE(mean(i) == Approx(0.0).margin(mc_margin));
         for(int j = 0; j < dim; j++) {
