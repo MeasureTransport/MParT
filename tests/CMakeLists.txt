@@ -47,9 +47,6 @@ set (TEST_SOURCES
      tests/Test_SummarizedMap.cpp
      #tests/Test_TensorProductFunction.cpp
 
-     tests/Test_MapObjective.cpp
-     tests/Test_TrainMap.cpp
-
      ${MPART_SERIALIZE_TESTS}
      ${MPART_OPT_TESTS}
 PARENT_SCOPE)
