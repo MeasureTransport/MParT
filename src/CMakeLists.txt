@@ -1,3 +1,12 @@
+set (MPART_OPT_FILES "")
+if (MPART_OPT)
+    set(MPART_OPT_FILES
+        MapObjective.cpp
+        TrainMap.cpp
+        AdaptiveTransportMap.cpp
+    )
+endif ()
+
 target_sources(mpart
     PRIVATE
     MultiIndices/MultiIndex.cpp
@@ -41,10 +50,6 @@ target_sources(mpart
     MapFactoryImpl14.cpp
     MapFactoryImpl15.cpp
 
-    MapObjective.cpp
-    TrainMap.cpp
-
-    AdaptiveTransportMap.cpp
-
+    ${MPART_OPT_FILES}
     Initialization.cpp
 )
