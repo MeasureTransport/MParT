@@ -46,7 +46,7 @@ void SummarizedMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::HostSp
 
 #if defined(MPART_ENABLE_GPU)
 template<typename MemorySpace>
-void SummarizedMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs)
+void SummarizedMap<MemorySpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs)
 {
 
         // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable

@@ -41,6 +41,9 @@ set (TEST_SOURCES
      tests/Test_SummarizedMap.cpp
      #tests/Test_TensorProductFunction.cpp
 
+     tests/Test_MapObjective.cpp
+     tests/Test_TrainMap.cpp
+
      tests/Test_AdaptiveTransportMap.cpp
 
      ${SERIALIZE_FILES}

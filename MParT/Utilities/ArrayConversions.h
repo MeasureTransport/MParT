@@ -97,8 +97,9 @@ namespace mpart{
     }
 
     template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft, typename MemorySpace=Kokkos::HostSpace>
-    inline Kokkos::View<const ScalarType**, LayoutType, MemorySpace> ToConstKokkos(ScalarType* ptr, unsigned int rows, unsigned int cols)
+    inline Kokkos::View<const ScalarType**, LayoutType, MemorySpace> ToConstKokkos(const ScalarType* const_ptr, unsigned int rows, unsigned int cols)
     {
+        ScalarType* ptr = const_cast<ScalarType*>(const_ptr);
         return Kokkos::View<const ScalarType**, LayoutType, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 

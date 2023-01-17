@@ -219,7 +219,7 @@ void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Ko
 #if defined(MPART_ENABLE_GPU)
 
 template<>
-void ParameterizedFunctionBase<mpart::DeviceSpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+void ParameterizedFunctionBase<mpart::DeviceSpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs)
 {
     // Copy the coefficients to the device
     Kokkos::View<double*, mpart::DeviceSpace> coeffs_device = ToDevice<mpart::DeviceSpace>(coeffs);
