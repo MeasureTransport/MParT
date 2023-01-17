@@ -400,9 +400,26 @@ void MultiIndexSet::AddForwardNeighbors(unsigned int globalIndex, bool addInacti
 
 
 void MultiIndexSet::Visualize(std::ostream &out) const
-{ 
-  
+{
+  if(maxOrders.size() == 1) {
+    int dim = maxOrders.at(0);
+    out << "0  | ";
+    for(int j = 0; j < dim; j++)
+        out << "a  ";
+    out << "\n    -";
+    for(int j = 0; j < dim; j++)
+        out << "--";
+    out << "\n     ";
+    for(int j = 0; j < dim; j++) {
+      out << j;
+      if(j < 10) out << "  ";
+      else out << " ";
+    }
+    out << std::endl;
+    return;
+  }
   unsigned int max_ord = maxOrders.at(1) + 1;
+
   for(unsigned int order = 0; order <= maxOrders.at(1) + 1; order++) {
     unsigned int i=max_ord - order;
 
@@ -414,6 +431,7 @@ void MultiIndexSet::Visualize(std::ostream &out) const
 
       bool found = false;
       for(unsigned int k=0; k<active2global.size(); ++k){
+
         if((allMultis.at(active2global.at(k)).Get(0)==j)&&(allMultis.at(active2global.at(k)).Get(1)==i)){
           out << "a  ";
           found = true;
@@ -757,8 +775,8 @@ MultiIndexSet& MultiIndexSet::operator=(const MultiIndexSet& rhs){
     this->active2global = rhs.active2global;
     this->global2active = rhs.global2active;
     this->outEdges = rhs.outEdges;
-    this->inEdges = rhs.inEdges; 
-    this->maxOrders = rhs.maxOrders; 
+    this->inEdges = rhs.inEdges;
+    this->maxOrders = rhs.maxOrders;
     this->neighborhood = rhs.neighborhood;
     this->multi2global = rhs.multi2global;
 

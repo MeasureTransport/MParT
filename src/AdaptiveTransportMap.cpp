@@ -138,6 +138,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
             std::cout << "Size " << currSz-1 << " complete. Train error: " << train_error << " Test error: " << test_error << std::endl;
         }
     }
+
     // Create the "best" map components based on the best MultiIndexSets
     for(int i = 0; i < outputDim; i++) {
         mapBlocks[i] = MapFactory::CreateComponent(mset_best[i].Fix(true), options);
@@ -146,24 +147,22 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
 
     // Create the "best" map and optimize it
     map = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocks, true);
+    if(options.verbose) {
+        std::cout << "\nFinal map has " << map->numCoeffs << " terms.\n";
+    }
     // Train a map with the new MultiIndex
     double train_error = TrainMap(map, objective, options);
     // Get the testing error and assess the best map
     double test_error = objective.TestError(map);
 
     if(options.verbose) {
-        std::cout << "Final map has " << map->numCoeffs << " terms.\n";
         std::cout << "Training error: " << train_error << ", Testing error: " << test_error << "\n";
-        /*std::cout << "Visualization of MultiIndexSets-- ";
+        std::cout << "Visualization of MultiIndexSets--\n";
         for(int i = 0; i < outputDim; i++) {
             std::cout << "mset " << i << ":\n";
-            if(mset0[i].Size() == 1) {
-                std::cout << "0";
-            } else {
-                mset0[i].Visualize();
-            }
+            mset0[i].Visualize();
             std::cout << "\n";
-        }*/
+        }
         std::cout << std::endl;
     }
     return map;

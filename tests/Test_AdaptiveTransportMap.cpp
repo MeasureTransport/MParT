@@ -7,6 +7,20 @@
 using namespace mpart;
 using namespace Catch;
 
+#include <fstream>
+
+void SaveMatrix(std::string fname, StridedMatrix<double, Kokkos::HostSpace> mat, std::string path="/home/dannys4/misc/mpart_atm/") {
+    path = path + fname;
+    std::ofstream file {path, std::ios::out};
+    for(int i = 0; i < mat.extent(0); i++) {
+        for(int j = 0; j < mat.extent(1); j++) {
+            file << mat(i,j);
+            if(j < mat.extent(1) - 1) file << ",";
+        }
+        file << "\n";
+    }
+}
+
 void ATM() {
     unsigned int seed = 155829;
     unsigned int dim = 2;
@@ -24,13 +38,19 @@ void ATM() {
     ATMOptions opts;
     opts.opt_alg = "LD_SLSQP";
     opts.basisType = BasisTypes::ProbabilistHermite;
-    opts.maxSize = 16;
-    opts.maxPatience = 5;
+    opts.maxSize = 8;
+    opts.maxPatience = 3;
     opts.verbose = true;
     StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
     StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
     KLObjective<Kokkos::HostSpace> objective {trainSamps,testSamps,sampler};
     auto atm = AdaptiveTransportMap<Kokkos::HostSpace>(mset0, objective, opts);
+    Kokkos::View<double**, Kokkos::HostSpace> null_prefix ("Null prefix", 0, numPts);
+    auto forward_samps = atm->Evaluate(targetSamps);
+    auto inv_samps = atm->Inverse(null_prefix, targetSamps);
+    SaveMatrix("tSamps.csv", targetSamps);
+    SaveMatrix("fSamps.csv", forward_samps);
+    SaveMatrix("iSamps.csv", inv_samps);
 }
 
 /*void TestNLL() {
