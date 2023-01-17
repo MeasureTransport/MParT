@@ -1,10 +1,12 @@
-set (MPART_OPT_FILES "")
+
 if (MPART_OPT)
     set(MPART_OPT_FILES
         MapObjective.cpp
         TrainMap.cpp
         AdaptiveTransportMap.cpp
     )
+else()
+    set(MPART_OPT_FILES "")
 endif ()
 
 target_sources(mpart

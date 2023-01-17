@@ -21,6 +21,8 @@ class MapObjective {
     double operator()(unsigned int n, const double* x, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 
     double TestError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
+    unsigned int Dim(){return train_.extent(0);}
+    unsigned int NumSamples(){return train_.extent(1);}
 
     StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 

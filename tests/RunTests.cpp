@@ -2,7 +2,7 @@
 
 #include "MParT/Initialization.h"
 
-void TestNLL();
+// void TestNLL();
 void ATM();
 
 int main( int argc, char* argv[] ) {

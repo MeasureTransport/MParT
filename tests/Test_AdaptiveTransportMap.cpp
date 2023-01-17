@@ -1,6 +1,7 @@
 #include <catch2/catch_all.hpp>
 
 #include "MParT/Distributions/GaussianSamplerDensity.h"
+#include "MParT/MapObjective.h"
 #include "MParT/AdaptiveTransportMap.h"
 
 using namespace mpart;
@@ -27,10 +28,11 @@ void ATM() {
     opts.verbose = true;
     StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
     StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
-    auto atm = AdaptiveTransportMap(mset0, trainSamps, testSamps, opts);
+    KLObjective<Kokkos::HostSpace> objective {trainSamps,testSamps,sampler};
+    auto atm = AdaptiveTransportMap<Kokkos::HostSpace>(mset0, objective, opts);
 }
 
-void TestNLL() {
+/*void TestNLL() {
     unsigned int dim = 2;
     unsigned int numPts = 3;
     Kokkos::View<double**, Kokkos::HostSpace> x("x", dim, numPts);
@@ -57,4 +59,4 @@ void TestNLL() {
         std::cout << "grad[ " << i << "] = " << grad[i] << "\n";
     }
     std::cout << std::endl;
-}
+}*/
