@@ -63,7 +63,7 @@ void mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map,
 
     // Since objective is (rightfully) separate from the map, we use std::bind to create a functor
     // from objective::operator() that keeps the map argument held.
-    nlopt::functor_type functor = std::bind(objective, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, map);
+    std::function<double(unsigned, const double*, double*)> functor = std::bind(objective, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, map);
     opt.set_min_objective(functor);
 
     // Get the initial guess at the coefficients
