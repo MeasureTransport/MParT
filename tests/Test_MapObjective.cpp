@@ -44,7 +44,7 @@ TEST_CASE( "Test KLMapObjective", "[KLMapObjective]") {
         std::vector<double> kl_ests{};
         unsigned int init_pts = 10;
         double kl_est = objective.ObjectiveImpl(reference_samples, map);
-        SaveMatrix("refsamples.csv", reference_samples);
+        // SaveMatrix("refsamples.csv", reference_samples);
         double inv_cov_diag = map_scale*map_scale;
         double kl_exact = -std::log(inv_cov_diag) - 1 + inv_cov_diag + map_shift*map_shift*inv_cov_diag;
         kl_exact /= 2.;
