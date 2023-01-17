@@ -29,9 +29,9 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
     // Create initial map
     std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocks);
     Kokkos::View<double*, Kokkos::HostSpace> mapCoeffs ("mapCoeffs", map->numCoeffs);
-    Kokkos::parallel_for("Initialize Map Coeffs", map->numCoeffs, KOKKOS_LAMBDA (const int i) {
+    for(int i = 0; i < mapCoeffs.extent(0); i++) {
         mapCoeffs(i) = 1.;
-    });
+    }
     map->WrapCoeffs(mapCoeffs);
     if(options.verbose) {
         std::cout << "Initial map:" << std::endl;
@@ -154,7 +154,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
     if(options.verbose) {
         std::cout << "Final map has " << map->numCoeffs << " terms.\n";
         std::cout << "Training error: " << train_error << ", Testing error: " << test_error << "\n";
-        std::cout << "Visualization of MultiIndexSets-- ";
+        /*std::cout << "Visualization of MultiIndexSets-- ";
         for(int i = 0; i < outputDim; i++) {
             std::cout << "mset " << i << ":\n";
             if(mset0[i].Size() == 1) {
@@ -163,7 +163,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
                 mset0[i].Visualize();
             }
             std::cout << "\n";
-        }
+        }*/
         std::cout << std::endl;
     }
     return map;

@@ -16,12 +16,13 @@ void ATM() {
     sampler->SetSeed(seed);
     auto samples = sampler->Sample(numPts);
     Kokkos::View<double**, Kokkos::HostSpace> targetSamps("targetSamps", 2, numPts);
-    Kokkos::parallel_for("Banana", numPts, KOKKOS_LAMBDA(const unsigned int i) {
+    for(int i = 0; i < numPts; i++){
         targetSamps(0,i) = samples(0,i);
         targetSamps(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
-    });
+    };
     std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
     ATMOptions opts;
+    opts.opt_alg = "LD_SLSQP";
     opts.basisType = BasisTypes::ProbabilistHermite;
     opts.maxSize = 16;
     opts.maxPatience = 5;
