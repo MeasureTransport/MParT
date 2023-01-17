@@ -23,6 +23,12 @@ const std::vector<std::string> MPART_NLOPT_FAILURE_CODES {
     "forced termination"
 };
 
+double functor_wrapper(unsigned n, const double *x, double *grad, void *d_) {
+    using nloptStdFunction = std::function<double(unsigned,const double*,double*)>;
+    nloptStdFunction *obj = reinterpret_cast<nloptStdFunction*>(d_);
+    return (*obj)(n, x, grad);
+}
+
 nlopt::opt SetupOptimization(unsigned int dim, TrainOptions options) {
     nlopt::opt opt(options.opt_alg.c_str(), dim);
 
@@ -64,7 +70,7 @@ void mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map,
     // Since objective is (rightfully) separate from the map, we use std::bind to create a functor
     // from objective::operator() that keeps the map argument held.
     std::function<double(unsigned, const double*, double*)> functor = std::bind(objective, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, map);
-    opt.set_min_objective(functor);
+    opt.set_min_objective(functor_wrapper, reinterpret_cast<void*>(&functor));
 
     // Get the initial guess at the coefficients
     std::vector<double> mapCoeffsStd = KokkosToStd(map->Coeffs());

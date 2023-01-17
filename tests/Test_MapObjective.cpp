@@ -6,8 +6,22 @@
 #include "MParT/MapObjective.h"
 #include "MParT/Distributions/GaussianSamplerDensity.h"
 
+#include <fstream>
+
 using namespace mpart;
 using namespace Catch;
+
+void SaveMatrix(std::string fname, StridedMatrix<double, Kokkos::HostSpace> mat, std::string path = "/home/dannys4/misc/mpart_atm/") {
+    std::string full_path = path + fname;
+    std::ofstream file {full_path, std::ios::out};
+    for(int i = 0; i < mat.extent(0); i++) {
+        for(int j = 0; j < mat.extent(1); j++) {
+            file << mat(i,j);
+            if(j < mat.extent(1)-1) file << ",";
+        }
+        file << "\n";
+    }
+}
 
 TEST_CASE( "Test KLMapObjective", "[KLMapObjective]") {
     unsigned int dim = 2;
@@ -25,18 +39,12 @@ TEST_CASE( "Test KLMapObjective", "[KLMapObjective]") {
         double map_scale = 2.5;
         double map_shift = 1.5;
         Kokkos::View<double**, Kokkos::HostSpace> A ("Map scale", dim, dim);
-        Kokkos::View<double*, Kokkos::HostSpace> b ("Map shift", dim);;
-        for(int i = 0; i < dim; i++) {
-            b(i) = map_shift;
-            for(int j = 0; j < dim; j++) {
-                A(i,j) = map_scale*((double) i == j);
-            }
-        }
+        Kokkos::View<double*, Kokkos::HostSpace> b ("Map shift", dim);
         auto map = std::make_shared<AffineMap<Kokkos::HostSpace>>(A,b);
         std::vector<double> kl_ests{};
         unsigned int init_pts = 10;
         double kl_est = objective.ObjectiveImpl(reference_samples, map);
-
+        SaveMatrix("refsamples.csv", reference_samples);
         double inv_cov_diag = map_scale*map_scale;
         double kl_exact = -std::log(inv_cov_diag) - 1 + inv_cov_diag + map_shift*map_shift*inv_cov_diag;
         kl_exact /= 2.;
