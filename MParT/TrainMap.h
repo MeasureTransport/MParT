@@ -1,6 +1,7 @@
 #ifndef MPART_TRAINMAP_H
 #define MPART_TRAINMAP_H
 
+#include <functional>
 #include <nlopt.hpp>
 #include "ConditionalMapBase.h"
 #include "MapObjective.h"
