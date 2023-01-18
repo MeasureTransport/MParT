@@ -47,12 +47,7 @@ jobs:
 
       - name: Fix MATLAB
         run: |
-          MATLAB_PATH=$(dirname $(bash -c 'command -v matlab'))
-          MATLAB_VERSION=$(basename $(matlab -n | grep ' MATLAB ' | cut -d= -f2))
-          echo ${MATLAB_VERSION}
-          ls ${MATLAB_PATH}
-          rm ${MATLAB_PATH}/glnxa64/../../sys/os/glnxa64/libstdc++.so.6
-          ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/matlab/${MATLAB_VERSION}/bin/glnxa64/../../sys/os/glnxa64/libstdc++.so.6
+          export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libstdc++.so.6
 
       - name: Cache Kokkos
         uses: actions/cache@v3
