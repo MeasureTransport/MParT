@@ -403,7 +403,7 @@ void MultiIndexSet::Visualize(std::ostream &out) const
 {
   if(maxOrders.size() == 1) {
     int dim = maxOrders.at(0);
-    out << "0  | ";
+    out << " 0 | ";
     for(int j = 0; j < dim; j++)
         out << "a  ";
     out << "\n    -";
