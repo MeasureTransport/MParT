@@ -47,7 +47,7 @@ jobs:
 
       - name: Fix MATLAB
         run: |
-          MATLAB_PATH=$(dirname $(bash -c 'command -v gcc'))
+          MATLAB_PATH=$(dirname $(bash -c 'command -v matlab'))
           MATLAB_VERSION=$(basename $(matlab -n | grep ' MATLAB ' | cut -d= -f2))
           echo ${MATLAB_VERSION}
           ls ${MATLAB_PATH}
