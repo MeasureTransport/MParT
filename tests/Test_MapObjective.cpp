@@ -35,7 +35,6 @@ TEST_CASE( "Test KLMapObjective", "[KLMapObjective]") {
             }
         }
         auto map = std::make_shared<AffineMap<Kokkos::HostSpace>>(A,b);
-        unsigned int init_pts = 10;
         double kl_est = objective.ObjectiveImpl(reference_samples, map);
         double inv_cov_diag = map_scale*map_scale;
         double kl_exact = -std::log(inv_cov_diag) - 1 + inv_cov_diag + map_shift*map_shift*inv_cov_diag;
