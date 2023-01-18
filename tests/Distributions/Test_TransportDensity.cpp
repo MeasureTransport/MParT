@@ -70,6 +70,7 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         Kokkos::View<double**, Kokkos::HostSpace> nullPrefix ("null prefix", 0, N_samp);
         auto pushforwardEvalSample = map->Inverse(nullPrefix, samples);
 
+        Kokkos::fence();
         // Calculate the pullback and pushforward density error
         Kokkos::parallel_for("TestTransportDensity", N_samp, KOKKOS_LAMBDA(const int i) {
             double sampleNormPullback = 0.0;
@@ -93,6 +94,7 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         Kokkos::fence();
 
         // Check the maximum error
+        std::cerr << "logPullbackDensitySample.extent(0) = " << logPullbackDensitySample.extent(0) << ", N_samp = " << N_samp << std::endl;
         double max_pullback_err = *std::max_element(logPullbackDensitySample.data(), logPullbackDensitySample.data()+N_samp);
         double max_pushforward_err = *std::max_element(logPushforwardDensitySample.data(), logPushforwardDensitySample.data()+N_samp);
 

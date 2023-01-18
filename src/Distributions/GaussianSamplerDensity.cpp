@@ -49,6 +49,7 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
     Kokkos::parallel_for( "weighted norm", policy, KOKKOS_LAMBDA (const int& j, const int& i) {
         output(j) -= 0.5*diff(i,j)*diff(i,j);
     });
+    Kokkos::fence("GaussianSamplerDensity::LogDensity");
 }
 
 template<typename MemorySpace>
