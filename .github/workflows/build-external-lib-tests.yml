@@ -31,7 +31,7 @@ jobs:
         id: cache-conda
         with:
           path: "/usr/share/miniconda/envs/test"
-          key: conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
+          key: conda-cache-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
 
       - name: Cache Kokkos
         uses: actions/cache@v3
@@ -64,6 +64,7 @@ jobs:
       - name: Install Conda Dependencies
         shell: bash -l {0}
         run: conda env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
+        if: steps.cache-conda.outputs.cache-hit != 'true'
 
       - name: Configure MParT
         shell: bash -l {0}

@@ -24,8 +24,8 @@ jobs:
         uses: actions/cache@v3
         id: cache-conda
         with:
-          path: "~/conda_pkgs_dir"
-          key: conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
+          path: "/usr/share/miniconda/envs/test"
+          key: conda-cache-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
 
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
@@ -44,6 +44,11 @@ jobs:
 
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v1
+        run: |
+          MATLAB_VERSION=$(basename $(matlab -n | grep ' MATLAB ' | cut -d= -f2))
+          echo ${MATLAB_VERSION}
+          rm /opt/matlab/${MATLAB_VERSION}/bin/glnxa64/../../sys/os/glnxa64/libstdc++.so.6
+          ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 /opt/matlab/${MATLAB_VERSION}/bin/glnxa64/../../sys/os/glnxa64/libstdc++.so.6
 
       - name: Cache Kokkos
         uses: actions/cache@v3
