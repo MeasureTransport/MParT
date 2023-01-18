@@ -90,6 +90,7 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
             logPushforwardDensitySample(i) -= -0.5*sampleNormPushforward + offset + logdet;
             logPushforwardDensitySample(i) = std::abs(logPushforwardDensitySample(i));
         });
+        Kokkos::fence();
 
         // Check the maximum error
         double max_pullback_err = *std::max_element(logPullbackDensitySample.data(), logPullbackDensitySample.data()+N_samp);
@@ -138,6 +139,7 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
                 logDensityPerturb(j) -= coeffGrad(i, j);
                 logDensityPerturb(j) = std::abs(logDensityPerturb(j));
             });
+            Kokkos::fence();
             double max_err = *std::max_element(logDensityPerturb.data(), logDensityPerturb.data()+N_samp);
             REQUIRE(max_err < std::sqrt(fdstep));
             map->Coeffs()(i) = (double) (i + 1);
