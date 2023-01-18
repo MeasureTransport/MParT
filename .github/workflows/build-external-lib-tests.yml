@@ -23,7 +23,7 @@ jobs:
         uses: actions/cache@v3
         id: cache-conda
         with:
-          path: "~/conda_pkgs_dir"
+          path: "/usr/share/miniconda/envs/test"
           key: conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
 
       - name: Use Conda
