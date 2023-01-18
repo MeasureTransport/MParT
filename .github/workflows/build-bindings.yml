@@ -20,12 +20,18 @@ jobs:
         with:
           path: mpart
 
-      - name: Cache Conda Deps
-        uses: actions/cache@v3
-        id: cache-conda
-        with:
-          path: "/usr/share/miniconda/envs/test"
-          key: conda-cache-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v1
+
+      - name: Fix MATLAB
+        run: |
+          MATLAB_PATH=/usr/local/MATLAB
+          MATLAB_VERSION=$(basename $(matlab -n | grep ' MATLAB ' | cut -d= -f2))
+          MATLAB_LIBSTDCXX=$MATLAB_PATH/$MATLAB_VERSION/sys/os/glnxa64/libstdc++.so.6
+          echo ${MATLAB_VERSION}
+          ls ${MATLAB_PATH}
+          rm $MATLAB_LIBSTDCXX
+          ln -s /usr/lib/x86_64-linux-gnu/libstdc++.so.6 $MATLAB_LIBSTDCXX
 
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
@@ -34,6 +40,13 @@ jobs:
           python-version: "3.8"
           activate-environment: "test"
 
+      - name: Cache Conda Deps
+        uses: actions/cache@v3
+        id: cache-conda
+        with:
+          path: "/usr/share/miniconda/envs/test"
+          key: conda-cache-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
+
       - name: Setup Julia
         run: |
           julia -e "using Pkg; Pkg.add([\"CxxWrap\",\"TestReports\"])"
@@ -41,18 +54,6 @@ jobs:
           echo -n $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nMParT = \"' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo -n $GITHUB_WORKSPACE                                     >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo -n "/MPART_INSTALL\""                                    >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
-
-      - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v1
-
-      - name: Fix MATLAB
-        run: |
-          SYS_LIBSTDCXX_PATH=/usr/lib/x86_64-linux-gnu/
-          MATLAB_LIBSTDCXX_PATH=/home/runner/work/_actions/matlab-actions/run-command/v1/dist/sys/os/glnxa64/
-          echo $(which matlab)
-          export LD_PRELOAD=$SYS_LIBSTDCXX_PATH/libstdc++.so.6
-          ls $MATLAB_LIBSTDCXX_PATH
-          rm $MATLAB_LIBSTDCXX_PATH/libstdc++.so.6
 
       - name: Cache Kokkos
         uses: actions/cache@v3
