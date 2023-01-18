@@ -13,7 +13,7 @@ jobs:
 
       - name: Fix libstdc++6
         run: |
-          apt-get upgrade libstdc++-6
+          sudo apt-get upgrade libstdc++-6
           strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
 
       - name: Store Date
