@@ -13,7 +13,9 @@ jobs:
 
       - name: Fix libstdc++6
         run: |
-          sudo apt-get install libstdc++-6
+          sudo apt-get update
+          sudo apt-get install -y g++-9 libstdc++6
+          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
           strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
 
       - name: Store Date
