@@ -6,7 +6,7 @@ KokkosInitialize(2);
 
 suite = TestSuite.fromClass(?FixedMultiIndexSetTest);
 runner = TestRunner.withNoPlugins;
-xmlFile = 'test-results-matlab.xml';
+xmlFile = 'test-results-bindings-matlab.xml';
 p = XMLPlugin.producingJUnitFormat(xmlFile);
 runner.addPlugin(p)
 results = runner.run(suite);
