@@ -11,13 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Fix libstdc++6
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y g++-9 libstdc++6
-          sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
-          strings /usr/lib/x86_64-linux-gnu/libstdc++.so.6 | grep GLIBCXX
-
       - name: Store Date
         shell: bash -l {0}
         run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
@@ -27,23 +20,27 @@ jobs:
         with:
           path: mpart
 
-      - name: Set up MATLAB
-        uses: matlab-actions/setup-matlab@v1
-
-
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: test
+          use-mamba: true
           auto-update-conda: true
           python-version: "3.8"
-          activate-environment: "test"
 
       - name: Cache Conda Deps
         uses: actions/cache@v3
         id: cache-conda
         with:
-          path: "/usr/share/miniconda/envs/test"
-          key: conda-cache-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
+          path: /usr/share/miniconda3/envs/test
+          key: cache-conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
+
+      - name: Install Conda Dependencies
+        shell: bash -l {0}
+        run: mamba env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
+        if: steps.cache-conda.outputs.cache-hit != 'true'
 
       - name: Setup Julia
         run: |
@@ -52,6 +49,9 @@ jobs:
           echo -n $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nMParT = \"' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo -n $GITHUB_WORKSPACE                                     >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo -n "/MPART_INSTALL\""                                    >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
+
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v1
 
       - name: Cache Kokkos
         uses: actions/cache@v3
@@ -80,10 +80,6 @@ jobs:
                 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/KOKKOS_INSTALL/ \
                 ../
           sudo make -j2 install
-
-      - name: Install Conda Dependencies
-        shell: bash -l {0}
-        run: conda env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
 
       - name: Configure MParT
         shell: bash -l {0}
