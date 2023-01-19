@@ -105,13 +105,13 @@ jobs:
         run: |
           export PYTHONPATH=$PYTHONPATH:$GITHUB_WORKSPACE/MPART_INSTALL/python
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/MPART_INSTALL/python:$GITHUB_WORKSPACE/MPART_INSTALL/lib
-          pytest $GITHUB_WORKSPACE/mpart/bindings/python/tests -v --junitxml="$GITHUB_WORKSPACE/test-results-bindings-python.xml"
+          pytest $GITHUB_WORKSPACE/mpart/bindings/python/tests -v --junitxml="$GITHUB_WORKSPACE/test-results-python.xml"
 
       - name: Run Julia Tests
         continue-on-error: true
         shell: bash -l {0}
         run: |
-          julia -e "using Pkg; Pkg.add(url=\"https://github.com/MeasureTransport/MParT.jl\"); using TestReports; TestReports.test(\"MParT\",logfilepath=ENV[\"GITHUB_WORKSPACE\"], logfilename=\"test-results-bindings-julia.xml\")"
+          julia -e "using Pkg; Pkg.add(url=\"https://github.com/MeasureTransport/MParT.jl\"); using TestReports; TestReports.test(\"MParT\",logfilepath=ENV[\"GITHUB_WORKSPACE\"], logfilename=\"test-results-julia.xml\")"
 
       - name: Setup Matlab Tests
         continue-on-error: true
@@ -130,4 +130,4 @@ jobs:
         if: always()
         with:
           check_name: "Test Results with Bindings"
-          junit_files: ${{ github.workspace }}/test-results-bindings-*.xml
+          junit_files: ${{ github.workspace }}/test-results-*.xml
