@@ -22,9 +22,12 @@ jobs:
       - name: Use Conda
         uses: conda-incubator/setup-miniconda@v2
         with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: test
+          use-mamba: true
           auto-update-conda: true
           python-version: "3.8"
-          activate-environment: "test"
 
       - name: Cache Conda Deps
         uses: actions/cache@v3
