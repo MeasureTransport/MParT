@@ -24,7 +24,7 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         for(int i = 0; i < dim; i++) {
             b(i) = 1.0;
             for(int j = 0; j < dim; j++) {
-                A(i, j) = ((double) i == j)*diag_el;
+                A(i, j) = (i == j) ? diag_el : 0.0;
             }
         }
         // Create the log determinant of the map T analytically
@@ -42,9 +42,6 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         // Set the seed and create samples to test the densities
         density->SetSeed(seed);
         StridedMatrix<const double, Kokkos::HostSpace> samples = density->Sample(N_samp);
-
-        // Check logdet values
-        auto logdet_vals = map->LogDeterminant(samples);
 
         // Initialize the constants for the density calculation
         double offset = 1.8378770664093453; // log(2*pi)

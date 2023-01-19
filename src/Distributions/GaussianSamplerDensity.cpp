@@ -30,7 +30,9 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> diff ("diff", M, N);
 
     if(mean_.extent(0) == 0){
-        Kokkos::deep_copy(diff, pts);
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
+            diff(i,j) = pts(i,j);
+        });
     }
     else {
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
@@ -42,14 +44,11 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
         covChol_.solveInPlaceL(diff);
     }
 
-    Kokkos::fence();
-    ReduceDim<ReduceDimMap::norm,MemorySpace,0> rc(diff, -0.5);
-    Kokkos::parallel_reduce(M, rc, &output(0));
-    Kokkos::fence();
+    ReduceDim<ReduceDimMap::norm,MemorySpace,0> rr(diff, -0.5);
+    Kokkos::parallel_reduce(M, rr, &output(0));
     Kokkos::parallel_for( "log terms", N, KOKKOS_LAMBDA (const int& j) {
         output(j) -= 0.5*( M*logtau_ + logDetCov_ );
     });
-    Kokkos::fence();
 }
 
 template<typename MemorySpace>
