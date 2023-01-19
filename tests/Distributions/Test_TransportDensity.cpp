@@ -34,6 +34,7 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         auto map = std::make_shared<AffineMap<Kokkos::HostSpace>>(A, b);
         auto density = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(dim);
 
+
         // Create the pullback and pushforward densities
         PullbackDensity<Kokkos::HostSpace> pullback {map, density};
         PushforwardDensity<Kokkos::HostSpace> pushforward {map, density};
@@ -41,7 +42,13 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         // Set the seed and create samples to test the densities
         density->SetSeed(seed);
         StridedMatrix<const double, Kokkos::HostSpace> samples = density->Sample(N_samp);
-        CHECK(std::abs(samples(0,0)) < 10);
+
+        // Check logdet values
+        auto logdet_vals = map->LogDeterminant(samples);
+        for(int i = 0; i < N_samp; i++) {
+            CHECK(logdet_vals(i) == logdet);
+        }
+
         // Initialize the constants for the density calculation
         double offset = 1.8378770664093453; // log(2*pi)
         offset *= dim;

@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v3
         id: cache-conda
         with:
-          path: /usr/share/miniconda/envs/test
+          path: /usr/share/miniconda3/envs/test
           key: conda-cache-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}-${{ env.CONDA_CACHE_NUMBER }}
 
       - name: Cache Kokkos
