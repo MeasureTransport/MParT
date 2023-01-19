@@ -6,6 +6,9 @@ on:
       - main
   pull_request: {}
 
+env:
+  CONDA_CACHE_NUMBER: 0  # increase to reset cache manually
+
 jobs:
   build-tests:
     runs-on: ubuntu-latest
@@ -35,7 +38,7 @@ jobs:
         id: cache-conda
         with:
           path: /usr/share/miniconda3/envs/test
-          key: cache-conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
+          key: cache-conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}-${{ env.CONDA_CACHE_NUMBER }}
 
       - name: Install Conda Dependencies
         shell: bash -l {0}
