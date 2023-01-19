@@ -93,13 +93,12 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         });
         Kokkos::fence();
 
-        for(int i = 0; i < N_samps; i++) {
+        for(int i = 0; i < N_samp; i++) {
             double pullback_err = logPullbackDensitySample(i);
             std::cerr << "logPullbackDensitySample(" << i << ") = " << pullback_err << std::endl;
             CHECK(pullback_err < 1e-6);
         }
         // Check the maximum error
-        double max_pullback_err = *std::max_element(logPullbackDensitySample.data(), logPullbackDensitySample.data()+N_samp);
         double max_pushforward_err = *std::max_element(logPushforwardDensitySample.data(), logPushforwardDensitySample.data()+N_samp);
 
         // Check the maximum gradient error
