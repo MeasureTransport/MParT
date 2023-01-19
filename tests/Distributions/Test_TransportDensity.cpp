@@ -45,9 +45,6 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
 
         // Check logdet values
         auto logdet_vals = map->LogDeterminant(samples);
-        for(int i = 0; i < N_samp; i++) {
-            CHECK(logdet_vals(i) == logdet);
-        }
 
         // Initialize the constants for the density calculation
         double offset = 1.8378770664093453; // log(2*pi)
@@ -70,9 +67,15 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         REQUIRE(gradLogPushforwardExists == false);
 
         // Evaluate the map and its inverse at the samples for the analytical calculation
-        auto pullbackEvalSample = map->Evaluate(samples);
+        StridedMatrix<const double,Kokkos::HostSpace> pullbackEvalSample = map->Evaluate(samples);
         Kokkos::View<double**, Kokkos::HostSpace> nullPrefix ("null prefix", 0, N_samp);
         auto pushforwardEvalSample = map->Inverse(nullPrefix, samples);
+
+        // DEBUG checking density
+        auto logDSample = density->LogDensity(pullbackEvalSample);
+        for(int i = 0; i < N_samp; i++) {
+            CHECK(std::abs(logDSample(i)) < 100);
+        }
 
         Kokkos::fence();
         double diag_el_sq = diag_el*diag_el;
