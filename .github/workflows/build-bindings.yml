@@ -38,7 +38,7 @@ jobs:
         id: cache-conda
         with:
           path: /usr/share/miniconda3/envs/test
-          key: cache-conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}-${{ env.CONDA_CACHE_NUMBER }}
+          key: cache-conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}-${{ env.CONDA_CACHE_NUMBER }}-BINDINGS
 
       - name: Install Conda Dependencies
         shell: bash -l {0}
