@@ -27,7 +27,9 @@ class PushforwardDensity: public DensityBase<MemorySpace> {
         StridedMatrix<double, MemorySpace> mappedPts = map_->Inverse(prefix_null, pts);
         reference_->LogDensityImpl(mappedPts, output);
         StridedVector<double, MemorySpace> logJacobian = map_->LogDeterminant(mappedPts);
-        output += logJacobian;
+        Kokkos::parallel_for("Subtract logJac", output.extent(0), KOKKOS_LAMBDA(const unsigned int i){
+            output(i) -= logJacobian(i);
+        });
     };
 
     void LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override {
