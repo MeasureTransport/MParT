@@ -103,6 +103,7 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples ("sample matrix", dim, N_samp);
         Kokkos::View<double*, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_pdf ("sample pdf", N_samp);
         Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> samples_gradpdf ("sample grad pdf", dim, N_samp);
+        dist->SetSeed(seed);
         dist->SampleImpl(samples);
         dist->LogDensityImpl(samples, samples_pdf);
         dist->LogDensityInputGradImpl(samples, samples_gradpdf);
