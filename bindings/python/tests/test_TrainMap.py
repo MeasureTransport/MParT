@@ -35,6 +35,6 @@ def test_Normality():
     sorted_samps = np.sort(pullback_samples[:])
     erf = np.vectorize(math.erf)
     samps_cdf = (1 + erf(sorted_samps/np.sqrt(2)))/2
-    samps_ecdf = (np.arange(testPts) + 1)/testPts
+    samps_ecdf = (np.arange(dim*testPts) + 1)/(dim*testPts)
     KS_stat = np.abs(samps_cdf - samps_ecdf).max()
     assert KS_stat < 0.1
