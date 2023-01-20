@@ -39,11 +39,7 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
             diff(i,j) = pts(i,j) - mean_(i);
         });
     }
-    for(int i = 0; i < M; i++) {
-        for(int j = 0; j < N; j++) {
-            CHECK(std::abs(diff(i,j)) < 100);
-        }
-    }
+
     if(!idCov_) {
         covChol_.solveInPlaceL(diff);
     }
