@@ -14,6 +14,9 @@ set(PYTHON_BINDING_SOURCES
   src/MapFactory.cpp
   src/IdentityMap.cpp
 
+  src/MapObjective.cpp
+  src/TrainMap.cpp
+
 
   ../common/src/CommonUtilities.cpp
 )
