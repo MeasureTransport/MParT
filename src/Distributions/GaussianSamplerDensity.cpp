@@ -1,7 +1,4 @@
 #include "MParT/Distributions/GaussianSamplerDensity.h"
-#include <catch2/catch_all.hpp>
-
-using namespace Catch;
 
 using namespace mpart;
 
@@ -53,15 +50,9 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
 
     ReduceDim<ReduceDimMap::norm,MemorySpace,0> rr(diff, -0.5);
     Kokkos::parallel_reduce(M, rr, &output(0));
-    for(int j = 0; j<N; j++) {
-        CHECK(std::abs(output(j)) < 1000);
-    }
     Kokkos::parallel_for( "log terms", N, KOKKOS_LAMBDA (const int& j) {
         output(j) -= 0.5*( M*logtau_ + logDetCov_ );
     });
-    for(int j = 0; j<N; j++) {
-        CHECK(std::abs(output(j)) < 1000);
-    }
 }
 
 template<typename MemorySpace>

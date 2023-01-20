@@ -68,12 +68,6 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         Kokkos::View<double**, Kokkos::HostSpace> nullPrefix ("null prefix", 0, N_samp);
         auto pushforwardEvalSample = map->Inverse(nullPrefix, samples);
 
-        // DEBUG checking density
-        auto logDSample = density->LogDensity(pullbackEvalSample);
-        for(int i = 0; i < N_samp; i++) {
-            CHECK(std::abs(logDSample(i)) < 100);
-        }
-
         Kokkos::fence();
         double diag_el_sq = diag_el*diag_el;
         for(int i = 0; i < N_samp; i++) {
