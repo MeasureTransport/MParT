@@ -3,6 +3,7 @@ import mpart
 import numpy as np
 import math
 
+# Create samples from banana
 dim=2
 seed = 43
 numPts = 20000
@@ -10,13 +11,19 @@ testPts = numPts//5
 np.random.seed(seed)
 samples = np.random.randn(dim,numPts)
 target_samples = np.vstack([samples[0,:], samples[1,:] + samples[0,:]**2])
+
+# Separate into testing and training samples
 test_samples = target_samples[:,:testPts]
 train_samples = target_samples[:,testPts:]
+
+# Create training objective
 obj = mpart.GaussianKLObjective(np.asfortranarray(train_samples),np.asfortranarray(test_samples))
 
+# Create untrained map
 map_options = mpart.MapOptions()
 map = mpart.CreateTriangular(dim,dim,2,map_options)
 
+# Train map
 train_options = mpart.TrainOptions()
 mpart.TrainMap(map, obj, train_options)
 

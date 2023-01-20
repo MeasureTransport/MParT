@@ -13,10 +13,19 @@ using namespace mpart::binding;
 
 template<typename MemorySpace>
 void mpart::binding::MapObjectiveWrapper(py::module &m) {
+    std::string moName= "MapObjective";
     std::string tName = "GaussianKLObjective";
-    if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName = "d" + tName;
+    if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) {
+        moName = "d" + tName;
+        tName = "d" + tName;
+    }
 
-    py::class_<KLObjective<MemorySpace>, std::shared_ptr<KLObjective<MemorySpace>>>(m, tName.c_str())
+    py::class_<MapObjective<MemorySpace>, std::shared_ptr<MapObjective<MemorySpace>>>(m, moName.c_str())
+        .def("TestError", &KLObjective<MemorySpace>::TestError)
+        .def("TrainError", &KLObjective<MemorySpace>::TrainError)
+    ;
+
+    py::class_<KLObjective<MemorySpace>, MapObjective<MemorySpace>, std::shared_ptr<KLObjective<MemorySpace>>>(m, tName.c_str())
         .def(py::init( [](Eigen::Ref<Eigen::MatrixXd> &train){
             StridedMatrix<double, MemorySpace> trainView = MatToKokkos<double, MemorySpace>(train);
             Kokkos::View<double**,MemorySpace> storeTrain ("Training data store", trainView.extent(0), trainView.extent(1));
@@ -34,7 +43,6 @@ void mpart::binding::MapObjectiveWrapper(py::module &m) {
             std::shared_ptr<GaussianSamplerDensity<MemorySpace>> density = std::make_shared<GaussianSamplerDensity<MemorySpace>>(trainView.extent(0));
             return std::make_shared<KLObjective<MemorySpace>>(storeTrain, storeTest, density);
         }))
-        .def("TestError", &KLObjective<MemorySpace>::TestError)
     ;
 }
 

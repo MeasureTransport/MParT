@@ -71,6 +71,18 @@ void MapFactoryWrapper(jlcxx::Module&);
  */
 void ComposedMapWrapper(jlcxx::Module &);
 
+/**
+ * @brief Adds MapObjective bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void MapObjectiveWrapper(jlcxx::Module &);
+
+/**
+ * @brief Adds TrainMap and TrainOptions bindings to the existing module m.
+ * @param mod CxxWrap.jl module
+ */
+void TrainMapWrapper(jlcxx::Module&);
+
 #if defined(MPART_ENABLE_GPU)
 void ConditionalMapBaseDeviceWrapper(jlcxx::Module&);
 #endif

@@ -10,6 +10,8 @@ set(JULIA_BINDING_SOURCES
   src/Wrapper.cpp
   src/AffineMap.cpp
   src/ComposedMap.cpp
+  src/MapObjective.cpp
+  src/TrainMap.cpp
   ../common/src/CommonUtilities.cpp
 )
 
