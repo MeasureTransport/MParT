@@ -3,7 +3,7 @@
 
 using namespace mpart;
 
-MapOptions  mpart::MapOptionsFromMatlab(std::string basisType, std::string posFuncType, 
+MapOptions  mpart::binding::MapOptionsFromMatlab(std::string basisType, std::string posFuncType, 
                                         std::string quadType, double quadAbsTol,
                                         double quadRelTol, unsigned int quadMaxSub, 
                                         unsigned int quadMinSub,unsigned int quadPts, 
@@ -50,5 +50,3 @@ MapOptions  mpart::MapOptionsFromMatlab(std::string basisType, std::string posFu
     opts.basisNorm = basisNorm;
     return opts;
 }
-
-
