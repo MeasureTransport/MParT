@@ -26,6 +26,7 @@ void ATM() {
     unsigned int dim = 2;
     unsigned int numPts = 20000;
     unsigned int testPts = numPts / 5;
+    unsigned int totalOrder = 1;
     auto sampler = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(2);
     sampler->SetSeed(seed);
     auto samples = sampler->Sample(numPts);
@@ -34,7 +35,7 @@ void ATM() {
         targetSamps(0,i) = samples(0,i);
         targetSamps(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
     };
-    std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
+    std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,totalOrder), MultiIndexSet::CreateTotalOrder(2,totalOrder)};
     ATMOptions opts;
     opts.opt_alg = "LD_SLSQP";
     opts.basisType = BasisTypes::ProbabilistHermite;
