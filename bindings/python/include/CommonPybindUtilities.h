@@ -25,11 +25,6 @@ void MapOptionsWrapper(pybind11::module &m);
 
 void MultiIndexWrapper(pybind11::module &m);
 
-void TrainOptionsWrapper(pybind11::module &m);
-
-template<typename MemorySpace>
-void MapObjectiveWrapper(pybind11::module &m);
-
 template<typename MemorySpace>
 void ConditionalMapBaseWrapper(pybind11::module &m);
 
@@ -51,11 +46,19 @@ void IdentityMapWrapper(pybind11::module &m);
 // template<typename MemorySpace>
 // void DebugMapWrapper(pybind11::module &m);
 
+#if defined(MPART_HAS_NLOPT)
+void TrainOptionsWrapper(pybind11::module &m);
+
+template<typename MemorySpace>
+void MapObjectiveWrapper(pybind11::module &m);
+
 template<typename MemorySpace>
 void MapFactoryWrapper(pybind11::module &m);
 
 template<typename MemorySpace>
 void TrainMapWrapper(pybind11::module &m);
+#endif
+
 
 #if defined(MPART_HAS_CEREAL)
 template<typename MemorySpace>

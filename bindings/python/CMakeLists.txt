@@ -14,16 +14,19 @@ set(PYTHON_BINDING_SOURCES
   src/MapFactory.cpp
   src/IdentityMap.cpp
 
-  src/MapObjective.cpp
-  src/TrainMap.cpp
-
-
   ../common/src/CommonUtilities.cpp
 )
 
 if(MPART_ARCHIVE)
   set(PYTHON_BINDING_SOURCES ${PYTHON_BINDING_SOURCES}
     src/Serialization.cpp
+  )
+endif()
+
+if(MPART_OPT)
+  set(PYTHON_BINDING_SOURCES ${PYTHON_BINDING_SOURCES}
+    src/MapObjective.cpp
+    src/TrainMap.cpp
   )
 endif()
 

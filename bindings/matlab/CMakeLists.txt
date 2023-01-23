@@ -15,6 +15,12 @@ set(MEX_SOURCE
     src/MexOptionsConversions.cpp
 )
 
+if(MPART_OPT)
+    set(MEX_SOURCE ${MEX_SOURCE}
+        src/MapObjective_mex.cpp
+    )
+endif()
+
 matlab_add_mex(NAME MParT_ SRC ${MEX_SOURCE} LINK_TO mpart Kokkos::kokkos Eigen3::Eigen ${EXT_LIBRARIES})
 
 # Add an installation target for the matlab bindings
