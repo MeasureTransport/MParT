@@ -117,11 +117,11 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         unsigned int maxIdxBlock = 0;
         double maxVal = 0.;
         double signMaxVal = 0;
-        coeffIdx = 0;
+        unsigned int blockStart = 0;
         for(int output = 0; output < outputDim; output++) {
             for(int i = 0; i < multis_rm[output].size(); i++) {
                 unsigned int idx = multis_rm[output][i];
-                double gradVal = gradCoeff(coeffIdx + idx);
+                double gradVal = gradCoeff(blockStart + idx);
                 if(std::abs(gradVal) > maxVal) {
                     signMaxVal = gradVal;
                     maxVal = std::abs(gradVal);
@@ -129,8 +129,9 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
                     maxIdxBlock = output;
                 }
             }
-            coeffIdx += mset_tmp[output].Size();
+            blockStart += mset_tmp[output].Size();
         }
+        std::cerr << "blockStart = " << blockStart << ", map->numCoeffs = " << map->numCoeffs << std::endl;
         // Add the multiindex with largest gradient to the map
         std::cerr << "Before: mset0[" << maxIdxBlock << "].Size() = " << mset0[maxIdxBlock].Size() << ", mset_sizes[" << maxIdxBlock << "] = " << mset_sizes[maxIdxBlock] << "\n";
         mset0[maxIdxBlock] += mset_tmp[maxIdxBlock][maxIdx];
