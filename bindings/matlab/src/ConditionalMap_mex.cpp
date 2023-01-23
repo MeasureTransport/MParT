@@ -206,7 +206,7 @@ MEX_DEFINE(GaussianKLObjective_TestError) (int nlhs, mxArray* plhs[],
   const KLObjective<MemorySpace>& obj = Session<KLObjective<MemorySpace>>::getConst(input.get(0));
   ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
   std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
-  output.set(0, KokkosToStd(obj.TestError(condMap_ptr)));
+  output.set(0, obj.TestError(condMap_ptr));
 }
 
 MEX_DEFINE(GaussianKLObjective_TrainError) (int nlhs, mxArray* plhs[],
@@ -216,7 +216,7 @@ MEX_DEFINE(GaussianKLObjective_TrainError) (int nlhs, mxArray* plhs[],
   const KLObjective<MemorySpace>& obj = Session<KLObjective<MemorySpace>>::getConst(input.get(0));
   ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
   std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
-  output.set(0, KokkosToStd(obj.TrainError(condMap_ptr)));
+  output.set(0, obj.TrainError(condMap_ptr));
 }
 
 MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
