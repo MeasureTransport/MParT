@@ -2,7 +2,7 @@
 #include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MexArrayConversions.h"
-#include "MexMapOptionsConversions.h"
+#include "MexOptionsConversions.h"
 #include "MParT/MapOptions.h"
 #include "MParT/MapFactory.h"
 #include "MParT/ConditionalMapBase.h"
