@@ -36,14 +36,14 @@ classdef TrainOptions
             obj.verbose = value;
         end
         function optionsArray = getMexOptions(obj)
-            optionsArray{1} = char(obj.opt_alg)
-            optionsArray{2} = obj.opt_stopval
-            optionsArray{3} = obj.opt_ftol_rel
-            optionsArray{4} = obj.opt_ftol_abs
-            optionsArray{5} = obj.opt_xtol_rel
-            optionsArray{6} = int(obj.opt_maxeval)
-            optionsArray{7} = obj.opt_maxtime
-            optionsArray{8} = bool(obj.verbose)
+            optionsArray{1} = char(obj.opt_alg);
+            optionsArray{2} = obj.opt_stopval;
+            optionsArray{3} = obj.opt_ftol_rel;
+            optionsArray{4} = obj.opt_ftol_abs;
+            optionsArray{5} = obj.opt_xtol_rel;
+            optionsArray{6} = obj.opt_maxeval;
+            optionsArray{7} = obj.opt_maxtime;
+            optionsArray{8} = obj.verbose;
         end
     end
 end
