@@ -10,10 +10,15 @@ set(JULIA_BINDING_SOURCES
   src/Wrapper.cpp
   src/AffineMap.cpp
   src/ComposedMap.cpp
-  src/MapObjective.cpp
-  src/TrainMap.cpp
   ../common/src/CommonUtilities.cpp
 )
+
+if(MPART_OPT)
+  set(JULIA_BINDING_SOURCES ${JULIA_BINDING_SOURCES}
+      src/MapObjective.cpp
+      src/TrainMap.cpp
+  )
+endif()
 
 include_directories(./include ../common/include)
 add_library(mpartjl SHARED ${JULIA_BINDING_SOURCES})

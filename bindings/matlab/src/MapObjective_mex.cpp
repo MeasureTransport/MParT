@@ -1,7 +1,10 @@
 #include <mexplus.h>
+#include "MexArrayConversions.h"
+#include "mexplus_eigen.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MapObjective.h"
 #include "MParT/Utilities/ArrayConversions.h"
+#include "MParT/Distributions/GaussianSamplerDensity.h"
 
 using namespace mpart;
 using namespace mexplus;
@@ -41,26 +44,6 @@ namespace {
     InputArguments input(nrhs, prhs, 1);
     OutputArguments output(nlhs, plhs, 0);
     Session<KLObjective<MemorySpace>>::destroy(input.get(0));
-    }
-
-    MEX_DEFINE(GaussianKLObjective_TestError) (int nlhs, mxArray* plhs[],
-                        int nrhs, const mxArray* prhs[]) {
-    InputArguments input(nrhs, prhs, 2);
-    OutputArguments output(nlhs, plhs, 1);
-    const KLObjective<MemorySpace>& obj = Session<FixedMultiIndexSet<Kokkos::HostSpace>>::getConst(input.get(0));
-    ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
-    std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
-    output.set(0, KokkosToStd(obj.TestError(condMap_ptr)));
-    }
-
-    MEX_DEFINE(GaussianKLObjective_TrainError) (int nlhs, mxArray* plhs[],
-                        int nrhs, const mxArray* prhs[]) {
-    InputArguments input(nrhs, prhs, 2);
-    OutputArguments output(nlhs, plhs, 1);
-    const KLObjective<MemorySpace>& obj = Session<FixedMultiIndexSet<Kokkos::HostSpace>>::getConst(input.get(0));
-    ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
-    std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
-    output.set(0, KokkosToStd(obj.TrainError(condMap_ptr)));
     }
 
 }
