@@ -11,6 +11,7 @@
 
 
 using namespace mpart;
+using namespace mpart::binding;
 using namespace mexplus;
 using MemorySpace = Kokkos::HostSpace;
 
