@@ -1,10 +1,22 @@
 #include "MParT/AdaptiveTransportMap.h"
+#include <fstream>
 
 using namespace mpart;
 
 // Used for calculating the best location
 bool largestAbs(double a, double b) {
     return std::abs(a) < std::abs(b);
+}
+
+void SaveMatrix(std::string fname, StridedMatrix<double, Kokkos::HostSpace> mat, std::string path="/home/dannys4/misc/mpart_atm/") {
+    std::fstream file {path + fname, std::ios::out};
+    for(int i = 0; i < mat.extent(0); i++) {
+        for(int j = 0; j < mat.extent(1); j++) {
+            file << mat(i,j);
+            if(j < mat.extent(1)-1) file << ",";
+        }
+        file <<"\n";
+    }
 }
 
 template<>
@@ -30,7 +42,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
     std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocks);
     Kokkos::View<double*, Kokkos::HostSpace> mapCoeffs ("mapCoeffs", map->numCoeffs);
     for(int i = 0; i < mapCoeffs.extent(0); i++) {
-        mapCoeffs(i) = 1.;
+        mapCoeffs(i) = 0.;
     }
     map->WrapCoeffs(mapCoeffs);
     if(options.verbose) {
@@ -57,6 +69,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         if(options.verbose) {
             std::cout << "\n\nSize " << currSz << ":" << std::endl;
         }
+        
         for(int i = 0; i < outputDim; i++) {
             // Expand the current map
             mset_tmp[i] = mset0[i];
@@ -64,12 +77,18 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
             // Create a component with the expanded multiindexset
             std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> comp_i = MapFactory::CreateComponent(mset_tmp[i].Fix(), options);
             Kokkos::View<double*,Kokkos::HostSpace> coeffsFrontier ("Frontier coeffs", comp_i->numCoeffs);
-            // Copy the old coefficients from the current map to the new component
-            double* map_coeff_i = mapBlocks[i]->Coeffs().data();
-            double* comp_coeff_i = coeffsFrontier.data();
-            std::copy(map_coeff_i, map_coeff_i + mset_sizes[i], comp_coeff_i);
-            // Fill the rest of the coefficients with zeros
-            std::fill(comp_coeff_i + mset_sizes[i], comp_coeff_i + comp_i->numCoeffs, 0.);
+            int oldIdx = 0;
+            int rmIdx = 0;
+            for(int j = 0; j < comp_i->numCoeffs; j++) {
+                if(j == multis_rm[i][rmIdx]){ // Fill new coeff with zero
+                    coeffsFrontier(j) = 0.;
+                    rmIdx++;
+                }
+                else{ // Copy the old coefficients from the current map to the new component
+                    coeffsFrontier(j) = mapBlocks[i]->Coeffs()(oldIdx);
+                    oldIdx++;
+                }
+            }
             comp_i->WrapCoeffs(coeffsFrontier);
             // Set the new component
             mapBlocksTmp[i] = comp_i;
@@ -78,18 +97,34 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mapTmp = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocksTmp, true);
         // Calculate the gradient of the map with expanded margins
         StridedVector<double, Kokkos::HostSpace> gradCoeff = objective.TrainCoeffGrad(mapTmp);
+        int coeffIdx = 0;
+        for(int output=0; output<outputDim; output++){
+            int rmIdx = 0;
+            for(int i = 0; i < mset_tmp[output].Size(); i++) {
+                std::cerr << "gradCoeff(" << coeffIdx << ")=" << gradCoeff(coeffIdx) << ", midx=[" << mset_tmp[output][i] << "]";
+                if(i == multis_rm[output][rmIdx]) {
+                    std::cerr << " rm!";
+                    rmIdx++;
+                }
+                std::cerr << std::endl;
+                coeffIdx++;
+            }
+        }
+
 
         // Find the largest gradient value, calculate which output and multiindex it corresponds to
         unsigned int maxIdx = 0;
         unsigned int maxIdxBlock = 0;
         double maxVal = 0.;
-        int coeffIdx = 0;
+        double signMaxVal = 0;
+        coeffIdx = 0;
         for(int output = 0; output < outputDim; output++) {
             for(int i = 0; i < multis_rm[output].size(); i++) {
                 unsigned int idx = multis_rm[output][i];
-                double gradVal = std::abs(gradCoeff(coeffIdx + idx));
-                if(gradVal > maxVal) {
-                    maxVal = gradVal;
+                double gradVal = gradCoeff(coeffIdx + idx);
+                if(std::abs(gradVal) > maxVal) {
+                    signMaxVal = gradVal;
+                    maxVal = std::abs(gradVal);
                     maxIdx = idx;
                     maxIdxBlock = output;
                 }
@@ -100,6 +135,8 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         std::cerr << "Before: mset0[" << maxIdxBlock << "].Size() = " << mset0[maxIdxBlock].Size() << ", mset_sizes[" << maxIdxBlock << "] = " << mset_sizes[maxIdxBlock] << "\n";
         mset0[maxIdxBlock] += mset_tmp[maxIdxBlock][maxIdx];
         std::cerr << "After: mset0[" << maxIdxBlock << "].Size() = " << mset0[maxIdxBlock].Size() << std::endl;
+        MultiIndex addedMulti = mset_tmp[maxIdxBlock][maxIdx];
+        std::cerr << "Added Gradient: " << signMaxVal << ", added multi = [" << addedMulti.String() << "]" <<std::endl;
         currSz++;
         if(mset0[maxIdxBlock].Size() != mset_sizes[maxIdxBlock]+1) {
             std::cerr << mset_tmp[maxIdxBlock][maxIdx] << "\n";
@@ -122,6 +159,11 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         double train_error = TrainMap(map, objective, options);
         // Get the testing error and assess the best map
         double test_error = objective.TestError(map);
+
+        // DEBUG
+        auto train = objective.GetTrain();
+        auto evalSamples = map->Evaluate(train);
+        SaveMatrix("sz" + std::to_string(currSz) + "map.csv", evalSamples);
         if(test_error < bestError) {
             bestError = test_error;
             for(int i = 0; i < outputDim; i++) {

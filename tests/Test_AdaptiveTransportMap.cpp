@@ -22,7 +22,7 @@ void SaveMatrix(std::string fname, StridedMatrix<double, Kokkos::HostSpace> mat,
 }
 
 void ATM() {
-    unsigned int seed = 155829;
+    unsigned int seed = 20;
     unsigned int dim = 2;
     unsigned int numPts = 20000;
     unsigned int testPts = numPts / 5;
@@ -40,6 +40,8 @@ void ATM() {
     opts.basisType = BasisTypes::ProbabilistHermite;
     opts.maxSize = 8;
     opts.maxPatience = 3;
+    opts.opt_xtol_rel = 1e-16;
+    opts.opt_xtol_abs = 1e-16;
     opts.verbose = true;
     StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
     StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
@@ -48,9 +50,6 @@ void ATM() {
     Kokkos::View<double**, Kokkos::HostSpace> null_prefix ("Null prefix", 0, numPts);
     auto forward_samps = atm->Evaluate(targetSamps);
     auto inv_samps = atm->Inverse(null_prefix, targetSamps);
-    SaveMatrix("tSamps.csv", targetSamps);
-    SaveMatrix("fSamps.csv", forward_samps);
-    SaveMatrix("iSamps.csv", inv_samps);
 }
 
 /*void TestNLL() {

@@ -35,6 +35,7 @@ nlopt::opt SetupOptimization(unsigned int dim, TrainOptions options) {
     // Set all the optimization options for nlopt here
     opt.set_stopval(options.opt_stopval);
     opt.set_xtol_rel(options.opt_xtol_rel);
+    opt.set_xtol_abs(options.opt_xtol_abs);
     opt.set_ftol_rel(options.opt_ftol_rel);
     opt.set_ftol_abs(options.opt_ftol_abs);
     opt.set_maxeval(options.opt_maxeval);
