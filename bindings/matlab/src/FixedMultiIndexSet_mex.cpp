@@ -117,7 +117,7 @@ MEX_DEFINE(FixedMultiIndexSet_Deserialize) (int nlhs, mxArray* plhs[],
   const FixedMultiIndexSet<Kokkos::HostSpace>& mset = Session<FixedMultiIndexSet<Kokkos::HostSpace>>::getConst(input.get(0));
   std::string filename = input.get<std::string>(1);
   std::ifstream is(filename);
-  cereal::BinaryOutputArchive iarchive(is);
+  cereal::BinaryInputArchive iarchive(is);
   iarchive(mset);
 #else
   mexErrMsgIdAndTxt("MParT:NoCereal",
