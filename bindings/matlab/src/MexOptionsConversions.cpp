@@ -51,7 +51,7 @@ MapOptions  mpart::binding::MapOptionsFromMatlab(std::string basisType, std::str
     return opts;
 }
 
-void mpart::binding::MapOptionsToMatlab(MapOptions opts, OutputArguments &output, int start = 0)
+void mpart::binding::MapOptionsToMatlab(MapOptions opts, mexplus::OutputArguments &output, int start = 0)
 {
     int i = start; // Alias
     switch(opts.basisType) {

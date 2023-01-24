@@ -17,7 +17,7 @@ namespace binding{
                                         unsigned int quadMinSub,unsigned int quadPts, 
                                         bool contDeriv, double basisLB, double basisUB, bool basisNorm);
 
-    void MapOptionsToMatlab(MapOptions opts, OutputArguments &output);
+    void MapOptionsToMatlab(MapOptions opts, mexplus::OutputArguments &output);
 }
 }
 
