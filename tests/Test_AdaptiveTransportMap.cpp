@@ -38,10 +38,12 @@ void ATM() {
     ATMOptions opts;
     opts.opt_alg = "LD_SLSQP";
     opts.basisType = BasisTypes::ProbabilistHermite;
-    opts.maxSize = 8;
+    opts.maxSize = 16;
     opts.maxPatience = 3;
     opts.opt_xtol_rel = 1e-16;
     opts.opt_xtol_abs = 1e-16;
+    opts.basisLB = -3.;
+    opts.basisUB = 3.;
     opts.verbose = true;
     StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
     StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
