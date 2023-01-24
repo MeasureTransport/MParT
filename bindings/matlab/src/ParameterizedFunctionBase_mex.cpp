@@ -1,3 +1,4 @@
+#include <fstream>
 #include <mexplus.h>
 #include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/Utilities/ArrayConversions.h"
@@ -167,7 +168,7 @@ MEX_DEFINE(ParameterizedFunction_Serialize) (int nlhs, mxArray* plhs[],
   int numCoeffs = parFunc.fun_ptr->numCoeffs;
   auto coeffs = parFunc.fun_ptr->Coeffs();
   std::string filename = input.get<std::string>(1);
-  std::ofstream(filename);
+  std::ofstream os(filename);
   cereal::BinaryOutputArchive(os);
   archive(inputDim,outputDim,numCoeffs);
   archive(coeffs);
