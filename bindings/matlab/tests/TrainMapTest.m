@@ -21,7 +21,6 @@ classdef TrainMapTest < matlab.unittest.TestCase
 
             % Set Training Options
             train_options = TrainOptions;
-            train_options.verbose = true;
             train_options.opt_alg = 'LD_SLSQP';
 
             % Print test error before
