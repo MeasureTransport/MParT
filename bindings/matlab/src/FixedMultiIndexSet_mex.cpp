@@ -21,7 +21,7 @@ namespace {
 // Defines MEX API for new.
 MEX_DEFINE(FixedMultiIndexSet_newTotalOrder) (int nlhs, mxArray* plhs[],
                                               int nrhs, const mxArray* prhs[]) {
-  
+
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
   const unsigned int dim = input.get<unsigned int>(0);
@@ -99,7 +99,7 @@ MEX_DEFINE(FixedMultiIndexSet_Serialize) (int nlhs, mxArray* plhs[],
 #if defined(MPART_HAS_CEREAL)
   InputArguments input(nrhs, prhs, 2);
   const FixedMultiIndexSet<Kokkos::HostSpace>& mset = Session<FixedMultiIndexSet<Kokkos::HostSpace>>::getConst(input.get(0));
-  const std::string& filename = Session<std::string>::getConst(input.get(1));
+  std::string filename = input.get<std::string>(1);
   std::ofstream os(filename);
   cereal::BinaryOutputArchive oarchive(os);
   oarchive(mset);
