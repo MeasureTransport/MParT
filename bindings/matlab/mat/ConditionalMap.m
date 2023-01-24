@@ -69,7 +69,7 @@ methods
       outputDim = varargin{2};
       totalOrder = varargin{3};
       opts = varargin{4};
-      
+
       mexOptions = opts.getMexOptions;
 
       input_str=['MParT_(',char(39),'ConditionalMap_newTotalTriMap',char(39),',inputDim,outputDim,totalOrder'];
@@ -83,7 +83,7 @@ methods
     elseif(nargin==1)
          this.id_=MParT_('ConditionalMap_newTriMap', varargin{1});
     else
-        error('Invalid number of inputs') 
+        error('Invalid number of inputs')
     end
   end
 
@@ -159,11 +159,16 @@ methods
 
   function result = outputDim(this)
     result = MParT_('ConditionalMap_outputDim',this.id_);
-  end 
+  end
 
   function result = inputDim(this)
     result = MParT_('ConditionalMap_inputDim',this.id_);
-  end 
+  end
+
+  function Serialize(this,filename)
+    MParT_('ConditionalMap_Serialize',this.id_,filename);
+  end
+
 
 end
 

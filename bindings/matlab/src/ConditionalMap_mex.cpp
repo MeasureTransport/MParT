@@ -23,10 +23,10 @@ using namespace mexplus;
 using MemorySpace = Kokkos::HostSpace;
 
 class ConditionalMapMex {       // The class
-public:             
+public:
   std::shared_ptr<ConditionalMapBase<MemorySpace>> map_ptr;
 
-  ConditionalMapMex(FixedMultiIndexSet<MemorySpace> const& mset, 
+  ConditionalMapMex(FixedMultiIndexSet<MemorySpace> const& mset,
                     MapOptions                             opts){
     map_ptr = MapFactory::CreateComponent<MemorySpace>(mset,opts);
   }
@@ -38,7 +38,7 @@ public:
   ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks){
     map_ptr = std::make_shared<TriangularMap<MemorySpace>>(blocks);
   }
-  
+
   ConditionalMapMex(unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder, MapOptions opts){
     map_ptr = MapFactory::CreateTriangular<MemorySpace>(inputDim,outputDim,totalOrder,opts);
   }
@@ -62,10 +62,10 @@ public:
 }; //end class
 
 class ParameterizedFunctionMex {       // The class
-public:             
+public:
   std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> fun_ptr;
 
-  ParameterizedFunctionMex(unsigned int outputDim, FixedMultiIndexSet<MemorySpace> const& mset, 
+  ParameterizedFunctionMex(unsigned int outputDim, FixedMultiIndexSet<MemorySpace> const& mset,
                     MapOptions opts){
     fun_ptr = MapFactory::CreateExpansion<MemorySpace>(outputDim,mset,opts);
   }
@@ -84,16 +84,16 @@ namespace {
 
 MEX_DEFINE(ConditionalMap_newTriMap) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
-  
+
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
 
   std::vector<intptr_t> list_id = input.get<std::vector<intptr_t>>(0);
   unsigned int numBlocks = list_id.size();
-  
+
   std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> blocks(numBlocks);
   for(unsigned int i=0;i<numBlocks;++i){
-      const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(list_id.at(i)); 
+      const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(list_id.at(i));
       blocks.at(i) = condMap.map_ptr;
     }
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(blocks)));
@@ -101,16 +101,16 @@ MEX_DEFINE(ConditionalMap_newTriMap) (int nlhs, mxArray* plhs[],
 
 MEX_DEFINE(ConditionalMap_newComposedMap) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
-  
+
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
 
   std::vector<intptr_t> list_id = input.get<std::vector<intptr_t>>(0);
   unsigned int numMaps = list_id.size();
-  
+
   std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> TriMaps(numMaps);
   for(unsigned int i=0;i<numMaps;++i){
-      const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(list_id.at(i)); 
+      const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(list_id.at(i));
       TriMaps.at(i) = condMap.map_ptr;
     }
   std::string typeMap = "composed";
@@ -119,7 +119,7 @@ MEX_DEFINE(ConditionalMap_newComposedMap) (int nlhs, mxArray* plhs[],
 
 MEX_DEFINE(ConditionalMap_newAffineMapAb) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
-  
+
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
 
@@ -131,7 +131,7 @@ MEX_DEFINE(ConditionalMap_newAffineMapAb) (int nlhs, mxArray* plhs[],
 
 MEX_DEFINE(ConditionalMap_newAffineMapA) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
-  
+
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
 
@@ -142,7 +142,7 @@ MEX_DEFINE(ConditionalMap_newAffineMapA) (int nlhs, mxArray* plhs[],
 
 MEX_DEFINE(ConditionalMap_newAffineMapb) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
-  
+
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 1);
 
@@ -226,7 +226,7 @@ MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
     ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
     std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
     KLObjective<MemorySpace>& obj = *Session<KLObjective<MemorySpace>>::get(input.get(1));
-    
+
     TrainOptions opts {input.get<std::string>(2),input.get<double>(3),
                       input.get<double>(4), input.get<double>(5),
                       input.get<double>(6), input.get<int>(7),
@@ -330,7 +330,7 @@ MEX_DEFINE(ConditionalMap_Evaluate) (int nlhs, mxArray* plhs[],
 
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
   StridedMatrix<const double, Kokkos::HostSpace> pts = MexToKokkos2d(prhs[1]);
-  StridedMatrix<double, Kokkos::HostSpace> out = MexToKokkos2d(prhs[2]); 
+  StridedMatrix<double, Kokkos::HostSpace> out = MexToKokkos2d(prhs[2]);
   condMap.map_ptr->EvaluateImpl(pts, out);
 }
 
@@ -341,8 +341,8 @@ MEX_DEFINE(ConditionalMap_LogDeterminant) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 0);
 
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  
-  Kokkos::View<double*, Kokkos::HostSpace> out = MexToKokkos1d(prhs[2]);  
+
+  Kokkos::View<double*, Kokkos::HostSpace> out = MexToKokkos1d(prhs[2]);
   StridedMatrix<const double, Kokkos::HostSpace> pts = MexToKokkos2d(prhs[1]);
 
   condMap.map_ptr->LogDeterminantImpl(pts, out);
@@ -355,7 +355,7 @@ MEX_DEFINE(ConditionalMap_Inverse) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 0);
 
   const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  
+
   auto x1 = MexToKokkos2d(prhs[1]);
   auto r = MexToKokkos2d(prhs[2]);
   auto inv = MexToKokkos2d(prhs[3]);
@@ -374,7 +374,7 @@ MEX_DEFINE(ConditionalMap_CoeffGrad) (int nlhs, mxArray* plhs[],
   auto pts = MexToKokkos2d(prhs[1]);
   auto sens = MexToKokkos2d(prhs[2]);
   auto out = MexToKokkos2d(prhs[3]);
-  
+
   condMap.map_ptr->CoeffGradImpl(pts,sens,out);
 }
 
@@ -389,7 +389,7 @@ MEX_DEFINE(ConditionalMap_Gradient) (int nlhs, mxArray* plhs[],
   auto pts = MexToKokkos2d(prhs[1]);
   auto sens = MexToKokkos2d(prhs[2]);
   auto out = MexToKokkos2d(prhs[3]);
-  
+
   condMap.map_ptr->GradientImpl(pts,sens,out);
 }
 
@@ -402,7 +402,7 @@ MEX_DEFINE(ConditionalMap_LogDeterminantCoeffGrad) (int nlhs, mxArray* plhs[],
 
   auto pts = MexToKokkos2d(prhs[1]);
   auto out = MexToKokkos2d(prhs[2]);
-  
+
   condMap.map_ptr->LogDeterminantCoeffGradImpl(pts,out);
 }
 
@@ -415,8 +415,31 @@ MEX_DEFINE(ConditionalMap_LogDeterminantInputGrad) (int nlhs, mxArray* plhs[],
 
   auto pts = MexToKokkos2d(prhs[1]);
   auto out = MexToKokkos2d(prhs[2]);
-  
+
   condMap.map_ptr->LogDeterminantInputGradImpl(pts,out);
+}
+
+MEX_DEFINE(ConditionalMap_Serialize) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+
+#if defined(MPART_HAS_CEREAL)
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 0);
+
+  const ConditionalMapMex& parFunc = Session<ConditionalMapMex>::getConst(input.get(0));
+  int inputDim = parFunc.fun_ptr->inputDim;
+  int outputDim = parFunc.fun_ptr->outputDim;
+  int numCoeffs = parFunc.fun_ptr->numCoeffs;
+  auto coeffs = parFunc.fun_ptr->Coeffs();
+  std::string filename = input.get<std::string>(1);
+  std::ofstream os(filename);
+  cereal::BinaryOutputArchive oarchive(os);
+  oarchive(inputDim,outputDim,numCoeffs);
+  oarchive(coeffs);
+#else
+  mexErrMsgIdAndTxt("MParT:NoCereal",
+                    "MParT was not compiled with Cereal support.");
+#endif // MPART_HAS_CEREAL
 }
 
 } // namespace
