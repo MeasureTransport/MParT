@@ -169,9 +169,9 @@ MEX_DEFINE(ParameterizedFunction_Serialize) (int nlhs, mxArray* plhs[],
   auto coeffs = parFunc.fun_ptr->Coeffs();
   std::string filename = input.get<std::string>(1);
   std::ofstream os(filename);
-  cereal::BinaryOutputArchive(os);
-  archive(inputDim,outputDim,numCoeffs);
-  archive(coeffs);
+  cereal::BinaryOutputArchive oarchive(os);
+  oarchive(inputDim,outputDim,numCoeffs);
+  oarchive(coeffs);
 #else
   mexErrMsgIdAndTxt("MParT:NoCereal",
                     "MParT was not compiled with Cereal support.");
@@ -185,6 +185,7 @@ MEX_DEFINE(ParameterizedFunction_DeserializeMap) (int nlhs, mxArray* plhs[],
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 3);
 
+  std::string filename = input.get<std::string>(0);
   std::ifstream is(filename);
   cereal::BinaryInputArchive archive(is);
   unsigned int inputDim, outputDim, numCoeffs;
@@ -230,6 +231,7 @@ MEX_DEFINE(MapOptions_Deserialize) (int nlhs, mxArray* plhs[],
   InputArguments input(nrhs, prhs, 1);
   OutputArguments output(nlhs, plhs, 12);
 
+  std::string filename = input.get<std::string>(0);
   MapOptions opts;
   std::ifstream is(filename);
   cereal::BinaryInputArchive iarchive(is);
