@@ -5,6 +5,6 @@ function TrainMap(map, objective, train_options)
         input_o=[',mexOptions{',num2str(o),'}'];
         input_str=[input_str,input_o];
     end
-    input_str=[input_str,')']
+    input_str=[input_str,')'];
     eval(input_str);
 end
