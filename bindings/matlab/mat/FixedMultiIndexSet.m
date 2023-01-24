@@ -47,6 +47,14 @@ methods
     result = this.id_;
   end
 
+  function Serialize(this,filename)
+    MParT_('FixedMultiIndexSet_Serialize', this.id_, filename);
+  end
+
+  function Deserialize(this,filename)
+    MParT_('FixedMultiIndexSet_Deserialize', this.id_, filename);
+  end
+
 end
 
 end

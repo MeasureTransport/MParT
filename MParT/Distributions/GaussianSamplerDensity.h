@@ -76,7 +76,7 @@ class GaussianSamplerDensity: public SampleGenerator<MemorySpace>, public Densit
     StridedVector<double, MemorySpace> mean_;
     mpart::Cholesky<MemorySpace> covChol_;
     bool idCov_ = false;
-    double logDetCov_;
+    double logDetCov_ = 0.;
 };
 
 template<typename MemorySpace, typename... T>

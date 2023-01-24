@@ -20,6 +20,9 @@ PYBIND11_MODULE(pympart, m) {
     IdentityMapWrapper<Kokkos::HostSpace>(m);
     // DebugMapWrapper<Kokkos::HostSpace>(m);
 
+    MapObjectiveWrapper<Kokkos::HostSpace>(m);
+    TrainOptionsWrapper(m);
+    TrainMapWrapper<Kokkos::HostSpace>(m);
     MapFactoryWrapper<Kokkos::HostSpace>(m);
 
 #if defined(MPART_HAS_CEREAL)

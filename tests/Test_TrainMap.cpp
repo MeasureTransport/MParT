@@ -35,8 +35,6 @@ TEST_CASE("Test_TrainMap", "[TrainMap]") {
 
     TrainOptions train_options;
     train_options.verbose = false;
-    Kokkos::Timer timer {};
-    timer.reset();
     TrainMap(map, obj, train_options);
     auto pullback_samples = map->Evaluate(testSamps);
     TestStandardNormalSamples(pullback_samples);
