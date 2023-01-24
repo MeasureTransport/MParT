@@ -76,7 +76,7 @@ classdef MapOptions
         function obj = Deserialize(obj,filename)
             options_len = 12;
             optionsArray = cell(options_len,1);
-            input_str = [']=MParT_(',char(39),'MapOptions_Deserialize',char(39),',filename);']
+            input_str = [']=MParT_(',char(39),'MapOptions_Deserialize',char(39),',filename);'];
             for i=options_len:-1:1
                 comma_str = ',';
                 if i == 1
