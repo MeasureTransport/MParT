@@ -426,11 +426,11 @@ MEX_DEFINE(ConditionalMap_Serialize) (int nlhs, mxArray* plhs[],
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 0);
 
-  const ConditionalMapMex& parFunc = Session<ConditionalMapMex>::getConst(input.get(0));
-  int inputDim = parFunc.fun_ptr->inputDim;
-  int outputDim = parFunc.fun_ptr->outputDim;
-  int numCoeffs = parFunc.fun_ptr->numCoeffs;
-  auto coeffs = parFunc.fun_ptr->Coeffs();
+  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
+  int inputDim = condMap.map_ptr->inputDim;
+  int outputDim = condMap.map_ptr->outputDim;
+  int numCoeffs = condMap.map_ptr->numCoeffs;
+  auto coeffs = condMap.map_ptr->Coeffs();
   std::string filename = input.get<std::string>(1);
   std::ofstream os(filename);
   cereal::BinaryOutputArchive oarchive(os);
