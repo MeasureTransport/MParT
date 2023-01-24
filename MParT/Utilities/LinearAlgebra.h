@@ -255,7 +255,7 @@ struct ReduceDim {
     StridedMatrix<const double, MemorySpace> A_;
     double alpha_;
 
-    ReduceDim(StridedMatrix<double, MemorySpace> A, double alpha, double base = 0.): value_count(A.extent(1-Dim)), A_(A), alpha_(alpha) {}
+    ReduceDim(StridedMatrix<double, MemorySpace> A, double alpha): value_count(A.extent(1-Dim)), A_(A), alpha_(alpha) {}
 
     KOKKOS_INLINE_FUNCTION void operator()(const size_type reduce_idx, value_type sum) const {
         for(size_type full_idx=0; full_idx<value_count; ++full_idx) {

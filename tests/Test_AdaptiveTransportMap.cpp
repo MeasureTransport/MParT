@@ -7,6 +7,7 @@
 using namespace mpart;
 using namespace Catch;
 
+#include "MParT/Utilities/LinearAlgebra.h"
 #include <fstream>
 
 void SaveMatrix(std::string fname, StridedMatrix<double, Kokkos::HostSpace> mat, std::string path="/home/dannys4/misc/mpart_atm/") {
@@ -21,8 +22,32 @@ void SaveMatrix(std::string fname, StridedMatrix<double, Kokkos::HostSpace> mat,
     }
 }
 
+void NormalizeSamples(StridedMatrix<double, Kokkos::HostSpace> mat) {
+    using MemorySpace = Kokkos::HostSpace;
+    unsigned int dim = mat.extent(0);
+    unsigned int N_samples = mat.extent(1);
+    // Take sum of each row, divide by 1/N_samples
+    ReduceDim<ReduceDimMap::sum,MemorySpace,1> rd_mean(mat, 1./(static_cast<double>(N_samples)));
+    Kokkos::View<double*, MemorySpace> meanVar("MeanStd", dim);
+    Kokkos::parallel_reduce(N_samples, rd_mean, &meanVar(0));
+    // Subtract mean from each point
+    using ExecSpace = typename MemoryToExecution<MemorySpace>::Space;
+    auto policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>,ExecSpace>({0,0},{dim,N_samples});
+    Kokkos::parallel_for("Center data", policy, KOKKOS_LAMBDA(const unsigned int i, const unsigned int j){
+        mat(i,j) -= meanVar(i);
+    });
+    // Take || . ||_2^2 of each row, divide by 1/(N_samples-1)
+    ReduceDim<ReduceDimMap::norm,MemorySpace,1> rd_var(mat, 1./(static_cast<double>(N_samples-1)));
+    Kokkos::parallel_reduce(N_samples, rd_var, &meanVar(0));
+    // Divide each point by appropriate standard deviation
+    Kokkos::parallel_for("Scale data", policy, KOKKOS_LAMBDA(const unsigned int i, const unsigned int j){
+        mat(i,j) /= std::sqrt(meanVar(i));
+    });
+    Kokkos::fence("Normalize data");
+}
+
 void ATM() {
-    unsigned int seed = 20;
+    unsigned int seed = 186930;
     unsigned int dim = 2;
     unsigned int numPts = 20000;
     unsigned int testPts = numPts / 5;
@@ -34,16 +59,15 @@ void ATM() {
         targetSamps(0,i) = samples(0,i);
         targetSamps(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
     };
+    NormalizeSamples(targetSamps);
     std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
     ATMOptions opts;
     opts.opt_alg = "LD_SLSQP";
     opts.basisType = BasisTypes::ProbabilistHermite;
     opts.maxSize = 16;
-    opts.maxPatience = 3;
-    opts.opt_xtol_rel = 1e-16;
-    opts.opt_xtol_abs = 1e-16;
-    opts.basisLB = -3.;
-    opts.basisUB = 3.;
+    opts.maxPatience = 8;
+    opts.basisLB = -2.;
+    opts.basisUB = 2.;
     opts.verbose = true;
     StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
     StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
