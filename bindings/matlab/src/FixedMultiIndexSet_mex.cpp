@@ -114,7 +114,7 @@ MEX_DEFINE(FixedMultiIndexSet_Deserialize) (int nlhs, mxArray* plhs[],
 #if defined(MPART_HAS_CEREAL)
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
-  const FixedMultiIndexSet<Kokkos::HostSpace>& mset = Session<FixedMultiIndexSet<Kokkos::HostSpace>>::getConst(input.get(0));
+  FixedMultiIndexSet<Kokkos::HostSpace>& mset = *Session<FixedMultiIndexSet<Kokkos::HostSpace>>::get(input.get(0));
   std::string filename = input.get<std::string>(1);
   std::ifstream is(filename);
   cereal::BinaryInputArchive iarchive(is);
