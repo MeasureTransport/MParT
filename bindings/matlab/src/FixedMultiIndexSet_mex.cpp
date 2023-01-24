@@ -93,5 +93,36 @@ MEX_DEFINE(FixedMultiIndexSet_Length) (int nlhs, mxArray* plhs[],
   output.set(0, mset.Length());
 }
 
+MEX_DEFINE(FixedMultiIndexSet_Serialize) (int nlhs, mxArray* plhs[],
+                int nrhs, const mxArray* prhs[]) {
+#if defined(MPART_HAS_CEREAL)
+  InputArguments input(nrhs, prhs, 2);
+  const FixedMultiIndexSet<Kokkos::HostSpace>& mset = Session<FixedMultiIndexSet<Kokkos::HostSpace>>::getConst(input.get(0));
+  const std::string& filename = Session<std::string>::getConst(input.get(1));
+  std::ofstream os(filename);
+  cereal::BinaryOutputArchive oarchive(os);
+  oarchive(mset);
+#else
+  mexErrMsgIdAndTxt("MParT:NoCereal",
+                    "MParT was not compiled with Cereal support.");
+#endif
+}
+
+MEX_DEFINE(FixedMultiIndexSet_Deserialize) (int nlhs, mxArray* plhs[],
+                int nrhs, const mxArray* prhs[]) {
+#if defined(MPART_HAS_CEREAL)
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  const FixedMultiIndexSet<Kokkos::HostSpace>& mset = Session<FixedMultiIndexSet<Kokkos::HostSpace>>::getConst(input.get(0));
+  std::string filename = input.get<std::string>(1);
+  std::ifstream is(filename);
+  cereal::BinaryOutputArchive iarchive(is);
+  iarchive(mset);
+  output.set(0, mset);
+#else
+  mexErrMsgIdAndTxt("MParT:NoCereal",
+                    "MParT was not compiled with Cereal support.");
+#endif
+}
 
 } // namespace

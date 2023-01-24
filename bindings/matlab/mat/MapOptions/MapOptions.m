@@ -65,6 +65,39 @@ classdef MapOptions
             optionsArray{11} = obj.basisUB;
             optionsArray{12} = obj.basisNorm;
         end
+        
+        function Serialize(obj,filename)
+            MParT_('MapOptions_Serialize',filename,
+                char(obj.basisType),
+                char(obj.posFuncType),
+                char(obj.quadType),
+                obj.quadAbsTol,
+                obj.quadRelTol,
+                obj.quadMaxSub,
+                obj.quadMinSub,
+                obj.quadPts,
+                obj.contDeriv,
+                obj.basisLB,
+                obj.basisUB,
+                obj.basisNorm
+            )
+        end
+
+        function Deserialize(obj,filename)
+            optionsArray = MParT_('MapOptions_Deserialize',filename);
+            obj.basisType = optionsArray{1};
+            obj.posFuncType = optionsArray{2};
+            obj.quadType = optionsArray{3};
+            obj.quadAbsTol = optionsArray{4};
+            obj.quadRelTol = optionsArray{5};
+            obj.quadMaxSub = optionsArray{6};
+            obj.quadMinSub = optionsArray{7};
+            obj.quadPts = optionsArray{8};
+            obj.contDeriv = optionsArray{9};
+            obj.basisLB = optionsArray{10};
+            obj.basisUB = optionsArray{11};
+            obj.basisNorm = optionsArray{12};
+        end
     end
 
 end

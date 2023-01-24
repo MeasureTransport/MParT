@@ -2,6 +2,7 @@
 #define MPART_MEXOPTIONSCONVERSIONS_H
 
 #include <iostream>
+#include <mexplus.h>
 #include "MParT/MapOptions.h"
 
 namespace mpart{
@@ -15,6 +16,8 @@ namespace binding{
                                         double quadRelTol, unsigned int quadMaxSub, 
                                         unsigned int quadMinSub,unsigned int quadPts, 
                                         bool contDeriv, double basisLB, double basisUB, bool basisNorm);
+
+    void MapOptionsToMatlab(MapOptions opts, OutputArguments &output);
 }
 }
 
