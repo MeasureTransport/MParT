@@ -1,3 +1,4 @@
+#include <fstream>
 #include <mexplus.h>
 #include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/Utilities/ArrayConversions.h"
