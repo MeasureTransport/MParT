@@ -5,6 +5,7 @@
  *
  */
 #include <mexplus.h>
+#include <fstream>
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/Utilities/ArrayConversions.h"
@@ -118,7 +119,6 @@ MEX_DEFINE(FixedMultiIndexSet_Deserialize) (int nlhs, mxArray* plhs[],
   std::ifstream is(filename);
   cereal::BinaryOutputArchive iarchive(is);
   iarchive(mset);
-  output.set(0, mset);
 #else
   mexErrMsgIdAndTxt("MParT:NoCereal",
                     "MParT was not compiled with Cereal support.");
