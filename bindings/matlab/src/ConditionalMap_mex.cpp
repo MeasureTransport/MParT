@@ -222,7 +222,7 @@ MEX_DEFINE(GaussianKLObjective_TrainError) (int nlhs, mxArray* plhs[],
 
 MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
                                      int nrhs, const mxArray* prhs[]) {
-    InputArguments input(nrhs, prhs, 10);
+    InputArguments input(nrhs, prhs, 11);
     OutputArguments output(nlhs, plhs, 0);
     ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
     std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
@@ -230,8 +230,8 @@ MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
 
     TrainOptions opts {input.get<std::string>(2),input.get<double>(3),
                       input.get<double>(4), input.get<double>(5),
-                      input.get<double>(6), input.get<int>(7),
-                      input.get<double>(8), input.get<bool>(9)};
+                      input.get<double>(6), input.get<double>(7),
+                      input.get<int>(8), input.get<double>(9), input.get<bool>(10)};
 
     TrainMap<KLObjective<MemorySpace>>(condMap_ptr, obj, opts);
   }

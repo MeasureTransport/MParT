@@ -25,6 +25,7 @@ void mpart::binding::TrainOptionsWrapper(py::module &m)
     .def_readwrite("opt_ftol_rel", &TrainOptions::opt_ftol_rel)
     .def_readwrite("opt_ftol_abs", &TrainOptions::opt_ftol_abs)
     .def_readwrite("opt_xtol_rel", &TrainOptions::opt_xtol_rel)
+    .def_readwrite("opt_xtol_abs", &TrainOptions::opt_xtol_abs)
     .def_readwrite("opt_maxeval", &TrainOptions::opt_maxeval)
     .def_readwrite("opt_maxtime", &TrainOptions::opt_maxtime)
     .def_readwrite("verbose", &TrainOptions::verbose)
@@ -33,7 +34,7 @@ void mpart::binding::TrainOptionsWrapper(py::module &m)
 
 template<typename MemorySpace>
 void mpart::binding::TrainMapWrapper(py::module &m) {
-    
+
     std::string tName = "TrainMap";
     if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName = "d" + tName;
 
