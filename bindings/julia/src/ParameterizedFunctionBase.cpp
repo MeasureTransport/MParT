@@ -69,7 +69,7 @@ void mpart::binding::ParameterizedFunctionBaseWrapper(jlcxx::Module &mod) {
             Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Map coeffs", numCoeffs);
             load(archive, coeffs);
             dims[0] = inputDim; dims[1] = outputDim;
-            return KokkosToJulia(coeffs);
+            return KokkosToStd(coeffs);
 #else
             std::cerr << "DeserializeMap: MParT was not compiled with Cereal support. Operation incomplete." << std::endl;
 #endif // MPART_HAS_CEREAL
