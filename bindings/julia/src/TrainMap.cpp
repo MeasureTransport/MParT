@@ -13,17 +13,7 @@ void mpart::binding::TrainMapWrapper(jlcxx::Module &mod) {
     ;
 
     mod.set_override_module(jl_base_module);
-    mod.method("string", [](const TrainOptions &opts){
-        std::stringstream ss;
-        ss << "opt_alg = " << opts.opt_alg << "\n";
-        ss << "opt_ftol_rel = " << opts.opt_ftol_rel << "\n";
-        ss << "opt_ftol_abs = " << opts.opt_ftol_abs << "\n";
-        ss << "opt_xtol_rel = " << opts.opt_xtol_rel << "\n";
-        ss << "opt_xtol_abs = " << opts.opt_xtol_abs << "\n";
-        ss << "opt_maxeval = " << opts.opt_maxeval << "\n";
-        ss << "verbose = " << (opts.verbose ? "true" : "false") << "\n";
-        return ss.str();
-    });
+    mod.method("string", [](TrainOptions opts){return opts.String();});
     mod.unset_override_module();
 
     // TrainMap

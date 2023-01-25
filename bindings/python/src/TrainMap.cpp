@@ -20,6 +20,8 @@ void mpart::binding::TrainOptionsWrapper(py::module &m)
     // TrainOptions
     py::class_<TrainOptions, std::shared_ptr<TrainOptions>>(m, "TrainOptions")
     .def(py::init<>())
+    .def("__str__", &TrainOptions::String)
+    .def("__repr__", [](TrainOptions opts){return "<TrainOptions with fields\n" + opts.String() + ">";})
     .def_readwrite("opt_alg", &TrainOptions::opt_alg)
     .def_readwrite("opt_stopval", &TrainOptions::opt_stopval)
     .def_readwrite("opt_ftol_rel", &TrainOptions::opt_ftol_rel)
@@ -30,6 +32,8 @@ void mpart::binding::TrainOptionsWrapper(py::module &m)
     .def_readwrite("opt_maxtime", &TrainOptions::opt_maxtime)
     .def_readwrite("verbose", &TrainOptions::verbose)
     ;
+
+    
 }
 
 template<typename MemorySpace>

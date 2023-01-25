@@ -63,25 +63,7 @@ void mpart::binding::MapOptionsWrapper(jlcxx::Module &mod) {
     ;
 
     mod.set_override_module(jl_base_module);
-    mod.method("string", [](const MapOptions &opts){
-        std::string btypes[3] = {"ProbabilistHermite", "PhysicistHermite", "HermiteFunctions"};
-        std::string pftypes[2] = {"Exp", "SoftPlus"};
-        std::string qtypes[3] = {"ClenshawCurtis", "AdaptiveSimpson", "AdaptiveClenshawCurtis"};
-        std::stringstream ss;
-        ss << "basisType = " << btypes[static_cast<unsigned int>(opts.basisType)] << "\n";
-        ss << "basisLB = " << opts.basisLB << "\n";
-        ss << "basisUB = " << opts.basisUB << "\n";
-        ss << "basisNorm = " << (opts.basisNorm ? "true" : "false") << "\n";
-        ss << "posFuncType = " << pftypes[static_cast<unsigned int>(opts.posFuncType)] << "\n";
-        ss << "quadType = " << qtypes[static_cast<unsigned int>(opts.quadType)] << "\n";
-        ss << "quadAbsTol = " << opts.quadAbsTol << "\n";
-        ss << "quadRelTol = " << opts.quadRelTol << "\n";
-        ss << "quadMaxSub = " << opts.quadMaxSub << "\n";
-        ss << "quadMinSub = " << opts.quadMinSub << "\n";
-        ss << "quadPts = " << opts.quadPts << "\n";
-        ss << "contDeriv = " << (opts.contDeriv ? "true" : "false");
-        return ss.str();
-    });
+    mod.method("string", [](MapOptions opts){return opts.String();});
     mod.method("==", [](MapOptions opts1, MapOptions opts2){return opts1 == opts2;});
     mod.unset_override_module();
 }
