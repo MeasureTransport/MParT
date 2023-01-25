@@ -37,6 +37,7 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     // MapOptions
     py::class_<MapOptions, std::shared_ptr<MapOptions>>(m, "MapOptions")
     .def(py::init<>())
+    .def("__eq__", &MapOptions::operator==)
     .def_readwrite("basisType", &MapOptions::basisType)
     .def_readwrite("basisLB", &MapOptions::basisLB)
     .def_readwrite("basisUB", &MapOptions::basisUB)

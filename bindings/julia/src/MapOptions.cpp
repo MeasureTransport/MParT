@@ -82,5 +82,6 @@ void mpart::binding::MapOptionsWrapper(jlcxx::Module &mod) {
         ss << "contDeriv = " << (opts.contDeriv ? "true" : "false");
         return ss.str();
     });
+    mod.method("==", [](MapOptions opts1, MapOptions opts2){return opts1 == opts2;});
     mod.unset_override_module();
 }

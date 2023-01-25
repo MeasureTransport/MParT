@@ -101,6 +101,23 @@ namespace mpart{
             archive( basisType, basisLB, basisUB, posFuncType, quadType, quadAbsTol, quadRelTol, quadMaxSub, quadMinSub, quadPts, contDeriv, basisNorm );
         }
         #endif // MPART_HAS_CEREAL
+
+        bool operator==(MapOptions opts2) const {
+            bool ret = true;
+            ret &= (basisType   == opts2.basisType);
+            ret &= (basisLB     == opts2.basisLB);
+            ret &= (basisUB     == opts2.basisUB);
+            ret &= (posFuncType == opts2.posFuncType);
+            ret &= (quadType    == opts2.quadType);
+            ret &= (quadAbsTol  == opts2.quadAbsTol);
+            ret &= (quadRelTol  == opts2.quadRelTol);
+            ret &= (quadMaxSub  == opts2.quadMaxSub);
+            ret &= (quadMinSub  == opts2.quadMinSub);
+            ret &= (quadPts     == opts2.quadPts);
+            ret &= (contDeriv   == opts2.contDeriv);
+            ret &= (basisNorm   == opts2.basisNorm);
+            return ret;
+        }
     };
 };
 
