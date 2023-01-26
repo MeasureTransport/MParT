@@ -24,11 +24,17 @@ double MapObjective<MemorySpace>::TrainError(std::shared_ptr<ConditionalMapBase<
 }
 
 template<typename MemorySpace>
+void MapObjective<MemorySpace>::TrainCoeffGradImpl(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, StridedVector<double, MemorySpace> grad) const {
+    CoeffGradImpl(train_, grad, map);
+}
+
+template<typename MemorySpace>
 StridedVector<double, MemorySpace> MapObjective<MemorySpace>::TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {
     Kokkos::View<double*, MemorySpace> grad("trainCoeffGrad", map->numCoeffs);
-    CoeffGradImpl(train_, grad, map);
+    TrainCoeffGradImpl(map, grad);
     return grad;
 }
+
 
 template<typename MemorySpace>
 double KLObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {

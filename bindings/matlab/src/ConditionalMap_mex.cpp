@@ -210,6 +210,17 @@ MEX_DEFINE(GaussianKLObjective_TestError) (int nlhs, mxArray* plhs[],
   output.set(0, obj.TestError(condMap_ptr));
 }
 
+MEX_DEFINE(GaussianKLObjective_TrainCoeffGrad) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 3);
+  
+  const KLObjective<MemorySpace>& obj = Session<KLObjective<MemorySpace>>::getConst(input.get(0));
+  ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(1));
+  std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
+  StridedMatrix<double, Kokkos::HostSpace> out = MexToKokkos2d(prhs[2]);
+  obj.TrainCoeffGradImpl(condMap_ptr, out);
+}
+
 MEX_DEFINE(GaussianKLObjective_TrainError) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);

@@ -24,6 +24,11 @@ methods
     function result = TrainError(this, map)
         result = MParT_('GaussianKLObjective_TrainError',this.id_,map.get_id());
     end
+
+    function result = TrainCoeffGrad(this, map)
+        result = zeros(map.numCoeffs);
+        MParT_('GaussianKLObjective_TrainCoeffGrad', this.id_, map.get_id());
+    end
     
     function result = get_id(this)
         result = this.id_;
