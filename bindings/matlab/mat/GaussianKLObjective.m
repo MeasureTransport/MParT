@@ -26,7 +26,7 @@ methods
     end
 
     function result = TrainCoeffGrad(this, map)
-        result = zeros(map.numCoeffs);
+        result = zeros(map.numCoeffs,1);
         MParT_('GaussianKLObjective_TrainCoeffGrad', this.id_, map.get_id(),result);
     end
     
