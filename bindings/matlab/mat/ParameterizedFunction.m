@@ -91,7 +91,11 @@ methods
 
   function result = inputDim(this)
     result = MParT_('ParameterizedFunction_inputDim',this.id_);
-  end 
+  end
+
+  function Serialize(this,filename)
+    MParT_('ParameterizedFunction_Serialize',this.id_,filename);
+  end
 
 end
 

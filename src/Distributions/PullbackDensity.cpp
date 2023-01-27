@@ -15,7 +15,7 @@ void PullbackDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const double, Me
     StridedMatrix<double, MemorySpace> mappedPts = map_->Evaluate(pts);
     reference_->LogDensityImpl(mappedPts, output);
     StridedVector<double, MemorySpace> logJacobian = map_->LogDeterminant(pts);
-    output += logJacobian;
+    Kokkos::parallel_for("Add logJacobian", output.extent(0), KOKKOS_LAMBDA(const unsigned int i){output(i) += logJacobian(i);});
 }
 
 template<typename MemorySpace>
@@ -24,7 +24,8 @@ void PullbackDensity<MemorySpace>::LogDensityInputGradImpl(StridedMatrix<const d
     StridedMatrix<double, MemorySpace> sens_map = reference_->LogDensityInputGrad(mappedPts);
     map_->GradientImpl(pts, sens_map, output);
     StridedMatrix<double, MemorySpace> gradLogJacobian = map_->LogDeterminantInputGrad(pts);
-    output += gradLogJacobian;
+    auto policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>,typename MemoryToExecution<MemorySpace>::Space>({0,0},{output.extent(1),output.extent(0)});
+    Kokkos::parallel_for("Add GradLogJacobian",policy,KOKKOS_LAMBDA(const unsigned int j, const unsigned int i){output(i,j) += gradLogJacobian(i,j);});
 }
 
 template<typename MemorySpace>
@@ -33,7 +34,8 @@ void PullbackDensity<MemorySpace>::LogDensityCoeffGradImpl(StridedMatrix<const d
     StridedMatrix<double, MemorySpace> sens_map = reference_->LogDensityInputGrad(mappedPts);
     map_->CoeffGradImpl(pts, sens_map, output);
     StridedMatrix<double, MemorySpace> gradLogJacobian = map_->LogDeterminantCoeffGrad(pts);
-    output += gradLogJacobian;
+    auto policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>,typename MemoryToExecution<MemorySpace>::Space>({0,0},{output.extent(1),output.extent(0)});
+    Kokkos::parallel_for("Add GradLogJacobian",policy,KOKKOS_LAMBDA(const unsigned int j, const unsigned int i){output(i,j) += gradLogJacobian(i,j);});
 }
 
 template<typename MemorySpace>
