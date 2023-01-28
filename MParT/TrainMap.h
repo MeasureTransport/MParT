@@ -12,7 +12,7 @@ namespace mpart {
  * @brief TrainOptions adds options for training your map,
  * with fields largely based on nlopt settings. verbose is an integer
  * where 0=nothing, 1=some diagnostics, 2=debugging
- * 
+ *
  */
 struct TrainOptions {
     std::string opt_alg = "LD_LBFGS";
@@ -24,7 +24,6 @@ struct TrainOptions {
     int opt_maxeval = 30;
     double opt_maxtime = 100.;
     int verbose = 0;
-    bool verbose = false;
     std::string String() {
         std::stringstream ss;
         ss << "opt_alg = " << opt_alg << "\n";
@@ -35,7 +34,7 @@ struct TrainOptions {
         ss << "opt_xtol_abs = " << opt_xtol_abs << "\n";
         ss << "opt_maxeval = " << opt_maxeval << "\n";
         ss << "opt_maxtime = " << opt_maxtime << "\n";
-        ss << "verbose = " << (verbose ? "true" : "false");
+        ss << "verbose = " << verbose;
         return ss.str();
     }
 };

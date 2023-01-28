@@ -17,6 +17,7 @@ namespace mpart {
 struct ATMOptions: public MapOptions, public TrainOptions {
     int maxPatience = 10;
     int maxSize = 10;
+    std::vector<unsigned int> maxDegrees;
 };
 
 template<typename MemorySpace,typename ObjectiveType>

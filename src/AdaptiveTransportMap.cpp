@@ -7,21 +7,71 @@ template<>
 std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportMap(std::vector<MultiIndexSet> &mset0,
         KLObjective<Kokkos::HostSpace> &objective,
         ATMOptions options) {
+
     // Dimensions
     unsigned int inputDim = objective.Dim();
     unsigned int outputDim = mset0.size();
 
-    // Setup initial map
     std::vector<unsigned int> mset_sizes (outputDim);
     unsigned int currSz = 0;
     unsigned int currPatience = 0;
     std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> mapBlocks (outputDim);
     std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> mapBlocksTmp (outputDim);
-    for(int i = 0; i < outputDim; i++) {
-        mset_sizes[i] = mset0[i].Size();
-        mapBlocks[i] = MapFactory::CreateComponent(mset0[i].Fix(true), options);
-        currSz += mset_sizes[i];
+
+    // Setup Multiindex info for training
+    std::vector<std::vector<unsigned int>> multis_rm (outputDim);
+    std::vector<MultiIndexSet> mset_tmp {};
+    std::vector<MultiIndexSet> mset_best {};
+
+    // Ensure the given vector of multiindexsets is valid
+    unsigned int currMsetDim = mset0[0].Length();
+    for(unsigned int j = 0; j < outputDim; j++) {
+
+        MultiIndexSet mset_j = mset0[j];
+        mset_sizes[j] = mset_j.Size();
+
+        // Check the length is okay
+        if(mset_j.Length() != currMsetDim) {
+            std::stringstream ss;
+            ss << "AdaptiveTransportMap: Initial MultiIndexSet " << j << " is invalid.\n";
+            ss << "Expected Length " << currMsetDim << ", got " << mset_j.Length() << ".";
+            throw std::invalid_argument(ss.str());
+        }
+
+        // Create the jth component
+        mapBlocks[j] = MapFactory::CreateComponent(mset_j.Fix(true), options);
+
+        // Initialize the temporary mset vectors
+        MultiIndexSet mset_tmp_j = MultiIndexSet::CreateTotalOrder(inputDim-outputDim+j+1,0);
+        mset_tmp.push_back(mset_tmp_j);
+        mset_best.push_back(mset_tmp_j);
+
+        // Index global constants
+        currMsetDim++;
+        currSz += mset_sizes[j];
     }
+    currMsetDim--; // Adjust for the extra ++
+
+    // Check that the multiindex sets match with the objective
+    if(currMsetDim != inputDim) {
+        std::stringstream ss;
+            ss << "AdaptiveTransportMap: Initial MultiIndexSets must match Objective dimension.\n";
+            ss << "Expected last MultiIndexSet to have Length " << inputDim << ", got " << currMsetDim << ".";
+            throw std::invalid_argument(ss.str());
+    }
+
+    // Ensure that the dimensional maximum degree vector is valid
+    bool hasMaxDegrees = true;
+    if(options.maxDegrees.size() == 0) {
+        hasMaxDegrees = false;
+    } else if(options.maxDegrees.size() != currMsetDim){
+        std::stringstream ss;
+        mset0.end()->Length();
+        ss << "AdaptiveTransportMap: invalid options.maxDegrees for this vector of MultiIndexSet objects\n";
+        ss << "Expected length either zero or " << currMsetDim << "\n";
+        throw std::invalid_argument(ss.str());
+    }
+
     // Create initial map
     std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocks);
     Kokkos::View<double*, Kokkos::HostSpace> mapCoeffs ("mapCoeffs", map->numCoeffs);
@@ -29,6 +79,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         mapCoeffs(i) = 0.;
     }
     map->WrapCoeffs(mapCoeffs);
+
     if(options.verbose) {
         std::cout << "Initial map:" << std::endl;
     }
@@ -39,25 +90,17 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         std::cout << "Initial map test error: " << bestError << std::endl;
     }
 
-    // Setup Multiindex info for training
-    std::vector<std::vector<unsigned int>> multis_rm (outputDim);
-    std::vector<MultiIndexSet> mset_tmp {};
-    std::vector<MultiIndexSet> mset_best {};
-    for(int i = 1; i <= outputDim; i++) {
-        MultiIndexSet mset_i = MultiIndexSet::CreateTotalOrder(inputDim-outputDim+i,0);
-        mset_tmp.push_back(mset_i);
-        mset_best.push_back(mset_i);
-    }
-
+    // Perform ATM
     while(currSz < options.maxSize && currPatience < options.maxPatience) {
         if(options.verbose) {
             std::cout << "\n\nSize " << currSz << ":" << std::endl;
         }
-        
+
         for(int i = 0; i < outputDim; i++) {
             // Expand the current map
             mset_tmp[i] = mset0[i];
             multis_rm[i] = mset_tmp[i].Expand();
+
             // Create a component with the expanded multiindexset
             std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> comp_i = MapFactory::CreateComponent(mset_tmp[i].Fix(), options);
             Kokkos::View<double*,Kokkos::HostSpace> coeffsFrontier ("Frontier coeffs", comp_i->numCoeffs);
@@ -118,8 +161,8 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
             blockStart += mset_tmp[output].Size();
         }
         // Add the multiindex with largest gradient to the map
-        mset0[maxIdxBlock] += mset_tmp[maxIdxBlock][maxIdx];
         MultiIndex addedMulti = mset_tmp[maxIdxBlock][maxIdx];
+        mset0[maxIdxBlock] += addedMulti;
         if(options.verbose) {
             std::cerr << "Added multi = [" << addedMulti.String() << "]" <<std::endl;
         }
@@ -127,7 +170,8 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         if(mset0[maxIdxBlock].Size() != mset_sizes[maxIdxBlock]+1) {
             std::cerr << mset_tmp[maxIdxBlock][maxIdx] << "\n";
             std::stringstream ss_err;
-            ss_err << "maxIdxBlock = " << maxIdxBlock << ", mset0[maxIdxBlock].Size() = " << mset0[maxIdxBlock].Size() << ", mset_sizes[maxIdxBlock] = " << mset_sizes[maxIdxBlock];
+            ss_err << "AdaptiveTransportMap: Unexpected sizes of MultiIndexSets.\n";
+            ss_err << "mset0["<<maxIdxBlock<<"].Size() = " << mset0[maxIdxBlock].Size() << ", mset_sizes["<<maxIdxBlock<<"] = " << mset_sizes[maxIdxBlock];
             throw std::runtime_error(ss_err.str());
         }
 
@@ -146,9 +190,8 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         // Get the testing error and assess the best map
         double test_error = objective.TestError(map);
 
-        // DEBUG
-        auto train = objective.GetTrain();
-        auto evalSamples = map->Evaluate(train);
+        // Finish this step
+        currPatience++;
         if(test_error < bestError) {
             bestError = test_error;
             for(int i = 0; i < outputDim; i++) {
@@ -156,8 +199,6 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
             }
             // Reset the patience if we find a new best map
             currPatience = 0;
-        } else {
-            currPatience++;
         }
 
         // Print the current iteration results if verbose
@@ -183,12 +224,14 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
     double test_error = objective.TestError(map);
 
     if(options.verbose) {
-        std::cout << "\nFinal training error: " << train_error << ", final testing error: " << test_error << "\n";
-        std::cout << "Visualization of MultiIndexSets--\n";
-        for(int i = 0; i < outputDim; i++) {
-            std::cout << "mset " << i << ":\n";
-            mset0[i].Visualize();
-            std::cout << "\n";
+        std::cout << "\nFinal training error: " << train_error << ", final testing error: " << test_error;
+        if(options.verbose > 1) {
+            std::cout << "\nVisualization of MultiIndexSets--\n";
+            for(int i = 0; i < outputDim; i++) {
+                std::cout << "mset " << i << ":\n";
+                mset0[i].Visualize();
+                std::cout << "\n";
+            }
         }
         std::cout << std::endl;
     }
