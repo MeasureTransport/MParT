@@ -26,6 +26,7 @@ class MapObjective {
     double TestError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
 
     StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
+    void TrainCoeffGradImpl(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, StridedVector<double, MemorySpace> grad) const;
 
     StridedMatrix<const double, MemorySpace> GetTrain() {return train_;}
     StridedMatrix<const double, MemorySpace> GetTest() {return test_;}

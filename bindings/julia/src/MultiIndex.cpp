@@ -1,3 +1,4 @@
+#include <fstream>
 #include "MParT/MultiIndices/MultiIndex.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
@@ -25,6 +26,24 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
     mod.add_type<FixedMultiIndexSet<Kokkos::HostSpace>>("FixedMultiIndexSet")
         .constructor<unsigned int, unsigned int>()
         .method("MaxDegreesExtent", [] (const FixedMultiIndexSet<Kokkos::HostSpace> &set) { return set.MaxDegrees().extent(0); })
+        .method("Serialize", [](const FixedMultiIndexSet<Kokkos::HostSpace> &set, std::string &filename){
+#if defined(MPART_HAS_CEREAL)
+            std::ofstream os (filename);
+            cereal::BinaryOutputArchive oarchive(os);
+            oarchive(set);
+#else
+            std::cerr << "FixedMultiIndexSet::Serialize: MParT was not compiled with Cereal support. Operation incomplete." << std::endl;
+#endif
+        })
+        .method("Deserialize", [](FixedMultiIndexSet<Kokkos::HostSpace> &set, std::string &filename){
+#if defined(MPART_HAS_CEREAL)
+            std::ifstream is (filename);
+            cereal::BinaryInputArchive iarchive(is);
+            iarchive(set);
+#else
+            std::cerr << "FixedMultiIndexSet::Deserialize: MParT was not compiled with Cereal support. Operation incomplete." << std::endl;
+#endif
+        })
     ;
 
     // MultiIndexSet
@@ -61,6 +80,8 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
     mod.method("string", [](MultiIndex const& idx){ return idx.String(); });
     mod.method("length", [](MultiIndex const& idx){ return idx.Length(); });
     mod.method("length", [](MultiIndexSet const& idx){ return idx.Length(); });
+    mod.method("length", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset){return mset.Length();});
+    mod.method("size", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset){return mset.Size();});
     mod.method("vec", [](MultiIndex const& idx){ return idx.Vector(); });
     mod.method("==", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 == idx2; });
     mod.method("!=", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 != idx2; });

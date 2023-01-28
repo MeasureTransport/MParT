@@ -1,3 +1,4 @@
+#include <fstream>
 #include "MParT/ParameterizedFunctionBase.h"
 
 #include "CommonJuliaUtilities.h"
@@ -42,5 +43,37 @@ void mpart::binding::ParameterizedFunctionBaseWrapper(jlcxx::Module &mod) {
             pfb.GradientImpl(JuliaToKokkos(pts), JuliaToKokkos(sens), JuliaToKokkos(output));
             return output;
         })
+        .method("Serialize", [](ParameterizedFunctionBase<Kokkos::HostSpace> &pfb, std::string &filename) {
+#if defined(MPART_HAS_CEREAL)
+            unsigned int inputDim = pfb.inputDim;
+            unsigned int outputDim = pfb.outputDim;
+            unsigned int numCoeffs = pfb.numCoeffs;
+            auto coeffs = pfb.Coeffs();
+            std::ofstream os(filename);
+            cereal::BinaryOutputArchive oarchive(os);
+            oarchive(inputDim,outputDim,numCoeffs);
+            oarchive(coeffs);
+#else
+            std::cerr << "ParameterizedFunctionBase::Serialize: MParT was not compiled with Cereal support. Operation incomplete." << std::endl;
+#endif // MPART_HAS_CEREAL
+        })
     ;
+
+    mod.method("__DeserializeMap", [](std::string &filename, jlcxx::ArrayRef<int> dims){
+#if defined(MPART_HAS_CEREAL)
+
+            std::ifstream is(filename);
+            cereal::BinaryInputArchive archive(is);
+            unsigned int inputDim, outputDim, numCoeffs;
+            archive(inputDim, outputDim, numCoeffs);
+            jlcxx::ArrayRef<double> coeffs_jl = jlMalloc<double>(numCoeffs);
+            Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Map coeffs", numCoeffs);
+            load(archive, coeffs);
+            dims[0] = inputDim; dims[1] = outputDim;
+            Kokkos::deep_copy(JuliaToKokkos(coeffs_jl), coeffs);
+            return coeffs_jl;
+#else
+            std::cerr << "DeserializeMap: MParT was not compiled with Cereal support. Operation incomplete." << std::endl;
+#endif // MPART_HAS_CEREAL
+    });
 }

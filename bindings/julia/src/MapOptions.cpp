@@ -1,5 +1,10 @@
-#include <MParT/MapOptions.h>
+#include <fstream>
+#include "MParT/MapOptions.h"
 #include <Kokkos_Core.hpp>
+
+#if defined(MPART_HAS_CEREAL)
+#include "MParT/Utilities/Serialization.h"
+#endif // MPART_HAS_CEREAL
 
 #include "CommonJuliaUtilities.h"
 
@@ -37,5 +42,28 @@ void mpart::binding::MapOptionsWrapper(jlcxx::Module &mod) {
         .method("__quadMinSub!", [](MapOptions &opts, unsigned int sub){ opts.quadMinSub = sub; })
         .method("__quadPts!", [](MapOptions &opts, unsigned int pts){ opts.quadPts = pts; })
         .method("__contDeriv!", [](MapOptions &opts, bool deriv){ opts.contDeriv = deriv; })
+        .method("Serialize", [](MapOptions &opts, std::string &filename){
+#if defined(MPART_HAS_CEREAL)
+            std::ofstream os (filename);
+            cereal::BinaryOutputArchive oarchive(os);
+            oarchive(opts);
+#else
+            std::cerr << "MapOptions::Serialize: MParT was not compiled with Cereal support. Operation incomplete." << std::endl;
+#endif
+        })
+        .method("Deserialize", [](MapOptions &opts, std::string &filename){
+#if defined(MPART_HAS_CEREAL)
+            std::ifstream is (filename);
+            cereal::BinaryInputArchive iarchive(is);
+            iarchive(opts);
+#else
+            std::cerr << "MapOptions::Deserialize: MParT was not compiled with Cereal support. Operation incomplete." << std::endl;
+#endif
+        })
     ;
+
+    mod.set_override_module(jl_base_module);
+    mod.method("string", [](MapOptions opts){return opts.String();});
+    mod.method("==", [](MapOptions opts1, MapOptions opts2){return opts1 == opts2;});
+    mod.unset_override_module();
 }

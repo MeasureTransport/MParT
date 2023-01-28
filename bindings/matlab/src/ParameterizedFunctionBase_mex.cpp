@@ -17,10 +17,10 @@ using namespace mexplus;
 using MemorySpace = Kokkos::HostSpace;
 
 class ParameterizedFunctionMex {       // The class
-public:             
+public:
   std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> fun_ptr;
 
-  ParameterizedFunctionMex(unsigned int outputDim, FixedMultiIndexSet<MemorySpace> const& mset, 
+  ParameterizedFunctionMex(unsigned int outputDim, FixedMultiIndexSet<MemorySpace> const& mset,
                     MapOptions opts){
     fun_ptr = MapFactory::CreateExpansion<MemorySpace>(outputDim,mset,opts);
   }
@@ -121,7 +121,7 @@ MEX_DEFINE(ParameterizedFunction_Evaluate) (int nlhs, mxArray* plhs[],
 
   const ParameterizedFunctionMex& parFunc = Session<ParameterizedFunctionMex>::getConst(input.get(0));
   StridedMatrix<const double, Kokkos::HostSpace> pts = MexToKokkos2d(prhs[1]);
-  StridedMatrix<double, Kokkos::HostSpace> out = MexToKokkos2d(prhs[2]); 
+  StridedMatrix<double, Kokkos::HostSpace> out = MexToKokkos2d(prhs[2]);
   parFunc.fun_ptr->EvaluateImpl(pts, out);
 }
 
@@ -136,7 +136,7 @@ MEX_DEFINE(ParameterizedFunction_CoeffGrad) (int nlhs, mxArray* plhs[],
   auto pts = MexToKokkos2d(prhs[1]);
   auto sens = MexToKokkos2d(prhs[2]);
   auto out = MexToKokkos2d(prhs[3]);
-  
+
   parFunc.fun_ptr->CoeffGradImpl(pts,sens,out);
 }
 
@@ -151,7 +151,7 @@ MEX_DEFINE(ParameterizedFunction_Gradient) (int nlhs, mxArray* plhs[],
   auto pts = MexToKokkos2d(prhs[1]);
   auto sens = MexToKokkos2d(prhs[2]);
   auto out = MexToKokkos2d(prhs[3]);
-  
+
   parFunc.fun_ptr->GradientImpl(pts,sens,out);
 }
 
@@ -163,9 +163,9 @@ MEX_DEFINE(ParameterizedFunction_Serialize) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 0);
 
   const ParameterizedFunctionMex& parFunc = Session<ParameterizedFunctionMex>::getConst(input.get(0));
-  int inputDim = parFunc.fun_ptr->inputDim;
-  int outputDim = parFunc.fun_ptr->outputDim;
-  int numCoeffs = parFunc.fun_ptr->numCoeffs;
+  unsigned int inputDim = parFunc.fun_ptr->inputDim;
+  unsigned int outputDim = parFunc.fun_ptr->outputDim;
+  unsigned int numCoeffs = parFunc.fun_ptr->numCoeffs;
   auto coeffs = parFunc.fun_ptr->Coeffs();
   std::string filename = input.get<std::string>(1);
   std::ofstream os(filename);

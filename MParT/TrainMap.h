@@ -24,6 +24,20 @@ struct TrainOptions {
     int opt_maxeval = 30;
     double opt_maxtime = 100.;
     int verbose = 0;
+    bool verbose = false;
+    std::string String() {
+        std::stringstream ss;
+        ss << "opt_alg = " << opt_alg << "\n";
+        ss << "opt_stopval = " << opt_stopval << "\n";
+        ss << "opt_ftol_rel = " << opt_ftol_rel << "\n";
+        ss << "opt_ftol_abs = " << opt_ftol_abs << "\n";
+        ss << "opt_xtol_rel = " << opt_xtol_rel << "\n";
+        ss << "opt_xtol_abs = " << opt_xtol_abs << "\n";
+        ss << "opt_maxeval = " << opt_maxeval << "\n";
+        ss << "opt_maxtime = " << opt_maxtime << "\n";
+        ss << "verbose = " << (verbose ? "true" : "false");
+        return ss.str();
+    }
 };
 
 template<typename ObjectiveType>

@@ -180,7 +180,9 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
             }
             return maxDegreesEigen;
         })
-
+        .def("__len__", &FixedMultiIndexSet<Kokkos::HostSpace>::Length)
+        .def("Length", &FixedMultiIndexSet<Kokkos::HostSpace>::Length)
+        .def("Size", &FixedMultiIndexSet<Kokkos::HostSpace>::Size)
 #if defined(MPART_HAS_CEREAL)
         .def("Serialize", [](FixedMultiIndexSet<Kokkos::HostSpace> const &mset, std::string const &filename){
             std::ofstream os(filename);
