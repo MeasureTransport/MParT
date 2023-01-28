@@ -47,7 +47,7 @@ void NormalizeSamples(StridedMatrix<double, Kokkos::HostSpace> mat) {
 }
 
 void ATM() {
-    unsigned int seed = 186930;
+    unsigned int seed = 13982;
     unsigned int dim = 2;
     unsigned int numPts = 20000;
     unsigned int testPts = numPts / 5;
@@ -58,18 +58,18 @@ void ATM() {
     Kokkos::View<double**, Kokkos::HostSpace> targetSamps("targetSamps", 2, numPts);
     for(int i = 0; i < numPts; i++){
         targetSamps(0,i) = samples(0,i);
-        targetSamps(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
+        targetSamps(1,i) = samples(1,i) + samples(0,i) + samples(0,i)*samples(0,i);
     };
     NormalizeSamples(targetSamps);
     std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
     ATMOptions opts;
     opts.opt_alg = "LD_SLSQP";
     opts.basisType = BasisTypes::ProbabilistHermite;
-    opts.maxSize = 16;
-    opts.maxPatience = 8;
+    opts.maxSize = 10;
+    opts.maxPatience = 10;
     opts.basisLB = -2.;
     opts.basisUB = 2.;
-    opts.verbose = true;
+    opts.verbose = 1;
     StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
     StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
     KLObjective<Kokkos::HostSpace> objective {trainSamps,testSamps,sampler};

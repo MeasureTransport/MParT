@@ -34,7 +34,7 @@ TEST_CASE("Test_TrainMap", "[TrainMap]") {
     auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(dim, dim, 2, map_options);
 
     TrainOptions train_options;
-    train_options.verbose = false;
+    train_options.verbose = 0;
     TrainMap(map, obj, train_options);
     auto pullback_samples = map->Evaluate(testSamps);
     TestStandardNormalSamples(pullback_samples);

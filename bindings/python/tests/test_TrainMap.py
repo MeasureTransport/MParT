@@ -32,7 +32,7 @@ def test_TestError():
 
 def test_Normality():
     pullback_samples = map.Evaluate(test_samples)
-    sorted_samps = np.sort(pullback_samples[:])
+    sorted_samps = np.sort(pullback_samples.flatten())
     erf = np.vectorize(math.erf)
     samps_cdf = (1 + erf(sorted_samps/np.sqrt(2)))/2
     samps_ecdf = (np.arange(dim*testPts) + 1)/(dim*testPts)

@@ -3,22 +3,6 @@
 
 using namespace mpart;
 
-// Used for calculating the best location
-bool largestAbs(double a, double b) {
-    return std::abs(a) < std::abs(b);
-}
-
-void SaveMatrix(std::string fname, StridedMatrix<double, Kokkos::HostSpace> mat, std::string path="/home/dannys4/misc/mpart_atm/") {
-    std::fstream file {path + fname, std::ios::out};
-    for(int i = 0; i < mat.extent(0); i++) {
-        for(int j = 0; j < mat.extent(1); j++) {
-            file << mat(i,j);
-            if(j < mat.extent(1)-1) file << ",";
-        }
-        file <<"\n";
-    }
-}
-
 template<>
 std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportMap(std::vector<MultiIndexSet> &mset0,
         KLObjective<Kokkos::HostSpace> &objective,
@@ -98,16 +82,18 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         // Calculate the gradient of the map with expanded margins
         StridedVector<double, Kokkos::HostSpace> gradCoeff = objective.TrainCoeffGrad(mapTmp);
         int coeffIdx = 0;
-        for(int output=0; output<outputDim; output++){
-            int rmIdx = 0;
-            for(int i = 0; i < mset_tmp[output].Size(); i++) {
-                std::cerr << "gradCoeff(" << coeffIdx << ")=" << gradCoeff(coeffIdx) << ", midx=[" << mset_tmp[output][i] << "]";
-                if(i == multis_rm[output][rmIdx]) {
-                    std::cerr << " rm!";
-                    rmIdx++;
+        if(options.verbose > 1) {
+            for(int output=0; output<outputDim; output++){
+                int rmIdx = 0;
+                for(int i = 0; i < mset_tmp[output].Size(); i++) {
+                    std::cerr << "gradCoeff(" << coeffIdx << ")=" << gradCoeff(coeffIdx) << ", midx=[" << mset_tmp[output][i] << "]";
+                    if(i == multis_rm[output][rmIdx]) {
+                        std::cerr << " rm!";
+                        rmIdx++;
+                    }
+                    std::cerr << std::endl;
+                    coeffIdx++;
                 }
-                std::cerr << std::endl;
-                coeffIdx++;
             }
         }
 
@@ -131,13 +117,12 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
             }
             blockStart += mset_tmp[output].Size();
         }
-        std::cerr << "blockStart = " << blockStart << ", mapTmp->numCoeffs = " << mapTmp->numCoeffs << std::endl;
         // Add the multiindex with largest gradient to the map
-        std::cerr << "Before: mset0[" << maxIdxBlock << "].Size() = " << mset0[maxIdxBlock].Size() << ", mset_sizes[" << maxIdxBlock << "] = " << mset_sizes[maxIdxBlock] << "\n";
         mset0[maxIdxBlock] += mset_tmp[maxIdxBlock][maxIdx];
-        std::cerr << "After: mset0[" << maxIdxBlock << "].Size() = " << mset0[maxIdxBlock].Size() << std::endl;
         MultiIndex addedMulti = mset_tmp[maxIdxBlock][maxIdx];
-        std::cerr << "Added Gradient: " << signMaxVal << ", added multi = [" << addedMulti.String() << "]" <<std::endl;
+        if(options.verbose) {
+            std::cerr << "Added multi = [" << addedMulti.String() << "]" <<std::endl;
+        }
         currSz++;
         if(mset0[maxIdxBlock].Size() != mset_sizes[maxIdxBlock]+1) {
             std::cerr << mset_tmp[maxIdxBlock][maxIdx] << "\n";
@@ -164,7 +149,6 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         // DEBUG
         auto train = objective.GetTrain();
         auto evalSamples = map->Evaluate(train);
-        SaveMatrix("sz" + std::to_string(currSz) + "map.csv", evalSamples);
         if(test_error < bestError) {
             bestError = test_error;
             for(int i = 0; i < outputDim; i++) {
@@ -199,7 +183,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
     double test_error = objective.TestError(map);
 
     if(options.verbose) {
-        std::cout << "Training error: " << train_error << ", Testing error: " << test_error << "\n";
+        std::cout << "\nFinal training error: " << train_error << ", final testing error: " << test_error << "\n";
         std::cout << "Visualization of MultiIndexSets--\n";
         for(int i = 0; i < outputDim; i++) {
             std::cout << "mset " << i << ":\n";

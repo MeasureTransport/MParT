@@ -7,7 +7,7 @@ classdef TrainOptions
         opt_xtol_rel = 1e-3
         opt_maxeval = 30
         opt_maxtime = 100
-        verbose = false
+        verbose = 0
     end
 
     methods
