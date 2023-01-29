@@ -41,8 +41,8 @@ public:
    @param[in] limiter An optional additional limiter to attach to the set.  Only multiindices that satisfy this limiter will be included.
    @return MultiIndexSet An instance of the MultiIndexSet class containing all multiindices of order <= maxOrder AND satisfying the limiter.
   */
-  static MultiIndexSet CreateTotalOrder(unsigned int length, 
-                                        unsigned int maxOrder, 
+  static MultiIndexSet CreateTotalOrder(unsigned int length,
+                                        unsigned int maxOrder,
                                         LimiterType const& limiter = MultiIndexLimiter::None());
 
   /**
@@ -52,18 +52,18 @@ public:
    @param[in] limiter An optional additional limiter to attach to the set.  Only multiindices that satisfy this limiter will be included.
    @return MultiIndexSet An instance of the MultiIndexSet class containing all multiindices with components a_i <= maxDegree AND satisfying the limiter.
   */
-  static MultiIndexSet CreateTensorProduct(unsigned int length, 
-                                           unsigned int maxOrder, 
+  static MultiIndexSet CreateTensorProduct(unsigned int length,
+                                           unsigned int maxOrder,
                                            LimiterType const& limiter = MultiIndexLimiter::None());
 
 
   /**
    @brief Construct a new MultiIndexSet object with a specific length.
-   @details Constructs an empty MultiIndexSet to store multi-indices of a specified length.  Also allows 
-            a functor to be be passed in as an additional limiter on the admissible set.  If no functor is 
-            provided, it is possible to include any multi-index in \f$\mathbb{N}^D\f$.  
+   @details Constructs an empty MultiIndexSet to store multi-indices of a specified length.  Also allows
+            a functor to be be passed in as an additional limiter on the admissible set.  If no functor is
+            provided, it is possible to include any multi-index in \f$\mathbb{N}^D\f$.
 
-            For example, to construct a MultiIndexSet in 2 dimensions that only allows multi-indices with maximum 
+            For example, to construct a MultiIndexSet in 2 dimensions that only allows multi-indices with maximum
             degree less than 5, we could use a lambda function:
 @code{.cpp}
 unsigned int length =2;
@@ -85,9 +85,9 @@ MultiIndexSet set(length, limiter);
 
   /**
    @brief Converts this multiindex set into the fixed representation provided by the "FixedMultiIndexSet" class.
-   @details The FixedMultiIndexSet cannot easily be adapted, but stores the multiindices in a contiguous block of memory 
-            in a Kokkos::View that can be more amenable to fast computation.   This function creates an instance of the 
-            FixedMultiIndexSet from the current state of *this.   Note that memory is deep copied and any subsequent updates 
+   @details The FixedMultiIndexSet cannot easily be adapted, but stores the multiindices in a contiguous block of memory
+            in a Kokkos::View that can be more amenable to fast computation.   This function creates an instance of the
+            FixedMultiIndexSet from the current state of *this.   Note that memory is deep copied and any subsequent updates
             to this class will not result in updates to the FixedMultiIndexSet.
    @param[in] compress Should the fixed representation be in compressed format?
    @return An instance of the FixedMultiIndexSet class with a snapshot of the current state of this MultiIndexSet.
@@ -180,7 +180,7 @@ MultiIndexSet set(length, limiter);
             MultiIndex in rhs.
     */
   MultiIndexSet& operator+=(MultiIndex const& rhs);
-  
+
   friend MultiIndexSet operator+(MultiIndexSet lhs, const MultiIndex& rhs)
   {
     lhs += rhs;
@@ -190,6 +190,9 @@ MultiIndexSet set(length, limiter);
   /** Assignment operator.  Will throw a runtime_error exception if the rhs does not have the same size of *this. */
   MultiIndexSet& operator=(const MultiIndexSet& rhs);
 
+  /** Checks which MultiIndices exceed a given MultiIndex bound */
+  std::vector<bool> FilterBounded(const MultiIndex& bound) const;
+
   /** @brief Add all terms in rhs to this instance.
     @details This function adds all unique MultiIndices from the rhs into this MultiIndexSet.  In the event that a multiindex is active in one set, but not the other, the union will set that multiindex to be active.
     @param[in] rhs The MultiIndex set we want to add to this instance.
@@ -198,7 +201,7 @@ MultiIndexSet set(length, limiter);
   unsigned int Union(const MultiIndexSet &rhs);
 
   /**
-      Make the multi-index active. If the multiIndex is not admissable, an exception 
+      Make the multi-index active. If the multiIndex is not admissable, an exception
       will be thrown.  To be admissable (according to this function), the multiIndex
       must already exist as an inactive member of this set.  If that is not the case,
       use the AddActive function instead.
@@ -271,15 +274,15 @@ MultiIndexSet set(length, limiter);
   std::vector<unsigned int> Frontier() const;
 
 
-  /** Returns multiindices in the margin of the set.  The margin contains multiindices in the 
+  /** Returns multiindices in the margin of the set.  The margin contains multiindices in the
       limiting set that also have at least one active backward neighbor.
-      @return A std::vector containing the multiindices in the margin 
+      @return A std::vector containing the multiindices in the margin
   */
   std::vector<MultiIndex> Margin() const;
 
-  /** Returns multiindices in the reduced margin of the set.  A multiindex is in the reduced 
+  /** Returns multiindices in the reduced margin of the set.  A multiindex is in the reduced
       margin if it is in the limiting set and all of its backward neighbors are active.
-      @return A std::vector containing the multiindices in the reduced margin 
+      @return A std::vector containing the multiindices in the reduced margin
   */
   std::vector<MultiIndex> ReducedMargin() const;
 
@@ -296,7 +299,7 @@ MultiIndexSet set(length, limiter);
   */
   std::vector<unsigned int> BackwardNeighbors(unsigned int activeIndex) const;
 
-  /** Returns indices for backward neighbors of an active or inactive multiindex. 
+  /** Returns indices for backward neighbors of an active or inactive multiindex.
   @param[in] multiIndex The multiindex in question.
   @return A vector with linear indices for the backward neighbors of this multiindex.
   */
@@ -309,7 +312,7 @@ MultiIndexSet set(length, limiter);
   */
   bool IsAdmissible(MultiIndex const& multiIndex) const;
 
-  /** 
+  /**
   Check to see if any forward neighbors of a multiIndex are admissible but not active.
   @param[in] activeIndex The linear index of the multi-index in question.
   @return true if this multiindex has at least one admissible but inactive forward neighbor.
@@ -328,50 +331,50 @@ MultiIndexSet set(length, limiter);
   /** Visualizes a two-dimensional MultiIndexSet as ASCII art using "a" to denote active multiindices, "r" to denoted multiindices in the reduced margin (not active), and "m" to denoted multiindices in the margin (also not active).
       Note that the `MultiIndexSet::at` and `MultiIndexSet::IndexToMulti` only provide access to the active multiindices.  The inactive multiindices in the margin
       are typically only used for adaptation.
-      
-   The output for a total order limited set with max order 11 looks like 
-  @code 
-12 | r  
-11 | a  r  
-10 | a  a  r  
- 9 | a  a  a  r  
- 8 | a  a  a  a  r  
- 7 | a  a  a  a  a  r  
- 6 | a  a  a  a  a  a  r  
- 5 | a  a  a  a  a  a  a  r  
- 4 | a  a  a  a  a  a  a  a  r  
- 3 | a  a  a  a  a  a  a  a  a  r  
- 2 | a  a  a  a  a  a  a  a  a  a  r  
- 1 | a  a  a  a  a  a  a  a  a  a  a  r  
- 0 | a  a  a  a  a  a  a  a  a  a  a  a  r  
+
+   The output for a total order limited set with max order 11 looks like
+  @code
+12 | r
+11 | a  r
+10 | a  a  r
+ 9 | a  a  a  r
+ 8 | a  a  a  a  r
+ 7 | a  a  a  a  a  r
+ 6 | a  a  a  a  a  a  r
+ 5 | a  a  a  a  a  a  a  r
+ 4 | a  a  a  a  a  a  a  a  r
+ 3 | a  a  a  a  a  a  a  a  a  r
+ 2 | a  a  a  a  a  a  a  a  a  a  r
+ 1 | a  a  a  a  a  a  a  a  a  a  a  r
+ 0 | a  a  a  a  a  a  a  a  a  a  a  a  r
     ----------------------------------------
-     0  1  2  3  4  5  6  7  8  9  10 11 12 
-  @endcode 
+     0  1  2  3  4  5  6  7  8  9  10 11 12
+  @endcode
 
 Another example for an adaptively constructed set is
-  @code 
- 4 | r  
- 3 | a  m  
- 2 | a  r  
- 1 | a  a  r  m  
- 0 | a  a  a  a  r  
+  @code
+ 4 | r
+ 3 | a  m
+ 2 | a  r
+ 1 | a  a  r  m
+ 0 | a  a  a  a  r
     ----------------
-     0  1  2  3  4 
+     0  1  2  3  4
   @endcode
 
 The following is the same set as before, but with a multiindex limiter preventing expansion of mixed terms
-@code 
- 4 | r  
- 3 | a  
- 2 | a  
- 1 | a  a  
- 0 | a  a  a  a  r  
+@code
+ 4 | r
+ 3 | a
+ 2 | a
+ 1 | a  a
+ 0 | a  a  a  a  r
     ----------------
      0  1  2  3  4
 @endcode
 
-  @param[in,out] out The output stream where the visualization should be written.  Defaults to std::cout.  
-  */ 
+  @param[in,out] out The output stream where the visualization should be written.  Defaults to std::cout.
+  */
   void Visualize(std::ostream &out = std::cout) const;
 
 protected:
@@ -412,13 +415,13 @@ private:
 
   int AddMulti(MultiIndex const& newMulti);
 
-  static void RecursiveTotalOrderFill(unsigned int   maxOrder, 
+  static void RecursiveTotalOrderFill(unsigned int   maxOrder,
                                       MultiIndexSet &mset,
                                       unsigned int currDim,
                                       std::vector<unsigned int> &denseMulti,
                                       LimiterType const& limiter);
 
-  static void RecursiveTensorFill(unsigned int   maxOrder, 
+  static void RecursiveTensorFill(unsigned int   maxOrder,
                                       MultiIndexSet &mset,
                                       unsigned int currDim,
                                       std::vector<unsigned int> &denseMulti,

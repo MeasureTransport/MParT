@@ -3,6 +3,7 @@
 #include "MParT/Distributions/GaussianSamplerDensity.h"
 #include "MParT/MapObjective.h"
 #include "MParT/AdaptiveTransportMap.h"
+#include "MParT/MultiIndices/MultiIndex.h"
 
 using namespace mpart;
 using namespace Catch;
@@ -58,7 +59,7 @@ void ATM() {
     Kokkos::View<double**, Kokkos::HostSpace> targetSamps("targetSamps", 2, numPts);
     for(int i = 0; i < numPts; i++){
         targetSamps(0,i) = samples(0,i);
-        targetSamps(1,i) = samples(1,i) + samples(0,i) + samples(0,i)*samples(0,i);
+        targetSamps(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
     };
     NormalizeSamples(targetSamps);
     std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
@@ -70,6 +71,8 @@ void ATM() {
     opts.basisLB = -2.;
     opts.basisUB = 2.;
     opts.verbose = 1;
+    opts.maxDegrees = MultiIndex({25, 5});
+
     StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
     StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
     KLObjective<Kokkos::HostSpace> objective {trainSamps,testSamps,sampler};

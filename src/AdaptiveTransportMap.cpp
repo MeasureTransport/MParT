@@ -3,6 +3,43 @@
 
 using namespace mpart;
 
+void findMaxGrad(StridedVector<double, Kokkos::HostSpace> const &gradCoeff, std::vector<std::vector<unsigned int>> const &multis_rm,
+    std::vector<MultiIndexSet> const &msets, unsigned int &maxIdx, unsigned int &maxIdxBlock) {
+    unsigned int outputDim = multis_rm.size();
+    double maxVal = 0.;
+    unsigned int blockStart = 0;
+    for(int output = 0; output < outputDim; output++) {
+        for(int i = 0; i < multis_rm[output].size(); i++) {
+            unsigned int idx = multis_rm[output][i];
+            double gradVal = std::abs(gradCoeff(blockStart + idx));
+            if(gradVal > maxVal) {
+                maxVal = gradVal;
+                maxIdx = idx;
+                maxIdxBlock = output;
+            }
+        }
+        blockStart += msets[output].Size();
+    }
+}
+
+void maxDegreeRMFilter(std::vector<MultiIndexSet> const &msets, MultiIndex const &maxDegrees,
+    std::vector<std::vector<unsigned int>> &multis_rm) {
+    unsigned int outputDim = msets.size();
+    for(unsigned int j = 0; j < outputDim; j++) {
+        std::vector<unsigned int>& rm_j = multis_rm[j];
+        const MultiIndexSet& mset_j = msets[j];
+        std::vector<bool> bounded = mset_j.FilterBounded(maxDegrees);
+        for(std::vector<unsigned int>::iterator it = rm_j.begin(); it != rm_j.end();) {
+            if(bounded[*it]) {
+                it = rm_j.erase(it);
+            } else {
+                it++;
+            }
+        }
+    }
+}
+
+
 template<>
 std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportMap(std::vector<MultiIndexSet> &mset0,
         KLObjective<Kokkos::HostSpace> &objective,
@@ -62,11 +99,10 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
 
     // Ensure that the dimensional maximum degree vector is valid
     bool hasMaxDegrees = true;
-    if(options.maxDegrees.size() == 0) {
+    if(options.maxDegrees.Length() == 0) {
         hasMaxDegrees = false;
-    } else if(options.maxDegrees.size() != currMsetDim){
+    } else if(options.maxDegrees.Length() != currMsetDim){
         std::stringstream ss;
-        mset0.end()->Length();
         ss << "AdaptiveTransportMap: invalid options.maxDegrees for this vector of MultiIndexSet objects\n";
         ss << "Expected length either zero or " << currMsetDim << "\n";
         throw std::invalid_argument(ss.str());
@@ -140,26 +176,15 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
             }
         }
 
+        // Filter out the reduced margin elements that meet or exceed the maximum
+        if(hasMaxDegrees) {
+            maxDegreeRMFilter(mset_tmp, options.maxDegrees, multis_rm);
+        }
 
         // Find the largest gradient value, calculate which output and multiindex it corresponds to
-        unsigned int maxIdx = 0;
-        unsigned int maxIdxBlock = 0;
-        double maxVal = 0.;
-        double signMaxVal = 0;
-        unsigned int blockStart = 0;
-        for(int output = 0; output < outputDim; output++) {
-            for(int i = 0; i < multis_rm[output].size(); i++) {
-                unsigned int idx = multis_rm[output][i];
-                double gradVal = gradCoeff(blockStart + idx);
-                if(std::abs(gradVal) > maxVal) {
-                    signMaxVal = gradVal;
-                    maxVal = std::abs(gradVal);
-                    maxIdx = idx;
-                    maxIdxBlock = output;
-                }
-            }
-            blockStart += mset_tmp[output].Size();
-        }
+        unsigned int maxIdx, maxIdxBlock;
+        findMaxGrad(gradCoeff, multis_rm, mset_tmp, maxIdx, maxIdxBlock);
+
         // Add the multiindex with largest gradient to the map
         MultiIndex addedMulti = mset_tmp[maxIdxBlock][maxIdx];
         mset0[maxIdxBlock] += addedMulti;
@@ -168,10 +193,10 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         }
         currSz++;
         if(mset0[maxIdxBlock].Size() != mset_sizes[maxIdxBlock]+1) {
-            std::cerr << mset_tmp[maxIdxBlock][maxIdx] << "\n";
+            std::cerr << addedMulti << "\n";
             std::stringstream ss_err;
             ss_err << "AdaptiveTransportMap: Unexpected sizes of MultiIndexSets.\n";
-            ss_err << "mset0["<<maxIdxBlock<<"].Size() = " << mset0[maxIdxBlock].Size() << ", mset_sizes["<<maxIdxBlock<<"] = " << mset_sizes[maxIdxBlock];
+            ss_err << "mset0["<<maxIdxBlock<<"].Size() = " << mset0[maxIdxBlock].Size() << ", mset_sizes["<<maxIdxBlock<<"] = " << mset_sizes[maxIdxBlock]+1;
             throw std::runtime_error(ss_err.str());
         }
 

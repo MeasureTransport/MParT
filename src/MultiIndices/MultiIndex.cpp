@@ -212,6 +212,17 @@ bool MultiIndex::operator<=(const MultiIndex &b) const{
     return !(*this > b);
 }
 
+bool MultiIndex::AnyBounded(const MultiIndex &bound) const{
+  if(length > bound.length) {
+    throw std::invalid_argument("MultiIndex::AnyExceed: invalid length");
+  }
+  for(unsigned int i=0; i<length; ++i){
+    if(Get(i)>=bound.Get(i)){
+      return true;
+    }
+  }
+  return false;
+}
 
 std::string MultiIndex::String() const {
   std::string out;

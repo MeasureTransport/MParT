@@ -740,6 +740,14 @@ MultiIndexSet& MultiIndexSet::operator+=(const MultiIndexSet& rhs)
   return *this;
 }
 
+std::vector<bool> MultiIndexSet::FilterBounded(const MultiIndex& bound) const {
+  std::vector<bool> ret (active2global.size());
+  for(int i = 0; i < ret.size(); i++) {
+    ret[i] = allMultis[active2global[i]].AnyBounded(bound);
+  }
+  return ret;
+}
+
 unsigned int MultiIndexSet::Union(const MultiIndexSet& rhs)
 {
   int oldTerms = Size();
