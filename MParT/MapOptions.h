@@ -9,7 +9,8 @@ namespace mpart{
     {
         ProbabilistHermite,
         PhysicistHermite,
-        HermiteFunctions
+        HermiteFunctions,
+        RickerWavelet
     };
 
     enum class PosFuncTypes

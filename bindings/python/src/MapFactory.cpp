@@ -22,6 +22,9 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
 
     // CreateSingleEntryMap
     m.def(isDevice? "dCreateSingleEntryMap" : "CreateSingleEntryMap", &MapFactory::CreateSingleEntryMap<MemorySpace>);
+
+    // CreateExpansion
+    m.def(isDevice? "dCreateExpansion" : "CreateExpansion", &MapFactory::CreateExpansion<MemorySpace>);
 }
 template void mpart::binding::MapFactoryWrapper<Kokkos::HostSpace>(py::module&);
 #if defined(MPART_ENABLE_GPU)

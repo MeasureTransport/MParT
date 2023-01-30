@@ -11,6 +11,7 @@ void mpart::binding::MapOptionsWrapper(jlcxx::Module &mod) {
     mod.set_const("__ProbabilistHermite", BasisTypes::ProbabilistHermite);
     mod.set_const("__PhysicistHermite", BasisTypes::PhysicistHermite);
     mod.set_const("__HermiteFunctions", BasisTypes::HermiteFunctions);
+    mod.set_const("__RickerWavelet", BasisTypes::RickerWavelet);
 
     // PosFuncTypes
     mod.add_bits<PosFuncTypes>("__PosFuncTypes", jlcxx::julia_type("CppEnum"));

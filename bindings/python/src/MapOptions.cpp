@@ -21,7 +21,9 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     py::enum_<BasisTypes>(m, "BasisTypes")
     .value("ProbabilistHermite",BasisTypes::ProbabilistHermite)
     .value("PhysicistHermite",BasisTypes::PhysicistHermite)
-    .value("HermiteFunctions",BasisTypes::HermiteFunctions);
+    .value("HermiteFunctions",BasisTypes::HermiteFunctions)
+    .value("RickerWavelet",BasisTypes::RickerWavelet)
+    ;
 
     // PosFuncTypes
     py::enum_<PosFuncTypes>(m, "PosFuncTypes")

@@ -7,6 +7,7 @@
 #include "MParT/IdentityMap.h"
 #include "MParT/Quadrature.h"
 #include "MParT/OrthogonalPolynomial.h"
+#include "MParT/Wavelet.h"
 #include "MParT/HermiteFunction.h"
 #include "MParT/MultivariateExpansionWorker.h"
 #include "MParT/PositiveBijectors.h"
@@ -120,7 +121,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriang
 
 
 template<typename MemorySpace>
-std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::CreateExpansion(unsigned int outputDim,
+std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory:: CreateExpansion(unsigned int outputDim,
                                                                                            FixedMultiIndexSet<MemorySpace> const& mset,
                                                                                            MapOptions                                   opts)
 {
@@ -153,6 +154,12 @@ std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::Creat
             LinearizedBasis<HermiteFunction> basis1d(opts.basisLB, opts.basisUB);
             output = std::make_shared<MultivariateExpansion<decltype(basis1d), MemorySpace>>(outputDim, mset, basis1d);
         }
+    }else if(opts.basisType==BasisTypes::RickerWavelet){
+        if(isinf(opts.basisLB) || isinf(opts.basisUB)){
+            throw std::runtime_error("RickerWavelet basis requires finite domain bounds");
+        }
+        RickerWavelet basis1d(opts.basisLB, opts.basisUB);
+        output = std::make_shared<MultivariateExpansion<RickerWavelet, MemorySpace>>(outputDim, mset, basis1d);
     }
 
     if(output){
