@@ -15,7 +15,7 @@ namespace mpart {
  *
  */
 struct TrainOptions {
-    std::string opt_alg = "LD_LBFGS";
+    std::string opt_alg = "LD_SLSQP";
     double opt_stopval = -std::numeric_limits<double>::infinity();
     double opt_ftol_rel = 1e-3;
     double opt_ftol_abs = 1e-3;

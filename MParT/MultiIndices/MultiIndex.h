@@ -168,7 +168,7 @@ public:
     bool operator<=(const MultiIndex &b) const;
 
     /**
-     * @brief Similar to operator>=, but bound must be the same length. Further, it only
+     * @brief Similar to operator>=, but bound must same length or longer. Further, it only
      * returns false if every value in this is less than every value in bound.
      *
      * @param bound bound for this multiindex

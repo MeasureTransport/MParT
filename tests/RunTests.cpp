@@ -2,12 +2,8 @@
 
 #include "MParT/Initialization.h"
 
-// void TestNLL();
-void ATM();
-
 int main( int argc, char* argv[] ) {
   mpart::Initialize(argc,argv);
-  ATM();
 
   Catch::Session session; // There must be exactly one instance
 

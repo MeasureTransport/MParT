@@ -9,19 +9,7 @@ using namespace mpart;
 using namespace Catch;
 
 #include "MParT/Utilities/LinearAlgebra.h"
-#include <fstream>
-
-void SaveMatrix(std::string fname, StridedMatrix<double, Kokkos::HostSpace> mat, std::string path="/home/dannys4/misc/mpart_atm/") {
-    path = path + fname;
-    std::ofstream file {path, std::ios::out};
-    for(int i = 0; i < mat.extent(0); i++) {
-        for(int j = 0; j < mat.extent(1); j++) {
-            file << mat(i,j);
-            if(j < mat.extent(1) - 1) file << ",";
-        }
-        file << "\n";
-    }
-}
+#include "Distributions/Test_Distributions_Common.h"
 
 void NormalizeSamples(StridedMatrix<double, Kokkos::HostSpace> mat) {
     using MemorySpace = Kokkos::HostSpace;
@@ -47,66 +35,109 @@ void NormalizeSamples(StridedMatrix<double, Kokkos::HostSpace> mat) {
     Kokkos::fence("Normalize data");
 }
 
-void ATM() {
-    unsigned int seed = 13982;
+TEST_CASE("Adaptive Transport Map","[ATM]") {
     unsigned int dim = 2;
+    unsigned int seed = 13982;
     unsigned int numPts = 20000;
     unsigned int testPts = numPts / 5;
-    unsigned int totalOrder = 1;
-    auto sampler = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(2);
-    sampler->SetSeed(seed);
-    auto samples = sampler->Sample(numPts);
-    Kokkos::View<double**, Kokkos::HostSpace> targetSamps("targetSamps", 2, numPts);
-    for(int i = 0; i < numPts; i++){
-        targetSamps(0,i) = samples(0,i);
-        targetSamps(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
-    };
-    NormalizeSamples(targetSamps);
-    std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
-    ATMOptions opts;
-    opts.opt_alg = "LD_SLSQP";
-    opts.basisType = BasisTypes::ProbabilistHermite;
-    opts.maxSize = 10;
-    opts.maxPatience = 10;
-    opts.basisLB = -2.;
-    opts.basisUB = 2.;
-    opts.verbose = 1;
-    opts.maxDegrees = MultiIndex({25, 5});
 
-    StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
-    StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
-    KLObjective<Kokkos::HostSpace> objective {trainSamps,testSamps,sampler};
-    auto atm = AdaptiveTransportMap<Kokkos::HostSpace>(mset0, objective, opts);
-    Kokkos::View<double**, Kokkos::HostSpace> null_prefix ("Null prefix", 0, numPts);
-    auto forward_samps = atm->Evaluate(targetSamps);
-    auto inv_samps = atm->Inverse(null_prefix, targetSamps);
+    auto g_sampler = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(dim);
+    g_sampler->SetSeed(seed);
+    StridedMatrix<double,Kokkos::HostSpace> samples = g_sampler->Sample(numPts);
+    SECTION("ModifiedBanana") {
+        Kokkos::View<double**, Kokkos::HostSpace> targetSamples("targetSamples", 2, numPts);
+        Kokkos::parallel_for("Intializing targetSamples", numPts, KOKKOS_LAMBDA(const unsigned int i){
+            targetSamples(0,i) = samples(0,i);
+            targetSamples(1,i) = samples(1,i) + samples(0,i) + samples(0,i)*samples(0,i);
+        });
+        NormalizeSamples(targetSamples);
+
+        StridedMatrix<double, Kokkos::HostSpace> testSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
+        StridedMatrix<double, Kokkos::HostSpace> trainSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
+        KLObjective<Kokkos::HostSpace> objective {trainSamples,testSamples,g_sampler};
+
+        std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
+        MultiIndexSet correctMset1 = MultiIndexSet::CreateTotalOrder(1,1);
+        MultiIndexSet correctMset2 = MultiIndexSet::CreateTotalOrder(2,1) + MultiIndex{2,0};
+
+        ATMOptions opts;
+        opts.maxSize = 8; // Algorithm must add 4 correct terms in 6 iterations
+        opts.basisLB = -3.;
+        opts.basisUB = 3.;
+
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = AdaptiveTransportMap<Kokkos::HostSpace>(mset0, objective, opts);
+        MultiIndexSet finalMset1 = mset0[0];
+        MultiIndexSet finalMset2 = mset0[1];
+        CHECK((finalMset1 + correctMset1).Size() == finalMset1.Size());
+        CHECK((finalMset2 + correctMset2).Size() == finalMset2.Size());
+        StridedMatrix<double, Kokkos::HostSpace> pullback_test = atm->Evaluate(testSamples);
+        TestStandardNormalSamples(pullback_test);
+    }
+    SECTION("GaussianMixture") {
+        double mean_1=-2,std_1=std::sqrt(0.5);
+        double mean_2= 2,std_2=std::sqrt(  2);
+        double prob_1 = 0.5;
+        auto u_sampler = std::make_shared<UniformSampler<Kokkos::HostSpace>>(1,1.);
+        StridedMatrix<double,Kokkos::HostSpace> u_samples = u_sampler->Sample(numPts);
+        StridedMatrix<double,Kokkos::HostSpace> targetSamples = Kokkos::View<double**,Kokkos::HostSpace>("targetSamples",2,numPts);
+        Kokkos::parallel_for("Create Gaussian mixture", numPts, KOKKOS_LAMBDA(const unsigned int i){
+            bool pick_1 = u_samples(0,i) < prob_1;
+            double scale = pick_1 ? std_1 : std_2;
+            double shift = pick_1 ? mean_1 : mean_2;
+            for(int j = 0; j < dim; j++) {
+                targetSamples(j,i) = samples(j,i)*scale;
+                samples(j,i) += shift;
+            }
+        });
+        NormalizeSamples(targetSamples);
+        StridedMatrix<double, Kokkos::HostSpace> testSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
+        StridedMatrix<double, Kokkos::HostSpace> trainSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
+        KLObjective<Kokkos::HostSpace> objective {trainSamples,testSamples,g_sampler};
+
+        ATMOptions opts;
+        opts.maxSize = 5;
+        opts.basisLB = -3.;
+        opts.basisUB = 3.;
+
+        std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = AdaptiveTransportMap<Kokkos::HostSpace>(mset0, objective, opts);
+        StridedMatrix<double, Kokkos::HostSpace> pullback_test = atm->Evaluate(testSamples);
+        TestStandardNormalSamples(pullback_test);
+    }
+    SECTION("TraditionalBanana") {
+        Kokkos::View<double**, Kokkos::HostSpace> targetSamples("targetSamples", 2, numPts);
+        Kokkos::parallel_for("Intializing targetSamples", numPts, KOKKOS_LAMBDA(const unsigned int i){
+            targetSamples(0,i) = samples(0,i);
+            targetSamples(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
+        });
+        NormalizeSamples(targetSamples);
+
+        StridedMatrix<double, Kokkos::HostSpace> testSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
+        StridedMatrix<double, Kokkos::HostSpace> trainSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
+        KLObjective<Kokkos::HostSpace> objective {trainSamples,testSamples,g_sampler};
+
+        std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
+        MultiIndexSet correctMset1 = MultiIndexSet::CreateTotalOrder(1,1);
+        MultiIndexSet correctMset2 = (MultiIndexSet::CreateTotalOrder(2,0) + MultiIndex{0,1}) + MultiIndex{2,0};
+
+        ATMOptions opts;
+        opts.maxSize = 15; // Algorithm must add 3 correct terms in 6 iterations
+        opts.basisLB = -3.;
+        opts.basisUB = 3.;
+        opts.maxDegrees = MultiIndex{1000,4}; // Limit the second input to have cubic complexity or less
+
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = AdaptiveTransportMap<Kokkos::HostSpace>(mset0, objective, opts);
+        MultiIndexSet finalMset1 = mset0[0];
+        MultiIndexSet finalMset2 = mset0[1];
+        CHECK((finalMset1 + correctMset1).Size() == finalMset1.Size());
+        CHECK((finalMset2 + correctMset2).Size() == finalMset2.Size());
+        std::vector<bool> bounded1 = finalMset1.FilterBounded(opts.maxDegrees);
+        std::vector<bool> bounded2 = finalMset2.FilterBounded(opts.maxDegrees);
+        bool checkBound = false;
+        for(auto b1 : bounded1) checkBound |= b1;
+        for(auto b2 : bounded2) checkBound |= b2;
+        CHECK(!checkBound);
+        StridedMatrix<double, Kokkos::HostSpace> pullback_test = atm->Evaluate(testSamples);
+        TestStandardNormalSamples(pullback_test);
+    }
 }
-
-/*void TestNLL() {
-    unsigned int dim = 2;
-    unsigned int numPts = 3;
-    Kokkos::View<double**, Kokkos::HostSpace> x("x", dim, numPts);
-    for(int i = 0; i < dim; i++) {
-        for(int j = 0; j < numPts; j++) {
-            x(i,j) = dim*j + i + 1;
-        }
-    }
-
-    ATMOptions opts;
-    opts.basisType = BasisTypes::ProbabilistHermite;
-    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, 1);
-    auto comp = MapFactory::CreateComponent(mset.Fix(true), opts);
-    Kokkos::View<double*, Kokkos::HostSpace> coeffs("coeffs", comp->numCoeffs);
-    Kokkos::parallel_for("init coeffs", comp->numCoeffs, KOKKOS_LAMBDA(const unsigned int i) {
-        coeffs(i) = 1;
-    });
-    StridedMatrix<double, Kokkos::HostSpace> xStrided = x;
-    ATMObjective obj {xStrided, xStrided, comp, opts};
-    std::vector<double> grad(comp->numCoeffs);
-    double nll = obj(comp->numCoeffs, coeffs.data(), grad.data());
-    std::cout << "nll = " << nll << "\n";
-    for(int i = 0; i < comp->numCoeffs; i++) {
-        std::cout << "grad[ " << i << "] = " << grad[i] << "\n";
-    }
-    std::cout << std::endl;
-}*/
