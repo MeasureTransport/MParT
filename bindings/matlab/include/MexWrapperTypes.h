@@ -11,7 +11,6 @@
 
 
 using namespace mpart;
-using namespace mpart::binding;
 using namespace mexplus;
 using MemorySpace = Kokkos::HostSpace;
 
@@ -73,7 +72,7 @@ public:
     std::shared_ptr<MapObjective<MemorySpace>> obj_ptr;
 
     MapObjectiveMex(std::shared_ptr<MapObjective<MemorySpace>> init_ptr): obj_ptr(init_ptr) {};
-}
+};
 
 // Instance manager for ConditionalMap.
 template class mexplus::Session<ConditionalMapMex>;

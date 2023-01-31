@@ -12,7 +12,6 @@
 #include "MexOptionsConversions.h"
 
 using namespace mpart;
-using namespace mpart::binding;
 using namespace mexplus;
 using MemorySpace = Kokkos::HostSpace;
 
@@ -173,14 +172,15 @@ MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
     OutputArguments output(nlhs, plhs, 0);
     ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
     std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
-    KLObjective<MemorySpace>& obj = *Session<KLObjective<MemorySpace>>::get(input.get(1));
+    MapObjectiveMex *obj = Session<MapObjectiveMex>::get(input.get(1));
+    std::shared_ptr<MapObjective<MemorySpace>> obj_ptr = obj->obj->ptr;
 
     TrainOptions opts {input.get<std::string>(2),input.get<double>(3),
                       input.get<double>(4), input.get<double>(5),
                       input.get<double>(6), input.get<double>(7),
                       input.get<int>(8), input.get<double>(9), input.get<bool>(10)};
 
-    TrainMap<KLObjective<MemorySpace>>(condMap_ptr, obj, opts);
+    TrainMap<MemorySpace>(condMap_ptr, obj_ptr, opts);
   }
 
 // Defines MEX API for delete.
