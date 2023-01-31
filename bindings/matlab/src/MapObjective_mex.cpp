@@ -11,31 +11,35 @@ using namespace mexplus;
 using MemorySpace = Kokkos::HostSpace;
 
 // Instance manager for KL objective.
-template class mexplus::Session<KLObjective<Kokkos::HostSpace>>;
+template class mexplus::Session<MapObjective<Kokkos::HostSpace>>;
+class MapObjectiveMex {       // The class
+public:
+    std::shared_ptr<MapObjective<MemorySpace>> obj_ptr;
 
+    MapObjectiveMex(std::shared_ptr<MapObjective<MemorySpace>> init_ptr): obj_ptr(init_ptr) {};
+}
 namespace {
     // Defines MEX API for new.
     MEX_DEFINE(GaussianKLObjective_newTrain) (int nlhs, mxArray* plhs[],
                                               int nrhs, const mxArray* prhs[]) {
-  
+
         InputArguments input(nrhs, prhs, 1);
         OutputArguments output(nlhs, plhs, 1);
         auto train = MexToKokkos2d(prhs[0]);
-        unsigned int dim = train.extent(0);
-        std::shared_ptr<mpart::GaussianSamplerDensity<MemorySpace>> density = std::make_shared<mpart::GaussianSamplerDensity<MemorySpace>>(dim);
-        output.set(0, Session<KLObjective<MemorySpace>>::create(new KLObjective<MemorySpace>(train, density)));
+        auto objective = ObjectiveFactory::CreateGaussianKLObjective(train);
+        output.set(0, Session<KLObjective<MemorySpace>>::create(new MapObjectiveMex(objective)));
     }
+
     // Defines MEX API for new.
     MEX_DEFINE(GaussianKLObjective_newTrainTest) (int nlhs, mxArray* plhs[],
                                               int nrhs, const mxArray* prhs[]) {
-  
+
         InputArguments input(nrhs, prhs, 2);
         OutputArguments output(nlhs, plhs, 1);
         auto train = MexToKokkos2d(prhs[0]);
         auto test = MexToKokkos2d(prhs[1]);
-        unsigned int dim = train.extent(0);
-        std::shared_ptr<mpart::GaussianSamplerDensity<MemorySpace>> density = std::make_shared<mpart::GaussianSamplerDensity<MemorySpace>>(dim);
-        output.set(0, Session<KLObjective<MemorySpace>>::create(new KLObjective<MemorySpace>(train, test, density)));
+        auto objective = ObjectiveFactory::CreateGaussianKLObjective(train, test);
+        output.set(0, Session<KLObjective<MemorySpace>>::create(new MapObjectiveMex(objective));
     }
 
     // Defines MEX API for delete.

@@ -204,31 +204,31 @@ MEX_DEFINE(GaussianKLObjective_TestError) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
-  const KLObjective<MemorySpace>& obj = Session<KLObjective<MemorySpace>>::getConst(input.get(0));
+  const MapObjectiveMex& obj = Session<MapObjective<MemorySpace>>::getConst(input.get(0));
   ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(1));
   std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
-  output.set(0, obj.TestError(condMap_ptr));
+  output.set(0, obj.obj_ptr->TestError(condMap_ptr));
 }
 
 MEX_DEFINE(GaussianKLObjective_TrainCoeffGrad) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 3);
   
-  const KLObjective<MemorySpace>& obj = Session<KLObjective<MemorySpace>>::getConst(input.get(0));
+  const MapObjectiveMex& obj = Session<MapObjective<MemorySpace>>::getConst(input.get(0));
   ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(1));
   std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
   StridedVector<double, Kokkos::HostSpace> out = MexToKokkos1d(prhs[2]);
-  obj.TrainCoeffGradImpl(condMap_ptr, out);
+  obj.obj_ptr->TrainCoeffGradImpl(condMap_ptr, out);
 }
 
 MEX_DEFINE(GaussianKLObjective_TrainError) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
-  const KLObjective<MemorySpace>& obj = Session<KLObjective<MemorySpace>>::getConst(input.get(0));
+  const MapObjectiveMex& obj = Session<MapObjective<MemorySpace>>::getConst(input.get(0));
   ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(1));
   std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
-  output.set(0, obj.TrainError(condMap_ptr));
+  output.set(0, obj.obj_ptr->TrainError(condMap_ptr));
 }
 
 MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
