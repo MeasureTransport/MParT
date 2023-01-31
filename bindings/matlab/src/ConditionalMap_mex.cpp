@@ -96,7 +96,7 @@ MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
   unsigned int outputDim = input.get<unsigned int>(1);
   unsigned int totalOrder = input.get<unsigned int>(2);
 
-  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(3),input.get<std::string>(4),
+  MapOptions opts = binding::MapOptionsFromMatlab(input.get<std::string>(3),input.get<std::string>(4),
                                          input.get<std::string>(5),input.get<double>(6),
                                          input.get<double>(7),input.get<unsigned int>(8),
                                          input.get<unsigned int>(9),input.get<unsigned int>(10),
@@ -111,7 +111,7 @@ MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
   InputArguments input(nrhs, prhs, 13);
   OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
-  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
+  MapOptions opts = binding::MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
                                          input.get<std::string>(3),input.get<double>(4),
                                          input.get<double>(5),input.get<unsigned int>(6),
                                          input.get<unsigned int>(7),input.get<unsigned int>(8),
@@ -126,7 +126,7 @@ MEX_DEFINE(ConditionalMap_newMapFixed) (int nlhs, mxArray* plhs[],
   InputArguments input(nrhs, prhs, 13);
   OutputArguments output(nlhs, plhs, 1);
   const FixedMultiIndexSet<MemorySpace>& mset = Session<FixedMultiIndexSet<MemorySpace>>::getConst(input.get(0));
-  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
+  MapOptions opts = binding::MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
                                          input.get<std::string>(3),input.get<double>(4),
                                          input.get<double>(5),input.get<unsigned int>(6),
                                          input.get<unsigned int>(7),input.get<unsigned int>(8),
