@@ -35,6 +35,11 @@ StridedVector<double, MemorySpace> MapObjective<MemorySpace>::TrainCoeffGrad(std
     return grad;
 }
 
+template<typename MemorySpace>
+std::shared_ptr<KLObjective<MemorySpace>> GaussianKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test) {
+    std::shared_ptr<GaussianSamplerDensity<MemorySpace>> density = std::make_shared<GaussianSamplerDensity<MemorySpace>>(train.extent(0));
+    return std::make_shared<KLObjective<MemorySpace>>(train, test, density);
+}
 
 template<typename MemorySpace>
 double KLObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {
