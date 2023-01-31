@@ -1,7 +1,10 @@
-#include "MParT/MultiIndices/FixedMultiIndexSet.h"
-#include "MParT/MapObjective.h"
 #include "MParT/Utilities/ArrayConversions.h"
+#include "MParT/MultiIndices/FixedMultiIndexSet.h"
+#include "MParT/MapOptions.h"
+#include "MParT/MapFactory.h"
 #include "MParT/Distributions/GaussianSamplerDensity.h"
+#include "MParT/MapObjective.h"
+#include "MParT/TrainMap.h"
 
 #include "MexWrapperTypes.h"
 #include "MexArrayConversions.h"
@@ -18,8 +21,8 @@ namespace {
 
         InputArguments input(nrhs, prhs, 1);
         OutputArguments output(nlhs, plhs, 1);
-        auto train = MexToKokkos2d(prhs[0]);
-        auto objective = ObjectiveFactory::CreateGaussianKLObjective(train);
+        StridedMatrix<const double, MemorySpace> train = MexToKokkos2d(prhs[0]);
+        std::shared_ptr<MapObjective<MemorySpace>> objective = ObjectiveFactory::CreateGaussianKLObjective(train);
         output.set(0, Session<MapObjectiveMex>::create(new MapObjectiveMex(objective)));
     }
 
@@ -29,9 +32,9 @@ namespace {
 
         InputArguments input(nrhs, prhs, 2);
         OutputArguments output(nlhs, plhs, 1);
-        auto train = MexToKokkos2d(prhs[0]);
-        auto test = MexToKokkos2d(prhs[1]);
-        auto objective = ObjectiveFactory::CreateGaussianKLObjective(train, test);
+        StridedMatrix<const double, MemorySpace> train = MexToKokkos2d(prhs[0]);
+        StridedMatrix<const double, MemorySpace> test = MexToKokkos2d(prhs[1]);
+        std::shared_ptr<MapObjective<MemorySpace>> objective = ObjectiveFactory::CreateGaussianKLObjective(train, test);
         output.set(0, Session<MapObjectiveMex>::create(new MapObjectiveMex(objective));
     }
 
