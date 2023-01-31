@@ -39,8 +39,8 @@ struct TrainOptions {
     }
 };
 
-template<typename ObjectiveType>
-double TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options);
+template<typename MemorySpace>
+double TrainMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<MapObjective<MemorySpace>> objective, TrainOptions options);
 
 } // namespace mpart
 

@@ -20,9 +20,9 @@ struct ATMOptions: public MapOptions, public TrainOptions {
     MultiIndex maxDegrees;
 };
 
-template<typename MemorySpace,typename ObjectiveType>
+template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> AdaptiveTransportMap(std::vector<MultiIndexSet> &mset0,
-    ObjectiveType &objective,
+    std::shared_ptr<MapObjective<MemorySpace>> objective,
     ATMOptions options);
 
 // template<typename MemorySpace>

@@ -17,5 +17,5 @@ void mpart::binding::TrainMapWrapper(jlcxx::Module &mod) {
     mod.unset_override_module();
 
     // TrainMap
-    mod.method("TrainMap", &mpart::TrainMap<KLObjective<Kokkos::HostSpace>>);
+    mod.method("TrainMap", &mpart::TrainMap<Kokkos::HostSpace>);
 }

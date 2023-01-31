@@ -52,9 +52,9 @@ TEST_CASE("Adaptive Transport Map","[ATM]") {
         });
         NormalizeSamples(targetSamples);
 
-        StridedMatrix<double, Kokkos::HostSpace> testSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
-        StridedMatrix<double, Kokkos::HostSpace> trainSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
-        KLObjective<Kokkos::HostSpace> objective {trainSamples,testSamples,g_sampler};
+        StridedMatrix<const double, Kokkos::HostSpace> testSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
+        StridedMatrix<const double, Kokkos::HostSpace> trainSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
+        auto objective = ObjectiveFactory::CreateGaussianKLObjective(trainSamples,testSamples);
 
         std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
         MultiIndexSet correctMset1 = MultiIndexSet::CreateTotalOrder(1,1);
@@ -90,9 +90,9 @@ TEST_CASE("Adaptive Transport Map","[ATM]") {
             }
         });
         NormalizeSamples(targetSamples);
-        StridedMatrix<double, Kokkos::HostSpace> testSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
-        StridedMatrix<double, Kokkos::HostSpace> trainSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
-        KLObjective<Kokkos::HostSpace> objective {trainSamples,testSamples,g_sampler};
+        StridedMatrix<const double, Kokkos::HostSpace> testSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
+        StridedMatrix<const double, Kokkos::HostSpace> trainSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
+        auto objective = ObjectiveFactory::CreateGaussianKLObjective(trainSamples,testSamples);
 
         ATMOptions opts;
         opts.maxSize = 5;
@@ -112,9 +112,9 @@ TEST_CASE("Adaptive Transport Map","[ATM]") {
         });
         NormalizeSamples(targetSamples);
 
-        StridedMatrix<double, Kokkos::HostSpace> testSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
-        StridedMatrix<double, Kokkos::HostSpace> trainSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
-        KLObjective<Kokkos::HostSpace> objective {trainSamples,testSamples,g_sampler};
+        StridedMatrix<const double, Kokkos::HostSpace> testSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
+        StridedMatrix<const double, Kokkos::HostSpace> trainSamples = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
+        auto objective = ObjectiveFactory::CreateGaussianKLObjective(trainSamples,testSamples);
 
         std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
         MultiIndexSet correctMset1 = MultiIndexSet::CreateTotalOrder(1,1);

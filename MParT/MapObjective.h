@@ -5,6 +5,7 @@
 #include "Distributions/PullbackDensity.h"
 #include "Utilities/ArrayConversions.h"
 #include "Utilities/LinearAlgebra.h"
+#include "Distributions/GaussianSamplerDensity.h"
 
 namespace mpart {
 template<typename MemorySpace>
@@ -49,6 +50,11 @@ class KLObjective: public MapObjective<MemorySpace> {
     private:
     std::shared_ptr<DensityBase<MemorySpace>> density_;
 };
+
+namespace ObjectiveFactory {
+template<typename MemorySpace>
+std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test);
+} // namespace ObjectiveFactory
 
 } // namespace mpart
 

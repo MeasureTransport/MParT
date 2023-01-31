@@ -56,8 +56,8 @@ nlopt::opt SetupOptimization(unsigned int dim, TrainOptions options) {
     return opt;
 }
 
-template<typename ObjectiveType>
-double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options) {
+template<>
+double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective, TrainOptions options) {
     if(map->Coeffs().extent(0) == 0) {
         std::cout << "TrainMap: Initializing map coeffs to 1." << std::endl;
         Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Default coeffs", map->numCoeffs);
@@ -70,7 +70,7 @@ double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> ma
 
     // Since objective is (rightfully) separate from the map, we use std::bind to create a functor
     // from objective::operator() that keeps the map argument held.
-    std::function<double(unsigned, const double*, double*)> functor = std::bind(objective, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, map);
+    std::function<double(unsigned, const double*, double*)> functor = std::bind(&MapObjective<Kokkos::HostSpace>::operator(), objective, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, map);
     opt.set_min_objective(functor_wrapper, reinterpret_cast<void*>(&functor));
 
     // Get the initial guess at the coefficients
@@ -99,7 +99,3 @@ double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> ma
     }
     return error;
 }
-
-// Explicitly instantiate the function for HostSpace-- it doesn't work for device, since NLopt is CPU-based.
-template double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, KLObjective<Kokkos::HostSpace> &objective, TrainOptions options);
-

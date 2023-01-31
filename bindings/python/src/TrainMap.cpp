@@ -42,9 +42,7 @@ void mpart::binding::TrainMapWrapper(py::module &m) {
     std::string tName = "TrainMap";
     if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName = "d" + tName;
 
-    m.def(tName.c_str(), [](std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<KLObjective<MemorySpace>> kl, TrainOptions opts){
-        TrainMap(map, *kl, opts);
-    })
+    m.def(tName.c_str(), &TrainMap<Kokkos::HostSpace>)
     ;
 }
 
