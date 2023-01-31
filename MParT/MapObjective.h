@@ -53,6 +53,9 @@ class KLObjective: public MapObjective<MemorySpace> {
 
 namespace ObjectiveFactory {
 template<typename MemorySpace>
+std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train);
+
+template<typename MemorySpace>
 std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test);
 } // namespace ObjectiveFactory
 

@@ -35,7 +35,7 @@ namespace {
         StridedMatrix<const double, MemorySpace> train = MexToKokkos2d(prhs[0]);
         StridedMatrix<const double, MemorySpace> test = MexToKokkos2d(prhs[1]);
         std::shared_ptr<MapObjective<MemorySpace>> objective = ObjectiveFactory::CreateGaussianKLObjective(train, test);
-        output.set(0, Session<MapObjectiveMex>::create(new MapObjectiveMex(objective));
+        output.set(0, Session<MapObjectiveMex>::create(new MapObjectiveMex(objective)));
     }
 
     // Defines MEX API for delete.
