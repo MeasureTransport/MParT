@@ -77,7 +77,7 @@ public:
 // Instance manager for ConditionalMap.
 template class mexplus::Session<ConditionalMapMex>;
 template class mexplus::Session<ParameterizedFunctionMex>;
-template class mexplus::Session<MapObjectiveMex>
+template class mexplus::Session<MapObjectiveMex>;
 
 
 #endif // MPART_MEXWRAPPERTYPES_H

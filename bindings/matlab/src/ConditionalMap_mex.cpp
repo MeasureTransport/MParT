@@ -173,7 +173,7 @@ MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
     ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
     std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
     MapObjectiveMex *obj = Session<MapObjectiveMex>::get(input.get(1));
-    std::shared_ptr<MapObjective<MemorySpace>> obj_ptr = obj->obj->ptr;
+    std::shared_ptr<MapObjective<MemorySpace>> obj_ptr = obj->obj_ptr;
 
     TrainOptions opts {input.get<std::string>(2),input.get<double>(3),
                       input.get<double>(4), input.get<double>(5),
