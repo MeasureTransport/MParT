@@ -27,7 +27,7 @@ namespace {
         OutputArguments output(nlhs, plhs, 1);
         auto train = MexToKokkos2d(prhs[0]);
         auto objective = ObjectiveFactory::CreateGaussianKLObjective(train);
-        output.set(0, Session<KLObjective<MemorySpace>>::create(new MapObjectiveMex(objective)));
+        output.set(0, Session<MapObjective<MemorySpace>>::create(new MapObjectiveMex(objective)));
     }
 
     // Defines MEX API for new.
@@ -39,15 +39,15 @@ namespace {
         auto train = MexToKokkos2d(prhs[0]);
         auto test = MexToKokkos2d(prhs[1]);
         auto objective = ObjectiveFactory::CreateGaussianKLObjective(train, test);
-        output.set(0, Session<KLObjective<MemorySpace>>::create(new MapObjectiveMex(objective));
+        output.set(0, Session<MapObjective<MemorySpace>>::create(new MapObjectiveMex(objective));
     }
 
     // Defines MEX API for delete.
-    MEX_DEFINE(GaussianKLObjective_delete) (int nlhs, mxArray* plhs[],
+    MEX_DEFINE(MapObjective_delete) (int nlhs, mxArray* plhs[],
                         int nrhs, const mxArray* prhs[]) {
     InputArguments input(nrhs, prhs, 1);
     OutputArguments output(nlhs, plhs, 0);
-    Session<KLObjective<MemorySpace>>::destroy(input.get(0));
+    Session<MapObjective<MemorySpace>>::destroy(input.get(0));
     }
 
 }
