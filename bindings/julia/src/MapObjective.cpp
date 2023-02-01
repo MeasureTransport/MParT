@@ -24,22 +24,23 @@ void mpart::binding::MapObjectiveWrapper(jlcxx::Module &mod) {
     ;
 
     mod.add_type<KLObjective<MemorySpace>>(tName,jlcxx::julia_base_type<MapObjective<MemorySpace>>());
-    mod.method(tName, [](jlcxx::ArrayRef<double,2> train) {
-        StridedMatrix<double, MemorySpace> trainView = JuliaToKokkos(train);
+    mod.method("Create"+tName, [](jlcxx::ArrayRef<double,2> train) {
+        StridedMatrix<const double, MemorySpace> trainView = JuliaToKokkos(train);
         Kokkos::View<double**,MemorySpace> storeTrain ("Training data", trainView.extent(0), trainView.extent(1));
         Kokkos::deep_copy(storeTrain, trainView);
-        std::shared_ptr<GaussianSamplerDensity<MemorySpace>> density = std::make_shared<GaussianSamplerDensity<MemorySpace>>(trainView.extent(0));
-        return std::make_shared<KLObjective<MemorySpace>>(storeTrain, density);
+        trainView = storeTrain;
+        return ObjectiveFactory::CreateGaussianKLObjective(trainView);
     });
-    mod.method(tName, [](jlcxx::ArrayRef<double,2> train, jlcxx::ArrayRef<double,2> test) {
-        StridedMatrix<double, MemorySpace> trainView = JuliaToKokkos(train);
-        StridedMatrix<double, MemorySpace> testView = JuliaToKokkos(test);
+    mod.method("Create"+tName, [](jlcxx::ArrayRef<double,2> train, jlcxx::ArrayRef<double,2> test) {
+        StridedMatrix<const double, MemorySpace> trainView = JuliaToKokkos(train);
+        StridedMatrix<const double, MemorySpace> testView = JuliaToKokkos(test);
         Kokkos::View<double**,MemorySpace> storeTrain ("Training data", trainView.extent(0), trainView.extent(1));
         Kokkos::View<double**,MemorySpace> storeTest ("Testing data", testView.extent(0), testView.extent(1));
         Kokkos::deep_copy(storeTrain, trainView);
         Kokkos::deep_copy(storeTest, testView);
-        std::shared_ptr<GaussianSamplerDensity<MemorySpace>> density = std::make_shared<GaussianSamplerDensity<MemorySpace>>(trainView.extent(0));
-        return std::make_shared<KLObjective<MemorySpace>>(storeTrain, storeTest, density);
+        trainView = storeTrain;
+        testView = storeTest;
+        return ObjectiveFactory::CreateGaussianKLObjective(trainView, testView);
     });
 }
 
