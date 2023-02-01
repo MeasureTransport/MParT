@@ -16,7 +16,8 @@ namespace jlcxx {
 
 void mpart::binding::MapObjectiveWrapper(jlcxx::Module &mod) {
     using MemorySpace = Kokkos::HostSpace;
-    std::string tName = "GaussianKLObjective";
+    std::string tName = "KLObjective";
+    std::string mName = "CreateGaussian"+tName;
 
     mod.add_type<MapObjective<MemorySpace>>("MapObjective")
         .method("TrainError", &MapObjective<MemorySpace>::TrainError)
@@ -24,14 +25,14 @@ void mpart::binding::MapObjectiveWrapper(jlcxx::Module &mod) {
     ;
 
     mod.add_type<KLObjective<MemorySpace>>(tName,jlcxx::julia_base_type<MapObjective<MemorySpace>>());
-    mod.method("Create"+tName, [](jlcxx::ArrayRef<double,2> train) {
+    mod.method(mName, [](jlcxx::ArrayRef<double,2> train) {
         StridedMatrix<const double, MemorySpace> trainView = JuliaToKokkos(train);
         Kokkos::View<double**,MemorySpace> storeTrain ("Training data", trainView.extent(0), trainView.extent(1));
         Kokkos::deep_copy(storeTrain, trainView);
         trainView = storeTrain;
         return ObjectiveFactory::CreateGaussianKLObjective(trainView);
     });
-    mod.method("Create"+tName, [](jlcxx::ArrayRef<double,2> train, jlcxx::ArrayRef<double,2> test) {
+    mod.method(mName, [](jlcxx::ArrayRef<double,2> train, jlcxx::ArrayRef<double,2> test) {
         StridedMatrix<const double, MemorySpace> trainView = JuliaToKokkos(train);
         StridedMatrix<const double, MemorySpace> testView = JuliaToKokkos(test);
         Kokkos::View<double**,MemorySpace> storeTrain ("Training data", trainView.extent(0), trainView.extent(1));
