@@ -24,12 +24,14 @@ void mpart::binding::AdaptiveTransportMapWrapper(jlcxx::Module &mod) {
         .method("__opt_xtol_abs!", [](ATMOptions &opts, double tol){opts.opt_xtol_abs = tol;})
         .method("__opt_maxeval!", [](ATMOptions &opts, int eval){opts.opt_maxeval = eval;})
         .method("__verbose!", [](ATMOptions &opts, int verbose){opts.verbose = verbose;})
+        .method("__maxPatience!", [](ATMOptions &opts, int maxPatience){opts.maxPatience = maxPatience;})
+        .method("__maxSize!", [](ATMOptions &opts, int maxSize){opts.maxSize = maxSize;})
+        .method("__maxDegrees!", [](ATMOptions &opts, MultiIndex &maxDegrees){opts.maxDegrees = maxDegrees;})
         .method("TrainOptions", [](ATMOptions &opts){ return static_cast<TrainOptions>(opts);})
     ;
 
 
-    mod.method("AdaptiveTransportMap", [](jlcxx::ArrayRef<MultiIndexSet> arr, std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective,
-    ATMOptions options) {
+    mod.method("AdaptiveTransportMap", [](jlcxx::ArrayRef<MultiIndexSet> arr, std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective, ATMOptions options) {
         std::vector<MultiIndexSet> vec (arr.begin(), arr.end());
         auto map = AdaptiveTransportMap(vec, objective, options);
         std::copy(vec.begin(), vec.end(), arr.begin());

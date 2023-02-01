@@ -14,8 +14,8 @@ namespace mpart {
 
 // Options specifically for ATM algorithm, with map eval opts -> training opts-> ATM specific opts
 struct ATMOptions: public MapOptions, public TrainOptions {
-    int maxPatience = 10;
-    int maxSize = 10;
+    unsigned int maxPatience = 10;
+    unsigned int maxSize = 10;
     MultiIndex maxDegrees;
     std::string String() override {
         std::string md_str = maxDegrees.String();
