@@ -24,7 +24,7 @@ struct TrainOptions {
     int opt_maxeval = 30;
     double opt_maxtime = 100.;
     int verbose = 0;
-    std::string String() {
+    virtual std::string String() {
         std::stringstream ss;
         ss << "opt_alg = " << opt_alg << "\n";
         ss << "opt_stopval = " << opt_stopval << "\n";

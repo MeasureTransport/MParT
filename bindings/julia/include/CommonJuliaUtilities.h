@@ -71,6 +71,8 @@ void MapFactoryWrapper(jlcxx::Module&);
  */
 void ComposedMapWrapper(jlcxx::Module &);
 
+#if defined(MPART_HAS_NLOPT)
+
 /**
  * @brief Adds MapObjective bindings to the existing module m.
  * @param mod CxxWrap.jl module
@@ -82,6 +84,14 @@ void MapObjectiveWrapper(jlcxx::Module &);
  * @param mod CxxWrap.jl module
  */
 void TrainMapWrapper(jlcxx::Module&);
+
+/**
+ * @brief Adds AdaptiveTransportMap and ATMOptions to the existing module m.
+ * @param mod CxxWrap.jl module
+*/
+void AdaptiveTransportMapWrapper(jlcxx::Module&);
+
+#endif // defined(MPART_HAS_NLOPT)
 
 #if defined(MPART_ENABLE_GPU)
 void ConditionalMapBaseDeviceWrapper(jlcxx::Module&);
