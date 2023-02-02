@@ -34,7 +34,7 @@ void mpart::binding::AdaptiveTransportMapWrapper(jlcxx::Module &mod) {
     mod.method("AdaptiveTransportMap", [](jlcxx::ArrayRef<MultiIndexSet> arr, std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective, ATMOptions options) {
         std::vector<MultiIndexSet> vec (arr.begin(), arr.end());
         auto map = AdaptiveTransportMap(vec, objective, options);
-        std::copy(vec.begin(), vec.end(), arr.begin());
+        for(int i = 0; i < vec.size(); i++) arr[i] = vec[i];
         return map;
     });
 }
