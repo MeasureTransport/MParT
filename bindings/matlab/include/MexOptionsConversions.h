@@ -19,7 +19,8 @@ namespace binding{
 
     void MapOptionsToMatlab(MapOptions opts, mexplus::OutputArguments &output, int start = 0);
 #if defined(MPART_HAS_NLOPT)
-    ATMOptions ATMOptionsFromMatlab(InputArguments input, unsigned int start);
+    TrainOptions TrainOptionsFromMatlab(InputArguments &input, unsigned int start);
+    ATMOptions ATMOptionsFromMatlab(InputArguments &input, unsigned int start);
     ATMOptions ATMOptionsFromMatlab(std::string basisType, std::string posFuncType,
                                     std::string quadType, double quadAbsTol,
                                     double quadRelTol, unsigned int quadMaxSub,

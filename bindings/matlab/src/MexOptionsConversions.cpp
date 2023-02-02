@@ -85,6 +85,14 @@ void mpart::binding::MapOptionsToMatlab(MapOptions opts, mexplus::OutputArgument
 
 #if defined(MPART_HAS_NLOPT)
 
+TrainOptions mpart::binding::TrainOptionsFromMatlab(InputArguments &input, unsigned int start) {
+    return TrainOptions(input.get<std::string>(start + 0), input.get<double>(start + 1),
+                        input.get<double>(start + 2), input.get<double>(start + 3),
+                        input.get<double>(start + 4), input.get<double>(start + 5),
+                        input.get<int>(start + 6), input.get<double>(start + 7),
+                        input.get<int>(start + 8));
+}
+
 ATMOptions mpart::binding::ATMOptionsFromMatlab(InputArguments &input, unsigned int start) {
     return ATMOptionsFromMatlab(input.get<std::string>(start + 0), input.get<std::string>(start + 1),
                                 input.get<std::string>(start + 2), input.get<double>(start + 3),
