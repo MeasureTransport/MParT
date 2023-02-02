@@ -202,7 +202,7 @@ MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
     MapObjectiveMex *obj = Session<MapObjectiveMex>::get(input.get(1));
     std::shared_ptr<MapObjective<MemorySpace>> obj_ptr = obj->obj_ptr;
 
-    TrainOptions opts  = TrainOptionsFromMatlab(input, 2);
+    TrainOptions opts  = binding::TrainOptionsFromMatlab(input, 2);
 
     TrainMap<MemorySpace>(condMap_ptr, obj_ptr, opts);
 }
