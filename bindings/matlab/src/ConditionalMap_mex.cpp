@@ -35,6 +35,31 @@ MEX_DEFINE(ConditionalMap_newTriMap) (int nlhs, mxArray* plhs[],
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(blocks)));
 }
 
+#if defined(MPART_HAS_NLOPT)
+MEX_DEFINE(ConditionalMap_AdaptiveTransportMap) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 25);
+  OutputArguments output(nlhs, plhs, 1);
+
+  std::vector<intptr_t> list_id_mset = input.get<std::vector<intptr_t>>(0);
+  std::vector<MultiIndexSet> mset0 {};
+  for(unsigned int i=0;i<numBlocks;++i){
+    MultiIndexSet *mset_i = Session<MultiIndexSet>::get(list_id.at(i));
+    mset0.push_back(*mset_i);
+  }
+  MapObjectiveMex *obj = Session<MapObjectiveMex>::get(input.get(1));
+  std::shared_ptr<MapObjective<MemorySpace>> obj_ptr = obj->obj_ptr;
+  ATMOptions opts = ATMOptionsFromMatlab(input, 2);
+  std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map = AdaptiveTransportMap(mset0, obj_ptr, opts);
+  for(unsigned int i=0;i<numBlocks;++i){
+    MultiIndexSet *mset_i = Session<MultiIndexSet>::get(list_id.at(i));
+    *mset_i = mset0[i];
+  }
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(map)));
+}
+#endif // defined(MPART_HAS_NLOPT)
+
 MEX_DEFINE(ConditionalMap_newComposedMap) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
 
@@ -166,6 +191,7 @@ MEX_DEFINE(GaussianKLObjective_TrainError) (int nlhs, mxArray* plhs[],
   output.set(0, obj.obj_ptr->TrainError(condMap_ptr));
 }
 
+#if defined(MPART_HAS_NLOPT)
 MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
                                      int nrhs, const mxArray* prhs[]) {
     InputArguments input(nrhs, prhs, 11);
@@ -178,10 +204,11 @@ MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
     TrainOptions opts {input.get<std::string>(2),input.get<double>(3),
                       input.get<double>(4), input.get<double>(5),
                       input.get<double>(6), input.get<double>(7),
-                      input.get<int>(8), input.get<double>(9), input.get<bool>(10)};
+                      input.get<int>(8), input.get<double>(9), input.get<int>(10)};
 
     TrainMap<MemorySpace>(condMap_ptr, obj_ptr, opts);
-  }
+}
+#endif //defined(MPART_HAS_NLOPT)
 
 // Defines MEX API for delete.
 MEX_DEFINE(ConditionalMap_deleteMap) (int nlhs, mxArray* plhs[],
