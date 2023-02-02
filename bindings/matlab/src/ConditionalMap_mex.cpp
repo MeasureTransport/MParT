@@ -43,14 +43,15 @@ MEX_DEFINE(ConditionalMap_AdaptiveTransportMap) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 1);
 
   std::vector<intptr_t> list_id_mset = input.get<std::vector<intptr_t>>(0);
+  unsigned int numBlocks = list_id_mset.size();
   std::vector<MultiIndexSet> mset0 {};
   for(unsigned int i=0;i<numBlocks;++i){
-    MultiIndexSet *mset_i = Session<MultiIndexSet>::get(list_id.at(i));
+    MultiIndexSet *mset_i = Session<MultiIndexSet>::get(list_id_mset.at(i));
     mset0.push_back(*mset_i);
   }
   MapObjectiveMex *obj = Session<MapObjectiveMex>::get(input.get(1));
   std::shared_ptr<MapObjective<MemorySpace>> obj_ptr = obj->obj_ptr;
-  ATMOptions opts = ATMOptionsFromMatlab(input, 2);
+  ATMOptions opts = binding::ATMOptionsFromMatlab(input, 2);
   std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map = AdaptiveTransportMap(mset0, obj_ptr, opts);
   for(unsigned int i=0;i<numBlocks;++i){
     MultiIndexSet *mset_i = Session<MultiIndexSet>::get(list_id.at(i));

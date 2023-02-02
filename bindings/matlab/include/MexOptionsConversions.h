@@ -29,7 +29,7 @@ namespace binding{
                                     double opt_ftol_rel, double opt_ftol_abs,
                                     double opt_xtol_rel, double opt_xtol_abs,
                                     int opt_maxeval, double opt_maxtime, int verbose,
-                                    unsigned int maxPatience, unsigned int maxSize, MultiIndex maxDegrees)
+                                    unsigned int maxPatience, unsigned int maxSize, MultiIndex maxDegrees);
 #endif // defined(MPART_HAS_NLOPT)
 }
 }
