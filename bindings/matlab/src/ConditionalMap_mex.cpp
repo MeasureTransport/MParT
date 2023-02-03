@@ -39,7 +39,7 @@ MEX_DEFINE(ConditionalMap_newTriMap) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(ConditionalMap_AdaptiveTransportMap) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 25);
+  InputArguments input(nrhs, prhs, 26);
   OutputArguments output(nlhs, plhs, 1);
 
   std::vector<intptr_t> list_id_mset = input.get<std::vector<intptr_t>>(0);

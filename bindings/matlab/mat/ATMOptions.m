@@ -2,7 +2,7 @@ classdef ATMOptions < TrainOptions & MapOptions
     properties (Access = public)
         maxPatience = 10;
         maxSize = 10;
-        maxDegrees;
+        maxDegrees = MultiIndex(0);
     end
     methods
         function obj = set.maxPatience(obj,value)
@@ -38,7 +38,7 @@ classdef ATMOptions < TrainOptions & MapOptions
             optionsArray{12+9} = obj.verbose;
             optionsArray{12+9+1} = obj.maxPatience;
             optionsArray{12+9+2} = obj.maxSize;
-            optionsArray{12+9+3} = obj.maxDegrees;
+            optionsArray{12+9+3} = obj.maxDegrees.get_id();
         end
     end
 end
