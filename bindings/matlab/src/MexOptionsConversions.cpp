@@ -94,6 +94,7 @@ TrainOptions mpart::binding::TrainOptionsFromMatlab(mexplus::InputArguments &inp
 }
 
 ATMOptions mpart::binding::ATMOptionsFromMatlab(mexplus::InputArguments &input, unsigned int start) {
+    MultiIndex& maxDegrees = *Session<MultiIndex>::get(input.get(start+22));
     return ATMOptionsFromMatlab(input.get<std::string>(start + 0), input.get<std::string>(start + 1),
                                 input.get<std::string>(start + 2), input.get<double>(start + 3),
                                 input.get<double>(start + 4), input.get<unsigned int>(start + 5),
@@ -105,7 +106,7 @@ ATMOptions mpart::binding::ATMOptionsFromMatlab(mexplus::InputArguments &input, 
                                 input.get<double>(start + 16), input.get<double>(start + 17),
                                 input.get<int>(start + 18), input.get<double>(start + 19),
                                 input.get<int>(start + 20), input.get<unsigned int>(start + 21),
-                                input.get<unsigned int>(start + 21), input.get<MultiIndex>(start+22));
+                                input.get<unsigned int>(start + 21), maxDegrees);
 }
 
 ATMOptions  mpart::binding::ATMOptionsFromMatlab(std::string basisType, std::string posFuncType,
@@ -117,7 +118,7 @@ ATMOptions  mpart::binding::ATMOptionsFromMatlab(std::string basisType, std::str
                                         double opt_ftol_rel, double opt_ftol_abs,
                                         double opt_xtol_rel, double opt_xtol_abs,
                                         int opt_maxeval, double opt_maxtime, int verbose,
-                                        unsigned int maxPatience, unsigned int maxSize, MultiIndex maxDegrees)
+                                        unsigned int maxPatience, unsigned int maxSize, MultiIndex& maxDegrees)
 {
     ATMOptions opts;
 
