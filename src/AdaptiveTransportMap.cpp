@@ -189,7 +189,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         MultiIndex addedMulti = mset_tmp[maxIdxBlock][maxIdx];
         mset0[maxIdxBlock] += addedMulti;
         if(options.verbose) {
-            std::cerr << "Added multi = [" << addedMulti.String() << "]" <<std::endl;
+            std::cout << "Added multi = [" << addedMulti.String() << "]" <<std::endl;
         }
         currSz++;
         if(mset0[maxIdxBlock].Size() != mset_sizes[maxIdxBlock]+1) {

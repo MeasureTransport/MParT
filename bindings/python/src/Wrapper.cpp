@@ -19,12 +19,14 @@ PYBIND11_MODULE(pympart, m) {
     SummarizedMapWrapper<Kokkos::HostSpace>(m);
     IdentityMapWrapper<Kokkos::HostSpace>(m);
     // DebugMapWrapper<Kokkos::HostSpace>(m);
+    MapFactoryWrapper<Kokkos::HostSpace>(m);
+    MapObjectiveWrapper<Kokkos::HostSpace>(m);
 
 #if defined(MPART_HAS_NLOPT)
-    MapObjectiveWrapper<Kokkos::HostSpace>(m);
     TrainOptionsWrapper(m);
+    ATMOptionsWrapper(m);
     TrainMapWrapper<Kokkos::HostSpace>(m);
-    MapFactoryWrapper<Kokkos::HostSpace>(m);
+    AdaptiveTransportMapWrapper<Kokkos::HostSpace>(m);
 #endif // MPART_HAS_NLOPT
 
 #if defined(MPART_HAS_CEREAL)

@@ -32,7 +32,10 @@ void mpart::binding::AdaptiveTransportMapWrapper(py::module &m) {
     std::string tName = "AdaptiveTransportMap";
     if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName = "d" + tName;
 
-    m.def(tName.c_str(), &AdaptiveTransportMap<MemorySpace>)
+    m.def(tName.c_str(), [](std::vector<MultiIndexSet> &mset0, std::shared_ptr<MapObjective<MemorySpace>> obj, ATMOptions opts){
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = AdaptiveTransportMap<MemorySpace>(mset0, obj, opts);
+        return py::make_tuple(mset0, map);
+    })
     ;
 }
 
