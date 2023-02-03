@@ -100,7 +100,7 @@ TrainOptions mpart::binding::TrainOptionsFromMatlab(mexplus::InputArguments &inp
 }
 
 ATMOptions mpart::binding::ATMOptionsFromMatlab(mexplus::InputArguments &input, unsigned int start) {
-    MultiIndex& maxDegrees = *mexplus::Session<MultiIndex>::get(input.get(start+22));
+    MultiIndex& maxDegrees = *mexplus::Session<MultiIndex>::get(input.get(start+23));
     return ATMOptionsFromMatlab(input.get<std::string>(start + 0), input.get<std::string>(start + 1),
                                 input.get<std::string>(start + 2), input.get<double>(start + 3),
                                 input.get<double>(start + 4), input.get<unsigned int>(start + 5),
@@ -112,7 +112,7 @@ ATMOptions mpart::binding::ATMOptionsFromMatlab(mexplus::InputArguments &input, 
                                 input.get<double>(start + 16), input.get<double>(start + 17),
                                 input.get<int>(start + 18), input.get<double>(start + 19),
                                 input.get<int>(start + 20), input.get<unsigned int>(start + 21),
-                                input.get<unsigned int>(start + 21), maxDegrees);
+                                input.get<unsigned int>(start + 22), maxDegrees);
 }
 
 ATMOptions  mpart::binding::ATMOptionsFromMatlab(std::string basisType, std::string posFuncType,
