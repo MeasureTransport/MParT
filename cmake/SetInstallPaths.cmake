@@ -22,6 +22,6 @@ else()
 endif()
 
 
-if(SKBUILD)
-set(CMAKE_INSTALL_RPATH "\$ORIGIN/../lib:\$ORIGIN/../..")
-endif()
+# if(SKBUILD)
+# set(CMAKE_INSTALL_RPATH "\$ORIGIN/../lib:\$ORIGIN/../..")
+# endif()
