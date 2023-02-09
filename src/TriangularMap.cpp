@@ -63,7 +63,7 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
 
 
 template<typename MemorySpace>
-void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
@@ -80,7 +80,7 @@ void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpa
 }
 
 template<typename MemorySpace>
-void TriangularMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+void TriangularMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::WrapCoeffs(coeffs);
@@ -95,42 +95,6 @@ void TriangularMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::HostSp
         cumNumCoeffs += comps_.at(i)->numCoeffs;
     }
 }
-
-#if defined(MPART_ENABLE_GPU)
-template<typename MemorySpace>
-void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs)
-{
-    // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
-    ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
-
-    // Now create subviews for each of the components
-    unsigned int cumNumCoeffs = 0;
-    for(unsigned int i=0; i<comps_.size(); ++i){
-        assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
-
-        comps_.at(i)->WrapCoeffs( Kokkos::subview(this->savedCoeffs,
-            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
-        cumNumCoeffs += comps_.at(i)->numCoeffs;
-    }
-}
-
-template<typename MemorySpace>
-void TriangularMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs)
-{
-    // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
-    ConditionalMapBase<MemorySpace>::WrapCoeffs(coeffs);
-
-    // Now create subviews for each of the components
-    unsigned int cumNumCoeffs = 0;
-    for(unsigned int i=0; i<comps_.size(); ++i){
-        assert(cumNumCoeffs+comps_.at(i)->numCoeffs <= this->savedCoeffs.size());
-
-        comps_.at(i)->WrapCoeffs( Kokkos::subview(this->savedCoeffs,
-            std::make_pair(cumNumCoeffs, cumNumCoeffs+comps_.at(i)->numCoeffs)));
-        cumNumCoeffs += comps_.at(i)->numCoeffs;
-    }
-}
-#endif
 
 template<typename MemorySpace>
 void TriangularMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
@@ -348,5 +312,5 @@ void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
 // Explicit template instantiation
 template class mpart::TriangularMap<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)
-    template class mpart::TriangularMap<Kokkos::DefaultExecutionSpace::memory_space>;
+    template class mpart::TriangularMap<mpart::DeviceSpace>;
 #endif
