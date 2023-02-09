@@ -358,7 +358,7 @@ FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<Kokkos::HostSpace>::ToD
 }
 
 // If a device is being used, compile code to copy the FixedMultiIndexSet to device memory
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined(MPART_ENABLE_GPU)
     template<>
     template<>
     FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>()
@@ -369,7 +369,7 @@ FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<Kokkos::HostSpace>::ToD
         FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> output(dim, deviceStarts, deviceDims, deviceOrders);
         return output;
     }
-    
+
     template<>
     template<>
     FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>::ToDevice<Kokkos::HostSpace>()

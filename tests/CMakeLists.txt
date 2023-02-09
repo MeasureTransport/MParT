@@ -8,8 +8,16 @@ endif ()
 set (TEST_SOURCES
      tests/RunTests.cpp
 
+     # MultiIndex tests
      tests/MultiIndices/Test_MultiIndex.cpp
      tests/MultiIndices/Test_MultiIndexSet.cpp
+
+     # Distributions tests
+     tests/Distributions/Test_DensityBase.cpp
+     tests/Distributions/Test_SampleGenerator.cpp
+     tests/Distributions/Test_Distribution.cpp
+     tests/Distributions/Test_GaussianDistribution.cpp
+
      tests/Test_OrthogonalPolynomials.cpp
      tests/Test_HermiteFunctions.cpp
      tests/Test_PositiveBijectors.cpp
