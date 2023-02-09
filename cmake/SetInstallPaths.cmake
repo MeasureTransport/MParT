@@ -20,3 +20,8 @@ else()
   message(STATUS "JULIA_INSTALL_PREFIX was not set by user, defaulting to ${CMAKE_INSTALL_PREFIX}/julia.")
   set(JULIA_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX}/julia)
 endif()
+
+
+if(SKBUILD)
+set(CMAKE_INSTALL_RPATH "\$ORIGIN/../lib:\$ORIGIN/../..")
+endif()
