@@ -131,7 +131,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
     }
 }
 
-template struct GaussianSamplerDensity<Kokkos::HostSpace>;
+template struct mpart::GaussianSamplerDensity<Kokkos::HostSpace>;
 #ifdef MPART_ENABLE_GPU
-template struct GaussianSamplerDensity<mpart::DeviceSpace>;
+template struct mpart::GaussianSamplerDensity<mpart::DeviceSpace>;
 #endif
