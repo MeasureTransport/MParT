@@ -1,0 +1,24 @@
+[build-system]
+requires = [
+    "setuptools",
+    "scikit-build>=0.13",
+    "cmake",
+    "ninja",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "MParT"
+authors = [
+    {name = "Matthew Parno"},
+]
+license={file="LICENSE.txt"}
+readme="README.md"
+requires-python = ">=3.7"
+description="A Monotone Parameterization Toolkit"
+version="1.4.0"
+keywords=["Measure Transport", "Monotone", "Transport Map", "Isotonic Regression", "Triangular", "Knothe-Rosenblatt"]
+
+[project.urls]
+Documentation = "https://measuretransport.github.io/MParT/"
+Source = "https://github.com/MeasureTransport/MParT"
