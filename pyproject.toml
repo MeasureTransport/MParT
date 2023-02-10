@@ -16,7 +16,7 @@ license={file="LICENSE.txt"}
 readme="README.md"
 requires-python = ">=3.7"
 description="A Monotone Parameterization Toolkit"
-version="1.4.0"
+version="1.4.4"
 keywords=["Measure Transport", "Monotone", "Transport Map", "Isotonic Regression", "Triangular", "Knothe-Rosenblatt"]
 
 [project.urls]
