@@ -53,10 +53,10 @@ class KLObjective: public MapObjective<MemorySpace> {
 
 namespace ObjectiveFactory {
 template<typename MemorySpace>
-std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train);
+std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, unsigned int dim=0);
 
 template<typename MemorySpace>
-std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test);
+std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test, unsigned int dim=0);
 } // namespace ObjectiveFactory
 
 } // namespace mpart
