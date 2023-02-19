@@ -25,14 +25,14 @@ void mpart::binding::MapObjectiveWrapper(jlcxx::Module &mod) {
     ;
 
     mod.add_type<KLObjective<MemorySpace>>(tName,jlcxx::julia_base_type<MapObjective<MemorySpace>>());
-    mod.method(mName, [](jlcxx::ArrayRef<double,2> train) {
+    mod.method(mName, [](jlcxx::ArrayRef<double,2> train, unsigned int dim=0) {
         StridedMatrix<const double, MemorySpace> trainView = JuliaToKokkos(train);
         Kokkos::View<double**,MemorySpace> storeTrain ("Training data", trainView.extent(0), trainView.extent(1));
         Kokkos::deep_copy(storeTrain, trainView);
         trainView = storeTrain;
-        return ObjectiveFactory::CreateGaussianKLObjective(trainView);
+        return ObjectiveFactory::CreateGaussianKLObjective(trainView, dim);
     });
-    mod.method(mName, [](jlcxx::ArrayRef<double,2> train, jlcxx::ArrayRef<double,2> test) {
+    mod.method(mName, [](jlcxx::ArrayRef<double,2> train, jlcxx::ArrayRef<double,2> test, unsigned int dim = 0) {
         StridedMatrix<const double, MemorySpace> trainView = JuliaToKokkos(train);
         StridedMatrix<const double, MemorySpace> testView = JuliaToKokkos(test);
         Kokkos::View<double**,MemorySpace> storeTrain ("Training data", trainView.extent(0), trainView.extent(1));
@@ -41,7 +41,7 @@ void mpart::binding::MapObjectiveWrapper(jlcxx::Module &mod) {
         Kokkos::deep_copy(storeTest, testView);
         trainView = storeTrain;
         testView = storeTest;
-        return ObjectiveFactory::CreateGaussianKLObjective(trainView, testView);
+        return ObjectiveFactory::CreateGaussianKLObjective(trainView, testView, dim);
     });
 }
 
