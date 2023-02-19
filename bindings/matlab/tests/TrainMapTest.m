@@ -13,29 +13,37 @@ classdef TrainMapTest < matlab.unittest.TestCase
             train = target(:,N_test+1:end);
 
             % Create objective and map
-            obj = GaussianKLObjective(train, test);
+            obj1 = GaussianKLObjective(train, test, 1);
+            obj2 = GaussianKLObjective(train, test);
             map_options = MapOptions();
             max_order = 2;
-            map = CreateTriangular(dim,dim,max_order,map_options);
-            map.SetCoeffs(zeros(map.numCoeffs,1));
+            map1 = CreateComponent(FixedMultiIndex(dim,max_order),map_options);
+            map2 = CreateTriangular(dim,dim,max_order,map_options);
+            map1.SetCoeffs(zeros(map1.numCoeffs,1));
+            map2.SetCoeffs(zeros(map2.numCoeffs,1));
 
             % Set Training Options
             train_options = TrainOptions;
-            train_options.verbose = 1;
-            train_options.opt_alg = 'LD_SLSQP';
 
             % Print test error before
-            TrainMap(map, obj, train_options);
+            TrainMap(map1, obj1, train_options);
+            TrainMap(map2, obj2, train_options);
 
             % Evaluate test samples after training
-            pullback_evals = Evaluate(map,test);
-
-            % Perform Kolmogorov-Smirnov test
-            sorted_samples = sort(pullback_evals(:));
-            samps_cdf = (1 + erf(sorted_samples/sqrt(2)))/2;
-            samps_ecdf = (1:2*N_test)'/(2*N_test);
-            KS_stat = max(abs(samps_ecdf - samps_cdf));
-            testCase.verifyTrue(KS_stat < 0.1)
+            KS_stat1 = KSStatistic(map1,test);
+            KS_stat2 = KSStatistic(map2,test);
+            testCase.verifyTrue(KS_stat1 < 0.1);
+            testCase.verifyTrue(KS_stat2 < 0.1);
         end
     end
+end
+
+
+% Perform Kolmogorov-Smirnov test
+function KS_stat = KSStatistic(map,samples)
+    pullback_evals = Evaluate(map,samples);
+    sorted_samples = sort(pullback_evals(:));
+    samps_cdf = (1 + erf(sorted_samples/sqrt(2)))/2;
+    samps_ecdf = (1:numel(samples))'/numel(samples);
+    KS_stat = max(abs(samps_ecdf - samps_cdf));
 end
