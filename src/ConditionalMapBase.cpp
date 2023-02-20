@@ -138,7 +138,7 @@ Eigen::RowMatrixXd ConditionalMapBase<mpart::DeviceSpace>::Inverse(Eigen::Ref<co
     return KokkosToMat( ToHost( Inverse(xView, rView) ));
 }
 
-#endif 
+#endif
 
 template<>
 template<>
@@ -177,10 +177,10 @@ template<>
 template<>
 StridedMatrix<double, Kokkos::HostSpace> ConditionalMapBase<mpart::DeviceSpace>::LogDeterminantCoeffGrad(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
 {
-    // Copy the points to the device space 
+    // Copy the points to the device space
     StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace>(pts);
 
-    // Evaluate on the device space 
+    // Evaluate on the device space
     StridedMatrix<double, mpart::DeviceSpace> evals_device = this->LogDeterminantCoeffGrad(pts_device);
 
     // Copy back to the host space
@@ -255,7 +255,7 @@ template<>
 StridedMatrix<double, Kokkos::HostSpace> ConditionalMapBase<mpart::DeviceSpace>::LogDeterminantInputGrad(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
 {
     // Copy the points to the device space
-    StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace>(pts);
+    StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace,const double>(pts);
 
     // Evaluate on the device space
     StridedMatrix<double, mpart::DeviceSpace> evals_device = this->LogDeterminantInputGrad(pts_device);
