@@ -9,7 +9,10 @@
 namespace mpart {
 
 /**
- * @brief An abstract class to represent an objective for optimizing a transport map based on a Training (and perhaps testing) dataset
+ * @brief An abstract class to represent an objective for optimizing a transport map based on a Training (and perhaps testing) dataset.
+ * @details MapObjective is a class that represents a functional \f$T\f$ of a transport map \f$T(\cdot;\theta)\f$, expected to be estimated using some dataset \f$\mathcal{S}\f$.
+ * It provides facilities to use a training dataset as well as an optional testing dataset, and provides the functionality \f$F(T(\cdot;\theta);\mathcal{S})\f$ and
+ * \f$\nabla_\theta F(T(\cdot;\theta);\mathcal{S})\f$, the gradient of the objective with respect to the map coefficients/parameters.
  *
  * @tparam MemorySpace Space where all data is stored
  */
@@ -131,6 +134,7 @@ class MapObjective {
  * where \f$\mu\f$ is a measure with some density \f$\pi\f$. Explicitly, \f$\hat{D}(T;\mathcal{S}) := -\frac{1}{K}\sum_{k=1}^K \log p(T(X^{(k)})) + \log|\det(\nabla T(X^{(k)}))\f$.
  *
  * @tparam MemorySpace Space where data is stored
+ * @see mpart::MapObjective
  */
 template<typename MemorySpace>
 class KLObjective: public MapObjective<MemorySpace> {
