@@ -22,7 +22,7 @@ namespace {
         InputArguments input(nrhs, prhs, 1, 1, "dim");
         OutputArguments output(nlhs, plhs, 1);
         StridedMatrix<const double, MemorySpace> train = MexToKokkos2d(prhs[0]);
-        unsigned int dim = input.get<unsigned int>("dim", 0)
+        unsigned int dim = input.get<unsigned int>("dim", 0);
         std::shared_ptr<MapObjective<MemorySpace>> objective = ObjectiveFactory::CreateGaussianKLObjective(train, dim);
         output.set(0, Session<MapObjectiveMex>::create(new MapObjectiveMex(objective)));
     }
@@ -35,7 +35,7 @@ namespace {
         OutputArguments output(nlhs, plhs, 1);
         StridedMatrix<const double, MemorySpace> train = MexToKokkos2d(prhs[0]);
         StridedMatrix<const double, MemorySpace> test = MexToKokkos2d(prhs[1]);
-        unsigned int dim = input.get<unsigned int>("dim",0)
+        unsigned int dim = input.get<unsigned int>("dim",0);
         std::shared_ptr<MapObjective<MemorySpace>> objective = ObjectiveFactory::CreateGaussianKLObjective(train, test, dim);
         output.set(0, Session<MapObjectiveMex>::create(new MapObjectiveMex(objective)));
     }
