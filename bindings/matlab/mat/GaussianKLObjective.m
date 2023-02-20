@@ -7,11 +7,11 @@ end
 methods
     function this = GaussianKLObjective(train, test, dim)
         if(nargin==1)
-            this.id_ = MParT_('GaussianKLObjective_newTrain',train);
+            this.id_ = MParT_('GaussianKLObjective_newTrain',train,0);
         elseif(isinteger(test))
             this.id_ = MParT_('GaussianKLObjective_newTrain',train,test);
         elseif(nargin==2)
-            this.id_ = MParT_('GaussianKLObjective_newTrainTest',train,test);
+            this.id_ = MParT_('GaussianKLObjective_newTrainTest',train,test,0);
         else
             this.id_ = MParT_('GaussianKLObjective_newTrainTest',train,test,dim);
         end
