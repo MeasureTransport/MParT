@@ -18,8 +18,8 @@ struct TrainOptions {
     double opt_ftol_abs = 1e-3;
     double opt_xtol_rel = 1e-4;
     double opt_xtol_abs = 1e-4;
-    int opt_maxeval = 30;
-    double opt_maxtime = 100.;
+    int opt_maxeval = 1000;
+    double opt_maxtime = std::numeric_limits<double>::infinity();
     bool verbose = false;
     std::string String() {
         std::stringstream ss;
