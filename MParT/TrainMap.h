@@ -7,6 +7,10 @@
 #include "MapObjective.h"
 
 namespace mpart {
+/**
+ * @brief Concise struct representing options for optimizing a map using NLopt
+ *
+ */
 struct TrainOptions {
     std::string opt_alg = "LD_LBFGS";
     double opt_stopval = -std::numeric_limits<double>::infinity();
@@ -18,6 +22,14 @@ struct TrainOptions {
     bool verbose = false;
 };
 
+/**
+ * @brief Function to train a map inplace given an objective and optimization options
+ *
+ * @tparam ObjectiveType
+ * @param map Map to optimize (inplace)
+ * @param objective MapObjective to optimize over
+ * @param options Options for optimizing the map
+ */
 template<typename ObjectiveType>
 void TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options);
 
