@@ -125,8 +125,10 @@ class MapObjective {
 };
 
 /**
- * @brief Calculate the sample-based Kullback-Leibler divergence of a map w.r.t to a given density
- *        The data should be sampled from the desired pushforward distribution.
+ * @brief Calculate the sample-based forward Kullback-Leibler divergence of a map w.r.t to a given density.
+ * @details For a given function \f$T:\mathbb{R}^n\to\mathbb{R}^m\f$ with \f$m\leq n\f$, and a dataset \f$\mathcal{S} = \{X^{(k)}\}\subset\mathbb{R}^n\sim\nu\f$,
+ * estimate the sample-based forward KL divergence \f$\hat{D}(T;\mathcal{S})\approx D(T^\sharp\nu||\mu)\f$ using the empirical distribution of \f$\{X^{(k)}\}\f$,
+ * where \f$\mu\f$ is a measure with some density \f$\pi\f$. Explicitly, \f$\hat{D}(T;\mathcal{S}) := -\frac{1}{K}\sum_{k=1}^K \log p(T(X^{(k)})) + \log|\det(\nabla T(X^{(k)}))\f$.
  *
  * @tparam MemorySpace Space where data is stored
  */
