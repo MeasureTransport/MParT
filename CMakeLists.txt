@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 project(MParT VERSION 0.0.1)
 
+message(STATUS "Will install MParT to ${CMAKE_INSTALL_PREFIX}")
+
 # Add the cmake folder as a search path and include files
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
 Include(FetchContent)
@@ -186,7 +188,7 @@ endif()
 
 # Add cereal if necessary
 if(MPART_ARCHIVE)
-    find_package(cereal)
+    find_package(cereal QUIET)
     if(NOT cereal_FOUND)
         if(${MPART_FETCH_DEPS})
             message(STATUS "Could not find Cereal. Fetching source.")
@@ -217,8 +219,8 @@ endif()
 
 # Add NLopt if necessary
 if(MPART_OPT)
-    find_package(NLopt)
-
+    find_package(NLopt QUIET)
+    
     if(NOT NLopt_FOUND)
         if(${MPART_FETCH_DEPS})
             message(STATUS "Could not find NLopt. Fetching source.")
