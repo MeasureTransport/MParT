@@ -18,6 +18,8 @@ class MapObjective {
     MapObjective(StridedMatrix<const double, MemorySpace> train): train_(train) {}
     MapObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test): train_(train), test_(test) {}
 
+    virtual ~MapObjective() = default;
+
     double operator()(unsigned int n, const double* x, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 
     double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
