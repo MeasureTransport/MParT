@@ -17,9 +17,28 @@ struct TrainOptions {
     double opt_ftol_rel = 1e-3;
     double opt_ftol_abs = 1e-3;
     double opt_xtol_rel = 1e-4;
-    int opt_maxeval = 30;
-    double opt_maxtime = 100.;
+    double opt_xtol_abs = 1e-4;
+    int opt_maxeval = 1000;
+    double opt_maxtime = std::numeric_limits<double>::infinity();
     bool verbose = false;
+    /**
+     * @brief Create a string representation of these training options (helpful for bindings)
+     *
+     * @return std::string Every option value in this struct
+     */
+    std::string String() {
+        std::stringstream ss;
+        ss << "opt_alg = " << opt_alg << "\n";
+        ss << "opt_stopval = " << opt_stopval << "\n";
+        ss << "opt_ftol_rel = " << opt_ftol_rel << "\n";
+        ss << "opt_ftol_abs = " << opt_ftol_abs << "\n";
+        ss << "opt_xtol_rel = " << opt_xtol_rel << "\n";
+        ss << "opt_xtol_abs = " << opt_xtol_abs << "\n";
+        ss << "opt_maxeval = " << opt_maxeval << "\n";
+        ss << "opt_maxtime = " << opt_maxtime << "\n";
+        ss << "verbose = " << (verbose ? "true" : "false");
+        return ss.str();
+    }
 };
 
 /**
