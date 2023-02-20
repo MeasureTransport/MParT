@@ -1,8 +1,12 @@
+#ifndef TEST_DISTRIBUTIONS_COMMON_H
+#define TEST_DISTRIBUTIONS_COMMON_H
+
 #include<algorithm>
 #include <catch2/catch_all.hpp>
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Distributions/DensityBase.h"
 #include "MParT/Distributions/SampleGenerator.h"
+#include "MParT/Distributions/GaussianSamplerDensity.h"
 #include "MParT/Distributions/Distribution.h"
 
 using namespace mpart;
@@ -50,3 +54,8 @@ void LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts
     });
 }
 };
+
+// Tests samples that should be transformed to a standard normal distribution
+void TestStandardNormalSamples(StridedMatrix<double, Kokkos::HostSpace> samples);
+
+#endif //MPART_TEST_DISTRIBUTIONS_COMMON_H

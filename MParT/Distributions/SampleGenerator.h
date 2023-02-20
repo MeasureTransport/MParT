@@ -52,7 +52,7 @@ class SampleGenerator {
      *
      * @param seed new seed to set for the pool
      */
-    void SetSeed(unsigned int seed) {
+    virtual void SetSeed(unsigned int seed) {
         rand_pool = PoolType(seed);
     }
 

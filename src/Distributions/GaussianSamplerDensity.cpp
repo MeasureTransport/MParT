@@ -81,10 +81,9 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityInputGradImpl(StridedMatrix<
 // Currently this requires that output be a LayoutLeft view
 template<typename MemorySpace>
 void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, MemorySpace> output_) {
-    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> output = output_;
     // Sample from the distribution
-    int M = output.extent(0);
-    int N = output.extent(1);
+    int M = output_.extent(0);
+    int N = output_.extent(1);
     // Check dimensions
     if(M != dim_) {
         throw std::runtime_error("GaussianSamplerDensity::SampleImpl: The number of rows in output must match the dimension of the distribution.");
@@ -96,7 +95,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
         if(mean_.extent(0) == 0) {
             Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
                 GeneratorType rgen = rand_pool.get_state();
-                output(i,j) = rgen.normal();
+                output_(i,j) = rgen.normal();
                 rand_pool.free_state(rgen);
             });
         }
@@ -104,13 +103,15 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
         else {
             Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
                 GeneratorType rgen = rand_pool.get_state();
-                output(i,j) = rgen.normal() + mean_(i);
+                output_(i,j) = rgen.normal() + mean_(i);
                 rand_pool.free_state(rgen);
             });
         }
     }
     // Otherwise, we assume dense covariance
     else {
+        // Enforce that the output is the correct layout!
+        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> output = output_;
         // Sample from the standard normal
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
             GeneratorType rgen = rand_pool.get_state();

@@ -60,7 +60,7 @@ TEST_CASE( "Testing Custom Uniform Density", "[UniformDensity]" ) {
         }
     }
 
-    SECTION("GradLogDensityKokkos") {
+    SECTION("LogDensityInputGradKokkos") {
         auto output = density->LogDensityInputGrad(ptsConst);
         for(unsigned int j = 0; j < N_pts; ++j) {
             REQUIRE(output(0,j) == Approx(0.));
@@ -68,7 +68,7 @@ TEST_CASE( "Testing Custom Uniform Density", "[UniformDensity]" ) {
         }
     }
 
-    SECTION("GradLogDensityEigen") {
+    SECTION("LogDensityInputGradEigen") {
         auto output_eigen = density->LogDensityInputGrad(pts_eigen);
         for(unsigned int j = 0; j < N_pts; ++j) {
             REQUIRE(output_eigen(0,j) == Approx(0.));

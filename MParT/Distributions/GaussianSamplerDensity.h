@@ -86,7 +86,7 @@ class GaussianSamplerDensity: public SampleGenerator<MemorySpace>, public Densit
 };
 
 template<typename MemorySpace, typename... T>
-Distribution<MemorySpace> CreateGaussianDistribution(T... args) {
+std::shared_ptr<Distribution<MemorySpace>> CreateGaussianDistribution(T... args) {
     return CreateDistribution<MemorySpace,GaussianSamplerDensity<MemorySpace>>(args...);
 }
 
