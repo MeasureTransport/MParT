@@ -63,9 +63,9 @@ class MapObjective {
      * @brief Shortcut to calculate the error of the map on the testing dataset
      *
      * @param map Map to calculate the error on
-     * @return double training error
+     * @return double testing error
      */
-    double TestError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
+    double TestError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
 
     /**
      * @brief Get the gradient of the map objective with respect to map coefficients on the training dataset
@@ -73,7 +73,23 @@ class MapObjective {
      * @param map Map to use in this objective gradient
      * @return StridedVector<double, MemorySpace> Gradient of the map on the training dataset
      */
-    StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
+    StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
+
+    /**
+     * @brief Shortcut to calculate the error of the map on the training dataset
+     *
+     * @param map Map to calculate the error on
+     * @return double training error
+     */
+    double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
+
+    /**
+     * @brief Shortcut to calculate the gradient of the objective on the training dataset w.r.t. the map coefficients
+     *
+     * @param map Map to calculate the gradient with respect to
+     * @param grad storage for the gradient
+     */
+    void TrainCoeffGradImpl(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, StridedVector<double, MemorySpace> grad) const;
 
     /**
      * @brief Objective value of map at data
@@ -82,7 +98,8 @@ class MapObjective {
      * @param map map to calculate objective with respect to
      * @return double Objective value of map at data
      */
-    virtual double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) = 0;
+    virtual double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const = 0;
+
     /**
      * @brief Gradient of the objective at the data with respect to the coefficients of the map
      *
@@ -90,7 +107,7 @@ class MapObjective {
      * @param grad storage for calculating gradient inplace
      * @param map map with coefficients to take gradient on
      */
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) = 0;
+    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const = 0;
 
     /**
      * @brief Implementation of objective and gradient objective calculation (gradient w.r.t. map coefficients), inplace. Default uses `ObjectiveImpl` and `CoeffGradImpl`,
@@ -101,7 +118,7 @@ class MapObjective {
      * @param map Map to evaluate on
      * @return double objective value on the map at the dataset
      */
-    virtual double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map){
+    virtual double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const{
         CoeffGradImpl(data, grad, map);
         return ObjectiveImpl(data, map);
     }
