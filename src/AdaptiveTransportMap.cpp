@@ -60,6 +60,13 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
     std::vector<MultiIndexSet> mset_tmp {};
     std::vector<MultiIndexSet> mset_best {};
 
+    if(mset0.size() != inputDim) {
+        std::stringstream ss;
+            ss << "AdaptiveTransportMap: Number of MultiIndexSets must match Objective dimension.\n";
+            ss << "Expected Length " << inputDim << ", got " << mset0.size() << ".";
+            throw std::invalid_argument(ss.str());
+    }
+
     // Ensure the given vector of multiindexsets is valid
     unsigned int currMsetDim = mset0[0].Length();
     for(unsigned int j = 0; j < outputDim; j++) {

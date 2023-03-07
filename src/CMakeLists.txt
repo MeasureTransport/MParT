@@ -51,6 +51,7 @@ target_sources(mpart
     MapFactoryImpl13.cpp
     MapFactoryImpl14.cpp
     MapFactoryImpl15.cpp
+    MapFactoryImpl16.cpp
 
     ${MPART_OPT_FILES}
     Initialization.cpp
