@@ -275,7 +275,7 @@ StridedMatrix<double, mpart::DeviceSpace> ConditionalMapBase<Kokkos::HostSpace>:
     StridedMatrix<double, Kokkos::HostSpace> evals_host = this->LogDeterminantInputGrad(pts_host);
 
     // Copy back to the device
-    return ToDevice<mpart::DeviceSpace>(evals_host);
+    return ToDevice<mpart::DeviceSpace,double>(evals_host);
 }
 
 

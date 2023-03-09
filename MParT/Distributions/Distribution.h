@@ -106,7 +106,18 @@ class Distribution{
         density_->LogDensityInputGradImpl(pts, output);
     };
 
+    /**
+     * @brief Get the Sampler object from the distribution
+     *
+     * @return std::shared_ptr<SampleGenerator<MemorySpace>> a shared pointer to the sampler that this object uses
+     */
     std::shared_ptr<SampleGenerator<MemorySpace>> GetSampler() const { return sampler_; };
+
+    /**
+     * @brief Get the Density object from the distribution
+     *
+     * @return std::shared_ptr<DensityBase<MemorySpace>> a shared pointer to the density this object uses
+     */
     std::shared_ptr<DensityBase<MemorySpace>> GetDensity() const { return density_; };
 
     private:
@@ -115,6 +126,15 @@ class Distribution{
 
 }; // class Distribution
 
+/**
+ * @brief Convenient way to create a Distribution object from arguments to create an object that's both a sampler + density
+ *
+ * @tparam MemorySpace Where the data is stored for computation
+ * @tparam SamplerDensity The type of object that's both a sampler and a density
+ * @tparam T Parameter pack representing the argument types for the SamplerDensity constructor
+ * @param args arguments to create the SamplerDensity instance
+ * @return std::shared_ptr<Distribution<MemorySpace>> A distribution with sampler & density as the same object, constructed from args
+ */
 template<typename MemorySpace, typename SamplerDensity, typename... T>
 std::shared_ptr<Distribution<MemorySpace>> CreateDistribution(T... args) {
     std::shared_ptr<SamplerDensity> samplerDensity = std::make_shared<SamplerDensity>(args...);

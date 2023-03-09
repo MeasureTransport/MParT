@@ -21,9 +21,14 @@ struct TrainOptions {
     double opt_ftol_abs = 1e-3;
     double opt_xtol_rel = 1e-4;
     double opt_xtol_abs = 1e-4;
-    int opt_maxeval = 30;
-    double opt_maxtime = 100.;
-    int verbose = 0;
+    int opt_maxeval = 1000;
+    double opt_maxtime = std::numeric_limits<double>::infinity();
+    bool verbose = false;
+    /**
+     * @brief Create a string representation of these training options (helpful for bindings)
+     *
+     * @return std::string Every option value in this struct
+     */
     std::string String() {
         std::stringstream ss;
         ss << "opt_alg = " << opt_alg << "\n";
@@ -39,6 +44,14 @@ struct TrainOptions {
     }
 };
 
+/**
+ * @brief Function to train a map inplace given an objective and optimization options
+ *
+ * @tparam ObjectiveType
+ * @param map Map to optimize (inplace)
+ * @param objective MapObjective to optimize over
+ * @param options Options for optimizing the map
+ */
 template<typename ObjectiveType>
 double TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options);
 
