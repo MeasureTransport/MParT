@@ -1,6 +1,8 @@
 #ifndef MPART_MAPOPTIONS_H
 #define MPART_MAPOPTIONS_H
 
+#include <string>
+#include <sstream>
 #include <limits>
 
 namespace mpart{
@@ -101,6 +103,43 @@ namespace mpart{
             archive( basisType, basisLB, basisUB, posFuncType, quadType, quadAbsTol, quadRelTol, quadMaxSub, quadMinSub, quadPts, contDeriv, basisNorm );
         }
         #endif // MPART_HAS_CEREAL
+
+        bool operator==(MapOptions opts2) const {
+            bool ret = true;
+            ret &= (basisType   == opts2.basisType);
+            ret &= (basisLB     == opts2.basisLB);
+            ret &= (basisUB     == opts2.basisUB);
+            ret &= (posFuncType == opts2.posFuncType);
+            ret &= (quadType    == opts2.quadType);
+            ret &= (quadAbsTol  == opts2.quadAbsTol);
+            ret &= (quadRelTol  == opts2.quadRelTol);
+            ret &= (quadMaxSub  == opts2.quadMaxSub);
+            ret &= (quadMinSub  == opts2.quadMinSub);
+            ret &= (quadPts     == opts2.quadPts);
+            ret &= (contDeriv   == opts2.contDeriv);
+            ret &= (basisNorm   == opts2.basisNorm);
+            return ret;
+        }
+
+        std::string String() {
+            std::string btypes[3] = {"ProbabilistHermite", "PhysicistHermite", "HermiteFunctions"};
+            std::string pftypes[2] = {"Exp", "SoftPlus"};
+            std::string qtypes[3] = {"ClenshawCurtis", "AdaptiveSimpson", "AdaptiveClenshawCurtis"};
+            std::stringstream ss;
+            ss << "basisType = " << btypes[static_cast<unsigned int>(basisType)] << "\n";
+            ss << "basisLB = " << basisLB << "\n";
+            ss << "basisUB = " << basisUB << "\n";
+            ss << "basisNorm = " << (basisNorm ? "true" : "false") << "\n";
+            ss << "posFuncType = " << pftypes[static_cast<unsigned int>(posFuncType)] << "\n";
+            ss << "quadType = " << qtypes[static_cast<unsigned int>(quadType)] << "\n";
+            ss << "quadAbsTol = " << quadAbsTol << "\n";
+            ss << "quadRelTol = " << quadRelTol << "\n";
+            ss << "quadMaxSub = " << quadMaxSub << "\n";
+            ss << "quadMinSub = " << quadMinSub << "\n";
+            ss << "quadPts = " << quadPts << "\n";
+            ss << "contDeriv = " << (contDeriv ? "true" : "false");
+            return ss.str();
+        }
     };
 };
 

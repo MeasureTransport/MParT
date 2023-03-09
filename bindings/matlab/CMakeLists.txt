@@ -12,8 +12,14 @@ set(MEX_SOURCE
     src/FixedMultiIndexSet_mex.cpp
     src/ParameterizedFunctionBase_mex.cpp
     src/MexArrayConversions.cpp
-    src/MexMapOptionsConversions.cpp
+    src/MexOptionsConversions.cpp
 )
+
+if(MPART_OPT)
+    set(MEX_SOURCE ${MEX_SOURCE}
+        src/MapObjective_mex.cpp
+    )
+endif()
 
 matlab_add_mex(NAME MParT_ SRC ${MEX_SOURCE} LINK_TO mpart Kokkos::kokkos Eigen3::Eigen ${EXT_LIBRARIES})
 

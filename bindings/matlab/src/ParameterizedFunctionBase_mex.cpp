@@ -1,8 +1,9 @@
+#include <fstream>
 #include <mexplus.h>
 #include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MexArrayConversions.h"
-#include "MexMapOptionsConversions.h"
+#include "MexOptionsConversions.h"
 #include "MParT/MapOptions.h"
 #include "MParT/MapFactory.h"
 #include "MParT/ConditionalMapBase.h"
@@ -11,14 +12,15 @@
 
 
 using namespace mpart;
+using namespace mpart::binding;
 using namespace mexplus;
 using MemorySpace = Kokkos::HostSpace;
 
 class ParameterizedFunctionMex {       // The class
-public:             
+public:
   std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> fun_ptr;
 
-  ParameterizedFunctionMex(unsigned int outputDim, FixedMultiIndexSet<MemorySpace> const& mset, 
+  ParameterizedFunctionMex(unsigned int outputDim, FixedMultiIndexSet<MemorySpace> const& mset,
                     MapOptions opts){
     fun_ptr = MapFactory::CreateExpansion<MemorySpace>(outputDim,mset,opts);
   }
@@ -119,7 +121,7 @@ MEX_DEFINE(ParameterizedFunction_Evaluate) (int nlhs, mxArray* plhs[],
 
   const ParameterizedFunctionMex& parFunc = Session<ParameterizedFunctionMex>::getConst(input.get(0));
   StridedMatrix<const double, Kokkos::HostSpace> pts = MexToKokkos2d(prhs[1]);
-  StridedMatrix<double, Kokkos::HostSpace> out = MexToKokkos2d(prhs[2]); 
+  StridedMatrix<double, Kokkos::HostSpace> out = MexToKokkos2d(prhs[2]);
   parFunc.fun_ptr->EvaluateImpl(pts, out);
 }
 
@@ -134,7 +136,7 @@ MEX_DEFINE(ParameterizedFunction_CoeffGrad) (int nlhs, mxArray* plhs[],
   auto pts = MexToKokkos2d(prhs[1]);
   auto sens = MexToKokkos2d(prhs[2]);
   auto out = MexToKokkos2d(prhs[3]);
-  
+
   parFunc.fun_ptr->CoeffGradImpl(pts,sens,out);
 }
 
@@ -149,8 +151,96 @@ MEX_DEFINE(ParameterizedFunction_Gradient) (int nlhs, mxArray* plhs[],
   auto pts = MexToKokkos2d(prhs[1]);
   auto sens = MexToKokkos2d(prhs[2]);
   auto out = MexToKokkos2d(prhs[3]);
-  
+
   parFunc.fun_ptr->GradientImpl(pts,sens,out);
+}
+
+MEX_DEFINE(ParameterizedFunction_Serialize) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+
+#if defined(MPART_HAS_CEREAL)
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 0);
+
+  const ParameterizedFunctionMex& parFunc = Session<ParameterizedFunctionMex>::getConst(input.get(0));
+  unsigned int inputDim = parFunc.fun_ptr->inputDim;
+  unsigned int outputDim = parFunc.fun_ptr->outputDim;
+  unsigned int numCoeffs = parFunc.fun_ptr->numCoeffs;
+  auto coeffs = parFunc.fun_ptr->Coeffs();
+  std::string filename = input.get<std::string>(1);
+  std::ofstream os(filename);
+  cereal::BinaryOutputArchive oarchive(os);
+  oarchive(inputDim,outputDim,numCoeffs);
+  oarchive(coeffs);
+#else
+  mexErrMsgIdAndTxt("MParT:NoCereal",
+                    "MParT was not compiled with Cereal support.");
+#endif // MPART_HAS_CEREAL
+}
+
+MEX_DEFINE(ParameterizedFunction_DeserializeMap) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+
+#if defined(MPART_HAS_CEREAL)
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 3);
+
+  std::string filename = input.get<std::string>(0);
+  std::ifstream is(filename);
+  cereal::BinaryInputArchive archive(is);
+  unsigned int inputDim, outputDim, numCoeffs;
+  archive(inputDim, outputDim, numCoeffs);
+  Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Map coeffs", numCoeffs);
+  load(archive, coeffs);
+  output.set(0,inputDim);
+  output.set(1,outputDim);
+  output.set(2,CopyKokkosToVec(coeffs));
+#else
+  mexErrMsgIdAndTxt("MParT:NoCereal",
+                    "MParT was not compiled with Cereal support.");
+#endif // MPART_HAS_CEREAL
+}
+
+MEX_DEFINE(MapOptions_Serialize) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+
+#if defined(MPART_HAS_CEREAL)
+  InputArguments input(nrhs, prhs, 13);
+  OutputArguments output(nlhs, plhs, 1);
+
+  std::string filename = input.get<std::string>(0);
+  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
+                                         input.get<std::string>(3),input.get<double>(4),
+                                         input.get<double>(5),input.get<unsigned int>(6),
+                                         input.get<unsigned int>(7),input.get<unsigned int>(8),
+                                         input.get<bool>(9),input.get<double>(10),input.get<double>(11),input.get<bool>(12));
+  std::ofstream os (filename);
+  cereal::BinaryOutputArchive oarchive(os);
+  oarchive(opts);
+#else
+  mexErrMsgIdAndTxt("MParT:NoCereal",
+                    "MParT was not compiled with Cereal support.");
+#endif // MPART_HAS_CEREAL
+}
+
+
+MEX_DEFINE(MapOptions_Deserialize) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+
+#if defined(MPART_HAS_CEREAL)
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 12);
+
+  std::string filename = input.get<std::string>(0);
+  MapOptions opts;
+  std::ifstream is(filename);
+  cereal::BinaryInputArchive iarchive(is);
+  iarchive(opts);
+  MapOptionsToMatlab(opts, output);
+#else
+  mexErrMsgIdAndTxt("MParT:NoCereal",
+                    "MParT was not compiled with Cereal support.");
+#endif // MPART_HAS_CEREAL
 }
 
 } // namespace

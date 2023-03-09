@@ -9,7 +9,10 @@
 namespace mpart {
 
 /**
- * @brief An abstract class to represent an objective for optimizing a transport map based on a Training (and perhaps testing) dataset
+ * @brief An abstract class to represent an objective for optimizing a transport map based on a Training (and perhaps testing) dataset.
+ * @details MapObjective is a class that represents a functional \f$T\f$ of a transport map \f$T(\cdot;\theta)\f$, expected to be estimated using some dataset \f$\mathcal{S}\f$.
+ * It provides facilities to use a training dataset as well as an optional testing dataset, and provides the functionality \f$F(T(\cdot;\theta);\mathcal{S})\f$ and
+ * \f$\nabla_\theta F(T(\cdot;\theta);\mathcal{S})\f$, the gradient of the objective with respect to the map coefficients/parameters.
  *
  * @tparam MemorySpace Space where all data is stored
  */
@@ -46,6 +49,8 @@ class MapObjective {
      */
     MapObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test): train_(train), test_(test) {}
 
+    virtual ~MapObjective() = default;
+
     /**
      * @brief Exposed functor-like function to calculate objective value and its gradient
      *
@@ -61,9 +66,9 @@ class MapObjective {
      * @brief Shortcut to calculate the error of the map on the testing dataset
      *
      * @param map Map to calculate the error on
-     * @return double training error
+     * @return double testing error
      */
-    double TestError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
+    double TestError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
 
     /**
      * @brief Get the gradient of the map objective with respect to map coefficients on the training dataset
@@ -71,7 +76,23 @@ class MapObjective {
      * @param map Map to use in this objective gradient
      * @return StridedVector<double, MemorySpace> Gradient of the map on the training dataset
      */
-    StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
+    StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
+
+    /**
+     * @brief Shortcut to calculate the error of the map on the training dataset
+     *
+     * @param map Map to calculate the error on
+     * @return double training error
+     */
+    double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
+
+    /**
+     * @brief Shortcut to calculate the gradient of the objective on the training dataset w.r.t. the map coefficients
+     *
+     * @param map Map to calculate the gradient with respect to
+     * @param grad storage for the gradient
+     */
+    void TrainCoeffGradImpl(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, StridedVector<double, MemorySpace> grad) const;
 
     /**
      * @brief Objective value of map at data
@@ -80,7 +101,8 @@ class MapObjective {
      * @param map map to calculate objective with respect to
      * @return double Objective value of map at data
      */
-    virtual double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) = 0;
+    virtual double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const = 0;
+
     /**
      * @brief Gradient of the objective at the data with respect to the coefficients of the map
      *
@@ -88,7 +110,7 @@ class MapObjective {
      * @param grad storage for calculating gradient inplace
      * @param map map with coefficients to take gradient on
      */
-    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) = 0;
+    virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const = 0;
 
     /**
      * @brief Implementation of objective and gradient objective calculation (gradient w.r.t. map coefficients), inplace. Default uses `ObjectiveImpl` and `CoeffGradImpl`,
@@ -99,17 +121,20 @@ class MapObjective {
      * @param map Map to evaluate on
      * @return double objective value on the map at the dataset
      */
-    virtual double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map){
+    virtual double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const{
         CoeffGradImpl(data, grad, map);
         return ObjectiveImpl(data, map);
     }
 };
 
 /**
- * @brief Calculate the sample-based Kullback-Leibler divergence of a map w.r.t to a given density
- *        The data should be sampled from the desired pushforward distribution.
+ * @brief Calculate the sample-based forward Kullback-Leibler divergence of a map w.r.t to a given density.
+ * @details For a given function \f$T:\mathbb{R}^n\to\mathbb{R}^m\f$ with \f$m\leq n\f$, and a dataset \f$\mathcal{S} = \{X^{(k)}\}\subset\mathbb{R}^n\sim\nu\f$,
+ * estimate the sample-based forward KL divergence \f$\hat{D}(T;\mathcal{S})\approx D(T^\sharp\nu||\mu)\f$ using the empirical distribution of \f$\{X^{(k)}\}\f$,
+ * where \f$\mu\f$ is a measure with some density \f$\pi\f$. Explicitly, \f$\hat{D}(T;\mathcal{S}) := -\frac{1}{K}\sum_{k=1}^K \log p(T(X^{(k)})) + \log|\det(\nabla T(X^{(k)}))\f$.
  *
  * @tparam MemorySpace Space where data is stored
+ * @see mpart::MapObjective
  */
 template<typename MemorySpace>
 class KLObjective: public MapObjective<MemorySpace> {
@@ -130,9 +155,9 @@ class KLObjective: public MapObjective<MemorySpace> {
      */
     KLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test, std::shared_ptr<DensityBase<MemorySpace>> density): MapObjective<MemorySpace>(train, test), density_(density) {}
 
-    double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) override;
-    double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) override;
-    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) override;
+    double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
+    double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
+    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
 
     private:
     /**

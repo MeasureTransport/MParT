@@ -65,6 +65,56 @@ classdef MapOptions
             optionsArray{11} = obj.basisUB;
             optionsArray{12} = obj.basisNorm;
         end
+
+        function res = eq(obj1, obj2)
+            res = true;
+            res = res && isequal(obj1.basisType,   obj2.basisType);
+            res = res && isequal(obj1.basisLB,     obj2.basisLB);
+            res = res && isequal(obj1.basisUB,     obj2.basisUB);
+            res = res && isequal(obj1.basisNorm,   obj2.basisNorm);
+            res = res && isequal(obj1.posFuncType, obj2.posFuncType);
+            res = res && isequal(obj1.quadType,    obj2.quadType);
+            res = res && isequal(obj1.quadAbsTol,  obj2.quadAbsTol);
+            res = res && isequal(obj1.quadRelTol,  obj2.quadRelTol);
+            res = res && isequal(obj1.quadMaxSub,  obj2.quadMaxSub);
+            res = res && isequal(obj1.quadMinSub,  obj2.quadMinSub);
+            res = res && isequal(obj1.quadPts,     obj2.quadPts);
+            res = res && isequal(obj1.contDeriv,   obj2.contDeriv);
+        end
+
+        function Serialize(obj,filename)
+            MParT_('MapOptions_Serialize',filename, char(obj.basisType),  ...
+             char(obj.posFuncType), char(obj.quadType), obj.quadAbsTol,   ...
+             obj.quadRelTol, obj.quadMaxSub, obj.quadMinSub, obj.quadPts, ...
+             obj.contDeriv, obj.basisLB, obj.basisUB, obj.basisNorm)
+        end
+
+        function obj = Deserialize(obj,filename)
+            options_len = 12;
+            optionsArray = cell(options_len,1);
+            input_str = [']=MParT_(',char(39),'MapOptions_Deserialize',char(39),',filename);'];
+            for i=options_len:-1:1
+                comma_str = ',';
+                if i == 1
+                    comma_str='[';
+                end
+                add_str = [comma_str,'optionsArray{',num2str(i),'}'];
+                input_str = [add_str, input_str];
+            end
+            eval(input_str);
+            obj.basisType = optionsArray{1};
+            obj.posFuncType = optionsArray{2};
+            obj.quadType = optionsArray{3};
+            obj.quadAbsTol = optionsArray{4};
+            obj.quadRelTol = optionsArray{5};
+            obj.quadMaxSub = optionsArray{6};
+            obj.quadMinSub = optionsArray{7};
+            obj.quadPts = optionsArray{8};
+            obj.contDeriv = optionsArray{9};
+            obj.basisLB = optionsArray{10};
+            obj.basisUB = optionsArray{11};
+            obj.basisNorm = optionsArray{12};
+        end
     end
 
 end
