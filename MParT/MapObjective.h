@@ -64,7 +64,7 @@ class MapObjective {
 
     unsigned int Dim(){return train_.extent(0);}
     unsigned int NumSamples(){return train_.extent(1);}
-    double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
+
     /**
      * @brief Shortcut to calculate the error of the map on the testing dataset
      *
