@@ -21,6 +21,11 @@ struct TrainOptions {
     int opt_maxeval = 1000;
     double opt_maxtime = std::numeric_limits<double>::infinity();
     bool verbose = false;
+    /**
+     * @brief Create a string representation of these training options (helpful for bindings)
+     *
+     * @return std::string Every option value in this struct
+     */
     std::string String() {
         std::stringstream ss;
         ss << "opt_alg = " << opt_alg << "\n";
