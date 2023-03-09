@@ -46,7 +46,9 @@ class PushforwardDensity: public DensityBase<MemorySpace> {
         StridedMatrix<double, MemorySpace> mappedPts = map_->Inverse(prefix_null, pts);
         density_->LogDensityImpl(mappedPts, output);
         StridedVector<double, MemorySpace> logJacobian = map_->LogDeterminant(mappedPts);
-        output += logJacobian;
+        Kokkos::parallel_for("Subtract logJac", output.extent(0), KOKKOS_LAMBDA(const unsigned int i){
+            output(i) -= logJacobian(i);
+        });
     };
 
     // CANNOT EVALUATE GRADIENT OF T WRT INPUTS OR COEFFS

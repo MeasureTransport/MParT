@@ -53,7 +53,7 @@ public:
                   start at index \f$\sum_{j=1}^{k-1} C_j\f$.
     */
     using ParameterizedFunctionBase<MemorySpace>::SetCoeffs;
-    void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
+    void SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs) override;
     void WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
 
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}

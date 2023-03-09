@@ -1,8 +1,14 @@
 
+set (MPART_SERIALIZE_TESTS "")
+set (MPART_OPT_TESTS "")
 if (MPART_ARCHIVE)
-     set (SERIALIZE_FILES tests/Test_Serialization.cpp)
-else()
-     set (SERIALIZE_FILES "")
+     set (MPART_SERIALIZE_TESTS tests/Test_Serialization.cpp)
+endif ()
+if (MPART_OPT)
+     set (MPART_OPT_TESTS
+          tests/Test_MapObjective.cpp
+          tests/Test_TrainMap.cpp
+     )
 endif ()
 
 set (TEST_SOURCES
@@ -41,5 +47,6 @@ set (TEST_SOURCES
      tests/Test_SummarizedMap.cpp
      #tests/Test_TensorProductFunction.cpp
 
-     ${SERIALIZE_FILES}
+     ${MPART_SERIALIZE_TESTS}
+     ${MPART_OPT_TESTS}
 PARENT_SCOPE)

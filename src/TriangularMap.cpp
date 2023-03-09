@@ -12,10 +12,10 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
                         std::accumulate(components.begin(), components.end(), 0, [](size_t sum, std::shared_ptr<ConditionalMapBase<MemorySpace>> const& comp){ return sum + comp->numCoeffs; })),
                         comps_(components)
 {
-    
+
 
     // Check the sizes of all the inputs
-    
+
     for(unsigned int i=0; i<comps_.size(); ++i){
         if(comps_.at(i)->outputDim > comps_.at(i)->inputDim){
             std::stringstream msg;
@@ -42,7 +42,7 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
 
         Kokkos::View<double*,MemorySpace> coeffs("coeffs", this->numCoeffs);
         unsigned int cumNumCoeffs = 0;
-        
+
         for(unsigned int i=0; i<comps_.size(); ++i){
 
             if(!comps_.at(i)->CheckCoefficients()){
@@ -63,7 +63,7 @@ TriangularMap<MemorySpace>::TriangularMap(std::vector<std::shared_ptr<Conditiona
 
 
 template<typename MemorySpace>
-void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs)
+void TriangularMap<MemorySpace>::SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::SetCoeffs(coeffs);
@@ -245,7 +245,7 @@ void TriangularMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, Memor
             subOut = Kokkos::subview(output, std::make_pair(startParamDim,int(startParamDim+comps_.at(i)->numCoeffs)), Kokkos::ALL());
             comps_.at(i)->CoeffGradImpl(subPts, subSens, subOut);
 
-            
+
             startParamDim += comps_.at(i)->numCoeffs;
         }
 

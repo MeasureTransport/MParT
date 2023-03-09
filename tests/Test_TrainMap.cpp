@@ -1,0 +1,43 @@
+#include <catch2/catch_all.hpp>
+
+#include "MParT/MapFactory.h"
+#include "MParT/MapObjective.h"
+#include "MParT/TrainMap.h"
+#include "MParT/Distributions/GaussianSamplerDensity.h"
+
+// For testing the normality of the pushforward
+#include "Distributions/Test_Distributions_Common.h"
+
+using namespace mpart;
+using namespace Catch;
+
+TEST_CASE("Test_TrainMap", "[TrainMap]") {
+    unsigned int seed = 42;
+    unsigned int dim = 2;
+    unsigned int numPts = 20000;
+    unsigned int testPts = numPts / 5;
+    auto sampler = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(2);
+    sampler->SetSeed(seed);
+    auto samples = sampler->Sample(numPts);
+    Kokkos::View<double**, Kokkos::HostSpace> targetSamps("targetSamps", 2, numPts);
+    double max = 0;
+    Kokkos::parallel_for("Banana", numPts, KOKKOS_LAMBDA(const unsigned int i) {
+        targetSamps(0,i) = samples(0,i);
+        targetSamps(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
+    });
+    StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
+    StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
+    KLObjective<Kokkos::HostSpace> obj {trainSamps, testSamps, sampler};
+
+    MapOptions map_options;
+    map_options.basisType = BasisTypes::ProbabilistHermite;
+    auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(dim, dim, 2, map_options);
+
+    TrainOptions train_options;
+    train_options.verbose = false;
+    Kokkos::Timer timer {};
+    timer.reset();
+    TrainMap(map, obj, train_options);
+    auto pullback_samples = map->Evaluate(testSamps);
+    TestStandardNormalSamples(pullback_samples);
+}

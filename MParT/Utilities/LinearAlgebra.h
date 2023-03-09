@@ -230,6 +230,54 @@ StridedMatrix<double, MemorySpace> operator*(TransposeObject<MemorySpace> A,
     return C;
 }
 
+enum class ReduceDimMap { sum, norm };
+
+template<ReduceDimMap Map>
+KOKKOS_INLINE_FUNCTION double ReduceDimMapKernel(double) {return 0.;};
+
+template<>
+KOKKOS_INLINE_FUNCTION double ReduceDimMapKernel<ReduceDimMap::sum>(double x) {return x;};
+
+template<>
+KOKKOS_INLINE_FUNCTION double ReduceDimMapKernel<ReduceDimMap::norm>(double x) {return x*x;};
+
+
+// This struct allows you to reduce the columns of a mxn matrix
+// Performs alpha*A*[1,...,1]
+template<ReduceDimMap Map, typename MemorySpace, unsigned int Dim = 1, typename = std::enable_if_t<Dim <= 1,int> >
+struct ReduceDim {
+    using value_type = double[];
+    using size_type = typename StridedMatrix<double, MemorySpace>::size_type;
+
+    // Keep track of the dimension we are not reducing
+    size_type value_count;
+
+    StridedMatrix<const double, MemorySpace> A_;
+    double alpha_;
+
+    ReduceDim(StridedMatrix<double, MemorySpace> A, double alpha, double base = 0.): value_count(A.extent(1-Dim)), A_(A), alpha_(alpha) {}
+
+    KOKKOS_INLINE_FUNCTION void operator()(const size_type reduce_idx, value_type sum) const {
+        for(size_type full_idx=0; full_idx<value_count; ++full_idx) {
+            double aij = 0.;
+            if(Dim == 1) aij = A_(full_idx,reduce_idx);
+            else aij = A_(reduce_idx,full_idx);
+            sum[full_idx] += ReduceDimMapKernel<Map>(aij)*alpha_;
+        }
+    }
+
+    KOKKOS_INLINE_FUNCTION void join (volatile value_type dst, const volatile value_type src) const {
+        for (size_type i = 0; i < value_count; ++i) {
+            dst[i] += src[i];
+        }
+    }
+
+    KOKKOS_INLINE_FUNCTION void init (value_type sum) const {
+        for (size_type i = 0; i < value_count; ++i) {
+            sum[i] = 0.0;
+        }
+    }
+};
 
 /** Mimics the interface of the Eigen::PartialPivLU class, but using Kokkos::Views and CUBLAS/CUSOLVER linear algebra.
 

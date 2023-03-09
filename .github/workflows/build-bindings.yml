@@ -6,6 +6,9 @@ on:
       - main
   pull_request: {}
 
+env:
+  CONDA_CACHE_NUMBER: 0  # increase to reset cache manually
+
 jobs:
   build-tests:
     runs-on: ubuntu-latest
@@ -20,19 +23,27 @@ jobs:
         with:
           path: mpart
 
+      - name: Use Conda
+        uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniforge-variant: Mambaforge
+          miniforge-version: latest
+          activate-environment: test
+          use-mamba: true
+          auto-update-conda: true
+          python-version: "3.8"
+
       - name: Cache Conda Deps
         uses: actions/cache@v3
         id: cache-conda
         with:
-          path: "~/conda_pkgs_dir"
-          key: conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}
+          path: /usr/share/miniconda3/envs/test
+          key: cache-conda-${{ hashFiles('mpart/.github/environment.yml') }}-${{ env.DATE }}-${{ env.CONDA_CACHE_NUMBER }}-BINDINGS
 
-      - name: Use Conda
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: "3.8"
-          activate-environment: "test"
+      - name: Install Conda Dependencies
+        shell: bash -l {0}
+        run: mamba env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
+        if: steps.cache-conda.outputs.cache-hit != 'true'
 
       - name: Setup Julia
         run: |
@@ -72,10 +83,6 @@ jobs:
                 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/KOKKOS_INSTALL/ \
                 ../
           sudo make -j2 install
-
-      - name: Install Conda Dependencies
-        shell: bash -l {0}
-        run: conda env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
 
       - name: Configure MParT
         shell: bash -l {0}
