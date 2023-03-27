@@ -135,6 +135,21 @@ namespace mpart{
     }
 
     /**
+     * @brief Wraps a const std::vector in a StridedVector
+     *
+     * @tparam ScalarType
+     * @tparam MemorySpace
+     * @param vec
+     * @return StridedVector<ScalarType*, MemorySpace>
+     */
+    template<typename ScalarType, class MemorySpace>
+    StridedVector<ScalarType, MemorySpace> ConstVecToKokkos(const std::vector<ScalarType> &vec)
+    {
+        double* ptr = const_cast<double*>(vec.data());
+        return Kokkos::View<ScalarType*, MemorySpace>(ptr, vec.size());
+    }
+
+    /**
      * @brief Wraps a std::vector in a StridedMatrix
      *
      * @tparam ScalarType

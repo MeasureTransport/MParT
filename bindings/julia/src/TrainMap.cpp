@@ -9,7 +9,7 @@ void mpart::binding::TrainMapWrapper(jlcxx::Module &mod) {
         .method("__opt_xtol_rel!", [](TrainOptions &opts, double tol){opts.opt_xtol_rel = tol;})
         .method("__opt_xtol_abs!", [](TrainOptions &opts, double tol){opts.opt_xtol_abs = tol;})
         .method("__opt_maxeval!", [](TrainOptions &opts, int eval){opts.opt_maxeval = eval;})
-        .method("__verbose!", [](TrainOptions &opts, bool verbose){opts.verbose = verbose;})
+        .method("__verbose!", [](TrainOptions &opts, int verbose){opts.verbose = verbose;})
     ;
 
     mod.set_override_module(jl_base_module);

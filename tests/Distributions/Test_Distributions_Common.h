@@ -18,17 +18,19 @@ template<typename MemorySpace>
 class UniformSampler: public SampleGenerator<MemorySpace> {
 public:
 // Set a given seed for this test
-UniformSampler(int dim): SampleGenerator<MemorySpace>(dim, 160258) {}
+UniformSampler(int dim, double scale = std::exp(1.)): SampleGenerator<MemorySpace>(dim, seed), scale_(scale) {}
 
 void SampleImpl(StridedMatrix<double, MemorySpace> output) {
-    double euler = std::exp(1.);
     Kokkos::MDRangePolicy<Kokkos::Rank<2>,typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {output.extent(0), output.extent(1)});
     Kokkos::parallel_for(policy, KOKKOS_LAMBDA(int i, int j) {
         auto rgen = this->rand_pool.get_state();
-        output(i,j) = euler*rgen.drand();
+        output(i,j) = scale_*rgen.drand();
         this->rand_pool.free_state(rgen);
     });
 }
+private:
+static const unsigned int seed = 160258;
+const double scale_;
 };
 
 // Uniform density on [0,e]^2

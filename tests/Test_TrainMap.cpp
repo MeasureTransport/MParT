@@ -19,14 +19,14 @@ TEST_CASE("Test_TrainMap", "[TrainMap]") {
     auto sampler = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(2);
     sampler->SetSeed(seed);
     auto samples = sampler->Sample(numPts);
-    Kokkos::View<double**, Kokkos::HostSpace> targetSamps("targetSamps", 2, numPts);
+    Kokkos::View<double**, Kokkos::HostSpace> targetSamples("targetSamples", 2, numPts);
     double max = 0;
     Kokkos::parallel_for("Banana", numPts, KOKKOS_LAMBDA(const unsigned int i) {
-        targetSamps(0,i) = samples(0,i);
-        targetSamps(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
+        targetSamples(0,i) = samples(0,i);
+        targetSamples(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
     });
-    StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
-    StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamps, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
+    StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
+    StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
     KLObjective<Kokkos::HostSpace> obj {trainSamps, testSamps, sampler};
 
     MapOptions map_options;
@@ -34,7 +34,7 @@ TEST_CASE("Test_TrainMap", "[TrainMap]") {
     auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(dim, dim, 2, map_options);
 
     TrainOptions train_options;
-    train_options.verbose = false;
+    train_options.verbose = 0;
     TrainMap(map, obj, train_options);
     auto pullback_samples = map->Evaluate(testSamps);
     TestStandardNormalSamples(pullback_samples);

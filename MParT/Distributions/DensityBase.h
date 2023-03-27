@@ -79,7 +79,6 @@ public:
 protected:
     const unsigned int dim_;
 };
-
 }
 
 #endif // MPART_DensityBase_H

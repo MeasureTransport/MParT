@@ -57,7 +57,7 @@ nlopt::opt SetupOptimization(unsigned int dim, TrainOptions options) {
 }
 
 template<typename ObjectiveType>
-void mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options) {
+double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options) {
     if(map->Coeffs().extent(0) == 0) {
         std::cout << "TrainMap: Initializing map coeffs to 1." << std::endl;
         Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Default coeffs", map->numCoeffs);
@@ -97,8 +97,9 @@ void mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map,
         std::cout << "Optimization error: " << error << "\n";
         std::cout << "Optimization evaluations: " << opt.get_numevals() << std::endl;
     }
+    return error;
 }
 
 // Explicitly instantiate the function for HostSpace-- it doesn't work for device, since NLopt is CPU-based.
-template void mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, KLObjective<Kokkos::HostSpace> &objective, TrainOptions options);
+template double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, KLObjective<Kokkos::HostSpace> &objective, TrainOptions options);
 

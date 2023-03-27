@@ -104,7 +104,7 @@ public:
     /** Get the number of components in the index.  When used to define a
         multivariate polynomial, this will return the dimension of the
         polynomial.
-        @return The length of the multiindex.  When used for defining multivariate polynomials, 
+        @return The length of the multiindex.  When used for defining multivariate polynomials,
                 this will be the dimension of the polynomial.
     */
     unsigned int Length() const{return length;};
@@ -121,9 +121,9 @@ public:
     */
     bool operator!=(const MultiIndex &b) const;
 
-    /** 
+    /**
         Check if this multiindex is less than b.  The multiindices are ordered such that:
-        
+
         a<b if:
         - the length of a is less than the length of b OR
         - the lengths are the same, but the total order of "a" is less than the total order of "b" OR
@@ -135,9 +135,9 @@ public:
     */
     bool operator<(const MultiIndex &b) const;
 
-    /** 
+    /**
         Check if this multiindex is greather than b.  The multiindices are ordered such that:
-        
+
         a<b if:
         - the length of a is less than the length of b OR
         - the lengths are the same, but the total order of "a" is less than the total order of "b" OR
@@ -149,8 +149,8 @@ public:
     */
     bool operator>(const MultiIndex &b) const;
 
-    /** 
-        Check if this multiindex is greater than or equal to b.  This is checked by returning 
+    /**
+        Check if this multiindex is greater than or equal to b.  This is checked by returning
         "not (a<b)"
 
         @param[in] b The multiindex to compare with *this.
@@ -158,8 +158,8 @@ public:
     */
     bool operator>=(const MultiIndex &b) const;
 
-    /** 
-        Check if this multiindex is greater than or equal to b.  This is checked by returning 
+    /**
+        Check if this multiindex is greater than or equal to b.  This is checked by returning
         "not (a>b)"
 
         @param[in] b The multiindex to compare with *this.
@@ -167,6 +167,15 @@ public:
     */
     bool operator<=(const MultiIndex &b) const;
 
+    /**
+     * @brief Similar to operator>=, but bound must same length or longer. Further, it only
+     * returns false if every value in this is less than every value in bound.
+     *
+     * @param bound bound for this multiindex
+     * @return true if any value this[j] is at or above bound[j]
+     * @return false else
+     */
+    bool AnyBounded(const MultiIndex &bound) const;
 private:
 
     unsigned int length;
@@ -174,7 +183,7 @@ private:
     /// a vector holding pairs of (dimension,index) for nonzero values of index.
     std::vector<unsigned int> nzInds;
     std::vector<unsigned int> nzVals;
-    
+
     /// The maximum index over all nzInds pairs.
     unsigned int maxValue;
 

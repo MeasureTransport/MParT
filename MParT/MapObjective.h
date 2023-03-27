@@ -62,6 +62,9 @@ class MapObjective {
      */
     double operator()(unsigned int n, const double* x, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 
+    unsigned int Dim(){return train_.extent(0);}
+    unsigned int NumSamples(){return train_.extent(1);}
+
     /**
      * @brief Shortcut to calculate the error of the map on the testing dataset
      *
@@ -93,6 +96,20 @@ class MapObjective {
      * @param grad storage for the gradient
      */
     void TrainCoeffGradImpl(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, StridedVector<double, MemorySpace> grad) const;
+
+    /**
+     * @brief Get the Training data for this objective
+     *
+     * @return StridedMatrix<const double, MemorySpace> Training data for optimization
+     */
+    StridedMatrix<const double, MemorySpace> GetTrain() {return train_;}
+
+    /**
+     * @brief Get the Testing data for this objective
+     *
+     * @return StridedMatrix<const double, MemorySpace> Testing data for optimization
+     */
+    StridedMatrix<const double, MemorySpace> GetTest() {return test_;}
 
     /**
      * @brief Objective value of map at data
