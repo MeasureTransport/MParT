@@ -165,12 +165,12 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
             for(int output=0; output<outputDim; output++){
                 int rmIdx = 0;
                 for(int i = 0; i < mset_tmp[output].Size(); i++) {
-                    std::cerr << "gradCoeff(" << coeffIdx << ")=" << gradCoeff(coeffIdx) << ", midx=[" << mset_tmp[output][i] << "]";
+                    std::cout << "gradCoeff(" << coeffIdx << ")=" << gradCoeff(coeffIdx) << ", midx=[" << mset_tmp[output][i] << "]";
                     if(i == multis_rm[output][rmIdx]) {
-                        std::cerr << " rm!";
+                        std::cout << " rm!";
                         rmIdx++;
                     }
-                    std::cerr << std::endl;
+                    std::cout << std::endl;
                     coeffIdx++;
                 }
             }
@@ -189,7 +189,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         MultiIndex addedMulti = mset_tmp[maxIdxBlock][maxIdx];
         mset0[maxIdxBlock] += addedMulti;
         if(options.verbose) {
-            std::cerr << "Added multi = [" << addedMulti.String() << "]" <<std::endl;
+            std::cout << "Added multi = [" << addedMulti.String() << "]" <<std::endl;
         }
         currSz++;
         if(mset0[maxIdxBlock].Size() != mset_sizes[maxIdxBlock]+1) {
