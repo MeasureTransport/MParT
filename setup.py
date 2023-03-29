@@ -1,6 +1,7 @@
 from skbuild import setup
 
 import os, sys, site
+import warnings
 
 def get_install_locations():
     """Return the installation directory, or '' if no directory could be found 
@@ -11,20 +12,21 @@ def get_install_locations():
     if '--user' in sys.argv:
         paths = (site.getusersitepackages(),)
     else:
-        py_version = '%s.%s' % (sys.version_info[0], sys.version_info[1])
-        paths = (s % (py_version) for s in (
-            sys.prefix + '/lib/python%s/dist-packages/',
-            sys.prefix + '/lib/python%s/site-packages/',
-            sys.prefix + '/local/lib/python%s/dist-packages/',
-            sys.prefix + '/local/lib/python%s/site-packages/',
-            '/Library/Python/%s/site-packages/',
-        ))
+        py_version = f'{sys.version_info[0]}.{sys.version_info[1]}'
+        paths = [
+            sys.prefix + f'/lib/python{py_version}/dist-packages/',
+            sys.prefix + f'/lib/python{py_version}/site-packages/',
+            sys.prefix + f'/local/lib/python{py_version}/dist-packages/',
+            sys.prefix + f'/local/lib/python{py_version}/site-packages/',
+            f'/Library/Frameworks/Python.framework/Versions/{py_version}/lib/python{py_version}/site-packages/'
+        ]
 
     for path in paths:
         if os.path.exists(path):
             parts = path.split('/')
             lib_indices = [index for index, item in enumerate(parts) if item == 'lib']
             return path, '/'.join(parts[0:(lib_indices[-1]+1)])
+        
     return ''
 
 site_folder, lib_folder = get_install_locations()
