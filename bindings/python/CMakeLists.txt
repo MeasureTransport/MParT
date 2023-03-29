@@ -44,11 +44,7 @@ install(DIRECTORY package/ DESTINATION "${PYTHON_INSTALL_PREFIX}")
 #message(STATUS "LIB_PATH = ${lib_path}")
 #list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
 if(SKBUILD)
-    set_target_properties(pympart PROPERTIES
-        INSTALL_RPATH "\$ORIGIN/../../../../lib")
-    # # The following is necessary for installation in a virtual
-    # # environment `python -m pip venv env`
-    # set_target_properties(_mwe PROPERTIES
-    #     INSTALL_RPATH_USE_LINK_PATH TRUE
-    #     INSTALL_RPATH "${lib_path}")
+    if (SKBUILD_LIB_RPATH)
+        set_target_properties(pympart PROPERTIES INSTALL_RPATH "${SKBUILD_LIB_RPATH}")
+    endif()
 endif()
