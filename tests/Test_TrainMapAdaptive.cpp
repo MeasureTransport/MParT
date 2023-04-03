@@ -2,7 +2,7 @@
 
 #include "MParT/Distributions/GaussianSamplerDensity.h"
 #include "MParT/MapObjective.h"
-#include "MParT/AdaptiveTransportMap.h"
+#include "MParT/TrainMapAdaptive.h"
 #include "MParT/MultiIndices/MultiIndex.h"
 
 using namespace mpart;
@@ -65,7 +65,7 @@ TEST_CASE("Adaptive Transport Map","[ATM]") {
         opts.basisLB = -3.;
         opts.basisUB = 3.;
 
-        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = AdaptiveTransportMap<Kokkos::HostSpace>(mset0, objective, opts);
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = TrainMapAdaptive<Kokkos::HostSpace>(mset0, objective, opts);
         MultiIndexSet finalMset1 = mset0[0];
         MultiIndexSet finalMset2 = mset0[1];
         CHECK((finalMset1 + correctMset1).Size() == finalMset1.Size());
@@ -100,7 +100,7 @@ TEST_CASE("Adaptive Transport Map","[ATM]") {
         opts.basisUB = 3.;
 
         std::vector<MultiIndexSet> mset0 {MultiIndexSet::CreateTotalOrder(1,0), MultiIndexSet::CreateTotalOrder(2,0)};
-        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = AdaptiveTransportMap<Kokkos::HostSpace>(mset0, objective, opts);
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = TrainMapAdaptive<Kokkos::HostSpace>(mset0, objective, opts);
         StridedMatrix<double, Kokkos::HostSpace> pullback_test = atm->Evaluate(testSamples);
         TestStandardNormalSamples(pullback_test);
     }
@@ -126,7 +126,7 @@ TEST_CASE("Adaptive Transport Map","[ATM]") {
         opts.basisUB = 3.;
         opts.maxDegrees = MultiIndex{1000,4}; // Limit the second input to have cubic complexity or less
 
-        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = AdaptiveTransportMap<Kokkos::HostSpace>(mset0, objective, opts);
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = TrainMapAdaptive<Kokkos::HostSpace>(mset0, objective, opts);
         MultiIndexSet finalMset1 = mset0[0];
         MultiIndexSet finalMset2 = mset0[1];
         CHECK((finalMset1 + correctMset1).Size() == finalMset1.Size());
