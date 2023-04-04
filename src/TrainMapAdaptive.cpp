@@ -42,7 +42,7 @@ void maxDegreeRMFilter(std::vector<MultiIndexSet> const &msets, MultiIndex const
 
 template<>
 std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::TrainMapAdaptive(std::vector<MultiIndexSet> &mset0,
-        std::shared_ptr<MapObjective<MemorySpace>> objective,
+        std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective,
         ATMOptions options) {
 
     // Dimensions

@@ -17,7 +17,7 @@ if(MPART_OPT)
   set(JULIA_BINDING_SOURCES ${JULIA_BINDING_SOURCES}
       src/MapObjective.cpp
       src/TrainMap.cpp
-      src/AdaptiveTransportMap.cpp
+      src/TrainMapAdaptive.cpp
   )
 endif()
 

@@ -26,7 +26,7 @@ PYBIND11_MODULE(pympart, m) {
     TrainOptionsWrapper(m);
     ATMOptionsWrapper(m);
     TrainMapWrapper<Kokkos::HostSpace>(m);
-    AdaptiveTransportMapWrapper<Kokkos::HostSpace>(m);
+    TrainMapAdaptiveWrapper<Kokkos::HostSpace>(m);
 #endif // MPART_HAS_NLOPT
 
 #if defined(MPART_HAS_CEREAL)
