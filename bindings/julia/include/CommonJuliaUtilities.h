@@ -86,7 +86,7 @@ void MapObjectiveWrapper(jlcxx::Module &);
 void TrainMapWrapper(jlcxx::Module&);
 
 /**
- * @brief Adds AdaptiveTransportMap and ATMOptions to the existing module m.
+ * @brief Adds TrainMapAdaptive and ATMOptions to the existing module m.
  * @param mod CxxWrap.jl module
 */
 void TrainMapAdaptiveWrapper(jlcxx::Module&);

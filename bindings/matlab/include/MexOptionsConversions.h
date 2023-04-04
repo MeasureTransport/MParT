@@ -5,7 +5,7 @@
 #include <mexplus.h>
 #include "MParT/MapOptions.h"
 #if defined(MPART_HAS_NLOPT)
-#include "MParT/AdaptiveTransportMap.h"
+#include "MParT/TrainMapAdaptive.h"
 #endif // defined(MPART_HAS_NLOPT)
 
 namespace mpart{
