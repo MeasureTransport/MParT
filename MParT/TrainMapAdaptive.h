@@ -1,5 +1,5 @@
-#ifndef MPART_ADAPTIVETRANSPORTMAP_H
-#define MPART_ADAPTIVETRANSPORTMAP_H
+#ifndef MPART_TRAINMAPADAPTIVE_H
+#define MPART_TRAINMAPADAPTIVE_H
 
 #include <vector>
 #include "Utilities/ArrayConversions.h"
@@ -29,18 +29,18 @@ struct ATMOptions: public MapOptions, public TrainOptions {
 };
 
 template<typename MemorySpace>
-std::shared_ptr<ConditionalMapBase<MemorySpace>> AdaptiveTransportMap(std::vector<MultiIndexSet> &mset0,
+std::shared_ptr<ConditionalMapBase<MemorySpace>> TrainMapAdaptive(std::vector<MultiIndexSet> &mset0,
     std::shared_ptr<MapObjective<MemorySpace>> objective,
     ATMOptions options);
 
 // template<typename MemorySpace>
-// std::tuple<std::shared_ptr<ConditionalMapBase<MemorySpace>>,std::vector<MultiIndexSet>> AdaptiveTransportMap(StridedMatrix<double, MemorySpace> train_x, StridedMatrix<double, MemorySpace> test_x, ATMOptions options = ATMOptions()) {
+// std::shared_ptr<ConditionalMapBase<MemorySpace>> TrainMapAdaptive(StridedMatrix<double, MemorySpace> train_x, StridedMatrix<double, MemorySpace> test_x, ATMOptions options = ATMOptions()) {
 //     unsigned int dim = train_x.extent(0);
-
-//     return AdaptiveTransportMap(mset0, train_x, test_x, options);
+//     MultiIndexSet mset0 = MultiIndexSet::CreateTotalOrder(dim, 0);
+//     return TrainMapAdaptive(mset0, train_x, test_x, options);
 // }
 
 }
 
 
-#endif // MPART_ADAPTIVETRANSPORTMAP_H
+#endif // MPART_TRAINMAPADAPTIVE_H

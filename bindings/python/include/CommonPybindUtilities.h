@@ -61,7 +61,7 @@ void TrainMapWrapper(pybind11::module &m);
 void ATMOptionsWrapper(pybind11::module &m);
 
 template<typename MemorySpace>
-void AdaptiveTransportMapWrapper(pybind11::module &m);
+void TrainMapAdaptiveWrapper(pybind11::module &m);
 #endif
 
 

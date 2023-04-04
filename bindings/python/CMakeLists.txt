@@ -27,7 +27,7 @@ if(MPART_OPT)
   set(PYTHON_BINDING_SOURCES ${PYTHON_BINDING_SOURCES}
     src/MapObjective.cpp
     src/TrainMap.cpp
-    src/AdaptiveTransportMap.cpp
+    src/TrainMapAdaptive.cpp
   )
 endif()
 

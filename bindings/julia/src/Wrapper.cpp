@@ -30,6 +30,6 @@ JLCXX_MODULE MParT_julia_module(jlcxx::Module& mod)
 #if defined(MPART_HAS_NLOPT)
     binding::MapObjectiveWrapper(mod);
     binding::TrainMapWrapper(mod);
-    binding::AdaptiveTransportMapWrapper(mod);
+    binding::TrainMapAdaptiveWrapper(mod);
 #endif // MPART_HAS_NLOPT
 }

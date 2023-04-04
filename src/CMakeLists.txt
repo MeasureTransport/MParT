@@ -3,7 +3,7 @@ if (MPART_OPT)
     set(MPART_OPT_FILES
         MapObjective.cpp
         TrainMap.cpp
-        AdaptiveTransportMap.cpp
+        TrainMapAdaptive.cpp
     )
 else()
     set(MPART_OPT_FILES "")
