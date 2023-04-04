@@ -7,6 +7,12 @@
 
 namespace mpart {
 
+/**
+ * @brief A class to represent both the sampler and the density for a multivariate Gaussian distribution.
+ *        Implements features for efficient calculation in the zero mean and/or identity variance cases.
+ *
+ * @tparam MemorySpace Where to store data for computation
+ */
 template<typename MemorySpace>
 class GaussianSamplerDensity: public SampleGenerator<MemorySpace>, public DensityBase<MemorySpace> {
     public:
