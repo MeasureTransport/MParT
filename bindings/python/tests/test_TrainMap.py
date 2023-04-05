@@ -17,7 +17,7 @@ test_samples = target_samples[:,:testPts]
 train_samples = target_samples[:,testPts:]
 
 # Create training objective
-obj = mpart.GaussianKLObjective(np.asfortranarray(train_samples),np.asfortranarray(test_samples))
+obj = mpart.CreateGaussianKLObjective(np.asfortranarray(train_samples),np.asfortranarray(test_samples))
 
 # Create untrained map
 map_options = mpart.MapOptions()
