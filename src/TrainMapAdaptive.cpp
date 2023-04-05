@@ -1,4 +1,4 @@
-#include "MParT/AdaptiveTransportMap.h"
+#include "MParT/TrainMapAdaptive.h"
 #include <fstream>
 
 using namespace mpart;
@@ -41,7 +41,7 @@ void maxDegreeRMFilter(std::vector<MultiIndexSet> const &msets, MultiIndex const
 
 
 template<>
-std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportMap(std::vector<MultiIndexSet> &mset0,
+std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::TrainMapAdaptive(std::vector<MultiIndexSet> &mset0,
         std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective,
         ATMOptions options) {
 
@@ -70,7 +70,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         // Check the length is okay
         if(mset_j.Length() != currMsetDim) {
             std::stringstream ss;
-            ss << "AdaptiveTransportMap: Initial MultiIndexSet " << j << " is invalid.\n";
+            ss << "TrainMapAdaptive: Initial MultiIndexSet " << j << " is invalid.\n";
             ss << "Expected Length " << currMsetDim << ", got " << mset_j.Length() << ".";
             throw std::invalid_argument(ss.str());
         }
@@ -92,7 +92,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
     // Check that the multiindex sets match with the objective
     if(currMsetDim != inputDim) {
         std::stringstream ss;
-            ss << "AdaptiveTransportMap: Initial MultiIndexSets must match Objective dimension.\n";
+            ss << "TrainMapAdaptive: Initial MultiIndexSets must match Objective dimension.\n";
             ss << "Expected last MultiIndexSet to have Length " << inputDim << ", got " << currMsetDim << ".";
             throw std::invalid_argument(ss.str());
     }
@@ -103,7 +103,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         hasMaxDegrees = false;
     } else if(options.maxDegrees.Length() != currMsetDim){
         std::stringstream ss;
-        ss << "AdaptiveTransportMap: invalid options.maxDegrees for this vector of MultiIndexSet objects\n";
+        ss << "TrainMapAdaptive: invalid options.maxDegrees for this vector of MultiIndexSet objects\n";
         ss << "Expected length either zero or " << currMsetDim << "\n";
         throw std::invalid_argument(ss.str());
     }
@@ -165,12 +165,12 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
             for(int output=0; output<outputDim; output++){
                 int rmIdx = 0;
                 for(int i = 0; i < mset_tmp[output].Size(); i++) {
-                    std::cerr << "gradCoeff(" << coeffIdx << ")=" << gradCoeff(coeffIdx) << ", midx=[" << mset_tmp[output][i] << "]";
+                    std::cout << "gradCoeff(" << coeffIdx << ")=" << gradCoeff(coeffIdx) << ", midx=[" << mset_tmp[output][i] << "]";
                     if(i == multis_rm[output][rmIdx]) {
-                        std::cerr << " rm!";
+                        std::cout << " rm!";
                         rmIdx++;
                     }
-                    std::cerr << std::endl;
+                    std::cout << std::endl;
                     coeffIdx++;
                 }
             }
@@ -189,13 +189,13 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::AdaptiveTransportM
         MultiIndex addedMulti = mset_tmp[maxIdxBlock][maxIdx];
         mset0[maxIdxBlock] += addedMulti;
         if(options.verbose) {
-            std::cerr << "Added multi = [" << addedMulti.String() << "]" <<std::endl;
+            std::cout << "Added multi = [" << addedMulti.String() << "]" <<std::endl;
         }
         currSz++;
         if(mset0[maxIdxBlock].Size() != mset_sizes[maxIdxBlock]+1) {
             std::cerr << addedMulti << "\n";
             std::stringstream ss_err;
-            ss_err << "AdaptiveTransportMap: Unexpected sizes of MultiIndexSets.\n";
+            ss_err << "TrainMapAdaptive: Unexpected sizes of MultiIndexSets.\n";
             ss_err << "mset0["<<maxIdxBlock<<"].Size() = " << mset0[maxIdxBlock].Size() << ", mset_sizes["<<maxIdxBlock<<"] = " << mset_sizes[maxIdxBlock]+1;
             throw std::runtime_error(ss_err.str());
         }

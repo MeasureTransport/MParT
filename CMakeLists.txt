@@ -220,7 +220,6 @@ endif()
 # Add NLopt if necessary
 if(MPART_OPT)
     find_package(NLopt QUIET)
-
     if(NOT NLopt_FOUND)
         if(${MPART_FETCH_DEPS})
             message(STATUS "Could not find NLopt. Fetching source.")

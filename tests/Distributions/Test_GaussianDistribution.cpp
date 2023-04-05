@@ -2,7 +2,6 @@
 #include <catch2/catch_all.hpp>
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Distributions/GaussianSamplerDensity.h"
-
 #include "Test_Distributions_Common.h"
 
 using namespace mpart;
