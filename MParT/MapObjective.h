@@ -47,6 +47,9 @@ class MapObjective {
      */
     MapObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test): train_(train), test_(test) {}
 
+    unsigned int Dim(){return train_.extent(0);}
+    unsigned int NumSamples(){return train_.extent(1);}
+
     /**
      * @brief Exposed functor-like function to calculate objective value and its gradient
      *
