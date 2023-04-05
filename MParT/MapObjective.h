@@ -101,12 +101,12 @@ class MapObjective {
     virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const = 0;
 
     /**
-     * @brief Gradient of the objective at the training data with respect to the coefficients of the map
+     * @brief Shortcut to calculate the gradient of the objective on the training dataset w.r.t. the map coefficients
      *
-     * @param grad storage for calculating gradient inplace
-     * @param map map with coefficients to take gradient on
+     * @param map Map to calculate the gradient with respect to
+     * @param grad storage for the gradient
      */
-    virtual void TrainCoeffGradImpl(StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const = 0;
+    void TrainCoeffGradImpl(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, StridedVector<double, MemorySpace> grad) const;
 
     /**
      * @brief Implementation of objective and gradient objective calculation (gradient w.r.t. map coefficients), inplace. Default uses `ObjectiveImpl` and `CoeffGradImpl`,
