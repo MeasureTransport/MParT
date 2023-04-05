@@ -62,9 +62,17 @@ class MapObjective {
      * @brief Shortcut to calculate the error of the map on the testing dataset
      *
      * @param map Map to calculate the error on
+     * @return double testing error
+     */
+    double TestError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
+
+    /**
+     * @brief Shortcut to calculate the error of the map on the training dataset
+     *
+     * @param map Map to calculate the error on
      * @return double training error
      */
-    double TestError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
+    double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
 
     /**
      * @brief Get the gradient of the map objective with respect to map coefficients on the training dataset
@@ -72,7 +80,7 @@ class MapObjective {
      * @param map Map to use in this objective gradient
      * @return StridedVector<double, MemorySpace> Gradient of the map on the training dataset
      */
-    StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
+    StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
 
     /**
      * @brief Objective value of map at data
