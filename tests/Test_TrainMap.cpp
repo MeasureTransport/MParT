@@ -25,12 +25,11 @@ TEST_CASE("Test_TrainMap", "[TrainMap]") {
         targetSamples(0,i) = samples(0,i);
         targetSamples(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
     });
-    StridedMatrix<double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
-    StridedMatrix<double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
-    KLObjective<Kokkos::HostSpace> obj {trainSamps, testSamps, sampler};
+    StridedMatrix<const double, Kokkos::HostSpace> testSamps = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(0, testPts));
+    StridedMatrix<const double, Kokkos::HostSpace> trainSamps = Kokkos::subview(targetSamples, Kokkos::ALL, Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
+    auto obj = ObjectiveFactory::CreateGaussianKLObjective(trainSamps, testSamps);
 
     MapOptions map_options;
-    map_options.basisType = BasisTypes::ProbabilistHermite;
     auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(dim, dim, 2, map_options);
 
     TrainOptions train_options;
