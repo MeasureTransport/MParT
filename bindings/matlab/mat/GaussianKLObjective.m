@@ -5,11 +5,15 @@ properties (Access = private)
 end
 
 methods
-    function this = GaussianKLObjective(varargin)
+    function this = GaussianKLObjective(train, test, dim)
         if(nargin==1)
-            this.id_ = MParT_('GaussianKLObjective_newTrain',varargin{1});
+            this.id_ = MParT_('GaussianKLObjective_newTrain',train,0);
+        elseif(isinteger(test))
+            this.id_ = MParT_('GaussianKLObjective_newTrain',train,test);
+        elseif(nargin==2)
+            this.id_ = MParT_('GaussianKLObjective_newTrainTest',train,test,0);
         else
-            this.id_ = MParT_('GaussianKLObjective_newTrainTest',varargin{1},varargin{2});
+            this.id_ = MParT_('GaussianKLObjective_newTrainTest',train,test,dim);
         end
     end
 

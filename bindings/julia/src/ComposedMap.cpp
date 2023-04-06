@@ -13,10 +13,10 @@ using namespace mpart;
 
 void mpart::binding::ComposedMapWrapper(jlcxx::Module &mod)
 {
-    mod.add_type<ComposedMap<Kokkos::HostSpace>>("ComposedMap", jlcxx::julia_base_type<ConditionalMapBase<Kokkos::HostSpace>>())
-        .constructor<std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> const&>()
-        // .method("EvaluateUntilK", [](ComposedMap<Kokkos::HostSpace> &map, int k, jlcxx::ArrayRef<double,2>& intPts, jlcxx::ArrayRef<double,2>& output){
-        //     return KokkosToJulia(map.EvaluateUntilK(k, JuliaToKokkos(intPts), JuliaToKokkos(output)));
-        // })
-        ;
+    mod.add_type<ComposedMap<Kokkos::HostSpace>>("ComposedMap", jlcxx::julia_base_type<ConditionalMapBase<Kokkos::HostSpace>>());
+    mod.method("ComposedMap", [](std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> const& maps){
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> ret =  std::make_shared<ComposedMap<Kokkos::HostSpace>>(maps);
+        return ret;
+    })
+    ;
 }

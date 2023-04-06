@@ -67,6 +67,14 @@ class MapObjective {
     unsigned int NumSamples(){return train_.extent(1);}
 
     /**
+     * @brief Shortcut to calculate the error of the map on the training dataset
+     *
+     * @param map Map to calculate the error on
+     * @return double training error
+     */
+    double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
+
+    /**
      * @brief Shortcut to calculate the error of the map on the testing dataset
      *
      * @param map Map to calculate the error on
@@ -81,14 +89,6 @@ class MapObjective {
      * @return StridedVector<double, MemorySpace> Gradient of the map on the training dataset
      */
     StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
-
-    /**
-     * @brief Shortcut to calculate the error of the map on the training dataset
-     *
-     * @param map Map to calculate the error on
-     * @return double training error
-     */
-    double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
 
     /**
      * @brief Shortcut to calculate the gradient of the objective on the training dataset w.r.t. the map coefficients
@@ -187,10 +187,10 @@ class KLObjective: public MapObjective<MemorySpace> {
 
 namespace ObjectiveFactory {
 template<typename MemorySpace>
-std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train);
+std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, unsigned int dim=0);
 
 template<typename MemorySpace>
-std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test);
+std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test, unsigned int dim=0);
 } // namespace ObjectiveFactory
 
 } // namespace mpart

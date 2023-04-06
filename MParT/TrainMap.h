@@ -43,6 +43,7 @@ struct TrainOptions {
         return ss.str();
     }
 };
+
 /**
  * @brief Function to train a map inplace given an objective and optimization options
  *
