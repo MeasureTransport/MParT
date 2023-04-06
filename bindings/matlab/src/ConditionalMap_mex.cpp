@@ -36,7 +36,7 @@ MEX_DEFINE(ConditionalMap_newTriMap) (int nlhs, mxArray* plhs[],
 }
 
 #if defined(MPART_HAS_NLOPT)
-MEX_DEFINE(ConditionalMap_AdaptiveTransportMap) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_TrainMapAdaptive) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
 
   InputArguments input(nrhs, prhs, 26);
@@ -52,7 +52,7 @@ MEX_DEFINE(ConditionalMap_AdaptiveTransportMap) (int nlhs, mxArray* plhs[],
   MapObjectiveMex *obj = Session<MapObjectiveMex>::get(input.get(1));
   std::shared_ptr<MapObjective<MemorySpace>> obj_ptr = obj->obj_ptr;
   ATMOptions opts = binding::ATMOptionsFromMatlab(input, 2);
-  std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map = AdaptiveTransportMap(mset0, obj_ptr, opts);
+  std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map = TrainMapAdaptive(mset0, obj_ptr, opts);
   for(unsigned int i=0;i<numBlocks;++i){
     MultiIndexSet *mset_i = Session<MultiIndexSet>::get(list_id_mset.at(i));
     *mset_i = mset0[i];

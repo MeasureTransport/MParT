@@ -13,7 +13,7 @@ using namespace Catch;
 
 TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]") {
     unsigned int dim = 2;
-    unsigned int N_samp = 10;
+    unsigned int N_samp = 1000;
     unsigned int seed = 169203;
     SECTION( "AffineMapPullback") {
 
@@ -24,7 +24,7 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         for(int i = 0; i < dim; i++) {
             b(i) = 1.0;
             for(int j = 0; j < dim; j++) {
-                A(i, j) = (i == j) ? diag_el : 0.0;
+                A(i, j) = ((double) i == j)*diag_el;
             }
         }
         // Create the log determinant of the map T analytically

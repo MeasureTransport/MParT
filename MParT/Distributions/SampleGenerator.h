@@ -10,10 +10,21 @@
 
 namespace mpart {
 
+/**
+ * @brief A base class to generate samples from a distribution
+ *
+ * @tparam MemorySpace where the samples will be stored
+ */
 template<typename MemorySpace>
 class SampleGenerator {
     public:
 
+    /**
+     * @brief Construct a new Sample Generator base object with a dimension and a seed for the random pool
+     *
+     * @param dim  dimension of the distribution
+     * @param seed what seed to initialize the random pool with
+     */
     SampleGenerator(unsigned int dim, unsigned int seed = time(NULL)) : dim_(dim), rand_pool(seed) {};
 
     virtual ~SampleGenerator() = default;
@@ -36,6 +47,11 @@ class SampleGenerator {
         return output;
     };
 
+    /**
+     * @brief Set the Seed for the random pool, reinitializing it to ensure sampling has reproducible behavior
+     *
+     * @param seed new seed to set for the pool
+     */
     virtual void SetSeed(unsigned int seed) {
         rand_pool = PoolType(seed);
     }
@@ -44,10 +60,24 @@ class SampleGenerator {
     // Eigen::RowMatrixXd SampleEigen(unsigned int N);
     using PoolType = typename Kokkos::Random_XorShift64_Pool<typename MemoryToExecution<MemorySpace>::Space>;
 
+    /**
+     * @brief Retrieve the dimension of the distribution we sample from
+     *
+     * @return unsigned int dimension of the samples
+     */
     virtual unsigned int Dim() const { return dim_; }
 
     protected:
+    /**
+     * @brief Dimension of the distribution
+     *
+     */
     const unsigned int dim_;
+
+    /**
+     * @brief Pool containing RNGs for internal random sampling
+     *
+     */
     PoolType rand_pool;
 };
 

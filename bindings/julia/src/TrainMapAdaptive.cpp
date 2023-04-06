@@ -2,7 +2,7 @@
 #include "MParT/MapOptions.h"
 #include "MParT/MapObjective.h"
 #include "MParT/TrainMap.h"
-#include "MParT/AdaptiveTransportMap.h"
+#include "MParT/TrainMapAdaptive.h"
 
 #include <Kokkos_Core.hpp>
 
@@ -13,7 +13,7 @@ namespace jlcxx {
     template<> struct SuperType<mpart::ATMOptions> {typedef mpart::MapOptions type;};
 }
 
-void mpart::binding::AdaptiveTransportMapWrapper(jlcxx::Module &mod) {
+void mpart::binding::TrainMapAdaptiveWrapper(jlcxx::Module &mod) {
     // Can only do single inheritence, so I arbitrarily picked inheritence from MapOptions
     // If you need to convert to TrainOptions, I allow a conversion
     mod.add_type<ATMOptions>("__ATMOptions", jlcxx::julia_base_type<MapOptions>())
@@ -31,9 +31,9 @@ void mpart::binding::AdaptiveTransportMapWrapper(jlcxx::Module &mod) {
     ;
 
 
-    mod.method("AdaptiveTransportMap", [](jlcxx::ArrayRef<MultiIndexSet> arr, std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective, ATMOptions options) {
+    mod.method("TrainMapAdaptive", [](jlcxx::ArrayRef<MultiIndexSet> arr, std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective, ATMOptions options) {
         std::vector<MultiIndexSet> vec (arr.begin(), arr.end());
-        auto map = AdaptiveTransportMap(vec, objective, options);
+        auto map = TrainMapAdaptive(vec, objective, options);
         for(int i = 0; i < vec.size(); i++) arr[i] = vec[i];
         return map;
     });

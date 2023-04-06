@@ -3,7 +3,7 @@ if (MPART_OPT)
     set(MPART_OPT_FILES
         MapObjective.cpp
         TrainMap.cpp
-        AdaptiveTransportMap.cpp
+        TrainMapAdaptive.cpp
     )
 else()
     set(MPART_OPT_FILES "")
@@ -21,7 +21,6 @@ target_sources(mpart
     Utilities/LinearAlgebra.cpp
 
     Distributions/DensityBase.cpp
-    Distributions/SampleGenerator.cpp
     Distributions/GaussianSamplerDensity.cpp
     Distributions/PullbackDensity.cpp
 

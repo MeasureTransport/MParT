@@ -10,11 +10,23 @@
 
 namespace mpart {
 
-    template <typename MemorySpace>
-    class DensityBase {
+/**
+ * @brief A base class to represent a density, a function \f$p:\mathbb{R}^m\to\mathbb{R}\f$, which usually (but
+ *        does not have to) integrates to unity over the input space. Any density must contain a LogDensityImpl
+ *        and LogDensityInputGradImpl function.
+ *
+ * @tparam MemorySpace Where the density stores data for computation.
+ */
+template <typename MemorySpace>
+class DensityBase {
 
-    public:
+public:
 
+    /**
+     * @brief Construct a new Density Base object with dimension dim
+     *
+     * @param dim the dimension of the input to the density
+     */
     DensityBase(unsigned int dim): dim_(dim) {};
 
     virtual ~DensityBase() = default;
@@ -57,11 +69,16 @@ namespace mpart {
     template<typename AnyMemorySpace>
     StridedMatrix<double, AnyMemorySpace> LogDensityInputGrad(StridedMatrix<const double, AnyMemorySpace> const &X);
 
+    /**
+     * @brief Returns the input dimension of the density
+     *
+     * @return unsigned int dimension of the density
+     */
     virtual unsigned int Dim() const { return dim_; }
 
-    protected:
+protected:
     const unsigned int dim_;
-    };
+};
 }
 
 #endif // MPART_DensityBase_H

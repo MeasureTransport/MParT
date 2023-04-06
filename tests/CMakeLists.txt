@@ -8,7 +8,7 @@ if (MPART_OPT)
      set (MPART_OPT_TESTS
           tests/Test_MapObjective.cpp
           tests/Test_TrainMap.cpp
-          tests/Test_AdaptiveTransportMap.cpp
+          tests/Test_TrainMapAdaptive.cpp
      )
 endif ()
 

@@ -86,10 +86,10 @@ void MapObjectiveWrapper(jlcxx::Module &);
 void TrainMapWrapper(jlcxx::Module&);
 
 /**
- * @brief Adds AdaptiveTransportMap and ATMOptions to the existing module m.
+ * @brief Adds TrainMapAdaptive and ATMOptions to the existing module m.
  * @param mod CxxWrap.jl module
 */
-void AdaptiveTransportMapWrapper(jlcxx::Module&);
+void TrainMapAdaptiveWrapper(jlcxx::Module&);
 
 #endif // defined(MPART_HAS_NLOPT)
 
