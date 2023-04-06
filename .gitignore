@@ -1,4 +1,5 @@
 build
+*.egg-info*
 .vscode
 docs/_build
 bin
