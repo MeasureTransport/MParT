@@ -63,8 +63,9 @@ class MapObjective {
      */
     double operator()(unsigned int n, const double* x, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 
-    unsigned int Dim(){return train_.extent(0);}
-    unsigned int NumSamples(){return train_.extent(1);}
+    unsigned int InputDim() const {return train_.extent(0);}
+    virtual unsigned int MapOutputDim() const {return train_.extent(0);}
+    unsigned int NumSamples() const {return train_.extent(1);}
 
     /**
      * @brief Shortcut to calculate the error of the map on the training dataset
@@ -176,7 +177,7 @@ class KLObjective: public MapObjective<MemorySpace> {
     double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
     double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
     void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
-
+    unsigned int MapOutputDim() const override {return density_->Dim();}
     private:
     /**
      * @brief Density \f$\mu\f$ to calculate the KL with respect to (i.e. \f$D(\cdot||\mu)\f$ )

@@ -61,7 +61,6 @@ double KLObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const 
     }, sumDensity);
     ReduceDim<ReduceDimMap::sum,MemorySpace> rc(densityGradX, -1.0/((double) N_samps));
     Kokkos::parallel_reduce(N_samps, rc, &grad(0));
-    Kokkos::fence("End of MapObjective");
     return sumDensity/N_samps;
 }
 
