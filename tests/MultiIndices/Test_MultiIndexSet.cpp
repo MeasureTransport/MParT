@@ -356,6 +356,16 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
         // Check the result of IsAdmissable().
         REQUIRE( indexFamily.IsAdmissible(multi));
+
+        // Check to make sure https://github.com/MeasureTransport/MParT/issues/308 is resolved
+        indexFamily = MultiIndexSet(2);
+        indexFamily += MultiIndex{0,0};
+        indexFamily += MultiIndex{1,0};
+        indexFamily.Expand();
+        
+        REQUIRE( indexFamily.IsActive(MultiIndex{2,0}) );
+        REQUIRE( indexFamily.IsActive(MultiIndex{0,1}) );
+        REQUIRE(! indexFamily.IsActive(MultiIndex{1,1}) );   
     }
 
     /*
