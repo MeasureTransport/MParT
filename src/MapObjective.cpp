@@ -56,7 +56,6 @@ double KLObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const 
     StridedVector<double, MemorySpace> densityX = pullback.LogDensity(data);
     StridedMatrix<double, MemorySpace> densityGradX = pullback.LogDensityCoeffGrad(data);
     double sumDensity = 0.;
-    double* grad_ptr = &grad(0);
     Kokkos::parallel_reduce ("Sum Negative Log Likelihood", N_samps, KOKKOS_LAMBDA (const int i, double &sum) {
         sum -= densityX(i);
     }, sumDensity);
