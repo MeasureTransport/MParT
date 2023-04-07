@@ -658,7 +658,7 @@ std::vector<unsigned int> MultiIndexSet::Expand(unsigned int activeIndex)
   // loop through the forward neighbors of this index
   std::set<int> tempSet = outEdges.at(globalIndex);
   for(int neighbor : tempSet)
-  {
+  { 
     if(IsAdmissible(neighbor)&&(!IsActive(neighbor))){
       Activate(neighbor);
       newIndices.push_back(global2active.at(neighbor));
@@ -672,13 +672,31 @@ std::vector<unsigned int> MultiIndexSet::Expand(unsigned int activeIndex)
 
 std::vector<unsigned int> MultiIndexSet::Expand()
 {
-  std::vector<unsigned int> frontier = Frontier();
-  std::vector<unsigned int> newInds, allNewInds;
-  for(auto& ind : frontier){
-    newInds = Expand(ind);
-    allNewInds.insert(allNewInds.end(), newInds.begin(), newInds.end());
-  }
-  return allNewInds;
+    // Figure out which terms in the frontier should be activated
+    std::vector<unsigned int> frontier = Frontier();
+    std::vector<unsigned int> toExpand; // Global indices to activate
+    for(auto& ind : frontier){
+
+        unsigned int globalIndex = active2global.at(ind);
+
+        // loop through the forward neighbors of this index
+        std::set<int> tempSet = outEdges.at(globalIndex);
+        for(int neighbor : tempSet)
+        { 
+            if(IsAdmissible(neighbor)&&(!IsActive(neighbor))){
+                toExpand.push_back(neighbor);
+            }
+        }
+    }
+
+    // Activate those terms
+    std::vector<unsigned int> allNewInds;
+    for(auto& neighbor : toExpand){ 
+        Activate(neighbor);
+        allNewInds.push_back(global2active.at(neighbor));
+    }
+    
+    return allNewInds;
 }
 
 std::vector<unsigned int> MultiIndexSet::ForciblyExpand(unsigned int const activeIndex)
