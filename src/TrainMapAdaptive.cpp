@@ -46,8 +46,8 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::TrainMapAdaptive(s
         ATMOptions options) {
 
     // Dimensions
-    unsigned int inputDim = objective->Dim();
-    unsigned int outputDim = mset0.size();
+    unsigned int inputDim = objective->InputDim();
+    unsigned int outputDim = objective->MapOutputDim();
 
     std::vector<unsigned int> mset_sizes (outputDim);
     unsigned int currSz = 0;
@@ -60,9 +60,9 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::TrainMapAdaptive(s
     std::vector<MultiIndexSet> mset_tmp {};
     std::vector<MultiIndexSet> mset_best {};
 
-    if(mset0.size() != inputDim) {
+    if(mset0.size() != outputDim) {
         std::stringstream ss;
-            ss << "AdaptiveTransportMap: Number of MultiIndexSets must match Objective dimension.\n";
+            ss << "AdaptiveTransportMap: Number of MultiIndexSets must match dimension of Objective.\n";
             ss << "Expected Length " << inputDim << ", got " << mset0.size() << ".";
             throw std::invalid_argument(ss.str());
     }

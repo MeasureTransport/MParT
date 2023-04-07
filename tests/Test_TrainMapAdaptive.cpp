@@ -141,9 +141,10 @@ TEST_CASE("Adaptive Transport Map","[ATM]") {
         TestStandardNormalSamples(pullback_test);
     }
     SECTION("TraditionalBananaOneComp") {
-        Kokkos::View<double**, Kokkos::HostSpace> targetSamples("targetSamples", 1, numPts);
+        Kokkos::View<double**, Kokkos::HostSpace> targetSamples("targetSamples", 2, numPts);
         Kokkos::parallel_for("Intializing targetSamples", numPts, KOKKOS_LAMBDA(const unsigned int i){
-            targetSamples(0,i) = samples(1,i) + samples(0,i)*samples(0,i);
+            targetSamples(0,i) = samples(0,i);
+            targetSamples(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
         });
         NormalizeSamples(targetSamples);
 
@@ -160,7 +161,7 @@ TEST_CASE("Adaptive Transport Map","[ATM]") {
         opts.basisUB = 3.;
         opts.maxDegrees = MultiIndex{1000,4}; // Limit the second input to have cubic complexity or less
 
-        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = AdaptiveTransportMap<Kokkos::HostSpace>(mset0, objective, opts);
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> atm = TrainMapAdaptive<Kokkos::HostSpace>(mset0, objective, opts);
         MultiIndexSet finalMset = mset0[0];
         CHECK((finalMset + correctMset).Size() == finalMset.Size());
         std::vector<bool> bounded = finalMset.FilterBounded(opts.maxDegrees);
