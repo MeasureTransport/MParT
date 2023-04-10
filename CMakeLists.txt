@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(MParT VERSION 2.0.1)
+project(MParT VERSION 2.0.2)
 
 message(STATUS "Will install MParT to ${CMAKE_INSTALL_PREFIX}")
 
@@ -53,6 +53,7 @@ option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 
 # #############################################################
 # RPATH settings
+# See https://gist.github.com/kprussing/db21614ca5b51cedff07dfb70059f280 for scikit-build example
 
 # use, i.e. don't skip the full RPATH for the build tree
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -70,9 +71,9 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # the RPATH to be used when installing, but only if it's not a system directory
 list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 
-if("${isSystemDir}" STREQUAL "-1")
-    set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
-endif("${isSystemDir}" STREQUAL "-1")
+# if("${isSystemDir}" STREQUAL "-1")
+#     set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+# endif("${isSystemDir}" STREQUAL "-1")
 
 # #############################################################
 # Dependencies
