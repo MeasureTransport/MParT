@@ -14,29 +14,19 @@ classdef TrainMapTest < matlab.unittest.TestCase
 
             % Create objective and map
             obj1 = GaussianKLObjective(train, test, 1);
-            obj2 = GaussianKLObjective(train, test, 2);
-            obj3 = GaussianKLObjective(train, test);
-            map_options = MapOptions();
-            max_order = 2;
-            map1 = CreateComponent(FixedMultiIndexSet(dim+1,max_order),map_options);
-            map2 = CreateTriangular(dim+1,dim,max_order,map_options);
-            map3 = CreateTriangular(dim+1,dim+1,max_order,map_options);
-            map1.SetCoeffs(zeros(map1.numCoeffs,1));
-            map2.SetCoeffs(zeros(map2.numCoeffs,1));
-            map3.SetCoeffs(zeros(map3.numCoeffs,1));
-
-            % Set Training Options
-            train_options = TrainOptions;
+            obj2 = GaussianKLObjective(train, test);
+            map_options = ATMOptions();
+            map_options.maxDegrees = MultiIndex([3,5])
+            msets2 = [CreateTotalOrder(1,1), CreateTotalOrder(2,1)]
+            msets1 = [CreateTotalOrder(2,1)]
 
             % Print test error before
-            TrainMap(map1, obj1, train_options);
-            TrainMap(map2, obj2, train_options);
-            TrainMap(map3, obj3, train_options);
+            map1 = TrainMapAdaptive(msets1, obj1, map_options);
+            map2 = TrainMapAdaptive(msets2, obj2, map_options);
 
             % Evaluate test samples after training
             KS_stat1 = KSStatistic(map1,test);
             KS_stat2 = KSStatistic(map2,test);
-            KS_stat3 = KSStatistic(map3,test);
             testCase.verifyTrue(KS_stat1 < 0.1);
             testCase.verifyTrue(KS_stat2 < 0.1);
         end

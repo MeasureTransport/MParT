@@ -3,12 +3,12 @@
 
 using namespace mpart;
 
-MapOptions  mpart::binding::MapOptionsFromMatlab(std::string basisType, std::string posFuncType, 
+MapOptions  mpart::binding::MapOptionsFromMatlab(std::string basisType, std::string posFuncType,
                                         std::string quadType, double quadAbsTol,
-                                        double quadRelTol, unsigned int quadMaxSub, 
-                                        unsigned int quadMinSub,unsigned int quadPts, 
+                                        double quadRelTol, unsigned int quadMaxSub,
+                                        unsigned int quadMinSub,unsigned int quadPts,
                                         bool contDeriv, double basisLB, double basisUB, bool basisNorm)
-{   
+{
     MapOptions opts;
 
     if (basisType == "ProbabilistHermite") {
@@ -82,3 +82,102 @@ void mpart::binding::MapOptionsToMatlab(MapOptions opts, mexplus::OutputArgument
     output.set(i+10,opts.basisUB);
     output.set(i+11,opts.basisNorm);
 }
+
+#if defined(MPART_HAS_NLOPT)
+
+TrainOptions mpart::binding::TrainOptionsFromMatlab(mexplus::InputArguments &input, unsigned int start) {
+    TrainOptions opts;
+    opts.opt_alg = input.get<std::string>(start + 0);
+    opts.opt_stopval = input.get<double>(start + 1);
+    opts.opt_ftol_rel = input.get<double>(start + 2);
+    opts.opt_ftol_abs = input.get<double>(start + 3);
+    opts.opt_xtol_rel = input.get<double>(start + 4);
+    opts.opt_xtol_abs = input.get<double>(start + 5);
+    opts.opt_maxeval = input.get<int>(start + 6);
+    opts.opt_maxtime = input.get<double>(start + 7);
+    opts.verbose = input.get<int>(start + 8);
+    return opts;
+}
+
+ATMOptions mpart::binding::ATMOptionsFromMatlab(mexplus::InputArguments &input, unsigned int start) {
+    MultiIndex& maxDegrees = *mexplus::Session<MultiIndex>::get(input.get(start+23));
+    return ATMOptionsFromMatlab(input.get<std::string>(start + 0), input.get<std::string>(start + 1),
+                                input.get<std::string>(start + 2), input.get<double>(start + 3),
+                                input.get<double>(start + 4), input.get<unsigned int>(start + 5),
+                                input.get<unsigned int>(start + 6),input.get<unsigned int>(start + 7),
+                                input.get<bool>(start + 8), input.get<double>(start + 9),
+                                input.get<double>(start + 10), input.get<bool>(start + 11),
+                                input.get<std::string>(start + 12), input.get<double>(start + 13),
+                                input.get<double>(start + 14), input.get<double>(start + 15),
+                                input.get<double>(start + 16), input.get<double>(start + 17),
+                                input.get<int>(start + 18), input.get<double>(start + 19),
+                                input.get<int>(start + 20), input.get<unsigned int>(start + 21),
+                                input.get<unsigned int>(start + 22), maxDegrees);
+}
+
+ATMOptions  mpart::binding::ATMOptionsFromMatlab(std::string basisType, std::string posFuncType,
+                                        std::string quadType, double quadAbsTol,
+                                        double quadRelTol, unsigned int quadMaxSub,
+                                        unsigned int quadMinSub,unsigned int quadPts,
+                                        bool contDeriv, double basisLB, double basisUB, bool basisNorm,
+                                        std::string opt_alg, double opt_stopval,
+                                        double opt_ftol_rel, double opt_ftol_abs,
+                                        double opt_xtol_rel, double opt_xtol_abs,
+                                        int opt_maxeval, double opt_maxtime, int verbose,
+                                        unsigned int maxPatience, unsigned int maxSize, MultiIndex& maxDegrees)
+{
+    ATMOptions opts;
+
+    if (basisType == "ProbabilistHermite") {
+    opts.basisType    = BasisTypes::ProbabilistHermite;
+    } else if (basisType == "PhysicistHermite") {
+    opts.basisType    = BasisTypes::PhysicistHermite;
+    } else if (basisType == "HermiteFunctions") {
+    opts.basisType    = BasisTypes::HermiteFunctions;
+    } else {
+    std::cout << "Unknown basisType, value is set to default" <<std::endl;
+    }
+
+    if (posFuncType == "Exp") {
+    opts.posFuncType    = PosFuncTypes::Exp;
+    } else if (posFuncType == "SoftPlus") {
+    opts.posFuncType    = PosFuncTypes::SoftPlus;
+    } else {
+    std::cout << "Unknown posFuncType type, value is set to default" <<std::endl;
+    }
+
+    if (quadType == "ClenshawCurtis") {
+    opts.quadType    = QuadTypes::ClenshawCurtis;
+    } else if (quadType == "AdaptiveSimpson") {
+    opts.quadType    = QuadTypes::AdaptiveSimpson;
+    } else if (quadType == "AdaptiveClenshawCurtis") {
+    opts.quadType    = QuadTypes::AdaptiveClenshawCurtis;
+    } else {
+    std::cout << "Unknown quadType, value is set to default" <<std::endl;
+    }
+
+    opts.quadAbsTol = quadAbsTol;
+    opts.quadRelTol = quadRelTol;
+    opts.quadMaxSub = quadMaxSub;
+    opts.quadMinSub = quadMinSub;
+    opts.quadPts = quadPts;
+    opts.contDeriv = contDeriv;
+    opts.basisLB = basisLB;
+    opts.basisUB = basisUB;
+    opts.basisNorm = basisNorm;
+    opts.opt_alg = opt_alg;
+    opts.opt_stopval = opt_stopval;
+    opts.opt_ftol_rel = opt_ftol_rel;
+    opts.opt_ftol_abs = opt_ftol_abs;
+    opts.opt_xtol_rel = opt_xtol_rel;
+    opts.opt_xtol_abs = opt_xtol_abs;
+    opts.opt_maxeval = opt_maxeval;
+    opts.opt_maxtime = opt_maxtime;
+    opts.verbose = verbose;
+    opts.maxPatience = maxPatience;
+    opts.maxSize = maxSize;
+    opts.maxDegrees = maxDegrees;
+
+    return opts;
+}
+#endif // defined(MPART_HAS_NLOPT)

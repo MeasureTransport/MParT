@@ -12,17 +12,25 @@
 
 namespace mpart {
 
-// Options specifically for ATM algorithm
-// 0. indicates that MParT uses the optimization's default value
+// Options specifically for ATM algorithm, with map eval opts -> training opts-> ATM specific opts
 struct ATMOptions: public MapOptions, public TrainOptions {
-    int maxPatience = 10;
-    int maxSize = 10;
+    unsigned int maxPatience = 10;
+    unsigned int maxSize = 10;
     MultiIndex maxDegrees;
+    std::string String() override {
+        std::string md_str = maxDegrees.String();
+        std::stringstream ss;
+        ss << MapOptions::String() << "\n" << TrainOptions::String() << "\n";
+        ss << "maxPatience = " << maxPatience << "\n";
+        ss << "maxSize = " << maxSize << "\n";
+        ss << "maxDegrees = " << maxDegrees.String();
+        return ss.str();
+    }
 };
 
-template<typename MemorySpace,typename ObjectiveType>
+template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> TrainMapAdaptive(std::vector<MultiIndexSet> &mset0,
-    ObjectiveType &objective,
+    std::shared_ptr<MapObjective<MemorySpace>> objective,
     ATMOptions options);
 
 // template<typename MemorySpace>

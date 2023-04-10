@@ -5,6 +5,7 @@
 #include "Distributions/PullbackDensity.h"
 #include "Utilities/ArrayConversions.h"
 #include "Utilities/LinearAlgebra.h"
+#include "Distributions/GaussianSamplerDensity.h"
 
 namespace mpart {
 
@@ -62,8 +63,17 @@ class MapObjective {
      */
     double operator()(unsigned int n, const double* x, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 
-    unsigned int Dim(){return train_.extent(0);}
-    unsigned int NumSamples(){return train_.extent(1);}
+    unsigned int InputDim() const {return train_.extent(0);}
+    virtual unsigned int MapOutputDim() const {return train_.extent(0);}
+    unsigned int NumSamples() const {return train_.extent(1);}
+
+    /**
+     * @brief Shortcut to calculate the error of the map on the training dataset
+     *
+     * @param map Map to calculate the error on
+     * @return double training error
+     */
+    double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
 
     /**
      * @brief Shortcut to calculate the error of the map on the testing dataset
@@ -80,14 +90,6 @@ class MapObjective {
      * @return StridedVector<double, MemorySpace> Gradient of the map on the training dataset
      */
     StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
-
-    /**
-     * @brief Shortcut to calculate the error of the map on the training dataset
-     *
-     * @param map Map to calculate the error on
-     * @return double training error
-     */
-    double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
 
     /**
      * @brief Shortcut to calculate the gradient of the objective on the training dataset w.r.t. the map coefficients
@@ -175,7 +177,7 @@ class KLObjective: public MapObjective<MemorySpace> {
     double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
     double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
     void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
-
+    unsigned int MapOutputDim() const override {return density_->Dim();}
     private:
     /**
      * @brief Density \f$\mu\f$ to calculate the KL with respect to (i.e. \f$D(\cdot||\mu)\f$ )
@@ -183,6 +185,14 @@ class KLObjective: public MapObjective<MemorySpace> {
      */
     std::shared_ptr<DensityBase<MemorySpace>> density_;
 };
+
+namespace ObjectiveFactory {
+template<typename MemorySpace>
+std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, unsigned int dim=0);
+
+template<typename MemorySpace>
+std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test, unsigned int dim=0);
+} // namespace ObjectiveFactory
 
 } // namespace mpart
 

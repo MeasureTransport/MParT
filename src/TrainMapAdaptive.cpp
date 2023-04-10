@@ -42,12 +42,12 @@ void maxDegreeRMFilter(std::vector<MultiIndexSet> const &msets, MultiIndex const
 
 template<>
 std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::TrainMapAdaptive(std::vector<MultiIndexSet> &mset0,
-        KLObjective<Kokkos::HostSpace> &objective,
+        std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective,
         ATMOptions options) {
 
     // Dimensions
-    unsigned int inputDim = objective.Dim();
-    unsigned int outputDim = mset0.size();
+    unsigned int inputDim = objective->InputDim();
+    unsigned int outputDim = objective->MapOutputDim();
 
     std::vector<unsigned int> mset_sizes (outputDim);
     unsigned int currSz = 0;
@@ -59,6 +59,13 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::TrainMapAdaptive(s
     std::vector<std::vector<unsigned int>> multis_rm (outputDim);
     std::vector<MultiIndexSet> mset_tmp {};
     std::vector<MultiIndexSet> mset_best {};
+
+    if(mset0.size() != outputDim) {
+        std::stringstream ss;
+            ss << "AdaptiveTransportMap: Number of MultiIndexSets must match dimension of Objective.\n";
+            ss << "Expected Length " << inputDim << ", got " << mset0.size() << ".";
+            throw std::invalid_argument(ss.str());
+    }
 
     // Ensure the given vector of multiindexsets is valid
     unsigned int currMsetDim = mset0[0].Length();
@@ -120,7 +127,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::TrainMapAdaptive(s
         std::cout << "Initial map:" << std::endl;
     }
     TrainMap(map, objective, options);
-    double bestError = objective.TestError(map);
+    double bestError = objective->TestError(map);
 
     if(options.verbose) {
         std::cout << "Initial map test error: " << bestError << std::endl;
@@ -159,7 +166,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::TrainMapAdaptive(s
         // Create a temporary map
         std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mapTmp = std::make_shared<TriangularMap<Kokkos::HostSpace>>(mapBlocksTmp, true);
         // Calculate the gradient of the map with expanded margins
-        StridedVector<double, Kokkos::HostSpace> gradCoeff = objective.TrainCoeffGrad(mapTmp);
+        StridedVector<double, Kokkos::HostSpace> gradCoeff = objective->TrainCoeffGrad(mapTmp);
         int coeffIdx = 0;
         if(options.verbose > 1) {
             for(int output=0; output<outputDim; output++){
@@ -213,7 +220,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::TrainMapAdaptive(s
         // Train a map with the new MultiIndex
         double train_error = TrainMap(map, objective, options);
         // Get the testing error and assess the best map
-        double test_error = objective.TestError(map);
+        double test_error = objective->TestError(map);
 
         // Finish this step
         currPatience++;
@@ -246,7 +253,7 @@ std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::TrainMapAdaptive(s
     // Train a map with the new MultiIndex
     double train_error = TrainMap(map, objective, options);
     // Get the testing error and assess the best map
-    double test_error = objective.TestError(map);
+    double test_error = objective->TestError(map);
 
     if(options.verbose) {
         std::cout << "\nFinal training error: " << train_error << ", final testing error: " << test_error;

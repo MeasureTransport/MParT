@@ -1,84 +1,19 @@
-#include <fstream>
-#include <mexplus.h>
-#include "MParT/MultiIndices/MultiIndexSet.h"
-#include "MParT/Utilities/ArrayConversions.h"
-#include "MexArrayConversions.h"
-#include "MexOptionsConversions.h"
-#include "MParT/MapOptions.h"
-#include "MParT/MapFactory.h"
-#include "MParT/ConditionalMapBase.h"
-#include "MParT/TriangularMap.h"
-#include "MParT/ComposedMap.h"
-#include "MParT/AffineMap.h"
-#include "MParT/MapObjective.h"
-#include "MParT/TrainMap.h"
+#include <chrono>
 #include <Eigen/Dense>
 
+#include "MParT/MultiIndices/MultiIndexSet.h"
+#include "MParT/Utilities/ArrayConversions.h"
+#include "MParT/MapOptions.h"
+#include "MParT/MapFactory.h"
+#include "MParT/TrainMap.h"
 
-#include <chrono>
-
+#include "MexWrapperTypes.h"
+#include "MexArrayConversions.h"
+#include "MexOptionsConversions.h"
 
 using namespace mpart;
-using namespace mpart::binding;
 using namespace mexplus;
 using MemorySpace = Kokkos::HostSpace;
-
-class ConditionalMapMex {       // The class
-public:
-  std::shared_ptr<ConditionalMapBase<MemorySpace>> map_ptr;
-
-  ConditionalMapMex(FixedMultiIndexSet<MemorySpace> const& mset,
-                    MapOptions                             opts){
-    map_ptr = MapFactory::CreateComponent<MemorySpace>(mset,opts);
-  }
-
-  ConditionalMapMex(std::shared_ptr<ConditionalMapBase<MemorySpace>> init_ptr){
-    map_ptr = init_ptr;
-  }
-
-  ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks){
-    map_ptr = std::make_shared<TriangularMap<MemorySpace>>(blocks);
-  }
-
-  ConditionalMapMex(unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder, MapOptions opts){
-    map_ptr = MapFactory::CreateTriangular<MemorySpace>(inputDim,outputDim,totalOrder,opts);
-  }
-
-  ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> triMaps,std::string typeMap){
-    map_ptr = std::make_shared<ComposedMap<MemorySpace>>(triMaps);
-  }
-
-  ConditionalMapMex(StridedMatrix<double,MemorySpace> A, StridedVector<double,MemorySpace> b){
-    map_ptr = std::make_shared<AffineMap<MemorySpace>>(A,b);
-  }
-
-  ConditionalMapMex(StridedMatrix<double,MemorySpace> A){
-    map_ptr = std::make_shared<AffineMap<MemorySpace>>(A);
-  }
-
-  ConditionalMapMex(StridedVector<double,MemorySpace> b){
-    map_ptr = std::make_shared<AffineMap<MemorySpace>>(b);
-  }
-
-}; //end class
-
-class ParameterizedFunctionMex {       // The class
-public:
-  std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> fun_ptr;
-
-  ParameterizedFunctionMex(unsigned int outputDim, FixedMultiIndexSet<MemorySpace> const& mset,
-                    MapOptions opts){
-    fun_ptr = MapFactory::CreateExpansion<MemorySpace>(outputDim,mset,opts);
-  }
-
-  ParameterizedFunctionMex(std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> init_ptr){
-    fun_ptr = init_ptr;
-  }
-}; //end class
-
-// Instance manager for ConditionalMap.
-template class mexplus::Session<ConditionalMapMex>;
-template class mexplus::Session<ParameterizedFunctionMex>;
 
 namespace {
 
@@ -99,6 +34,32 @@ MEX_DEFINE(ConditionalMap_newTriMap) (int nlhs, mxArray* plhs[],
     }
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(blocks)));
 }
+
+#if defined(MPART_HAS_NLOPT)
+MEX_DEFINE(ConditionalMap_TrainMapAdaptive) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 26);
+  OutputArguments output(nlhs, plhs, 1);
+
+  std::vector<intptr_t> list_id_mset = input.get<std::vector<intptr_t>>(0);
+  unsigned int numBlocks = list_id_mset.size();
+  std::vector<MultiIndexSet> mset0 {};
+  for(unsigned int i=0;i<numBlocks;++i){
+    MultiIndexSet *mset_i = Session<MultiIndexSet>::get(list_id_mset.at(i));
+    mset0.push_back(*mset_i);
+  }
+  MapObjectiveMex *obj = Session<MapObjectiveMex>::get(input.get(1));
+  std::shared_ptr<MapObjective<MemorySpace>> obj_ptr = obj->obj_ptr;
+  ATMOptions opts = binding::ATMOptionsFromMatlab(input, 2);
+  std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map = TrainMapAdaptive(mset0, obj_ptr, opts);
+  for(unsigned int i=0;i<numBlocks;++i){
+    MultiIndexSet *mset_i = Session<MultiIndexSet>::get(list_id_mset.at(i));
+    *mset_i = mset0[i];
+  }
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(map)));
+}
+#endif // defined(MPART_HAS_NLOPT)
 
 MEX_DEFINE(ConditionalMap_newComposedMap) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
@@ -161,7 +122,7 @@ MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
   unsigned int outputDim = input.get<unsigned int>(1);
   unsigned int totalOrder = input.get<unsigned int>(2);
 
-  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(3),input.get<std::string>(4),
+  MapOptions opts = binding::MapOptionsFromMatlab(input.get<std::string>(3),input.get<std::string>(4),
                                          input.get<std::string>(5),input.get<double>(6),
                                          input.get<double>(7),input.get<unsigned int>(8),
                                          input.get<unsigned int>(9),input.get<unsigned int>(10),
@@ -176,7 +137,7 @@ MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
   InputArguments input(nrhs, prhs, 13);
   OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
-  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
+  MapOptions opts = binding::MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
                                          input.get<std::string>(3),input.get<double>(4),
                                          input.get<double>(5),input.get<unsigned int>(6),
                                          input.get<unsigned int>(7),input.get<unsigned int>(8),
@@ -191,7 +152,7 @@ MEX_DEFINE(ConditionalMap_newMapFixed) (int nlhs, mxArray* plhs[],
   InputArguments input(nrhs, prhs, 13);
   OutputArguments output(nlhs, plhs, 1);
   const FixedMultiIndexSet<MemorySpace>& mset = Session<FixedMultiIndexSet<MemorySpace>>::getConst(input.get(0));
-  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
+  MapOptions opts = binding::MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
                                          input.get<std::string>(3),input.get<double>(4),
                                          input.get<double>(5),input.get<unsigned int>(6),
                                          input.get<unsigned int>(7),input.get<unsigned int>(8),
@@ -204,48 +165,48 @@ MEX_DEFINE(GaussianKLObjective_TestError) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
-  const KLObjective<MemorySpace>& obj = Session<KLObjective<MemorySpace>>::getConst(input.get(0));
+  const MapObjectiveMex& obj = Session<MapObjectiveMex>::getConst(input.get(0));
   ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(1));
   std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
-  output.set(0, obj.TestError(condMap_ptr));
+  output.set(0, obj.obj_ptr->TestError(condMap_ptr));
 }
 
 MEX_DEFINE(GaussianKLObjective_TrainCoeffGrad) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 3);
-  
-  const KLObjective<MemorySpace>& obj = Session<KLObjective<MemorySpace>>::getConst(input.get(0));
+
+  const MapObjectiveMex& obj = Session<MapObjectiveMex>::getConst(input.get(0));
   ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(1));
   std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
   StridedVector<double, Kokkos::HostSpace> out = MexToKokkos1d(prhs[2]);
-  obj.TrainCoeffGradImpl(condMap_ptr, out);
+  obj.obj_ptr->TrainCoeffGradImpl(condMap_ptr, out);
 }
 
 MEX_DEFINE(GaussianKLObjective_TrainError) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);
   OutputArguments output(nlhs, plhs, 1);
-  const KLObjective<MemorySpace>& obj = Session<KLObjective<MemorySpace>>::getConst(input.get(0));
+  const MapObjectiveMex& obj = Session<MapObjectiveMex>::getConst(input.get(0));
   ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(1));
   std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
-  output.set(0, obj.TrainError(condMap_ptr));
+  output.set(0, obj.obj_ptr->TrainError(condMap_ptr));
 }
 
+#if defined(MPART_HAS_NLOPT)
 MEX_DEFINE(ConditionalMap_TrainMap) (int nlhs, mxArray* plhs[],
                                      int nrhs, const mxArray* prhs[]) {
     InputArguments input(nrhs, prhs, 11);
     OutputArguments output(nlhs, plhs, 0);
     ConditionalMapMex *condMap = Session<ConditionalMapMex>::get(input.get(0));
     std::shared_ptr<ConditionalMapBase<MemorySpace>> condMap_ptr = condMap->map_ptr;
-    KLObjective<MemorySpace>& obj = *Session<KLObjective<MemorySpace>>::get(input.get(1));
+    MapObjectiveMex *obj = Session<MapObjectiveMex>::get(input.get(1));
+    std::shared_ptr<MapObjective<MemorySpace>> obj_ptr = obj->obj_ptr;
 
-    TrainOptions opts {input.get<std::string>(2),input.get<double>(3),
-                      input.get<double>(4), input.get<double>(5),
-                      input.get<double>(6), input.get<double>(7),
-                      input.get<int>(8), input.get<double>(9), input.get<bool>(10)};
+    TrainOptions opts  = binding::TrainOptionsFromMatlab(input, 2);
 
-    TrainMap<KLObjective<MemorySpace>>(condMap_ptr, obj, opts);
-  }
+    TrainMap<MemorySpace>(condMap_ptr, obj_ptr, opts);
+}
+#endif //defined(MPART_HAS_NLOPT)
 
 // Defines MEX API for delete.
 MEX_DEFINE(ConditionalMap_deleteMap) (int nlhs, mxArray* plhs[],

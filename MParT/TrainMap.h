@@ -23,7 +23,7 @@ struct TrainOptions {
     double opt_xtol_abs = 1e-4;
     int opt_maxeval = 1000;
     double opt_maxtime = std::numeric_limits<double>::infinity();
-    bool verbose = false;
+    int verbose = 0;
     /**
      * @brief Create a string representation of these training options (helpful for bindings)
      *
@@ -52,8 +52,8 @@ struct TrainOptions {
  * @param objective MapObjective to optimize over
  * @param options Options for optimizing the map
  */
-template<typename ObjectiveType>
-double TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, ObjectiveType &objective, TrainOptions options);
+template<typename MemorySpace>
+double TrainMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<MapObjective<MemorySpace>> objective, TrainOptions options);
 
 } // namespace mpart
 
