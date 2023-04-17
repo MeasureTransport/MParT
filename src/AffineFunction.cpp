@@ -43,18 +43,25 @@ template<typename MemorySpace>
 void AffineFunction<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                           StridedMatrix<double, MemorySpace>              output)
 {
+    unsigned int numPts = pts.extent(1);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{numPts, this->outputDim}});
+
     // Linear part
     if(A_.extent(0)>0){
+        
+        // Initialize output to zeros 
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
+            output(i,j) = 0.0;
+        });
+
         dgemm<MemorySpace>(1.0, A_, pts, 0.0, output);
+        
     }else{
         Kokkos::deep_copy(output, pts);
     }
-    
+ 
     // Bias part
     if(b_.size()>0){
-
-        unsigned int numPts = pts.extent(1);
-        Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {numPts, this->outputDim});
 
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
             output(i,j) += b_(i);
