@@ -11,7 +11,7 @@ using namespace mpart;
 
 template<typename MemorySpace>
 AffineFunction<MemorySpace>::AffineFunction(StridedVector<double,MemorySpace> b) : ParameterizedFunctionBase<MemorySpace>(b.size(),b.size(),0), 
-                                                                  b_("b",b.layout()) 
+                                                                  b_("b",b.extent(0)) 
 {
 
     Kokkos::deep_copy(b_, b);
@@ -19,7 +19,7 @@ AffineFunction<MemorySpace>::AffineFunction(StridedVector<double,MemorySpace> b)
 
 template<typename MemorySpace>
 AffineFunction<MemorySpace>::AffineFunction(StridedMatrix<double,MemorySpace> A) : ParameterizedFunctionBase<MemorySpace>(A.extent(1),A.extent(0),0),
-                                                                               A_("A", A.layout())
+                                                                               A_("A", A.extent(0), A.extent(1))
 {
     Kokkos::deep_copy(A_, A);
     assert(A_.extent(0)<=A_.extent(1));
@@ -29,8 +29,8 @@ AffineFunction<MemorySpace>::AffineFunction(StridedMatrix<double,MemorySpace> A)
 template<typename MemorySpace>
 AffineFunction<MemorySpace>::AffineFunction(StridedMatrix<double,MemorySpace> A,
                                   StridedVector<double,MemorySpace> b) : ParameterizedFunctionBase<MemorySpace>(A.extent(1),A.extent(0),0),
-                                                                  A_("A", A.layout()),
-                                                                  b_("b",b.layout())
+                                                                  A_("A", A.extent(0), A.extent(1)),
+                                                                  b_("b", b.extent(0))
 {   
     Kokkos::deep_copy(A_, A);
     Kokkos::deep_copy(b_, b);

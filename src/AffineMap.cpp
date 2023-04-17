@@ -17,7 +17,7 @@ AffineMap<MemorySpace>::AffineMap(StridedVector<double,MemorySpace> b) : Conditi
 
 template<typename MemorySpace>
 AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A) : ConditionalMapBase<MemorySpace>(A.extent(1),A.extent(0),0),
-                                                                  A_("A", A.extent(0))
+                                                                  A_("A", A.extent(0), A.extent(1))
 {
     Kokkos::deep_copy(A_, A);
     assert(A_.extent(0)<=A_.extent(1));
@@ -150,7 +150,7 @@ void AffineMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpac
         });
 
         dgemm<MemorySpace>(1.0, A_, pts, 0.0, output);
-        
+
     }else{
         Kokkos::deep_copy(output, pts);
     }
