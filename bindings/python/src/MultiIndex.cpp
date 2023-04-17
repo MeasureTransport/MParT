@@ -113,10 +113,10 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def(py::init<const unsigned int>())
         .def(py::init<Eigen::Ref<const Eigen::MatrixXi> const&>())
         .def("fix", &MultiIndexSet::Fix)
-        .def("__len__", &MultiIndexSet::Length)
+        .def("__len__", &MultiIndexSet::Length, "Retrieves the length of _each_ multiindex within this set (i.e. the dimension of the input)")
         .def("__getitem__", &MultiIndexSet::at)
         .def("at", &MultiIndexSet::at)
-        .def("Size", &MultiIndexSet::Size)
+        .def("Size", &MultiIndexSet::Size, "Retrieves the number of elements in this MultiIndexSet")
 
         .def_static("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder, py::arg("length"), py::arg("maxOrder"), py::arg("limiter")=MultiIndexLimiter::None())
         .def_static("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct, py::arg("length"), py::arg("maxOrder"), py::arg("limiter")=MultiIndexLimiter::None())
@@ -131,6 +131,10 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("Expand", py::overload_cast<>(&MultiIndexSet::Expand), "Expand all frontiers of a MultiIndexSet")
         .def("append", py::overload_cast<MultiIndex const&>(&MultiIndexSet::operator+=))
         .def("__iadd__", py::overload_cast<MultiIndex const&>(&MultiIndexSet::operator+=))
+        .def("deepcopy" [](MultiIndexSet &mset){
+            MultiIndexSet mset_copy = mset;
+            return mset_copy
+        })
         .def("Activate", py::overload_cast<MultiIndex const&>(&MultiIndexSet::Activate))
         .def("AddActive", &MultiIndexSet::AddActive)
         .def("Frontier", &MultiIndexSet::Frontier)
