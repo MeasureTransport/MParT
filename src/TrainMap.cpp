@@ -59,7 +59,9 @@ nlopt::opt SetupOptimization(unsigned int dim, TrainOptions options) {
 template<>
 double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective, TrainOptions options) {
     if(map->Coeffs().extent(0) == 0) {
-        std::cout << "TrainMap: Initializing map coeffs to 1." << std::endl;
+        if(options.verbose) {
+            std::cout << "TrainMap: Initializing map coeffs to 1." << std::endl;
+        }
         Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Default coeffs", map->numCoeffs);
         Kokkos::parallel_for("Setting default coeff val", map->numCoeffs, KOKKOS_LAMBDA(const unsigned int i){
             coeffs(i) = 1.;
