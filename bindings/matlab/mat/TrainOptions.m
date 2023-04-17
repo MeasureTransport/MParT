@@ -1,14 +1,14 @@
 classdef TrainOptions
     properties (Access = public)
-        opt_alg = "LD_LBFGS"
+        opt_alg = "LD_SLSQP"
         opt_stopval = log(0)
         opt_ftol_rel = 1e-3
         opt_ftol_abs = 1e-3
         opt_xtol_rel = 1e-4
         opt_xtol_abs = 1e-4
         opt_maxeval = 30
-        opt_maxtime = 100
-        verbose = false
+        opt_maxtime = 1e2
+        verbose = 0
     end
 
     methods

@@ -16,7 +16,7 @@ def KS_statistic(map, test_samples):
 # Create samples from banana
 dim=2
 seed = 43
-numPts = 20000
+numPts = 5000
 testPts = numPts//5
 np.random.seed(seed)
 samples = np.random.randn(dim,numPts)
@@ -27,27 +27,21 @@ test_samples = target_samples[:,:testPts]
 train_samples = target_samples[:,testPts:]
 
 # Create training objective
-obj2 = mpart.CreateGaussianKLObjective(np.asfortranarray(train_samples),np.asfortranarray(test_samples))
-obj1 = mpart.CreateGaussianKLObjective(np.asfortranarray(train_samples),np.asfortranarray(test_samples),1)
+obj = mpart.CreateGaussianKLObjective(np.asfortranarray(train_samples),np.asfortranarray(test_samples))
 
-# Create untrained maps
-map_options = mpart.MapOptions()
-map2 = mpart.CreateTriangular(dim,dim,2,map_options) # Triangular map
-map1 = mpart.CreateComponent(mpart.FixedMultiIndexSet(2,2),map_options) # Singular Component
+# Use ATM to build a map
+opts = mpart.ATMOptions()
+msets = [mpart.MultiIndexSet.CreateTotalOrder(d+1,1) for d in range(2)]
+map = mpart.TrainMapAdaptive(msets, obj, opts)
 
-# Train map
-train_options = mpart.TrainOptions()
-mpart.TrainMap(map2, obj2, train_options)
-mpart.TrainMap(map1, obj1, train_options)
+def test_Msets():
+    # Make sure the multiindex set has changed
+    assert msets[1].Size()>3
 
 def test_TestError():
-    assert obj1.TestError(map1) < 5.
-    assert obj2.TestError(map2) < 5.
+    assert obj.TestError(map) < 5.
 
 def test_Normality():
     print("Testing map1...")
-    KS_stat1 = KS_statistic(map1, test_samples)
-    print("Testing map2...")
-    KS_stat2 = KS_statistic(map2, test_samples)
-    assert KS_stat1 < 0.1
-    assert KS_stat2 < 0.1
+    KS_stat = KS_statistic(map, test_samples)
+    assert KS_stat < 0.1

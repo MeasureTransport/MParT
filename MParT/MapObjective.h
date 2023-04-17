@@ -5,6 +5,7 @@
 #include "Distributions/PullbackDensity.h"
 #include "Utilities/ArrayConversions.h"
 #include "Utilities/LinearAlgebra.h"
+#include "Distributions/GaussianSamplerDensity.h"
 
 namespace mpart {
 
@@ -62,6 +63,17 @@ class MapObjective {
      */
     double operator()(unsigned int n, const double* x, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map);
 
+    unsigned int Dim(){return train_.extent(0);}
+    unsigned int NumSamples(){return train_.extent(1);}
+
+    /**
+     * @brief Shortcut to calculate the error of the map on the training dataset
+     *
+     * @param map Map to calculate the error on
+     * @return double training error
+     */
+    double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
+
     /**
      * @brief Shortcut to calculate the error of the map on the testing dataset
      *
@@ -79,20 +91,26 @@ class MapObjective {
     StridedVector<double, MemorySpace> TrainCoeffGrad(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
 
     /**
-     * @brief Shortcut to calculate the error of the map on the training dataset
-     *
-     * @param map Map to calculate the error on
-     * @return double training error
-     */
-    double TrainError(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
-
-    /**
      * @brief Shortcut to calculate the gradient of the objective on the training dataset w.r.t. the map coefficients
      *
      * @param map Map to calculate the gradient with respect to
      * @param grad storage for the gradient
      */
     void TrainCoeffGradImpl(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, StridedVector<double, MemorySpace> grad) const;
+
+    /**
+     * @brief Get the Training data for this objective
+     *
+     * @return StridedMatrix<const double, MemorySpace> Training data for optimization
+     */
+    StridedMatrix<const double, MemorySpace> GetTrain() {return train_;}
+
+    /**
+     * @brief Get the Testing data for this objective
+     *
+     * @return StridedMatrix<const double, MemorySpace> Testing data for optimization
+     */
+    StridedMatrix<const double, MemorySpace> GetTest() {return test_;}
 
     /**
      * @brief Objective value of map at data
@@ -166,6 +184,14 @@ class KLObjective: public MapObjective<MemorySpace> {
      */
     std::shared_ptr<DensityBase<MemorySpace>> density_;
 };
+
+namespace ObjectiveFactory {
+template<typename MemorySpace>
+std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, unsigned int dim=0);
+
+template<typename MemorySpace>
+std::shared_ptr<MapObjective<MemorySpace>> CreateGaussianKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test, unsigned int dim=0);
+} // namespace ObjectiveFactory
 
 } // namespace mpart
 

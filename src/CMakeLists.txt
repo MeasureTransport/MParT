@@ -1,9 +1,12 @@
-set (OPT_FILES "")
+
 if (MPART_OPT)
-    set(OPT_FILES
+    set(MPART_OPT_FILES
         MapObjective.cpp
         TrainMap.cpp
+        TrainMapAdaptive.cpp
     )
+else()
+    set(MPART_OPT_FILES "")
 endif ()
 
 target_sources(mpart
@@ -48,6 +51,6 @@ target_sources(mpart
     MapFactoryImpl14.cpp
     MapFactoryImpl15.cpp
 
-    ${OPT_FILES}
+    ${MPART_OPT_FILES}
     Initialization.cpp
 )

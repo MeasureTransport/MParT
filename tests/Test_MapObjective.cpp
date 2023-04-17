@@ -13,7 +13,7 @@ using namespace Catch;
 
 TEST_CASE( "Test KLMapObjective", "[KLMapObjective]") {
     unsigned int dim = 2;
-    unsigned int seed = 170283;
+    unsigned int seed = 42;
     unsigned int N_samples = 20000;
     unsigned int N_testpts = N_samples/5;
     std::shared_ptr<GaussianSamplerDensity<Kokkos::HostSpace>> density = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(dim);

@@ -7,11 +7,6 @@
 #include <Kokkos_Core.hpp>
 #include <pybind11/pybind11.h>
 
-#if defined(MPART_HAS_CEREAL)
-#include "MParT/Utilities/Serialization.h"
-#include <fstream>
-#endif // MPART_HAS_CEREAL
-
 namespace py = pybind11;
 using namespace mpart::binding;
 
@@ -32,8 +27,6 @@ void mpart::binding::TrainOptionsWrapper(py::module &m)
     .def_readwrite("opt_maxtime", &TrainOptions::opt_maxtime)
     .def_readwrite("verbose", &TrainOptions::verbose)
     ;
-
-    
 }
 
 template<typename MemorySpace>
@@ -42,9 +35,7 @@ void mpart::binding::TrainMapWrapper(py::module &m) {
     std::string tName = "TrainMap";
     if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName = "d" + tName;
 
-    m.def(tName.c_str(), [](std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<KLObjective<MemorySpace>> kl, TrainOptions opts){
-        TrainMap(map, *kl, opts);
-    })
+    m.def(tName.c_str(), &TrainMap<Kokkos::HostSpace>)
     ;
 }
 

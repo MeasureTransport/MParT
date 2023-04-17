@@ -121,7 +121,7 @@ namespace mpart{
             return ret;
         }
 
-        std::string String() {
+        virtual std::string String() {
             std::string btypes[3] = {"ProbabilistHermite", "PhysicistHermite", "HermiteFunctions"};
             std::string pftypes[2] = {"Exp", "SoftPlus"};
             std::string qtypes[3] = {"ClenshawCurtis", "AdaptiveSimpson", "AdaptiveClenshawCurtis"};

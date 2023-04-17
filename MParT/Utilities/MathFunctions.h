@@ -2,6 +2,7 @@
 #define MPART_MATHFUNCTIONS_H
 
 #include <Kokkos_Core.hpp>
+#include "ArrayConversions.h"
 
 namespace mpart{
 
@@ -13,6 +14,7 @@ namespace mpart{
             out *= i;
         return out;
     }
+
 }
 
-#endif 
+#endif
