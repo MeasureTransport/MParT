@@ -13,15 +13,15 @@ using namespace mpart::binding;
 void mpart::binding::AffineMapWrapperHost(py::module &m)
 {
     py::class_<AffineMap<Kokkos::HostSpace>, ConditionalMapBase<Kokkos::HostSpace>, std::shared_ptr<AffineMap<Kokkos::HostSpace>>>(m, "AffineMap")
-        .def(py::init( [](Eigen::Ref<Eigen::VectorXd> const& b)
+        .def(py::init( [](py::EigenDRef<Eigen::VectorXd> const& b)
         {
             return new AffineMap<Kokkos::HostSpace>(VecToKokkos<double, Kokkos::HostSpace>(b));
         }))
-        .def(py::init( [](Eigen::Ref<Eigen::MatrixXd> const& A, Eigen::Ref<Eigen::VectorXd> const& b)
+        .def(py::init( [](py::EigenDRef<Eigen::MatrixXd> const& A, py::EigenDRef<Eigen::VectorXd> const& b)
         {
             return new AffineMap<Kokkos::HostSpace>(MatToKokkos<double, Kokkos::HostSpace>(A), VecToKokkos<double, Kokkos::HostSpace>(b));
         }))
-        .def(py::init( [](Eigen::Ref<Eigen::MatrixXd> const& A)
+        .def(py::init( [](py::EigenDRef<Eigen::MatrixXd> const& A)
         {
             return new AffineMap<Kokkos::HostSpace>(MatToKokkos<double, Kokkos::HostSpace>(A));
         }));
@@ -31,15 +31,15 @@ void mpart::binding::AffineMapWrapperHost(py::module &m)
 void mpart::binding::AffineFunctionWrapperHost(py::module &m)
 {
     py::class_<AffineFunction<Kokkos::HostSpace>, ParameterizedFunctionBase<Kokkos::HostSpace>, std::shared_ptr<AffineFunction<Kokkos::HostSpace>>>(m, "AffineFunction")
-        .def(py::init( [](Eigen::Ref<Eigen::VectorXd> const& b)
+        .def(py::init( [](py::EigenDRef<Eigen::VectorXd> const& b)
         {
             return new AffineFunction<Kokkos::HostSpace>(VecToKokkos<double, Kokkos::HostSpace>(b));
         }))
-        .def(py::init( [](Eigen::Ref<Eigen::MatrixXd> const& A, Eigen::Ref<Eigen::VectorXd> const& b)
+        .def(py::init( [](py::EigenDRef<Eigen::MatrixXd> const& A, py::EigenDRef<Eigen::VectorXd> const& b)
         {
             return new AffineFunction<Kokkos::HostSpace>(MatToKokkos<double, Kokkos::HostSpace>(A), VecToKokkos<double, Kokkos::HostSpace>(b));
         }))
-        .def(py::init( [](Eigen::Ref<Eigen::MatrixXd> const& A)
+        .def(py::init( [](py::EigenDRef<Eigen::MatrixXd> const& A)
         {
             return new AffineFunction<Kokkos::HostSpace>(MatToKokkos<double, Kokkos::HostSpace>(A));
         }));
