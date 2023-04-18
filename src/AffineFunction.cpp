@@ -11,7 +11,7 @@ using namespace mpart;
 
 template<typename MemorySpace>
 AffineFunction<MemorySpace>::AffineFunction(StridedVector<double,MemorySpace> b) : ParameterizedFunctionBase<MemorySpace>(b.size(),b.size(),0), 
-                                                                  b_("b",b.layout()) 
+                                                                  b_("b",b.extent(0)) 
 {
 
     Kokkos::deep_copy(b_, b);
@@ -19,7 +19,7 @@ AffineFunction<MemorySpace>::AffineFunction(StridedVector<double,MemorySpace> b)
 
 template<typename MemorySpace>
 AffineFunction<MemorySpace>::AffineFunction(StridedMatrix<double,MemorySpace> A) : ParameterizedFunctionBase<MemorySpace>(A.extent(1),A.extent(0),0),
-                                                                               A_("A", A.layout())
+                                                                               A_("A", A.extent(0), A.extent(1))
 {
     Kokkos::deep_copy(A_, A);
     assert(A_.extent(0)<=A_.extent(1));
@@ -29,8 +29,8 @@ AffineFunction<MemorySpace>::AffineFunction(StridedMatrix<double,MemorySpace> A)
 template<typename MemorySpace>
 AffineFunction<MemorySpace>::AffineFunction(StridedMatrix<double,MemorySpace> A,
                                   StridedVector<double,MemorySpace> b) : ParameterizedFunctionBase<MemorySpace>(A.extent(1),A.extent(0),0),
-                                                                  A_("A", A.layout()),
-                                                                  b_("b",b.layout())
+                                                                  A_("A", A.extent(0), A.extent(1)),
+                                                                  b_("b", b.extent(0))
 {   
     Kokkos::deep_copy(A_, A);
     Kokkos::deep_copy(b_, b);
@@ -43,18 +43,25 @@ template<typename MemorySpace>
 void AffineFunction<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                           StridedMatrix<double, MemorySpace>              output)
 {
+    unsigned int numPts = pts.extent(1);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{numPts, this->outputDim}});
+
     // Linear part
     if(A_.extent(0)>0){
+        
+        // Initialize output to zeros 
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
+            output(i,j) = 0.0;
+        });
+
         dgemm<MemorySpace>(1.0, A_, pts, 0.0, output);
+        
     }else{
         Kokkos::deep_copy(output, pts);
     }
-    
+ 
     // Bias part
     if(b_.size()>0){
-
-        unsigned int numPts = pts.extent(1);
-        Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {numPts, this->outputDim});
 
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
             output(i,j) += b_(i);

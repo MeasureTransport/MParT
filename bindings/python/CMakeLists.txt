@@ -39,3 +39,13 @@ target_link_libraries(pympart PRIVATE mpart Kokkos::kokkos Eigen3::Eigen ${EXT_L
 # Add an installation target for the python bindings
 install(TARGETS pympart DESTINATION "${PYTHON_INSTALL_PREFIX}")
 install(DIRECTORY package/ DESTINATION "${PYTHON_INSTALL_PREFIX}")
+
+# See https://gist.github.com/kprussing/db21614ca5b51cedff07dfb70059f280
+#set(lib_path "${PYTHON_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+#message(STATUS "LIB_PATH = ${lib_path}")
+#list(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${lib_path}" is_system)
+if(SKBUILD)
+    if (SKBUILD_LIB_RPATH)
+        set_target_properties(pympart PROPERTIES INSTALL_RPATH "${SKBUILD_LIB_RPATH}")
+    endif()
+endif()
