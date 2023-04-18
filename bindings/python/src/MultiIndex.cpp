@@ -131,10 +131,11 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("Expand", py::overload_cast<>(&MultiIndexSet::Expand), "Expand all frontiers of a MultiIndexSet")
         .def("append", py::overload_cast<MultiIndex const&>(&MultiIndexSet::operator+=))
         .def("__iadd__", py::overload_cast<MultiIndex const&>(&MultiIndexSet::operator+=))
-        .def("deepcopy" [](MultiIndexSet &mset){
-            MultiIndexSet mset_copy = mset;
-            return mset_copy
-        })
+        // .def("deepcopy" [](const MultiIndexSet& mset)
+        // {
+        //     mset_copy = MultiIndexSet(mset);
+        //     return mset_copy;
+        // })
         .def("Activate", py::overload_cast<MultiIndex const&>(&MultiIndexSet::Activate))
         .def("AddActive", &MultiIndexSet::AddActive)
         .def("Frontier", &MultiIndexSet::Frontier)
