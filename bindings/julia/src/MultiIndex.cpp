@@ -63,6 +63,8 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
         .method("NumActiveForward", &MultiIndexSet::NumActiveForward)
         .method("NumForward", &MultiIndexSet::NumForward)
         .method("Size", &MultiIndexSet::Size)
+        .method("addto!", [](MultiIndexSet &mset, MultiIndex const& idx){ return mset += idx; })
+        .method("addto!", [](MultiIndexSet &mset, MultiIndexSet const& mset2){ return mset += mset2; })
     ;
 
     mod.method("MultiIndexSet", [](jlcxx::ArrayRef<int,2> idxs) {
