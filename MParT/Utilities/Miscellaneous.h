@@ -18,6 +18,20 @@ namespace mpart{
     std::string GetOption(std::unordered_map<std::string,std::string> const& map,
                           std::string                                 const& key,
                           std::string                                 const& defaultValue);
+
+    template<typename MemorySpace, typename ErrorType>
+    struct ProcAgnosticError {
+        static void error(const char*) {
+            assert(0);
+        }
+    };
+
+    template<typename ErrorType>
+    struct ProcAgnosticError<Kokkos::HostSpace, ErrorType> {
+        static void error(const char* message) {
+            throw ErrorType(message);
+        }
+    };
 }
 
 #endif

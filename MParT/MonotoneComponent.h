@@ -101,15 +101,22 @@ public:
         });
     }
 
+    bool isGradFunctionInputValid(int sensRows, int sensCols, int ptsRows, int ptsCols, int outputRows, int outputCols, int expectedOutputRows) {
+        bool isSensRowsValid = sensRows==this->outputDim;
+        bool isInputColsValid = sensCols==ptsCols;
+        bool isPtsValid = ptsRows==this->inputDim;
+        bool isOutputRowsValid = outputRows==expectedOutputRows;
+        bool isOutputColsValid = outputCols==ptsCols;
+        return isSensRowsValid && isInputColsValid && isPtsValid && isOutputRowsValid && isOutputColsValid;
+    }
+
     void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                       StridedMatrix<const double, MemorySpace> const& sens,
                       StridedMatrix<double, MemorySpace>              output) override
     {
-        assert(sens.extent(0)==this->outputDim);
-        assert(sens.extent(1)==pts.extent(1));
-        assert(pts.extent(0)==this->inputDim);
-        assert(output.extent(0)==this->inputDim);
-        assert(output.extent(1)==pts.extent(1));
+        bool isInputValid = isGradFunctionInputValid(sens.extent(0), sens.extent(1), pts.extent(0), pts.extent(1), output.extent(0), output.extent(1), this->inputDim);
+        if(!isInputValid)
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("GradientImpl: Invalid dimensions of inputs");
 
         Kokkos::View<double*,MemorySpace> evals("Map output", pts.extent(1));
 
@@ -127,11 +134,10 @@ public:
                        StridedMatrix<const double, MemorySpace> const& sens,
                        StridedMatrix<double, MemorySpace>              output) override
     {
-        assert(sens.extent(0)==this->outputDim);
-        assert(sens.extent(1)==pts.extent(1));
-        assert(pts.extent(0)==this->inputDim);
-        assert(output.extent(0)==this->numCoeffs);
-        assert(output.extent(1)==pts.extent(1));
+        bool isInputValid = isGradFunctionInputValid(sens.extent(0), sens.extent(1), pts.extent(0), pts.extent(1), output.extent(0), output.extent(1), this->numCoeffs);
+        if(!isInputValid) {
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("CoeffGradImpl: Invalid dimension of inputs");
+        }
 
         Kokkos::View<double*,MemorySpace> evals("Map output", pts.extent(1));
 
@@ -222,8 +228,8 @@ public:
                       StridedVector<double,MemorySpace>                     output)
     {
         const unsigned int numPts = pts.extent(1);
-
-        assert(output.extent(0)==numPts);
+        if(output.extent(0)!=numPts)
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("EvaluateImpl: output has incorrect number of columns");
 
         // Ask the expansion how much memory it would like for its one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -541,8 +547,6 @@ public:
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
 
-        assert(coeffs.extent(0)==numTerms);
-
         Kokkos::View<double*,MemorySpace> output("ExpansionOutput", numPts);
 
         // Ask the expansion how much memory it would like for it's one-point cache
@@ -600,6 +604,13 @@ public:
     //     DiscreteDerivative(pts2, coeffs2, evals, derivs);
     // }
 
+    bool isJacobianInputValid(int jacRows, int jacCols, int evalRows, int expectJacRows, int expectJacCols, int expectEvalRows) {
+        bool isJacRowsCorrect = jacRows == expectJacRows;
+        bool isJacColsCorrect = jacCols == expectJacCols;
+        bool isEvalRowsCorrect = evalRows == expectEvalRows;
+        return isJacRowsCorrect && isJacColsCorrect && isEvalRowsCorrect;
+    }
+
     /** @brief Returns the gradient of the map with respect to the parameters \f$\mathbf{w}\f$ at multiple points.
 
         @details
@@ -609,8 +620,8 @@ public:
 
         @param[in] pts A \f$D\times N\f$ matrix containing the points \f$x^{(1)},\ldots,x^{(N)}\f$.  Each column is a point.
         @param[in] coeffs A vector of coefficients defining the function \f$f(\mathbf{x}; \mathbf{w})\f$.
-        @param[out] evaluations A vector containing the \f$N\f$ predictions \f$y_d^{(i)}\f$.  The vector must be preallocated and have \f$N\f$ components when passed to this function.  An assertion will be thrown in this vector is not the correct size.
-        @param[out] jacobian A matrix containing the \f$M\times N\f$ Jacobian matrix, where \f$M\f$ is the length of the parameter vector \f$\mathbf{w}\f$.  This matrix must be sized correctly or an assertion will be thrown.
+        @param[out] evaluations A vector containing the \f$N\f$ predictions \f$y_d^{(i)}\f$.  The vector must be preallocated and have \f$N\f$ components when passed to this function.  An error will occur if this vector is not the correct size.
+        @param[out] jacobian A matrix containing the \f$M\times N\f$ Jacobian matrix, where \f$M\f$ is the length of the parameter vector \f$\mathbf{w}\f$.  This matrix must be sized correctly or an error will occur.
 
         @see CoeffGradient
     */
@@ -623,9 +634,9 @@ public:
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
 
-        assert(jacobian.extent(1)==numPts);
-        assert(jacobian.extent(0)==numTerms);
-        assert(evaluations.extent(0)==numPts);
+        bool isInputValid = isJacobianInputValid(jacobian.extent(0), jacobian.extent(1), evaluations.extent(0), numTerms, numPts, numPts);
+        if(!isInputValid)
+            ProcAgnosticError<MemorySpace, std::invalid_argument>::error("CoeffJacobian: Incorrect input arg sizes");
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -684,8 +695,8 @@ public:
 
         @param[in] pts A \f$D\times N\f$ matrix containing the points \f$x^{(1)},\ldots,x^{(N)}\f$.  Each column is a point.
         @param[in] coeffs A vector of coefficients defining the function \f$f(\mathbf{x}; \mathbf{w})\f$.
-        @param[out] evaluations A vector containing the \f$N\f$ predictions \f$y_d^{(i)}\f$.  The vector must be preallocated and have \f$N\f$ components when passed to this function.  An assertion will be thrown in this vector is not the correct size.
-        @param[out] jacobian A matrix containing the \f$d\times N\f$ Jacobian matrix, where \f$d\f$ is the length of the input vector \f$\mathbf{x}\f$.  This matrix must be sized correctly or an assertion will be thrown.
+        @param[out] evaluations A vector containing the \f$N\f$ predictions \f$y_d^{(i)}\f$.  The vector must be preallocated and have \f$N\f$ components when passed to this function.  An error will occur if this vector is not the correct size.
+        @param[out] jacobian A matrix containing the \f$d\times N\f$ Jacobian matrix, where \f$d\f$ is the length of the input vector \f$\mathbf{x}\f$.  This matrix must be sized correctly or an error will occur.
 
         @see CoeffGradient
     */
@@ -698,9 +709,9 @@ public:
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
 
-        assert(jacobian.extent(1)==numPts);
-        assert(jacobian.extent(0)==dim_);
-        assert(evaluations.extent(0)==numPts);
+        bool isInputValid = isJacobianInputValid(jacobian.extent(0), jacobian.extent(1), evaluations.extent(0), dim_, numPts, numPts);
+        if(!isInputValid)
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("InputJacobian: Invalid input arg size");
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -754,6 +765,10 @@ public:
         Kokkos::parallel_for(policy, functor);
     }
 
+    bool isMixedJacobianInputValid(int jacRows, int jacCols, int expectJacRows, int expectJacCols) {
+        return isJacobianInputValid(jacRows, jacCols, 0, expectJacRows, expectJacCols, 0);
+    }
+
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
     void ContinuousMixedJacobian(StridedMatrix<const double, MemorySpace> const& pts,
                                  StridedVector<const double, MemorySpace> const& coeffs,
@@ -763,8 +778,9 @@ public:
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
 
-        assert(jacobian.extent(1)==numPts);
-        assert(jacobian.extent(0)==numTerms);
+        bool isInputValid = isMixedJacobianInputValid(jacobian.extent(0), jacobian.extent(1), numTerms, numPts);
+        if(!isInputValid)
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("ContinuousMixedJacobian: Invalid sizes of input args");
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -815,9 +831,9 @@ public:
         const unsigned int numPts = pts.extent(1);
         const unsigned int dim = pts.extent(0);
 
-
-        assert(jacobian.extent(1)==numPts);
-        assert(jacobian.extent(0)==dim);
+        bool isInputValid = isMixedJacobianInputValid(jacobian.extent(0), jacobian.extent(1), dim, numPts);
+        if(!isInputValid)
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("ContinuousMixedInputJacobian: Invalid sizes of input args");
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -868,9 +884,9 @@ public:
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
-
-        assert(jacobian.extent(1)==numPts);
-        assert(jacobian.extent(0)==numTerms);
+        bool isInputValid = isMixedJacobianInputValid(jacobian.extent(0), jacobian.extent(1), numTerms, numPts);
+        if(!isInputValid)
+            ProcAgnosticError<MemorySpace, std::invalid_argument>::error("DiscreteMixedJacobian: Invalid sizes of input args")
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -1013,7 +1029,8 @@ public:
                     break;
                 }
             }
-            assert(i<maxIts);
+            if(i>maxIts)
+                ProcAgnosticError<MemorySpace, std::runtime_error>::error("InverseSingleBracket: lower bound iterations exceed maxIts");
 
         // We have a lower bound...
         }else{
@@ -1030,7 +1047,8 @@ public:
                     break;
                 }
             }
-            assert(i<10000);
+            if(i>maxIts)
+                ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: upper bound calculation exceeds maxIts")
         }
 
         assert(ylb<yub);
@@ -1074,7 +1092,8 @@ public:
                 break;
         };
 
-        assert(it<maxIts);
+        if(it>maxIts)
+            ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: Bracket search iterations exceeds maxIts");
         return 0.5*(xub+xlb);
     }
 
