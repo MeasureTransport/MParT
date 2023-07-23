@@ -12,11 +12,23 @@
 
 namespace mpart {
 
-// Options specifically for ATM algorithm, with map eval opts -> training opts-> ATM specific opts
+/**
+ * @brief Both map and training options combined with special ATM options.
+ *
+ */
 struct ATMOptions: public MapOptions, public TrainOptions {
+    /** Maximum number of iterations that do not improve error */
     unsigned int maxPatience = 10;
-    unsigned int maxSize = 10;
+    /** Maximum number of coefficients in final expansion (including ALL dimensions of map) */
+    unsigned int maxSize = std::numeric_limits<unsigned int>::infinity();
+    /** Multiindex representing the maximum degree in each input dimension */
     MultiIndex maxDegrees;
+
+    /**
+     * @brief Create a string representation of these options.
+     *
+     * @return std::string
+     */
     std::string String() override {
         std::string md_str = maxDegrees.String();
         std::stringstream ss;
@@ -24,10 +36,19 @@ struct ATMOptions: public MapOptions, public TrainOptions {
         ss << "maxPatience = " << maxPatience << "\n";
         ss << "maxSize = " << maxSize << "\n";
         ss << "maxDegrees = " << maxDegrees.String();
+
         return ss.str();
     }
 };
 
+/**
+ * @brief Adaptively discover new terms in coefficient basis to add to map using the ATM algorithm of Baptista, et al. 2022.
+ *
+ * @tparam MemorySpace Device or host space to work in
+ * @param mset0 vector storing initial (minimal) guess of multiindex sets, corresponding to each dimension. Is changed in-place.
+ * @param objective What this map should be adapted to fits
+ * @return std::shared_ptr<ConditionalMapBase<MemorySpace>> New map according to specifications.
+ */
 template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> TrainMapAdaptive(std::vector<MultiIndexSet> &mset0,
     std::shared_ptr<MapObjective<MemorySpace>> objective,

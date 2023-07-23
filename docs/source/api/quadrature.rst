@@ -8,5 +8,5 @@ C++ Objects
 .. toctree::
 
    quadrature/clenshawcurtis
-   quadrature/adaptivesimpson 
-   quadrature/adaptiveclenshawcurtis
+   quadrature/adaptivesimpson
+   quadrature/recursivequadrature
