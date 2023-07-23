@@ -886,7 +886,7 @@ public:
         const unsigned int numTerms = coeffs.extent(0);
         bool isInputValid = isMixedJacobianInputValid(jacobian.extent(0), jacobian.extent(1), numTerms, numPts);
         if(!isInputValid)
-            ProcAgnosticError<MemorySpace, std::invalid_argument>::error("DiscreteMixedJacobian: Invalid sizes of input args")
+            ProcAgnosticError<MemorySpace, std::invalid_argument>::error("DiscreteMixedJacobian: Invalid sizes of input args");
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -1048,7 +1048,7 @@ public:
                 }
             }
             if(i>maxIts)
-                ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: upper bound calculation exceeds maxIts")
+                ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: upper bound calculation exceeds maxIts");
         }
 
         assert(ylb<yub);
