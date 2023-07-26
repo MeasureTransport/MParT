@@ -110,13 +110,23 @@ public:
         return isSensRowsValid && isInputColsValid && isPtsValid && isOutputRowsValid && isOutputColsValid;
     }
 
+    void checkGradFunctionInput(const std::string method, int sensRows, int sensCols, int ptsRows, int ptsCols, int outputRows, int outputCols, int expectedOutputRows) {
+        bool isInputValid = isGradFunctionInputValid(sensRows, sensCols, ptsRows, ptsCols, outputRows, outputCols, expectedOutputRows);
+        if(!isInputValid) {
+            std::stringstream ss;
+            ss << method << ": Invalid dimensions of input args." <<
+            "sens: (" << sensRows << "," << sensCols << "), expected: " << this->outputDim << ", " << ptsCols << "), "
+            << "pts: (" << ptsRows << "," << ptsCols << "), expected: (" << this->inputDim << "," << ptsCols << "), "
+            << "output: (" << outputRows << "," << outputCols << "), expected: (" << expectedOutputRows << "," << ptsCols << ")";
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+        }
+    }
+
     void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                       StridedMatrix<const double, MemorySpace> const& sens,
                       StridedMatrix<double, MemorySpace>              output) override
     {
-        bool isInputValid = isGradFunctionInputValid(sens.extent(0), sens.extent(1), pts.extent(0), pts.extent(1), output.extent(0), output.extent(1), this->inputDim);
-        if(!isInputValid)
-            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("GradientImpl: Invalid dimensions of inputs");
+        checkGradFunctionInput("Gradient", sens.extent(0), sens.extent(1), pts.extent(0), pts.extent(1), output.extent(0), output.extent(1), this->inputDim);
 
         Kokkos::View<double*,MemorySpace> evals("Map output", pts.extent(1));
 
@@ -134,10 +144,7 @@ public:
                        StridedMatrix<const double, MemorySpace> const& sens,
                        StridedMatrix<double, MemorySpace>              output) override
     {
-        bool isInputValid = isGradFunctionInputValid(sens.extent(0), sens.extent(1), pts.extent(0), pts.extent(1), output.extent(0), output.extent(1), this->numCoeffs);
-        if(!isInputValid) {
-            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("CoeffGradImpl: Invalid dimension of inputs");
-        }
+        checkGradFunctionInput("CoeffGradImpl", sens.extent(0), sens.extent(1), pts.extent(0), pts.extent(1), output.extent(0), output.extent(1), this->numCoeffs);
 
         Kokkos::View<double*,MemorySpace> evals("Map output", pts.extent(1));
 
@@ -228,8 +235,12 @@ public:
                       StridedVector<double,MemorySpace>                     output)
     {
         const unsigned int numPts = pts.extent(1);
-        if(output.extent(0)!=numPts)
-            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("EvaluateImpl: output has incorrect number of columns");
+        if(output.extent(0)!=numPts) {
+            std::stringstream ss;
+            ss << "EvaluateImpl: output has incorrect number of columns. "
+            << "Expected: " << pts.extent(1) << ", got " << output.extent(0);
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+        }
 
         // Ask the expansion how much memory it would like for its one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -611,6 +622,18 @@ public:
         return isJacRowsCorrect && isJacColsCorrect && isEvalRowsCorrect;
     }
 
+    void checkJacobianInput(const std::string method, int jacRows, int jacCols, int evalRows, int expectJacRows, int expectJacCols, int expectEvalRows) {
+        bool isInputValid = isJacobianInputValid(jacRows, jacCols, evalRows, expectJacRows, expectJacCols, expectEvalRows);
+        if(!isInputValid) {
+            std::stringstream ss;
+            ss << method << ": Incorrect input arg sizes. "
+               << "jacobian: (" << jacRows << "," << jacCols << "), expected: (" << expectJacRows << "," << expectJacCols << "), ";
+            if(expectEvalRows > 0)
+                ss << "evaluations: (" << evalRows << "), expected: (" << expectEvalRows << ")";
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+        }
+    }
+
     /** @brief Returns the gradient of the map with respect to the parameters \f$\mathbf{w}\f$ at multiple points.
 
         @details
@@ -634,9 +657,7 @@ public:
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
 
-        bool isInputValid = isJacobianInputValid(jacobian.extent(0), jacobian.extent(1), evaluations.extent(0), numTerms, numPts, numPts);
-        if(!isInputValid)
-            ProcAgnosticError<MemorySpace, std::invalid_argument>::error("CoeffJacobian: Incorrect input arg sizes");
+        checkJacobianInput("CoeffJacobian", jacobian.extent(0), jacobian.extent(1), evaluations.extent(0), numTerms, numPts, numPts);
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -709,9 +730,7 @@ public:
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
 
-        bool isInputValid = isJacobianInputValid(jacobian.extent(0), jacobian.extent(1), evaluations.extent(0), dim_, numPts, numPts);
-        if(!isInputValid)
-            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("InputJacobian: Invalid input arg size");
+        checkJacobianInput("InputJacobian",jacobian.extent(0), jacobian.extent(1), evaluations.extent(0), dim_, numPts, numPts);
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -765,8 +784,8 @@ public:
         Kokkos::parallel_for(policy, functor);
     }
 
-    bool isMixedJacobianInputValid(int jacRows, int jacCols, int expectJacRows, int expectJacCols) {
-        return isJacobianInputValid(jacRows, jacCols, 0, expectJacRows, expectJacCols, 0);
+    void checkMixedJacobianInput(const std::string method, int jacRows, int jacCols, int expectJacRows, int expectJacCols) {
+        checkJacobianInput(method, jacRows, jacCols, 0, expectJacRows, expectJacCols, 0);
     }
 
     template<typename ExecutionSpace=typename MemoryToExecution<MemorySpace>::Space>
@@ -778,9 +797,7 @@ public:
         const unsigned int numTerms = coeffs.extent(0);
         const unsigned int dim = pts.extent(0);
 
-        bool isInputValid = isMixedJacobianInputValid(jacobian.extent(0), jacobian.extent(1), numTerms, numPts);
-        if(!isInputValid)
-            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("ContinuousMixedJacobian: Invalid sizes of input args");
+        checkMixedJacobianInput("ContinuousMixedJacobian", jacobian.extent(0), jacobian.extent(1), numTerms, numPts);
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -831,9 +848,7 @@ public:
         const unsigned int numPts = pts.extent(1);
         const unsigned int dim = pts.extent(0);
 
-        bool isInputValid = isMixedJacobianInputValid(jacobian.extent(0), jacobian.extent(1), dim, numPts);
-        if(!isInputValid)
-            ProcAgnosticError<MemorySpace,std::invalid_argument>::error("ContinuousMixedInputJacobian: Invalid sizes of input args");
+        checkMixedJacobianInput("ContinuousMixedInputJacobian", jacobian.extent(0), jacobian.extent(1), dim, numPts);
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
@@ -884,9 +899,8 @@ public:
     {
         const unsigned int numPts = pts.extent(1);
         const unsigned int numTerms = coeffs.extent(0);
-        bool isInputValid = isMixedJacobianInputValid(jacobian.extent(0), jacobian.extent(1), numTerms, numPts);
-        if(!isInputValid)
-            ProcAgnosticError<MemorySpace, std::invalid_argument>::error("DiscreteMixedJacobian: Invalid sizes of input args");
+
+        checkMixedJacobianInput("DiscreteMixedJacobian", jacobian.extent(0), jacobian.extent(1), numTerms, numPts);
 
         // Ask the expansion how much memory it would like for it's one-point cache
         const unsigned int cacheSize = expansion_.CacheSize();
