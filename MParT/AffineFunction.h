@@ -51,9 +51,9 @@ public:
 
 
 protected:
-
-    StridedMatrix<double,MemorySpace> A_;
-    StridedVector<double,MemorySpace> b_;
+    
+    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> A_;
+    Kokkos::View<double*, Kokkos::LayoutLeft, MemorySpace> b_;
 
     int ldA;
 

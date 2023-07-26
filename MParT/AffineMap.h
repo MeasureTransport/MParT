@@ -13,6 +13,7 @@
 namespace mpart{
 
 /** @brief Defines transformations of the form \f$Ax+b\f$ for an invertible matrix \f$A\f$ and vector offset \f$b\f$.
+ * Makes a deep copy of any views passed to the constructor.
 */
 template<typename MemorySpace>
 class AffineMap : public ConditionalMapBase<MemorySpace>
@@ -64,8 +65,8 @@ public:
 
 protected:
 
-    StridedMatrix<double,MemorySpace> A_;
-    StridedVector<double,MemorySpace> b_;
+    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> A_;
+    Kokkos::View<double*, Kokkos::LayoutLeft, MemorySpace> b_;
 
     mpart::PartialPivLU<MemorySpace> luSolver_;
     double logDet_;
