@@ -11,7 +11,7 @@ namespace mpart {
 /**
  * @brief TrainOptions adds options for training your map,
  * with fields largely based on NLopt settings. For documentation
- * of such fields, see NLOpt.
+ * of such fields, see <a href="https://nlopt.readthedocs.io/en/latest/NLopt_C-plus-plus_Reference/#stopping-criteria">NLOpt</a>.
  *
  */
 struct TrainOptions {
