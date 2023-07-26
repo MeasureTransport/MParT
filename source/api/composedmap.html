@@ -399,6 +399,7 @@ document.write(`
 <li class="toctree-l1 has-children"><a class="reference internal" href="quadrature.html">Quadrature</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="quadrature/clenshawcurtis.html">Clenshaw Curtis Quadrature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quadrature/adaptivesimpson.html">Adaptive Simpson Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quadrature/recursivequadrature.html">Adaptive Clenshaw Curtis Quadrature</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utilities/linearalgebra.html">Linear Algebra</a></li>
@@ -418,6 +419,11 @@ document.write(`
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utilities/initialization.html">Initialization Helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utilities/serialization.html">Serialization</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="maptraining.html">Map Training</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="maptraining/trainmap.html">Train Map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maptraining/trainmapadaptive.html">Adaptive Map Training</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </nav></div>
@@ -517,7 +523,8 @@ T(x) = T_L(x) \circ \ \dots \ \circ T_1(x),
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart11ComposedMap10WrapCoeffsEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE">
 <span class="target" id="classmpart_1_1_composed_map_1a26bac65c9f31b3ee64b21a11132fe354"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">WrapCoeffs</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">coeffs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N5mpart11ComposedMap10WrapCoeffsEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Wrap the internal coefficient view around another view. &#64;detail Performs a shallow copy of the input coefficients to the internally stored coefficients. If values in the view passed to this function are changed, the values will also change in the internally stored view. </p>
+<dd><p>Wrap the internal coefficient view around another view. </p>
+<p>Performs a shallow copy of the input coefficients to the internally stored coefficients. If values in the view passed to this function are changed, the values will also change in the internally stored view. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>coeffs</strong> – A view containing the coefficients we want to wrap. </p>

@@ -399,6 +399,7 @@ document.write(`
 <li class="toctree-l1 has-children"><a class="reference internal" href="quadrature.html">Quadrature</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="quadrature/clenshawcurtis.html">Clenshaw Curtis Quadrature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quadrature/adaptivesimpson.html">Adaptive Simpson Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quadrature/recursivequadrature.html">Adaptive Clenshaw Curtis Quadrature</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utilities/linearalgebra.html">Linear Algebra</a></li>
@@ -418,6 +419,11 @@ document.write(`
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utilities/initialization.html">Initialization Helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utilities/serialization.html">Serialization</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="maptraining.html">Map Training</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="maptraining/trainmap.html">Train Map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maptraining/trainmapadaptive.html">Adaptive Map Training</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </nav></div>
@@ -605,7 +611,7 @@ document.write(`
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptionsE">
 <span class="target" id="structmpart_1_1_map_options"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MapOptions</span></span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptionsE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>struct to hold options used by the <a class="reference internal" href="#namespacempart_1_1_map_factory"><span class="std std-ref">MapFactory</span></a> methods to construct monotone components and triangular maps. </p>
-<p>Subclassed by mpart::ATMOptions</p>
+<p>Subclassed by <a class="reference internal" href="maptraining/trainmapadaptive.html#structmpart_1_1_a_t_m_options"><span class="std std-ref">mpart::ATMOptions</span></a></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">

@@ -20,3 +20,4 @@ API Reference
    templateconcepts
    utilities/initialization
    utilities/serialization
+   maptraining
