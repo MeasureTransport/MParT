@@ -179,20 +179,20 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
         Kokkos::View<double*,HostSpace> coeffGrad("Coefficient Gradient", dim);
 
         for(double t : std::vector<double>{0.0, 0.5, -0.5, 1.0}){
-            
-            
+
+
             integrand(t, fval.data());
-            
+
             // Compute what it should be
             double xd = pt(dim-1);
             expansion.FillCache2(&cache[0], pt, t*xd, DerivativeFlags::Diagonal);
-            
+
             df = expansion.MixedInputDerivative(&cache[0], coeffs, coeffGrad);
             REQUIRE(fval(0) == Approx(std::abs(xd)*exp(df)).epsilon(testTol));
 
             // Check the derivative against finite differences
             for(unsigned int wrt=0; wrt<dim-1; ++wrt){
-                CHECK(fval(wrt+1) == Approx(xd * std::exp(df)*coeffGrad(wrt)).epsilon(1e-4));  
+                CHECK(fval(wrt+1) == Approx(xd * std::exp(df)*coeffGrad(wrt)).epsilon(1e-4));
             }
         }
     }
@@ -629,8 +629,16 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
         }
 
     }
-}
 
+    SECTION("GradientImpl") {
+
+            Kokkos::View<double**, HostSpace> evals("Evaluations", 1, numPts);
+
+            Kokkos::View<double**, HostSpace> sens("Jacobian", dim+1, numPts);
+            REQUIRE_THROWS_AS(comp.GradientImpl(evalPts, sens, evals), std::invalid_argument);
+
+    }
+}
 
 
 TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
@@ -691,7 +699,7 @@ TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[M
 {
     //const double testTol = 1e-4;
     unsigned int dim = 2;
- 
+
     // Create points evently spaced on [lb,ub]
     unsigned int numPts = 20;
     //double lb = -0.5;
@@ -717,11 +725,11 @@ TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[M
     Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
     for(unsigned int i=0; i<coeffs.extent(0); ++i)
         coeffs(i) = 0.1*std::cos( 0.01*i );
-    
+
     comp.SetCoeffs(coeffs);
 
     SECTION("CoeffGrad"){
-        
+
         Kokkos::View<double**, HostSpace> sens("Sensitivity", 1, numPts);
         for(unsigned int i=0; i<numPts; ++i)
             sens(0,i) = 0.25*(i+1);
@@ -760,7 +768,7 @@ TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[M
             logDets2 = comp.LogDeterminant(evalPts);
             for(unsigned int ptInd=0; ptInd<numPts; ++ptInd)
                 CHECK( grads(i,ptInd) == Approx((logDets2(ptInd)-logDets(ptInd))/fdstep).epsilon(1e-5));
-            
+
             coeffs(i) -= fdstep;
         }
 

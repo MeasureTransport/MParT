@@ -2,6 +2,7 @@
 #define MPART_MONOTONEINTEGRAND_H
 
 #include "MParT/DerivativeFlags.h"
+#include "MParT/Utilities/Miscellaneous.h"
 
 #include <Kokkos_Core.hpp>
 
@@ -157,7 +158,7 @@ public:
                 gradSeg(i) = scale*gradSeg(i) + _workspace(i);
 
         }else if(derivType_==DerivativeFlags::Input){
-            
+
             Kokkos::View<double*,MemorySpace,Kokkos::MemoryTraits<Kokkos::Unmanaged>> gradSeg(&output[1], dim);
             df = expansion_.MixedInputDerivative(cache_, coeffs_, gradSeg);
 
@@ -172,17 +173,17 @@ public:
         // First output is always the integrand itself
         double gf = PosFuncType::Evaluate(df);
         output[0] = xd_*gf;
-        
+
         // Check for infs or nans
         if(std::isinf(gf)){
             printf("\nERROR: In MonotoneIntegrand, value of g(df(...)) is inf.  The value of df(...) is %0.4f, and the value of f(df(...)) is %0.4f.\n\n", df, gf);
-        }else if(std::isnan(gf)){
-            printf("\nERROR: In MonotoneIntegrand, A nan was encountered in value of g(df(...)).\n\n");
+        }else if(failOnNaN && std::isnan(gf)){
+            ProcAgnosticError<MemorySpace,std::runtime_error>::error("MonotoneIntegrand: nan was encountered in value of g(df(...)). Use MonotoneIntegrand::setFailOnNaN for enabling NaN propagation.");
         }
 
         // Compute the derivative with respect to x_d
         if((derivType_==DerivativeFlags::Diagonal) || (derivType_==DerivativeFlags::Input)){
-            
+
             unsigned int ind = (derivType_==DerivativeFlags::Diagonal) ? 1 : dim;
             // Compute \partial^2_d f
             output[ind] = expansion_.DiagonalDerivative(cache_, coeffs_, 2);
@@ -193,6 +194,7 @@ public:
         }
     }
 
+    void setFailOnNaN(bool shouldFailOnNaN) {failOnNaN = shouldFailOnNaN;}
 private:
 
     const unsigned int dim_;
@@ -203,6 +205,7 @@ private:
     CoeffsType const& coeffs_;
     DerivativeFlags::DerivativeType derivType_;
     Kokkos::View<double*,MemorySpace> _workspace;
+    bool failOnNaN = true;
 
 }; // class MonotoneIntegrand
 

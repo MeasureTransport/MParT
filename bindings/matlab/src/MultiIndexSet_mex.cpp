@@ -169,6 +169,16 @@ MEX_DEFINE(MultiIndexSet_ExpandAny) (int nlhs, mxArray* plhs[],
   output.set(0, mset->Expand());
 }
 
+MEX_DEFINE(MultiIndexSet_DeepCopy) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
+  MultiIndexSet mset_copy = MultiIndexSet::CreateTotalOrder(mset.Length(), 0);
+  mset_copy += mset;
+  output.set(0, Session<MultiIndexSet>::create(new MultiIndexSet(mset_copy)));
+}
+
 MEX_DEFINE(MultiIndexSet_ForciblyExpand) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 2);

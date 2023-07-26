@@ -50,6 +50,11 @@ methods
     multi = MultiIndex(multi_id,"id");
   end
 
+  function mset = DeepCopy(this)
+    mset_id = MParT_('MultiIndexSet_DeepCopy', this.id_);
+    mset = MultiIndeSet(mset_id,"id");
+  end
+
   function result = MultiToIndex(this,multi)
     result= MParT_('MultiIndexSet_MultiToIndex',this.id_,multi.get_id());
     result = result + 1;
