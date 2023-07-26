@@ -7,7 +7,7 @@ RUN --mount=type=cache,target=/opt/conda/pkgs conda env create -f MParT_/.docker
 
 SHELL ["conda", "run", "-n", "mpart", "/bin/bash", "-c"]
 
-RUN git clone --depth=1 --branch tags/3.7.01 https://github.com/kokkos/kokkos.git && \
+RUN git clone --depth=1 --branch 3.7.02 https://github.com/kokkos/kokkos.git && \
     mkdir kokkos/build && \
     cd kokkos/build && \
     cmake \
