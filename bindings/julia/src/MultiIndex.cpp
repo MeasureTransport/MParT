@@ -63,6 +63,8 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
         .method("NumActiveForward", &MultiIndexSet::NumActiveForward)
         .method("NumForward", &MultiIndexSet::NumForward)
         .method("Size", &MultiIndexSet::Size)
+        .method("addto!", [](MultiIndexSet &mset, MultiIndex const& idx){ return mset += idx; })
+        .method("addto!", [](MultiIndexSet &mset, MultiIndexSet const& mset2){ return mset += mset2; })
     ;
 
     mod.method("MultiIndexSet", [](jlcxx::ArrayRef<int,2> idxs) {
@@ -83,7 +85,6 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
     mod.method("length", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset){return mset.Length();});
     mod.method("size", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset){return mset.Size();});
     mod.method("vec", [](MultiIndex const& idx){ return idx.Vector(); });
-    mod.method("copy", [](MultiIndexSet const& mset){ MultiIndexSet mset_copy = mset; return mset_copy;});
     mod.method("==", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 == idx2; });
     mod.method("!=", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 != idx2; });
     mod.method("<", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 < idx2; });
