@@ -10,20 +10,30 @@ namespace mpart {
 
 /**
  * @brief TrainOptions adds options for training your map,
- * with fields largely based on nlopt settings. verbose is an integer
- * where 0=nothing, 1=some diagnostics, 2=debugging
+ * with fields largely based on NLopt settings. For documentation
+ * of such fields, see <a href="https://nlopt.readthedocs.io/en/latest/NLopt_C-plus-plus_Reference/#stopping-criteria">NLOpt</a>.
  *
  */
 struct TrainOptions {
+    /** NLOpt: Optimization Algorithm to use */
     std::string opt_alg = "LD_SLSQP";
+    /** NLOpt: Lower bound on optimizer */
     double opt_stopval = -std::numeric_limits<double>::infinity();
+    /** NLOpt: Relative tolerance on function value change */
     double opt_ftol_rel = 1e-3;
+    /** NLOpt: Absolute tolerance of function value change */
     double opt_ftol_abs = 1e-3;
+    /** NLOpt: Relative tolerance of minimizer value change */
     double opt_xtol_rel = 1e-4;
+    /** NLOpt: Absolute tolerance of minimizer value change */
     double opt_xtol_abs = 1e-4;
+    /** NLOpt: Maximum number of evaluations of function to optimize */
     int opt_maxeval = 1000;
+    /** NLOpt: Maximum amount of time to spend optimizing */
     double opt_maxtime = std::numeric_limits<double>::infinity();
+    /** Verbosity of map training (1: verbose, 2: debug) */
     int verbose = 0;
+
     /**
      * @brief Create a string representation of these training options (helpful for bindings)
      *
@@ -47,7 +57,6 @@ struct TrainOptions {
 /**
  * @brief Function to train a map inplace given an objective and optimization options
  *
- * @tparam ObjectiveType
  * @param map Map to optimize (inplace)
  * @param objective MapObjective to optimize over
  * @param options Options for optimizing the map

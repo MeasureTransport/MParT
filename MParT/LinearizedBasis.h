@@ -6,6 +6,13 @@
 
 namespace mpart{
 
+/**
+ * @brief Basis that is linear outside a given upper and lower bound.
+ * @details Implemented to be piecewise-defined mapping \f$F_{ab}[\psi]\f$, where \f$\psi\f$ is a real-valued univariate function. We define
+ * \f[ F_{ab}[\psi](x) = \begin{cases}\psi(x) & x\in[a,b]\\\psi(a)+(x-a)\psi^\prime(a) & x<a\\\psi(b) + (x-b)\psi^\prime(b) && x>b \f]
+ *
+ * @tparam OtherBasis type of basis inside bounds (e.g. OrthogonalPolynomial)
+ */
 template<typename OtherBasis>
 class LinearizedBasis
 {
@@ -30,8 +37,8 @@ public:
     KOKKOS_INLINE_FUNCTION void EvaluateAll(double*              output,
                                             unsigned int         maxOrder,
                                             double               x) const
-    {   
-        
+    {
+
         if(x<lb_){
             polyBasis_.EvaluateAll(output, maxOrder, lb_);
 
@@ -55,13 +62,13 @@ public:
                                                     double*              derivs,
                                                     unsigned int         maxOrder,
                                                     double               x) const
-    {   
+    {
         if(x<lb_){
 
             // Evaluate the underlying basis at the left linearization point
             polyBasis_.EvaluateDerivatives(vals, derivs, maxOrder, lb_);
 
-            // Now update the basis values based on the derivative values at the left point 
+            // Now update the basis values based on the derivative values at the left point
             for(unsigned int i=0; i<=maxOrder; ++i)
                 vals[i] += derivs[i]*(x-lb_);
 
@@ -69,7 +76,7 @@ public:
 
             // Evaluate the underlying basis at the right linearization point
             polyBasis_.EvaluateDerivatives(vals, derivs, maxOrder, ub_);
-            
+
             // Now update the basis values based on the derivative values at the right point
             for(unsigned int i=0; i<=maxOrder; ++i)
                 vals[i] += derivs[i]*(x-ub_);
@@ -85,12 +92,12 @@ public:
                                    double*              derivs2,
                                    unsigned int         maxOrder,
                                    double               x) const
-    {   
+    {
         if(x<lb_){
             EvaluateDerivatives(vals, derivs, maxOrder, x);
             for(unsigned int i=0; i<=maxOrder; ++i)
                 derivs2[i] = 0.0;
-            
+
         }else if(x>ub_){
             EvaluateDerivatives(vals, derivs, maxOrder, x);
             for(unsigned int i=0; i<=maxOrder; ++i)
@@ -102,7 +109,7 @@ public:
     }
 
 
-    KOKKOS_INLINE_FUNCTION double Evaluate(unsigned int const order, 
+    KOKKOS_INLINE_FUNCTION double Evaluate(unsigned int const order,
                                            double const x) const
     {
         if(x<lb_){
@@ -114,9 +121,9 @@ public:
         }
     }
 
-    KOKKOS_INLINE_FUNCTION double Derivative(unsigned int const order, 
-                                             double const x) const 
-    {   
+    KOKKOS_INLINE_FUNCTION double Derivative(unsigned int const order,
+                                             double const x) const
+    {
         if(x<lb_){
             return polyBasis_.Derivative(order,lb_);
         }else if(x>ub_){
@@ -126,9 +133,9 @@ public:
         }
     }
 
-    KOKKOS_INLINE_FUNCTION double SecondDerivative(unsigned int const order, 
+    KOKKOS_INLINE_FUNCTION double SecondDerivative(unsigned int const order,
                             double const x) const
-    {   
+    {
         if(x<lb_){
             return 0.0;
         }else if(x>ub_){
@@ -148,4 +155,4 @@ private:
 
 }
 
-#endif 
+#endif

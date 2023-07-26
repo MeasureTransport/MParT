@@ -41,7 +41,7 @@ namespace mpart {
         virtual Kokkos::View<double*, MemorySpace>& Coeffs(){return this->savedCoeffs;};
 
         /** @brief Set the internally stored view of coefficients.
-            @detail Performs a deep copy of the input coefficients to the internally stored coefficients.
+            @details Performs a deep copy of the input coefficients to the internally stored coefficients.
             @param coeffs A view containing the coefficients to copy.
         */
        virtual void SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs);
@@ -51,7 +51,7 @@ namespace mpart {
        #endif
 
         /** @brief Wrap the internal coefficient view around another view.
-            @detail Performs a shallow copy of the input coefficients to the internally stored coefficients.
+            @details Performs a shallow copy of the input coefficients to the internally stored coefficients.
             If values in the view passed to this function are changed, the values will also change in the
             internally stored view.
             @param coeffs A view containing the coefficients we want to wrap.

@@ -28,9 +28,9 @@ namespace mpart{
 The function \f$T\f$ is based on another (generally non-monotone) function \f$f : R^N\rightarrow R\f$ and a strictly positve function
 \f$g : R\rightarrow R_{>0}\f$.   Together, these functions define the monotone component $T$ through
 
-$$
+\f[
 T(x_1, x_2, ..., x_D) = f(x_1,x_2,..., x_{D-1}, 0) + \int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt
-$$
+\f]
 
 @tparam ExpansionType A class defining the function \f$f\f$.  It must satisfy the cached parameterization concept.
 @tparam PosFuncType A class defining the function \f$g\f$.  This class must have `Evaluate` and `Derivative` functions accepting a double and returning a double.  The MParT::SoftPlus and MParT::Exp classes in PositiveBijectors.h are examples of classes defining this interface.
