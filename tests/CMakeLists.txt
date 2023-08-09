@@ -30,6 +30,7 @@ set (TEST_SOURCES
 
      tests/Test_OrthogonalPolynomials.cpp
      tests/Test_HermiteFunctions.cpp
+     tests/Test_Sigmoid.cpp
      tests/Test_PositiveBijectors.cpp
      tests/Test_Quadrature.cpp
      tests/Test_MonotoneComponent.cpp
