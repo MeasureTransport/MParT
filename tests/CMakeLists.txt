@@ -27,6 +27,7 @@ set (TEST_SOURCES
      tests/Distributions/Test_GaussianDistribution.cpp
      tests/Distributions/Test_TransportDensity.cpp
      tests/Distributions/Test_TransportSampler.cpp
+     tests/Distributions/Test_TransportDistributionFactory.cpp
 
      tests/Test_OrthogonalPolynomials.cpp
      tests/Test_HermiteFunctions.cpp
