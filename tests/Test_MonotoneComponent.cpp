@@ -11,6 +11,10 @@
 
 #include <Eigen/Dense>
 
+// TO REMOVE
+#include <iostream>
+#include <chrono>
+
 using namespace mpart;
 using namespace Catch;
 using HostSpace = Kokkos::HostSpace;
@@ -386,7 +390,12 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         comp.EvaluateImpl(evalPts, coeffs, ys);
 
         Kokkos::View<double*, HostSpace> testInverse("Test output", numPts);
-        comp.InverseImpl(evalPts, ys, coeffs, testInverse);
+        auto start = std::chrono::high_resolution_clock::now();
+        for(int i = 0; i < 100; i++)
+            comp.InverseImpl(evalPts, ys, coeffs, testInverse);
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        std::cout << "Inversion time taken: " << static_cast<double>(duration.count())*1e-9 << " microseconds" << std::endl;
 
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(testTol));

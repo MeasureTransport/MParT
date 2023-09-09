@@ -12,6 +12,7 @@
 #include "MParT/Utilities/Miscellaneous.h"
 #include "MParT/Utilities/KokkosSpaceMappings.h"
 #include "MParT/Utilities/KokkosHelpers.h"
+#include "MParT/Utilities/RootFinding.h"
 
 
 #include <Eigen/Core>
@@ -399,7 +400,13 @@ public:
 
                 // Compute the inverse
                 Kokkos::View<double*,MemorySpace> workspace(team_member.thread_scratch(1), workspaceSize);
-                output(ptInd) = InverseSingleBracket(workspace.data(), cache.data(), pt, ys(ptInd), coeffs, xtol, ytol, quad_, expansion_);
+                auto evaluate_lambda = KOKKOS_LAMBDA(double x){
+                    return EvaluateSingle(workspace.data(), cache.data(), pt, x, coeffs, quad_, expansion_);
+                };
+                // OLD
+                // output(ptInd) = InverseSingleBracket(workspace.data(), cache.data(), pt, ys(ptInd), coeffs, xtol, ytol, quad_, expansion_);
+                // NEW
+                output(ptInd) = RootFinding::InverseSingleBracket<MemorySpace>(ys(ptInd), evaluate_lambda, pt(pt.extent(0)-1), xtol, ytol);
             }
         };
 

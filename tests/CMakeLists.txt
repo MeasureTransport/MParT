@@ -29,6 +29,7 @@ set (TEST_SOURCES
      tests/Distributions/Test_TransportSampler.cpp
 
      tests/Test_OrthogonalPolynomials.cpp
+     tests/Test_RootFinding.cpp
      tests/Test_HermiteFunctions.cpp
      tests/Test_Sigmoid.cpp
      tests/Test_PositiveBijectors.cpp
