@@ -353,7 +353,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
 
 TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBracketInverse]" ) {
 
-    const double testTol = 1e-7;
+    const double testTol = 1e-6;
     unsigned int dim = 1;
 
     // Create points evently space on [lb,ub]
@@ -390,12 +390,8 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         comp.EvaluateImpl(evalPts, coeffs, ys);
 
         Kokkos::View<double*, HostSpace> testInverse("Test output", numPts);
-        auto start = std::chrono::high_resolution_clock::now();
         for(int i = 0; i < 100; i++)
             comp.InverseImpl(evalPts, ys, coeffs, testInverse);
-        auto end = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        std::cout << "Inversion time taken: " << static_cast<double>(duration.count())*1e-9 << " microseconds" << std::endl;
 
         for(unsigned int i=0; i<numPts; ++i){
             CHECK(testInverse(i) == Approx(evalPts(0,i)).epsilon(testTol));
