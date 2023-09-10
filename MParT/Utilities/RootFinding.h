@@ -12,7 +12,9 @@ KOKKOS_INLINE_FUNCTION void swapPair(T& x1, T& x2, T& y1, T& y2) {
 }
 
 template<typename MemorySpace, typename FunctorType>
-KOKKOS_INLINE_FUNCTION void FindBound(bool haveLowerBound, double yd, FunctorType f, double& x_unbound, double& y_unbound, double& x_prebounded, double& y_prebounded, const unsigned int maxIts) {
+KOKKOS_INLINE_FUNCTION void FindBound(bool haveLowerBound, double yd,
+    FunctorType f, double& x_bound, double& y_bound,
+    double& x_unbound, double& y_unbound, const unsigned int maxIts) {
     double boundSign = haveLowerBound ? 1.0 : -1.0;
     double stepSize = 1.0;
     unsigned int iter;
@@ -20,10 +22,10 @@ KOKKOS_INLINE_FUNCTION void FindBound(bool haveLowerBound, double yd, FunctorTyp
         x_unbound += boundSign*stepSize;
         y_unbound = f(x_unbound);
         if(boundSign*(y_unbound - yd) > 0) return;
-        swapPair(x_prebounded, x_unbound, y_prebounded, y_unbound);
+        swapPair(x_bound, x_unbound, y_bound, y_unbound);
         stepSize *= 2;
     }
-    if(iter>maxIts)
+    if(iter>=maxIts)
             ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: bound calculation exceeds maxIts");
 }
 
@@ -31,7 +33,7 @@ KOKKOS_INLINE_FUNCTION double Find_x_ITP(double xlb, double xub, double yd, doub
                            double k1, double k2, double nhalf, double n0, int it, double xtol) {
 
         double xb = 0.5*(xub+xlb); // bisection point
-        double xf = xlb - (yd-ylb)*(xub-xlb) / (yub-ylb); // regula-falsi point
+        double xf = (xub*ylb - xlb*yub)/(ylb-yub); // regula-falsi point
 
         double sigma = ((xb-xf)>0)?1.0:-1.0; // sign(xb-xf)
         double delta = fmin(k1*pow((xub-xlb), k2), fabs(xb-xf));
@@ -54,19 +56,14 @@ KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, dou
     double ylb, yub;
     double xc, yc;
 
-    xlb = x0;
-    ylb = f(xlb);
+    xlb = xub = x0;
+    ylb = yub = f(xlb);
 
-    // We actually found an upper bound...
-    if(ylb>yd){
-        swapPair(xlb, xub, ylb, yub);
-        // Now find a lower bound...
-        FindBound<MemorySpace>(false, yd, f, xlb, ylb, xub, yub, maxIts);
-
-    // We have a lower bound...
-    }else{
-        // Now find an upper bound...
-        FindBound<MemorySpace>(true, yd, f, xub, yub, xlb, ylb, maxIts);
+    bool haveLowerBound = ylb < yd; // if ylb is a lower bound for yd
+    if(haveLowerBound) {
+        FindBound<MemorySpace>(haveLowerBound, yd, f, xlb, ylb, xub, yub, maxIts);
+    } else {
+        FindBound<MemorySpace>(haveLowerBound, yd, f, xub, yub, xlb, ylb, maxIts);
     }
 
     assert(ylb<yub);
@@ -84,7 +81,7 @@ KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, dou
 
         yc = f(xc);
 
-        if(abs(yc-yd)<ftol){
+        if(fabs(yc-yd)<ftol){
             return xc;
         }else if(yc>yd){
             swapPair(xc, xub, yc, yub);
