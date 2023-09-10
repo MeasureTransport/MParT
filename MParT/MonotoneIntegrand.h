@@ -176,9 +176,11 @@ public:
 
         // Check for infs or nans
         if(std::isinf(gf)){
-            printf("\nERROR: In MonotoneIntegrand, value of g(df(...)) is inf.  The value of df(...) is %0.4f, and the value of f(df(...)) is %0.4f.\n\n", df, gf);
-        }else if(failOnNaN && std::isnan(gf)){
-            ProcAgnosticError<MemorySpace,std::runtime_error>::error("MonotoneIntegrand: nan was encountered in value of g(df(...)). Use MonotoneIntegrand::setFailOnNaN for enabling NaN propagation.");
+            if(failOnNaN) {
+                ProcAgnosticError<MemorySpace,std::runtime_error>::error("MonotoneIntegrand: nan was encountered in value of g(df(...)). Use MonotoneIntegrand::setFailOnNaN for enabling NaN propagation.");
+            } else {
+                printf("\nERROR: In MonotoneIntegrand, value of g(df(...)) is inf.  The value of df(...) is %0.4f, and the value of f(df(...)) is %0.4f.\n\n", df, gf);
+            }
         }
 
         // Compute the derivative with respect to x_d
