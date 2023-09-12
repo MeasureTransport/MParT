@@ -32,7 +32,8 @@ template<typename MemorySpace, typename SigmoidType>
 class Sigmoid1d: public ParameterizedFunctionBase<MemorySpace>
 {
     public:
-    Sigmoid1d(StridedVector<const double, MemorySpace> centers, StridedVector<const double, MemorySpace> widths): ParameterizedFunctionBase<MemorySpace>(1, 1, widths.extent(0))
+    Sigmoid1d(StridedVector<const double, MemorySpace> centers, StridedVector<const double, MemorySpace> widths):
+        centers_(centers), widths_(widths), ParameterizedFunctionBase<MemorySpace>(1, 1, widths.extent(0))
     {
         if(centers.extent(0) != widths.extent(0)) {
             std::stringstream ss;
@@ -44,12 +45,12 @@ class Sigmoid1d: public ParameterizedFunctionBase<MemorySpace>
     }
 
     void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts, StridedMatrix<double, MemorySpace> out) override {
-        Kokkos::parallel_for(pts.extent(1), KOKKOS_CLASS_LAMBDA (unsigned int pointInd) {
+        Kokkos::parallel_for(pts.extent(1), KOKKOS_CLASS_LAMBDA (unsigned int sample_index) {
             double eval_pt = 0.;
             for(int coeff_index = 0; coeff_index < this->numCoeffs; coeff_index++){
-                eval_pt += this->savedCoeffs(coeff_index)*SigmoidType::Evaluate(pts(0,pointInd));
+                eval_pt += this->savedCoeffs(coeff_index)*SigmoidType::Evaluate(widths_(coeff_index)*(pts(0,sample_index)-centers_(coeff_index)));
             }
-            out(0,pointInd) = eval_pt;
+            out(0,sample_index) = eval_pt;
         });
     }
 
@@ -58,7 +59,7 @@ class Sigmoid1d: public ParameterizedFunctionBase<MemorySpace>
         Kokkos::parallel_for(pts.extent(1), KOKKOS_CLASS_LAMBDA(unsigned int sample_index) {
             double grad_pt = 0.;
             for(int coeff_index = 0; coeff_index < this->numCoeffs; coeff_index++){
-                grad_pt += this->savedCoeffs(coeff_index)*SigmoidType::Derivative(pts(0,sample_index));
+                grad_pt += this->savedCoeffs(coeff_index)*widths_(coeff_index)*SigmoidType::Derivative(widths_(coeff_index)*(pts(0,sample_index)-centers_(coeff_index)));
             }
             out(0,sample_index) = sens(0,sample_index)*grad_pt;
         });
@@ -67,12 +68,13 @@ class Sigmoid1d: public ParameterizedFunctionBase<MemorySpace>
     void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& sens,StridedMatrix<const double, MemorySpace> const& pts, StridedMatrix<double, MemorySpace> out) override {
         Kokkos::MDRangePolicy<Kokkos::Rank<2>, ExecutionSpace> policy ({0,0}, {this->numCoeffs, (int)sens.extent(1)});
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(unsigned int coeff_index, unsigned int sample_index) {
-            out(coeff_index,sample_index) = sens(0,sample_index)*SigmoidType::Evaluate(pts(0,sample_index));
+            out(coeff_index,sample_index) = sens(0,sample_index)*SigmoidType::Evaluate(widths_(coeff_index)*(pts(0,sample_index)-centers_(coeff_index)));
         });
     }
 
     private:
     using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
+    Kokkos::View<const double*, MemorySpace> centers_, widths_;
 };
 }
 
