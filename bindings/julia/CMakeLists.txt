@@ -11,6 +11,7 @@ set(JULIA_BINDING_SOURCES
   src/AffineMap.cpp
   src/ComposedMap.cpp
   ../common/src/CommonUtilities.cpp
+  src/Distributions.cpp
 )
 
 if(MPART_OPT)

@@ -71,6 +71,12 @@ void MapFactoryWrapper(jlcxx::Module&);
  */
 void ComposedMapWrapper(jlcxx::Module &);
 
+/**
+ * @brief Adds bindings for distributions to the existing module m
+ * @param mod CxxWrap.jl module
+*/
+void DistributionsWrapper(jlcxx::Module &);
+
 #if defined(MPART_HAS_NLOPT)
 
 /**

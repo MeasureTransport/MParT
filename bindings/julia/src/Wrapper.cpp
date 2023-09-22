@@ -27,6 +27,7 @@ JLCXX_MODULE MParT_julia_module(jlcxx::Module& mod)
     binding::AffineMapWrapper(mod);
     binding::AffineFunctionWrapper(mod);
     binding::MapFactoryWrapper(mod);
+    binding::DistributionsWrapper(mod);
 #if defined(MPART_HAS_NLOPT)
     binding::MapObjectiveWrapper(mod);
     binding::TrainMapWrapper(mod);

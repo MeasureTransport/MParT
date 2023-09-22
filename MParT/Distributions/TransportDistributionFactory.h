@@ -35,8 +35,8 @@ namespace mpart {
     }
     template<typename MemorySpace>
     std::shared_ptr<Distribution<MemorySpace>> CreateGaussianPushforward(std::shared_ptr<ConditionalMapBase<MemorySpace>> map) {
-        unsigned int inputDim = map->outputDim;
-        auto dist = std::make_shared<GaussianSamplerDensity<MemorySpace>>(outputDim);
+        unsigned int inputDim = map->inputDim;
+        auto dist = std::make_shared<GaussianSamplerDensity<MemorySpace>>(inputDim);
         auto sampler = std::make_shared<PullbackSampler<MemorySpace>>(map, dist);
         auto density = std::make_shared<PullbackDensity<MemorySpace>>(map, dist);
         return std::make_shared<Distribution<MemorySpace>>(sampler, density);
