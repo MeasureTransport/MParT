@@ -76,6 +76,11 @@ class Distribution{
         return density_->LogDensity(pts);
     };
 
+    /** LogDensity function with conversion from Eigen to Kokkos (and possibly copy to/from device). */
+    Eigen::VectorXd LogDensity(Eigen::Ref<const Eigen::RowMatrixXd> const &pts) {
+        return density_->LogDensity(pts);
+    }
+
     /**
      * @brief Wrap around the LogDensityImpl method from the density
      *
@@ -95,6 +100,11 @@ class Distribution{
     StridedMatrix<double, MemorySpace> LogDensityInputGrad(StridedMatrix<const double, MemorySpace> const &pts) {
         return density_->LogDensityInputGrad(pts);
     };
+
+    /** LogDensity function with conversion from Eigen to Kokkos (and possibly copy to/from device). */
+    Eigen::RowMatrixXd LogDensityInputGrad(Eigen::Ref<const Eigen::RowMatrixXd> const &pts) {
+        return density_->LogDensityInputGrad(pts);
+    }
 
     /**
      * @brief Wrap around the LogDensityInputGradImpl method from the density

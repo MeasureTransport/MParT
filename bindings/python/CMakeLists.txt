@@ -13,6 +13,7 @@ set(PYTHON_BINDING_SOURCES
   # src/DebugMap.cpp
   src/MapFactory.cpp
   src/IdentityMap.cpp
+  src/Distributions.cpp
 
   ../common/src/CommonUtilities.cpp
 )

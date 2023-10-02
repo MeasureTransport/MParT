@@ -43,6 +43,9 @@ void SummarizedMapWrapper(pybind11::module &m);
 template<typename MemorySpace>
 void IdentityMapWrapper(pybind11::module &m);
 
+template<typename MemorySpace>
+void DistributionsWrapper(pybind11::module &m);
+
 // template<typename MemorySpace>
 // void DebugMapWrapper(pybind11::module &m);
 
