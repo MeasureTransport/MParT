@@ -5,20 +5,20 @@ cff-version: 1.2.0
 title: Monotone Parameterization Toolkit (MParT)
 message: 'If you use MParT, please cite it as below.'
 type: software
-version: 1.4.0
+version: 2.0.3
 authors:
   - given-names: Matthew
     family-names: Parno
     email: parnomd@gmail.com
     orcid: https://orcid.org/0000-0002-9419-2693
-  - given-names: Paul-Baptiste
-    family-names: Rubio
-    email: rubiop@mit.edu
-    orcid: https://orcid.org/0000-0002-9765-1162
   - given-names: Daniel
     family-names: Sharp
     email: dannys4@vt.edu
     orcid: https://orcid.org/0000-0002-0439-5084
+  - given-names: Paul-Baptiste
+    family-names: Rubio
+    email: rubiop@mit.edu
+    orcid: https://orcid.org/0000-0002-9765-1162
   - given-names: Michael
     family-names: Brennan
     email: mcbrenn@mit.edu
