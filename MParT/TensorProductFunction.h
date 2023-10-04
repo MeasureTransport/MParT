@@ -1,5 +1,5 @@
-#ifndef MPART_TENSORPRODUCTFUNCTION_H
-#define MPART_TENSORPRODUCTFUNCTION_H
+#ifndef MPART_DIAGONALTENSORPRODUCTFUNCTION_H
+#define MPART_DIAGONALTENSORPRODUCTFUNCTION_H
 
 #include <utility>
 
@@ -8,58 +8,61 @@
 
 namespace mpart {
 
-
-template<class FunctionType1, class FunctionType2>
-class TensorProductFunction {
+/**
+ * We assume that OffDiagFunction satisfies the Cached Paramterization Concept
+ * and DiagFunction has function FillCache (since it's univariate, no need for 1 and 2)
+*/
+template<class OffDiagFunction, class DiagFunction>
+class DiagonalTensorProductFunction {
 public:
 
-    TensorProductFunction(FunctionType1 const& f1,
-                          FunctionType2 const& f2) : _f1(f1),
-                                                     _dim1(f1.InputSize()),
-                                                     _f2(f2),
-                                                     _dim2(f2.InputSize())
+    DiagonalTensorProductFunction(OffDiagFunction const& f1,
+                          DiagFunction const& f2) : _f1(f1),
+                                                    _dim(f1.InputSize()+1),
+                                                    _f2(f2)
     {
 
     };
 
 
-    unsigned int CacheSize() const{ return _f1.CacheSize() + _f2.CacheSize();};
+    KOKKOS_INLINE_FUNCTION unsigned int CacheSize() const{ return _f1.CacheSize() + _f2.CacheSize();};
 
-    unsigned int NumCoeffs() const{return _f1.NumCoeffs() + _f2.NumCoeffs();};
+    KOKKOS_INLINE_FUNCTION unsigned int NumCoeffs() const{return _f1.NumCoeffs() + _f2.NumCoeffs();};
 
-    unsigned int InputSize() const {return _dim1 + _dim2;};
+    KOKKOS_INLINE_FUNCTION unsigned int InputSize() const {return _dim1 + _dim2;};
 
-    template<class... KokkosProperties>
-    void FillCache1(double*                                           cache,
-                    Kokkos::View<double*, KokkosProperties...> const& pt,
-                    DerivativeFlags::DerivativeType                   derivType) const
+    // Fills all the cache entries independent of dimension \f$d\f$,
+    // which is exactly all of the dimensions dependent on _f1
+    template<typename PointType>
+    KOKKOS_FUNCTION void FillCache1(double* cache,
+                    PointType const&        pt,
+                    DerivativeFlags::DerivativeType derivType) const
     {
         auto pt2 = Kokkos::subview(pt, std::make_pair(_dim1, _dim1+_dim2));
 
         _f1.FillCache1(cache, pt, derivType);
-        _f1.FillCache2(cache, pt, pt(_dim1-1), derivType);
-
-        _f2.FillCache1(&cache[_f1.CacheSize()], pt2, derivType);
+        _f1.FillCache2(cache, pt, pt(_dim-2), derivType);
     }
 
-    template<class... KokkosProperties>
-    void FillCache2(double*                                           cache,
-                    Kokkos::View<double*, KokkosProperties...> const& pt,
-                    double                                            xd,
-                    DerivativeFlags::DerivativeType                   derivType) const
-    {
-        auto pt2 = Kokkos::subview(pt, std::make_pair(int(_dim1), int(pt.extent(0))));
-
-        _f2.FillCache2(&cache[_f1.CacheSize()], pt2, xd, derivType);
+    template<class PointType>
+    KOKKOS_FUNCTION void FillCache2(double* cache,
+                    PointType const&,
+                    double                  xd,
+                    DerivativeFlags::DerivativeType derivType) const
+    { // TODO: Figure out derivType
+        _f2.FillCache(&cache[_f1.CacheSize()], xd, derivType);
     }
 
 
-    template<class... KokkosProperties>
-    double Evaluate(const double* cache,
-                    Kokkos::View<double*, KokkosProperties...> const& coeffs) const
+    template<typename CoeffVecType>
+    KOKKOS_FUNCTION double Evaluate(const double* cache,
+                    CoeffVecType const& coeffs) const
     {
         double f;
+        // TODO: Figure out how to keep track of this
+        // idea: keep the diagonal indices in this class
 
+        // I think this is the wrong subview-- _dim1 is input dimension, not coeff dimension
         auto coeffs1 = Kokkos::subview(coeffs, std::make_pair(int(0), int(_dim1)));
         f = _f1.Evaluate(cache, coeffs1);
 
@@ -70,10 +73,10 @@ public:
     }
 
 
-    template<class... KokkosProperties>
-    double DiagonalDerivative(const double*                                     cache,
-                              Kokkos::View<double*, KokkosProperties...> const& coeffs,
-                              unsigned int                                      derivOrder) const
+    template<typename CoeffVecType>
+    KOKKOS_FUNCTION double DiagonalDerivative(const double* cache,
+                              CoeffVecType const&           coeffs,
+                              unsigned int                  derivOrder) const
     {
         double df;
 
@@ -87,10 +90,10 @@ public:
     }
 
 
-    template<class... KokkosProperties>
-    double CoeffDerivative(const double* cache,
-                           Kokkos::View<double*, KokkosProperties...> const& coeffs,
-                           Eigen::Ref<Eigen::VectorXd> grad) const
+    template<typename CoeffVecType, typename GradVecType>
+    KOKKOS_FUNCTION double CoeffDerivative(const double* cache,
+                           CoeffVecType const& coeffs,
+                           GradVecType grad) const
     {
         double f1, f2;
 
@@ -108,11 +111,11 @@ public:
         return f1*f2;
     }
 
-    template<class... KokkosProperties>
-    double MixedDerivative(const double* cache,
-                           Kokkos::View<double*, KokkosProperties...> const& coeffs,
+    template<typename CoeffVecType, typename GradVecType>
+    KOKKOS_FUNCTION double MixedDerivative(const double* cache,
+                           CoeffVecType const& coeffs,
                            unsigned int derivOrder,
-                           Eigen::Ref<Eigen::VectorXd> grad) const
+                           GradVecType grad) const
     {
         double f1, df2;
 
@@ -133,14 +136,14 @@ public:
 
 
 private:
-    FunctionType1 _f1;
+    OffDiagFunction _f1;
     unsigned int _dim1; //<- The number of inputs to f1
 
-    FunctionType2 _f2;
+    DiagFunction _f2;
     unsigned int _dim2; //<- The number of inputs to f2
 
-}; // class TensorProductFunction
+}; // class DiagonalTensorProductFunction
 
 } // namespace mpart
 
-#endif // #ifndef MPART_TENSORPRODUCTFUNCTION_H
+#endif // #ifndef MPART_DIAGONALTENSORPRODUCTFUNCTION_H
