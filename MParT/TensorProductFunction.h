@@ -16,18 +16,21 @@ template<class OffDiagFunction, class DiagFunction>
 class DiagonalTensorProductFunction {
 public:
 
+    template<typename MemorySpace>
     DiagonalTensorProductFunction(OffDiagFunction const& f1,
-                          DiagFunction const& f2) : _f1(f1),
-                                                    _dim(f1.InputSize()+1),
-                                                    _f2(f2)
+        DiagFunction const& f2) : _f1(f1),
+                                  _f2(f2),
+                                  _dim(f1.InputSize()+1),
+                                  _coeff_f1(f1.NumCoeffs()),
+                                  _coeff_f2(f2.NumCoeffs())
     {
 
     };
 
 
-    KOKKOS_INLINE_FUNCTION unsigned int CacheSize() const{ return _f1.CacheSize() + _f2.CacheSize();};
+    KOKKOS_INLINE_FUNCTION unsigned int CacheSize() const {return _f1.CacheSize() + _f2.CacheSize();};
 
-    KOKKOS_INLINE_FUNCTION unsigned int NumCoeffs() const{return _f1.NumCoeffs() + _f2.NumCoeffs();};
+    KOKKOS_INLINE_FUNCTION unsigned int NumCoeffs() const {return _coeff_f1 + _coeff_f2;};
 
     KOKKOS_INLINE_FUNCTION unsigned int InputSize() const {return _dim1 + _dim2;};
 
@@ -49,7 +52,7 @@ public:
                     PointType const&,
                     double                  xd,
                     DerivativeFlags::DerivativeType derivType) const
-    { // TODO: Figure out derivType
+    {
         _f2.FillCache(&cache[_f1.CacheSize()], xd, derivType);
     }
 
@@ -59,14 +62,10 @@ public:
                     CoeffVecType const& coeffs) const
     {
         double f;
-        // TODO: Figure out how to keep track of this
-        // idea: keep the diagonal indices in this class
-
-        // I think this is the wrong subview-- _dim1 is input dimension, not coeff dimension
-        auto coeffs1 = Kokkos::subview(coeffs, std::make_pair(int(0), int(_dim1)));
+        auto coeffs1 = Kokkos::subview(coeffs, std::make_pair(int(0), int(_coeff_f1)));
         f = _f1.Evaluate(cache, coeffs1);
 
-        auto coeffs2 = Kokkos::subview(coeffs, std::make_pair(_dim1, _dim1+_dim2));
+        auto coeffs2 = Kokkos::subview(coeffs, std::make_pair(int(_coeff_f1), int(_coeff_f1+_coeff_f2)));
         f *= _f2.Evaluate(&cache[_f1.CacheSize()], coeffs2);
 
         return f;
@@ -80,11 +79,11 @@ public:
     {
         double df;
 
-        auto coeffs1 = Kokkos::subview(coeffs, std::make_pair(int(0), int(_dim1)));
+        auto coeffs1 = Kokkos::subview(coeffs, std::make_pair(int(0), int(_coeff_f1)));
         df = _f1.Evaluate(cache, coeffs1);
 
-        auto coeffs2 = Kokkos::subview(coeffs, std::make_pair(_dim1, _dim1+_dim2));
-        df *= _f2.DiagonalDerivative(&cache[_f1.CacheSize()], coeffs2, derivOrder);
+        auto coeffs2 = Kokkos::subview(coeffs, std::make_pair(int(_coeff_f1), int(_coeff_f1+_coeff_f2)));
+        df *= _f2.InputDerivative(&cache[_f1.CacheSize()], coeffs2, derivOrder);
 
         return df;
     }
@@ -137,10 +136,10 @@ public:
 
 private:
     OffDiagFunction _f1;
-    unsigned int _dim1; //<- The number of inputs to f1
-
     DiagFunction _f2;
-    unsigned int _dim2; //<- The number of inputs to f2
+    unsigned int _dim; // (number of inputs to f1) + 1
+    unsigned int _coeff_f1; // Number of coefficients for f1
+    unsigned int _coeff_f2; // Number of coefficients for f2
 
 }; // class DiagonalTensorProductFunction
 
