@@ -5,7 +5,7 @@ cff-version: 1.2.0
 title: Monotone Parameterization Toolkit (MParT)
 message: 'If you use MParT, please cite it as below.'
 type: software
-version: 2.0.3
+version: 2.1.1
 authors:
   - given-names: Matthew
     family-names: Parno
