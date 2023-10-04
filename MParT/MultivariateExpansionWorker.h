@@ -56,7 +56,7 @@ struct CacheSizeFunctor{
      \text{cache} = \left[\begin{array}{c}
      \phi_1^0(x_1)\\
      \phi_1^1(x_1)\\
-     \vdots
+     \vdots\\
      \phi_1^{p_1}\\
      \phi_2^0(x_2)\\
      \vdots\\
@@ -66,7 +66,7 @@ struct CacheSizeFunctor{
      \frac{\partial}{\partial x_d}\phi_d^0(x_d)\\
      \vdots\\
      \frac{\partial}{\partial x_d}\phi_d^{p_d}(x_d)\\
-     \frac{\partial^2}{\partial x_d}\phi_d^0(x_d^2)\\
+     \frac{\partial^2}{\partial x_d^2}\phi_d^0(x_d^2)\\
      \vdots\\
      \frac{\partial^2}{\partial x_d^2}\phi_d^{p_d}(x_d)
      \end{array}
