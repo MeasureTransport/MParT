@@ -20,7 +20,7 @@ struct ATMOptions: public MapOptions, public TrainOptions {
     /** Maximum number of iterations that do not improve error */
     unsigned int maxPatience = 10;
     /** Maximum number of coefficients in final expansion (including ALL dimensions of map) */
-    unsigned int maxSize = std::numeric_limits<unsigned int>::infinity();
+    unsigned int maxSize = std::numeric_limits<int>::max(); // <- use this instead of infinity because python doesn't have infinite ints
     /** Multiindex representing the maximum degree in each input dimension */
     MultiIndex maxDegrees;
 
