@@ -145,7 +145,7 @@ namespace mpart{
     template<typename ScalarType, class MemorySpace>
     StridedVector<ScalarType, MemorySpace> ConstVecToKokkos(const std::vector<ScalarType> &vec)
     {
-        double* ptr = const_cast<double*>(vec.data());
+        ScalarType* ptr = const_cast<ScalarType*>(vec.data());
         return Kokkos::View<ScalarType*, MemorySpace>(ptr, vec.size());
     }
 
