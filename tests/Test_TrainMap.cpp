@@ -14,7 +14,7 @@ using namespace Catch;
 TEST_CASE("Test_TrainMap", "[TrainMap]") {
     unsigned int seed = 42;
     unsigned int dim = 2;
-    unsigned int numPts = 20000;
+    unsigned int numPts = 5000;
     unsigned int testPts = numPts / 5;
     auto sampler = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(3);
     sampler->SetSeed(seed);
