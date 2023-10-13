@@ -11,22 +11,62 @@ KOKKOS_INLINE_FUNCTION void swapPair(T& x1, T& x2, T& y1, T& y2) {
     simple_swap(y1, y2);
 }
 
+/** Finds a bracket [xlb, xub] such that f(xlb)<yd and f(xub)>yd. */
 template<typename MemorySpace, typename FunctorType>
-KOKKOS_INLINE_FUNCTION void FindBound(bool haveLowerBound, double yd,
-    FunctorType f, double& x_bound, double& y_bound,
-    double& x_unbound, double& y_unbound, const unsigned int maxIts) {
-    double boundSign = haveLowerBound ? 1.0 : -1.0;
+KOKKOS_INLINE_FUNCTION void FindBracket(FunctorType f,
+                                        double& xlb, double& ylb,
+                                        double& xub, double& yub,
+                                        const double yd)
+{
+    double xb, xf; // Bisection point and regula falsi point
+    double xc, yc;
+    const unsigned int maxIts = 1000;
     double stepSize = 1.0;
-    unsigned int iter;
-    for(iter = 0; iter < maxIts; iter++) {
-        x_unbound += boundSign*stepSize;
-        y_unbound = f(x_unbound);
-        if(boundSign*(y_unbound - yd) > 0) return;
-        swapPair(x_bound, x_unbound, y_bound, y_unbound);
-        stepSize *= 2;
+
+    ylb = f(xb);
+
+    // We actually found an upper bound...
+    if(ylb>yd){
+
+        mpart::simple_swap(ylb,yub);
+        mpart::simple_swap(xlb,xub);
+
+        // Now find a lower bound...
+        unsigned int i;
+        for(i=0; i<maxIts; ++i){ // Could just be while(true), but want to avoid infinite loop
+            xlb = xub-stepSize;
+            ylb = f(xlb);
+            if(ylb>yd){
+                mpart::simple_swap(ylb,yub);
+                mpart::simple_swap(xlb,xub);
+                stepSize *= 2.0;
+            }else{
+                break;
+            }
+        }
+
+        if(i>=maxIts)
+            ProcAgnosticError<MemorySpace,std::runtime_error>::error("FindBracket: Could not find initial bracket such that f(xlb)<yd and f(xub)>yd.");
+
+    // We have a lower bound...
+    }else{
+        // Now find an upper bound...
+        unsigned int i;
+        for(i=0; i<maxIts; ++i){ // Could just be while(true), but want to avoid infinite loop
+            xub = xlb+stepSize;
+            yub = f(xub);
+            if(yub<yd){
+                mpart::simple_swap(ylb,yub);
+                mpart::simple_swap(xlb,xub);
+                stepSize *= 2.0;
+            }else{
+                break;
+            }
+        }
+
+        if(i>=maxIts)
+            ProcAgnosticError<MemorySpace,std::runtime_error>::error("FindBracket: Could not find initial bracket such that f(xlb)<yd and f(xub)>yd.");
     }
-    if(iter>=maxIts)
-            ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: bound calculation exceeds maxIts");
 }
 
 KOKKOS_INLINE_FUNCTION double Find_x_ITP(double xlb, double xub, double yd, double ylb, double yub,
@@ -47,7 +87,8 @@ KOKKOS_INLINE_FUNCTION double Find_x_ITP(double xlb, double xub, double yd, doub
 
 template<typename MemorySpace, typename FunctorType>
 KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, double x0, const double xtol, const double ftol)
-{
+{   
+    std::cout << "Hereherehere" << std::endl;
     double stepSize=1.0;
     const unsigned int maxIts = 10000;
 
@@ -59,13 +100,10 @@ KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, dou
     xlb = xub = x0;
     ylb = yub = f(xlb);
 
-    bool haveLowerBound = ylb < yd; // if ylb is a lower bound for yd
-    if(haveLowerBound) {
-        FindBound<MemorySpace>(haveLowerBound, yd, f, xlb, ylb, xub, yub, maxIts);
-    } else {
-        FindBound<MemorySpace>(haveLowerBound, yd, f, xub, yub, xlb, ylb, maxIts);
-    }
-
+    // Compute bounds
+    std::cout << "About to call find bracket..." << std::endl;
+    FindBracket<MemorySpace>(f, xlb, ylb, xub, yub, yd);
+    std::cout << "done " << xlb << ", " << xub << ", " << ylb << ", " << yub << std::endl;
     assert(ylb<yub);
     assert(xlb<xub);
 
@@ -77,7 +115,9 @@ KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, dou
 
     unsigned int it;
     for(it=0; it<maxIts; ++it){
+        std::cout << " about to call Find_x_ITP" << std::endl;
         xc = Find_x_ITP(xlb, xub, yd, ylb, yub, k1, k2, nhalf, n0, it, xtol);
+        std::cout << " done" << std::endl;
 
         yc = f(xc);
 
