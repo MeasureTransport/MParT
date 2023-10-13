@@ -30,7 +30,7 @@ TEST_CASE( "RootFindingUtils", "[RootFindingUtils]") {
         double yd = identity(xd);
         double xub = 2., yub = 2.;
         double xlb = 0., ylb = 0.;
-        FindBracket<HostSpace>(identity, xlb, ylb, xub, ylb, 10'000);
+        FindBracket<HostSpace>(identity, xlb, ylb, xub, yub, yd);
         CheckFoundBounds(identity, xlb, xd, xub, ylb, yd, yub);
     }
     SECTION("FindBracker sigmoid") {
@@ -38,7 +38,7 @@ TEST_CASE( "RootFindingUtils", "[RootFindingUtils]") {
         double yd = sigmoid(xd);
         double xub =  2., yub = sigmoid(xub);
         double xlb =  0., ylb = sigmoid(xlb);
-        FindBracket<HostSpace>(sigmoid, xlb, ylb, xub, ylb, 10'000);
+        FindBracket<HostSpace>(sigmoid, xlb, ylb, xub, yub, yd);
         CheckFoundBounds(sigmoid, xlb, xd, xub, ylb, yd, yub);
     }
     SECTION("Test Inverse Linear, low x0") {

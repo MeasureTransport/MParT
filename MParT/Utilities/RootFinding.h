@@ -18,16 +18,15 @@ KOKKOS_INLINE_FUNCTION void FindBracket(FunctorType f,
                                         double& xub, double& yub,
                                         const double yd)
 {
-    double xb, xf; // Bisection point and regula falsi point
-    double xc, yc;
     const unsigned int maxIts = 1000;
     double stepSize = 1.0;
-
-    ylb = f(xb);
-
+    
+    ylb = f(xlb);
+    yub = f(xub);
+    
     // We actually found an upper bound...
     if(ylb>yd){
-
+    
         mpart::simple_swap(ylb,yub);
         mpart::simple_swap(xlb,xub);
 
@@ -67,7 +66,7 @@ KOKKOS_INLINE_FUNCTION void FindBracket(FunctorType f,
         if(i>=maxIts)
             ProcAgnosticError<MemorySpace,std::runtime_error>::error("FindBracket: Could not find initial bracket such that f(xlb)<yd and f(xub)>yd.");
     }
-}
+ }
 
 KOKKOS_INLINE_FUNCTION double Find_x_ITP(double xlb, double xub, double yd, double ylb, double yub,
                            double k1, double k2, double nhalf, double n0, int it, double xtol) {
@@ -88,7 +87,6 @@ KOKKOS_INLINE_FUNCTION double Find_x_ITP(double xlb, double xub, double yd, doub
 template<typename MemorySpace, typename FunctorType>
 KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, double x0, const double xtol, const double ftol)
 {   
-    std::cout << "Hereherehere" << std::endl;
     double stepSize=1.0;
     const unsigned int maxIts = 10000;
 
@@ -101,9 +99,7 @@ KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, dou
     ylb = yub = f(xlb);
 
     // Compute bounds
-    std::cout << "About to call find bracket..." << std::endl;
     FindBracket<MemorySpace>(f, xlb, ylb, xub, yub, yd);
-    std::cout << "done " << xlb << ", " << xub << ", " << ylb << ", " << yub << std::endl;
     assert(ylb<yub);
     assert(xlb<xub);
 
@@ -115,9 +111,7 @@ KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, dou
 
     unsigned int it;
     for(it=0; it<maxIts; ++it){
-        std::cout << " about to call Find_x_ITP" << std::endl;
         xc = Find_x_ITP(xlb, xub, yd, ylb, yub, k1, k2, nhalf, n0, it, xtol);
-        std::cout << " done" << std::endl;
 
         yc = f(xc);
 

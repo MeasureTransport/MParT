@@ -400,7 +400,7 @@ public:
 
                 // Compute the inverse
                 Kokkos::View<double*,MemorySpace> workspace(team_member.thread_scratch(1), workspaceSize);
-                auto eval = SingleEvaluator(workspace.data(), cache.data(), pt, coeffs, quad_, expansion_);
+                auto eval = SingleEvaluator<decltype(pt),decltype(coeffs)>(workspace.data(), cache.data(), pt, coeffs, quad_, expansion_);
                 output(ptInd) = RootFinding::InverseSingleBracket<MemorySpace>(ys(ptInd), eval, pt(pt.extent(0)-1), xtol, ytol);
             }
         };
