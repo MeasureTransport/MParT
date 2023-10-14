@@ -22,7 +22,7 @@ namespace mpart{
     template<typename MemorySpace, typename ErrorType>
     struct ProcAgnosticError {
         static void error(const char*) {
-            assert(0);
+            assert(false);
         }
     };
 
