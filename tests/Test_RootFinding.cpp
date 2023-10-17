@@ -24,7 +24,6 @@ TEST_CASE( "RootFindingUtils", "[RootFindingUtils]") {
     auto sigmoid = [](double x){return 1./(std::exp(-x)+1);};
     auto sigmoid_combo = [sigmoid](double x){return sigmoid(2*(x-1)) + 3*sigmoid(x*0.5) + 0.5*sigmoid(1.5*(x+1));};
     
-    
     SECTION("FindBracket linear") {
         double xd = -1.1;
         double yd = identity(xd);
@@ -46,7 +45,6 @@ TEST_CASE( "RootFindingUtils", "[RootFindingUtils]") {
         CHECK(info==0);
     }
     SECTION("FindBracket flat") {
-        double xd = -1.1;
         double yd = 0.0;
         double xub = 2., yub = -1.0;
         double xlb = 0., ylb = -1.0;
@@ -72,7 +70,7 @@ TEST_CASE( "RootFindingUtils", "[RootFindingUtils]") {
         CHECK(info==0);
     }
     SECTION("Test Inverse Flat") {
-        double xd = 0.5, yd = -1.0;
+        double xd = 0.5, yd = 0.0;
         double x0 = 0.0, xtol = 1e-5, ftol = 1e-5;
         auto f = [](double x){return -1.0;};
         int info = 0;

@@ -43,9 +43,9 @@ KOKKOS_INLINE_FUNCTION void FindBracket(FunctorType f,
             xlb = xub-stepSize;
             ylb = f(xlb);
             
-            if(abs((yub-ylb)/(xub-xlb))<1e-12){
+            if((fabs((yub-ylb)/(xub-xlb))<1e-12)&&((xub-xlb)>10)){
                 info = -1;
-                break;
+                return;
             }
 
             if(ylb>yd){
@@ -67,11 +67,11 @@ KOKKOS_INLINE_FUNCTION void FindBracket(FunctorType f,
         for(i=0; i<maxIts; ++i){ // Could just be while(true), but want to avoid infinite loop
             xub = xlb+stepSize;
             yub = f(xub);
-          
-            // Check to see if function is perfectly flat
-            if(abs((yub-ylb)/(xub-xlb))<1e-12){
+
+            // Check to see if function is perfectly flat over a wide region
+            if((fabs((yub-ylb)/(xub-xlb))<1e-12)&&((xub-xlb)>10)){
                 info = -1;
-                break;
+                return;
             }
 
             if(yub<yd){
@@ -128,6 +128,7 @@ KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, dou
     // Compute initial bracket containing the root
     int bracket_info = 0;
     FindBracket<MemorySpace>(f, xlb, ylb, xub, yub, yd, bracket_info);
+    
     if((bracket_info<0)||(((ylb>yd)||(yub<yd)))){
         info = -2;
         return std::numeric_limits<double>::quiet_NaN();
@@ -142,7 +143,6 @@ KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, dou
     unsigned int it;
     for(it=0; it<maxIts; ++it){
         
-        //std::cout << "Iteration " << it << std::endl;
         xc = Find_x_ITP(xlb, xub, yd, ylb, yub, k1, k2, nhalf, n0, it, xtol);
 
         yc = f(xc);
