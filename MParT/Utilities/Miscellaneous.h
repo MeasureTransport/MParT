@@ -19,6 +19,9 @@ namespace mpart{
                           std::string                                 const& key,
                           std::string                                 const& defaultValue);
 
+    /** Provides a mechanism for raising exceptions in CPU code where recovery is possible 
+        and assertions in GPU code where exceptions aren't alllowed.
+     */
     template<typename MemorySpace, typename ErrorType>
     struct ProcAgnosticError {
         static void error(const char*) {

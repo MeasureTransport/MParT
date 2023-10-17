@@ -11,20 +11,25 @@ KOKKOS_INLINE_FUNCTION void swapPair(T& x1, T& x2, T& y1, T& y2) {
     simple_swap(y1, y2);
 }
 
-/** Finds a bracket [xlb, xub] such that f(xlb)<yd and f(xub)>yd. */
+/** Finds a bracket [xlb, xub] such that f(xlb)<yd and f(xub)>yd. 
+ * The info argument can be used to detect when a bracket cannot be found.  Upon exit, a value of info=0
+ * indicates success while a negative value indicates failure.  info=-1 indicates that the function 
+ * seems to be perfectly flat and a root might not exist.  info=-2 indicates that the maximum number of 
+ * iterations (128) was exceeded.
+*/
 template<typename MemorySpace, typename FunctorType>
 KOKKOS_INLINE_FUNCTION void FindBracket(FunctorType f,
                                         double& xlb, double& ylb,
                                         double& xub, double& yub,
-                                        const double yd)
+                                        const double yd,
+                                        int& info)
 {
-    const unsigned int maxIts = 40;
+    const unsigned int maxIts = 128;
     double stepSize = 1.0;
-    
+    info = 0;
+
     ylb = f(xlb);
     yub = f(xub);
-    //std::cout << "-1" << ": " << xlb << ", " << ylb << ", " << xub << ", " << yub << " vs " << yd << std::endl;
-            
 
     // We actually found an upper bound...
     if(ylb>yd){
@@ -37,12 +42,10 @@ KOKKOS_INLINE_FUNCTION void FindBracket(FunctorType f,
         for(i=0; i<maxIts; ++i){ // Could just be while(true), but want to avoid infinite loop
             xlb = xub-stepSize;
             ylb = f(xlb);
-            //std::cout << "\n\n1 " << i << ": " << xlb << ", " << ylb << ", " << xub << ", " << yub << " vs " << yd << std::endl;
             
             if(abs((yub-ylb)/(xub-xlb))<1e-12){
+                info = -1;
                 break;
-                //std::cout << "slope = " << (yub-ylb)/(xub-xlb) << std::endl;
-                //assert(abs(yub-ylb)>1e-10);
             }
 
             if(ylb>yd){
@@ -54,9 +57,8 @@ KOKKOS_INLINE_FUNCTION void FindBracket(FunctorType f,
             }
         }
 
-
-        // if(i>=maxIts)
-        //     ProcAgnosticError<MemorySpace,std::runtime_error>::error("FindBracket: Could not find initial bracket such that f(xlb)<yd and f(xub)>yd.");
+        if(i>=maxIts)
+            info = -2;
 
     // We have a lower bound...
     }else{
@@ -65,13 +67,13 @@ KOKKOS_INLINE_FUNCTION void FindBracket(FunctorType f,
         for(i=0; i<maxIts; ++i){ // Could just be while(true), but want to avoid infinite loop
             xub = xlb+stepSize;
             yub = f(xub);
-            //std::cout << "\n\n2 " << i << ": " << xlb << ", " << ylb << ", " << xub << ", " << yub << " vs " << yd << std::endl;
+          
+            // Check to see if function is perfectly flat
+            if(abs((yub-ylb)/(xub-xlb))<1e-12){
+                info = -1;
+                break;
+            }
 
-            // if(abs((yub-ylb)/(xub-xlb))<1e-10){
-            //     std::cout << "Function seems to be flat!" << std::endl;
-            //     std::cout << "slope = " << (yub-ylb)/(xub-xlb) << std::endl;
-            //     assert(abs(yub-ylb)>1e-10);
-            // }
             if(yub<yd){
                 ylb = yub;
                 xlb = xub;
@@ -81,13 +83,14 @@ KOKKOS_INLINE_FUNCTION void FindBracket(FunctorType f,
             }
         }
 
-        // if(i>=maxIts)
-        //     ProcAgnosticError<MemorySpace,std::runtime_error>::error("FindBracket: Could not find initial bracket such that f(xlb)<yd and f(xub)>yd.");
+        if(i>=maxIts){
+            info = -2;
+        }
     }
  }
 
 KOKKOS_INLINE_FUNCTION double Find_x_ITP(double xlb, double xub, double yd, double ylb, double yub,
-                           double k1, double k2, double nhalf, double n0, int it, double xtol) {
+                                         double k1, double k2, double nhalf, double n0, int it, double xtol) {
 
         double xb = 0.5*(xub+xlb); // bisection point
         double xf = (xub*ylb - xlb*yub)/(ylb-yub); // regula-falsi point
@@ -102,8 +105,13 @@ KOKKOS_INLINE_FUNCTION double Find_x_ITP(double xlb, double xub, double yd, doub
         return xc;
 }
 
+/** Computes the inverse of a function using the ITP method.  
+ *  The info argument will be 0 upon successful completion and negative for failed inversions.  
+ *  A value of info=-2 indicates a failure to find a bracket that contains the root. In this case, a nan will be returned.
+ *  A value of info=-1 indicates that the maximum number of iterations was exceeded. 
+*/
 template<typename MemorySpace, typename FunctorType>
-KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, double x0, const double xtol, const double ftol)
+KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, double x0, const double xtol, const double ftol, int& info)
 {   
     double stepSize=1.0;
     const unsigned int maxIts = 10000;
@@ -112,16 +120,18 @@ KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, dou
     double xlb, xub;
     double ylb, yub;
     double xc, yc;
+    info = 0;
 
-    //std::cout << "xlb = " << xlb << std::endl;
     xlb = xub = x0;
     ylb = yub = f(xlb);
 
-    // Compute bounds
-    FindBracket<MemorySpace>(f, xlb, ylb, xub, yub, yd);
-    
-    if ((ylb>yd)||(yub<yd))
+    // Compute initial bracket containing the root
+    int bracket_info = 0;
+    FindBracket<MemorySpace>(f, xlb, ylb, xub, yub, yd, bracket_info);
+    if((bracket_info<0)||(((ylb>yd)||(yub<yd)))){
+        info = -2;
         return std::numeric_limits<double>::quiet_NaN();
+    }
 
     // Bracketed search
     const double k1 = 0.1;
@@ -151,8 +161,7 @@ KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, dou
 
 
     if(it>maxIts)
-        return std::numeric_limits<double>::quiet_NaN();
-        //ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: Bracket search iterations exceeds maxIts");
+        info = -1;
 
     return 0.5*(xub+xlb);
 }

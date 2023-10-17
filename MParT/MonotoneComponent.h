@@ -395,6 +395,7 @@ public:
         auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
             unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
+            int info;
 
             if(ptInd<numPts){
                 unsigned int xInd = ptInd;
@@ -404,38 +405,22 @@ public:
                 // Create a subview containing x_{1:d-1}
                 auto pt = Kokkos::subview(xs, Kokkos::ALL(), xInd);
                 
-                //std::cout << "\n\nPt0 = \n" << std::endl;
+                // Check for NaNs.  If found, set output to nan and return
                 for(unsigned int ii=0; ii<pt.size(); ++ii){
-                    //std::cout << "  " << pt(ii);
                     if(std::isnan(pt(ii))){
-                        std::cout << "Warning: Found nan in point, not computing inverse!" << std::endl;
-                        //throw std::runtime_error("Found nan in point!");
+                        output(ptInd) = std::numeric_limits<double>::quiet_NaN();
                         return;
                     }
                 }
-                //std::cout << std::endl << std::endl;
 
                 // Fill in the cache with everything that doesn't depend on x_d
                 Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
                 expansion_.FillCache1(cache.data(), pt, DerivativeFlags::None);
 
-                // std::cout << "\n\nPt1 = \n" << std::endl;
-                // double max_val = 0.0;
-                // for(unsigned int ii=0; ii<pt.size(); ++ii){
-                //     std::cout << "  " << pt(ii);
-                //     max_val  = (abs(pt(ii))>max_val) ?  abs(pt(ii)) : max_val;
-                // }
-                // std::cout << std::endl << std::endl;
-                // if (max_val > 1e-4){
-                //     std::cout << "Max val = " << max_val;
-                //     assert(max_val < 1e4);
-                // }
                 // Compute the inverse
                 Kokkos::View<double*,MemorySpace> workspace(team_member.thread_scratch(1), workspaceSize);
                 auto eval = SingleEvaluator<decltype(pt),decltype(coeffs)>(workspace.data(), cache.data(), pt, coeffs, quad_, expansion_);
-                //std::cout << "Here 0" << std::endl;
-                output(ptInd) = RootFinding::InverseSingleBracket<MemorySpace>(ys(ptInd), eval, pt(pt.extent(0)-1), xtol, ytol);
-                //std::cout << "Here 1" << std::endl;
+                output(ptInd) = RootFinding::InverseSingleBracket<MemorySpace>(ys(ptInd), eval, pt(pt.extent(0)-1), xtol, ytol, info);
             }
         };
 
