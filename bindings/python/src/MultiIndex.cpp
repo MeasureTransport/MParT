@@ -214,6 +214,25 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
             iarchive(mset);
             return mset;
         })
+        .def(py::pickle(
+            [](FixedMultiIndexSet<Kokkos::HostSpace> &mset) { // __getstate__
+                std::stringstream ss;
+                cereal::BinaryOutputArchive oarchive(ss);
+                oarchive(mset);
+                return py::bytes(ss.str());
+            },
+            [](py::bytes input) {
+                
+                FixedMultiIndexSet<Kokkos::HostSpace> mset;
+
+                std::stringstream ss;
+                ss.str(input);
+                cereal::BinaryInputArchive iarchive(ss);
+                iarchive(mset);
+
+                return mset;
+            }
+        ));
 #endif // MPART_HAS_CEREAL
 #if defined(MPART_ENABLE_GPU)
         .def("ToDevice", &FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<mpart::DeviceSpace>)

@@ -5,6 +5,8 @@ import numpy as np
 import os
 import pytest
 
+import pickle
+
 # Initialize folder name for test
 foldername = "_test_serialization/"
 
@@ -101,6 +103,11 @@ def test_trimap_saveload():
 
     # Create a copy by reading the byte string
     tmap2 = mt.TriangularMap.FromBytes(tmap_bytes)
+    assert np.all(tmap2.CoeffMap() == tmap.CoeffMap())
+
+    # Now try it with pickle
+    tmap_bytes = pickle.dumps(tmap)
+    tmap2 = pickle.loads(tmap_bytes)
     assert np.all(tmap2.CoeffMap() == tmap.CoeffMap())
 
 test_trimap_saveload()

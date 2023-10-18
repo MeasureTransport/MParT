@@ -17,9 +17,24 @@ void mpart::binding::TriangularMapWrapper(py::module &m)
     if(!std::is_same<MemorySpace,Kokkos::HostSpace>::value) tName = "d" + tName;
 
     // TriangularMap
-    py::class_<TriangularMap<MemorySpace>, ConditionalMapBase<MemorySpace>, std::shared_ptr<TriangularMap<MemorySpace>>>(m, tName.c_str())
+    py::class_<TriangularMap<MemorySpace>, ConditionalMapBase<MemorySpace>, ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<TriangularMap<MemorySpace>>>(m, tName.c_str())
         .def(py::init<std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>, bool>(), py::arg("comps"), py::arg("moveCoeffs") = false)
         .def("GetComponent", &TriangularMap<MemorySpace>::GetComponent)
+        .def(py::pickle(
+            [](std::shared_ptr<TriangularMap<Kokkos::HostSpace>> const& ptr) { // __getstate__
+                std::stringstream ss;
+                ptr->Save(ss);
+                return py::bytes(ss.str());
+            },
+            [](py::bytes input) {
+                
+                std::stringstream ss;
+                ss.str(input);
+
+                auto ptr = std::dynamic_pointer_cast<TriangularMap<Kokkos::HostSpace>>(ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss));
+                return ptr;
+            }
+        ));
         ;
 
 }
