@@ -312,16 +312,6 @@ public:
                      StridedVector<double, MemorySpace>              output,
                  std::map<std::string, std::string>                  options=std::map<std::string,std::string>())
     {
-        // std::cout << "xs.shape = " << xs.extent(0) << "," << xs.extent(1) << std::endl;
-        // std::cout << "xs = \n" << std::endl;
-        // for(unsigned int row=0; row<xs.extent(0); ++row){
-        //     for(unsigned int col=0; col<xs.extent(1); ++col){
-        //         std::cout << "  " << xs(row,col);
-        //     }
-        //     std::cout << std::endl;
-        // }
-        // std::cout << std::endl;
-
         // Extract the method from the options map
         std::string method;
         if(options.count("Method")){
@@ -986,16 +976,6 @@ public:
                                                  QuadratureType    const& quad,
                                                  ExpansionType     const& expansion)
     {
-        // std::cout << "pt = " << std::endl;
-        // for(unsigned int i=0; i<pt.size(); ++i)
-        //     std::cout << "  " << pt(i);
-        // std::cout << std::endl;
-        // std::cout << "xd = " << xd << std::endl;
-        // std::cout << "Coefficients = " << std::endl;
-        // for(unsigned int i=0; i<coeffs.size(); ++i)
-        //     std::cout << "  " << coeffs(i);
-        // std::cout << std::endl;
-        
         double output = 0.0;
         // Compute the integral \int_0^1 g( \partial_D f(x_1,...,x_{D-1},t*x_d)) dt
         MonotoneIntegrand<ExpansionType, PosFuncType, PointType, CoeffsType, MemorySpace> integrand(cache,
@@ -1006,147 +986,12 @@ public:
                                                                                        DerivativeFlags::None);
 
         quad.Integrate(workspace, integrand, 0, 1, &output);
-        // std::cout << "output 1 = " << output << std::endl;
-
-        // Finish filling in the cache for an evaluation of the expansion with x_d=0
-        // std::cout << "pt = " << std::endl;
-        // for(unsigned int i=0; i<pt.size(); ++i)
-        //     std::cout << "  " << pt(i);
-        // std::cout << std::endl;
 
         expansion.FillCache2(cache, pt, 0.0, DerivativeFlags::None);
         output += expansion.Evaluate(cache, coeffs);
-        // std::cout << "output 2 = " << output << std::endl;
+        
         return output;
     }
-
-
-    /**
-     @brief Solves \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$ at a single point using the ITP bracketing method.
-     @details Uses the [Interpolate Truncate and Project (ITP)](https://en.wikipedia.org/wiki/ITP_method) method to solve
-              \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$.  This method is a bracketing method similar to bisection, but
-              with faster convergence.   The worst case performance of ITP, in terms of required evaluations of \f$T\f$,
-              is the same as bisection.
-
-     @param cache Memory set up by Kokkos for this evaluation.  The `expansion_.FillCache1` function must be
-                  called before calling this function.
-     @param pt Array of length \f$D\f$ containing the fixed values of \f$x_{1:D-1}\f$ and an initial guess for \f$x_D\f$ in the last component.
-     @param coeffs An array of coefficients for the expansion.
-     @param options
-     @return The value of \f$x_D\f$ solving \f$y_D = T(x_1,\ldots,x_D)\f$
-
-     @tparam PointType The type of the point.  Typically either Kokkos::View<double*> or some subview with a similar 1d signature.
-     @tparam CoeffsType The type of the coefficients.  Typically Kokkos::View<double*> or a similarly structured subview.
-     */
-    // template<typename PointType, typename CoeffsType>
-    // KOKKOS_FUNCTION static double InverseSingleBracket(double*                    cache,
-    //                                                    double*                    workspace,
-    //                                                    PointType           const& pt,
-    //                                                    double                     yd,
-    //                                                    CoeffsType          const& coeffs,
-    //                                                    const double               xtol,
-    //                                                    const double               ftol,
-    //                                                    QuadratureType      const& quad,
-    //                                                    ExpansionType       const& expansion)
-    // {
-    //     double stepSize=1.0;
-    //     const unsigned int maxIts = 10000;
-
-    //     // First, we need to find two points that bound the solution.
-    //     double xlb, xub;
-    //     double ylb, yub;
-    //     double xb, xf; // Bisection point and regula falsi point
-    //     double xc, yc;
-
-    //     xlb = pt(pt.extent(0)-1);
-    //     ylb = EvaluateSingle(workspace, cache, pt, xlb, coeffs, quad, expansion);
-
-    //     // We actually found an upper bound...
-    //     if(ylb>yd){
-
-    //         mpart::simple_swap(ylb,yub);
-    //         mpart::simple_swap(xlb,xub);
-
-    //         // Now find a lower bound...
-    //         unsigned int i;
-    //         for(i=0; i<maxIts; ++i){ // Could just be while(true), but want to avoid infinite loop
-    //             xlb = xub-stepSize;
-    //             ylb = EvaluateSingle(workspace, cache, pt, xlb, coeffs, quad, expansion);
-    //             if(ylb>yd){
-    //                 mpart::simple_swap(ylb,yub);
-    //                 mpart::simple_swap(xlb,xub);
-    //                 stepSize *= 2.0;
-    //             }else{
-    //                 break;
-    //             }
-    //         }
-    //         if(i>maxIts)
-    //             ProcAgnosticError<MemorySpace, std::runtime_error>::error("InverseSingleBracket: lower bound iterations exceed maxIts");
-
-    //     // We have a lower bound...
-    //     }else{
-    //         // Now find an upper bound...
-    //         unsigned int i;
-    //         for(i=0; i<maxIts; ++i){ // Could just be while(true), but want to avoid infinite loop
-    //             xub = xlb+stepSize;
-    //             yub = EvaluateSingle(workspace, cache, pt, xub, coeffs, quad, expansion);
-    //             if(yub<yd){
-    //                 mpart::simple_swap(ylb,yub);
-    //                 mpart::simple_swap(xlb,xub);
-    //                 stepSize *= 2.0;
-    //             }else{
-    //                 break;
-    //             }
-    //         }
-    //         if(i>maxIts)
-    //             ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: upper bound calculation exceeds maxIts");
-    //     }
-
-    //     assert(ylb<yub);
-    //     assert(xlb<xub);
-
-    //     // Bracketed search
-    //     const double k1 = 0.1;
-    //     const double k2 = 2.0;
-    //     const double nhalf = ceil(log2(0.5*(xub-xlb)/xtol));
-    //     const double n0 = 1.0;
-
-    //     double sigma, delta, rho;
-    //     unsigned int it;
-    //     for(it=0; it<maxIts; ++it){
-
-    //         xb = 0.5*(xub+xlb); // bisection point
-    //         xf = xlb - (yd-ylb)*(xub-xlb) / (yub-ylb); // regula-falsi point
-
-    //         sigma = ((xb-xf)>0)?1.0:-1.0; // sign(xb-xf)
-    //         delta = fmin(k1*pow((xub-xlb), k2), fabs(xb-xf));
-
-    //         xf += delta*sigma;
-
-    //         rho = fmin(xtol*pow(2.0, nhalf + n0 - it) - 0.5*(xub-xlb), fabs(xf - xb));
-    //         xc = xb - sigma*rho;
-
-    //         yc = EvaluateSingle(workspace, cache, pt, xc, coeffs, quad, expansion);
-
-    //         if(abs(yc-yd)<ftol){
-    //             return xc;
-    //         }else if(yc>yd){
-    //             mpart::simple_swap(yc,yub);
-    //             mpart::simple_swap(xc,xub);
-    //         }else{
-    //             mpart::simple_swap(yc,ylb);
-    //             mpart::simple_swap(xc,xlb);
-    //         }
-
-    //         // Check for convergence
-    //         if(((xub-xlb)<xtol)||((yub-ylb)<ftol))
-    //             break;
-    //     };
-
-    //     if(it>maxIts)
-    //         ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: Bracket search iterations exceeds maxIts");
-    //     return 0.5*(xub+xlb);
-    // }
 
     /** Give access to the underlying FixedMultiIndexSet
      * @return The FixedMultiIndexSet
