@@ -39,4 +39,5 @@ REGISTER_MONO_COMP(HermiteFunction, SoftPlus, ClenshawCurtisQuadrature, Kokkos::
 REGISTER_MONO_COMP(HermiteFunction, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 REGISTER_MONO_COMP(HermiteFunction, Softplus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 #endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpart8)
 #endif

@@ -39,4 +39,5 @@ REGISTER_MONO_COMP(ProbabilistHermite, SoftPlus, ClenshawCurtisQuadrature, Kokko
 REGISTER_MONO_COMP(ProbabilistHermite, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 REGISTER_MONO_COMP(ProbabilistHermite, Softplus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 #endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpart5)
 #endif

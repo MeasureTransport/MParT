@@ -33,6 +33,18 @@ void mpart::binding::ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(py::mod
             archive(obj.inputDim, obj.outputDim, obj.numCoeffs);
             archive(obj.Coeffs());
         })
+        .def("ToBytes", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> const &ptr) {
+            std::stringstream ss;
+            ptr->Save(ss);
+            return py::bytes(ss.str());
+        })
+        .def_static("FromBytes", [](std::string input) {
+            std::stringstream ss;
+            ss.str(input);
+
+            auto ptr = ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss);
+            return ptr;  
+        })
         #endif
         ;
 }

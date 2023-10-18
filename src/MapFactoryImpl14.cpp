@@ -41,4 +41,5 @@ REGISTER_MONO_COMP(LinearizedBasis<mpart::ProbabilistHermite>, SoftPlus, Clensha
 REGISTER_MONO_COMP(LinearizedBasis<mpart::ProbabilistHermite>, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 REGISTER_MONO_COMP(LinearizedBasis<mpart::ProbabilistHermite>, Softplus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 #endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpart14)
 #endif 

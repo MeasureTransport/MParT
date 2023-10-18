@@ -387,7 +387,7 @@ TEST_CASE("Test serialization of triangular map.", "[Serialization]"){
 
     auto out1 = triMap1->Evaluate(in);
 
-    SECTION("Check TriangularMap Serialization"){
+    SECTION("Check direct triangularMap Serialization"){
         {
             cereal::BinaryOutputArchive oarchive(ss);
             oarchive(triMap1);
@@ -420,5 +420,34 @@ TEST_CASE("Test serialization of triangular map.", "[Serialization]"){
                 }
             }   
         }
+    }
+
+    SECTION("Check save/load functions."){
+        ss.str("");
+        triMap1->Save(ss);
+        auto triMap2 = ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss);
+    
+        CHECK(triMap1->inputDim == triMap2->inputDim);
+        CHECK(triMap1->outputDim == triMap2->outputDim);
+        CHECK(triMap1->numCoeffs == triMap2->numCoeffs);
+    
+        // Make sure the coefficients are the same 
+        auto coeffs1 = triMap1->Coeffs();
+        auto coeffs2 = triMap2->Coeffs();
+        
+        REQUIRE(coeffs1.size() == coeffs2.size());
+        for(unsigned int i=0; i<coeffs1.size(); ++i){
+            CHECK(coeffs1(i)==coeffs2(i));
+        }
+
+        // Test evaluation
+        auto out2 = triMap1->Evaluate(in);
+        REQUIRE(out1.extent(0)==out2.extent(0));
+        REQUIRE(out1.extent(1)==out2.extent(1));
+        for(unsigned int i=0; i<out1.extent(0); ++i){
+            for(unsigned int j=0; j<out1.extent(1); ++j){
+                CHECK(fabs(out1(i,j)-out2(i,j))<1e-10);
+            }
+        }   
     }
 }

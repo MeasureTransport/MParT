@@ -39,4 +39,5 @@ REGISTER_MONO_COMP(PhysicistHermite, SoftPlus, AdaptiveSimpson, Kokkos::HostSpac
 REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveSimpson, mpart::DeviceSpace)
 REGISTER_MONO_COMP(PhysicistHermite, Softplus, AdaptiveSimpson, mpart::DeviceSpace)
 #endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpart3)
 #endif 

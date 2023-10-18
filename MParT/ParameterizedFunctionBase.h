@@ -20,7 +20,7 @@ namespace mpart {
 
 
     template<typename MemorySpace>
-    class ParameterizedFunctionBase {
+    class ParameterizedFunctionBase : public std::enable_shared_from_this<ParameterizedFunctionBase<MemorySpace>> {
 
     public:
 
@@ -186,12 +186,37 @@ namespace mpart {
         /** Checks to see if the coefficients have been initialized yet, returns true if so, false if not */
         bool CheckCoefficients() const;
 
-
         const unsigned int inputDim; /// The total dimension of the input N+M
         const unsigned int outputDim; /// The output dimension M
         const unsigned int numCoeffs; /// The number of coefficients used to parameterize this map.
 
 #if defined(MPART_HAS_CEREAL)
+    /** Saves this object as a binary sequence in a stream. Due to subtleties in the 
+         serialization process, this function should only be called from smart pointers 
+        to the object. 
+        @param ostream A stream object that can be used to constraint an instance of the cereal::BinaryOutputArchive class.
+                       Examples include `std::ofstream` and `std::sstream` 
+        */
+    template<class OutStreamType>
+    void Save(OutStreamType& ostream) const{
+        auto ptr = this->shared_from_this();
+        cereal::BinaryOutputArchive archive(ostream);
+        archive(ptr);
+    }
+
+    /** Reads the output of the `Save` function to construct a smart pointer containing 
+        a copy of a previously saved object.
+    */
+    template<class InStreamType>
+    static std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> Load(InStreamType& istream){
+        
+        cereal::BinaryInputArchive archive(istream);
+
+        std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> ptr;
+        archive(ptr);
+        return ptr;
+    }
+    
     // Define a serialize or save/load pair as you normally would
     template <class Archive>
     void save( Archive & ar ) const

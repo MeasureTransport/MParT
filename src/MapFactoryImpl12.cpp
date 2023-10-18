@@ -41,4 +41,5 @@ REGISTER_MONO_COMP(LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, AdaptiveS
 REGISTER_MONO_COMP(LinearizedBasis<mpart::PhysicistHermite>, Exp, AdaptiveSimpson, mpart::DeviceSpace)
 REGISTER_MONO_COMP(LinearizedBasis<mpart::PhysicistHermite>, Softplus, AdaptiveSimpson, mpart::DeviceSpace)
 #endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpart12)
 #endif 

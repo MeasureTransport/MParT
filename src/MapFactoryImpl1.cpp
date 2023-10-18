@@ -44,4 +44,6 @@ REGISTER_MONO_COMP(PhysicistHermite, SoftPlus, AdaptiveClenshawCurtis, Kokkos::H
 REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 REGISTER_MONO_COMP(PhysicistHermite, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 #endif 
+
+CEREAL_REGISTER_DYNAMIC_INIT(mpart1)
 #endif 

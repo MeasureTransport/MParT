@@ -41,5 +41,6 @@ REGISTER_MONO_COMP(HermiteFunction, SoftPlus, AdaptiveClenshawCurtis, Kokkos::Ho
 #if defined(MPART_ENABLE_GPU)
 REGISTER_MONO_COMP(HermiteFunction, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 REGISTER_MONO_COMP(HermiteFunction, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
-#endif 
+#endif
+CEREAL_REGISTER_DYNAMIC_INIT(mpart7) 
 #endif

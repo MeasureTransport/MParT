@@ -40,4 +40,5 @@ REGISTER_MONO_COMP(ProbabilistHermite, SoftPlus, AdaptiveSimpson, Kokkos::HostSp
 REGISTER_MONO_COMP(ProbabilistHermite, Exp, AdaptiveSimpson, mpart::DeviceSpace)
 REGISTER_MONO_COMP(ProbabilistHermite, Softplus, AdaptiveSimpson, mpart::DeviceSpace)
 #endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpart6)
 #endif
