@@ -34,3 +34,12 @@ static auto reg_host_linhf_acc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos
     static auto reg_device_linhf_acc_exp = mpart::MapFactory::CompFactoryImpl<DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, true, PosFuncTypes::Exp, QuadTypes::AdaptiveClenshawCurtis), CreateComponentImpl_LinHF_ACC<Kokkos::HostSpace, Exp>));
     static auto reg_device_linhf_acc_splus = mpart::MapFactory::CompFactoryImpl<DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, true, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveClenshawCurtis), CreateComponentImpl_LinHF_ACC<Kokkos::HostSpace, SoftPlus>));
 #endif
+
+#if defined(MPART_HAS_CEREAL)
+REGISTER_MONO_COMP(LinearizedBasis<mpart::HermiteFunction>, Exp, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+REGISTER_MONO_COMP(LinearizedBasis<mpart::HermiteFunction>, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+#if defined(MPART_ENABLE_GPU)
+REGISTER_MONO_COMP(LinearizedBasis<mpart::HermiteFunction>, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(LinearizedBasis<mpart::HermiteFunction>, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+#endif 
+#endif 

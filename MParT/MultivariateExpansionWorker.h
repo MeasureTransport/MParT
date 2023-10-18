@@ -432,6 +432,21 @@ public:
      */
     FixedMultiIndexSet<MemorySpace> GetMultiIndexSet() const { return multiSet_; }
 
+#if defined(MPART_HAS_CEREAL)
+    template<typename Archive>
+    void save(Archive& ar) const{
+        ar(dim_, multiSet_, basis1d_);
+        ar(startPos_, cacheSize_);
+    }
+
+    template<typename Archive>
+    void load(Archive& ar) {
+        ar(dim_, multiSet_, basis1d_);
+        ar(startPos_, cacheSize_);
+        maxDegrees_ = multiSet_.MaxDegrees();
+    }
+#endif // MPART_HAS_CEREAL
+
 private:
 
     unsigned int dim_;

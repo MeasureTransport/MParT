@@ -8,6 +8,13 @@
 
 #include <Kokkos_Core.hpp>
 
+#if defined(MPART_HAS_CEREAL)
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/memory.hpp>
+#endif 
 
 namespace mpart{
 
@@ -117,10 +124,26 @@ public:
 
 #if defined(MPART_HAS_CEREAL)
     template<class Archive>
-    void serialize(Archive & archive)
+    void save(Archive & ar) const
     {
-        archive(cereal::base_class<ConditionalMapBase<MemorySpace>>(this), comps_);
+        ar(cereal::base_class<ConditionalMapBase<MemorySpace>>(this), comps_);
+
+        bool moveCoeffs = (this->savedCoeffs.is_allocated() && (this->savedCoeffs.size()>0));
+        ar(comps_, moveCoeffs);
     }
+
+    template <class Archive>
+    static void load_and_construct( Archive & ar, cereal::construct<TriangularMap<MemorySpace>> & construct )
+    {      
+        std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> comps;
+        ar(comps);
+        
+        bool moveCoeffs;
+        ar(moveCoeffs);
+
+        construct( comps , moveCoeffs);
+    }
+
 #endif // MPART_HAS_CEREAL
 
 private:
@@ -131,5 +154,13 @@ private:
 }; // class TriangularMap
 
 }
+
+#if defined(MPART_HAS_CEREAL)
+// Register this class with CEREAL 
+CEREAL_REGISTER_TYPE(mpart::TriangularMap<Kokkos::HostSpace>)
+#if defined(MPART_ENABLE_GPU)
+CEREAL_REGISTER_TYPE(mpart::TriangularMap<mpart::DeviceSpace>)
+#endif 
+#endif 
 
 #endif

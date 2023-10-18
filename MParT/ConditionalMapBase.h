@@ -1,12 +1,20 @@
 #ifndef MPART_ConditionalMapBase_H
 #define MPART_ConditionalMapBase_H
 
+#if defined(MPART_HAS_CEREAL)
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/access.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/archives/binary.hpp>
+#endif // MPART_HAS_CEREAL
+
 #include "MParT/Utilities/EigenTypes.h"
 #include "MParT/Utilities/ArrayConversions.h"
 
 #include "MParT/ParameterizedFunctionBase.h"
 
 #include <Eigen/Core>
+
 
 namespace mpart {
 
@@ -23,8 +31,6 @@ namespace mpart {
      */
     template<typename MemorySpace>
     class ConditionalMapBase : public ParameterizedFunctionBase<MemorySpace>{
-
-
     public:
 
         /**
@@ -35,6 +41,8 @@ namespace mpart {
          @param nCoeffs The number of coefficients in the map parameterization.
          */
         ConditionalMapBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs) : ParameterizedFunctionBase<MemorySpace>(inDim, outDim, nCoeffs){};
+
+        ConditionalMapBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs, Kokkos::View<const double*, MemorySpace> coeffsIn) : ParameterizedFunctionBase<MemorySpace>(inDim, outDim, nCoeffs, coeffsIn){};
 
         virtual ~ConditionalMapBase() = default;
 
@@ -149,13 +157,23 @@ namespace mpart {
 
         virtual void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                  StridedMatrix<double, MemorySpace>              output) = 0;
+
+
 #if defined(MPART_HAS_CEREAL)
-        template<typename Archive>
-        void serialize(Archive& ar) {
-            ar(cereal::base_class<ParameterizedFunctionBase<MemorySpace>>(this));
-        }
+    // Define a serialize or save/load pair as you normally would
+    template <class Archive>
+    void save( Archive & ar ) const
+    {
+        ar( cereal::base_class<ParameterizedFunctionBase<MemorySpace>>( this )); 
+    }
+    template <class Archive>
+    void load( Archive & ar )
+    {
+        std::cout << "Shouldn't be here!" << std::endl;
+    }
+
 #endif // MPART_HAS_CEREAL
+
     }; // class ConditionalMapBase<MemorySpace>
 }
-
 #endif

@@ -31,3 +31,12 @@ static auto reg_host_prob_cc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::
     static auto reg_device_prob_cc_exp = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::Exp, QuadTypes::ClenshawCurtis), CreateComponentImpl_Prob_CC<mpart::DeviceSpace, Exp>));
     static auto reg_device_prob_cc_splus = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::SoftPlus, QuadTypes::ClenshawCurtis), CreateComponentImpl_Prob_CC<mpart::DeviceSpace, SoftPlus>));
 #endif
+
+#if defined(MPART_HAS_CEREAL)
+REGISTER_MONO_COMP(ProbabilistHermite, Exp, ClenshawCurtisQuadrature, Kokkos::HostSpace)
+REGISTER_MONO_COMP(ProbabilistHermite, SoftPlus, ClenshawCurtisQuadrature, Kokkos::HostSpace)
+#if defined(MPART_ENABLE_GPU)
+REGISTER_MONO_COMP(ProbabilistHermite, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+REGISTER_MONO_COMP(ProbabilistHermite, Softplus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+#endif 
+#endif

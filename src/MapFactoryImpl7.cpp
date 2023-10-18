@@ -33,3 +33,13 @@ static auto reg_host_hf_acc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::H
     static auto reg_device_hf_acc_exp = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, false, PosFuncTypes::Exp, QuadTypes::AdaptiveClenshawCurtis), CreateComponentImpl_HF_ACC<mpart::DeviceSpace, Exp>));
     static auto reg_device_hf_acc_splus = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, false, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveClenshawCurtis), CreateComponentImpl_HF_ACC<mpart::DeviceSpace, SoftPlus>));
 #endif
+
+
+#if defined(MPART_HAS_CEREAL)
+REGISTER_MONO_COMP(HermiteFunction, Exp, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+REGISTER_MONO_COMP(HermiteFunction, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+#if defined(MPART_ENABLE_GPU)
+REGISTER_MONO_COMP(HermiteFunction, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(HermiteFunction, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+#endif 
+#endif

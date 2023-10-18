@@ -1,14 +1,18 @@
 #ifndef MPART_ParameterizedFunctionBase_H
 #define MPART_ParameterizedFunctionBase_H
 
+#if defined(MPART_HAS_CEREAL)
+#include <cereal/types/polymorphic.hpp>
+#include "MParT/Utilities/Serialization.h"
+#include <cereal/archives/binary.hpp>
+#endif // MPART_HAS_CEREAL
+
 #include "MParT/Utilities/EigenTypes.h"
 #include "MParT/Utilities/ArrayConversions.h"
 
 #include "MParT/Utilities/GPUtils.h"
 
-#if defined(MPART_HAS_CEREAL)
-#include "MParT/Utilities/Serialization.h"
-#endif // MPART_HAS_CEREAL
+
 
 #include <Eigen/Core>
 
@@ -27,6 +31,8 @@ namespace mpart {
          @param nCoeffs The number of coefficients in the parameterization.
          */
         ParameterizedFunctionBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs) : inputDim(inDim), outputDim(outDim), numCoeffs(nCoeffs){};
+
+        ParameterizedFunctionBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs, Kokkos::View<const double*, MemorySpace> coeffsIn) : inputDim(inDim), outputDim(outDim), numCoeffs(coeffsIn.size()){SetCoeffs(coeffsIn);};
 
         virtual ~ParameterizedFunctionBase() = default;
 
@@ -186,11 +192,18 @@ namespace mpart {
         const unsigned int numCoeffs; /// The number of coefficients used to parameterize this map.
 
 #if defined(MPART_HAS_CEREAL)
-        template <typename Archive>
-        void serialize(Archive & ar){
-            ar(inputDim, outputDim, numCoeffs);
-            ar(savedCoeffs);
-        }
+    // Define a serialize or save/load pair as you normally would
+    template <class Archive>
+    void save( Archive & ar ) const
+    {
+        // Do nothing.
+    }
+    template <class Archive>
+    void load( Archive & ar )
+    {
+        std::cout << "Shouldn't be here!" << std::endl;
+    }
+
 #endif // MPART_HAS_CEREAL
 
     protected:
@@ -201,13 +214,11 @@ namespace mpart {
          */
         void CheckDeviceMismatch(std::string functionName) const;
 
-
-
         /** Checks to see if the coefficients have been initialized yet. If not, an exception is thrown. */
         void CheckCoefficients(std::string const& functionName) const;
 
         Kokkos::View<double*, MemorySpace> savedCoeffs;
-
+        
     }; // class ParameterizedFunctionBase
 }
 

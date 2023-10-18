@@ -62,7 +62,7 @@ public:
 
     KOKKOS_INLINE_FUNCTION unsigned int Size() const
     {
-        if(isCompressed){
+        if(this->isCompressed){
             return nzStarts.extent(0)-1;
         }else{
             return nzOrders.extent(0) / dim;
@@ -75,12 +75,12 @@ public:
     template<typename OtherMemorySpace>
     FixedMultiIndexSet<OtherMemorySpace> ToDevice();
 
-    #if defined(MPART_HAS_CEREAL)
+#if defined(MPART_HAS_CEREAL)
 
     template<class Archive>
     void save(Archive & ar) const
     {
-        ar(dim);
+        ar(dim, isCompressed);
         cereal::save<unsigned int>(ar, nzStarts);
         cereal::save<unsigned int>(ar, nzDims);
         cereal::save<unsigned int>(ar, nzOrders);
@@ -90,15 +90,15 @@ public:
     template<class Archive>
     void load(Archive & ar)
     {
-        ar(dim);
-        isCompressed = true;
-        cereal::load(ar, nzStarts);
-        cereal::load(ar, nzDims);
-        cereal::load(ar, nzOrders);
-        cereal::load(ar, maxDegrees);
+        ar(dim, isCompressed);
+        cereal::load<unsigned int>(ar, nzStarts);
+        cereal::load<unsigned int>(ar, nzDims);
+        cereal::load<unsigned int>(ar, nzOrders);
+        cereal::load<unsigned int>(ar, maxDegrees);
     }
 
-    #endif // MPART_HAS_CEREAL
+    FixedMultiIndexSet(){};
+#endif // MPART_HAS_CEREAL
 
     Kokkos::View<unsigned int*, MemorySpace> nzStarts;
     Kokkos::View<unsigned int*, MemorySpace> nzDims;

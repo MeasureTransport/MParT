@@ -9,6 +9,7 @@
 #include "MParT/PositiveBijectors.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
+
 using namespace mpart;
 
 
@@ -35,3 +36,12 @@ static auto reg_host_phys_acc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos:
     static auto reg_device_phys_acc_exp = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::PhysicistHermite, false, PosFuncTypes::Exp, QuadTypes::AdaptiveClenshawCurtis), CreateComponentImpl_Phys_ACC<mpart::DeviceSpace, Exp>));
     static auto reg_device_phys_acc_splus = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::PhysicistHermite, false, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveClenshawCurtis), CreateComponentImpl_Phys_ACC<mpart::DeviceSpace, SoftPlus>));
 #endif
+
+#if defined(MPART_HAS_CEREAL)
+REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+REGISTER_MONO_COMP(PhysicistHermite, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+#if defined(MPART_ENABLE_GPU)
+REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(PhysicistHermite, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+#endif 
+#endif 

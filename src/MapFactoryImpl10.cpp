@@ -36,3 +36,4 @@ static auto reg_host_linphys_acc_splus = mpart::MapFactory::CompFactoryImpl<Kokk
     static auto reg_device_linphys_acc_exp = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::PhysicistHermite, true, PosFuncTypes::Exp, QuadTypes::AdaptiveClenshawCurtis), CreateComponentImpl_LinPhys_ACC<mpart::DeviceSpace, Exp>));
     static auto reg_device_linphys_acc_splus = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::PhysicistHermite, true, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveClenshawCurtis), CreateComponentImpl_LinPhys_ACC<mpart::DeviceSpace, SoftPlus>));
 #endif
+

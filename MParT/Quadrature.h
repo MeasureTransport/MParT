@@ -9,6 +9,11 @@
 
 #include <Eigen/Core>
 
+#if defined(MPART_HAS_CEREAL)
+#include <cereal/access.hpp>
+#include <cereal/types/base_class.hpp>
+#endif 
+
 namespace mpart{
 
 namespace QuadError{
@@ -29,6 +34,9 @@ template<typename MemorySpace>
 class QuadratureBase {
 
 public:
+#if defined(MPART_HAS_CEREAL)
+    friend class cereal::access;
+#endif 
 
     /** Constructs a quadrature rule with internally managed workspace. */
     QuadratureBase(unsigned int maxDim, unsigned int workspaceSize) : fdim_(maxDim),
@@ -53,11 +61,35 @@ public:
 
     KOKKOS_INLINE_FUNCTION void SetDim(unsigned int fdim){assert(fdim<=maxDim_); fdim_ = fdim;}
 
+#if defined(MPART_HAS_CEREAL)
+    // Define a serialize or save/load pair as you normally would
+    template <class Archive>
+    void save( Archive & ar ) const
+    {   
+        ar(fdim_, maxDim_, workspaceSize_);
+        ar(internalWork_);
+    }
+
+    template <class Archive>
+    void load( Archive & ar )
+    {   
+        ar(fdim_, maxDim_, workspaceSize_);
+        ar(internalWork_);
+
+        // Set the workspace point if applicable
+        if(internalWork_.is_allocated()){
+            if(internalWork_.size()>=workspaceSize_){
+                workspace_ = internalWork_.data();
+            }
+        }
+    }
+    QuadratureBase() : workspace_(nullptr){};
+#endif    
 
 protected:
 
     unsigned int fdim_; // The current length of f(x)
-    const unsigned int maxDim_; // The maximum length of f(x) allowed by the cache size
+    unsigned int maxDim_; // The maximum length of f(x) allowed by the cache size
     unsigned int workspaceSize_; // The total number of doubles that could be used by this quadrature method to store function evaluations during a call to "integrate"
 
     Kokkos::View<double*,MemorySpace> internalWork_;
@@ -109,6 +141,9 @@ quad.Integrate(&workspace[0], f, 0, 1, &integral); // Integrate x^2 from 0 to 1 
 template<typename MemorySpace=Kokkos::HostSpace>
 class ClenshawCurtisQuadrature : public QuadratureBase<MemorySpace>{
 public:
+#if defined(MPART_HAS_CEREAL)
+    friend class cereal::access;
+#endif 
 
     /**
      * @brief Construct a new Clenshaw Curtis Quadrature object using an internally allocated workspace.
@@ -273,9 +308,30 @@ public:
         }
     }
 
+#if defined(MPART_HAS_CEREAL)
+    // Define a serialize or save/load pair as you normally would
+    template <class Archive>
+    void save( Archive & ar ) const
+    {   
+        ar(cereal::base_class<QuadratureBase<MemorySpace>>(this));
+        ar(pts_,wts_, numPts_);
+    }
+    template <class Archive>
+    void load( Archive & ar )
+    {   
+        ar(cereal::base_class<QuadratureBase<MemorySpace>>(this));
+        ar(pts_,wts_, numPts_);
+    }
+
+    /** Default constructor should never be used directly.  Only for serialization. */
+    ClenshawCurtisQuadrature(){};
+
+#endif 
+
 private:
+    
     Kokkos::View<double*, MemorySpace> pts_, wts_;
-    const unsigned int numPts_;
+    unsigned int numPts_;
 
 }; // class ClenshawCurtisQuadrature
 
@@ -327,6 +383,9 @@ class RecursiveQuadratureBase : public QuadratureBase<MemorySpace>
 {
 
 public:
+#if defined(MPART_HAS_CEREAL)
+    friend class cereal::access;
+#endif 
 
     RecursiveQuadratureBase(unsigned int maxSub,
                             unsigned int maxDim,
@@ -358,7 +417,24 @@ public:
     {}
 
 
+#if defined(MPART_HAS_CEREAL)
+    // Define a serialize or save/load pair as you normally would
+    template <class Archive>
+    void save( Archive & ar ) const
+    {   
+        ar(cereal::base_class<QuadratureBase<MemorySpace>>(this));
+        ar(maxSub_, minSub_, absTol_, relTol_, errorMetric_);
+    }
+    template <class Archive>
+    void load( Archive & ar )
+    {   
+        ar(cereal::base_class<QuadratureBase<MemorySpace>>(this));
+        ar(maxSub_, minSub_, absTol_, relTol_, errorMetric_);
+    }
+#endif 
+
 protected:
+    RecursiveQuadratureBase(){};
 
     KOKKOS_FUNCTION void EstimateError(const double* coarseVal,
                                        const double* fineVal,
@@ -402,10 +478,10 @@ protected:
         tol = std::fmax( relTol_*relRefVal, absTol_);
     }
 
-    const unsigned int maxSub_;
-    const unsigned int minSub_;
-    const double absTol_;
-    const double relTol_;
+    unsigned int maxSub_;
+    unsigned int minSub_;
+    double absTol_;
+    double relTol_;
 
     QuadError::Type errorMetric_;
 };
@@ -419,6 +495,9 @@ protected:
 template<typename MemorySpace=Kokkos::HostSpace>
 class AdaptiveSimpson : public RecursiveQuadratureBase<MemorySpace> {
 public:
+#if defined(MPART_HAS_CEREAL)
+    friend class cereal::access;
+#endif 
 
     AdaptiveSimpson(unsigned int maxSub,
                     unsigned int fdim,
@@ -594,7 +673,25 @@ public:
         }
     }
 
+#if defined(MPART_HAS_CEREAL)
+    // Define a serialize or save/load pair as you normally would
+    template <class Archive>
+    void save( Archive & ar ) const
+    {   
+        ar(cereal::base_class<RecursiveQuadratureBase<MemorySpace>>(this));
+    }
+    template <class Archive>
+    void load( Archive & ar )
+    {   
+        ar(cereal::base_class<RecursiveQuadratureBase<MemorySpace>>(this));
+    }
+
+    AdaptiveSimpson(){};
+#endif 
+
 private:
+
+    
 
     KOKKOS_FUNCTION void UpdateValues(double* workspace, unsigned int currLevel, unsigned int currSegment, double* &leftVal, double* &midVal, double* &rightVal) const
     {
@@ -630,6 +727,9 @@ private:
 template<typename MemorySpace=Kokkos::HostSpace>
 class AdaptiveClenshawCurtis : public RecursiveQuadratureBase<MemorySpace>{
 public:
+#if defined(MPART_HAS_CEREAL)
+    friend class cereal::access;
+#endif 
 
     /**
        @brief Construct a new adaptive quadrature class with specified stopping criteria.
@@ -865,9 +965,25 @@ public:
 
     }
 
+#if defined(MPART_HAS_CEREAL)
+    // Define a serialize or save/load pair as you normally would
+    template <class Archive>
+    void save( Archive & ar ) const
+    {   
+        ar(cereal::base_class<RecursiveQuadratureBase<MemorySpace>>(this));
+        ar(coarsePts_, coarseWts_, finePts_, fineWts_);
+    }
+    template <class Archive>
+    void load( Archive & ar )
+    {   
+        ar(cereal::base_class<RecursiveQuadratureBase<MemorySpace>>(this));
+        ar(coarsePts_, coarseWts_, finePts_, fineWts_);
+    }
+
+    AdaptiveClenshawCurtis(){};
+#endif 
 
 private:
-
 
     KOKKOS_FUNCTION void UpdateValues(double* workspace, unsigned int currLevel, unsigned int currSegment, double* &leftVal, double* &rightVal) const
     {
