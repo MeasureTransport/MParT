@@ -314,3 +314,13 @@ template class mpart::TriangularMap<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)
     template class mpart::TriangularMap<mpart::DeviceSpace>;
 #endif
+
+
+#if defined(MPART_HAS_CEREAL)
+// Register this class with CEREAL 
+CEREAL_REGISTER_TYPE(mpart::TriangularMap<Kokkos::HostSpace>)
+#if defined(MPART_ENABLE_GPU)
+CEREAL_REGISTER_TYPE(mpart::TriangularMap<mpart::DeviceSpace>)
+#endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpart_triangularmap)
+#endif 

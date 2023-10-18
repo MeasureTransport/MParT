@@ -23,6 +23,21 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
         .def("LogDeterminantCoeffGrad", static_cast<Eigen::RowMatrixXd (ConditionalMapBase<MemorySpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad))
         .def("LogDeterminantInputGrad", static_cast<Eigen::RowMatrixXd (ConditionalMapBase<MemorySpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ConditionalMapBase<MemorySpace>::LogDeterminantInputGrad))
         .def("GetBaseFunction", &ConditionalMapBase<MemorySpace>::GetBaseFunction)
+        .def(py::pickle(
+            [](std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> const& ptr) { // __getstate__
+                std::stringstream ss;
+                ptr->Save(ss);
+                return py::bytes(ss.str());
+            },
+            [](py::bytes input) {
+                
+                std::stringstream ss;
+                ss.str(input);
+
+                auto ptr = std::dynamic_pointer_cast<ConditionalMapBase<Kokkos::HostSpace>>(ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss));
+                return ptr;
+            }
+        ))
         ;
 
 }

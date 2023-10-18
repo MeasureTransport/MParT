@@ -5,6 +5,8 @@ import numpy as np
 import os
 import pytest
 
+import pickle
+
 # Initialize folder name for test
 foldername = "_test_serialization/"
 
@@ -44,9 +46,9 @@ def DeserializeComponent():
 def run_around_tests():
     os.mkdir(foldername)
     yield
-    os.remove(foldername + "opts.mt")
-    os.remove(foldername + "fmset.mt")
-    os.remove(foldername + "comp.mt")
+    for filename in ["opts.mt", "fmset.mt", "comp.mt"]:
+        if os.path.isfile(foldername + filename):
+            os.remove(foldername + filename)
     os.rmdir(foldername)
 
 
@@ -80,3 +82,30 @@ def test_serialization():
     assert component_s.inputDim == inputDim_s
     assert component_s.outputDim == outputDim_s
     assert (component_s.CoeffMap() == coeffs).all()
+
+def test_trimap_saveload():
+    opts = mt.MapOptions()
+
+    multis_1 = np.array([[0],[1]])  # linear
+    multis_2 = np.array([[0,0],[0,1],[2,0]])  # quadratic in x_1, linear in x_2, matches form of target 
+
+    mset_1 = mt.MultiIndexSet(multis_1).fix(True)
+    mset_2 = mt.MultiIndexSet(multis_2).fix(True)
+
+    map_1 = mt.CreateComponent(mset_1, opts)
+    map_2 = mt.CreateComponent(mset_2, opts)
+
+    tmap = mt.TriangularMap([map_1,map_2],True)
+    tmap.SetCoeffs(np.random.randn(tmap.numCoeffs))
+    
+    # Dump the tmap to a byte string
+    tmap_bytes = tmap.ToBytes()
+
+    # Create a copy by reading the byte string
+    tmap2 = mt.TriangularMap.FromBytes(tmap_bytes)
+    assert np.all(tmap2.CoeffMap() == tmap.CoeffMap())
+
+    # Now try it with pickle
+    tmap_bytes = pickle.dumps(tmap)
+    tmap2 = pickle.loads(tmap_bytes)
+    assert np.all(tmap2.CoeffMap() == tmap.CoeffMap())

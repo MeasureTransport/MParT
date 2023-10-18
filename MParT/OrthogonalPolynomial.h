@@ -277,7 +277,17 @@ public:
         }
     }
 
-    const bool normalize_;
+    #if defined(MPART_HAS_CEREAL)
+        // Define a serialize or save/load pair as you normally would
+        template <class Archive>
+        void serialize( Archive & ar )
+        {   
+            ar(normalize_);
+        }
+    #endif     
+private:
+
+    bool normalize_;
 };
 
 

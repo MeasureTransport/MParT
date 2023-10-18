@@ -1,6 +1,14 @@
 #ifndef MPART_MONOTONECOMPONENT_H
 #define MPART_MONOTONECOMPONENT_H
 
+#if defined(MPART_HAS_CEREAL)
+#include <cereal/types/polymorphic.hpp>
+#include "MParT/Utilities/Serialization.h"
+#include <cereal/access.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/archives/binary.hpp>
+#endif // MPART_HAS_CEREAL
+
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
 
@@ -18,7 +26,6 @@
 #include <Eigen/Core>
 
 #include <Kokkos_Core.hpp>
-
 
 namespace mpart{
 
@@ -47,7 +54,7 @@ public:
         @details
         @param expansion The expansion used to define the function \f$f\f$.
         @param quad The quadrature rule used to approximate \f$\int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt\f$
-        @param useCondDeriv A flag to specify whether the analytic derivative of \f$T(x_1, x_2, ..., x_D)\f$ should be used by default, or if the derivative of the discretized integral should be used.  If "true", the analytic or "continuous" derivative will be used.  If "false", the derivative of the numerically approximated integral will be used.
+        @param useContDeriv A flag to specify whether the analytic derivative of \f$T(x_1, x_2, ..., x_D)\f$ should be used by default, or if the derivative of the discretized integral should be used.  If "true", the analytic or "continuous" derivative will be used.  If "false", the derivative of the numerically approximated integral will be used.
         @verbatim embed:rst
           See the :ref:`diag_deriv_section` mathematical background for more details.
         @endverbatim
@@ -60,6 +67,16 @@ public:
                                                     dim_(expansion.InputSize()),
                                                     useContDeriv_(useContDeriv){};
 
+    
+
+    MonotoneComponent(ExpansionType  const& expansion,
+                      QuadratureType const& quad,
+                      bool useContDeriv,
+                      Kokkos::View<const double*, MemorySpace> coeffsIn) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs(), coeffsIn),
+                                                    expansion_(expansion),
+                                                    quad_(quad),
+                                                    dim_(expansion.InputSize()),
+                                                    useContDeriv_(useContDeriv){};
 
     virtual std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> GetBaseFunction() override{return std::make_shared<MultivariateExpansion<typename ExpansionType::BasisType, typename ExpansionType::KokkosSpace>>(1,expansion_);};
 
@@ -1000,11 +1017,44 @@ public:
         return expansion_.GetMultiIndexSet();
     }
 
+#if defined(MPART_HAS_CEREAL)
+    // Define a serialize or save/load pair as you normally would
+    template <class Archive>
+    void save( Archive & ar ) const
+    {   
+        ar( cereal::base_class<ConditionalMapBase<MemorySpace>>( this )); 
+        ar( expansion_, quad_, useContDeriv_);
+        ar( this->savedCoeffs );
+    }
+
+    template <class Archive>
+    static void load_and_construct( Archive & ar, cereal::construct<MonotoneComponent<ExpansionType, PosFuncType,QuadratureType,MemorySpace>> & construct )
+    {   
+        ExpansionType expansion;
+        QuadratureType quad;
+        bool useContDeriv;
+        ar(expansion, quad, useContDeriv);
+
+        Kokkos::View<double*, MemorySpace> coeffs;
+        ar( coeffs );
+
+        if(coeffs.size() == expansion.NumCoeffs()){
+            construct( expansion, quad, useContDeriv, coeffs);
+        }else{
+            construct( expansion, quad, useContDeriv);
+        }
+    }
+
+#endif // MPART_HAS_CEREAL
+
 private:
+
     ExpansionType expansion_;
     QuadratureType quad_;
-    const unsigned int dim_;
+    unsigned int dim_;
     bool useContDeriv_;
+
+
     template<typename PointType, typename CoeffType>
     struct SingleEvaluator {
         double* workspace;
@@ -1023,4 +1073,26 @@ private:
 };
 
 } // namespace mpart
+
+#if defined(MPART_HAS_CEREAL)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory1)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory2)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory3)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory4)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory5)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory6)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory7)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory8)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory9)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory10)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory11)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory12)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory13)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory14)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory15)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory16)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory17)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory18)
+#endif
+
 #endif

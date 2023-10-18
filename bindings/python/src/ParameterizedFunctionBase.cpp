@@ -26,13 +26,40 @@ void mpart::binding::ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(py::mod
         .def_readonly("numCoeffs", &ParameterizedFunctionBase<Kokkos::HostSpace>::numCoeffs)
         .def_readonly("inputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::inputDim)
         .def_readonly("outputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::outputDim)
-        #if defined(MPART_HAS_CEREAL)
+#if defined(MPART_HAS_CEREAL)
         .def("Serialize", [](ParameterizedFunctionBase<Kokkos::HostSpace> const &obj, std::string const &filename){
             std::ofstream os(filename);
             cereal::BinaryOutputArchive archive(os);
             archive(obj.inputDim, obj.outputDim, obj.numCoeffs);
             archive(obj.Coeffs());
         })
+        .def("ToBytes", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> const &ptr) {
+            std::stringstream ss;
+            ptr->Save(ss);
+            return py::bytes(ss.str());
+        })
+        .def_static("FromBytes", [](std::string input) {
+            std::stringstream ss;
+            ss.str(input);
+
+            auto ptr = ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss);
+            return ptr;  
+        })
+        .def(py::pickle(
+            [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> const& ptr) { // __getstate__
+                std::stringstream ss;
+                ptr->Save(ss);
+                return py::bytes(ss.str());
+            },
+            [](py::bytes input) {
+                
+                std::stringstream ss;
+                ss.str(input);
+
+                auto ptr = ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss);
+                return ptr;
+            }
+        ))
         #endif
         ;
 }

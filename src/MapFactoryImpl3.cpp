@@ -32,3 +32,12 @@ static auto reg_host_phys_as_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::
     static auto reg_device_phys_as_splus = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::PhysicistHermite, false, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveSimpson), CreateComponentImpl_Phys_AS<mpart::DeviceSpace, SoftPlus>));
 #endif
 
+#if defined(MPART_HAS_CEREAL)
+REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveSimpson, Kokkos::HostSpace)
+REGISTER_MONO_COMP(PhysicistHermite, SoftPlus, AdaptiveSimpson, Kokkos::HostSpace)
+#if defined(MPART_ENABLE_GPU)
+REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveSimpson, mpart::DeviceSpace)
+REGISTER_MONO_COMP(PhysicistHermite, Softplus, AdaptiveSimpson, mpart::DeviceSpace)
+#endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory3)
+#endif 

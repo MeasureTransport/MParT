@@ -31,3 +31,13 @@ static auto reg_host_hf_cc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::Ho
     static auto reg_device_hf_cc_exp = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, false, PosFuncTypes::Exp, QuadTypes::ClenshawCurtis), CreateComponentImpl_HF_CC<mpart::DeviceSpace, Exp>));
     static auto reg_device_hf_cc_splus = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, false, PosFuncTypes::SoftPlus, QuadTypes::ClenshawCurtis), CreateComponentImpl_HF_CC<mpart::DeviceSpace, SoftPlus>));
 #endif
+
+#if defined(MPART_HAS_CEREAL)
+REGISTER_MONO_COMP(HermiteFunction, Exp, ClenshawCurtisQuadrature, Kokkos::HostSpace)
+REGISTER_MONO_COMP(HermiteFunction, SoftPlus, ClenshawCurtisQuadrature, Kokkos::HostSpace)
+#if defined(MPART_ENABLE_GPU)
+REGISTER_MONO_COMP(HermiteFunction, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+REGISTER_MONO_COMP(HermiteFunction, Softplus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+#endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory8)
+#endif
