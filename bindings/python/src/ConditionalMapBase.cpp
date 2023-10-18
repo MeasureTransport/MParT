@@ -37,7 +37,7 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
                 auto ptr = std::dynamic_pointer_cast<ConditionalMapBase<Kokkos::HostSpace>>(ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss));
                 return ptr;
             }
-        ));
+        ))
         ;
 
 }

@@ -226,7 +226,9 @@ namespace mpart {
     template <class Archive>
     void load( Archive & ar )
     {
-        std::cout << "Shouldn't be here!" << std::endl;
+        std::cout << "Somehow a 'load' function that should be impossible to call is being called.  ";
+        std::cout << "The load_and_construct should be called instead." << std::endl;
+        assert(false);
     }
 
 #endif // MPART_HAS_CEREAL

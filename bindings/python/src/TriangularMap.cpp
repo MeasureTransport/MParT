@@ -34,7 +34,7 @@ void mpart::binding::TriangularMapWrapper(py::module &m)
                 auto ptr = std::dynamic_pointer_cast<TriangularMap<Kokkos::HostSpace>>(ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss));
                 return ptr;
             }
-        ));
+        ))
         ;
 
 }

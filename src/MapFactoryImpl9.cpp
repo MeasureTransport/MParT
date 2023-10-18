@@ -39,5 +39,5 @@ REGISTER_MONO_COMP(HermiteFunction, SoftPlus, AdaptiveSimpson, Kokkos::HostSpace
 REGISTER_MONO_COMP(HermiteFunction, Exp, AdaptiveSimpson, mpart::DeviceSpace)
 REGISTER_MONO_COMP(HermiteFunction, Softplus, AdaptiveSimpson, mpart::DeviceSpace)
 #endif 
-CEREAL_REGISTER_DYNAMIC_INIT(mpart9)
+CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory9)
 #endif

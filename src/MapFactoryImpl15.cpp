@@ -41,5 +41,5 @@ REGISTER_MONO_COMP(LinearizedBasis<mpart::ProbabilistHermite>, SoftPlus, Adaptiv
 REGISTER_MONO_COMP(LinearizedBasis<mpart::ProbabilistHermite>, Exp, AdaptiveSimpson, mpart::DeviceSpace)
 REGISTER_MONO_COMP(LinearizedBasis<mpart::ProbabilistHermite>, Softplus, AdaptiveSimpson, mpart::DeviceSpace)
 #endif 
-CEREAL_REGISTER_DYNAMIC_INIT(mpart15)
+CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory15)
 #endif 

@@ -45,5 +45,5 @@ REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveClenshawCurtis, mpart::DeviceS
 REGISTER_MONO_COMP(PhysicistHermite, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 #endif 
 
-CEREAL_REGISTER_DYNAMIC_INIT(mpart1)
+CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory1)
 #endif 

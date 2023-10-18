@@ -59,7 +59,7 @@ void mpart::binding::ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(py::mod
                 auto ptr = ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss);
                 return ptr;
             }
-        ));
+        ))
         #endif
         ;
 }

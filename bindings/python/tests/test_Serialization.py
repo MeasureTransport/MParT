@@ -46,9 +46,9 @@ def DeserializeComponent():
 def run_around_tests():
     os.mkdir(foldername)
     yield
-    os.remove(foldername + "opts.mt")
-    os.remove(foldername + "fmset.mt")
-    os.remove(foldername + "comp.mt")
+    for filename in ["opts.mt", "fmset.mt", "comp.mt"]:
+        if os.path.isfile(foldername + filename):
+            os.remove(foldername + filename)
     os.rmdir(foldername)
 
 
@@ -109,5 +109,3 @@ def test_trimap_saveload():
     tmap_bytes = pickle.dumps(tmap)
     tmap2 = pickle.loads(tmap_bytes)
     assert np.all(tmap2.CoeffMap() == tmap.CoeffMap())
-
-test_trimap_saveload()

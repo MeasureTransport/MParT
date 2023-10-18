@@ -232,7 +232,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
 
                 return mset;
             }
-        ));
+        ))
 #endif // MPART_HAS_CEREAL
 #if defined(MPART_ENABLE_GPU)
         .def("ToDevice", &FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<mpart::DeviceSpace>)

@@ -42,5 +42,5 @@ REGISTER_MONO_COMP(LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, ClenshawC
 REGISTER_MONO_COMP(LinearizedBasis<mpart::PhysicistHermite>, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 REGISTER_MONO_COMP(LinearizedBasis<mpart::PhysicistHermite>, Softplus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 #endif 
-CEREAL_REGISTER_DYNAMIC_INIT(mpart11)
+CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory11)
 #endif 

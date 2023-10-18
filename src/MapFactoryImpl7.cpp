@@ -42,5 +42,5 @@ REGISTER_MONO_COMP(HermiteFunction, SoftPlus, AdaptiveClenshawCurtis, Kokkos::Ho
 REGISTER_MONO_COMP(HermiteFunction, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 REGISTER_MONO_COMP(HermiteFunction, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 #endif
-CEREAL_REGISTER_DYNAMIC_INIT(mpart7) 
+CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory7) 
 #endif
