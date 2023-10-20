@@ -510,6 +510,7 @@ document.write(`
 <span class="n">options</span><span class="p">.</span><span class="n">quadRelTol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1e-6</span><span class="p">;</span><span class="w">                          </span><span class="c1">// Optional. Default = 1e-6</span>
 <span class="n">options</span><span class="p">.</span><span class="n">quadMaxSub</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">                            </span><span class="c1">// Optional. Default = 30</span>
 <span class="n">options</span><span class="p">.</span><span class="n">contDeriv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span><span class="w">                           </span><span class="c1">// Optional. Default = true</span>
+<span class="n">options</span><span class="p">.</span><span class="n">nugget</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1e-4</span><span class="p">;</span><span class="w">                              </span><span class="c1">// Optional. Default = 0.0</span>
 
 <span class="c1">// Create a triangular map with these options</span>
 <span class="kt">unsigned</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">inDim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span>
@@ -710,6 +711,12 @@ document.write(`
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions9basisNormE">
 <span class="target" id="structmpart_1_1_map_options_1a4444a079ae0d1f45b4984f6b2dee39ef"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basisNorm</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">true</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions9basisNormE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>If orthogonal polynomial basis functions should be normalized. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions6nuggetE">
+<span class="target" id="structmpart_1_1_map_options_1a45504704a5d136c9c7aabbe1b9507f64"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nugget</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions6nuggetE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>The minimum slope of the monotone component. This nugget is added to the g(df) integrand. Must be non-negative. </p>
 </dd></dl>
 
 </div>

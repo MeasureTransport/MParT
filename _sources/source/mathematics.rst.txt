@@ -17,14 +17,14 @@ While there are infinitely many transformations that couple densities, if :math:
 Monotone Parameterizations
 --------------------------
 
-We represent monotone functions as the smooth transformation of an unconstrained function :math:`f\colon\mathbb{R}^{d} \rightarrow \mathbb{R}`. Let :math:`g\colon\mathbb{R}\rightarrow \mathbb{R}_{>0}` be a strictly positive function, such as the softplus :math:`g(x) = \log(1 + \exp(x))`. Then, the d-th map component :math:`T_{d}` is given by
+We represent monotone functions as the smooth transformation of an unconstrained function :math:`f\colon\mathbb{R}^{d} \rightarrow \mathbb{R}`. Let :math:`g\colon\mathbb{R}\rightarrow \mathbb{R}_{>0}` be a strictly positive function, such as the softplus :math:`g(x) = \log(1 + \exp(x))`, and let :math:`\epsilon \geq 0` be a non-negative constant. Then, the d-th map component :math:`T_{d}` is given by
 
 .. math::
     :label: cont_map 
 
-    T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt.
+    T_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g( \partial_d f(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) + \epsilon dt.
 
-Other choices for the :math:`g` include the squared and exponential functions. These choices, however, have implications for the identifiability of the coefficients. If :math:`g` is bijective, then we can recover :math:`f` from :math:`T_d` as 
+Notice that the additive "nugget" :math:`\epsilon` is the lower bound on the diagonal derivative :math:`\partial T_d / \partial x_d`.  Other choices for the :math:`g` include the squared and exponential functions. These choices, however, have implications for the identifiability of the coefficients. If :math:`g` is bijective and :math:`\epsilon=0`, then we can recover :math:`f` from :math:`T_d` as 
 
 .. math::
     f(\mathbf{x}_{1:d}; \mathbf{w}) = T_d(x_1,\ldots, x_{d-1},0; \mathbf{w}) + \int_0^{x_d} g^{-1}( \partial_d T_d(x_1,\ldots, x_{d-1},t; \mathbf{w}) ) dt.
@@ -59,7 +59,7 @@ Computationally, we approximate the integral in the definition of :math:`T_d(\ma
 .. math::
     :label: discr_map 
 
-    \tilde{T}_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + x_d \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ),
+    \tilde{T}_d(\mathbf{x}_{1:d}; \mathbf{w}) = f(x_1,\ldots, x_{d-1},0; \mathbf{w}) + x_d \sum_{i=1}^N c^{(i)} \left[g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) + \epsilon \right],
 
 where the :math:`x_d` term outside the summation comes from a change of integration domains from :math:`[0,1]` to :math:`[0,x_d]`. 
 
@@ -75,15 +75,15 @@ The derivative :math:`\partial T_d / \partial x_d` is particularly important whe
 .. math::
     :label: cont_deriv 
 
-    \frac{\partial T_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) = g(\, \partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\, ).
+    \frac{\partial T_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) = g(\, \partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\, ) + \epsilon.
 
 The discrete derivative on the other hand is more complicated: 
 
 .. math::
     :label: discr_deriv 
 
-    \frac{\partial \tilde{T}_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) &= \frac{\partial}{\partial x_d} \left[x_d \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) )\right]\\
-    & = \sum_{i=1}^N c^{(i)} g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \\
+    \frac{\partial \tilde{T}_d}{\partial x_d}(\mathbf{x}_{1:d}; \mathbf{w}) &= \frac{\partial}{\partial x_d} \left[x_d \sum_{i=1}^N c^{(i)} \left(g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) + \epsilon\right)\right]\\
+    & = \sum_{i=1}^N c^{(i)} \left(g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) )+\epsilon\right) \\
     &+ x_d \sum_{i=1}^N c^{(i)} t^{(i)} \partial g( \partial_d f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) ) \partial^2_{dd}f(x_1,\ldots, x_{d-1},x_d t^{(i)}; \mathbf{w}) .
 
 
@@ -104,7 +104,7 @@ If is also possible to compute the gradient of the diagonal derivative :math:`\n
 
 .. math::
 
-    \nabla_{\mathbf{w}}\left[ \frac{\partial T_d}{\partial d}\right] & = \nabla_{\mathbf{w}}\left[ g(\, \partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\, ) \right] \\
+    \nabla_{\mathbf{w}}\left[ \frac{\partial T_d}{\partial d}\right] & = \nabla_{\mathbf{w}}\left[ g(\, \partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\, ) + \epsilon \right] \\
     & = \partial g(\, \partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\, )  \nabla_{\mathbf{w}}\left[\partial_d f(\mathbf{x}_{1:d}; \mathbf{w})\right].
 
 
