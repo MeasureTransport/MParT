@@ -7,7 +7,7 @@ MapOptions  mpart::binding::MapOptionsFromMatlab(std::string basisType, std::str
                                         std::string quadType, double quadAbsTol,
                                         double quadRelTol, unsigned int quadMaxSub,
                                         unsigned int quadMinSub,unsigned int quadPts,
-                                        bool contDeriv, double basisLB, double basisUB, bool basisNorm)
+                                        bool contDeriv, double basisLB, double basisUB, bool basisNorm, double nugget)
 {
     MapOptions opts;
 
@@ -48,6 +48,7 @@ MapOptions  mpart::binding::MapOptionsFromMatlab(std::string basisType, std::str
     opts.basisLB = basisLB;
     opts.basisUB = basisUB;
     opts.basisNorm = basisNorm;
+    opts.nugget = nugget;
     return opts;
 }
 

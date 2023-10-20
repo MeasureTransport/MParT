@@ -12,6 +12,7 @@ classdef MapOptions
         basisLB = log(0);
         basisUB = 1.0/0.0;
         basisNorm = true;
+        nugget = 0.0;
     end
 
     methods
@@ -51,6 +52,9 @@ classdef MapOptions
         function obj = set.contDeriv(obj,value)
             obj.contDeriv = value;
         end
+        function obj = set.nugget(obj,value)
+            obj.nugget = value;
+        end
         function optionsArray = getMexOptions(obj)
             optionsArray{1} = char(obj.basisType);
             optionsArray{2} = char(obj.posFuncType);
@@ -64,6 +68,7 @@ classdef MapOptions
             optionsArray{10} = obj.basisLB;
             optionsArray{11} = obj.basisUB;
             optionsArray{12} = obj.basisNorm;
+            optionsArray{13} = obj.nugget;
         end
 
         function res = eq(obj1, obj2)
@@ -80,17 +85,18 @@ classdef MapOptions
             res = res && isequal(obj1.quadMinSub,  obj2.quadMinSub);
             res = res && isequal(obj1.quadPts,     obj2.quadPts);
             res = res && isequal(obj1.contDeriv,   obj2.contDeriv);
+            res = res && isequal(obj1.nugget,      obj2.nugget);
         end
 
         function Serialize(obj,filename)
             MParT_('MapOptions_Serialize',filename, char(obj.basisType),  ...
              char(obj.posFuncType), char(obj.quadType), obj.quadAbsTol,   ...
              obj.quadRelTol, obj.quadMaxSub, obj.quadMinSub, obj.quadPts, ...
-             obj.contDeriv, obj.basisLB, obj.basisUB, obj.basisNorm)
+             obj.contDeriv, obj.basisLB, obj.basisUB, obj.basisNorm, obj.nugget)
         end
 
         function obj = Deserialize(obj,filename)
-            options_len = 12;
+            options_len = 13;
             optionsArray = cell(options_len,1);
             input_str = [']=MParT_(',char(39),'MapOptions_Deserialize',char(39),',filename);'];
             for i=options_len:-1:1
@@ -114,6 +120,7 @@ classdef MapOptions
             obj.basisLB = optionsArray{10};
             obj.basisUB = optionsArray{11};
             obj.basisNorm = optionsArray{12};
+            obj.nugget = optionsArray{13};
         end
     end
 
