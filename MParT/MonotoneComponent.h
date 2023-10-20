@@ -33,11 +33,11 @@ namespace mpart{
 @brief Defines a function \f$T:R^N\rightarrow R\f$ such that \f$\partial T / \partial x_N >0\f$ is strictly positive.
 
 @details
-The function \f$T\f$ is based on another (generally non-monotone) function \f$f : R^N\rightarrow R\f$ and a strictly positve function
-\f$g : R\rightarrow R_{>0}\f$.   Together, these functions define the monotone component $T$ through
+The function \f$T\f$ is based on another (generally non-monotone) function \f$f : R^N\rightarrow R\f$, a strictly positve function
+\f$g : R\rightarrow R_{>0}\f$, and a non-negative scalar \f$\epsilon\f$.   Together, these functions define the monotone component $T$ through
 
 \f[
-T(x_1, x_2, ..., x_D) = f(x_1,x_2,..., x_{D-1}, 0) + \int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt
+T(x_1, x_2, ..., x_D) = f(x_1,x_2,..., x_{D-1}, 0) + \int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) + \epsilon \right) dt
 \f]
 
 @tparam ExpansionType A class defining the function \f$f\f$.  It must satisfy the cached parameterization concept.
@@ -55,28 +55,33 @@ public:
         @param expansion The expansion used to define the function \f$f\f$.
         @param quad The quadrature rule used to approximate \f$\int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt\f$
         @param useContDeriv A flag to specify whether the analytic derivative of \f$T(x_1, x_2, ..., x_D)\f$ should be used by default, or if the derivative of the discretized integral should be used.  If "true", the analytic or "continuous" derivative will be used.  If "false", the derivative of the numerically approximated integral will be used.
+        @param nugget The value of the non negative quantity \f$\epsilon\f$ defining the minimum slope of the transport map.
         @verbatim embed:rst
           See the :ref:`diag_deriv_section` mathematical background for more details.
         @endverbatim
     */
     MonotoneComponent(ExpansionType  const& expansion,
                       QuadratureType const& quad,
-                      bool useContDeriv=true) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs()),
+                      bool useContDeriv=true,
+                      double nugget=0.0) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs()),
                                                     expansion_(expansion),
                                                     quad_(quad),
                                                     dim_(expansion.InputSize()),
-                                                    useContDeriv_(useContDeriv){};
+                                                    useContDeriv_(useContDeriv),
+                                                    nugget_(nugget){};
 
     
 
     MonotoneComponent(ExpansionType  const& expansion,
                       QuadratureType const& quad,
                       bool useContDeriv,
+                      double nugget,
                       Kokkos::View<const double*, MemorySpace> coeffsIn) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs(), coeffsIn),
                                                     expansion_(expansion),
                                                     quad_(quad),
                                                     dim_(expansion.InputSize()),
-                                                    useContDeriv_(useContDeriv){};
+                                                    useContDeriv_(useContDeriv),
+                                                    nugget_(nugget){};
 
     virtual std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> GetBaseFunction() override{return std::make_shared<MultivariateExpansion<typename ExpansionType::BasisType, typename ExpansionType::KokkosSpace>>(1,expansion_);};
 
@@ -426,7 +431,7 @@ public:
 
                 // Compute the inverse
                 Kokkos::View<double*,MemorySpace> workspace(team_member.thread_scratch(1), workspaceSize);
-                auto eval = SingleEvaluator<decltype(pt),decltype(coeffs)>(workspace.data(), cache.data(), pt, coeffs, quad_, expansion_);
+                auto eval = SingleEvaluator<decltype(pt),decltype(coeffs)>(workspace.data(), cache.data(), pt, coeffs, quad_, expansion_, nugget_);
                 output(ptInd) = RootFinding::InverseSingleBracket<MemorySpace>(ys(ptInd), eval, pt(pt.extent(0)-1), xtol, ytol, info);
             }
         };
@@ -614,7 +619,7 @@ public:
                 expansion_.FillCache1(cache.data(), pt, DerivativeFlags::None);
 
                 // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Diagonal);
+                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Diagonal, nugget_);
 
                 // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt
                 quad_.Integrate(workspace.data(), integrand, 0, 1, both.data());
@@ -713,7 +718,7 @@ public:
                 expansion_.FillCache1(cache.data(), pt, DerivativeFlags::None);
 
                 // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Parameters);
+                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Parameters, nugget_);
 
                 // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
                 quad_.Integrate(workspace.data(), integrand, 0, 1, integral.data());
@@ -786,7 +791,7 @@ public:
                 expansion_.FillCache1(cache.data(), pt, DerivativeFlags::Input);
 
                 // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Input);
+                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Input, nugget_);
 
                 // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the map input
                 quad_.Integrate(workspace.data(), integrand, 0, 1, integral.data());
@@ -957,7 +962,7 @@ public:
 
                 // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
                 Kokkos::View<double*,MemorySpace> integrandWork(team_member.thread_scratch(1), numTerms);
-                MonotoneIntegrand<ExpansionType, PosFuncType,  decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Mixed, integrandWork);
+                MonotoneIntegrand<ExpansionType, PosFuncType,  decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Mixed, nugget_, integrandWork);
 
                 // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
                 quad_.Integrate(workspace.data(), integrand, 0, 1, integral.data());
@@ -991,7 +996,8 @@ public:
                                                  double                   xd,
                                                  CoeffsType        const& coeffs,
                                                  QuadratureType    const& quad,
-                                                 ExpansionType     const& expansion)
+                                                 ExpansionType     const& expansion,
+                                                 double                   nugget=0.0)
     {
         double output = 0.0;
         // Compute the integral \int_0^1 g( \partial_D f(x_1,...,x_{D-1},t*x_d)) dt
@@ -1000,8 +1006,8 @@ public:
                                                                                        pt,
                                                                                        xd,
                                                                                        coeffs,
-                                                                                       DerivativeFlags::None);
-
+                                                                                       DerivativeFlags::None,
+                                                                                       nugget);
         quad.Integrate(workspace, integrand, 0, 1, &output);
 
         expansion.FillCache2(cache, pt, 0.0, DerivativeFlags::None);
@@ -1023,7 +1029,7 @@ public:
     void save( Archive & ar ) const
     {   
         ar( cereal::base_class<ConditionalMapBase<MemorySpace>>( this )); 
-        ar( expansion_, quad_, useContDeriv_);
+        ar( expansion_, quad_, useContDeriv_, nugget_);
         ar( this->savedCoeffs );
     }
 
@@ -1033,15 +1039,16 @@ public:
         ExpansionType expansion;
         QuadratureType quad;
         bool useContDeriv;
-        ar(expansion, quad, useContDeriv);
+        double nugget;
+        ar(expansion, quad, useContDeriv, nugget);
 
         Kokkos::View<double*, MemorySpace> coeffs;
         ar( coeffs );
 
         if(coeffs.size() == expansion.NumCoeffs()){
-            construct( expansion, quad, useContDeriv, coeffs);
+            construct( expansion, quad, useContDeriv, nugget, coeffs);
         }else{
-            construct( expansion, quad, useContDeriv);
+            construct( expansion, quad, useContDeriv, nugget);
         }
     }
 
@@ -1053,6 +1060,7 @@ private:
     QuadratureType quad_;
     unsigned int dim_;
     bool useContDeriv_;
+    double nugget_;
 
 
     template<typename PointType, typename CoeffType>
@@ -1063,11 +1071,12 @@ private:
         CoeffType coeffs;
         QuadratureType quad;
         ExpansionType expansion;
+        double nugget;
 
-        SingleEvaluator(double* workspace_, double* cache_, PointType pt_, CoeffType coeffs_, QuadratureType quad_, ExpansionType expansion_):
-            workspace(workspace_), cache(cache_), pt(pt_), coeffs(coeffs_), quad(quad_), expansion(expansion_) {};
+        SingleEvaluator(double* workspace_, double* cache_, PointType pt_, CoeffType coeffs_, QuadratureType quad_, ExpansionType expansion_, double nugget_):
+            workspace(workspace_), cache(cache_), pt(pt_), coeffs(coeffs_), quad(quad_), expansion(expansion_), nugget(nugget_) {};
         double operator()(double x) {
-            return EvaluateSingle(cache, workspace, pt, x, coeffs, quad, expansion);
+            return EvaluateSingle(cache, workspace, pt, x, coeffs, quad, expansion, nugget);
         }
     };
 };

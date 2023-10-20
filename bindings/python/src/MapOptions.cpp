@@ -52,6 +52,7 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     .def_readwrite("quadMinSub", &MapOptions::quadMinSub)
     .def_readwrite("quadPts", &MapOptions::quadPts)
     .def_readwrite("contDeriv", &MapOptions::contDeriv)
+    .def_readwrite("nugget", &MapOptions::nugget)
     #if defined(MPART_HAS_CEREAL)
     .def("Serialize", [](MapOptions const &opts, std::string const &filename){
         std::ofstream os (filename);
