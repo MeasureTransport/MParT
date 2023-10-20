@@ -82,6 +82,7 @@ void mpart::binding::MapOptionsToMatlab(MapOptions opts, mexplus::OutputArgument
     output.set(i+9,opts.basisLB);
     output.set(i+10,opts.basisUB);
     output.set(i+11,opts.basisNorm);
+    output.set(i+12,opts.nugget);
 }
 
 #if defined(MPART_HAS_NLOPT)
