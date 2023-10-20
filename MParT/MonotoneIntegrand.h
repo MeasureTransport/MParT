@@ -53,7 +53,8 @@ public:
                                              ExpansionType               const& expansion,
                                              PointType                   const& pt,
                                              CoeffsType                  const& coeffs,
-                                             DerivativeFlags::DerivativeType    derivType) : MonotoneIntegrand(cache, expansion, pt, pt(pt.extent(0)-1), coeffs, derivType)
+                                             DerivativeFlags::DerivativeType    derivType,
+                                             double                             nugget) : MonotoneIntegrand(cache, expansion, pt, pt(pt.extent(0)-1), coeffs, derivType, nugget)
     {
     }
 
@@ -62,13 +63,15 @@ public:
                                              PointType                   const& pt,
                                              double                             xd,
                                              CoeffsType                  const& coeffs,
-                                             DerivativeFlags::DerivativeType    derivType) : dim_(pt.extent(0)),
+                                             DerivativeFlags::DerivativeType    derivType,
+                                             double                             nugget) : dim_(pt.extent(0)),
                                                                                             cache_(cache),
                                                                                             expansion_(expansion),
                                                                                             pt_(pt),
                                                                                             xd_(xd),
                                                                                             coeffs_(coeffs),
-                                                                                            derivType_(derivType)
+                                                                                            derivType_(derivType),
+                                                                                            nugget_(nugget)
     {
         assert(derivType!=DerivativeFlags::Mixed);
         assert(derivType!=DerivativeFlags::MixedInput);
@@ -79,7 +82,8 @@ public:
                                              PointType                   const& pt,
                                              CoeffsType                  const& coeffs,
                                              DerivativeFlags::DerivativeType    derivType,
-                                             Kokkos::View<double*, MemorySpace> workspace) : MonotoneIntegrand(cache, expansion, pt, pt(pt.extent(0)-1), coeffs, derivType, workspace)
+                                             double                             nugget,
+                                             Kokkos::View<double*, MemorySpace> workspace) : MonotoneIntegrand(cache, expansion, pt, pt(pt.extent(0)-1), coeffs, derivType, nugget, workspace)
     {
     }
 
@@ -89,6 +93,7 @@ public:
                                              double                             xd,
                                              CoeffsType                  const& coeffs,
                                              DerivativeFlags::DerivativeType    derivType,
+                                             double                             nugget,
                                              Kokkos::View<double*, MemorySpace> workspace) : dim_(pt.extent(0)),
                                                                                             cache_(cache),
                                                                                             expansion_(expansion),
@@ -96,7 +101,8 @@ public:
                                                                                             xd_(xd),
                                                                                             coeffs_(coeffs),
                                                                                             derivType_(derivType),
-                                                                                            _workspace(workspace)
+                                                                                            nugget_(nugget),
+                                                                                            workspace_(workspace)
     {
         if(derivType==DerivativeFlags::Mixed)
             assert(workspace.extent(0)>=coeffs.extent(0));
@@ -105,7 +111,7 @@ public:
 
 
     /**
-     Evaluates \f$g( \partial_d f(x_1,x_2,\ldots, x_d*t))\f$ using the cached values of \f$x\f$ given to the constructor
+     Evaluates \f$g( \partial_d f(x_1,x_2,\ldots, x_d*t)) + eps\f$ using the cached values of \f$x\f$ given to the constructor
      and the value of \f$t\f$ passed to this function.  Note that we assume t ranges from [0,1].  The change of variables to x_d*t is
      taken care of inside this function.
     */
@@ -144,18 +150,18 @@ public:
             df = expansion_.DiagonalDerivative(cache_, coeffs_, 1);
 
             double dgdf = PosFuncType::Derivative(df);
-            double df2 = expansion_.MixedCoeffDerivative(cache_, coeffs_, 2, _workspace);
+            double df2 = expansion_.MixedCoeffDerivative(cache_, coeffs_, 2, workspace_);
 
             double scale = xd_* t * dgdf;
             for(unsigned int i=0; i<numTerms; ++i)
-                _workspace(i) *= scale;
+                workspace_(i) *= scale;
 
             Kokkos::View<double*,MemorySpace,Kokkos::MemoryTraits<Kokkos::Unmanaged>> gradSeg(&output[1], numTerms);
             df = expansion_.MixedCoeffDerivative(cache_, coeffs_, 1, gradSeg);
 
             scale = xd_*t*df2*PosFuncType::SecondDerivative(df) + dgdf;
             for(unsigned int i=0; i<numTerms; ++i)
-                gradSeg(i) = scale*gradSeg(i) + _workspace(i);
+                gradSeg(i) = scale*gradSeg(i) + workspace_(i);
 
         }else if(derivType_==DerivativeFlags::Input){
 
@@ -172,7 +178,7 @@ public:
 
         // First output is always the integrand itself
         double gf = PosFuncType::Evaluate(df);
-        output[0] = xd_*gf;
+        output[0] = xd_*(gf + nugget_);
 
         // Check for infs or nans
         if(std::isinf(gf)){
@@ -192,7 +198,7 @@ public:
 
             // Use the chain rule to get \partial_d g(f)
             output[ind] *= xd_*t*PosFuncType::Derivative(df);
-            output[ind] += gf;
+            output[ind] += (gf+nugget_);
         }
     }
 
@@ -206,7 +212,8 @@ private:
     double xd_;
     CoeffsType const& coeffs_;
     DerivativeFlags::DerivativeType derivType_;
-    Kokkos::View<double*,MemorySpace> _workspace;
+    double nugget_;
+    Kokkos::View<double*,MemorySpace> workspace_;
     bool failOnNaN = true;
 
 }; // class MonotoneIntegrand

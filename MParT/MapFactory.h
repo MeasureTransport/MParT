@@ -28,6 +28,7 @@ namespace mpart{
     options.quadRelTol = 1e-6;                          // Optional. Default = 1e-6
     options.quadMaxSub = 10;                            // Optional. Default = 30
     options.contDeriv = true;                           // Optional. Default = true
+    options.nugget = 1e-4;                              // Optional. Default = 0.0
 
     // Create a triangular map with these options
     unsigned int inDim = 4;

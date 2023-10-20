@@ -96,11 +96,14 @@ namespace mpart{
         /** If orthogonal polynomial basis functions should be normalized. */
         bool basisNorm = true;
 
+        /** The minimum slope of the monotone component.  This nugget is added to the g(df) integrand. Must be non-negative. */
+        double nugget = 0.0;
+
         #if defined(MPART_HAS_CEREAL)
         template<class Archive>
         void serialize(Archive &archive)
         {
-            archive( basisType, basisLB, basisUB, posFuncType, quadType, quadAbsTol, quadRelTol, quadMaxSub, quadMinSub, quadPts, contDeriv, basisNorm );
+            archive( basisType, basisLB, basisUB, posFuncType, quadType, quadAbsTol, quadRelTol, quadMaxSub, quadMinSub, quadPts, contDeriv, basisNorm, nugget);
         }
         #endif // MPART_HAS_CEREAL
 
@@ -118,6 +121,7 @@ namespace mpart{
             ret &= (quadPts     == opts2.quadPts);
             ret &= (contDeriv   == opts2.contDeriv);
             ret &= (basisNorm   == opts2.basisNorm);
+            ret &= (nugget      == opts2.nugget);
             return ret;
         }
 
@@ -137,7 +141,8 @@ namespace mpart{
             ss << "quadMaxSub = " << quadMaxSub << "\n";
             ss << "quadMinSub = " << quadMinSub << "\n";
             ss << "quadPts = " << quadPts << "\n";
-            ss << "contDeriv = " << (contDeriv ? "true" : "false");
+            ss << "contDeriv = " << (contDeriv ? "true" : "false") << "\n";
+            ss << "nugget = " << nugget << "\n";
             return ss.str();
         }
     };
