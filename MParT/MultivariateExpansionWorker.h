@@ -52,27 +52,22 @@ enum BasisHomogeneity {Homogeneous, OffdiagHomogeneous, Heterogeneous};
 
 template<BasisHomogeneity HowHomogeneous, typename BasisEvaluatorType>
 struct BasisEvaluator {
-    // Basis evaluator, dimension size
-    BasisEvaluator(BasisEvaluatorType, int) {
+    // dimension size, Basis evaluator
+    BasisEvaluator(int, BasisEvaluatorType) {
         assert(0); // TODO: Figure this out
     }
     // EvaluateAll(dim, output, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateAll(int, double*, int, double) {
-        assert(0); // TODO: Figure this out
-    }
+    KOKKOS_INLINE_FUNCTION void EvaluateAll(int, double*, int, double) {}
     // EvaluateDerivatives(dim, output_eval, output_deriv, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int, double*, double*, int, double) {
-        assert(0); // TODO: Figure this out
-    }
+    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int, double*, double*, int, double) {}
     // EvaluateSecondDerivatives(dim, output_eval, output_deriv, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int, double*, double*, double*, int, double) {
-        assert(0); // TODO: Figure this out
-    }
+    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int, double*, double*, double*, int, double) {}
 };
 
 template<typename BasisEvaluatorType>
 struct BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
-    BasisEvaluator(BasisEvaluatorType const& basis1d, int): basis1d_(basis1d) {}
+    // dimension size, Basis evaluator
+    BasisEvaluator(int, BasisEvaluatorType const& basis1d): basis1d_(basis1d) {}
     // EvaluateAll(dim, output, max_order, input)
     KOKKOS_INLINE_FUNCTION void EvaluateAll(int, double* output, int max_order, double input) {
         basis1d_.EvaluateAll(output, max_order, input);
@@ -85,14 +80,15 @@ struct BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
     KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int, double* output, double* output_diff, double* output_diff2, int max_order, double input) {
         basis1d_.EvaluateSecondDerivatives(output, output_diff, output_diff2, max_order, input);
     }
-    BasisEvaluatorType basis1d_;
+    const BasisEvaluatorType basis1d_;
 };
 
 
 template<typename BasisEvaluatorType1, typename BasisEvaluatorType2>
 struct BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<BasisEvaluatorType1, BasisEvaluatorType2>> {
-    BasisEvaluator(Kokkos::pair<BasisEvaluatorType1, BasisEvaluatorType2> const& basis1d, int dim): offdiag_(basis1d.first), diag_(basis1d.second), dim_(dim) {}
-    BasisEvaluator(BasisEvaluatorType1 const &offdiag, BasisEvaluatorType2 const &diag, int dim): offdiag_(offdiag), diag_(diag), dim_(dim) {}
+    
+    BasisEvaluator(int dim, Kokkos::pair<BasisEvaluatorType1, BasisEvaluatorType2> const& basis1d): offdiag_(basis1d.first), diag_(basis1d.second), dim_(dim) {}
+    BasisEvaluator(int dim, BasisEvaluatorType1 const &offdiag, BasisEvaluatorType2 const &diag): offdiag_(offdiag), diag_(diag), dim_(dim) {}
     // EvaluateAll(dim, output, max_order, input)
     // dim is zero-based indexing
     KOKKOS_INLINE_FUNCTION void EvaluateAll(int dim, double* output, int max_order, double input) {
@@ -110,13 +106,13 @@ struct BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<BasisEv
         else diag_.EvaluateDerivatives(output, output_diff, output_diff2, max_order, input);
     }
     const int dim_;
-    BasisEvaluatorType1 offdiag_;
-    BasisEvaluatorType2 diag_;
+    const BasisEvaluatorType1 offdiag_;
+    const BasisEvaluatorType2 diag_;
 };
 
 template<typename CommonBasisEvaluatorType>
-struct BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<CommonBasisEvaluatorType>> {
-    BasisEvaluator(std::vector<CommonBasisEvaluatorType> const& basis1d, int dim): basis1d_(basis1d) {
+struct BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<const CommonBasisEvaluatorType>> {
+    BasisEvaluator(int dim, std::vector<const CommonBasisEvaluatorType> const& basis1d, int dim): basis1d_(basis1d) {
         if(basis1d.size() != dim) assert(0); // TODO: check this
     }
     // EvaluateAll(dim, output, max_order, input)
@@ -132,7 +128,7 @@ struct BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<CommonBasisEv
     KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int dim, double* output, double* output_diff, double* output_diff2, int max_order, double input) {
         basis1d_[dim].EvaluateSecondDerivatives(output, output_diff, output_diff2, max_order, input);
     }
-    std::vector<CommonBasisEvaluatorType> basis1d_;
+    const std::vector<const CommonBasisEvaluatorType> basis1d_;
 };
 
 

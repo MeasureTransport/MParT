@@ -10,6 +10,58 @@
 using namespace mpart;
 using namespace Catch;
 
+struct TestEvaluators {
+    virtual void EvaluateAll(double* output, int max_order, double input);
+    virtual void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input);
+    virtual void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input);
+};
+
+struct IdentityEvaluator: TestEvaluators {
+    KOKKOS_INLINE_FUNCTION void EvaluateAll(double* output, int max_order, double input) override {
+        for(int i = 0; i < max_order; i++) {
+            output[i] = input;
+        }
+    }
+    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) override {
+        for(int i = 0; i < max_order; i++) {
+            output[i] = input;
+            output_diff[i] = 1;
+        }
+    }
+    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) override {
+        for(int i = 0; i < max_order; i++) {
+            output[i] = input;
+            output_diff[i] = 1;
+            output_diff2[i] = 0;
+        }
+    }
+};
+
+struct NegativeEvaluator: TestEvaluators {
+    KOKKOS_INLINE_FUNCTION void EvaluateAll(double* output, int max_order, double input) override {
+        for(int i = 0; i < max_order; i++) {
+            output[i] = -input;
+        }
+    }
+    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) override {
+        for(int i = 0; i < max_order; i++) {
+            output[i] = -input;
+            output_diff[i] = -1;
+        }
+    }
+    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) override {
+        for(int i = 0; i < max_order; i++) {
+            output[i] = -input;
+            output_diff[i] = -1;
+            output_diff2[i] = 0;
+        }
+    }
+};
+
+TEST_CASE( "Testing basis evaluators", "[BasisEvaluators]") {
+    
+}
+
 TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]") {
 
     unsigned int dim = 3;
