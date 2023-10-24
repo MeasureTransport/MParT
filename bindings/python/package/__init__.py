@@ -6,6 +6,7 @@ sys.modules[__name__] = sys.modules['mpart']
 
 try:
     from .torch import *
+    mpart_has_torch = True
 except ImportError:
-    pass 
+    mpart_has_torch = False
 
