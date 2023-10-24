@@ -23,6 +23,9 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
             obj->LogDeterminantImpl(ToKokkos<double,MemorySpace>(input),ToKokkos<double,MemorySpace>(output));
         })
         .def("Inverse", static_cast<Eigen::RowMatrixXd (ConditionalMapBase<MemorySpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ConditionalMapBase<MemorySpace>::Inverse))
+        .def("InverseImpl", [](std::shared_ptr<ConditionalMapBase<MemorySpace>> obj, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> x, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> r, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> output){
+            obj->InverseImpl(ToKokkos<double,MemorySpace>(x), ToKokkos<double,MemorySpace>(r), ToKokkos<double,MemorySpace>(output));
+        })
         .def("LogDeterminantCoeffGrad", static_cast<Eigen::RowMatrixXd (ConditionalMapBase<MemorySpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ConditionalMapBase<MemorySpace>::LogDeterminantCoeffGrad))
         .def("LogDeterminantCoeffGradImpl", [](std::shared_ptr<ConditionalMapBase<MemorySpace>> obj, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> input, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> output){
             obj->LogDeterminantCoeffGradImpl(ToKokkos<double,MemorySpace>(input),ToKokkos<double,MemorySpace>(output));

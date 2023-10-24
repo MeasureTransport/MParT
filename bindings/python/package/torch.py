@@ -45,7 +45,6 @@ class MpartTorchAutograd(torch.autograd.Function):
         if return_logdet:
             logdet = torch.zeros(input.shape[1], dtype=input.dtype)
             f.LogDeterminantImpl(ExtractTorchTensorData(input), ExtractTorchTensorData(logdet))
-
             return output, logdet
         else:
             return output
@@ -111,7 +110,7 @@ class TorchParameterizedFunctionBase(torch.nn.Module):
 
     def forward(self, x):
         
-        return MpartTorchAutograd.apply(x, self.coeffs, self.f, False)
+        return MpartTorchAutograd.apply(x.T, self.coeffs, self.f, False).T
 
 
 class TorchConditionalMapBase(torch.nn.Module):
@@ -132,7 +131,21 @@ class TorchConditionalMapBase(torch.nn.Module):
 
     def forward(self, x):
         
-        return MpartTorchAutograd.apply(x, self.coeffs, self.f, self.return_logdet)
+        if self.return_logdet:
+            y, logdet = MpartTorchAutograd.apply(x.T, self.coeffs, self.f, self.return_logdet)
+            return y.T, logdet
+        else:
+            y = MpartTorchAutograd.apply(x.T, self.coeffs, self.f, self.return_logdet)
+            return y.T
+
+    def inverse(self, x, r):
+        if (x.shape[1] != self.f.inputDim) & ((x.shape[1]+r.shape[1]) == self.f.inputDim):
+            x = torch.hstack([x,r])
+
+        output = torch.zeros((self.f.outputDim, x.shape[0]), dtype=torch.double)
+        self.f.InverseImpl(ExtractTorchTensorData(x.T), ExtractTorchTensorData(r.T), ExtractTorchTensorData(output))
+
+        return output.T
 
 
 

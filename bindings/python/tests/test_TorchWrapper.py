@@ -61,12 +61,13 @@ if haveTorch:
         tmap2 = mt.TorchParameterizedFunctionBase(tmap)
         assert tmap2.coeffs.grad is None
 
-        loss = tmap2.forward(x).sum()
+        loss = tmap2.forward(x.T).sum()
         loss.backward()
         assert tmap2.coeffs.grad is not None
 
         # Use the TorchConditionalMapBase module to compute gradients wrt to the coeffs
         tmap2 = mt.TorchConditionalMapBase(tmap)
+        assert not tmap2.return_logdet
         assert tmap2.coeffs.grad is None
 
         loss = tmap2.forward(x).sum()
@@ -84,17 +85,16 @@ if haveTorch:
         opts = mt.MapOptions()
         tmap = mt.CreateTriangular(dim,dim,3,opts) # Simple third order map
 
-        x = torch.randn(dim,numSamps, dtype=torch.double)
+        x = torch.randn(numSamps, dim, dtype=torch.double)
         tmap2 = tmap.torch()
         y = tmap2.forward(x)
-        
-        assert np.all(y.detach().numpy() == tmap.Evaluate(x.detach().numpy()))
+        assert np.all(y.detach().numpy() == tmap.Evaluate(x.T.detach().numpy()).T)
 
         tmap2 = tmap.torch(return_logdet=True)
         y, logdet = tmap2.forward(x)
         
-        assert np.all(y.detach().numpy() == tmap.Evaluate(x.detach().numpy()))
-        assert np.all(logdet.detach().numpy() == tmap.LogDeterminant(x.detach().numpy()))
+        assert np.all(y.detach().numpy() == tmap.Evaluate(x.T.detach().numpy()).T)
+        assert np.all(logdet.detach().numpy() == tmap.LogDeterminant(x.T.detach().numpy()))
 
 
 if __name__=='__main__':
