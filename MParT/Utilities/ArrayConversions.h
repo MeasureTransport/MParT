@@ -96,6 +96,40 @@ namespace mpart{
         return Kokkos::View<ScalarType**, LayoutType, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>>(ptr, rows, cols);
     }
 
+    /** Constructs a Kokkos::View with strided layout from a memory address, shape tuple, and stride tuple. 
+        This is primarily used to provide an interface with pytorch in the python bindings.
+    */
+    template<typename ScalarType, typename MemorySpace=Kokkos::HostSpace>
+    StridedMatrix<ScalarType, MemorySpace> ToKokkos(std::tuple<long, std::tuple<int,int>, std::tuple<int,int>> info)    
+    {
+        ScalarType* ptr = reinterpret_cast<ScalarType*>(std::get<0>(info));
+
+        const int rows = std::get<0>(std::get<1>(info));
+        const int cols = std::get<1>(std::get<1>(info));
+        const int rowStride = std::get<0>(std::get<2>(info));
+        const int colStride = std::get<1>(std::get<2>(info));
+
+        Kokkos::LayoutStride layout(rows, rowStride, cols, colStride);
+
+        Kokkos::View<ScalarType**, Kokkos::LayoutStride, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> output(ptr, layout);
+        return output;
+    }
+
+    template<typename ScalarType, typename MemorySpace=Kokkos::HostSpace>
+    StridedVector<ScalarType, MemorySpace> ToKokkos(std::tuple<long, int, int> info)    
+    {
+        ScalarType* ptr = reinterpret_cast<ScalarType*>(std::get<0>(info));
+
+        const int length = std::get<1>(info);
+        const int stride = std::get<2>(info);
+
+        Kokkos::LayoutStride layout(length, stride);
+
+        Kokkos::View<ScalarType*, Kokkos::LayoutStride, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> output(ptr, layout);
+        return output;
+    }
+
+
     template<typename ScalarType, typename LayoutType=Kokkos::LayoutLeft, typename MemorySpace=Kokkos::HostSpace>
     inline Kokkos::View<const ScalarType**, LayoutType, MemorySpace> ToConstKokkos(const ScalarType* const_ptr, unsigned int rows, unsigned int cols)
     {
