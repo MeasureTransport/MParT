@@ -29,24 +29,72 @@ if haveTorch:
     
     def test_Autograd():
         x.requires_grad = True 
-        fx = mt.TorchWrapper_ParameterizedFunction.apply(x,None,f)
+        fx = mt.MpartTorchAutograd.apply(x,None,f,False)
         assert torch.all(fx==x)
 
         loss = fx.sum()
         loss.backward()
         assert torch.all(x.grad==sens)
 
+
     def test_AutogradCoeffs():
-        x.requires_grad = False 
 
         opts = mt.MapOptions()
         tmap = mt.CreateTriangular(dim,dim,3,opts) # Simple third order map
 
+        x.requires_grad = True
+        assert torch.autograd.gradcheck(lambda xx: mt.MpartTorchAutograd.apply(x,None,tmap,False), x)
+        assert torch.autograd.gradcheck(lambda xx: mt.MpartTorchAutograd.apply(x,None,tmap,True)[1], x)
+        assert torch.autograd.gradcheck(lambda xx: mt.MpartTorchAutograd.apply(x,None,tmap,True)[0], x)
+
+        x.requires_grad = False        
         coeffs = torch.randn(tmap.numCoeffs, dtype=torch.double)
         coeffs.requires_grad = True 
 
         # Check the autograd gradient with finite differences
-        assert torch.autograd.gradcheck(lambda c: mt.TorchWrapper_ParameterizedFunction.apply(x,c,tmap), coeffs)
+        assert torch.autograd.gradcheck(lambda c: mt.MpartTorchAutograd.apply(x,c,tmap,False), coeffs)
+        assert torch.autograd.gradcheck(lambda c: mt.MpartTorchAutograd.apply(x,c,tmap,True)[1], coeffs)
+        assert torch.autograd.gradcheck(lambda c: mt.MpartTorchAutograd.apply(x,c,tmap,True)[0], coeffs)
+
+
+        # Use the TorchParameterizedFunctionBase module to compute gradients wrt to the coeffs
+        tmap2 = mt.TorchParameterizedFunctionBase(tmap)
+        assert tmap2.coeffs.grad is None
+
+        loss = tmap2.forward(x).sum()
+        loss.backward()
+        assert tmap2.coeffs.grad is not None
+
+        # Use the TorchConditionalMapBase module to compute gradients wrt to the coeffs
+        tmap2 = mt.TorchConditionalMapBase(tmap)
+        assert tmap2.coeffs.grad is None
+
+        loss = tmap2.forward(x).sum()
+        loss.backward()
+        assert tmap2.coeffs.grad is not None
+        
+        tmap2.return_logdet = True 
+        y, logdet = tmap2.forward(x)
+        loss = -0.5*(y*y).sum() + logdet.sum()
+
+        loss.backward()
+        assert tmap2.coeffs.grad is not None
+    
+    def test_TorchMethod():
+        opts = mt.MapOptions()
+        tmap = mt.CreateTriangular(dim,dim,3,opts) # Simple third order map
+
+        x = torch.randn(dim,numSamps, dtype=torch.double)
+        tmap2 = tmap.torch()
+        y = tmap2.forward(x)
+        
+        assert np.all(y.detach().numpy() == tmap.Evaluate(x.detach().numpy()))
+
+        tmap2 = tmap.torch(return_logdet=True)
+        y, logdet = tmap2.forward(x)
+        
+        assert np.all(y.detach().numpy() == tmap.Evaluate(x.detach().numpy()))
+        assert np.all(logdet.detach().numpy() == tmap.LogDeterminant(x.detach().numpy()))
 
 
 if __name__=='__main__':
@@ -54,3 +102,4 @@ if __name__=='__main__':
     test_GradientEvaluation()
     test_Autograd()
     test_AutogradCoeffs()
+    test_TorchMethod()
