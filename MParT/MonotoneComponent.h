@@ -12,6 +12,7 @@
 #include "MParT/Utilities/Miscellaneous.h"
 #include "MParT/Utilities/KokkosSpaceMappings.h"
 #include "MParT/Utilities/KokkosHelpers.h"
+#include "MParT/Utilities/RootFinding.h"
 
 
 #include <Eigen/Core>
@@ -399,7 +400,8 @@ public:
 
                 // Compute the inverse
                 Kokkos::View<double*,MemorySpace> workspace(team_member.thread_scratch(1), workspaceSize);
-                output(ptInd) = InverseSingleBracket(workspace.data(), cache.data(), pt, ys(ptInd), coeffs, xtol, ytol, quad_, expansion_);
+                auto eval = SingleEvaluator(workspace.data(), cache.data(), pt, coeffs, quad_, expansion_);
+                output(ptInd) = RootFinding::InverseSingleBracket<MemorySpace>(ys(ptInd), eval, pt(pt.extent(0)-1), xtol, ytol);
             }
         };
 
@@ -1123,6 +1125,21 @@ private:
     QuadratureType quad_;
     const unsigned int dim_;
     bool useContDeriv_;
+    template<typename PointType, typename CoeffType>
+    struct SingleEvaluator {
+        double* workspace;
+        double* cache;
+        PointType pt;
+        CoeffType coeffs;
+        QuadratureType quad;
+        ExpansionType expansion;
+
+        SingleEvaluator(double* workspace_, double* cache_, PointType pt_, CoeffType coeffs_, QuadratureType quad_, ExpansionType expansion_):
+            workspace(workspace_), cache(cache_), pt(pt_), coeffs(coeffs_), quad(quad_), expansion(expansion_) {};
+        double operator()(double x) {
+            return EvaluateSingle(cache, workspace, pt, x, coeffs, quad, expansion);
+        }
+    };
 };
 
 } // namespace mpart

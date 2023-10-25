@@ -164,14 +164,23 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         }))
 
         .def(py::init( [](unsigned int dim,
-                          Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &nzStarts,
-                          Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &nzDims,
-                          Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> &nzOrders)
-        {
-            return new FixedMultiIndexSet<Kokkos::HostSpace>(dim,
-                                          VecToKokkos<unsigned int, Kokkos::HostSpace>(nzStarts),
-                                          VecToKokkos<unsigned int, Kokkos::HostSpace>(nzDims),
-                                          VecToKokkos<unsigned int, Kokkos::HostSpace>(nzOrders));
+                          Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> nzStartsIn,
+                          Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> nzDimsIn,
+                          Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> nzOrdersIn)
+        {   
+            // Deep copy the arrays into Kokkos 
+            Kokkos::View<unsigned int*,Kokkos::HostSpace> nzStarts("nzStarts", nzStartsIn.rows());
+            Kokkos::View<unsigned int*,Kokkos::HostSpace> nzDims("nzDims", nzDimsIn.rows());
+            Kokkos::View<unsigned int*,Kokkos::HostSpace> nzOrders("nzOrders", nzOrdersIn.rows());
+
+            for(unsigned int i=0; i<nzStartsIn.rows(); ++i)
+                nzStarts(i) = nzStartsIn(i);
+            for(unsigned int i=0; i<nzDimsIn.rows(); ++i)
+                nzDims(i) = nzDimsIn(i);
+            for(unsigned int i=0; i<nzOrdersIn.rows(); ++i)
+                nzOrders(i) = nzOrdersIn(i);
+                
+            return new FixedMultiIndexSet<Kokkos::HostSpace>(dim, nzStarts, nzDims, nzOrders);
         }))
 
         .def(py::init<unsigned int, unsigned int>())
@@ -189,6 +198,9 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("__len__", &FixedMultiIndexSet<Kokkos::HostSpace>::Length)
         .def("Length", &FixedMultiIndexSet<Kokkos::HostSpace>::Length)
         .def("Size", &FixedMultiIndexSet<Kokkos::HostSpace>::Size)
+        .def("IndexToMulti", &FixedMultiIndexSet<Kokkos::HostSpace>::IndexToMulti)
+        .def("MultiToIndex", &FixedMultiIndexSet<Kokkos::HostSpace>::MultiToIndex)
+
 #if defined(MPART_HAS_CEREAL)
         .def("Serialize", [](FixedMultiIndexSet<Kokkos::HostSpace> const &mset, std::string const &filename){
             std::ofstream os(filename);
