@@ -1,5 +1,6 @@
 #include <catch2/catch_all.hpp>
 
+#include "MParT/Sigmoid"
 #include "MParT/MultivariateExpansionWorker.h"
 #include "MParT/OrthogonalPolynomial.h"
 
@@ -153,12 +154,16 @@ TEST_CASE( "Testing basis evaluators", "[BasisEvaluators]") {
     }
 }
 
-TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]") {
+using HomogeneousEval_T = BasisEvaluator<BasisHomogeneity::Homogeneous, ProbabilistHermite>;
+using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid>>>;
+using HeterogeneousEval_T = BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>>>>;
+
+TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]") {
 
     unsigned int dim = 3;
     unsigned int maxDegree = 3;
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
-    ProbabilistHermite poly1d;
+    BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite> poly1d;
     MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,Kokkos::HostSpace> expansion(mset);
 
     unsigned int cacheSize = expansion.CacheSize();
@@ -173,16 +178,21 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
 
     // Fill in the cache the first d-1 components of the cache
     expansion.FillCache1(&cache[0], pt, DerivativeFlags::None);
+    double out[maxDegree+1];
     for(unsigned int d=0; d<dim-1;++d){
+        for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
+        poly1d.EvaluateAll(d, out, maxDegree, pt(d));
         for(unsigned int i=0; i<maxDegree+1; ++i){
-            CHECK(cache[i + d*(maxDegree+1)] == Approx( poly1d.Evaluate(i,pt(d))).epsilon(1e-15) );
+            CHECK(cache[i + d*(maxDegree+1)] == Approx(out[i]).epsilon(1e-15) );
         }
     }
 
     // Fill in the last part of the cache for an evaluation
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::None);
+    for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
+    poly1d.EvaluateAll(dim-1, out, maxDegree, pt(dim-1));
     for(unsigned int i=0; i<maxDegree+1; ++i){
-        CHECK(cache[i + (dim-1)*(maxDegree+1)] == Approx( poly1d.Evaluate(i,pt(dim-1))).epsilon(1e-15) );
+        CHECK(cache[i + (dim-1)*(maxDegree+1)] == Approx(out[i]).epsilon(1e-15) );
     }
 
     // Evaluate the expansion using the cache
