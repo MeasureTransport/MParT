@@ -54,30 +54,38 @@ template<BasisHomogeneity HowHomogeneous, typename BasisEvaluatorType>
 struct BasisEvaluator {
     // dimension size, Basis evaluator
     BasisEvaluator(int, BasisEvaluatorType) {
-        assert(0); // TODO: Figure this out
+        assert(false); // TODO: Figure this out
     }
     // EvaluateAll(dim, output, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateAll(int, double*, int, double) {}
+    KOKKOS_INLINE_FUNCTION void EvaluateAll(int, double*, int, double) const {
+        assert(false);
+    }
     // EvaluateDerivatives(dim, output_eval, output_deriv, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int, double*, double*, int, double) {}
+    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int, double*, double*, int, double) const {
+        assert(false);
+    }
     // EvaluateSecondDerivatives(dim, output_eval, output_deriv, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int, double*, double*, double*, int, double) {}
+    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int, double*, double*, double*, int, double) const {
+        assert(false);
+    }
 };
 
 template<typename BasisEvaluatorType>
 struct BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
     // dimension size, Basis evaluator
     BasisEvaluator(int, BasisEvaluatorType const& basis1d): basis1d_(basis1d) {}
+    template<typename... Args>
+    BasisEvaluator(Args... args): basis1d_(args...) {}
     // EvaluateAll(dim, output, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateAll(int, double* output, int max_order, double input) {
+    KOKKOS_INLINE_FUNCTION void EvaluateAll(int, double* output, int max_order, double input) const {
         basis1d_.EvaluateAll(output, max_order, input);
     }
     // EvaluateDerivatives(dim, output_eval, output_deriv, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int, double* output, double* output_diff, int max_order, double input) {
+    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int, double* output, double* output_diff, int max_order, double input) const {
         basis1d_.EvaluateDerivatives(output, output_diff, max_order, input);
     }
     // EvaluateSecondDerivatives(dim, output_eval, output_deriv, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int, double* output, double* output_diff, double* output_diff2, int max_order, double input) {
+    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int, double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
         basis1d_.EvaluateSecondDerivatives(output, output_diff, output_diff2, max_order, input);
     }
     const BasisEvaluatorType basis1d_;
@@ -91,17 +99,17 @@ struct BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<BasisEv
     BasisEvaluator(int dim, BasisEvaluatorType1 const &offdiag, BasisEvaluatorType2 const &diag): offdiag_(offdiag), diag_(diag), dim_(dim) {}
     // EvaluateAll(dim, output, max_order, input)
     // dim is zero-based indexing
-    KOKKOS_INLINE_FUNCTION void EvaluateAll(int dim, double* output, int max_order, double input) {
+    KOKKOS_INLINE_FUNCTION void EvaluateAll(int dim, double* output, int max_order, double input) const {
         if(dim < dim_-1) offdiag_.EvaluateAll(output, max_order, input);
         else diag_.EvaluateAll(output, max_order, input);
     }
     // EvaluateDerivatives(dim, output_eval, output_deriv, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int dim, double* output, double* output_diff, int max_order, double input) {
+    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int dim, double* output, double* output_diff, int max_order, double input) const {
         if(dim < dim_-1) offdiag_.EvaluateDerivatives(output, output_diff, max_order, input);
         else diag_.EvaluateDerivatives(output, output_diff, max_order, input);
     }
     // EvaluateSecondDerivatives(dim, output_eval, output_deriv, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int dim, double* output, double* output_diff, double* output_diff2, int max_order, double input) {
+    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int dim, double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
         if(dim < dim_-1) offdiag_.EvaluateSecondDerivatives(output, output_diff, output_diff2, max_order, input);
         else diag_.EvaluateSecondDerivatives(output, output_diff, output_diff2, max_order, input);
     }
@@ -110,6 +118,8 @@ struct BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<BasisEv
     const BasisEvaluatorType2 diag_;
 };
 
+/// @brief Type to represent a basis evaluation when we use different basis functions for different variables
+/// @tparam CommonBasisEvaluatorType Some type all the basis functions fall under
 template<typename CommonBasisEvaluatorType>
 struct BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_ptr<CommonBasisEvaluatorType>>> {
     BasisEvaluator(int dim, std::vector<std::shared_ptr<CommonBasisEvaluatorType>> const& basis1d): basis1d_(basis1d) {
@@ -117,20 +127,20 @@ struct BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_p
     }
     // EvaluateAll(dim, output, max_order, input)
     // dim is zero-based indexing
-    KOKKOS_INLINE_FUNCTION void EvaluateAll(int dim, double* output, int max_order, double input) {
+    KOKKOS_INLINE_FUNCTION void EvaluateAll(int dim, double* output, int max_order, double input) const {
         basis1d_[dim]->EvaluateAll(output, max_order, input);
     }
     // EvaluateDerivatives(dim, output_eval, output_deriv, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int dim, double* output, double* output_diff, int max_order, double input) {
+    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int dim, double* output, double* output_diff, int max_order, double input) const{
         basis1d_[dim]->EvaluateDerivatives(output, output_diff, max_order, input);
     }
     // EvaluateSecondDerivatives(dim, output_eval, output_deriv, max_order, input)
-    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int dim, double* output, double* output_diff, double* output_diff2, int max_order, double input) {
+    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int dim, double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
         basis1d_[dim]->EvaluateSecondDerivatives(output, output_diff, output_diff2, max_order, input);
     }
     const std::vector<std::shared_ptr<CommonBasisEvaluatorType>> basis1d_;
+    // NOTE: shared_ptr is necessary to avoid type slicing
 };
-
 
 
 /**
@@ -226,12 +236,12 @@ public:
         // Fill in first derivative information if needed
         if((derivType == DerivativeFlags::Input)||(derivType==DerivativeFlags::MixedInput)){
             for(unsigned int d=0; d<dim_-1; ++d)
-                basis1d_.EvaluateDerivatives(&polyCache[startPos_(d)],&polyCache[startPos_(d+dim_)], maxDegrees_(d), pt(d));
+                basis1d_.EvaluateDerivatives(d, &polyCache[startPos_(d)],&polyCache[startPos_(d+dim_)], maxDegrees_(d), pt(d));
 
         // Evaluate all degrees of all 1d polynomials except the last dimension, which will be evaluated inside the integrand
         }else{
             for(unsigned int d=0; d<dim_-1; ++d)
-                basis1d_.EvaluateAll(&polyCache[startPos_(d)], maxDegrees_(d), pt(d));
+                basis1d_.EvaluateAll(d, &polyCache[startPos_(d)], maxDegrees_(d), pt(d));
         }
     }
 
@@ -256,18 +266,21 @@ public:
 
         if((derivType==DerivativeFlags::None)||(derivType==DerivativeFlags::Parameters)){
 
-            basis1d_.EvaluateAll(&polyCache[startPos_(dim_-1)],
-                                  maxDegrees_(dim_-1),
-                                  xd);
+            basis1d_.EvaluateAll(dim_-1,
+                                 &polyCache[startPos_(dim_-1)],
+                                 maxDegrees_(dim_-1),
+                                 xd);
 
         }else if((derivType==DerivativeFlags::Diagonal) || (derivType==DerivativeFlags::Input)){
-            basis1d_.EvaluateDerivatives(&polyCache[startPos_(dim_-1)],     // basis vals
+            basis1d_.EvaluateDerivatives(dim_ - 1,                          // input dimension
+                                         &polyCache[startPos_(dim_-1)],     // basis vals
                                          &polyCache[startPos_(2*dim_-1)],   // basis derivatives
                                          maxDegrees_(dim_-1),               // largest basis degree
                                          xd);                               // point to evaluate at
 
         }else if((derivType==DerivativeFlags::Diagonal2) || (derivType==DerivativeFlags::MixedInput)){
-            basis1d_.EvaluateSecondDerivatives(&polyCache[startPos_(dim_-1)],     // basis vals
+            basis1d_.EvaluateSecondDerivatives(dim_ - 1,                          // input dimension
+                                               &polyCache[startPos_(dim_-1)],     // basis vals
                                                &polyCache[startPos_(2*dim_-1)],   // basis derivatives
                                                &polyCache[startPos_(2*dim_)],     // basis second derivatives
                                                maxDegrees_(dim_-1),               // largest basis degree

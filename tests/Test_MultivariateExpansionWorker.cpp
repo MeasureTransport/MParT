@@ -158,9 +158,8 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
     unsigned int dim = 3;
     unsigned int maxDegree = 3;
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
-
     ProbabilistHermite poly1d;
-    MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> expansion(mset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,Kokkos::HostSpace> expansion(mset);
 
     unsigned int cacheSize = expansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(2*dim+1));
@@ -315,8 +314,8 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWo
     FixedMultiIndexSet<Kokkos::HostSpace> hset(dim,maxDegree);
     FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice<DeviceSpace>(); // Create a total order limited fixed multindex set
 
-    MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> hexpansion(hset);
-    MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> dexpansion(dset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,Kokkos::HostSpace> hexpansion(hset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,DeviceSpace> dexpansion(dset);
 
     unsigned int cacheSize = hexpansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(2*dim+1));

@@ -13,7 +13,7 @@ using namespace mpart;
 template<typename MemorySpace, typename PosFuncType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_HF_CC(FixedMultiIndexSet<MemorySpace> const& mset, MapOptions opts)
 {
-    HermiteFunction basis1d;
+    BasisEvaluator<BasisHomogeneity::Homogeneous,HermiteFunction> basis1d;
     ClenshawCurtisQuadrature<MemorySpace> quad(opts.quadPts, 1);
 
     MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);

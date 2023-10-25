@@ -15,7 +15,7 @@ using namespace mpart;
 template<typename MemorySpace, typename PosFuncType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_LinProb_CC(FixedMultiIndexSet<MemorySpace> const& mset, MapOptions opts)
 {
-    LinearizedBasis<ProbabilistHermite> basis1d(ProbabilistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
+    BasisEvaluator<BasisHomogeneity::Homogeneous,LinearizedBasis<ProbabilistHermite>> basis1d(ProbabilistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
     ClenshawCurtisQuadrature<MemorySpace> quad(opts.quadPts, 1);
 
     MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);

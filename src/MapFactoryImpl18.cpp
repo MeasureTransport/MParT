@@ -15,7 +15,7 @@ using namespace mpart;
 template<typename MemorySpace, typename PosFuncType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_LinHF_ACC(FixedMultiIndexSet<MemorySpace> const& mset, MapOptions opts)
 {
-    LinearizedBasis<HermiteFunction> basis1d(HermiteFunction(), opts.basisLB, opts.basisUB);
+    BasisEvaluator<BasisHomogeneity::Homogeneous,LinearizedBasis<HermiteFunction>> basis1d(HermiteFunction(), opts.basisLB, opts.basisUB);
     unsigned int level = std::log2(opts.quadPts-2);
     AdaptiveClenshawCurtis<MemorySpace> quad(level, opts.quadMaxSub, 1, nullptr, opts.quadAbsTol, opts.quadRelTol, QuadError::First, opts.quadMinSub);
 

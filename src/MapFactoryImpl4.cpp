@@ -13,7 +13,7 @@ using namespace mpart;
 template<typename MemorySpace, typename PosFuncType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_Prob_ACC(FixedMultiIndexSet<MemorySpace> const& mset, MapOptions opts)
 {
-    ProbabilistHermite basis1d(opts.basisNorm);
+    BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite> basis1d(opts.basisNorm);
 
     unsigned int level = std::log2(opts.quadPts-2);
     AdaptiveClenshawCurtis<MemorySpace> quad(level, opts.quadMaxSub, 1, nullptr, opts.quadAbsTol, opts.quadRelTol, QuadError::First, opts.quadMinSub);

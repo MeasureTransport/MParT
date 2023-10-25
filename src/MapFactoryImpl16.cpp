@@ -15,7 +15,7 @@ using namespace mpart;
 template<typename MemorySpace, typename PosFuncType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_LinHF_AS(FixedMultiIndexSet<MemorySpace> const& mset, MapOptions opts)
 {
-    LinearizedBasis<HermiteFunction> basis1d(HermiteFunction(), opts.basisLB, opts.basisUB);
+    BasisEvaluator<BasisHomogeneity::Homogeneous,LinearizedBasis<HermiteFunction>> basis1d(HermiteFunction(), opts.basisLB, opts.basisUB);
     AdaptiveSimpson<MemorySpace> quad(opts.quadMaxSub, 1, nullptr, opts.quadAbsTol, opts.quadRelTol, QuadError::First, opts.quadMinSub);
 
     MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
