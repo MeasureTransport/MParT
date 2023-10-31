@@ -1,6 +1,6 @@
 #include <catch2/catch_all.hpp>
 
-#include "MParT/Sigmoid"
+#include "MParT/Sigmoid.h"
 #include "MParT/MultivariateExpansionWorker.h"
 #include "MParT/OrthogonalPolynomial.h"
 
@@ -155,16 +155,35 @@ TEST_CASE( "Testing basis evaluators", "[BasisEvaluators]") {
 }
 
 using HomogeneousEval_T = BasisEvaluator<BasisHomogeneity::Homogeneous, ProbabilistHermite>;
-using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid>>>;
-using HeterogeneousEval_T = BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>>>>;
+using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid1d<SigmoidTypes::Logistic>>>;
+using HeterogeneousEval_T = BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_ptr<ProbabilistHermite>>>;
 
-TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]") {
+template<typename T>
+T CreateEvaluator(int) {assert(false);}
+
+template<>
+HomogeneousEval_T CreateEvaluator<HomogeneousEval_T>(int) {
+    return HomogeneousEval_T{};
+}
+
+template<>
+OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
+    ProbabilistHermite offdiag;
+    const int order = 2;
+    double centers[order] = {-1., 2.};
+    double widths[order] = {1., 0.5};
+    double weights[order] = {0.5, 1.};
+    Sigmoid1d diag(order, centers, widths, weights);
+    return OffdiagHomogeneousEval_T {dim, offdiag, diag};
+}
+
+TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]", HomogeneousEval_T) {
 
     unsigned int dim = 3;
     unsigned int maxDegree = 3;
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
-    BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite> poly1d;
-    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,Kokkos::HostSpace> expansion(mset);
+    TestType poly1d = CreateEvaluator<TestType>(dim);
+    MultivariateExpansionWorker<TestType,Kokkos::HostSpace> expansion(mset, poly1d);
 
     unsigned int cacheSize = expansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(2*dim+1));

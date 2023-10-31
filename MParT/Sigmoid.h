@@ -3,7 +3,6 @@
 
 #include "MParT/Utilities/KokkosSpaceMappings.h"
 #include "MParT/Utilities/Miscellaneous.h"
-#include "MParT/ConditionalMapBase.h"
 
 #include <Kokkos_Core.hpp>
 
@@ -29,52 +28,95 @@ struct Logistic {
 };
 
 template<typename MemorySpace, typename SigmoidType>
-class Sigmoid1d: public ParameterizedFunctionBase<MemorySpace>
+class Sigmoid1d
 {
     public:
-    Sigmoid1d(StridedVector<const double, MemorySpace> centers, StridedVector<const double, MemorySpace> widths):
-        centers_(centers), widths_(widths), ParameterizedFunctionBase<MemorySpace>(1, 1, widths.extent(0))
+    Sigmoid1d(StridedVector<const double, MemorySpace> weights,
+              StridedVector<const double, MemorySpace> centers,
+              StridedVector<const double, MemorySpace> widths):
+        weights_(weights), centers_(centers), widths_(widths)
     {
-        if(centers.extent(0) != widths.extent(0)) {
+        if(centers.extent(0) != widths.extent(0) || centers.extent(0) != weights.extent(0)) {
             std::stringstream ss;
-            ss << "Sigmoid: incompatible dims of centers and widths.";
-            ss << "centers: " << centers.extent(0) << ", ";
+            ss << "Sigmoid: incompatible dims of centers and widths.\n";
+            ss << "centers: " << centers.extent(0) << ", \n";
             ss << "widths: " << widths.extent(0);
             ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
         }
+        // Arithmetic sum length calculation
+        double order_double = (MathSpace::sqrt(1+8*centers.extent(0))-1)/2;
+        int order = order_double;
+        if(MathSpace::abs((double)order - order_double) > 1e-15) {
+            std::stringstream ss;
+            ss << "Incorrect length of centers/widths/weights.";
+            ss << "Length should be of form 1+2+3+...+n for some order n";
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+        }
+        order_ = order;
     }
 
-    void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts, StridedMatrix<double, MemorySpace> out) override {
-        Kokkos::parallel_for(pts.extent(1), KOKKOS_CLASS_LAMBDA (unsigned int sample_index) {
-            double eval_pt = 0.;
-            for(int coeff_index = 0; coeff_index < this->numCoeffs; coeff_index++){
-                eval_pt += this->savedCoeffs(coeff_index)*SigmoidType::Evaluate(widths_(coeff_index)*(pts(0,sample_index)-centers_(coeff_index)));
+    void EvaluateAll(double* output, int max_order, double input) {
+        if(order_ < max_order) {
+            std::stringstream ss;
+            ss << "Sigmoid basis evaluation order too large.\n";
+            ss << "Given order " << max_order << ", ";
+            ss << "can only evaluate up to order " << order_;
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+        }
+        int param_idx = 0;
+        for(int curr_order = 0; curr_order <= max_order; curr_order++) {
+            for(int basis_idx = 0; basis_idx < curr_order; basis_idx++) {
+                output[curr_order] += weights_(param_idx)*SigmoidType::Evaluate(widths_(param_idx)*(input - centers_(param_idx)));
+                param_idx++;
             }
-            out(0,sample_index) = eval_pt;
-        });
+        }
     }
 
-    void GradientImpl(StridedMatrix<const double, MemorySpace> const& sens, StridedMatrix<const double, MemorySpace> const& pts, StridedMatrix<double, MemorySpace> out) override {
-        Kokkos::MDRangePolicy<Kokkos::Rank<2>, ExecutionSpace> policy ({0,0},{this->numCoeffs, (int) pts.extent(1)});
-        Kokkos::parallel_for(pts.extent(1), KOKKOS_CLASS_LAMBDA(unsigned int sample_index) {
-            double grad_pt = 0.;
-            for(int coeff_index = 0; coeff_index < this->numCoeffs; coeff_index++){
-                grad_pt += this->savedCoeffs(coeff_index)*widths_(coeff_index)*SigmoidType::Derivative(widths_(coeff_index)*(pts(0,sample_index)-centers_(coeff_index)));
+    void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) {
+        if(order_ < max_order) {
+            std::stringstream ss;
+            ss << "Sigmoid basis evaluation order too large.\n";
+            ss << "Given order " << max_order << ", ";
+            ss << "can only evaluate up to order " << order_;
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+        }
+        int param_idx = 0;
+        for(int curr_order = 0; curr_order <= max_order; curr_order++) {
+            output[curr_order] = 0.;
+            output_diff[curr_order] = 0.;
+            for(int basis_idx = 0; basis_idx < curr_order; basis_idx++) {
+                output[curr_order] += weights_(param_idx)*SigmoidType::Evaluate(widths_(param_idx)*(input - centers_(param_idx)));
+                output_diff[curr_order] += weights_(param_idx)*widths_(param_idx)*SigmoidType::Derivative(widths_(param_idx)*(input - centers_(param_idx)));
+                param_idx++;
             }
-            out(0,sample_index) = sens(0,sample_index)*grad_pt;
-        });
+        }
     }
 
-    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& sens,StridedMatrix<const double, MemorySpace> const& pts, StridedMatrix<double, MemorySpace> out) override {
-        Kokkos::MDRangePolicy<Kokkos::Rank<2>, ExecutionSpace> policy ({0,0}, {this->numCoeffs, (int)sens.extent(1)});
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(unsigned int coeff_index, unsigned int sample_index) {
-            out(coeff_index,sample_index) = sens(0,sample_index)*SigmoidType::Evaluate(widths_(coeff_index)*(pts(0,sample_index)-centers_(coeff_index)));
-        });
+    void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) {
+        if(order_ < max_order) {
+            std::stringstream ss;
+            ss << "Sigmoid basis evaluation order too large.\n";
+            ss << "Given order " << max_order << ", ";
+            ss << "can only evaluate up to order " << order_;
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+        }
+        int param_idx = 0;
+        for(int curr_order = 0; curr_order <= max_order; curr_order++) {
+            output[curr_order] = 0.;
+            output_diff[curr_order] = 0.;
+            output_diff2[curr_order] = 0.;
+            for(int basis_idx = 0; basis_idx < curr_order; basis_idx++) {
+                output[curr_order] += weights_(param_idx)*SigmoidType::Evaluate(widths_(param_idx)*(input - centers_(param_idx)));
+                output_diff[curr_order] += weights_(param_idx)*widths_(param_idx)*SigmoidType::Derivative(widths_(param_idx)*(input - centers_(param_idx)));
+                output_diff2[curr_order] += weights_(param_idx)*widths_(param_idx)*SigmoidType::Derivative(widths_(param_idx)*(input - centers_(param_idx)));
+                param_idx++;
+            }
+        }
     }
 
     private:
-    using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
-    Kokkos::View<const double*, MemorySpace> centers_, widths_;
+    int order_;
+    Kokkos::View<const double*, MemorySpace> centers_, widths_, weights_;
 };
 }
 
