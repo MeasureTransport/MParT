@@ -68,6 +68,12 @@ struct BasisEvaluator {
     KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int, double*, double*, double*, int, double) const {
         assert(false);
     }
+#if defined(MPART_HAS_CEREAL)
+    template<typename Archive>
+    void serialize(Archive &ar) {
+        assert(false);
+    }
+#endif
 };
 
 template<typename BasisEvaluatorType>
@@ -88,7 +94,13 @@ struct BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
     KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int, double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
         basis1d_.EvaluateSecondDerivatives(output, output_diff, output_diff2, max_order, input);
     }
-    const BasisEvaluatorType basis1d_;
+#if defined(MPART_HAS_CEREAL)
+    template<typename Archive>
+    void serialize(Archive &ar) {
+        ar(basis1d_);
+    }
+#endif
+    BasisEvaluatorType basis1d_;
 };
 
 
@@ -113,9 +125,15 @@ struct BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<BasisEv
         if(dim < dim_-1) offdiag_.EvaluateSecondDerivatives(output, output_diff, output_diff2, max_order, input);
         else diag_.EvaluateSecondDerivatives(output, output_diff, output_diff2, max_order, input);
     }
-    const int dim_;
-    const BasisEvaluatorType1 offdiag_;
-    const BasisEvaluatorType2 diag_;
+#if defined(MPART_HAS_CEREAL)
+    template<typename Archive>
+    void serialize(Archive &ar) {
+        ar(dim_, offdiag_, diag_);
+    }
+#endif
+    int dim_;
+    BasisEvaluatorType1 offdiag_;
+    BasisEvaluatorType2 diag_;
 };
 
 /// @brief Type to represent a basis evaluation when we use different basis functions for different variables
@@ -138,7 +156,13 @@ struct BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_p
     KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int dim, double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
         basis1d_[dim]->EvaluateSecondDerivatives(output, output_diff, output_diff2, max_order, input);
     }
-    const std::vector<std::shared_ptr<CommonBasisEvaluatorType>> basis1d_;
+#if defined(MPART_HAS_CEREAL)
+    template<typename Archive>
+    void serialize(Archive &ar) {
+        ar(basis1d_);
+    }
+#endif
+    std::vector<std::shared_ptr<CommonBasisEvaluatorType>> basis1d_;
     // NOTE: shared_ptr is necessary to avoid type slicing
 };
 
@@ -530,6 +554,21 @@ public:
      * @return The Fixed MultiIndex Set
      */
     FixedMultiIndexSet<MemorySpace> GetMultiIndexSet() const { return multiSet_; }
+
+#if defined(MPART_HAS_CEREAL)
+    template<typename Archive>
+    void save(Archive& ar) const{
+        ar(dim_, multiSet_, basis1d_);
+        ar(startPos_, cacheSize_);
+    }
+
+    template<typename Archive>
+    void load(Archive& ar) {
+        ar(dim_, multiSet_, basis1d_);
+        ar(startPos_, cacheSize_);
+        maxDegrees_ = multiSet_.MaxDegrees();
+    }
+#endif // MPART_HAS_CEREAL
 
 private:
 

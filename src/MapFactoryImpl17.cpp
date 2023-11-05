@@ -21,7 +21,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_LinHF_CC(Fi
     MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
     std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
-    output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv);
+    output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv, opts.nugget);
 
     output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
     return output;
@@ -33,3 +33,13 @@ static auto reg_host_linhf_cc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos:
     static auto reg_device_linhf_cc_exp = mpart::MapFactory::CompFactoryImpl<DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, true, PosFuncTypes::Exp, QuadTypes::ClenshawCurtis), CreateComponentImpl_LinHF_CC<Kokkos::HostSpace, Exp>));
     static auto reg_device_linhf_cc_splus = mpart::MapFactory::CompFactoryImpl<DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, true, PosFuncTypes::SoftPlus, QuadTypes::ClenshawCurtis), CreateComponentImpl_LinHF_CC<Kokkos::HostSpace, SoftPlus>));
 #endif
+
+#if defined(MPART_HAS_CEREAL)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::HermiteFunction>, Exp, ClenshawCurtisQuadrature, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::HermiteFunction>, SoftPlus, ClenshawCurtisQuadrature, Kokkos::HostSpace)
+#if defined(MPART_ENABLE_GPU)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::HermiteFunction>, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::HermiteFunction>, Softplus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+#endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory17)
+#endif 

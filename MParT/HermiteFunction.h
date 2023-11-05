@@ -141,6 +141,15 @@ public:
         }
     }
 
+#if defined(MPART_HAS_CEREAL)
+
+    template <class Archive>
+    void serialize( Archive & ar )
+    {   
+        ar( polyBase );
+    }
+#endif 
+
 private:
     PhysicistHermite polyBase;
 

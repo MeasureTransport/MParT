@@ -33,6 +33,7 @@ endif()
 
 include_directories(./include ../common/include)
 pybind11_add_module(pympart SHARED NO_EXTRAS ${PYTHON_BINDING_SOURCES})
+set_property(TARGET pympart PROPERTY CXX_VISIBILITY_PRESET "default") # <- see https://github.com/pybind/pybind11/issues/2479
 
 target_link_libraries(pympart PRIVATE mpart Kokkos::kokkos Eigen3::Eigen ${EXT_LIBRARIES})
 

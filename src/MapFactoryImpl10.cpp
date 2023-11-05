@@ -24,7 +24,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_LinPhys_ACC
     MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
     std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
-    output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv);
+    output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv, opts.nugget);
 
     output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
     return output;
@@ -36,3 +36,13 @@ static auto reg_host_linphys_acc_splus = mpart::MapFactory::CompFactoryImpl<Kokk
     static auto reg_device_linphys_acc_exp = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::PhysicistHermite, true, PosFuncTypes::Exp, QuadTypes::AdaptiveClenshawCurtis), CreateComponentImpl_LinPhys_ACC<mpart::DeviceSpace, Exp>));
     static auto reg_device_linphys_acc_splus = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::PhysicistHermite, true, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveClenshawCurtis), CreateComponentImpl_LinPhys_ACC<mpart::DeviceSpace, SoftPlus>));
 #endif
+
+#if defined(MPART_HAS_CEREAL)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Exp, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+#if defined(MPART_ENABLE_GPU)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+#endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory10)
+#endif 

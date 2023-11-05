@@ -155,7 +155,7 @@ TEST_CASE( "Testing basis evaluators", "[BasisEvaluators]") {
 }
 
 using HomogeneousEval_T = BasisEvaluator<BasisHomogeneity::Homogeneous, ProbabilistHermite>;
-using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid1d<SigmoidTypes::Logistic>>>;
+using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic>>>;
 using HeterogeneousEval_T = BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_ptr<ProbabilistHermite>>>;
 
 template<typename T>
@@ -170,11 +170,22 @@ template<>
 OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
     ProbabilistHermite offdiag;
     const int order = 2;
-    double centers[order] = {-1., 2.};
-    double widths[order] = {1., 0.5};
-    double weights[order] = {0.5, 1.};
-    Sigmoid1d diag(order, centers, widths, weights);
-    return OffdiagHomogeneousEval_T {dim, offdiag, diag};
+    const int params_size = 1+order*(order+1)/2;
+    Kokkos::View<double*,Kokkos::HostSpace> centers("Sigmoid centers", params_size);
+    Kokkos::View<double*,Kokkos::HostSpace> widths("Sigmoid widths", params_size);
+    Kokkos::View<double*,Kokkos::HostSpace> weights("Sigmoid weights", params_size);
+    int basis_idx = 0;
+    for(int curr_order = 0; curr_order <= order; curr_order++) {
+        for(int j = 0; j<curr_order; j++) {
+            centers(basis_idx) = 0.;
+            widths(basis_idx) = 0.;
+            weights(basis_idx) = 1.;
+            basis_idx++;
+        }
+    }
+
+    Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic> diag(centers, widths, weights);
+    return OffdiagHomogeneousEval_T {dim, Kokkos::make_pair(offdiag, diag)};
 }
 
 TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]", HomogeneousEval_T) {

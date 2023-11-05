@@ -1,6 +1,14 @@
 #ifndef MPART_MONOTONECOMPONENT_H
 #define MPART_MONOTONECOMPONENT_H
 
+#if defined(MPART_HAS_CEREAL)
+#include <cereal/types/polymorphic.hpp>
+#include "MParT/Utilities/Serialization.h"
+#include <cereal/access.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/archives/binary.hpp>
+#endif // MPART_HAS_CEREAL
+
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
 
@@ -19,18 +27,17 @@
 
 #include <Kokkos_Core.hpp>
 
-
 namespace mpart{
 
 /**
 @brief Defines a function \f$T:R^N\rightarrow R\f$ such that \f$\partial T / \partial x_N >0\f$ is strictly positive.
 
 @details
-The function \f$T\f$ is based on another (generally non-monotone) function \f$f : R^N\rightarrow R\f$ and a strictly positve function
-\f$g : R\rightarrow R_{>0}\f$.   Together, these functions define the monotone component $T$ through
+The function \f$T\f$ is based on another (generally non-monotone) function \f$f : R^N\rightarrow R\f$, a strictly positve function
+\f$g : R\rightarrow R_{>0}\f$, and a non-negative scalar \f$\epsilon\f$.   Together, these functions define the monotone component $T$ through
 
 \f[
-T(x_1, x_2, ..., x_D) = f(x_1,x_2,..., x_{D-1}, 0) + \int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt
+T(x_1, x_2, ..., x_D) = f(x_1,x_2,..., x_{D-1}, 0) + \int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) + \epsilon \right) dt
 \f]
 
 @tparam ExpansionType A class defining the function \f$f\f$.  It must satisfy the cached parameterization concept.
@@ -47,19 +54,34 @@ public:
         @details
         @param expansion The expansion used to define the function \f$f\f$.
         @param quad The quadrature rule used to approximate \f$\int_0^{x_D}  g\left( \partial_D f(x_1,x_2,..., x_{D-1}, t) \right) dt\f$
-        @param useCondDeriv A flag to specify whether the analytic derivative of \f$T(x_1, x_2, ..., x_D)\f$ should be used by default, or if the derivative of the discretized integral should be used.  If "true", the analytic or "continuous" derivative will be used.  If "false", the derivative of the numerically approximated integral will be used.
+        @param useContDeriv A flag to specify whether the analytic derivative of \f$T(x_1, x_2, ..., x_D)\f$ should be used by default, or if the derivative of the discretized integral should be used.  If "true", the analytic or "continuous" derivative will be used.  If "false", the derivative of the numerically approximated integral will be used.
+        @param nugget The value of the non negative quantity \f$\epsilon\f$ defining the minimum slope of the transport map.
         @verbatim embed:rst
           See the :ref:`diag_deriv_section` mathematical background for more details.
         @endverbatim
     */
     MonotoneComponent(ExpansionType  const& expansion,
                       QuadratureType const& quad,
-                      bool useContDeriv=true) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs()),
+                      bool useContDeriv=true,
+                      double nugget=0.0) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs()),
                                                     expansion_(expansion),
                                                     quad_(quad),
                                                     dim_(expansion.InputSize()),
-                                                    useContDeriv_(useContDeriv){};
+                                                    useContDeriv_(useContDeriv),
+                                                    nugget_(nugget){};
 
+    
+
+    MonotoneComponent(ExpansionType  const& expansion,
+                      QuadratureType const& quad,
+                      bool useContDeriv,
+                      double nugget,
+                      Kokkos::View<const double*, MemorySpace> coeffsIn) : ConditionalMapBase<MemorySpace>(expansion.InputSize(), 1, expansion.NumCoeffs(), coeffsIn),
+                                                    expansion_(expansion),
+                                                    quad_(quad),
+                                                    dim_(expansion.InputSize()),
+                                                    useContDeriv_(useContDeriv),
+                                                    nugget_(nugget){};
 
     virtual std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> GetBaseFunction() override{return std::make_shared<MultivariateExpansion<typename ExpansionType::BasisType, typename ExpansionType::KokkosSpace>>(1,expansion_);};
 
@@ -385,6 +407,7 @@ public:
         auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
             unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
+            int info;
 
             if(ptInd<numPts){
                 unsigned int xInd = ptInd;
@@ -393,6 +416,14 @@ public:
 
                 // Create a subview containing x_{1:d-1}
                 auto pt = Kokkos::subview(xs, Kokkos::ALL(), xInd);
+                
+                // Check for NaNs.  If found, set output to nan and return
+                for(unsigned int ii=0; ii<pt.size(); ++ii){
+                    if(std::isnan(pt(ii))){
+                        output(ptInd) = std::numeric_limits<double>::quiet_NaN();
+                        return;
+                    }
+                }
 
                 // Fill in the cache with everything that doesn't depend on x_d
                 Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
@@ -400,8 +431,8 @@ public:
 
                 // Compute the inverse
                 Kokkos::View<double*,MemorySpace> workspace(team_member.thread_scratch(1), workspaceSize);
-                auto eval = SingleEvaluator(workspace.data(), cache.data(), pt, coeffs, quad_, expansion_);
-                output(ptInd) = RootFinding::InverseSingleBracket<MemorySpace>(ys(ptInd), eval, pt(pt.extent(0)-1), xtol, ytol);
+                auto eval = SingleEvaluator<decltype(pt),decltype(coeffs)>(workspace.data(), cache.data(), pt, coeffs, quad_, expansion_, nugget_);
+                output(ptInd) = RootFinding::InverseSingleBracket<MemorySpace>(ys(ptInd), eval, pt(pt.extent(0)-1), xtol, ytol, info);
             }
         };
 
@@ -588,7 +619,7 @@ public:
                 expansion_.FillCache1(cache.data(), pt, DerivativeFlags::None);
 
                 // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Diagonal);
+                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Diagonal, nugget_);
 
                 // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt
                 quad_.Integrate(workspace.data(), integrand, 0, 1, both.data());
@@ -687,7 +718,7 @@ public:
                 expansion_.FillCache1(cache.data(), pt, DerivativeFlags::None);
 
                 // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Parameters);
+                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Parameters, nugget_);
 
                 // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
                 quad_.Integrate(workspace.data(), integrand, 0, 1, integral.data());
@@ -760,7 +791,7 @@ public:
                 expansion_.FillCache1(cache.data(), pt, DerivativeFlags::Input);
 
                 // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
-                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Input);
+                MonotoneIntegrand<ExpansionType, PosFuncType, decltype(pt),decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Input, nugget_);
 
                 // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the map input
                 quad_.Integrate(workspace.data(), integrand, 0, 1, integral.data());
@@ -931,7 +962,7 @@ public:
 
                 // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
                 Kokkos::View<double*,MemorySpace> integrandWork(team_member.thread_scratch(1), numTerms);
-                MonotoneIntegrand<ExpansionType, PosFuncType,  decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Mixed, integrandWork);
+                MonotoneIntegrand<ExpansionType, PosFuncType,  decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Mixed, nugget_, integrandWork);
 
                 // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
                 quad_.Integrate(workspace.data(), integrand, 0, 1, integral.data());
@@ -965,7 +996,8 @@ public:
                                                  double                   xd,
                                                  CoeffsType        const& coeffs,
                                                  QuadratureType    const& quad,
-                                                 ExpansionType     const& expansion)
+                                                 ExpansionType     const& expansion,
+                                                 double                   nugget=0.0)
     {
         double output = 0.0;
         // Compute the integral \int_0^1 g( \partial_D f(x_1,...,x_{D-1},t*x_d)) dt
@@ -974,143 +1006,14 @@ public:
                                                                                        pt,
                                                                                        xd,
                                                                                        coeffs,
-                                                                                       DerivativeFlags::None);
-
+                                                                                       DerivativeFlags::None,
+                                                                                       nugget);
         quad.Integrate(workspace, integrand, 0, 1, &output);
 
-        // Finish filling in the cache for an evaluation of the expansion with x_d=0
         expansion.FillCache2(cache, pt, 0.0, DerivativeFlags::None);
         output += expansion.Evaluate(cache, coeffs);
-
+        
         return output;
-    }
-
-
-    /**
-     @brief Solves \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$ at a single point using the ITP bracketing method.
-     @details Uses the [Interpolate Truncate and Project (ITP)](https://en.wikipedia.org/wiki/ITP_method) method to solve
-              \f$y_D = T(x_1,\ldots,x_D)\f$ for \f$x_D\f$.  This method is a bracketing method similar to bisection, but
-              with faster convergence.   The worst case performance of ITP, in terms of required evaluations of \f$T\f$,
-              is the same as bisection.
-
-     @param cache Memory set up by Kokkos for this evaluation.  The `expansion_.FillCache1` function must be
-                  called before calling this function.
-     @param pt Array of length \f$D\f$ containing the fixed values of \f$x_{1:D-1}\f$ and an initial guess for \f$x_D\f$ in the last component.
-     @param coeffs An array of coefficients for the expansion.
-     @param options
-     @return The value of \f$x_D\f$ solving \f$y_D = T(x_1,\ldots,x_D)\f$
-
-     @tparam PointType The type of the point.  Typically either Kokkos::View<double*> or some subview with a similar 1d signature.
-     @tparam CoeffsType The type of the coefficients.  Typically Kokkos::View<double*> or a similarly structured subview.
-     */
-    template<typename PointType, typename CoeffsType>
-    KOKKOS_FUNCTION static double InverseSingleBracket(double*                    cache,
-                                                       double*                    workspace,
-                                                       PointType           const& pt,
-                                                       double                     yd,
-                                                       CoeffsType          const& coeffs,
-                                                       const double               xtol,
-                                                       const double               ftol,
-                                                       QuadratureType      const& quad,
-                                                       ExpansionType       const& expansion)
-    {
-        double stepSize=1.0;
-        const unsigned int maxIts = 10000;
-
-        // First, we need to find two points that bound the solution.
-        double xlb, xub;
-        double ylb, yub;
-        double xb, xf; // Bisection point and regula falsi point
-        double xc, yc;
-
-        xlb = pt(pt.extent(0)-1);
-        ylb = EvaluateSingle(workspace, cache, pt, xlb, coeffs, quad, expansion);
-
-        // We actually found an upper bound...
-        if(ylb>yd){
-
-            mpart::simple_swap(ylb,yub);
-            mpart::simple_swap(xlb,xub);
-
-            // Now find a lower bound...
-            unsigned int i;
-            for(i=0; i<maxIts; ++i){ // Could just be while(true), but want to avoid infinite loop
-                xlb = xub-stepSize;
-                ylb = EvaluateSingle(workspace, cache, pt, xlb, coeffs, quad, expansion);
-                if(ylb>yd){
-                    mpart::simple_swap(ylb,yub);
-                    mpart::simple_swap(xlb,xub);
-                    stepSize *= 2.0;
-                }else{
-                    break;
-                }
-            }
-            if(i>maxIts)
-                ProcAgnosticError<MemorySpace, std::runtime_error>::error("InverseSingleBracket: lower bound iterations exceed maxIts");
-
-        // We have a lower bound...
-        }else{
-            // Now find an upper bound...
-            unsigned int i;
-            for(i=0; i<maxIts; ++i){ // Could just be while(true), but want to avoid infinite loop
-                xub = xlb+stepSize;
-                yub = EvaluateSingle(workspace, cache, pt, xub, coeffs, quad, expansion);
-                if(yub<yd){
-                    mpart::simple_swap(ylb,yub);
-                    mpart::simple_swap(xlb,xub);
-                    stepSize *= 2.0;
-                }else{
-                    break;
-                }
-            }
-            if(i>maxIts)
-                ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: upper bound calculation exceeds maxIts");
-        }
-
-        assert(ylb<yub);
-        assert(xlb<xub);
-
-        // Bracketed search
-        const double k1 = 0.1;
-        const double k2 = 2.0;
-        const double nhalf = ceil(log2(0.5*(xub-xlb)/xtol));
-        const double n0 = 1.0;
-
-        double sigma, delta, rho;
-        unsigned int it;
-        for(it=0; it<maxIts; ++it){
-
-            xb = 0.5*(xub+xlb); // bisection point
-            xf = xlb - (yd-ylb)*(xub-xlb) / (yub-ylb); // regula-falsi point
-
-            sigma = ((xb-xf)>0)?1.0:-1.0; // sign(xb-xf)
-            delta = fmin(k1*pow((xub-xlb), k2), fabs(xb-xf));
-
-            xf += delta*sigma;
-
-            rho = fmin(xtol*pow(2.0, nhalf + n0 - it) - 0.5*(xub-xlb), fabs(xf - xb));
-            xc = xb - sigma*rho;
-
-            yc = EvaluateSingle(workspace, cache, pt, xc, coeffs, quad, expansion);
-
-            if(abs(yc-yd)<ftol){
-                return xc;
-            }else if(yc>yd){
-                mpart::simple_swap(yc,yub);
-                mpart::simple_swap(xc,xub);
-            }else{
-                mpart::simple_swap(yc,ylb);
-                mpart::simple_swap(xc,xlb);
-            }
-
-            // Check for convergence
-            if(((xub-xlb)<xtol)||((yub-ylb)<ftol))
-                break;
-        };
-
-        if(it>maxIts)
-            ProcAgnosticError<MemorySpace,std::runtime_error>::error("InverseSingleBracket: Bracket search iterations exceeds maxIts");
-        return 0.5*(xub+xlb);
     }
 
     /** Give access to the underlying FixedMultiIndexSet
@@ -1120,11 +1023,46 @@ public:
         return expansion_.GetMultiIndexSet();
     }
 
+#if defined(MPART_HAS_CEREAL)
+    // Define a serialize or save/load pair as you normally would
+    template <class Archive>
+    void save( Archive & ar ) const
+    {   
+        ar( cereal::base_class<ConditionalMapBase<MemorySpace>>( this )); 
+        ar( expansion_, quad_, useContDeriv_, nugget_);
+        ar( this->savedCoeffs );
+    }
+
+    template <class Archive>
+    static void load_and_construct( Archive & ar, cereal::construct<MonotoneComponent<ExpansionType, PosFuncType,QuadratureType,MemorySpace>> & construct )
+    {   
+        ExpansionType expansion;
+        QuadratureType quad;
+        bool useContDeriv;
+        double nugget;
+        ar(expansion, quad, useContDeriv, nugget);
+
+        Kokkos::View<double*, MemorySpace> coeffs;
+        ar( coeffs );
+
+        if(coeffs.size() == expansion.NumCoeffs()){
+            construct( expansion, quad, useContDeriv, nugget, coeffs);
+        }else{
+            construct( expansion, quad, useContDeriv, nugget);
+        }
+    }
+
+#endif // MPART_HAS_CEREAL
+
 private:
+
     ExpansionType expansion_;
     QuadratureType quad_;
-    const unsigned int dim_;
+    unsigned int dim_;
     bool useContDeriv_;
+    double nugget_;
+
+
     template<typename PointType, typename CoeffType>
     struct SingleEvaluator {
         double* workspace;
@@ -1133,14 +1071,37 @@ private:
         CoeffType coeffs;
         QuadratureType quad;
         ExpansionType expansion;
+        double nugget;
 
-        SingleEvaluator(double* workspace_, double* cache_, PointType pt_, CoeffType coeffs_, QuadratureType quad_, ExpansionType expansion_):
-            workspace(workspace_), cache(cache_), pt(pt_), coeffs(coeffs_), quad(quad_), expansion(expansion_) {};
+        SingleEvaluator(double* workspace_, double* cache_, PointType pt_, CoeffType coeffs_, QuadratureType quad_, ExpansionType expansion_, double nugget_):
+            workspace(workspace_), cache(cache_), pt(pt_), coeffs(coeffs_), quad(quad_), expansion(expansion_), nugget(nugget_) {};
         double operator()(double x) {
-            return EvaluateSingle(cache, workspace, pt, x, coeffs, quad, expansion);
+            return EvaluateSingle(cache, workspace, pt, x, coeffs, quad, expansion, nugget);
         }
     };
 };
 
 } // namespace mpart
+
+#if defined(MPART_HAS_CEREAL)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory1)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory2)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory3)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory4)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory5)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory6)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory7)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory8)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory9)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory10)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory11)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory12)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory13)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory14)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory15)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory16)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory17)
+CEREAL_FORCE_DYNAMIC_INIT(mpartInitMapFactory18)
+#endif
+
 #endif

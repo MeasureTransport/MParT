@@ -41,7 +41,7 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     pt(0) = 1.0;
 
     SECTION("Integrand Only") {
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*, HostSpace>, Kokkos::View<double*, HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*, HostSpace>, Kokkos::View<double*, HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, 0.0);
 
         double val;
         integrand(0.0, &val);
@@ -53,7 +53,7 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     }
 
     SECTION("Integrand Derivative") {
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>, Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>, Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, 0.0);
 
         Kokkos::View<double*,HostSpace> test("Integrand",2);
 
@@ -68,8 +68,8 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     }
 
     SECTION("Integrand Parameters Gradient") {
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters);
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters, 0.0);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, 0.0);
 
         Kokkos::View<double*, HostSpace> testVal("Integrand", 1+mset.Size());
         integrand(0.5, testVal.data());
@@ -90,8 +90,8 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
 
     SECTION("Integrand Mixed Gradient") {
         Kokkos::View<double*,HostSpace> work("Integrand workspace", mset.Size());
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, work);
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, 0.0, work);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, 0.0);
 
         Kokkos::View<double*, HostSpace> testVal("Integrand", 1+mset.Size());
         integrand(0.5, testVal.data());
@@ -108,6 +108,96 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     }
 }
 
+
+
+TEST_CASE( "MonotoneIntegrand1d With Nugget", "[MonotoneIntegrand1d]") {
+
+    const double testTol = 1e-7;
+    const double nugget = 1.0; // Choose a large nugget just for testing purposes.  Typically this will be quite small
+    unsigned int dim = 1;
+    unsigned int maxDegree = 1;
+    FixedMultiIndexSet<HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
+
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>, HostSpace> expansion(mset);
+
+    // Make room for the cache
+    std::vector<double> cache(expansion.CacheSize());
+    REQUIRE(cache.size() == 6);
+
+    Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
+    coeffs(0) = 1.0; // Constant term
+    coeffs(1) = 1.0; // Linear term
+
+    Kokkos::View<double*, HostSpace> pt("evaluation point", dim);
+    pt(0) = 1.0;
+
+    SECTION("Integrand Only") {
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*, HostSpace>, Kokkos::View<double*, HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, nugget);
+
+        double val;
+        integrand(0.0, &val);
+        CHECK(val == Approx(exp(1)+nugget).epsilon(testTol));
+        integrand(0.5, &val);
+        CHECK(val == Approx(exp(1)+nugget).epsilon(testTol));
+        integrand(-0.5, &val);
+        CHECK(val == Approx(exp(1)+nugget).epsilon(testTol));
+    }
+
+    SECTION("Integrand Derivative") {
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>, Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, nugget);
+
+        Kokkos::View<double*,HostSpace> test("Integrand",2);
+
+        integrand(0.0, test.data());
+        CHECK(test(0) == Approx(exp(1)+nugget).epsilon(testTol));
+
+        integrand(0.5, test.data());
+        CHECK(test(0) == Approx(exp(1)+nugget).epsilon(testTol));
+
+        integrand(-0.5, test.data());
+        CHECK(test(0) == Approx(exp(1)+nugget).epsilon(testTol));
+    }
+
+    SECTION("Integrand Parameters Gradient") {
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters, nugget);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, nugget);
+
+        Kokkos::View<double*, HostSpace> testVal("Integrand", 1+mset.Size());
+        integrand(0.5, testVal.data());
+
+        const double fdStep = 1e-4;
+        double testVal2;
+        for(unsigned int termInd=0; termInd<mset.Size(); ++termInd){
+            coeffs(termInd) += fdStep;
+            integrand2(0.5, &testVal2);
+            double fdDeriv = (testVal2 - testVal(0))/fdStep;
+            CHECK(testVal(termInd+1) == Approx(fdDeriv).epsilon(1e-4));
+
+            coeffs(termInd) -= fdStep;
+        }
+
+    }
+
+
+    SECTION("Integrand Mixed Gradient") {
+        Kokkos::View<double*,HostSpace> work("Integrand workspace", mset.Size());
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, nugget, work);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, nugget);
+
+        Kokkos::View<double*, HostSpace> testVal("Integrand", 1+mset.Size());
+        integrand(0.5, testVal.data());
+
+        const double fdStep = 1e-4;
+        double testVal2;
+        for(unsigned int termInd=0; termInd<mset.Size(); ++termInd){
+            coeffs(termInd) += fdStep;
+            integrand2(0.5, &testVal2);
+            double fdDeriv = (testVal2 - testVal(0))/fdStep;
+            CHECK(testVal(termInd+1) == Approx(fdDeriv).epsilon(1e-4));
+            coeffs(termInd) -= fdStep;
+        }
+    }
+}
 
 TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
 
@@ -138,7 +228,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     SECTION("Integrand Only") {
 
         // Construct the integrand
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, 0.0);
 
         // Evaluate the expansion
         double df;
@@ -154,7 +244,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     }
 
     SECTION("Integrand Derivative") {
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, 0.0);
 
         // Evaluate the expansion
         double df, d2f;
@@ -175,7 +265,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     SECTION("Integrand Input Gradient") {
         double fdStep = 1e-5;
 
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Input);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Input, 0.0);
 
         // Evaluate the expansion
         double df, d2f;
@@ -203,7 +293,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
 
     SECTION("Integrand Parameters Gradient") {
 
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters, 0.0);
 
         // Evaluate the expansion
         double df;
@@ -230,7 +320,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     SECTION("Integrand Mixed Gradient") {
 
         Kokkos::View<double*, HostSpace> workspace("Integrand Workspace", numTerms);
-        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, workspace);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, 0.0, workspace);
 
         // Evaluate the expansion
         double df, d2f;
@@ -816,7 +906,7 @@ TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
         Kokkos::View<double*, DeviceSpace> dres("result", 1);
 
         Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
-            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::None);
+            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::None, 0.0);
             integrand(0.5, &dres(0));
         });
 
@@ -829,7 +919,7 @@ TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
         Kokkos::View<double*, DeviceSpace> dres("result", 2);
 
         Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
-            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Diagonal);
+            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Diagonal, 0.0);
             integrand(0.5, dres.data());
         });
 
@@ -846,8 +936,8 @@ TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
 
         Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
 
-            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Parameters);
-            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand2(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::None);
+            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Parameters, 0.0);
+            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand2(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::None, 0.0);
 
             integrand(0.5, testVal.data());
 
@@ -881,8 +971,8 @@ TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
 
         Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
 
-            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Mixed, workspace);
-            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand2(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Diagonal);
+            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Mixed, 0.0, workspace);
+            MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand2(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Diagonal, 0.0);
 
             integrand(0.5, testVal.data());
 

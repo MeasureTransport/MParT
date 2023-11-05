@@ -21,7 +21,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_LinPhys_AS(
     MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
     std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
-    output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv);
+    output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv, opts.nugget);
 
     output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
     return output;
@@ -34,3 +34,12 @@ static auto reg_host_linphys_as_splus = mpart::MapFactory::CompFactoryImpl<Kokko
     static auto reg_device_linphys_as_splus = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::PhysicistHermite, true, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveSimpson), CreateComponentImpl_LinPhys_AS<mpart::DeviceSpace, SoftPlus>));
 #endif
 
+#if defined(MPART_HAS_CEREAL)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Exp, AdaptiveSimpson, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, AdaptiveSimpson, Kokkos::HostSpace)
+#if defined(MPART_ENABLE_GPU)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Exp, AdaptiveSimpson, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Softplus, AdaptiveSimpson, mpart::DeviceSpace)
+#endif 
+CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory12)
+#endif 

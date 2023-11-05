@@ -15,7 +15,8 @@ namespace binding{
                                      std::string quadType, double quadAbsTol,
                                      double quadRelTol, unsigned int quadMaxSub,
                                      unsigned int quadMinSub,unsigned int quadPts,
-                                     bool contDeriv, double basisLB, double basisUB, bool basisNorm);
+                                     bool contDeriv, double basisLB, double basisUB, 
+                                     bool basisNorm, double nugget);
 
     void MapOptionsToMatlab(MapOptions opts, mexplus::OutputArguments &output, int start = 0);
 #if defined(MPART_HAS_NLOPT)

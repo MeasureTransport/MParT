@@ -54,19 +54,18 @@ TEST_CASE( "Testing Pointer to Kokkos Conversions in 1D", "[ArrayConversions1D]"
 
 }
 
+
 TEST_CASE( "Testing Pointer to Kokkos Conversions in 2D", "[ArrayConversions2D]" ) {
 
-    unsigned int rows = 10;
-    unsigned int cols = 20;
+    unsigned int rows = 3;
+    unsigned int cols = 5;
 
-
+    // Initialize a std vector
+    std::vector<double> data(rows*cols);
+    for(unsigned int i=0; i<rows*cols; ++i)
+        data[i] = i;
+        
     SECTION("double"){
-
-        // Initialize a std vector
-        std::vector<double> data(rows*cols);
-        for(unsigned int i=0; i<rows*cols; ++i)
-            data[i] = i;
-
 
         auto rowView = ToKokkos<double, Kokkos::LayoutRight, Kokkos::HostSpace>(&data[0], rows, cols);
 
@@ -97,6 +96,44 @@ TEST_CASE( "Testing Pointer to Kokkos Conversions in 2D", "[ArrayConversions2D]"
                 CHECK( &data[i + j*rows] == &colView(i,j) );
             }
         }
+    }
+
+    SECTION("RowMajor From Tuple"){
+        auto info = std::make_tuple(long(&data[0]), std::make_tuple(rows,cols), std::make_tuple(cols,1));
+        auto rowView = ToKokkos<double, Kokkos::HostSpace>(info);
+
+        REQUIRE(rowView.extent(0) == rows);
+        REQUIRE(rowView.extent(1) == cols);
+
+        for(unsigned int i=0; i<rows; ++i){
+            for(unsigned int j=0; j<cols; ++j){
+                // Make sure the values are the same
+                CHECK( data[i*cols+j] == rowView(i,j) );
+
+                // Check sure the memory address is the same  (i.e., we're not copying)
+                CHECK( &data[i*cols+j] == &rowView(i,j) );
+            }
+        }
+
+    }
+
+    SECTION("ColMajor From Tuple"){
+        auto info = std::make_tuple(long(&data[0]), std::make_tuple(rows,cols), std::make_tuple(1,rows));
+        auto view = ToKokkos<double, Kokkos::HostSpace>(info);
+
+        REQUIRE(view.extent(0) == rows);
+        REQUIRE(view.extent(1) == cols);
+
+        for(unsigned int i=0; i<rows; ++i){
+            for(unsigned int j=0; j<cols; ++j){
+                // Make sure the values are the same
+                CHECK( data[i +j*rows] == view(i,j) );
+
+                // Check sure the memory address is the same  (i.e., we're not copying)
+                CHECK( &data[i + j*rows] == &view(i,j) );
+            }
+        }
+
     }
 
 

@@ -1,14 +1,18 @@
 #ifndef MPART_ParameterizedFunctionBase_H
 #define MPART_ParameterizedFunctionBase_H
 
+#if defined(MPART_HAS_CEREAL)
+#include <cereal/types/polymorphic.hpp>
+#include "MParT/Utilities/Serialization.h"
+#include <cereal/archives/binary.hpp>
+#endif // MPART_HAS_CEREAL
+
 #include "MParT/Utilities/EigenTypes.h"
 #include "MParT/Utilities/ArrayConversions.h"
 
 #include "MParT/Utilities/GPUtils.h"
 
-#if defined(MPART_HAS_CEREAL)
-#include "MParT/Utilities/Serialization.h"
-#endif // MPART_HAS_CEREAL
+
 
 #include <Eigen/Core>
 
@@ -16,7 +20,7 @@ namespace mpart {
 
 
     template<typename MemorySpace>
-    class ParameterizedFunctionBase {
+    class ParameterizedFunctionBase : public std::enable_shared_from_this<ParameterizedFunctionBase<MemorySpace>> {
 
     public:
 
@@ -27,6 +31,8 @@ namespace mpart {
          @param nCoeffs The number of coefficients in the parameterization.
          */
         ParameterizedFunctionBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs) : inputDim(inDim), outputDim(outDim), numCoeffs(nCoeffs){};
+
+        ParameterizedFunctionBase(unsigned int inDim, unsigned int outDim, unsigned int nCoeffs, Kokkos::View<const double*, MemorySpace> coeffsIn) : inputDim(inDim), outputDim(outDim), numCoeffs(coeffsIn.size()){SetCoeffs(coeffsIn);};
 
         virtual ~ParameterizedFunctionBase() = default;
 
@@ -180,17 +186,51 @@ namespace mpart {
         /** Checks to see if the coefficients have been initialized yet, returns true if so, false if not */
         bool CheckCoefficients() const;
 
-
         const unsigned int inputDim; /// The total dimension of the input N+M
         const unsigned int outputDim; /// The output dimension M
         const unsigned int numCoeffs; /// The number of coefficients used to parameterize this map.
 
 #if defined(MPART_HAS_CEREAL)
-        template <typename Archive>
-        void serialize(Archive & ar){
-            ar(inputDim, outputDim, numCoeffs);
-            ar(savedCoeffs);
-        }
+    /** Saves this object as a binary sequence in a stream. Due to subtleties in the 
+         serialization process, this function should only be called from smart pointers 
+        to the object. 
+        @param ostream A stream object that can be used to constraint an instance of the cereal::BinaryOutputArchive class.
+                       Examples include `std::ofstream` and `std::sstream` 
+        */
+    template<class OutStreamType>
+    void Save(OutStreamType& ostream) const{
+        auto ptr = this->shared_from_this();
+        cereal::BinaryOutputArchive archive(ostream);
+        archive(ptr);
+    }
+
+    /** Reads the output of the `Save` function to construct a smart pointer containing 
+        a copy of a previously saved object.
+    */
+    template<class InStreamType>
+    static std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> Load(InStreamType& istream){
+        
+        cereal::BinaryInputArchive archive(istream);
+
+        std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> ptr;
+        archive(ptr);
+        return ptr;
+    }
+    
+    // Define a serialize or save/load pair as you normally would
+    template <class Archive>
+    void save( Archive & ar ) const
+    {
+        // Do nothing.
+    }
+    template <class Archive>
+    void load( Archive & ar )
+    {
+        std::cout << "Somehow a 'load' function that should be impossible to call is being called.  ";
+        std::cout << "The load_and_construct should be called instead." << std::endl;
+        assert(false);
+    }
+
 #endif // MPART_HAS_CEREAL
 
     protected:
@@ -201,13 +241,11 @@ namespace mpart {
          */
         void CheckDeviceMismatch(std::string functionName) const;
 
-
-
         /** Checks to see if the coefficients have been initialized yet. If not, an exception is thrown. */
         void CheckCoefficients(std::string const& functionName) const;
 
         Kokkos::View<double*, MemorySpace> savedCoeffs;
-
+        
     }; // class ParameterizedFunctionBase
 }
 

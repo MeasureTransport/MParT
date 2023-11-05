@@ -1,5 +1,7 @@
 #include "CommonPybindUtilities.h"
 #include "MParT/ParameterizedFunctionBase.h"
+#include "MParT/Utilities/ArrayConversions.h"
+
 #include <pybind11/stl.h>
 #include <pybind11/eigen.h>
 
@@ -20,19 +22,65 @@ void mpart::binding::ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(py::mod
     py::class_<ParameterizedFunctionBase<Kokkos::HostSpace>, std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>>>(m, "ParameterizedFunctionBase")
         .def("CoeffMap", &ParameterizedFunctionBase<Kokkos::HostSpace>::CoeffMap)
         .def("SetCoeffs", py::overload_cast<Eigen::Ref<Eigen::VectorXd>>(&ParameterizedFunctionBase<Kokkos::HostSpace>::SetCoeffs))
+        .def("WrapCoeffs", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> obj, std::tuple<long,int,int> coeffs){
+            obj->WrapCoeffs(ToKokkos<double,Kokkos::HostSpace>(coeffs));
+        })
         .def("Evaluate", static_cast<Eigen::RowMatrixXd (ParameterizedFunctionBase<Kokkos::HostSpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ParameterizedFunctionBase<Kokkos::HostSpace>::Evaluate))
+        .def("EvaluateImpl", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> obj, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> input, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> output){
+            obj->EvaluateImpl(ToKokkos<double,Kokkos::HostSpace>(input),ToKokkos<double,Kokkos::HostSpace>(output));
+        })
         .def("Gradient", static_cast<Eigen::RowMatrixXd (ParameterizedFunctionBase<Kokkos::HostSpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ParameterizedFunctionBase<Kokkos::HostSpace>::Gradient))
+        .def("GradientImpl", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> obj, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> input, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> sens, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> output){
+            obj->GradientImpl(ToKokkos<double,Kokkos::HostSpace>(input),ToKokkos<double,Kokkos::HostSpace>(sens), ToKokkos<double,Kokkos::HostSpace>(output));
+        })
         .def("CoeffGrad",static_cast<Eigen::RowMatrixXd (ParameterizedFunctionBase<Kokkos::HostSpace>::*)(Eigen::Ref<const Eigen::RowMatrixXd> const&, Eigen::Ref<const Eigen::RowMatrixXd> const&)>(&ParameterizedFunctionBase<Kokkos::HostSpace>::CoeffGrad))
+        .def("CoeffGradImpl",[](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> obj, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> input, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> sens, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> output){
+            obj->CoeffGradImpl(ToKokkos<double,Kokkos::HostSpace>(input),ToKokkos<double,Kokkos::HostSpace>(sens), ToKokkos<double,Kokkos::HostSpace>(output));
+        })
+        .def("torch", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> obj){
+            auto mpart = py::module::import("mpart");
+            if(!mpart.attr("mpart_has_torch").cast<bool>()){
+                throw std::runtime_error("MParT could not import pytorch.");
+            }
+            return mpart.attr("TorchParameterizedFunctionBase")(obj);
+        })
         .def_readonly("numCoeffs", &ParameterizedFunctionBase<Kokkos::HostSpace>::numCoeffs)
         .def_readonly("inputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::inputDim)
         .def_readonly("outputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::outputDim)
-        #if defined(MPART_HAS_CEREAL)
+#if defined(MPART_HAS_CEREAL)
         .def("Serialize", [](ParameterizedFunctionBase<Kokkos::HostSpace> const &obj, std::string const &filename){
             std::ofstream os(filename);
             cereal::BinaryOutputArchive archive(os);
             archive(obj.inputDim, obj.outputDim, obj.numCoeffs);
             archive(obj.Coeffs());
         })
+        .def("ToBytes", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> const &ptr) {
+            std::stringstream ss;
+            ptr->Save(ss);
+            return py::bytes(ss.str());
+        })
+        .def_static("FromBytes", [](std::string input) {
+            std::stringstream ss;
+            ss.str(input);
+
+            auto ptr = ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss);
+            return ptr;  
+        })
+        .def(py::pickle(
+            [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> const& ptr) { // __getstate__
+                std::stringstream ss;
+                ptr->Save(ss);
+                return py::bytes(ss.str());
+            },
+            [](py::bytes input) {
+                
+                std::stringstream ss;
+                ss.str(input);
+
+                auto ptr = ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss);
+                return ptr;
+            }
+        ))
         #endif
         ;
 }

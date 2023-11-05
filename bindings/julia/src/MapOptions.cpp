@@ -42,6 +42,7 @@ void mpart::binding::MapOptionsWrapper(jlcxx::Module &mod) {
         .method("__quadMinSub!", [](MapOptions &opts, unsigned int sub){ opts.quadMinSub = sub; })
         .method("__quadPts!", [](MapOptions &opts, unsigned int pts){ opts.quadPts = pts; })
         .method("__contDeriv!", [](MapOptions &opts, bool deriv){ opts.contDeriv = deriv; })
+        .method("__nugget!", [](MapOptions &opts, double nugget){ opts.nugget = nugget; })
         .method("Serialize", [](MapOptions &opts, std::string &filename){
 #if defined(MPART_HAS_CEREAL)
             std::ofstream os (filename);

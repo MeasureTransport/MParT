@@ -145,11 +145,20 @@ public:
         }
     }
 
+#if defined(MPART_HAS_CEREAL)
+
+    template <class Archive>
+    void serialize( Archive & ar )
+    {   
+        ar( polyBasis_, lb_, ub_ );
+    }
+#endif 
+
 private:
     OtherBasis polyBasis_;
 
-    const double lb_; //<- Left linearization point
-    const double ub_; //<- Right linearization point
+    double lb_; //<- Left linearization point
+    double ub_; //<- Right linearization point
 
 }; // class LinearizedBasis
 

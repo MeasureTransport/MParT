@@ -14,6 +14,7 @@ namespace MathSpace = Kokkos::Experimental;
 namespace MathSpace = Kokkos;
 #endif
 
+namespace SigmoidTypes {
 struct Logistic {
     KOKKOS_INLINE_FUNCTION double static Evaluate(double x) {
         return 0.5+0.5*MathSpace::tanh(x/2);
@@ -26,17 +27,43 @@ struct Logistic {
         return fx*(1-fx); // Known expression for the derivative of this
     }
 };
+}
 
 template<typename MemorySpace, typename SigmoidType>
 class Sigmoid1d
 {
     public:
-    Sigmoid1d(StridedVector<const double, MemorySpace> weights,
-              StridedVector<const double, MemorySpace> centers,
-              StridedVector<const double, MemorySpace> widths):
-        weights_(weights), centers_(centers), widths_(widths)
+    Sigmoid1d(Kokkos::View<double*, MemorySpace> centers,
+              Kokkos::View<double*, MemorySpace> widths,
+              Kokkos::View<double*, MemorySpace> weights):
+        centers_(centers), widths_(widths), weights_(weights)
     {
         if(centers.extent(0) != widths.extent(0) || centers.extent(0) != weights.extent(0)) {
+            std::stringstream ss;
+            ss << "Sigmoid: incompatible dims of centers and widths.\n";
+            ss << "centers: " << centers.extent(0) << ", \n";
+            ss << "widths: " << widths.extent(0) << ",\n";
+            ss << "weights: " << weights.extent(0) << "\n";
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+        }
+        // Arithmetic sum length calculation
+        double order_double = (MathSpace::sqrt(1+8*centers.extent(0))-1)/2;
+        int order = order_double;
+        if(order <= 0 || MathSpace::abs((double)order - order_double) > 1e-15) {
+            std::stringstream ss;
+            ss << "Incorrect length of centers/widths/weights.";
+            ss << "Length should be of form 1+2+3+...+n for some order n";
+            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+        }
+        order_ = order;
+    }
+
+    Sigmoid1d(Kokkos::View<double*, MemorySpace> centers,
+              Kokkos::View<double*, MemorySpace> widths):
+        centers_(centers), widths_(widths)
+    {
+        Kokkos::View<double*,MemorySpace> weights ("Sigmoid weights", centers.extent(0));
+        if(centers.extent(0) != widths.extent(0)) {
             std::stringstream ss;
             ss << "Sigmoid: incompatible dims of centers and widths.\n";
             ss << "centers: " << centers.extent(0) << ", \n";
@@ -46,14 +73,16 @@ class Sigmoid1d
         // Arithmetic sum length calculation
         double order_double = (MathSpace::sqrt(1+8*centers.extent(0))-1)/2;
         int order = order_double;
-        if(MathSpace::abs((double)order - order_double) > 1e-15) {
+        if(order <= 0 || MathSpace::abs((double)order - order_double) > 1e-15) {
             std::stringstream ss;
-            ss << "Incorrect length of centers/widths/weights.";
-            ss << "Length should be of form 1+2+3+...+n for some order n";
+            ss << "Incorrect length of centers/widths/weights, " << centers.extent(0) << ".";
+            ss << "Length should be of form 1+2+3+...+n for some order n>0";
             ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
         }
+        Kokkos::parallel_for(centers.extent(0), KOKKOS_LAMBDA(unsigned int i){weights(i) = 1.;});
         order_ = order;
     }
+
 
     void EvaluateAll(double* output, int max_order, double input) {
         if(order_ < max_order) {
@@ -63,8 +92,10 @@ class Sigmoid1d
             ss << "can only evaluate up to order " << order_;
             ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
         }
+        
         int param_idx = 0;
         for(int curr_order = 0; curr_order <= max_order; curr_order++) {
+            output[curr_order] = 0.;
             for(int basis_idx = 0; basis_idx < curr_order; basis_idx++) {
                 output[curr_order] += weights_(param_idx)*SigmoidType::Evaluate(widths_(param_idx)*(input - centers_(param_idx)));
                 param_idx++;
@@ -100,6 +131,9 @@ class Sigmoid1d
             ss << "can only evaluate up to order " << order_;
             ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
         }
+        output[0] = 0.;
+        output_diff[0] = 0.;
+        output_diff2[0] = 0.;
         int param_idx = 0;
         for(int curr_order = 0; curr_order <= max_order; curr_order++) {
             output[curr_order] = 0.;
@@ -113,6 +147,8 @@ class Sigmoid1d
             }
         }
     }
+
+    int GetOrder() const {return order_;}
 
     private:
     int order_;
