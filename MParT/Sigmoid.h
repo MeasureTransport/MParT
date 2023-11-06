@@ -26,6 +26,10 @@ struct Logistic {
         double fx = Evaluate(x);
         return fx*(1-fx); // Known expression for the derivative of this
     }
+    KOKKOS_INLINE_FUNCTION double static SecondDerivative(double x) {
+        double fx = Evaluate(x);
+        return fx*(1-fx)*(1-2*fx); // Known expression for the second derivative of this
+    }
 };
 }
 
@@ -84,7 +88,7 @@ class Sigmoid1d
     }
 
 
-    void EvaluateAll(double* output, int max_order, double input) {
+    void EvaluateAll(double* output, int max_order, double input) const {
         if(order_ < max_order) {
             std::stringstream ss;
             ss << "Sigmoid basis evaluation order too large.\n";
@@ -103,7 +107,7 @@ class Sigmoid1d
         }
     }
 
-    void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) {
+    void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) const {
         if(order_ < max_order) {
             std::stringstream ss;
             ss << "Sigmoid basis evaluation order too large.\n";
@@ -123,7 +127,7 @@ class Sigmoid1d
         }
     }
 
-    void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) {
+    void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
         if(order_ < max_order) {
             std::stringstream ss;
             ss << "Sigmoid basis evaluation order too large.\n";
@@ -142,7 +146,7 @@ class Sigmoid1d
             for(int basis_idx = 0; basis_idx < curr_order; basis_idx++) {
                 output[curr_order] += weights_(param_idx)*SigmoidType::Evaluate(widths_(param_idx)*(input - centers_(param_idx)));
                 output_diff[curr_order] += weights_(param_idx)*widths_(param_idx)*SigmoidType::Derivative(widths_(param_idx)*(input - centers_(param_idx)));
-                output_diff2[curr_order] += weights_(param_idx)*widths_(param_idx)*SigmoidType::Derivative(widths_(param_idx)*(input - centers_(param_idx)));
+                output_diff2[curr_order] += weights_(param_idx)*widths_(param_idx)*widths_(param_idx)*SigmoidType::SecondDerivative(widths_(param_idx)*(input - centers_(param_idx)));
                 param_idx++;
             }
         }

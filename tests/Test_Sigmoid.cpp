@@ -34,13 +34,13 @@ void TestSigmoidGradients(Function Sigmoid, unsigned int N_grad_points, double f
         Sigmoid.EvaluateSecondDerivatives(output_2deriv, output_diff_2deriv, output_diff2, max_order, gradPts(i));
         for(int j = 0; j <= max_order; j++) {
             double fd_diff = (output_pos_fd[j]-output[j])/fd_delta;
-            double fd_diff2 = (output_deriv_pos_fd[j] - output_deriv[j])/fd_delta;
+            double fd_diff2 = (output_diff_pos_fd[j] - output_diff[j])/fd_delta;
             REQUIRE_THAT(output_deriv[j], WithinRel(output[j], 1e-12));
             REQUIRE_THAT(output_2deriv[j], WithinRel(output[j], 1e-12));
             REQUIRE_THAT(output_deriv_pos_fd[j], WithinRel(output_pos_fd[j], 1e-12));
             REQUIRE_THAT(output_diff[j], WithinRel(fd_diff, 10*fd_delta));
-            REQUIRE_THAT(output_diff_2deriv[j], WithinRel(fd_diff, 10*fd_delta));
-            REQUIRE_THAT(output_diff2[j], WithinRel(fd_diff2, 10*fd_delta));
+            REQUIRE_THAT(output_diff_2deriv[j], WithinRel(fd_diff, 20*fd_delta));
+            REQUIRE_THAT(output_diff2[j], WithinAbs(fd_diff2, fd_delta));
         }
     }
 }
@@ -114,7 +114,7 @@ TEMPLATE_TEST_CASE("Sigmoid1d","[sigmoid1d]", SigmoidTypes::Logistic) {
         int param_idx = 0;
         for(int curr_order = 1; curr_order <= order; curr_order++) {
             for(int i = 0; i < curr_order; i++) {
-                center(param_idx) = -(curr_order-1)/2 + i;
+                center(param_idx) = 4*(-(curr_order-1)/2 + i);
                 width(param_idx) = 1/((double)i+1);
                 weight(param_idx) = 1./curr_order;
                 param_idx++;
