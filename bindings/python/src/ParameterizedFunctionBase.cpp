@@ -37,13 +37,13 @@ void mpart::binding::ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(py::mod
         .def("CoeffGradImpl",[](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> obj, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> input, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> sens, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> output){
             obj->CoeffGradImpl(ToKokkos<double,Kokkos::HostSpace>(input),ToKokkos<double,Kokkos::HostSpace>(sens), ToKokkos<double,Kokkos::HostSpace>(output));
         })
-        .def("torch", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> obj){
+        .def("torch", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> obj, bool store_coeffs){
             auto mpart = py::module::import("mpart");
             if(!mpart.attr("mpart_has_torch").cast<bool>()){
                 throw std::runtime_error("MParT could not import pytorch.");
             }
-            return mpart.attr("TorchParameterizedFunctionBase")(obj);
-        })
+            return mpart.attr("TorchParameterizedFunctionBase")(obj, store_coeffs);
+        }, py::arg("store_coeffs")=true)
         .def_readonly("numCoeffs", &ParameterizedFunctionBase<Kokkos::HostSpace>::numCoeffs)
         .def_readonly("inputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::inputDim)
         .def_readonly("outputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::outputDim)

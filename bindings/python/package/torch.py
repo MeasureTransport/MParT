@@ -118,18 +118,27 @@ class TorchParameterizedFunctionBase(torch.nn.Module):
         can be used with pytorch.  
     """
 
-    def __init__(self, f, dtype=torch.double):
+    def __init__(self, f, store_coeffs=True, dtype=torch.double):
         super().__init__()
 
         self.f = f 
         self.dtype = dtype 
 
-        coeff_tensor = torch.tensor( self.f.CoeffMap(), dtype=dtype)
-        self.coeffs = torch.nn.Parameter(coeff_tensor)
+        if store_coeffs:
+            coeff_tensor = torch.tensor( self.f.CoeffMap(), dtype=dtype)
+            self.coeffs = torch.nn.Parameter(coeff_tensor)
+        else:
+            self.coeffs = None 
 
-    def forward(self, x):
+    def forward(self, x, coeffs=None):
         
-        return MpartTorchAutograd.apply(x.T, self.coeffs, self.f, False).T
+        if coeffs is None:
+            if self.coeffs is None:
+                raise RuntimeError('Must either set store_coeffs=True in constructor or pass coeffs to forward function.')
+            else:
+                coeffs = self.coeffs
+
+        return MpartTorchAutograd.apply(x.T, coeffs, self.f, False).T
 
 
 class TorchConditionalMapBase(torch.nn.Module):
@@ -139,25 +148,44 @@ class TorchConditionalMapBase(torch.nn.Module):
         This can be done either in the constructor or afterwards.
     """
 
-    def __init__(self, f, return_logdet=False, dtype=torch.double):
+    def __init__(self, f, store_coeffs=True, return_logdet=False, dtype=torch.double):
         super().__init__()
 
         self.return_logdet = return_logdet
         self.f = f 
 
-        coeff_tensor = torch.tensor( self.f.CoeffMap(), dtype=dtype)
-        self.coeffs = torch.nn.Parameter(coeff_tensor)
+        if store_coeffs:
+            coeff_tensor = torch.tensor( self.f.CoeffMap(), dtype=dtype)
+            self.coeffs = torch.nn.Parameter(coeff_tensor)
+        else:
+            self.coeffs = None 
 
-    def forward(self, x):
+    def forward(self, x, coeffs=None):
+        
+        if coeffs is None:
+            if self.coeffs is None:
+                raise RuntimeError('Must either set store_coeffs=True in constructor or pass coeffs to forward function.')
+            else:
+                coeffs = self.coeffs
         
         if self.return_logdet:
-            y, logdet = MpartTorchAutograd.apply(x.T, self.coeffs, self.f, self.return_logdet)
+            y, logdet = MpartTorchAutograd.apply(x.T, coeffs, self.f, self.return_logdet)
             return y.T, logdet
         else:
-            y = MpartTorchAutograd.apply(x.T, self.coeffs, self.f, self.return_logdet)
+            y = MpartTorchAutograd.apply(x.T, coeffs, self.f, self.return_logdet)
             return y.T
 
-    def inverse(self, x, r):
+    def inverse(self, x, r, coeffs=None):
+
+        if coeffs is None:
+            if self.coeffs is None:
+                raise RuntimeError('Must either set store_coeffs=True in constructor or pass coeffs to inverse function.')
+            else:
+                coeffs_dbl = self.coeffs.double()
+        else:
+            coeffs_dbl = self.coeffs.double()
+        self.f.WrapCoeffs(ExtractTorchTensorData(coeffs_dbl))
+
         x_dbl = x.double()
         r_dbl = r.double()
 
