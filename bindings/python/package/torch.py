@@ -168,6 +168,8 @@ class TorchConditionalMapBase(torch.nn.Module):
             else:
                 coeffs = self.coeffs
         
+        self._check_shapes(x, None, coeffs)
+
         if self.return_logdet:
             y, logdet = MpartTorchAutograd.apply(x.T, coeffs, self.f, self.return_logdet)
             return y.T, logdet
@@ -177,13 +179,14 @@ class TorchConditionalMapBase(torch.nn.Module):
 
     def inverse(self, x, r, coeffs=None):
 
+        
         if coeffs is None:
             if self.coeffs is None:
                 raise RuntimeError('Must either set store_coeffs=True in constructor or pass coeffs to inverse function.')
             else:
                 coeffs_dbl = self.coeffs.double()
         else:
-            coeffs_dbl = self.coeffs.double()
+            coeffs_dbl = coeffs.double()
         self.f.WrapCoeffs(ExtractTorchTensorData(coeffs_dbl))
 
         x_dbl = x.double()
@@ -192,11 +195,24 @@ class TorchConditionalMapBase(torch.nn.Module):
         if (x.shape[1] != self.f.inputDim) & ((x.shape[1]+r.shape[1]) == self.f.inputDim):
             x_dbl = torch.hstack([x_dbl,r_dbl])
 
+        self._check_shapes(x_dbl, r_dbl, coeffs_dbl)
+
         output = torch.zeros((self.f.outputDim, x_dbl.shape[0]), dtype=torch.double)
         self.f.InverseImpl(ExtractTorchTensorData(x_dbl.T), ExtractTorchTensorData(r_dbl.T), ExtractTorchTensorData(output))
 
         return output.T.type(x.dtype)
 
 
+    def _check_shapes(self, x, r, coeffs):
 
-    
+        if x is not None:
+            if (x.shape[1] != self.f.inputDim):
+                raise ValueError(f'Input to map has wrong shape.  x has {x.shape[1]} columns but map expects input dimension of {self.f.inputDim}.')
+
+        if r is not None:
+            if (r.shape[1] != self.f.outputDim):
+                raise ValueError(f'Reference input to map inverse has wrong shape.  r has {r.shape[1]} columns but map expects input dimension of {self.f.outputDim}.')
+
+        if coeffs is not None:
+            if (coeffs.shape[0] != self.f.numCoeffs):
+                raise ValueError(f'Specified coefficients have wrong shape. coeffs input has length {coeffs.shape[0]} but map has {self.f.numCoeffs} coefficients.')
