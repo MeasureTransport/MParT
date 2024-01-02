@@ -167,5 +167,4 @@ The following classes currently implement this concept.
 .. toctree::
    :maxdepth: 1
 
-   ../multivariateexpansionworker
-   ../tensorproductfunction
+   ../basiseval/multivariateexpansionworker

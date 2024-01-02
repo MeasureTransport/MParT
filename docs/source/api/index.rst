@@ -21,3 +21,4 @@ API Reference
    utilities/initialization
    utilities/serialization
    maptraining
+   multivariatebasis

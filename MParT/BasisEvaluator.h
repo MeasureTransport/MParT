@@ -40,7 +40,7 @@ enum BasisHomogeneity { Homogeneous, OffdiagHomogeneous, Heterogeneous };
  * @tparam BasisEvaluatorType The type we need to evaluate when evaluating the basis
  */
 template <BasisHomogeneity HowHomogeneous, typename BasisEvaluatorType>
-struct BasisEvaluator {
+class BasisEvaluator {
   /**
    * @brief Construct a new Basis Evaluator object
    * 
@@ -111,12 +111,12 @@ struct BasisEvaluator {
 /**
  * @brief Basis evaluator when all univariate basis fcns are identical
  * 
- * See @ref OrthogonalPolynomial as an example of a valid BasisEvaluatorType
+ * \sa OrthogonalPolynomial is an example of a valid BasisEvaluatorType
  * 
  * @tparam BasisEvaluatorType Univariate type to evaluate
  */
 template <typename BasisEvaluatorType>
-struct BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
+class BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
   BasisEvaluator(int, BasisEvaluatorType const &basis1d) : basis1d_(basis1d) {}
   
   /**
@@ -172,7 +172,7 @@ struct BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
  * @tparam DiagEvaluatorType Type to eval diagonal univariate basis
  */
 template <typename OffdiagEvaluatorType, typename DiagEvaluatorType>
-struct BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
+class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
                       Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType>> {
   BasisEvaluator(
       int dim,
@@ -237,18 +237,13 @@ struct BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
   DiagEvaluatorType diag_;
 };
 
-/// @brief Type to represent a basis evaluation when we use different basis
-/// functions for different variables
-/// @tparam CommonBasisEvaluatorType Some type all the basis functions fall
-/// under
-
 /**
  * @brief Basis Evaluator to eval different basis fcns for arbitrary inputs
  * 
  * @tparam CommonBasisEvaluatorType Supertype to univariate basis eval types
  */
 template <typename CommonBasisEvaluatorType>
-struct BasisEvaluator<BasisHomogeneity::Heterogeneous,
+class BasisEvaluator<BasisHomogeneity::Heterogeneous,
                       std::vector<std::shared_ptr<CommonBasisEvaluatorType>>> {
   BasisEvaluator(
       int dim,
