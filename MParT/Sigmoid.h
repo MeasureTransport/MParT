@@ -14,6 +14,15 @@ namespace MathSpace = Kokkos::Experimental;
 namespace MathSpace = Kokkos;
 #endif
 
+/**
+ * @brief A small namespace to store univariate functions used in @ref Sigmoid1d
+ * 
+ * A "sigmoid" class is expected to have at least three functions:
+ * 
+ * - \c Evaluate
+ * - \c Derivative
+ * - \c SecondDerivative
+ */
 namespace SigmoidTypes {
 struct Logistic {
     KOKKOS_INLINE_FUNCTION double static Evaluate(double x) {
@@ -33,10 +42,50 @@ struct Logistic {
 };
 }
 
+/**
+ * @brief Class to represent univariate function space spanned by sigmoids
+ * 
+ * @details This class stores functions of the form 
+ * \f[f_k(x;\mathbf{c},\mathbf{b},\mathbf{w})=b_0+b_1(x-c_1)+\sum_{j=2}^kw_js(b_j(x-c_j))\f]
+ * 
+ * where \f$w_j,b_j\geq 0\f$ and \f$s\f$ is a monotone increasing function.
+ * While it is expected that \f$s\f$ is a sigmoid (e.g., Logistic or Erf
+ * function), any monotone function will allow this class to work as expected.
+ * Without loss of generality we set \f$b_0,b_1\equiv 1\f$ and
+ * \f$c_1\equiv0\f$-- for a linear basis, this will be equivalent to the class
+ * of functions presented above. If \f$k\in\{0,1\}\f$, then we revert only to
+ * (increasing) linear functions.
+ * 
+ * In the above expression, we denote \f$\mathbf{c}\f$ as the "centers",
+ * \f$\mathbf{b}\f$ as the "width" or "bandwidth", and \f$\mathbf{w}\f$ as the
+ * "weights". If we want a function class that works with up to "order n"
+ * sigmoids, then we need to store one "center+width+weight" for the first
+ * order, then two "center+width+weight"s for the second order, then three
+ * "center+width+weight"s for the third order and so on. Generally, the weights
+ * will be uniform, but the centers and widths of these sigmoids can affect
+ * behavior dramatically. If performing approximation in \f$L^2(\mu)\f$, a good
+ * heuristic is to place the weights at the quantiles of \f$\mu\f$ and create
+ * widths that are half the distance to the nearest neighbor.
+ * 
+ * @todo Currently, \f$b_0,b_1,c_1\f$ are not accounted for in the calculation.
+ * 
+ * @tparam MemorySpace Where the (nonlinear) parameters are stored
+ * @tparam SigmoidType Class defining eval, @ref SigmoidTypes
+ */
 template<typename MemorySpace, typename SigmoidType>
 class Sigmoid1d
 {
     public:
+    /**
+     * @brief Construct a new Sigmoid 1d object
+     * 
+     * Each input should be of length \f$n(n+1)/2\f$, where \f$n\f$ is the
+     * maximum order.
+     * 
+     * @param centers Where to center the sigmoids
+     * @param widths How "wide" the sigmoids should be
+     * @param weights How much to weight the sigmoids linearly
+     */
     Sigmoid1d(Kokkos::View<double*, MemorySpace> centers,
               Kokkos::View<double*, MemorySpace> widths,
               Kokkos::View<double*, MemorySpace> weights):
@@ -62,6 +111,15 @@ class Sigmoid1d
         order_ = order;
     }
 
+    /**
+     * @brief Construct a new Sigmoid 1d object from centers and widths
+     * 
+     * Each input should be of length \f$n(n+1)/2\f$, where \f$n\f$ is the
+     * maximum order.
+     * 
+     * @param centers
+     * @param widths 
+     */
     Sigmoid1d(Kokkos::View<double*, MemorySpace> centers,
               Kokkos::View<double*, MemorySpace> widths):
         centers_(centers), widths_(widths)
@@ -87,7 +145,13 @@ class Sigmoid1d
         order_ = order;
     }
 
-
+    /**
+     * @brief Evaluate all sigmoids at one input
+     * 
+     * @param output Place to put the output (size max_order+1)
+     * @param max_order Maximum order of basis function to evaluate
+     * @param input Point to evaluate function
+     */
     void EvaluateAll(double* output, int max_order, double input) const {
         if(order_ < max_order) {
             std::stringstream ss;
@@ -107,6 +171,14 @@ class Sigmoid1d
         }
     }
 
+    /**
+     * @brief Evaluate all sigmoids up to given order and first derivatives
+     * 
+     * @param output Storage for sigmoid evaluation, size max_order+1
+     * @param output_diff Storage for sigmoid derivative, size max_order+1
+     * @param max_order Number of sigmoids to evaluate
+     * @param input Where to evaluate sigmoids
+     */
     void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) const {
         if(order_ < max_order) {
             std::stringstream ss;
@@ -127,6 +199,15 @@ class Sigmoid1d
         }
     }
 
+    /**
+     * @brief Evaluate sigmoids up to given order and first+second derivatives
+     * 
+     * @param output Storage for sigmoid evaluation, size max_order+1
+     * @param output_diff Storage for sigmoid derivative, size max_order+1
+     * @param output_diff2 Storage for sigmoid 2nd deriv, size max_order+1
+     * @param max_order Maximum order of sigmoid to evaluate
+     * @param input Where to evaluate the sigmoids
+     */
     void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
         if(order_ < max_order) {
             std::stringstream ss;
@@ -152,6 +233,11 @@ class Sigmoid1d
         }
     }
 
+    /**
+     * @brief Get the maximum order of this function class
+     * 
+     * @return int 
+     */
     int GetOrder() const {return order_;}
 
     private:
