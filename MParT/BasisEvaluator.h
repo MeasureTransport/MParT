@@ -23,65 +23,73 @@ enum BasisHomogeneity { Homogeneous, OffdiagHomogeneous, Heterogeneous };
 
 /**
  * @brief Class to represent all elements of a multivariate function basis
- * 
- * See @ref BasisHomogeneity for information on options for \c HowHomogeneous .
- * The form of template parameter \c BasisEvaluatorType will depend on \c HowHomogeneous
- * See the documentation of each implementation for details on what's necessary.
- * 
+ *
+ * See BasisHomogeneity for information on options for \c HowHomogeneous .
+ * The form of template parameter \c BasisEvaluatorType will depend on \c
+ * HowHomogeneous See the documentation of each implementation for details on
+ * what's necessary.
+ *
  * Any univariate basis function used here must have the following functions:
- * 
+ *
  * - \c EvaluateAll
  * - \c EvaluateDerivatives
  * - \c EvaluateSecondDerivatives
- * 
- * See @ref OrthogonalPolynomial as an example that implements the required functions
- * 
- * @tparam HowHomogeneous What level of homogeneity the basis has (see @ref BasisHomogeneity for more info)
- * @tparam BasisEvaluatorType The type we need to evaluate when evaluating the basis
+ *
+ * See @ref OrthogonalPolynomial as an example that implements the required
+ * functions
+ *
+ * @tparam HowHomogeneous What level of homogeneity the basis has (see
+ * BasisHomogeneity for more info)
+ * @tparam BasisEvaluatorType The type we need to evaluate when evaluating the
+ * basis
  */
 template <BasisHomogeneity HowHomogeneous, typename BasisEvaluatorType>
 class BasisEvaluator {
+  public:
   /**
    * @brief Construct a new Basis Evaluator object
-   * 
+   *
    * @param dim input dimension of the multivariate basis
    * @param basis1d object(s) used to evaluate the basis
    */
-  BasisEvaluator(int, BasisEvaluatorType) {
+  BasisEvaluator(int dim, BasisEvaluatorType basis1d) {
     // This class should not be constructed
     assert(false);
   }
   /**
    * @brief Evaluate the functions for the multivariate basis
-   * 
+   *
    * @param dim Which input dimension to evaluate
-   * @param output Memory to store output (should be size maxOrder + 1)
+   * @param output_eval Memory to store output (should be size maxOrder + 1)
    * @param maxOrder Maximum basis order to evaluate
    * @param point Input point to evaluate the \c dim th basis functions at
    */
-  KOKKOS_INLINE_FUNCTION void EvaluateAll(int, double *, int, double) const {
+  KOKKOS_INLINE_FUNCTION void EvaluateAll(int dim, double *output_eval,
+                                          int maxOrder, double point) const {
     assert(false);
   }
   // EvaluateDerivatives(dim, output_eval, output_deriv, max_order, input)
 
   /**
    * @brief Evaluate the functions for the multivariate basis
-   * 
+   *
    * @param dim Which input dimension to evaluate
    * @param output_eval Memory to store eval output (size maxOrder + 1)
    * @param output_diff Memory to store 1st deriv output (size maxOrder + 1)
    * @param maxOrder Maximum basis order to evaluate
    * @param point Input point to evaluate the \c dim th basis functions at
    */
-  KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int, double *, double *, int,
-                                                  double) const {
+  KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int dim, double *output_eval,
+                                                  double *output_diff,
+                                                  int maxOrder,
+                                                  double point) const {
     assert(false);
   }
   // EvaluateSecondDerivatives(dim, output_eval, output_deriv, max_order, input)
 
   /**
    * @brief Evaluate the functions for the multivariate basis
-   * 
+   *
    * @param dim Which input dimension to evaluate
    * @param output_eval Memory to store eval output (size maxOrder + 1)
    * @param output_diff Memory to store 1st deriv output (size maxOrder + 1)
@@ -89,17 +97,17 @@ class BasisEvaluator {
    * @param maxOrder Maximum basis order to evaluate
    * @param point Input point to evaluate the \c dim th basis functions at
    */
-  KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int, double *, double *,
-                                                        double *, int,
-                                                        double) const {
+  KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(
+      int dim, double *output_eval, double *output_diff, double *output_diff_2,
+      int maxOrder, double point) const {
     assert(false);
   }
 #if defined(MPART_HAS_CEREAL)
   /**
    * @brief Create ability to archive a Basis Evaluator object
-   * 
-   * @tparam Archive 
-   * @param ar 
+   *
+   * @tparam Archive
+   * @param ar
    */
   template <typename Archive>
   void serialize(Archive &ar) {
@@ -110,24 +118,25 @@ class BasisEvaluator {
 
 /**
  * @brief Basis evaluator when all univariate basis fcns are identical
- * 
+ *
  * \sa OrthogonalPolynomial is an example of a valid BasisEvaluatorType
- * 
+ *
  * @tparam BasisEvaluatorType Univariate type to evaluate
  */
 template <typename BasisEvaluatorType>
 class BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
+  public:
   BasisEvaluator(int, BasisEvaluatorType const &basis1d) : basis1d_(basis1d) {}
-  
+
   /**
    * @brief Helper function to construct a new Basis Evaluator object
-   * 
-   * @tparam Args 
+   *
+   * @tparam Args
    * @param args Arguments to construct object of type \c BasisEvaluatorType
    */
   template <typename... Args>
   BasisEvaluator(Args... args) : basis1d_(args...) {}
-  
+
   // EvaluateAll(dim, output, max_order, input)
   KOKKOS_INLINE_FUNCTION void EvaluateAll(int, double *output, int max_order,
                                           double input) const {
@@ -160,28 +169,29 @@ class BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
 #endif
   /**
    * @brief Object to evaluate 1d basis fcns
-   * 
+   *
    */
   BasisEvaluatorType basis1d_;
 };
 
 /**
  * @brief Basis Evaluator to evaluate diagonal and off-diagonal types different
- * 
+ *
  * @tparam OffdiagEvaluatorType Type to eval offdiagonal univariate basis
  * @tparam DiagEvaluatorType Type to eval diagonal univariate basis
  */
 template <typename OffdiagEvaluatorType, typename DiagEvaluatorType>
 class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
-                      Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType>> {
+                     Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType>> {
+  public:
   BasisEvaluator(
       int dim,
       Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType> const &basis1d)
       : offdiag_(basis1d.first), diag_(basis1d.second), dim_(dim) {}
-  
+
   /**
    * @brief Construct new Basis Evaluator object from univariate basis objects
-   * 
+   *
    * @param dim Number of input dimensions for evaluator
    * @param offdiag Evaluator for offdiagonal input elements
    * @param diag Evaluator for diagonal input element
@@ -189,7 +199,7 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
   BasisEvaluator(int dim, OffdiagEvaluatorType const &offdiag,
                  DiagEvaluatorType const &diag)
       : offdiag_(offdiag), diag_(diag), dim_(dim) {}
-  
+
   // EvaluateAll(dim, output, max_order, input)
   KOKKOS_INLINE_FUNCTION void EvaluateAll(int dim, double *output,
                                           int max_order, double input) const {
@@ -239,12 +249,13 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
 
 /**
  * @brief Basis Evaluator to eval different basis fcns for arbitrary inputs
- * 
+ *
  * @tparam CommonBasisEvaluatorType Supertype to univariate basis eval types
  */
 template <typename CommonBasisEvaluatorType>
 class BasisEvaluator<BasisHomogeneity::Heterogeneous,
-                      std::vector<std::shared_ptr<CommonBasisEvaluatorType>>> {
+                     std::vector<std::shared_ptr<CommonBasisEvaluatorType>>> {
+  public:
   BasisEvaluator(
       int dim,
       std::vector<std::shared_ptr<CommonBasisEvaluatorType>> const &basis1d)

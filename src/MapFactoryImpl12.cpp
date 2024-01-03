@@ -42,4 +42,4 @@ REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::Physici
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Softplus, AdaptiveSimpson, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory12)
-#endif 
+#endif
