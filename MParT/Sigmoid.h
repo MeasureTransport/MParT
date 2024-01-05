@@ -67,7 +67,7 @@ struct Logistic {
  * heuristic is to place the weights at the quantiles of \f$\mu\f$ and create
  * widths that are half the distance to the nearest neighbor.
  * 
- * @todo Currently, \f$b_0,b_1,c_1\f$ are not accounted for in the calculation.
+ * Currently the minimum order one can construct is 1, i.e., an affine map.
  * 
  * @tparam MemorySpace Where the (nonlinear) parameters are stored
  * @tparam SigmoidType Class defining eval, @ref SigmoidTypes
@@ -108,7 +108,7 @@ class Sigmoid1d
             ss << "Length should be of form 1+2+3+...+n for some order n";
             ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
         }
-        order_ = order;
+        order_ = order+2; // two added for affine part of this
     }
 
     /**
@@ -142,7 +142,7 @@ class Sigmoid1d
             ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
         }
         Kokkos::parallel_for(centers.extent(0), KOKKOS_LAMBDA(unsigned int i){weights(i) = 1.;});
-        order_ = order;
+        order_ = order+2; // 2 added for affine part
     }
 
     /**
@@ -161,10 +161,15 @@ class Sigmoid1d
             ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
         }
         
+        output[0] = 1.;
+        if(max_order == 0) return;
+        output[1] = input;
+        if(max_order == 1) return;
+
         int param_idx = 0;
-        for(int curr_order = 0; curr_order <= max_order; curr_order++) {
+        for(int curr_order = 2; curr_order <= max_order; curr_order++) {
             output[curr_order] = 0.;
-            for(int basis_idx = 0; basis_idx < curr_order; basis_idx++) {
+            for(int basis_idx = 0; basis_idx <= curr_order-2; basis_idx++) {
                 output[curr_order] += weights_(param_idx)*SigmoidType::Evaluate(widths_(param_idx)*(input - centers_(param_idx)));
                 param_idx++;
             }
@@ -187,11 +192,19 @@ class Sigmoid1d
             ss << "can only evaluate up to order " << order_;
             ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
         }
+        
+        output[0] = 1.;
+        output_diff[0] = 0.;
+        if(max_order == 0) return;
+        output[1] = input;
+        output_diff[1] = 1.;
+        if(max_order == 1) return;
+
         int param_idx = 0;
-        for(int curr_order = 0; curr_order <= max_order; curr_order++) {
+        for(int curr_order = 2; curr_order <= max_order; curr_order++) {
             output[curr_order] = 0.;
             output_diff[curr_order] = 0.;
-            for(int basis_idx = 0; basis_idx < curr_order; basis_idx++) {
+            for(int basis_idx = 0; basis_idx <= curr_order-2; basis_idx++) {
                 output[curr_order] += weights_(param_idx)*SigmoidType::Evaluate(widths_(param_idx)*(input - centers_(param_idx)));
                 output_diff[curr_order] += weights_(param_idx)*widths_(param_idx)*SigmoidType::Derivative(widths_(param_idx)*(input - centers_(param_idx)));
                 param_idx++;
@@ -216,15 +229,22 @@ class Sigmoid1d
             ss << "can only evaluate up to order " << order_;
             ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
         }
-        output[0] = 0.;
+        
+        output[0] = 1.;
         output_diff[0] = 0.;
         output_diff2[0] = 0.;
+        if(max_order == 0) return;
+        output[1] = input;
+        output_diff[1] = 1.;
+        output_diff2[1] = 0.;
+        if(max_order == 1) return;
+
         int param_idx = 0;
-        for(int curr_order = 0; curr_order <= max_order; curr_order++) {
+        for(int curr_order = 2; curr_order <= max_order; curr_order++) {
             output[curr_order] = 0.;
             output_diff[curr_order] = 0.;
             output_diff2[curr_order] = 0.;
-            for(int basis_idx = 0; basis_idx < curr_order; basis_idx++) {
+            for(int basis_idx = 0; basis_idx <= curr_order-2; basis_idx++) {
                 output[curr_order] += weights_(param_idx)*SigmoidType::Evaluate(widths_(param_idx)*(input - centers_(param_idx)));
                 output_diff[curr_order] += weights_(param_idx)*widths_(param_idx)*SigmoidType::Derivative(widths_(param_idx)*(input - centers_(param_idx)));
                 output_diff2[curr_order] += weights_(param_idx)*widths_(param_idx)*widths_(param_idx)*SigmoidType::SecondDerivative(widths_(param_idx)*(input - centers_(param_idx)));

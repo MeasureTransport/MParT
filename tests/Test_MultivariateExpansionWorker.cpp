@@ -160,7 +160,7 @@ TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpan
 
             eval2 = expansion.Evaluate(&cache[0], coeffs);
 
-            CHECK(inGrad(wrt) == Approx((eval2-eval)/fdStep).epsilon(1e-4));
+            REQUIRE_THAT(inGrad(wrt), Matchers::WithinAbs((eval2-eval)/fdStep, fdStep*10));
             pt(wrt) -= fdStep;
         }
     }
