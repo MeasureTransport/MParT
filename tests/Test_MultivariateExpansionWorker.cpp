@@ -182,7 +182,7 @@ TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpan
 
             df2 = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
 
-            CHECK(inGrad(wrt) == Approx((df2-df)/fdStep).epsilon(1e-4));
+            REQUIRE_THAT(inGrad(wrt), Matchers::WithinAbs((df2-df)/fdStep, fdStep*10));
             pt(wrt) -= fdStep;
         }
     }

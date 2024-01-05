@@ -33,8 +33,8 @@ class MapObjective {
     StridedMatrix<const double, MemorySpace> test_;
 
     public:
-    MapObjective() = delete;
-
+    MapObjective() = default;
+    
     /**
      * @brief Construct a new Map Objective object from just a training dataset
      *
@@ -184,6 +184,22 @@ class KLObjective: public MapObjective<MemorySpace> {
      *
      */
     std::shared_ptr<DensityBase<MemorySpace>> density_;
+};
+
+template<typename MemorySpace>
+class ParamL2RegularizationObjective: public MapObjective<MemorySpace> {
+    public:
+    ParamL2RegularizationObjective(double scale): MapObjective<MemorySpace>(), scale_(scale) {}
+    double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
+    double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
+    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
+
+    /// @brief Change the scale parameter of the regularization
+    /// @param new_scale
+    void SetScale(double new_scale) {scale_ = new_scale;}
+
+    private:
+    double scale_;
 };
 
 namespace ObjectiveFactory {

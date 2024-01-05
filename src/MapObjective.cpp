@@ -85,9 +85,40 @@ void KLObjective<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
     Kokkos::parallel_reduce(N_samps, rc, &grad(0));
 }
 
+template<typename MemorySpace>
+double ParamL2RegularizationObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace>, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {
+    double sq_norm = 0;
+    const double scale = this->scale_;
+    const StridedVector<const double, MemorySpace> coeffs = map->Coeffs();
+    Kokkos::parallel_reduce("Square L2 Norm of Params", map->numCoeffs, KOKKOS_LAMBDA(const int& i, double& lnorm) {
+        lnorm += coeffs(i)*coeffs(i);
+        grad(i) = 2*scale*coeffs(i);
+    }, sq_norm);
+    return scale*sq_norm;
+}
+
+template<typename MemorySpace>
+double ParamL2RegularizationObjective<MemorySpace>::ObjectiveImpl(StridedMatrix<const double, MemorySpace>, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {
+    double sq_norm = 0;
+    StridedVector<const double, MemorySpace> coeffs = map->Coeffs();
+    Kokkos::parallel_reduce("Square L2 Norm of Params", map->numCoeffs, KOKKOS_LAMBDA(const int& i, double& lnorm) {
+        lnorm += coeffs(i)*coeffs(i);
+    }, sq_norm);
+    return sq_norm*this->scale_;
+}
+
+template<typename MemorySpace>
+void ParamL2RegularizationObjective<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace>, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {
+    double scale = this->scale_;
+    Kokkos::parallel_for("CoeffGrad of Regularization", map->numCoeffs, KOKKOS_LAMBDA(const int i) {
+        grad(i) = 2*scale*map->Coeffs()(i);
+    });
+}
+
 // Explicit template instantiation
 template class mpart::MapObjective<Kokkos::HostSpace>;
 template class mpart::KLObjective<Kokkos::HostSpace>;
+template class mpart::ParamL2RegularizationObjective<Kokkos::HostSpace>;
 template std::shared_ptr<MapObjective<Kokkos::HostSpace>> mpart::ObjectiveFactory::CreateGaussianKLObjective<Kokkos::HostSpace>(StridedMatrix<const double, Kokkos::HostSpace>, unsigned int);
 template std::shared_ptr<MapObjective<Kokkos::HostSpace>> mpart::ObjectiveFactory::CreateGaussianKLObjective<Kokkos::HostSpace>(StridedMatrix<const double, Kokkos::HostSpace>, StridedMatrix<const double, Kokkos::HostSpace>, unsigned int);
 #if defined(MPART_ENABLE_GPU)
