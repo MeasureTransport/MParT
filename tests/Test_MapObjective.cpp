@@ -101,6 +101,10 @@ TEST_CASE( "Test KLMapObjective", "[KLMapObjective]") {
         CHECK_THAT(param_reg_eval_1_2, WithinRel(coeff_sq_norm, 1e-12));
         for(int i = 0; i < n_param; i++) CHECK_THAT(param_grad(i),   WithinRel(2*map->Coeffs()(i)));
         for(int i = 0; i < n_param; i++) CHECK_THAT(param_grad_2(i), WithinRel(2*map->Coeffs()(i)));
+        Kokkos::parallel_for("Clear gradients", n_param, KOKKOS_LAMBDA(const int i) {
+            param_grad(i) = 0.;
+            param_grad_2(i) = 0.;
+        });
         double arbitrary_scale = 2e-4;
         param_reg.SetScale(arbitrary_scale);
         double param_reg_eval_arb = param_reg.ObjectiveImpl(reference_samples, map);
@@ -110,6 +114,50 @@ TEST_CASE( "Test KLMapObjective", "[KLMapObjective]") {
         CHECK_THAT(param_reg_eval_arb_2, WithinRel(coeff_sq_norm*arbitrary_scale, 1e-12));
         for(int i = 0; i < n_param; i++) CHECK_THAT(param_grad(i),   WithinRel(2*arbitrary_scale*map->Coeffs()(i)));
         for(int i = 0; i < n_param; i++) CHECK_THAT(param_grad_2(i), WithinRel(2*arbitrary_scale*map->Coeffs()(i)));
+        Kokkos::parallel_for("Clear gradients", n_param, KOKKOS_LAMBDA(const int i) {
+            param_grad(i) = 0.;
+            param_grad_2(i) = 0.;
+        });
+    }
+
+    SECTION("CombinedObjective") {
+        const int n_param = map->numCoeffs;
+        Kokkos::View<double*, MemorySpace> param_grad_combined("Combined Coeff Grad", n_param);
+        Kokkos::View<double*, MemorySpace> param_grad_kl("KL Coeff Grad", n_param);
+        Kokkos::View<double*, MemorySpace> param_grad_reg("ParamReg Coeff Grad", n_param);
+        Kokkos::parallel_for("Clear gradients", n_param, KOKKOS_LAMBDA(const int i) {
+            param_grad_combined(i) = 0.;
+            param_grad_kl(i) = 0.;
+            param_grad_reg(i) = 0.;
+        });
+        param_reg.SetScale(3.2);
+        // Test ObjectiveImpl
+        CombinedObjective<MemorySpace, decltype(objective), decltype(param_reg)> combined_obj(objective, param_reg);
+        double kl_eval = objective.ObjectiveImpl(reference_samples, map);
+        double param_reg_eval = param_reg.ObjectiveImpl(reference_samples, map);
+        double combined_eval = combined_obj.ObjectiveImpl(reference_samples, map);
+        CHECK_THAT(combined_eval, WithinAbs(kl_eval + param_reg_eval, 1e-14));
+        // Test CoeffGradImpl
+        objective.CoeffGradImpl(reference_samples, param_grad_kl, map);
+        param_reg.CoeffGradImpl(reference_samples, param_grad_reg, map);
+        combined_obj.CoeffGradImpl(reference_samples, param_grad_combined, map);
+        for(int i = 0; i < n_param; i++) {
+            CHECK_THAT(param_grad_combined(i), WithinAbs(param_grad_kl(i) + param_grad_reg(i), 1e-14));
+        }
+        // Clear gradients
+        Kokkos::parallel_for("Clear gradients", n_param, KOKKOS_LAMBDA(const int i) {
+            param_grad_combined(i) = 0.;
+            param_grad_kl(i) = 0.;
+            param_grad_reg(i) = 0.;
+        });
+        // Test ObjectivePlusCoeffGradImpl
+        double kl_eval_plus = objective.ObjectivePlusCoeffGradImpl(reference_samples, param_grad_kl, map);
+        double param_reg_eval_plus = param_reg.ObjectivePlusCoeffGradImpl(reference_samples, param_grad_reg, map);
+        double combined_eval_plus = combined_obj.ObjectivePlusCoeffGradImpl(reference_samples, param_grad_combined, map);
+        CHECK_THAT(combined_eval_plus, WithinAbs(kl_eval_plus + param_reg_eval_plus, 1e-14));
+        for(int i = 0; i < n_param; i++) {
+            CHECK_THAT(param_grad_combined(i), WithinAbs(param_grad_kl(i) + param_grad_reg(i), 1e-14));
+        }
     }
 
     SECTION("MapObjectiveFunctions") {
