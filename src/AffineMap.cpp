@@ -1,5 +1,6 @@
 #include "MParT/AffineMap.h"
 #include "MParT/Utilities/KokkosSpaceMappings.h"
+#include "MParT/Utilities/MathFunctions.h"
 
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Initialization.h"
@@ -41,14 +42,14 @@ AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A,
 
 template<typename MemorySpace>
 void AffineMap<MemorySpace>::Factorize(){
-
+    std::cout << "Factorizing AffineMap" << std::endl;
     if(A_.extent(0)!=A_.extent(1)){
         StridedMatrix<const double, MemorySpace> Asub = Kokkos::subview(A_, Kokkos::ALL(), std::make_pair(A_.extent(1)-A_.extent(0),A_.extent(1)));
         luSolver_.compute(Asub);
     }else{
         luSolver_.compute(A_);
     }
-    logDet_ = log(abs(luSolver_.determinant()));
+    logDet_ = MathSpace::log(MathSpace::abs(luSolver_.determinant()));
 }
 
 

@@ -3,16 +3,12 @@
 
 #include "MParT/Utilities/KokkosSpaceMappings.h"
 #include "MParT/Utilities/Miscellaneous.h"
+#include "MParT/Utilities/MathFunctions.h"
 
 #include <Kokkos_Core.hpp>
 
 namespace mpart{
 
-#if (KOKKOS_VERSION / 10000 == 3) && (KOKKOS_VERSION / 100 % 100 < 7)
-namespace MathSpace = Kokkos::Experimental;
-#else
-namespace MathSpace = Kokkos;
-#endif
 
 /**
  * @brief A small namespace to store univariate functions used in @ref Sigmoid1d
