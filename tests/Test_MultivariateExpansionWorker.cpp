@@ -26,13 +26,15 @@ HomogeneousEval_T CreateEvaluator<HomogeneousEval_T>(int) {
 template<>
 OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
     ProbabilistHermite offdiag;
-    const int order = 3;
-    const int params_size = order*(order+1)/2;
+    const int num_sigmoids = 3;
+    const int params_size = 2+num_sigmoids*(num_sigmoids+1)/2;
     Kokkos::View<double*,Kokkos::HostSpace> centers("Sigmoid centers", params_size);
     Kokkos::View<double*,Kokkos::HostSpace> widths("Sigmoid widths", params_size);
     Kokkos::View<double*,Kokkos::HostSpace> weights("Sigmoid weights", params_size);
-    int basis_idx = 0;
-    for(int curr_order = 1; curr_order <= order; curr_order++) {
+    centers(0) = -3; widths(0) = 1.5; weights(0) = 1.;
+    centers(1) = 3; widths(1) = 1.5; weights(1) = 1.;
+    int basis_idx = 2;
+    for(int curr_order = 1; curr_order <= num_sigmoids; curr_order++) {
         for(int j = 0; j<curr_order; j++) {
             centers(basis_idx) = 4*(-(curr_order-1)/2 + j);
             widths(basis_idx) = 1/((double)j+1);
