@@ -245,6 +245,20 @@ MEX_DEFINE(MultiIndexSet_ReducedMargin) (int nlhs, mxArray* plhs[],
   output.set(0,multi_ids);
 }
 
+MEX_DEFINE(MultiIndexSet_ReducedMarginDim) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  int dim = input.get<int>(1);
+  std::vector<MultiIndex> vecMultiIndex = mset->ReducedMarginDim(dim);
+  std::vector<intptr_t> multi_ids(vecMultiIndex.size());
+  for (int i=0; i<vecMultiIndex.size();i++){
+    multi_ids[i] =  Session<MultiIndex>::create(new MultiIndex(vecMultiIndex[i]));
+  }
+  output.set(0,multi_ids);
+}
+
 MEX_DEFINE(MultiIndexSet_StrictFrontier) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);

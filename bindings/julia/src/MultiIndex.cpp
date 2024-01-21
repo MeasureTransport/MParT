@@ -58,6 +58,7 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
         .method("Frontier", &MultiIndexSet::Frontier)
         .method("Margin", &MultiIndexSet::Margin)
         .method("ReducedMargin", &MultiIndexSet::ReducedMargin)
+        .method("ReducedMarginDim", &MultiIndexSet::ReducedMarginDim)
         .method("StrictFrontier", &MultiIndexSet::StrictFrontier)
         .method("IsExpandable", &MultiIndexSet::IsExpandable)
         .method("NumActiveForward", &MultiIndexSet::NumActiveForward)

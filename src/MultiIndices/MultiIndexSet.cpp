@@ -560,7 +560,7 @@ std::vector<MultiIndex> MultiIndexSet::ReducedMarginDim(unsigned int dim) const
 
       // Check the backward neighbors
       bool allActive = true;
-      bool anyLess = true;
+      bool anyLess = false;
       for(auto neighbor : inEdges[globalInd]) {
         allActive = (allActive && IsActive(neighbor));
         // If all backward neighbors at dimension d >= the current midx at dimension d, then this is not in the reduced margin

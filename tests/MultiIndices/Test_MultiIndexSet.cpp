@@ -496,6 +496,7 @@ TEST_CASE("MultiIndexSet ReducedMargin Test", "[MultiIndexSet_RM]") {
         // I'm unsure how big the RM should be for a particular dimension
         // e.g. [0,2,1] has bw neighbors [0,1,1], [0,2,0], which means it gets included
         // this multiple bw neighbors business makes it hard to count exactly
+        REQUIRE(rmset.size() < mset2.Size() - mset.Size());
         for(auto& multi : rmset) {
             REQUIRE(multi.Sum() == P+1);
         }
