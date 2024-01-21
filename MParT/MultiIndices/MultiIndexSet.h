@@ -285,7 +285,15 @@ MultiIndexSet set(length, limiter);
       @return A std::vector containing the multiindices in the reduced margin
   */
   std::vector<MultiIndex> ReducedMargin() const;
-
+  
+  /** @brief Returns multiindices in reduced margin incrementing dim.
+   * Will admit multiindices that have *any* backward neighbor where the given
+   * entry in the given dimension is lower. @see ReducedMargin().
+   * 
+   * @param[in] dim The dimension of the reduced margin to return.
+   * @return A std::vector containing the multiindices in the reduced margin
+  */
+  std::vector<MultiIndex> ReducedMarginDim(unsigned int dim) const;
 
   /** We define the strict frontier to be the collection of multiindices, where
       all admissible forward neighbors are inactive.
