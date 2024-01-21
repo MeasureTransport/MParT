@@ -2,6 +2,7 @@
 #define TEST_DISTRIBUTIONS_COMMON_H
 
 #include<algorithm>
+#include<numeric>
 #include <catch2/catch_all.hpp>
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Distributions/DensityBase.h"
