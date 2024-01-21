@@ -17,6 +17,7 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
         .constructor()
         .constructor<unsigned int, unsigned int>()
         .constructor<unsigned int>()
+        .constructor<MultiIndex&>()
         .constructor<std::vector<unsigned int> const&>()
         .method("NumNz", &MultiIndex::NumNz)
         .method("count_nonzero", &MultiIndex::NumNz);
@@ -58,7 +59,7 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
         .method("Frontier", &MultiIndexSet::Frontier)
         .method("Margin", &MultiIndexSet::Margin)
         .method("ReducedMargin", &MultiIndexSet::ReducedMargin)
-        .method("ReducedMarginDim", &MultiIndexSet::ReducedMarginDim)
+        .method("ReducedMarginDim", [](MultiIndexSet &mset, unsigned int dim){ return mset.ReducedMarginDim(dim-1); })
         .method("StrictFrontier", &MultiIndexSet::StrictFrontier)
         .method("IsExpandable", &MultiIndexSet::IsExpandable)
         .method("NumActiveForward", &MultiIndexSet::NumActiveForward)
