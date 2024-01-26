@@ -52,10 +52,6 @@ namespace mpart {
         */
        virtual void SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs);
 
-       #if defined(MPART_ENABLE_GPU)
-       void SetCoeffs(Kokkos::View<const double*, std::conditional_t<std::is_same_v<MemorySpace,Kokkos::HostSpace>,mpart::DeviceSpace,Kokkos::HostSpace>> coeffs);
-       #endif
-
         /** @brief Wrap the internal coefficient view around another view.
             @details Performs a shallow copy of the input coefficients to the internally stored coefficients.
             If values in the view passed to this function are changed, the values will also change in the
@@ -65,7 +61,7 @@ namespace mpart {
         virtual void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs);
 
         #if defined(MPART_ENABLE_GPU)
-        virtual void SetCoeffs(Kokkos::View<const double*, mpart::DeviceSpace> coeffs);
+        virtual void SetCoeffs(Kokkos::View<const double*, std::conditional_t<std::is_same_v<Kokkos::HostSpace,MemorySpace>, mpart::DeviceSpace, Kokkos::HostSpace>> coeffs);
         virtual void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs);
         #endif
 

@@ -182,27 +182,30 @@ Eigen::RowMatrixXd ParameterizedFunctionBase<mpart::DeviceSpace>::Gradient(Eigen
 
 #endif
 
-
-
-template<typename MemorySpace>
-void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs){
-
+template<typename MemorySpaceSrc, typename MemorySpaceDest>
+void SetCoeffsInternal(unsigned int numCoeffs,
+        Kokkos::View<double*,MemorySpaceDest>& coeffsDest,
+        Kokkos::View<const double*,MemorySpaceSrc> coeffsSrc) {
     // If coefficients already exist, make sure the sizes match
-    if(this->savedCoeffs.is_allocated()){
-        if(coeffs.size() != numCoeffs){
+    if(coeffsDest.is_allocated()){
+        if(coeffsSrc.size() != numCoeffs){
             std::stringstream msg;
             msg << "Error in ParameterizedFunctionBase<MemorySpace>::SetCoeffs.  Expected coefficient vector with size " << numCoeffs << ", but new coefficients have size " << coeffs.size() << ".";
             throw std::invalid_argument(msg.str());
         }
 
-        if(this->savedCoeffs.size() != numCoeffs)
-            Kokkos::resize(this->savedCoeffs, numCoeffs);
+        if(coeffsDest.size() != numCoeffs)
+            Kokkos::resize(coeffsDest, numCoeffs);
     }else{
-
-        this->savedCoeffs = Kokkos::View<double*, MemorySpace>("ParameterizedFunctionBase<MemorySpace> Coefficients", coeffs.size());
+        coeffsDest = Kokkos::View<double*, MemorySpace>("ParameterizedFunctionBase<MemorySpace> Coefficients", numCoeffs);
     }
 
-    Kokkos::deep_copy(this->savedCoeffs, coeffs);
+    Kokkos::deep_copy(coeffsDest, coeffsSrc);
+}
+
+template<typename MemorySpace>
+void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs){
+    SetCoeffsInternal(this->numCoeffs, this->savedCoeffs, coeffs);
 }
 
 template<typename MemorySpace>
@@ -218,12 +221,14 @@ void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Ko
 
 #if defined(MPART_ENABLE_GPU)
 
-template<>
 void ParameterizedFunctionBase<mpart::DeviceSpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs)
 {
-    // Copy the coefficients to the device
-    Kokkos::View<double*, mpart::DeviceSpace> coeffs_device = ToDevice<mpart::DeviceSpace>(coeffs);
-    this->SetCoeffs(coeffs_device);
+    SetCoeffsInternal(this->numCoeffs, this->savedCoeffs, coeffs);
+}
+
+void ParameterizedFunctionBase<Kokkos::HostSpace>::SetCoeffs(Kokkos::View<const double*, mpart::DeviceSpace> coeffs)
+{
+    SetCoeffsInternal(this->numCoeffs, this->savedCoeffs, coeffs);
 }
 
 
