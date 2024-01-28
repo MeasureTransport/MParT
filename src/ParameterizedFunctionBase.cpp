@@ -190,14 +190,14 @@ void SetCoeffsInternal(unsigned int numCoeffs,
     if(coeffsDest.is_allocated()){
         if(coeffsSrc.size() != numCoeffs){
             std::stringstream msg;
-            msg << "Error in ParameterizedFunctionBase<MemorySpace>::SetCoeffs.  Expected coefficient vector with size " << numCoeffs << ", but new coefficients have size " << coeffs.size() << ".";
+            msg << "Error in ParameterizedFunctionBase<MemorySpace>::SetCoeffs.  Expected coefficient vector with size " << numCoeffs << ", but new coefficients have size " << numCoeffs << ".";
             throw std::invalid_argument(msg.str());
         }
 
         if(coeffsDest.size() != numCoeffs)
             Kokkos::resize(coeffsDest, numCoeffs);
     }else{
-        coeffsDest = Kokkos::View<double*, MemorySpace>("ParameterizedFunctionBase<MemorySpace> Coefficients", numCoeffs);
+        coeffsDest = Kokkos::View<double*, MemorySpaceSrc>("ParameterizedFunctionBase<MemorySpace> Coefficients", numCoeffs);
     }
 
     Kokkos::deep_copy(coeffsDest, coeffsSrc);
