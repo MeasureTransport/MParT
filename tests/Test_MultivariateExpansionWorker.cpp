@@ -63,9 +63,9 @@ TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpan
     pt(1) = 0.1;
     pt(2) = 0.345;
 
-    // Fill in the cache the first d-1 components of the cache
+        // Fill in the cache the first d-1 components of the cache
     expansion.FillCache1(&cache[0], pt, DerivativeFlags::None);
-    double out[maxDegree+1];
+        double out[maxDegree+1];
     for(unsigned int d=0; d<dim-1;++d){
         for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
         poly1d.EvaluateAll(d, out, maxDegree, pt(d));
@@ -73,20 +73,20 @@ TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpan
             CHECK(cache[i + d*(maxDegree+1)] == Approx(out[i]).epsilon(1e-15) );
         }
     }
-
+    
     // Fill in the last part of the cache for an evaluation
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::None);
-    for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
+        for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
     poly1d.EvaluateAll(dim-1, out, maxDegree, pt(dim-1));
     for(unsigned int i=0; i<maxDegree+1; ++i){
         CHECK(cache[i + (dim-1)*(maxDegree+1)] == Approx(out[i]).epsilon(1e-15) );
     }
-
+    
     // Evaluate the expansion using the cache
     Eigen::VectorXd coeffsEig = Eigen::VectorXd::Random(mset.Size());
     Kokkos::View<double*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> coeffs(coeffsEig.data(), coeffsEig.size());
     double f = expansion.Evaluate(&cache[0], coeffs);
-
+    
 
     // Now fill in the last part of the cache for a gradient evaluation
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
