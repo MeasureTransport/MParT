@@ -249,7 +249,8 @@ void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, mp
 template<typename MemorySpace>
 void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs)
 {
-     SetCoeffs(Kokkos::View<double*,MemorySpace>(VecToKokkos<double,MemorySpace>(coeffs)));
+    Kokkos::View<const double*, MemorySpace> inputCoeffs = VecToKokkos<double, MemorySpace>(coeffs);
+    SetCoeffs(inputCoeffs);
 }
 
 template<typename MemorySpace>
