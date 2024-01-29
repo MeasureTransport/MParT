@@ -220,12 +220,12 @@ void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Ko
 }
 
 #if defined(MPART_ENABLE_GPU)
-
+template<>
 void ParameterizedFunctionBase<mpart::DeviceSpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs)
 {
     SetCoeffsInternal(this->numCoeffs, this->savedCoeffs, coeffs);
 }
-
+template<>
 void ParameterizedFunctionBase<Kokkos::HostSpace>::SetCoeffs(Kokkos::View<const double*, mpart::DeviceSpace> coeffs)
 {
     SetCoeffsInternal(this->numCoeffs, this->savedCoeffs, coeffs);
