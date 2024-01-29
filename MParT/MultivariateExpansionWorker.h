@@ -380,7 +380,11 @@ public:
 
             for(unsigned int termInd=0; termInd<numTerms; ++termInd)
             {
-                double termInd = GetTermValMixedDeriv(termInd, wrt, polyCache);
+                // Check if the term is constant, so deriv is zero
+                if(multiSet_.nzStarts(termInd)==multiSet_.nzStarts(termInd+1)) {
+                    continue;
+                }
+                double termVal = GetTermValMixedDeriv(termInd, wrt, polyCache);
 
                 // Multiply by the coefficients to get the contribution to the output
                 // Suppose termVal = 0. if wrt or dim is not used in termInd
@@ -510,29 +514,29 @@ private:
         return termVal;
     }
 
-    KOKKOS_FUNCTION double GetTermValMixedDeriv(unsigned int termInd, int wrt, const double* polyCache) {
+    KOKKOS_FUNCTION double GetTermValMixedDeriv(unsigned int termInd, int wrt, const double* polyCache) const {
         // Compute the value of this term in the expansion
         double termVal = 1.0;
-        bool hasDeriv1 = false;
-        bool hasDeriv2 = false;
+        double wrtVal = 0.; // value of univariate basis fcn in dim wrt
+        double wrtDeriv = (wrt == int(dim_)-1); // derivative of univariate basis fcn in dim wrt
+        unsigned int end_idx = multiSet_.nzStarts(termInd+1)-1; // last index in loop
+        
+        if(multiSet_.nzDims(end_idx)!=dim_-1) return 0.; // Value is zero if constant in last dimension
 
-        for(int i=multiSet_.nzStarts(termInd); i<multiSet_.nzStarts(termInd+1); ++i){
-            if(multiSet_.nzDims(i)==dim_-1){
-                posInd = (wrt==int(dim_-1)) ? (2*dim_) : (2*dim_-1);
-                termVal *= polyCache[startPos_(posInd) + multiSet_.nzOrders(i)];
-
-                hasDeriv2 = true;
-                if(wrt==(dim_-1))
-                    hasDeriv1 = true;
-
-            }else if(int(multiSet_.nzDims(i))==wrt){
-                termVal *= polyCache[startPos_(dim_+wrt) + multiSet_.nzOrders(i)];
-                hasDeriv1 = true;
+        for(int i=multiSet_.nzStarts(termInd); i<end_idx; ++i){
+            if(int(multiSet_.nzDims(i))==wrt){
+                wrtVal = polyCache[startPos_(wrt) + multiSet_.nzOrders(i)];
+                wrtDeriv = polyCache[startPos_(dim_+wrt) + multiSet_.nzOrders(i)];
             }else{
                 termVal *= polyCache[startPos_(multiSet_.nzDims(i)) + multiSet_.nzOrders(i)];
             }
         }
-
+        int posInd = (wrt==int(dim_)-1) ? (2*dim_) : (2*dim_-1);
+        double diagVal = polyCache[startPos_(posInd) + multiSet_.nzOrders(end_idx)];
+        if constexpr(!std::is_same_v<Rectifier,Identity>){
+            termVal = (wrt==int(dim_)-1) ? Rectifier::Evaluate(termVal) : Rectifier::Derivative(termVal*wrtVal);
+        }
+        termVal *= diagVal*wrtDeriv;
         return termVal;
     }
 
