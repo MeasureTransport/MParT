@@ -215,9 +215,10 @@ class BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
  * @tparam DiagEvaluatorType Type to eval diagonal univariate basis
  * @tparam RectifyType Whether the basis is rectified or not (i.e. positivize the non-diagonal part of cross terms)
  */
-template <typename OffdiagEvaluatorType, typename DiagEvaluatorType>
+template <typename OffdiagEvaluatorType, typename DiagEvaluatorType, typename Rectifier>
 class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
-                     Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType>> {
+                     Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType>,
+                     Rectifier> {
   public:
   BasisEvaluator(
       int dim,
@@ -286,9 +287,9 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
  *
  * @tparam CommonBasisEvaluatorType Supertype to univariate basis eval types
  */
-template <typename CommonBasisEvaluatorType>
+template <typename CommonBasisEvaluatorType, typename Rectifier>
 class BasisEvaluator<BasisHomogeneity::Heterogeneous,
-                     std::vector<std::shared_ptr<CommonBasisEvaluatorType>>> {
+                     std::vector<std::shared_ptr<CommonBasisEvaluatorType>>, Rectifier> {
   public:
   BasisEvaluator(
       int dim,

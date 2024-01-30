@@ -12,7 +12,13 @@ using namespace mpart;
 using namespace Catch;
 
 using HomogeneousEval_T = BasisEvaluator<BasisHomogeneity::Homogeneous, ProbabilistHermite>;
-using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic>>>;
+using Sigmoid_T = Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic>;
+using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid_T>, Identity>;
+using RectifiedOffdiagHomogeneousEval_T = BasisEvaluator<
+    BasisHomogeneity::OffdiagHomogeneous,
+    Kokkos::pair<ProbabilistHermite,Sigmoid_T>,
+    SoftPlus // Rectifier
+>;
 using HeterogeneousEval_T = BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_ptr<ProbabilistHermite>>>;
 
 template<typename T>
@@ -23,9 +29,7 @@ HomogeneousEval_T CreateEvaluator<HomogeneousEval_T>(int) {
     return HomogeneousEval_T{};
 }
 
-template<>
-OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
-    ProbabilistHermite offdiag;
+Sigmoid_T CreateDefaultSigmoids() {
     const int order = 3;
     const int params_size = order*(order+1)/2;
     Kokkos::View<double*,Kokkos::HostSpace> centers("Sigmoid centers", params_size);
@@ -41,11 +45,25 @@ OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
         }
     }
 
-    Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic> diag(centers, widths, weights);
+    return Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic> {centers, widths, weights};
+}
+
+template<>
+OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
+    ProbabilistHermite offdiag;
+    Sigmoid_T diag = CreateDefaultSigmoids();
     return OffdiagHomogeneousEval_T {dim, Kokkos::make_pair(offdiag, diag)};
 }
 
-TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]", HomogeneousEval_T, OffdiagHomogeneousEval_T) {
+template<>
+RectifiedOffdiagHomogeneousEval_T CreateEvaluator<RectifiedOffdiagHomogeneousEval_T>(int dim) {
+    ProbabilistHermite offdiag;
+    Sigmoid_T diag = CreateDefaultSigmoids();
+    return RectifiedOffdiagHomogeneousEval_T {dim, Kokkos::make_pair(offdiag, diag)};
+}
+
+TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]",
+        HomogeneousEval_T, OffdiagHomogeneousEval_T, RectifiedOffdiagHomogeneousEval_T) {
 
     unsigned int dim = 3;
     unsigned int maxDegree = 3;
@@ -93,7 +111,7 @@ TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpan
     double df = expansion.DiagonalDerivative(&cache[0], coeffs,1);
 
     // Compare with a finite difference approximation of the derivative
-    double fdStep = 1e-5;
+    double fdStep = 1e-7;
     expansion.FillCache2(&cache[0], pt, pt(dim-1)+fdStep, DerivativeFlags::None);
     double f2 = expansion.Evaluate(&cache[0], coeffs);
     CHECK( df==Approx((f2-f)/fdStep).epsilon(1e-4));
@@ -182,7 +200,7 @@ TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpan
 
             df2 = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
 
-            CHECK(inGrad(wrt) == Approx((df2-df)/fdStep).epsilon(1e-4));
+            CHECK_THAT(inGrad(wrt), Matchers::WithinRel((df2-df)/fdStep, 1e-4));
             pt(wrt) -= fdStep;
         }
     }
