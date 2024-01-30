@@ -199,8 +199,7 @@ TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpan
             expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
 
             df2 = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
-
-            CHECK_THAT(inGrad(wrt), Matchers::WithinRel((df2-df)/fdStep, 1e-4));
+            CHECK_THAT(inGrad(wrt), Matchers::WithinRel((df2-df)/fdStep, 1e-5));
             pt(wrt) -= fdStep;
         }
     }
