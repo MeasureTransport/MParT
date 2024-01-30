@@ -58,12 +58,11 @@ namespace mpart {
             internally stored view.
             @param coeffs A view containing the coefficients we want to wrap.
         */
-        virtual void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs);
+        virtual void WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs);
 
         #if defined(MPART_ENABLE_GPU)
         virtual void SetCoeffs(Kokkos::View<const double*, std::conditional_t<std::is_same_v<Kokkos::HostSpace,MemorySpace>, mpart::DeviceSpace, Kokkos::HostSpace>> coeffs);
-        virtual void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs);
-        #endif
+#endif
 
         /** SetCoeffs function with conversion from Eigen to Kokkos vector types.*/
         virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs);
