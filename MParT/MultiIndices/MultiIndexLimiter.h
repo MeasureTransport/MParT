@@ -27,6 +27,29 @@ namespace MultiIndexLimiter{
 
     };
 
+    /** @class SeparableTotalOrderLimiter
+        @brief Same as TotalOrder without cross-terms
+        @details This limter only allows terms that satisfy
+        \f$\|\mathbf{j}\|_1\leq p_U\f$, where \f$\mathbf{j}\f$
+        is the multiindex, and \f$p_U\f$ is a nonnegative integer passed to the
+        constructor of this class.
+    */
+    class SeparableTotalOrder{
+
+    public:
+
+        SeparableTotalOrder(unsigned int totalOrderIn) : totalOrder(totalOrderIn){};
+
+        bool operator()(MultiIndex const& multi){
+          unsigned int sum = multi.Sum();
+          return (sum <= totalOrder) && (!multi.HasNonzeroEnd() || sum == multi.Get(multi.Length()-1));
+        };
+
+    private:
+        const unsigned int totalOrder;
+
+    };
+
 
     /** @class Dimension
     @ingroup MultiIndices

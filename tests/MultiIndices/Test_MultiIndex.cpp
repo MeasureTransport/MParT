@@ -115,6 +115,7 @@ TEST_CASE( "Testing MultiIndex ordering", "[MultiIndexOrder]" ) {
 
     MultiIndex a({0,1,1,2});
     MultiIndex b({1,0,0,0});
+    REQUIRE(!b.HasNonzeroEnd());
 
     REQUIRE( b<a );
     REQUIRE( a>b );
@@ -139,4 +140,6 @@ TEST_CASE( "Testing MultiIndex ordering", "[MultiIndexOrder]" ) {
     b = MultiIndex({2,2,2,3});
     REQUIRE( !a.AnyBounded(b) );
     REQUIRE(  b.AnyBounded(a) );
+
+    REQUIRE( b.HasNonzeroEnd() );
 }

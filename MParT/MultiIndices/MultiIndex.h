@@ -176,6 +176,13 @@ public:
      * @return false else
      */
     bool AnyBounded(const MultiIndex &bound) const;
+
+    /**
+     * @brief Whether this index has a nonzero entry at the end
+     * 
+     * @return true if this has a nonzero entry at the end
+    */
+    bool HasNonzeroEnd() const;
 private:
 
     unsigned int length;

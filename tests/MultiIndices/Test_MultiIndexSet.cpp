@@ -110,6 +110,10 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
     REQUIRE( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
 
+    MultiIndexSet mset_sep = MultiIndexSet::CreateTotalOrder(dim+1, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder));
+    REQUIRE( mset_sep.Size()== ((maxOrder+1)*(maxOrder+2)/2) + maxOrder);
+    REQUIRE( mset_sep.NonzeroDiagonalEntries().size() == maxOrder);
+
 
     /*
     AdmissableNeighbor.ValidNeighbor
@@ -428,6 +432,22 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         REQUIRE( set.at(inds.at(1)) == MultiIndex{1,1} );
         REQUIRE( set.at(inds.at(2)) == MultiIndex{3,0} );
 
+    }
+
+    SECTION("NonzeroDiagonalEntries") {
+        unsigned int dim = 2, maxOrder = 3;
+        MultiIndexSet set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder));
+        std::vector<unsigned int> inds = set.NonzeroDiagonalEntries();
+        for(unsigned int ind: inds) {
+            MultiIndex multi = set.at(ind);
+            REQUIRE( multi.HasNonzeroEnd() );
+        }
+        unsigned int expected_size = 0;
+        for(unsigned int i = 0; i < set.Size(); ++i) {
+            MultiIndex multi = set.at(i);
+            expected_size += multi.HasNonzeroEnd();
+        }
+        REQUIRE( expected_size == inds.size() );
     }
 }
 
