@@ -320,28 +320,6 @@ namespace mpart{
 
     }
 
-    template<typename DeviceMemoryType, typename... OtherTraits>
-    StridedMatrix<typename Kokkos::View<OtherTraits...>::non_const_value_type, DeviceMemoryType> ToDevice(StridedMatrix<typename Kokkos::View<OtherTraits...>::non_const_value_type, Kokkos::HostSpace> const& inview)
-    {
-        size_t stride0 = inview.stride_0();
-        size_t stride1 = inview.stride_1();
-
-        if(stride0==1){
-            Kokkos::View<typename Kokkos::View<OtherTraits...>::non_const_value_type**, Kokkos::LayoutLeft, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
-            Kokkos::deep_copy(outview, inview);
-            return outview;
-        }else if(stride1==1){
-            Kokkos::View<typename Kokkos::View<OtherTraits...>::non_const_value_type**, Kokkos::LayoutRight, DeviceMemoryType> outview("Device Copy", inview.extent(0), inview.extent(1));
-            Kokkos::deep_copy(outview, inview);
-            return outview;
-        }else{
-            std::stringstream msg;
-            msg << "Cannot copy generally strided matrix to device.  MParT currently only supports copies of view with continguous memory layouts.";
-            throw std::runtime_error(msg.str());
-        }
-
-    }
-
     template<typename ScalarType>
     inline Kokkos::View<ScalarType*,DeviceSpace> ToKokkos<ScalarType,DeviceSpace>(ScalarType* ptr, unsigned int dim) {
         Kokkos::View<ScalarType*,DeviceSpace> view = ToKokkos(ptr, dim);
