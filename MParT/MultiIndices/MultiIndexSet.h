@@ -46,19 +46,6 @@ public:
                                         LimiterType const& limiter = MultiIndexLimiter::None());
 
   /**
-   @brief Factory method for constructing a total order limited multiindex set that is "separable".
-   This means no midx will have the last index and any other index be nonzero simultaneously
-   
-   @param[in] length The length of the multiindices stored in this set.
-   @param[in] maxOrder The maximum order of multiindices to include.
-   @param[in] limiter An optional additional limiter to attach to the set.  Only multiindices that satisfy this limiter will be included.
-   @return MultiIndexSet An instance of the MultiIndexSet class containing all multiindices of order <= maxOrder AND satisfying the limiter.
-  */
-  static MultiIndexSet CreateSeparableTotalOrder(unsigned int length,
-                                        unsigned int maxOrder,
-                                        LimiterType const& limiter = MultiIndexLimiter::None());
-
-  /**
    Factory method for constructing a full tensor product multiindex set.
    @param[in] length The length of the multiindices stored in this set.
    @param[in] maxDegree The maximum value allowed in any multiindex.
@@ -439,8 +426,7 @@ private:
                                       MultiIndexSet &mset,
                                       unsigned int currDim,
                                       std::vector<unsigned int> &denseMulti,
-                                      LimiterType const& limiter,
-                                      unsigned int maxDim);
+                                      LimiterType const& limiter);
 
   static void RecursiveTensorFill(unsigned int   maxOrder,
                                       MultiIndexSet &mset,

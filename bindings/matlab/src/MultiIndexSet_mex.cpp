@@ -36,7 +36,7 @@ MEX_DEFINE(MultiIndexSet_newTotalOrder) (int nlhs, mxArray* plhs[],
   const unsigned int order = input.get<unsigned int>(1);
   const bool isSeparable = input.get<bool>(2);
   MultiIndexSet toCreate = isSeparable ?
-    MultiIndexSet::CreateSeparableTotalOrder(dim, order) :
+    MultiIndexSet::CreateTotalOrder(dim, order, MultiIndexLimiter::SeparableTotalOrder(order)) :
     MultiIndexSet::CreateTotalOrder(dim, order);
   output.set(0, Session<MultiIndexSet>::create(new MultiIndexSet(toCreate)));
 }

@@ -16,35 +16,11 @@ MultiIndexSet MultiIndexSet::CreateTotalOrder(unsigned int length,
 
     // start with a vector of zeros
     std::vector<unsigned int> base(length,0);
-
-    RecursiveTotalOrderFill(maxOrder, output, 0, base, limiter, length);
-
+    std::cerr << "TO" << std::endl;
+    RecursiveTotalOrderFill(maxOrder, output, 0, base, limiter);
+    std::cerr << "end TO" << std::endl;
     return output;
 }
-
-MultiIndexSet MultiIndexSet::CreateSeparableTotalOrder(unsigned int length,
-                                              unsigned int maxOrder,
-                                              LimiterType const& limiter)
-{
-    assert(length>0);
-
-    // create an empy multiindex set
-    MultiIndexSet output(length, limiter);
-
-    // start with a vector of zeros
-    std::vector<unsigned int> base(length,0);
-
-    RecursiveTotalOrderFill(maxOrder, output, 0, base, limiter, length-1);
-    for(int p = 1; p <= maxOrder; p++) {
-        MultiIndex newTerm(length);
-        newTerm.Set(length-1, p);
-        if(limiter(newTerm))
-            output.AddActive(newTerm);
-    }
-
-    return output;
-}
-
 
 MultiIndexSet MultiIndexSet::CreateTensorProduct(unsigned int length,
                                                  unsigned int maxDegree,
@@ -67,8 +43,7 @@ void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder,
                                             MultiIndexSet &output,
                                             unsigned int currDim,
                                             std::vector<unsigned int> &base,
-                                            LimiterType const& limiter,
-                                            unsigned int maxDim)
+                                            LimiterType const& limiter)
 {
     unsigned int currOrder = 0;
     for(unsigned int i=0; i<currDim; ++i)
@@ -76,11 +51,11 @@ void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder,
 
     const unsigned int length = base.size();
 
-    if(currDim==maxDim-1)
+    if(currDim==length-1)
     {
         for(unsigned int i=0; i<=maxOrder-currOrder; ++i)
         {
-            base.at(maxDim-1) = i;
+            base.at(length-1) = i;
             MultiIndex newTerm(base);
             if(limiter(newTerm))
                 output.AddActive(newTerm);
@@ -89,11 +64,11 @@ void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder,
     }else{
         for(unsigned int i=0; i<=maxOrder-currOrder; ++i)
         {
-            for(unsigned int k=currDim+1; k< maxDim; ++k)
+            for(unsigned int k=currDim+1; k< length; ++k)
                 base.at(k) = 0;
 
             base.at(currDim) = i;
-            RecursiveTotalOrderFill(maxOrder,output,currDim+1,base,limiter,maxDim);
+            RecursiveTotalOrderFill(maxOrder,output,currDim+1,base,limiter);
         }
     }
 }
