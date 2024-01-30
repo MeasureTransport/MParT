@@ -252,14 +252,7 @@ void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Eigen::Ref<Eigen::Vector
 template<>
 void ParameterizedFunctionBase<Kokkos::HostSpace>::WrapCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs)
 {
-     Kokkos::View<double*, Kokkos::HostSpace> inputCoeffs = VecToKokkos<double, Kokkos::HostSpace>(coeffs);
-     
-    if(inputCoeffs.size() != this->numCoeffs){
-        std::stringstream msg;
-        msg << "Error in ParameterizedFunctionBase<MemorySpace>::WrapCoeffs.  Expected coefficient vector with size " << this->numCoeffs << ", but new coefficients have size " << inputCoeffs.size() << ".";
-        throw std::invalid_argument(msg.str());
-    }
-    this->savedCoeffs = inputCoeffs;
+    WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace>(VecToKokkos<double, Kokkos::HostSpace>(coeffs)));
 }
 
 template<>
