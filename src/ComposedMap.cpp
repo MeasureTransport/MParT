@@ -195,7 +195,7 @@ void ComposedMap<MemorySpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::Hos
 }
 
 template<typename MemorySpace>
-void ComposedMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+void ComposedMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
     ConditionalMapBase<MemorySpace>::WrapCoeffs(coeffs);
