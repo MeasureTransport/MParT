@@ -16,9 +16,7 @@ MultiIndexSet MultiIndexSet::CreateTotalOrder(unsigned int length,
 
     // start with a vector of zeros
     std::vector<unsigned int> base(length,0);
-    std::cerr << "TO" << std::endl;
     RecursiveTotalOrderFill(maxOrder, output, 0, base, limiter);
-    std::cerr << "end TO" << std::endl;
     return output;
 }
 
