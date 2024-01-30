@@ -250,13 +250,13 @@ StridedMatrix<double, mpart::DeviceSpace> ConditionalMapBase<mpart::DeviceSpace>
     return output;
 }
 
+
 template<>
 template<>
 StridedMatrix<double, Kokkos::HostSpace> ConditionalMapBase<mpart::DeviceSpace>::LogDeterminantInputGrad(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
 {
     // Copy the points to the device space
-    //
-    StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace,const double>(pts);
+    StridedMatrix<const double, mpart::DeviceSpace> pts_device = ToDevice<mpart::DeviceSpace>(pts);
 
     // Evaluate on the device space
     StridedMatrix<double, mpart::DeviceSpace> evals_device = this->LogDeterminantInputGrad(pts_device);
@@ -276,7 +276,7 @@ StridedMatrix<double, mpart::DeviceSpace> ConditionalMapBase<Kokkos::HostSpace>:
     StridedMatrix<double, Kokkos::HostSpace> evals_host = this->LogDeterminantInputGrad(pts_host);
 
     // Copy back to the device
-    return ToDevice<mpart::DeviceSpace,double>(evals_host);
+    return ToDevice<mpart::DeviceSpace>(evals_host);
 }
 
 
