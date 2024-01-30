@@ -429,6 +429,22 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         REQUIRE( set.at(inds.at(2)) == MultiIndex{3,0} );
 
     }
+
+    SECTION("NonzeroDiagonalEntries") {
+        unsigned int dim = 2, maxOrder = 3;
+        MultiIndexSet set = MultiIndexSet::CreateSeparableTotalOrder(dim, maxOrder);
+        std::vector<unsigned int> inds = set.NonzeroDiagonalEntries();
+        for(unsigned int ind: inds) {
+            MultiIndex multi = set.at(ind);
+            REQUIRE( multi.HasNonzeroEnd() );
+        }
+        unsigned int expected_size = 0;
+        for(unsigned int i = 0; i < set.Size(); ++i) {
+            MultiIndex multi = set.at(i);
+            expected_size += multi.HasNonzeroEnd();
+        }
+        REQUIRE( expected_size == inds.size() );
+    }
 }
 
 TEST_CASE("MultiIndexSet Operator Tests", "[MultiIndexSet_Operators]")

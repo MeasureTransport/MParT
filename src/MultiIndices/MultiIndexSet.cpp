@@ -422,6 +422,15 @@ void MultiIndexSet::AddForwardNeighbors(unsigned int globalIndex, bool addInacti
   }
 }
 
+std::vector<unsigned int> MultiIndexSet::NonzeroDiagonalEntries() const {
+    std::vector<unsigned int> idxs;
+    for(unsigned int i = 0; i < active2global.size(); i++) {
+        if(allMultis[active2global[i]].HasNonzeroEnd()) {
+            idxs.push_back(i);
+        }
+    }
+    return idxs;
+}
 
 void MultiIndexSet::Visualize(std::ostream &out) const
 {
