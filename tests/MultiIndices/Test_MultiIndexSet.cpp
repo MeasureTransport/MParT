@@ -484,6 +484,45 @@ TEST_CASE("MultiIndexSet Operator Tests", "[MultiIndexSet_Operators]")
 
 }
 
+TEST_CASE("MultiIndexSet ReducedMargin Test", "[MultiIndexSet_RM]") {
+    unsigned int dim = 5;
+    SECTION("OrderZero_RM") {
+        // Simple tests for the reduced margin function
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, 0);
+        std::vector<MultiIndex> rmset = mset.ReducedMargin();
+        REQUIRE(rmset.size() == 5);
+        for(auto& multi : rmset)
+            REQUIRE(multi.Sum() == 1);
+        unsigned int dim_idx = 2;
+        rmset = mset.ReducedMarginDim(dim_idx);
+        REQUIRE(rmset.size() == 1);
+        MultiIndex multi = rmset.at(0);
+        REQUIRE(multi.Sum() == 1);
+        REQUIRE(multi.Get(dim_idx) == 1);
+    }
+    std::cout << std::endl;
+    unsigned int P = 2;
+    SECTION("OrderP_RM") {
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, P);
+        // The RM of a TO set should be the same as the new midxs in the next TO set
+        MultiIndexSet mset2 = MultiIndexSet::CreateTotalOrder(dim, P+1);
+        std::vector<MultiIndex> rmset = mset.ReducedMargin();
+        REQUIRE(rmset.size() == mset2.Size() - mset.Size());
+        for(auto& multi : rmset) {
+            REQUIRE(multi.Sum() == P+1);
+        }
+        unsigned int dim_idx = 0;
+        rmset = mset.ReducedMarginDim(dim_idx);
+        // I'm unsure how big the RM should be for a particular dimension
+        // e.g. [0,2,1] has bw neighbors [0,1,1], [0,2,0], which means it gets included
+        // this multiple bw neighbors business makes it hard to count exactly
+        REQUIRE(rmset.size() < mset2.Size() - mset.Size());
+        for(auto& multi : rmset) {
+            REQUIRE(multi.Sum() == P+1);
+        }
+    }
+}
+
 TEST_CASE("MultiIndexSet Visualization Test", "[MultiIndexSet_Viz]")
 {
     SECTION("Floating"){
