@@ -10,19 +10,19 @@ template<typename MemorySpace>
 MarginalAffineMap<MemorySpace>::MarginalAffineMap(StridedVector<double,MemorySpace> scale,
                                   StridedVector<double,MemorySpace> shift,
                                   std::shared_ptr<ConditionalMapBase<MemorySpace>> map) :
-                                  ConditionalMapBase<MemorySpace>(map.inputDim, map.outputDim, map.numCoeffs),
+                                  ConditionalMapBase<MemorySpace>(map->inputDim, map->outputDim, map->numCoeffs),
                                                                   scale_("scale", scale.extent(0)),
                                                                   shift_("shift", shift.extent(0))
 {
     Kokkos::deep_copy(scale_, scale);
     Kokkos::deep_copy(shift_, shift);
     assert(scale_.size()==shift_.size());
-    assert(map_.inputDim == scale_.size());
+    assert(map_->inputDim == scale_.size());
 
     logDet_ = 0.;
-    Kokkos::parallel_for("MarginalAffineMap logdet", scale.extent(0), KOKKOS_LAMBDA(const int&){
-        logDet_ += MathSpace::log(scale(i));
-    });
+    Kokkos::parallel_reduce("MarginalAffineMap logdet", scale.extent(0), KOKKOS_LAMBDA(const int&i, double& ldet){
+        ldet += Kokkos::log(scale_(i));
+    }, logDet_);
 }
 
 template<typename MemorySpace>
@@ -40,60 +40,19 @@ void MarginalAffineMap<MemorySpace>::InverseImpl(StridedMatrix<const double, Mem
                                          StridedMatrix<const double, MemorySpace> const& r,
                                          StridedMatrix<double, MemorySpace>              output)
 {
-
-    int numPts = r.extent(1);
-
-    // Make sure we work with a column major output matrix if there is a linear component
-    bool copyOut = false;
-    StridedMatrix<double,MemorySpace> outLeft;
-    if(A_.extent(0)>0){
-        if(output.stride_0()==1){
-            outLeft = output;
-        }else{
-            outLeft = Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>("OutLeft", output.extent(0), output.extent(1));
-            copyOut = true;
-        }
-    }else{
-        outLeft = output;
-    }
-
-    // Bias part
-    if(b_.size()>0){
-
-        Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{numPts, this->outputDim}});
-
-        // After this for loop, we will have out = r - b
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
-            outLeft(i,j) = r(i,j) - b_(i);
-        });
-
-    }else{
-        Kokkos::deep_copy(outLeft, r);
-    }
-
-    // Linear part
-    if(A_.extent(0)>0){
-
-        int nrows = A_.extent(0);
-        int ncols = A_.extent(1);
-
-        // If the matrix is rectangular, treat it as the lower part of a block triangular matrix
-        // The value of x1 contains the compute inverse for the first block
-        if(nrows != ncols){
-
-            StridedMatrix<const double, MemorySpace> xsub = Kokkos::subview(x1, std::make_pair(0,ncols-nrows), Kokkos::ALL());
-            StridedMatrix<const double, MemorySpace> Asub = Kokkos::subview(A_, Kokkos::ALL(), std::make_pair(0,ncols-nrows));
-
-            dgemm<MemorySpace>(-1.0, Asub, xsub, 1.0, outLeft);
-        }
-
-        // Now solve with the square block of A_
-        luSolver_.solveInPlace(outLeft);
-
-        // Copy the inverse back if necessary
-        if(copyOut)
-            Kokkos::deep_copy(output, outLeft);
-    }
+    int r_n1 = r.extent(0), r_n2 = r.extent(1);
+    Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> r_tmp("r_tmp", r_n1, r_n2);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> prefix_policy({0, 0}, {r_n1, r_n2});
+    Kokkos::parallel_for(prefix_policy, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+        r_tmp(i,j) = r(i,j)*scale_(i) + shift_(i);
+    });
+    map_->InverseImpl(x1, r_tmp, output);
+    int n1 = output.extent(0), n2 = output.extent(1);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> output_policy({0, 0}, {n1, n2});
+    Kokkos::parallel_for(output_policy, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+        int input_idx = i+r_n1;
+        output(i,j) = (output(i,j) - shift_(input_idx))/scale_(input_idx);
+    });
 
 }
 
@@ -103,36 +62,26 @@ template<typename MemorySpace>
 void MarginalAffineMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                          StridedMatrix<double, MemorySpace>              output)
 {
-    return;
+    int n1 = pts.extent(0), n2 = pts.extent(1);
+    Kokkos::View<double**, MemorySpace> tmp("tmp", n1, n2);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {n1, n2});
+    Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+        tmp(i,j) = pts(i,j)*scale_(i) + shift_(i);
+    });
+    map_->LogDeterminantCoeffGradImpl(tmp, output);
 }
 
 template<typename MemorySpace>
 void MarginalAffineMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                           StridedMatrix<double, MemorySpace>              output)
 {
-    unsigned int numPts = pts.extent(1);
-    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{numPts, this->outputDim}});
-
-    // Linear part
-    if(A_.extent(0)>0){
-        
-        // Initialize output to zeros 
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
-            output(i,j) = 0.0;
-        });
-
-        dgemm<MemorySpace>(1.0, A_, pts, 0.0, output);
-
-    }else{
-        Kokkos::deep_copy(output, pts);
-    }
- 
-    // Bias part
-    if(b_.size()>0){
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
-            output(i,j) += b_(i);
-        });
-    }
+    int n1 = pts.extent(0), n2 = pts.extent(1);
+    Kokkos::View<double**, MemorySpace> tmp("tmp", n1, n2);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {n1, n2});
+    Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+        tmp(i,j) = pts(i,j)*scale_(i) + shift_(i);
+    });
+    map_->EvaluateImpl(tmp, output);
 }
 
 template<typename MemorySpace>
@@ -140,14 +89,33 @@ void MarginalAffineMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, M
                                            StridedMatrix<const double, MemorySpace> const& sens,
                                            StridedMatrix<double, MemorySpace>              output)
 {
-    return;
+    int n1 = pts.extent(0), n2 = pts.extent(1);
+    Kokkos::View<double**, MemorySpace> tmp("tmp", n1, n2);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {n1, n2});
+    Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+        tmp(i,j) = pts(i,j)*scale_(i) + shift_(i);
+    });
+    map_->CoeffGradImpl(tmp, sens, output);
 }
 
 template<typename MemorySpace>
 void MarginalAffineMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                          StridedMatrix<double, MemorySpace>              output)
 {
-    return;
+    int n1 = pts.extent(0), n2 = pts.extent(1);
+    Kokkos::View<double**, MemorySpace> tmp("tmp", n1, n2);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {n1, n2});
+    Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+        tmp(i,j) = pts(i,j)*scale_(i) + shift_(i);
+    });
+    map_->LogDeterminantInputGradImpl(tmp, output);
+    int out_n1 = output.extent(0), out_n2 = output.extent(1);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy2({0, 0}, {out_n1, out_n2});
+    int scale_idx_start = map_->inputDim-map_->outputDim;
+    Kokkos::parallel_for("MarginalAffineMap LogDeterminantInputGrad", policy2, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+        int scale_idx = i+scale_idx_start;
+        output(i,j) *= scale_(scale_idx);
+    });
 }
 
 template<typename MemorySpace>
@@ -155,12 +123,20 @@ void MarginalAffineMap<MemorySpace>::GradientImpl(StridedMatrix<const double, Me
                                           StridedMatrix<const double, MemorySpace> const& sens,
                                           StridedMatrix<double, MemorySpace>              output)
 {
-    // Linear part
-    if(A_.extent(0)>0){
-        dgemm<MemorySpace>(1.0, transpose(A_), sens, 0.0, output);
-    }else{
-        Kokkos::deep_copy(output, sens);
-    }
+    int n1 = pts.extent(0), n2 = pts.extent(1);
+    Kokkos::View<double**, MemorySpace> tmp("tmp", n1, n2);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {n1, n2});
+    Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+        tmp(i,j) = pts(i,j)*scale_(i) + shift_(i);
+    });
+    map_->GradientImpl(tmp, sens, output);
+    int out_n1 = output.extent(0), out_n2 = output.extent(1);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy2({0, 0}, {out_n1, out_n2});
+    int scale_idx_start = map_->inputDim-map_->outputDim;
+    Kokkos::parallel_for("MarginalAffineMap Gradient", policy2, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+        int scale_idx = i+scale_idx_start;
+        output(i,j) *= scale_(scale_idx);
+    });
 }
 
 
