@@ -19,7 +19,9 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
         .constructor<unsigned int>()
         .constructor<std::vector<unsigned int> const&>()
         .method("NumNz", &MultiIndex::NumNz)
-        .method("count_nonzero", &MultiIndex::NumNz);
+        .method("count_nonzero", &MultiIndex::NumNz)
+        .method("HasNonzeroEnd", &MultiIndex::HasNonzeroEnd)
+    ;
 
     jlcxx::stl::apply_stl<MultiIndex>(mod);
 
@@ -62,6 +64,7 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
         .method("IsExpandable", &MultiIndexSet::IsExpandable)
         .method("NumActiveForward", &MultiIndexSet::NumActiveForward)
         .method("NumForward", &MultiIndexSet::NumForward)
+        .method("NonzeroDiagonalEntries", &MultiIndexSet::NonzeroDiagonalEntries)
         .method("Size", &MultiIndexSet::Size)
         .method("addto!", [](MultiIndexSet &mset, MultiIndex const& idx){ return mset += idx; })
         .method("addto!", [](MultiIndexSet &mset, MultiIndexSet const& mset2){ return mset += mset2; })
@@ -72,6 +75,7 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
     });
 
     mod.method("CreateTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::None()); });
+    mod.method("CreateSeparableTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateSeparableTotalOrder(length, maxOrder, MultiIndexLimiter::None()); });
 
     mod.set_override_module(jl_base_module);
     mod.method("sum", [](MultiIndex const& idx){ return idx.Sum(); });
@@ -84,6 +88,7 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
     mod.method("length", [](MultiIndexSet const& idx){ return idx.Length(); });
     mod.method("length", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset){return mset.Length();});
     mod.method("size", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset){return mset.Size();});
+    mod.method("size", [](MultiIndexSet &mset){return mset.Size();});
     mod.method("vec", [](MultiIndex const& idx){ return idx.Vector(); });
     mod.method("==", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 == idx2; });
     mod.method("!=", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 != idx2; });

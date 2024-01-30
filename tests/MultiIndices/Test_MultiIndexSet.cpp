@@ -110,6 +110,10 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
     REQUIRE( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
 
+    MultiIndexSet mset_sep = MultiIndexSet::CreateSeparableTotalOrder(dim+1, maxOrder);
+    REQUIRE( mset_sep.Size()== ((maxOrder+1)*(maxOrder+2)/2) + maxOrder);
+    REQUIRE( mset_sep.NonzeroDiagonalEntries().size() == maxOrder);
+
 
     /*
     AdmissableNeighbor.ValidNeighbor

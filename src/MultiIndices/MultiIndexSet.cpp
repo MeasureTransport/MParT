@@ -80,7 +80,7 @@ void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder,
     {
         for(unsigned int i=0; i<=maxOrder-currOrder; ++i)
         {
-            base.at(length-1) = i;
+            base.at(maxDim-1) = i;
             MultiIndex newTerm(base);
             if(limiter(newTerm))
                 output.AddActive(newTerm);
