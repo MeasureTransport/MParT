@@ -16,12 +16,9 @@ MultiIndexSet MultiIndexSet::CreateTotalOrder(unsigned int length,
 
     // start with a vector of zeros
     std::vector<unsigned int> base(length,0);
-
     RecursiveTotalOrderFill(maxOrder, output, 0, base, limiter);
-
     return output;
 }
-
 
 MultiIndexSet MultiIndexSet::CreateTensorProduct(unsigned int length,
                                                  unsigned int maxDegree,
@@ -65,7 +62,7 @@ void MultiIndexSet::RecursiveTotalOrderFill(unsigned int   maxOrder,
     }else{
         for(unsigned int i=0; i<=maxOrder-currOrder; ++i)
         {
-            for(unsigned int k=currDim+1; k<length; ++k)
+            for(unsigned int k=currDim+1; k< length; ++k)
                 base.at(k) = 0;
 
             base.at(currDim) = i;
@@ -398,6 +395,15 @@ void MultiIndexSet::AddForwardNeighbors(unsigned int globalIndex, bool addInacti
   }
 }
 
+std::vector<unsigned int> MultiIndexSet::NonzeroDiagonalEntries() const {
+    std::vector<unsigned int> idxs;
+    for(unsigned int i = 0; i < active2global.size(); i++) {
+        if(allMultis[active2global[i]].HasNonzeroEnd()) {
+            idxs.push_back(i);
+        }
+    }
+    return idxs;
+}
 
 void MultiIndexSet::Visualize(std::ostream &out) const
 {

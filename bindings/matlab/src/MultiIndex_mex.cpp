@@ -166,6 +166,14 @@ MEX_DEFINE(MultiIndex_Le) (int nlhs, mxArray* plhs[],
   output.set(0, multi<=multi2);
 }
 
+MEX_DEFINE(MultiIndex_HasNonzeroEnd) (int nlhs, mxArray* plhs[],
+                                  int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndex& multi = Session<MultiIndex>::getConst(input.get(0));
+  output.set(0, multi.HasNonzeroEnd());
+}
+
 
 
 } // namespace

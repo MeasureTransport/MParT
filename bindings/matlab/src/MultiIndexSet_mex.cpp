@@ -30,11 +30,15 @@ MEX_DEFINE(MultiIndexSet_newEigen) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(MultiIndexSet_newTotalOrder) (int nlhs, mxArray* plhs[],
                                          int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 2);
+  InputArguments input(nrhs, prhs, 3);
   OutputArguments output(nlhs, plhs, 1);
   const unsigned int dim = input.get<unsigned int>(0);
   const unsigned int order = input.get<unsigned int>(1);
-  output.set(0, Session<MultiIndexSet>::create(new MultiIndexSet(MultiIndexSet::CreateTotalOrder(dim,order))));
+  const bool isSeparable = input.get<bool>(2);
+  MultiIndexSet toCreate = isSeparable ?
+    MultiIndexSet::CreateTotalOrder(dim, order, MultiIndexLimiter::SeparableTotalOrder(order)) :
+    MultiIndexSet::CreateTotalOrder(dim, order);
+  output.set(0, Session<MultiIndexSet>::create(new MultiIndexSet(toCreate)));
 }
 
 // Defines MEX API for delete.
@@ -329,6 +333,14 @@ MEX_DEFINE(MultiIndexSet_Visualize) (int nlhs, mxArray* plhs[],
   mset.Visualize();
 }
 
+
+MEX_DEFINE(MultiIndexSet_NonzeroDiagonalEntries) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
+  output.set(0, mset.NonzeroDiagonalEntries());
+}
 
 
 

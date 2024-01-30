@@ -21,7 +21,10 @@ end
 
 methods(Static)
     function mset = CreateTotalOrder(dim, totalOrder)
-        mset = MultiIndexSet(dim,totalOrder);
+        mset = MultiIndexSet(dim,totalOrder,false);
+    end
+    function mset = CreateSeparableTotalOrder(dim, totalOrder)
+        mset = MultiIndexSet(dim,totalOrder,true);
     end
 end
 
@@ -32,9 +35,9 @@ methods
         if(varargin{2}=="id")
           this.id_ = varargin{1};
         end
-      else
-        this.id_ = MParT_('MultiIndexSet_newTotalOrder', varargin{1},varargin{2});
       end
+    elseif(nargin==3)
+      this.id_ = MParT_('MultiIndexSet_newTotalOrder', varargin{1},varargin{2},varargin{3});
     else
         this.id_ = MParT_('MultiIndexSet_newEigen',varargin{1});
     end
@@ -229,6 +232,10 @@ methods
     fixed_mset = FixedMultiIndexSet(this);
   end
 
+  function indices = NonzeroDiagonalEntries(this)
+    indices = MParT_('MultiIndexSet_NonzeroDiagonalEntries',this.id_);
+    indices = indices + 1;
+  end
 
   
 end

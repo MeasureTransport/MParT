@@ -17,8 +17,8 @@ void mpart::binding::TriangularMapWrapper(jlcxx::Module &mod) {
        .method("GetComponent", &TriangularMap<Kokkos::HostSpace>::GetComponent)
     ;
 
-    mod.method("TriangularMap", [](std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> vec){
-        return std::static_pointer_cast<ConditionalMapBase<Kokkos::HostSpace>>(std::make_shared<TriangularMap<Kokkos::HostSpace>>(vec));
+    mod.method("TriangularMap", [](std::vector<std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>>> vec, bool move_coeffs=false){
+        return std::static_pointer_cast<ConditionalMapBase<Kokkos::HostSpace>>(std::make_shared<TriangularMap<Kokkos::HostSpace>>(vec, move_coeffs));
     });
 
 }
