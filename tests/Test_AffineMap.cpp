@@ -128,6 +128,7 @@ TEST_CASE( "Testing Rectangular AffineMap", "[RectangularLinearMap]" ) {
     for(unsigned int i=0; i<numPts; ++i){
         double trueOut1 = A(0,0)*pts(0,i) + A(0,1)*pts(1,i) + A(0,2)*pts(2,i);
         double trueOut2 = A(1,0)*pts(0,i) + A(1,1)*pts(1,i) + A(1,2)*pts(2,i);
+     
         REQUIRE_THAT(evals(0,i), Matchers::WithinAbs(trueOut1, 1e-14));
         REQUIRE_THAT(evals(1,i), Matchers::WithinAbs(trueOut2, 1e-14));
         REQUIRE_THAT(pts2(0,i), Matchers::WithinAbs(pts(1,i), 1e-14));
