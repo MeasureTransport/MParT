@@ -76,6 +76,7 @@ TEST_CASE( "Test MarginalAffineMap", "[MarginalAffineMap]") {
             }
         }
     }
+
     SECTION("TriangularMap, non-square") {
         unsigned int maxOrder = 3;
         unsigned int outputDim = 2;
@@ -87,7 +88,6 @@ TEST_CASE( "Test MarginalAffineMap", "[MarginalAffineMap]") {
             trimap->Coeffs()(k) = 1/(k+1);
         }
         auto map = std::make_shared<MarginalAffineMap<MemorySpace>>(scale, shift, trimap);
-        // TODO: Test move coeffs
 
         // Generate points
         Kokkos::View<double**, MemorySpace> pts("pts", inputDim, numPts);
@@ -164,6 +164,7 @@ TEST_CASE( "Test MarginalAffineMap", "[MarginalAffineMap]") {
                 trimap->Coeffs()(k) -= fd_step;
             }
         }
+
         for(unsigned int k=0; k<trimap->numCoeffs; ++k){
             for(unsigned int j=0; j<numPts; ++j){
                 REQUIRE_THAT(logdet_coeff_grad(k,j), WithinRel(exp_logdet_coeff_grad_map(k,j), 20*fd_step));
@@ -219,7 +220,31 @@ TEST_CASE( "Test MarginalAffineMap", "[MarginalAffineMap]") {
                 REQUIRE_THAT(coeff_grad(i,j), WithinRel(exp_coeff_grad_map(i,j), 20*fd_step) || WithinAbs(exp_coeff_grad_map(i,j), 1e-8));
             }
         }
+    }
 
-        
+    SECTION("MoveCoeffs") {
+        unsigned int maxOrder = 3;
+        unsigned int outputDim = 2;
+        unsigned int numPts = 20;
+        auto trimap = MapFactory::CreateTriangular<MemorySpace>(inputDim, outputDim, maxOrder, MapOptions());
+
+        // Penalize high order k
+        for(unsigned int k = 0; k < trimap->numCoeffs; k++) {
+            trimap->Coeffs()(k) = 1/(k+1);
+        }
+        auto map = std::make_shared<MarginalAffineMap<MemorySpace>>(scale, shift, trimap);
+        for(unsigned int k = 0; k < map->numCoeffs; k++) {
+            map->Coeffs()(k) += 0.1;
+        }
+        for(unsigned int k = 0; k < map->numCoeffs; k++) {
+            REQUIRE_THAT(map->Coeffs()(k), WithinRel(trimap->Coeffs()(k), 1e-14));
+        }
+        map = std::make_shared<MarginalAffineMap<MemorySpace>>(scale, shift, trimap, false);
+        for(unsigned int k = 0; k < map->numCoeffs; k++) {
+            map->Coeffs()(k) += 0.1;
+        }
+        for(unsigned int k = 0; k < map->numCoeffs; k++) {
+            REQUIRE_THAT(map->Coeffs()(k), WithinRel(trimap->Coeffs()(k) + 0.1, 1e-14));
+        }
     }
 }

@@ -28,11 +28,9 @@ MarginalAffineMap<MemorySpace>::MarginalAffineMap(StridedVector<double,MemorySpa
     Kokkos::parallel_reduce("MarginalAffineMap logdet", scale.extent(0), KOKKOS_LAMBDA(const int&i, double& ldet){
         ldet += Kokkos::log(scale_(i));
     }, logDet_);
+    this->SetCoeffs(map->Coeffs());
     if (moveCoeffs) {
-        this->SetCoeffs(map->Coeffs());
         map->WrapCoeffs(this->savedCoeffs);
-    } else {
-        this->WrapCoeffs(map->Coeffs());
     }
 }
 
