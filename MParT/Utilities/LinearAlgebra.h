@@ -8,6 +8,7 @@
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Utilities/GPUtils.h"
 #include "MParT/Utilities/KokkosSpaceMappings.h"
+#include "MParT/Utilities/KokkosHelpers.h"
 
 #if defined(MPART_ENABLE_GPU)
 #include <cuda_runtime.h>
@@ -21,55 +22,19 @@ namespace mpart{
 /**
  x += y
  */
-template<typename... Traits1, typename... Traits2>
-void AddInPlace(Kokkos::View<double*, Traits1...> x,
-                Kokkos::View<const double*, Traits2...> y)
-{
-    assert(x.extent(0)==y.extent(0));
-
-    using ExecSpace = typename MemoryToExecution<typename Kokkos::View<double*, Traits1...>::memory_space>::Space;
-    Kokkos::RangePolicy<ExecSpace> policy(0, x.extent(0));
-
-    struct Functor {
-        Functor(Kokkos::View<double*, Traits1...>& x, Kokkos::View<const double*, Traits2...> const& y) : x_(x), y_(y){};
-
-        KOKKOS_INLINE_FUNCTION void operator()(const int i) const {
-            x_(i) += y_(i);
-        }
-
-        Kokkos::View<double*, Traits1...>& x_;
-        Kokkos::View<const double*, Traits2...> const& y_;
-    };
-
-    Kokkos::parallel_for(policy, Functor(x,y));
+template<typename ViewType1, typename ViewType2>
+void AddInPlace(ViewType1 x, ViewType2 y) {
+    constexpr size_t rank = GetViewRank<ViewType1>::Rank;
+    if constexpr(rank == 1) {
+        Kokkos::parallel_for(x.extent(0), KOKKOS_LAMBDA(const int i){x(i) += y(i);});
+    } else if (rank == 2) {
+        Kokkos::MDRangePolicy<Kokkos::Rank<2>,typename ViewType1::execution_space> policy({0, 0}, {x.extent(0), x.extent(1)});
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i, const int j){x(i, j) += y(i, j);});
+    } else {
+        assert(false);
+    }
 }
 
-/**
- x += y
- */
-template<typename... Traits1, typename... Traits2>
-void AddInPlace(Kokkos::View<double**, Traits1...> x,
-                Kokkos::View<const double**, Traits2...> y)
-{
-    assert(x.extent(0)==y.extent(0));
-    assert(x.extent(1)==y.extent(1));
-
-    using ExecSpace = typename MemoryToExecution<typename Kokkos::View<double*, Traits1...>::memory_space>::Space;
-    Kokkos::MDRangePolicy<Kokkos::Rank<2>,ExecSpace> policy({0, 0}, {x.extent(0), x.extent(1)});
-
-    struct Functor {
-        Functor(Kokkos::View<double**, Traits1...>& x, Kokkos::View<const double**, Traits2...> const& y) : x_(x), y_(y){};
-
-        KOKKOS_INLINE_FUNCTION void operator()(const int i, const int j) const {
-            x_(i,j) += y_(i,j);
-        }
-
-        Kokkos::View<double**, Traits1...>& x_;
-        Kokkos::View<const double**, Traits2...> const& y_;
-    };
-
-    Kokkos::parallel_for(policy, Functor(x,y));
-}
 
 /**
 z = x + y
