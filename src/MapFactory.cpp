@@ -129,28 +129,28 @@ std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::Creat
     if(opts.basisType==BasisTypes::ProbabilistHermite){
 
         if(isinf(opts.basisLB) && isinf(opts.basisUB)){
-            ProbabilistHermite basis1d(opts.basisNorm);
-            output = std::make_shared<MultivariateExpansion<ProbabilistHermite, MemorySpace>>(outputDim, mset, basis1d);
+            BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite> basis1d(opts.basisNorm);
+            output = std::make_shared<MultivariateExpansion<decltype(basis1d), MemorySpace>>(outputDim, mset, basis1d);
         }else{
-            LinearizedBasis<ProbabilistHermite> basis1d(ProbabilistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
+            BasisEvaluator<BasisHomogeneity::Homogeneous,LinearizedBasis<ProbabilistHermite>> basis1d(LinearizedBasis(ProbabilistHermite(opts.basisNorm), opts.basisLB, opts.basisUB));
             output = std::make_shared<MultivariateExpansion<decltype(basis1d), MemorySpace>>(outputDim, mset, basis1d);
         }
     }else if(opts.basisType==BasisTypes::PhysicistHermite){
 
         if(isinf(opts.basisLB) && isinf(opts.basisUB)){
-            PhysicistHermite basis1d(opts.basisNorm);
-            output = std::make_shared<MultivariateExpansion<PhysicistHermite, MemorySpace>>(outputDim, mset, basis1d);
+            BasisEvaluator<BasisHomogeneity::Homogeneous,PhysicistHermite> basis1d(opts.basisNorm);
+            output = std::make_shared<MultivariateExpansion<decltype(basis1d), MemorySpace>>(outputDim, mset, basis1d);
         }else{
-            LinearizedBasis<PhysicistHermite> basis1d(PhysicistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
+            BasisEvaluator<BasisHomogeneity::Homogeneous,LinearizedBasis<PhysicistHermite>> basis1d(PhysicistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
             output = std::make_shared<MultivariateExpansion<decltype(basis1d), MemorySpace>>(outputDim, mset, basis1d);
         }
     }else if(opts.basisType==BasisTypes::HermiteFunctions){
 
         if(isinf(opts.basisLB) && isinf(opts.basisUB)){
-            HermiteFunction basis1d;
-            output = std::make_shared<MultivariateExpansion<HermiteFunction, MemorySpace>>(outputDim, mset, basis1d);
+            BasisEvaluator<BasisHomogeneity::Homogeneous,HermiteFunction> basis1d;
+            output = std::make_shared<MultivariateExpansion<decltype(basis1d), MemorySpace>>(outputDim, mset, basis1d);
         }else{
-            LinearizedBasis<HermiteFunction> basis1d(opts.basisLB, opts.basisUB);
+            BasisEvaluator<BasisHomogeneity::Homogeneous,LinearizedBasis<HermiteFunction>> basis1d(opts.basisLB, opts.basisUB);
             output = std::make_shared<MultivariateExpansion<decltype(basis1d), MemorySpace>>(outputDim, mset, basis1d);
         }
     }

@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include<Kokkos_Sort.hpp>
 
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
@@ -19,6 +20,47 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     CHECK(maxDegrees(0)==maxOrder);
     CHECK(maxDegrees(1)==maxOrder);
 }
+
+TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedMultiIndexSetSorting]" ) {
+
+    const unsigned int dim = 2;
+
+    // Manually construct the multiindex with a proper sorted ordering of the dimensions
+    // The set is given by the multiindices [[1,0], [0,1], [1,2]]
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> nzStarts("nzStarts", 4);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> nzDims("nzDims", 4);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> nzOrders("nzOrders", 4);
+    nzStarts(0) = 0;
+    nzStarts(1) = 1;
+    nzStarts(2) = 2;
+    nzStarts(3) = 4;
+
+    nzDims(0) = 0; nzOrders(0)=1; // [1,0]
+    nzDims(1) = 1; nzOrders(1)=1; // [0,1]
+    nzDims(2) = 0; nzOrders(2)=1; // The 1 in [1,2]
+    nzDims(3) = 1; nzOrders(3)=2; // The 2 in [1,2]
+
+    FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, nzStarts, nzDims, nzOrders);
+
+    CHECK(mset.nzDims(3)>mset.nzDims(2));
+    CHECK(mset.nzOrders(3)==2);
+    CHECK(mset.nzOrders(2)==1);
+
+    // Manually construct the multiindex with an IMPROPER ordering of the dimensions
+
+    nzDims(0) = 0; nzOrders(0)=1; // [1,0]
+    nzDims(1) = 1; nzOrders(1)=1; // [0,1]
+    nzDims(2) = 1; nzOrders(2)=2; // The 2 in [1,2]
+    nzDims(3) = 0; nzOrders(3)=1; // The 1 in [1,2].  Internal to the FixedMultiIndexSet, this should come before 2.
+    
+    FixedMultiIndexSet<Kokkos::HostSpace> mset2(dim, nzStarts, nzDims, nzOrders);
+
+    CHECK(mset.nzDims(3)>mset.nzDims(2));
+    CHECK(mset.nzOrders(3)==2);
+    CHECK(mset.nzOrders(2)==1);
+    
+}
+
 
 TEST_CASE("MultiIndexSet from Eigen", "[MultiIndexSetFromEigen]")
 {
@@ -482,6 +524,44 @@ TEST_CASE("MultiIndexSet Operator Tests", "[MultiIndexSet_Operators]")
     REQUIRE(mset4.at(1) == MultiIndex{1,0});
     REQUIRE(mset4.at(2) == MultiIndex{0,1});
 
+}
+
+TEST_CASE("MultiIndexSet ReducedMargin Test", "[MultiIndexSet_RM]") {
+    unsigned int dim = 5;
+    SECTION("OrderZero_RM") {
+        // Simple tests for the reduced margin function
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, 0);
+        std::vector<MultiIndex> rmset = mset.ReducedMargin();
+        REQUIRE(rmset.size() == 5);
+        for(auto& multi : rmset)
+            REQUIRE(multi.Sum() == 1);
+        unsigned int dim_idx = 2;
+        rmset = mset.ReducedMarginDim(dim_idx);
+        REQUIRE(rmset.size() == 1);
+        MultiIndex multi = rmset.at(0);
+        REQUIRE(multi.Sum() == 1);
+        REQUIRE(multi.Get(dim_idx) == 1);
+    }
+    unsigned int P = 2;
+    SECTION("OrderP_RM") {
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, P);
+        // The RM of a TO set should be the same as the new midxs in the next TO set
+        MultiIndexSet mset2 = MultiIndexSet::CreateTotalOrder(dim, P+1);
+        std::vector<MultiIndex> rmset = mset.ReducedMargin();
+        REQUIRE(rmset.size() == mset2.Size() - mset.Size());
+        for(auto& multi : rmset) {
+            REQUIRE(multi.Sum() == P+1);
+        }
+        unsigned int dim_idx = 0;
+        rmset = mset.ReducedMarginDim(dim_idx);
+        // I'm unsure how big the RM should be for a particular dimension
+        // e.g. [0,2,1] has bw neighbors [0,1,1], [0,2,0], which means it gets included
+        // this multiple bw neighbors business makes it hard to count exactly
+        REQUIRE(rmset.size() < mset2.Size() - mset.Size());
+        for(auto& multi : rmset) {
+            REQUIRE(multi.Sum() == P+1);
+        }
+    }
 }
 
 TEST_CASE("MultiIndexSet Visualization Test", "[MultiIndexSet_Viz]")

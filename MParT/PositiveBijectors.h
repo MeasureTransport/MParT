@@ -18,11 +18,12 @@ public:
     }
 
     KOKKOS_INLINE_FUNCTION static double Derivative(double x){
-        return 1.0 / (1.0 + std::exp(-1.0 * x));
+        return x < 0 ? std::exp(x) / (std::exp(x) + 1.0) : 1.0 / (1.0 + std::exp(-1.0 * x));
     }
 
     KOKKOS_INLINE_FUNCTION static double SecondDerivative(double x){
-        return 1.0 / (2.0 + std::exp(-1.0 * x) + std::exp(x));
+        double fx = Derivative(x);
+        return fx * (1.0 - fx);
     }
 
     KOKKOS_INLINE_FUNCTION static double Inverse(double x){

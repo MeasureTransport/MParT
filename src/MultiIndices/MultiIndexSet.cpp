@@ -555,6 +555,32 @@ std::vector<MultiIndex> MultiIndexSet::ReducedMargin() const
   return output;
 }
 
+std::vector<MultiIndex> MultiIndexSet::ReducedMarginDim(unsigned int dim) const
+{
+
+  std::vector<MultiIndex> output;
+  for(unsigned int globalInd=0; globalInd<global2active.size(); ++globalInd){
+
+    // If this is an inactive multiindex
+    if(!IsActive(globalInd)){
+
+      // Check the backward neighbors
+      bool allActive = true;
+      bool anyLess = false;
+      for(auto neighbor : inEdges[globalInd]) {
+        allActive = (allActive && IsActive(neighbor));
+        // If all backward neighbors at dimension d >= the current midx at dimension d, then this is not in the reduced margin
+        anyLess = (anyLess || allMultis.at(neighbor).Get(dim) < allMultis.at(globalInd).Get(dim));
+      }
+      if(allActive && anyLess) {
+        output.push_back(allMultis.at(globalInd));
+      }
+    }
+  }
+
+  return output;
+}
+
 
 std::vector<unsigned int> MultiIndexSet::StrictFrontier() const
 {

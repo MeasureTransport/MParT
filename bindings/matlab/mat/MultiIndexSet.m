@@ -177,6 +177,15 @@ methods
     end
   end  
 
+  function listMultis = ReducedMarginDim(this, dim)
+    %-1 to keep consistent with matlab ordering
+    multi_ids = MParT_('MultiIndexSet_ReducedMarginDim',this.id_,dim);
+    listMultis = [];
+    for i = 1:length(multi_ids)
+      listMultis=[listMultis,MultiIndex(multi_ids(i),"id")];
+    end
+  end  
+
   function result = StrictFrontier(this)
     result = MParT_('MultiIndexSet_StrictFrontier',this.id_);
     result = result + 1;

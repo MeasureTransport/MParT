@@ -1,5 +1,6 @@
 #include <catch2/catch_all.hpp>
 
+#include "MParT/Sigmoid.h"
 #include "MParT/MultivariateExpansionWorker.h"
 #include "MParT/OrthogonalPolynomial.h"
 
@@ -10,14 +11,67 @@
 using namespace mpart;
 using namespace Catch;
 
-TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]") {
+using HomogeneousEval_T = BasisEvaluator<BasisHomogeneity::Homogeneous, ProbabilistHermite>;
+using Sigmoid_T = Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic>;
+using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid_T>, Identity>;
+using RectifiedOffdiagHomogeneousEval_T = BasisEvaluator<
+    BasisHomogeneity::OffdiagHomogeneous,
+    Kokkos::pair<ProbabilistHermite,Sigmoid_T>,
+    SoftPlus // Rectifier
+>;
+using HeterogeneousEval_T = BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_ptr<ProbabilistHermite>>>;
+
+template<typename T>
+T CreateEvaluator(int) {assert(false);}
+
+template<>
+HomogeneousEval_T CreateEvaluator<HomogeneousEval_T>(int) {
+    return HomogeneousEval_T{};
+}
+
+Sigmoid_T CreateDefaultSigmoids() {
+    const int num_sigmoids = 3;
+    const int params_size = 2 + num_sigmoids*(num_sigmoids+1)/2;
+    Kokkos::View<double*,Kokkos::HostSpace> centers("Sigmoid centers", params_size);
+    Kokkos::View<double*,Kokkos::HostSpace> widths("Sigmoid widths", params_size);
+    Kokkos::View<double*,Kokkos::HostSpace> weights("Sigmoid weights", params_size);
+    centers(0) = -3; widths(0) = 1.5; weights(0) = 1.;
+    centers(1) = 3; widths(1) = 1.5; weights(1) = 1.;
+    int basis_idx = 2;
+    for(int curr_order = 1; curr_order <= num_sigmoids; curr_order++) {
+        for(int j = 0; j<curr_order; j++) {
+            centers(basis_idx) = 4*(-(curr_order-1)/2 + j);
+            widths(basis_idx) = 1/((double)j+1);
+            weights(basis_idx) = 1.;
+            basis_idx++;
+        }
+    }
+
+    return Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic> {centers, widths, weights};
+}
+
+template<>
+OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
+    ProbabilistHermite offdiag;
+    Sigmoid_T diag = CreateDefaultSigmoids();
+    return OffdiagHomogeneousEval_T {dim, Kokkos::make_pair(offdiag, diag)};
+}
+
+template<>
+RectifiedOffdiagHomogeneousEval_T CreateEvaluator<RectifiedOffdiagHomogeneousEval_T>(int dim) {
+    ProbabilistHermite offdiag;
+    Sigmoid_T diag = CreateDefaultSigmoids();
+    return RectifiedOffdiagHomogeneousEval_T {dim, Kokkos::make_pair(offdiag, diag)};
+}
+
+TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]",
+        HomogeneousEval_T, OffdiagHomogeneousEval_T, RectifiedOffdiagHomogeneousEval_T) {
 
     unsigned int dim = 3;
     unsigned int maxDegree = 3;
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
-
-    ProbabilistHermite poly1d;
-    MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> expansion(mset);
+    TestType poly1d = CreateEvaluator<TestType>(dim);
+    MultivariateExpansionWorker<TestType,Kokkos::HostSpace> expansion(mset, poly1d);
 
     unsigned int cacheSize = expansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(2*dim+1));
@@ -29,32 +83,37 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
     pt(1) = 0.1;
     pt(2) = 0.345;
 
-    // Fill in the cache the first d-1 components of the cache
+        // Fill in the cache the first d-1 components of the cache
     expansion.FillCache1(&cache[0], pt, DerivativeFlags::None);
+        double out[maxDegree+1];
     for(unsigned int d=0; d<dim-1;++d){
+        for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
+        poly1d.EvaluateAll(d, out, maxDegree, pt(d));
         for(unsigned int i=0; i<maxDegree+1; ++i){
-            CHECK(cache[i + d*(maxDegree+1)] == Approx( poly1d.Evaluate(i,pt(d))).epsilon(1e-15) );
+            CHECK(cache[i + d*(maxDegree+1)] == Approx(out[i]).epsilon(1e-15) );
         }
     }
-
+    
     // Fill in the last part of the cache for an evaluation
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::None);
+        for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
+    poly1d.EvaluateAll(dim-1, out, maxDegree, pt(dim-1));
     for(unsigned int i=0; i<maxDegree+1; ++i){
-        CHECK(cache[i + (dim-1)*(maxDegree+1)] == Approx( poly1d.Evaluate(i,pt(dim-1))).epsilon(1e-15) );
+        CHECK(cache[i + (dim-1)*(maxDegree+1)] == Approx(out[i]).epsilon(1e-15) );
     }
-
+    
     // Evaluate the expansion using the cache
     Eigen::VectorXd coeffsEig = Eigen::VectorXd::Random(mset.Size());
     Kokkos::View<double*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> coeffs(coeffsEig.data(), coeffsEig.size());
     double f = expansion.Evaluate(&cache[0], coeffs);
-
+    
 
     // Now fill in the last part of the cache for a gradient evaluation
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
     double df = expansion.DiagonalDerivative(&cache[0], coeffs,1);
 
     // Compare with a finite difference approximation of the derivative
-    double fdStep = 1e-5;
+    double fdStep = 1e-7;
     expansion.FillCache2(&cache[0], pt, pt(dim-1)+fdStep, DerivativeFlags::None);
     double f2 = expansion.Evaluate(&cache[0], coeffs);
     CHECK( df==Approx((f2-f)/fdStep).epsilon(1e-4));
@@ -121,7 +180,7 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
 
             eval2 = expansion.Evaluate(&cache[0], coeffs);
 
-            CHECK(inGrad(wrt) == Approx((eval2-eval)/fdStep).epsilon(1e-4));
+            REQUIRE_THAT(inGrad(wrt), Matchers::WithinAbs((eval2-eval)/fdStep, fdStep*10));
             pt(wrt) -= fdStep;
         }
     }
@@ -142,8 +201,7 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
             expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
 
             df2 = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
-
-            CHECK(inGrad(wrt) == Approx((df2-df)/fdStep).epsilon(1e-4));
+            CHECK_THAT(inGrad(wrt), Matchers::WithinRel((df2-df)/fdStep, 1e-5));
             pt(wrt) -= fdStep;
         }
     }
@@ -172,8 +230,8 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWo
     FixedMultiIndexSet<Kokkos::HostSpace> hset(dim,maxDegree);
     FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice<DeviceSpace>(); // Create a total order limited fixed multindex set
 
-    MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> hexpansion(hset);
-    MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> dexpansion(dset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,Kokkos::HostSpace> hexpansion(hset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,DeviceSpace> dexpansion(dset);
 
     unsigned int cacheSize = hexpansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(2*dim+1));
