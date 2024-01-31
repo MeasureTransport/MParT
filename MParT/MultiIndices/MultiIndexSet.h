@@ -285,7 +285,15 @@ MultiIndexSet set(length, limiter);
       @return A std::vector containing the multiindices in the reduced margin
   */
   std::vector<MultiIndex> ReducedMargin() const;
-
+  
+  /** @brief Returns multiindices in reduced margin incrementing dim.
+   * Will admit multiindices that have *any* backward neighbor where the given
+   * entry in the given dimension is lower. @see ReducedMargin().
+   * 
+   * @param[in] dim The dimension of the reduced margin to return.
+   * @return A std::vector containing the multiindices in the reduced margin
+  */
+  std::vector<MultiIndex> ReducedMarginDim(unsigned int dim) const;
 
   /** We define the strict frontier to be the collection of multiindices, where
       all admissible forward neighbors are inactive.
@@ -327,6 +335,13 @@ MultiIndexSet set(length, limiter);
 
   /// Returns the number of forward neighbors (active or inactive)
   unsigned int NumForward(unsigned int activeInd) const;
+  
+  /**
+   * @brief Finds all active indices in the multiindex set that have a nonzero value in the last dimension
+   * 
+   * @return std::vector<unsigned int> A vector of linear indices of active multiindices with nonzero last component
+   */
+  std::vector<unsigned int> NonzeroDiagonalEntries() const;
 
   /** Visualizes a two-dimensional MultiIndexSet as ASCII art using "a" to denote active multiindices, "r" to denoted multiindices in the reduced margin (not active), and "m" to denoted multiindices in the margin (also not active).
       Note that the `MultiIndexSet::at` and `MultiIndexSet::IndexToMulti` only provide access to the active multiindices.  The inactive multiindices in the margin

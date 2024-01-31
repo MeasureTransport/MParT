@@ -224,6 +224,10 @@ bool MultiIndex::AnyBounded(const MultiIndex &bound) const{
   return false;
 }
 
+bool MultiIndex::HasNonzeroEnd() const{
+  return (nzInds.size() > 0) && (nzInds.back() == length - 1);
+}
+
 std::string MultiIndex::String() const {
   std::string out;
   for(unsigned int i=0; i<Length(); ++i){

@@ -47,6 +47,10 @@ methods
     result = MParT_('MultiIndex_Sum', this.id_);
   end
 
+  function result = HasNonzeroEnd(this)
+    result = MParT_('MultiIndex_HasNonzeroEnd', this.id_);
+  end
+
   function result = Max(this)
     result = MParT_('MultiIndex_Max', this.id_);
   end
