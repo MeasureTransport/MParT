@@ -58,6 +58,12 @@ TEMPLATE_TEST_CASE("Sigmoid1d","[sigmoid1d]", SigmoidTypes::Logistic) {
 
         CHECK_THROWS_AS((Sigmoid1d<MemorySpace,TestType>(centers, widths, weights)), std::invalid_argument);
         CHECK_THROWS_AS((Sigmoid1d<MemorySpace,TestType>(centers, widths)), std::invalid_argument);
+        int N_wrong = 1+2+3+5;
+        centers = Kokkos::View<double*, MemorySpace>("Sigmoid Centers", N_wrong);
+        widths = Kokkos::View<double*, MemorySpace>("Sigmoid widths", N_wrong);
+        weights = Kokkos::View<double*, MemorySpace>("Sigmoid weights", N_wrong);
+        CHECK_THROWS_AS((Sigmoid1d<MemorySpace,TestType>(centers, widths, weights)), std::invalid_argument);
+        CHECK_THROWS_AS((Sigmoid1d<MemorySpace,TestType>(centers, widths)), std::invalid_argument);
         int N_wrong_arr[4] = {0, 1, 2+(1+3)};
         for(int N_wrong : N_wrong_arr) {
             centers = Kokkos::View<double*, MemorySpace>("Sigmoid Centers", N_wrong);
