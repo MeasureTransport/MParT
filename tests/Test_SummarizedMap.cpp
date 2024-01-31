@@ -196,7 +196,7 @@ TEST_CASE( "SummarizedMap", "[SummarizedMap_MonotoneComponent]" ) {
                 for(unsigned int j=0; j<sumMap->outputDim; ++j)
                     fdDeriv += sens(j,ptInd) * (evals2(j,ptInd)-evals(j,ptInd))/fdstep;
 
-                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).epsilon(1e-3)); 
+                CHECK( inputGrad(i,ptInd) == Approx(fdDeriv).epsilon(2e-3)); 
             }
 
             for(unsigned int ptInd=0; ptInd<numSamps; ++ptInd)

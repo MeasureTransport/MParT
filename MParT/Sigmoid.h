@@ -6,6 +6,7 @@
 #include "MParT/Utilities/MathFunctions.h"
 #include "MParT/Utilities/KokkosSpaceMappings.h"
 #include "MParT/Utilities/Miscellaneous.h"
+#include "MParT/Utilities/MathFunctions.h"
 
 namespace mpart {
 

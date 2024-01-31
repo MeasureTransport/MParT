@@ -92,7 +92,7 @@ TEST_CASE( "Testing basis evaluators", "[BasisEvaluators]") {
         }
     }
     SECTION("OffdiagHomogeneous") {
-        using Eval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<NegativeEvaluator, IdentityEvaluator>>;
+        using Eval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<NegativeEvaluator, IdentityEvaluator>, Identity>;
         Eval_T eval {dim, NegativeEvaluator(), IdentityEvaluator()};
         for(int d = 0; d < dim; d++) {
             reset_out();
