@@ -16,12 +16,12 @@ using namespace mpart;
 template<typename MemorySpace, typename PosFuncType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_Phys_ACC(FixedMultiIndexSet<MemorySpace> const& mset, MapOptions opts)
 {
-    PhysicistHermite basis1d(opts.basisNorm);
+    BasisEvaluator<BasisHomogeneity::Homogeneous,PhysicistHermite> basis1d(opts.basisNorm);
 
     unsigned int level = std::log2(opts.quadPts-2);
     AdaptiveClenshawCurtis<MemorySpace> quad(level, opts.quadMaxSub, 1, nullptr, opts.quadAbsTol, opts.quadRelTol, QuadError::First, opts.quadMinSub);
 
-    MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,PhysicistHermite>,MemorySpace> expansion(mset, basis1d);
     std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
     output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv, opts.nugget);
@@ -38,11 +38,11 @@ static auto reg_host_phys_acc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos:
 #endif
 
 #if defined(MPART_HAS_CEREAL)
-REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveClenshawCurtis, Kokkos::HostSpace)
-REGISTER_MONO_COMP(PhysicistHermite, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, PhysicistHermite, Exp, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, PhysicistHermite, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
-REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
-REGISTER_MONO_COMP(PhysicistHermite, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, PhysicistHermite, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, PhysicistHermite, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 #endif 
 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory1)

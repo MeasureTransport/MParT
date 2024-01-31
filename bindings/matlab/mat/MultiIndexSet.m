@@ -21,7 +21,10 @@ end
 
 methods(Static)
     function mset = CreateTotalOrder(dim, totalOrder)
-        mset = MultiIndexSet(dim,totalOrder);
+        mset = MultiIndexSet(dim,totalOrder,false);
+    end
+    function mset = CreateSeparableTotalOrder(dim, totalOrder)
+        mset = MultiIndexSet(dim,totalOrder,true);
     end
 end
 
@@ -32,9 +35,9 @@ methods
         if(varargin{2}=="id")
           this.id_ = varargin{1};
         end
-      else
-        this.id_ = MParT_('MultiIndexSet_newTotalOrder', varargin{1},varargin{2});
       end
+    elseif(nargin==3)
+      this.id_ = MParT_('MultiIndexSet_newTotalOrder', varargin{1},varargin{2},varargin{3});
     else
         this.id_ = MParT_('MultiIndexSet_newEigen',varargin{1});
     end
@@ -174,6 +177,15 @@ methods
     end
   end  
 
+  function listMultis = ReducedMarginDim(this, dim)
+    %-1 to keep consistent with matlab ordering
+    multi_ids = MParT_('MultiIndexSet_ReducedMarginDim',this.id_,dim);
+    listMultis = [];
+    for i = 1:length(multi_ids)
+      listMultis=[listMultis,MultiIndex(multi_ids(i),"id")];
+    end
+  end  
+
   function result = StrictFrontier(this)
     result = MParT_('MultiIndexSet_StrictFrontier',this.id_);
     result = result + 1;
@@ -220,6 +232,10 @@ methods
     fixed_mset = FixedMultiIndexSet(this);
   end
 
+  function indices = NonzeroDiagonalEntries(this)
+    indices = MParT_('MultiIndexSet_NonzeroDiagonalEntries',this.id_);
+    indices = indices + 1;
+  end
 
   
 end

@@ -30,11 +30,15 @@ MEX_DEFINE(MultiIndexSet_newEigen) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(MultiIndexSet_newTotalOrder) (int nlhs, mxArray* plhs[],
                                          int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 2);
+  InputArguments input(nrhs, prhs, 3);
   OutputArguments output(nlhs, plhs, 1);
   const unsigned int dim = input.get<unsigned int>(0);
   const unsigned int order = input.get<unsigned int>(1);
-  output.set(0, Session<MultiIndexSet>::create(new MultiIndexSet(MultiIndexSet::CreateTotalOrder(dim,order))));
+  const bool isSeparable = input.get<bool>(2);
+  MultiIndexSet toCreate = isSeparable ?
+    MultiIndexSet::CreateTotalOrder(dim, order, MultiIndexLimiter::SeparableTotalOrder(order)) :
+    MultiIndexSet::CreateTotalOrder(dim, order);
+  output.set(0, Session<MultiIndexSet>::create(new MultiIndexSet(toCreate)));
 }
 
 // Defines MEX API for delete.
@@ -245,6 +249,20 @@ MEX_DEFINE(MultiIndexSet_ReducedMargin) (int nlhs, mxArray* plhs[],
   output.set(0,multi_ids);
 }
 
+MEX_DEFINE(MultiIndexSet_ReducedMarginDim) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 2);
+  OutputArguments output(nlhs, plhs, 1);
+  MultiIndexSet *mset = Session<MultiIndexSet>::get(input.get(0));
+  int dim = input.get<int>(1);
+  std::vector<MultiIndex> vecMultiIndex = mset->ReducedMarginDim(dim);
+  std::vector<intptr_t> multi_ids(vecMultiIndex.size());
+  for (int i=0; i<vecMultiIndex.size();i++){
+    multi_ids[i] =  Session<MultiIndex>::create(new MultiIndex(vecMultiIndex[i]));
+  }
+  output.set(0,multi_ids);
+}
+
 MEX_DEFINE(MultiIndexSet_StrictFrontier) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
   InputArguments input(nrhs, prhs, 1);
@@ -315,6 +333,14 @@ MEX_DEFINE(MultiIndexSet_Visualize) (int nlhs, mxArray* plhs[],
   mset.Visualize();
 }
 
+
+MEX_DEFINE(MultiIndexSet_NonzeroDiagonalEntries) (int nlhs, mxArray* plhs[],
+                    int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+  const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
+  output.set(0, mset.NonzeroDiagonalEntries());
+}
 
 
 

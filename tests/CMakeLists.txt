@@ -36,6 +36,7 @@ set (TEST_SOURCES
      tests/Test_Quadrature.cpp
      tests/Test_MonotoneComponent.cpp
      tests/Test_MultivariateExpansion.cpp
+     tests/Test_BasisEvaluator.cpp
      tests/Test_MultivariateExpansionWorker.cpp
      tests/Test_ArrayConversions.cpp
      tests/Test_ConditionalMapBase.cpp
@@ -48,7 +49,6 @@ set (TEST_SOURCES
      tests/Test_AffineFunction.cpp
      tests/Test_IdentityMap.cpp
      tests/Test_SummarizedMap.cpp
-     #tests/Test_TensorProductFunction.cpp
 
      ${MPART_SERIALIZE_TESTS}
      ${MPART_OPT_TESTS}

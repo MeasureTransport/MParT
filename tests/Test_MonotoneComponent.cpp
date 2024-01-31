@@ -27,7 +27,7 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     unsigned int maxDegree = 1;
     FixedMultiIndexSet<HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
-    MultivariateExpansionWorker<ProbabilistHermite, HostSpace> expansion(mset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>, HostSpace> expansion(mset);
 
     // Make room for the cache
     std::vector<double> cache(expansion.CacheSize());
@@ -41,7 +41,7 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     pt(0) = 1.0;
 
     SECTION("Integrand Only") {
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*, HostSpace>, Kokkos::View<double*, HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, 0.0);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*, HostSpace>, Kokkos::View<double*, HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, 0.0);
 
         double val;
         integrand(0.0, &val);
@@ -53,7 +53,7 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     }
 
     SECTION("Integrand Derivative") {
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>, Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, 0.0);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>, Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, 0.0);
 
         Kokkos::View<double*,HostSpace> test("Integrand",2);
 
@@ -68,8 +68,8 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
     }
 
     SECTION("Integrand Parameters Gradient") {
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters, 0.0);
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, 0.0);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters, 0.0);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, 0.0);
 
         Kokkos::View<double*, HostSpace> testVal("Integrand", 1+mset.Size());
         integrand(0.5, testVal.data());
@@ -90,8 +90,8 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
 
     SECTION("Integrand Mixed Gradient") {
         Kokkos::View<double*,HostSpace> work("Integrand workspace", mset.Size());
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, 0.0, work);
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, 0.0);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, 0.0, work);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, 0.0);
 
         Kokkos::View<double*, HostSpace> testVal("Integrand", 1+mset.Size());
         integrand(0.5, testVal.data());
@@ -118,7 +118,7 @@ TEST_CASE( "MonotoneIntegrand1d With Nugget", "[MonotoneIntegrand1d]") {
     unsigned int maxDegree = 1;
     FixedMultiIndexSet<HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
 
-    MultivariateExpansionWorker<ProbabilistHermite, HostSpace> expansion(mset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>, HostSpace> expansion(mset);
 
     // Make room for the cache
     std::vector<double> cache(expansion.CacheSize());
@@ -132,7 +132,7 @@ TEST_CASE( "MonotoneIntegrand1d With Nugget", "[MonotoneIntegrand1d]") {
     pt(0) = 1.0;
 
     SECTION("Integrand Only") {
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*, HostSpace>, Kokkos::View<double*, HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, nugget);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*, HostSpace>, Kokkos::View<double*, HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, nugget);
 
         double val;
         integrand(0.0, &val);
@@ -144,7 +144,7 @@ TEST_CASE( "MonotoneIntegrand1d With Nugget", "[MonotoneIntegrand1d]") {
     }
 
     SECTION("Integrand Derivative") {
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>, Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, nugget);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>, Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, nugget);
 
         Kokkos::View<double*,HostSpace> test("Integrand",2);
 
@@ -159,8 +159,8 @@ TEST_CASE( "MonotoneIntegrand1d With Nugget", "[MonotoneIntegrand1d]") {
     }
 
     SECTION("Integrand Parameters Gradient") {
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters, nugget);
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, nugget);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters, nugget);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, nugget);
 
         Kokkos::View<double*, HostSpace> testVal("Integrand", 1+mset.Size());
         integrand(0.5, testVal.data());
@@ -181,8 +181,8 @@ TEST_CASE( "MonotoneIntegrand1d With Nugget", "[MonotoneIntegrand1d]") {
 
     SECTION("Integrand Mixed Gradient") {
         Kokkos::View<double*,HostSpace> work("Integrand workspace", mset.Size());
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, nugget, work);
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, nugget);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, nugget, work);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand2(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, nugget);
 
         Kokkos::View<double*, HostSpace> testVal("Integrand", 1+mset.Size());
         integrand(0.5, testVal.data());
@@ -209,7 +209,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
 
     unsigned int numTerms = mset.Size();
 
-    MultivariateExpansionWorker<ProbabilistHermite> expansion(mset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>> expansion(mset);
 
     // Make room for the cache
     std::vector<double> cache(expansion.CacheSize());
@@ -228,7 +228,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     SECTION("Integrand Only") {
 
         // Construct the integrand
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, 0.0);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::None, 0.0);
 
         // Evaluate the expansion
         double df;
@@ -244,7 +244,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     }
 
     SECTION("Integrand Derivative") {
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, 0.0);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Diagonal, 0.0);
 
         // Evaluate the expansion
         double df, d2f;
@@ -265,7 +265,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     SECTION("Integrand Input Gradient") {
         double fdStep = 1e-5;
 
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Input, 0.0);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Input, 0.0);
 
         // Evaluate the expansion
         double df, d2f;
@@ -293,7 +293,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
 
     SECTION("Integrand Parameters Gradient") {
 
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters, 0.0);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Parameters, 0.0);
 
         // Evaluate the expansion
         double df;
@@ -320,7 +320,7 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     SECTION("Integrand Mixed Gradient") {
 
         Kokkos::View<double*, HostSpace> workspace("Integrand Workspace", numTerms);
-        MonotoneIntegrand<MultivariateExpansionWorker<ProbabilistHermite>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, 0.0, workspace);
+        MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Mixed, 0.0, workspace);
 
         // Evaluate the expansion
         double df, d2f;
@@ -380,7 +380,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         unsigned int maxDegree = 1;
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
-        MultivariateExpansionWorker<ProbabilistHermite,HostSpace> expansion(mset);
+        MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace> expansion(mset);
 
         Kokkos::View<double*,HostSpace> coeffs("Expansion coefficients", mset.Size());
         coeffs(0) = 1.0; // Constant term
@@ -391,7 +391,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         double absTol = 1e-7;
         AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol, QuadError::First);
 
-        MonotoneComponent<decltype(expansion), Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+        MonotoneComponent<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace>, Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
 
         Kokkos::View<double*,HostSpace> output("output", numPts);
         comp.EvaluateImpl(evalPts, coeffs, output);
@@ -411,7 +411,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         unsigned int maxDegree = 2;
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
-        MultivariateExpansionWorker<ProbabilistHermite,HostSpace> expansion(mset);
+        MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace> expansion(mset);
 
         Kokkos::View<double*,HostSpace> coeffs("Expansion coefficients", mset.Size());
         coeffs(1) = 1.0; // Linear term = x ^1
@@ -423,7 +423,7 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
         double absTol = 1e-7;
         AdaptiveSimpson quad(maxSub, 1, nullptr, absTol, relTol,QuadError::First);
 
-        MonotoneComponent<decltype(expansion), Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
+        MonotoneComponent<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace>, Exp, AdaptiveSimpson<HostSpace>, HostSpace> comp(expansion, quad);
 
         Kokkos::View<double*,HostSpace> output("Output", numPts);
         comp.EvaluateImpl(evalPts, coeffs, output);
@@ -463,7 +463,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         unsigned int maxDegree = 1;
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
-        MultivariateExpansionWorker<ProbabilistHermite,HostSpace> expansion(mset);
+        MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace> expansion(mset);
 
         Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
         coeffs(0) = 1.0; // Constant term
@@ -498,7 +498,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         unsigned int maxDegree = 2;
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
 
-        MultivariateExpansionWorker<ProbabilistHermite,HostSpace> expansion(mset);
+        MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace> expansion(mset);
 
         Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
         coeffs(1) = 1.0; // Linear term = x ^1
@@ -531,7 +531,7 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
 
         unsigned int maxDegree = 2;
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
-        MultivariateExpansionWorker<ProbabilistHermite,HostSpace> expansion(mset);
+        MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace> expansion(mset);
 
         Kokkos::View<double*, HostSpace> coeffs("Expansion coefficients", mset.Size());
         coeffs(1) = 1.0; // Linear term = x ^1
@@ -584,7 +584,7 @@ TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivativ
 
     unsigned int maxDegree = 2;
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
-    MultivariateExpansionWorker<ProbabilistHermite,HostSpace> expansion(mset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace> expansion(mset);
 
 
     unsigned int numTerms = mset.Size();
@@ -750,7 +750,7 @@ TEST_CASE( "Least squares test", "[MonotoneComponentRegression]" ) {
 
 
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(1, 6);
-    MultivariateExpansionWorker<ProbabilistHermite,HostSpace> expansion(mset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace> expansion(mset);
 
     unsigned int maxSub = 30;
     double relTol = 1e-3;
@@ -808,7 +808,7 @@ TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[M
 
     unsigned int maxDegree = 3;
     MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
-    MultivariateExpansionWorker<ProbabilistHermite,HostSpace> expansion(mset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace> expansion(mset);
 
     unsigned int maxSub = 20;
     double relTol = 1e-7;
@@ -883,9 +883,9 @@ TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
     FixedMultiIndexSet<HostSpace> hset(dim, maxDegree);
     FixedMultiIndexSet<DeviceSpace> mset = hset.ToDevice<DeviceSpace>(); // Create a total order limited fixed multindex set
 
-    MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> expansion(mset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,DeviceSpace> expansion(mset);
 
-    MultivariateExpansionWorker<ProbabilistHermite,HostSpace> hexpansion(hset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,HostSpace> hexpansion(hset);
 
     // Make room for the cache
     unsigned int cacheSize = hexpansion.CacheSize();
@@ -1006,7 +1006,7 @@ TEST_CASE( "Testing MonotoneComponent::EvaluateSingle on Device", "[MonotoneComp
     FixedMultiIndexSet<HostSpace> hset(dim,maxDegree);
     FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice<DeviceSpace>(); // Create a total order limited fixed multindex set
 
-    MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> dexpansion(dset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,DeviceSpace> dexpansion(dset);
 
     // define f(x1,x2) = c0 + c1*x1 + c2*x2
     Kokkos::View<double*,HostSpace> hcoeffs("Expansion coefficients", hset.Size());
@@ -1076,7 +1076,7 @@ TEST_CASE( "Testing 1d monotone component evaluation on device", "[MonotoneCompo
         FixedMultiIndexSet<HostSpace> hset(dim, maxDegree);
         FixedMultiIndexSet<DeviceSpace> mset = hset.ToDevice<DeviceSpace>();
 
-        MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> expansion(mset);
+        MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,DeviceSpace> expansion(mset);
 
         Kokkos::View<double*,HostSpace> hcoeffs("Expansion coefficients", mset.Size());
         hcoeffs(0) = 1.0; // Constant term
@@ -1112,7 +1112,7 @@ TEST_CASE( "Testing 1d monotone component evaluation on device", "[MonotoneCompo
         FixedMultiIndexSet<HostSpace> hset(dim, maxDegree);
         FixedMultiIndexSet<DeviceSpace> mset = hset.ToDevice<DeviceSpace>();
 
-        MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> expansion(mset);
+        MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,DeviceSpace> expansion(mset);
 
         Kokkos::View<double*,HostSpace> hcoeffs("Expansion coefficients", mset.Size());
         hcoeffs(1) = 1.0; // Linear term = x ^1
