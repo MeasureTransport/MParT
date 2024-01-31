@@ -191,29 +191,6 @@ FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int                
     CalculateMaxDegrees();
 }
 
-// template<>
-// FixedMultiIndexSet<Kokkos::HostSpace>::FixedMultiIndexSet(unsigned int                dim,
-//                                        Kokkos::View<unsigned int*, Kokkos::HostSpace> nzStarts,
-//                                        Kokkos::View<unsigned int*, Kokkos::HostSpace> nzDims,
-//                                        Kokkos::View<unsigned int*, Kokkos::HostSpace> nzOrders) : dim(dim),
-//                                                                                 isCompressed(true),
-//                                                                                 nzStarts(nzStarts),
-//                                                                                 nzDims(nzDims),
-//                                                                                 nzOrders(nzOrders)
-// {
-//     std::cout << "Here 0 with " << nzStarts.extent(0)-1 << " multiindices in " << dim << " dimensions " << std::endl;
-//     // Sort so that nzDims increases for each multiindex
-//     DimensionSorter<Kokkos::HostSpace> sorter(nzStarts, nzDims, nzOrders);
-//     for(int i=0; i<nzStarts.extent(0)-1; ++i){
-//         sorter(i);
-//     }
-
-//     std::cout << "Here 1" << std::endl;
-
-//     CalculateMaxDegrees();
-// }
-
-
 template<typename MemorySpace>
 FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int dim,
                                                     unsigned int maxOrder) : dim(dim), isCompressed(true)
