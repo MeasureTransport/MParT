@@ -20,6 +20,47 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     CHECK(maxDegrees(1)==maxOrder);
 }
 
+TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedMultiIndexSetSorting]" ) {
+
+    const unsigned int dim = 2;
+
+    // Manually construct the multiindex with a proper sorted ordering of the dimensions
+    // The set is given by the multiindices [[1,0], [0,1], [1,2]]
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> nzStarts("nzStarts", 4);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> nzDims("nzDims", 4);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> nzOrders("nzOrders", 4);
+    nzStarts(0) = 0;
+    nzStarts(1) = 1;
+    nzStarts(2) = 2;
+    nzStarts(3) = 4;
+
+    nzDims(0) = 0; nzOrders(0)=1; // [1,0]
+    nzDims(1) = 1; nzOrders(1)=1; // [0,1]
+    nzDims(2) = 0; nzOrders(2)=1; // The 1 in [1,2]
+    nzDims(3) = 1; nzOrders(3)=2; // The 2 in [1,2]
+    
+    FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, nzStarts, nzDims, nzOrders);
+
+    CHECK(mset.nzDims(3)>mset.nzDims(2));
+    CHECK(mset.nzOrders(3)==2);
+    CHECK(mset.nzOrders(2)==1);
+
+    // Manually construct the multiindex with an IMPROPER ordering of the dimensions
+
+    nzDims(0) = 0; nzOrders(0)=1; // [1,0]
+    nzDims(1) = 1; nzOrders(1)=1; // [0,1]
+    nzDims(2) = 1; nzOrders(2)=2; // The 2 in [1,2]
+    nzDims(3) = 0; nzOrders(3)=1; // The 1 in [1,2].  Internal to the FixedMultiIndexSet, this should come before 2.
+    
+    FixedMultiIndexSet<Kokkos::HostSpace> mset2(dim, nzStarts, nzDims, nzOrders);
+
+    CHECK(mset.nzDims(3)>mset.nzDims(2));
+    CHECK(mset.nzOrders(3)==2);
+    CHECK(mset.nzOrders(2)==1);
+    
+}
+
+
 TEST_CASE("MultiIndexSet from Eigen", "[MultiIndexSetFromEigen]")
 {
     Eigen::MatrixXi multis(3,2);

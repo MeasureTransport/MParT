@@ -53,7 +53,49 @@ namespace mpart{
         Kokkos::View<unsigned int*, MemorySpace> nzOrders_;
         const unsigned int dim_;
     };
+    
+    /** Used to sort the dimensions within each multiindex so they are increasing. */
+    template<typename MemorySpace>
+    struct DimensionSorter {
 
+        DimensionSorter(Kokkos::View<unsigned int*, MemorySpace> nzStarts,
+                        Kokkos::View<unsigned int*, MemorySpace> nzDims,
+                        Kokkos::View<unsigned int*, MemorySpace> nzOrders) : nzStarts_(nzStarts), 
+                                                                             nzDims_(nzDims), 
+                                                                             nzOrders_(nzOrders){}
+
+        KOKKOS_INLINE_FUNCTION void operator()(const size_t mi) const{
+            
+            unsigned int start = nzStarts_(mi);
+            unsigned int end = nzStarts_(mi+1);
+            unsigned int minInd;
+            unsigned int temp;
+
+            // selection sort to sort dimensions and degrees in order of increasing dimension
+            for (unsigned int ind1 = nzStarts_(mi); ind1<nzStarts_(mi+1)-1; ind1++) {
+                minInd = ind1;
+
+                for (unsigned int ind2=ind1+1; ind2<nzStarts_(mi+1); ind2++) {
+                    if (nzDims_(ind2) < nzDims_(minInd))
+                        minInd = ind2;
+                } 
+
+                if (minInd != ind1){
+                    temp = nzDims_(minInd);
+                    nzDims_(minInd) = nzDims_(ind1);
+                    nzDims_(ind1) = temp;
+
+                    temp = nzOrders_(minInd);
+                    nzOrders_(minInd) = nzOrders_(ind1);
+                    nzOrders_(ind1) = temp;
+                }
+            }
+        }
+
+        Kokkos::View<unsigned int*, MemorySpace> nzStarts_;
+        Kokkos::View<unsigned int*, MemorySpace> nzDims_;
+        Kokkos::View<unsigned int*, MemorySpace> nzOrders_;
+    };
 
     template<typename MemorySpace>
     struct MaxDegreeInitializer {
@@ -149,6 +191,9 @@ FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int                
                                                                                 nzDims(nzDims),
                                                                                 nzOrders(nzOrders)
 {
+    // Sort so that nzDims increases for each multiindex
+    Kokkos::parallel_for(nzStarts.extent(0)-1, DimensionSorter<MemorySpace>(nzStarts, nzDims, nzOrders));
+
     CalculateMaxDegrees();
 }
 
