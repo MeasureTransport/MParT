@@ -42,7 +42,6 @@ AffineMap<MemorySpace>::AffineMap(StridedMatrix<double,MemorySpace> A,
 
 template<typename MemorySpace>
 void AffineMap<MemorySpace>::Factorize(){
-    std::cout << "Factorizing AffineMap" << std::endl;
     if(A_.extent(0)!=A_.extent(1)){
         StridedMatrix<const double, MemorySpace> Asub = Kokkos::subview(A_, Kokkos::ALL(), std::make_pair(A_.extent(1)-A_.extent(0),A_.extent(1)));
         luSolver_.compute(Asub);

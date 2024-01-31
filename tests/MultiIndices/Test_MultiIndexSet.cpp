@@ -500,7 +500,6 @@ TEST_CASE("MultiIndexSet ReducedMargin Test", "[MultiIndexSet_RM]") {
         REQUIRE(multi.Sum() == 1);
         REQUIRE(multi.Get(dim_idx) == 1);
     }
-    std::cout << std::endl;
     unsigned int P = 2;
     SECTION("OrderP_RM") {
         MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, P);
