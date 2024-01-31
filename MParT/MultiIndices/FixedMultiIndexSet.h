@@ -33,7 +33,10 @@ public:
     /** @brief Construct a fixed multiindex set in compressed form.
 
         Only nonzero orders are stored in this representation.   For multivariate polynomials,
-        the compressed representation can yield faster polynomial evaluations.
+        the compressed representation can yield faster polynomial evaluations.  Note that 
+        the internal order of `nzDims` is guaranteed to to be increasing for each multiindex.  The
+        internal values of `nzDims` might therefore differ from `_nzDims` because they will be 
+        sorted.
     */
     FixedMultiIndexSet(unsigned int                             _dim,
                        Kokkos::View<unsigned int*, MemorySpace> _nzStarts,
