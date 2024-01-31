@@ -1,6 +1,6 @@
 #include <Kokkos_Core.hpp>
 #include <catch2/catch_all.hpp>
-#include "MParT/MarginalAffineMap.h"
+#include "MParT/InnerMarginalAffineMap.h"
 #include "MParT/IdentityMap.h"
 #include "MParT/MapFactory.h"
 #include "MParT/Utilities/KokkosSpaceMappings.h"
@@ -11,7 +11,7 @@ using namespace Catch::Matchers;
 
 using MemorySpace = Kokkos::HostSpace;
 
-TEST_CASE( "Test MarginalAffineMap", "[MarginalAffineMap]") {
+TEST_CASE( "Test InnerMarginalAffineMap", "[InnerMarginalAffineMap]") {
     int inputDim = 4;
     double scale_base = 2.3;
     double shift_base = 1.2;
@@ -27,7 +27,7 @@ TEST_CASE( "Test MarginalAffineMap", "[MarginalAffineMap]") {
     SECTION("IdentityMap, square") {
         unsigned int dim = inputDim;
         auto id = std::make_shared<IdentityMap<MemorySpace>>(dim,dim);
-        auto map = std::make_shared<MarginalAffineMap<MemorySpace>>(scale, shift, id);
+        auto map = std::make_shared<InnerMarginalAffineMap<MemorySpace>>(scale, shift, id);
         int N_pts = 10;
         Kokkos::View<double**, MemorySpace> pts("pts", dim, N_pts);
         Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {dim, N_pts});
@@ -87,7 +87,7 @@ TEST_CASE( "Test MarginalAffineMap", "[MarginalAffineMap]") {
         for(unsigned int k = 0; k < trimap->numCoeffs; k++) {
             trimap->Coeffs()(k) = 1/(k+1);
         }
-        auto map = std::make_shared<MarginalAffineMap<MemorySpace>>(scale, shift, trimap);
+        auto map = std::make_shared<InnerMarginalAffineMap<MemorySpace>>(scale, shift, trimap);
 
         // Generate points
         Kokkos::View<double**, MemorySpace> pts("pts", inputDim, numPts);
@@ -232,14 +232,14 @@ TEST_CASE( "Test MarginalAffineMap", "[MarginalAffineMap]") {
         for(unsigned int k = 0; k < trimap->numCoeffs; k++) {
             trimap->Coeffs()(k) = 1/(k+1);
         }
-        auto map = std::make_shared<MarginalAffineMap<MemorySpace>>(scale, shift, trimap);
+        auto map = std::make_shared<InnerMarginalAffineMap<MemorySpace>>(scale, shift, trimap);
         for(unsigned int k = 0; k < map->numCoeffs; k++) {
             map->Coeffs()(k) += 0.1;
         }
         for(unsigned int k = 0; k < map->numCoeffs; k++) {
             REQUIRE_THAT(map->Coeffs()(k), WithinRel(trimap->Coeffs()(k), 1e-14));
         }
-        map = std::make_shared<MarginalAffineMap<MemorySpace>>(scale, shift, trimap, false);
+        map = std::make_shared<InnerMarginalAffineMap<MemorySpace>>(scale, shift, trimap, false);
         for(unsigned int k = 0; k < map->numCoeffs; k++) {
             map->Coeffs()(k) += 0.1;
         }
