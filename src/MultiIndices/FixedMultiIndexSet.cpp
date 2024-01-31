@@ -68,27 +68,21 @@ namespace mpart{
             
             unsigned int start = nzStarts_(mi);
             unsigned int end = nzStarts_(mi+1);
-            unsigned int minInd;
-            unsigned int temp;
+            unsigned int key, orderKey, j;
 
-            // selection sort to sort dimensions and degrees in order of increasing dimension
-            for (unsigned int ind1 = nzStarts_(mi); ind1<nzStarts_(mi+1)-1; ind1++) {
-                minInd = ind1;
+            // insertion sort 
+            for (unsigned int step = start+1; step < end; step++) {
+                key = nzDims_(step);
+                orderKey = nzOrders_(step);
+                j = step - 1;
 
-                for (unsigned int ind2=ind1+1; ind2<nzStarts_(mi+1); ind2++) {
-                    if (nzDims_(ind2) < nzDims_(minInd))
-                        minInd = ind2;
-                } 
-
-                if (minInd != ind1){
-                    temp = nzDims_(minInd);
-                    nzDims_(minInd) = nzDims_(ind1);
-                    nzDims_(ind1) = temp;
-
-                    temp = nzOrders_(minInd);
-                    nzOrders_(minInd) = nzOrders_(ind1);
-                    nzOrders_(ind1) = temp;
+                while ((key < nzDims_(j)) && (j >= start)) {
+                    nzDims_(j + 1) = nzDims_(j);
+                    nzOrders_(j + 1) = nzOrders_(j);
+                    --j;
                 }
+                nzDims_(j + 1) = key;
+                nzOrders_(j + 1) = orderKey;
             }
         }
 
@@ -196,6 +190,29 @@ FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int                
 
     CalculateMaxDegrees();
 }
+
+// template<>
+// FixedMultiIndexSet<Kokkos::HostSpace>::FixedMultiIndexSet(unsigned int                dim,
+//                                        Kokkos::View<unsigned int*, Kokkos::HostSpace> nzStarts,
+//                                        Kokkos::View<unsigned int*, Kokkos::HostSpace> nzDims,
+//                                        Kokkos::View<unsigned int*, Kokkos::HostSpace> nzOrders) : dim(dim),
+//                                                                                 isCompressed(true),
+//                                                                                 nzStarts(nzStarts),
+//                                                                                 nzDims(nzDims),
+//                                                                                 nzOrders(nzOrders)
+// {
+//     std::cout << "Here 0 with " << nzStarts.extent(0)-1 << " multiindices in " << dim << " dimensions " << std::endl;
+//     // Sort so that nzDims increases for each multiindex
+//     DimensionSorter<Kokkos::HostSpace> sorter(nzStarts, nzDims, nzOrders);
+//     for(int i=0; i<nzStarts.extent(0)-1; ++i){
+//         sorter(i);
+//     }
+
+//     std::cout << "Here 1" << std::endl;
+
+//     CalculateMaxDegrees();
+// }
+
 
 template<typename MemorySpace>
 FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int dim,

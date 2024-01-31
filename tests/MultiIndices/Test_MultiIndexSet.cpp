@@ -1,4 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
+#include<Kokkos_Sort.hpp>
 
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
@@ -38,7 +39,7 @@ TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedM
     nzDims(1) = 1; nzOrders(1)=1; // [0,1]
     nzDims(2) = 0; nzOrders(2)=1; // The 1 in [1,2]
     nzDims(3) = 1; nzOrders(3)=2; // The 2 in [1,2]
-    
+
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, nzStarts, nzDims, nzOrders);
 
     CHECK(mset.nzDims(3)>mset.nzDims(2));
