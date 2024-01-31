@@ -12,7 +12,13 @@ using namespace mpart;
 using namespace Catch;
 
 using HomogeneousEval_T = BasisEvaluator<BasisHomogeneity::Homogeneous, ProbabilistHermite>;
-using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic>>>;
+using Sigmoid_T = Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic>;
+using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid_T>, Identity>;
+using RectifiedOffdiagHomogeneousEval_T = BasisEvaluator<
+    BasisHomogeneity::OffdiagHomogeneous,
+    Kokkos::pair<ProbabilistHermite,Sigmoid_T>,
+    SoftPlus // Rectifier
+>;
 using HeterogeneousEval_T = BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_ptr<ProbabilistHermite>>>;
 
 template<typename T>
@@ -23,11 +29,9 @@ HomogeneousEval_T CreateEvaluator<HomogeneousEval_T>(int) {
     return HomogeneousEval_T{};
 }
 
-template<>
-OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
-    ProbabilistHermite offdiag;
+Sigmoid_T CreateDefaultSigmoids() {
     const int num_sigmoids = 3;
-    const int params_size = 2+num_sigmoids*(num_sigmoids+1)/2;
+    const int params_size = 2 + num_sigmoids*(num_sigmoids+1)/2;
     Kokkos::View<double*,Kokkos::HostSpace> centers("Sigmoid centers", params_size);
     Kokkos::View<double*,Kokkos::HostSpace> widths("Sigmoid widths", params_size);
     Kokkos::View<double*,Kokkos::HostSpace> weights("Sigmoid weights", params_size);
@@ -43,11 +47,25 @@ OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
         }
     }
 
-    Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic> diag(centers, widths, weights);
+    return Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic> {centers, widths, weights};
+}
+
+template<>
+OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
+    ProbabilistHermite offdiag;
+    Sigmoid_T diag = CreateDefaultSigmoids();
     return OffdiagHomogeneousEval_T {dim, Kokkos::make_pair(offdiag, diag)};
 }
 
-TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]", HomogeneousEval_T, OffdiagHomogeneousEval_T) {
+template<>
+RectifiedOffdiagHomogeneousEval_T CreateEvaluator<RectifiedOffdiagHomogeneousEval_T>(int dim) {
+    ProbabilistHermite offdiag;
+    Sigmoid_T diag = CreateDefaultSigmoids();
+    return RectifiedOffdiagHomogeneousEval_T {dim, Kokkos::make_pair(offdiag, diag)};
+}
+
+TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]",
+        HomogeneousEval_T, OffdiagHomogeneousEval_T, RectifiedOffdiagHomogeneousEval_T) {
 
     unsigned int dim = 3;
     unsigned int maxDegree = 3;
@@ -65,9 +83,9 @@ TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpan
     pt(1) = 0.1;
     pt(2) = 0.345;
 
-    // Fill in the cache the first d-1 components of the cache
+        // Fill in the cache the first d-1 components of the cache
     expansion.FillCache1(&cache[0], pt, DerivativeFlags::None);
-    double out[maxDegree+1];
+        double out[maxDegree+1];
     for(unsigned int d=0; d<dim-1;++d){
         for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
         poly1d.EvaluateAll(d, out, maxDegree, pt(d));
@@ -75,27 +93,27 @@ TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpan
             CHECK(cache[i + d*(maxDegree+1)] == Approx(out[i]).epsilon(1e-15) );
         }
     }
-
+    
     // Fill in the last part of the cache for an evaluation
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::None);
-    for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
+        for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
     poly1d.EvaluateAll(dim-1, out, maxDegree, pt(dim-1));
     for(unsigned int i=0; i<maxDegree+1; ++i){
         CHECK(cache[i + (dim-1)*(maxDegree+1)] == Approx(out[i]).epsilon(1e-15) );
     }
-
+    
     // Evaluate the expansion using the cache
     Eigen::VectorXd coeffsEig = Eigen::VectorXd::Random(mset.Size());
     Kokkos::View<double*, Kokkos::HostSpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> coeffs(coeffsEig.data(), coeffsEig.size());
     double f = expansion.Evaluate(&cache[0], coeffs);
-
+    
 
     // Now fill in the last part of the cache for a gradient evaluation
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
     double df = expansion.DiagonalDerivative(&cache[0], coeffs,1);
 
     // Compare with a finite difference approximation of the derivative
-    double fdStep = 1e-5;
+    double fdStep = 1e-7;
     expansion.FillCache2(&cache[0], pt, pt(dim-1)+fdStep, DerivativeFlags::None);
     double f2 = expansion.Evaluate(&cache[0], coeffs);
     CHECK( df==Approx((f2-f)/fdStep).epsilon(1e-4));
@@ -183,8 +201,7 @@ TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpan
             expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::Diagonal);
 
             df2 = expansion.DiagonalDerivative(&cache[0], coeffs, 1);
-
-            CHECK(inGrad(wrt) == Approx((df2-df)/fdStep).epsilon(1e-4));
+            CHECK_THAT(inGrad(wrt), Matchers::WithinRel((df2-df)/fdStep, 1e-5));
             pt(wrt) -= fdStep;
         }
     }
