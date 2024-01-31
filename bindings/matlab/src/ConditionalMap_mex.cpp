@@ -116,7 +116,7 @@ MEX_DEFINE(ConditionalMap_newAffineMapb) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
                                            int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 15);
+  InputArguments input(nrhs, prhs, 16);
   OutputArguments output(nlhs, plhs, 1);
   unsigned int inputDim = input.get<unsigned int>(0);
   unsigned int outputDim = input.get<unsigned int>(1);
@@ -134,7 +134,7 @@ MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 13);
+  InputArguments input(nrhs, prhs, 14);
   OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   MapOptions opts = binding::MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
@@ -149,7 +149,7 @@ MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(ConditionalMap_newMapFixed) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 13);
+  InputArguments input(nrhs, prhs, 14);
   OutputArguments output(nlhs, plhs, 1);
   const FixedMultiIndexSet<MemorySpace>& mset = Session<FixedMultiIndexSet<MemorySpace>>::getConst(input.get(0));
   MapOptions opts = binding::MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),

@@ -39,7 +39,7 @@ namespace {
 MEX_DEFINE(ParameterizedFunction_newMap) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 14);
+  InputArguments input(nrhs, prhs, 15);
   OutputArguments output(nlhs, plhs, 1);
   unsigned int outputDim = input.get<unsigned int>(0);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(1));
@@ -205,7 +205,7 @@ MEX_DEFINE(MapOptions_Serialize) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
 
 #if defined(MPART_HAS_CEREAL)
-  InputArguments input(nrhs, prhs, 13);
+  InputArguments input(nrhs, prhs, 14);
   OutputArguments output(nlhs, plhs, 1);
 
   std::string filename = input.get<std::string>(0);

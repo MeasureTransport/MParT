@@ -34,13 +34,13 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
         .def("LogDeterminantInputGradImpl", [](std::shared_ptr<ConditionalMapBase<MemorySpace>> obj, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> input, std::tuple<long,std::tuple<int,int>,std::tuple<int,int>> output){
             obj->LogDeterminantInputGradImpl(ToKokkos<double,MemorySpace>(input),ToKokkos<double,MemorySpace>(output));
         })
-        .def("torch", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> obj, bool return_logdet){
+        .def("torch", [](std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> obj, bool store_coeffs, bool return_logdet){
             auto mpart = py::module::import("mpart");
             if(!mpart.attr("mpart_has_torch").cast<bool>()){
                 throw std::runtime_error("MParT could not import pytorch.");
             }
-            return mpart.attr("TorchConditionalMapBase")(obj, return_logdet);
-        }, py::arg("return_logdet") = false)
+            return mpart.attr("TorchConditionalMapBase")(obj, store_coeffs, return_logdet);
+        }, py::arg("store_coeffs")=true, py::arg("return_logdet") = false)
         .def("GetBaseFunction", &ConditionalMapBase<MemorySpace>::GetBaseFunction)
 #if defined(MPART_HAS_CEREAL)
         .def(py::pickle(

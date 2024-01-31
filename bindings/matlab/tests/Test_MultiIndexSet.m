@@ -125,3 +125,9 @@ listMultis = mset.ReducedMargin();
 for k=1:length(listMultis)
     disp(listMultis(k).String)
 end
+
+disp('ReducedMarginDim')
+listMultis = mset.ReducedMarginDim(1);
+for k=1:length(listMultis)
+    disp(listMultis(k).String)
+end

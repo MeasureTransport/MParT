@@ -70,12 +70,12 @@ if haveTorch:
         assert not tmap2.return_logdet
         assert tmap2.coeffs.grad is None
 
-        loss = tmap2.forward(x).sum()
+        loss = tmap2.forward(x.T).sum()
         loss.backward()
         assert tmap2.coeffs.grad is not None
         
         tmap2.return_logdet = True 
-        y, logdet = tmap2.forward(x)
+        y, logdet = tmap2.forward(x.T)
         loss = -0.5*(y*y).sum() + logdet.sum()
 
         loss.backward()
@@ -86,15 +86,30 @@ if haveTorch:
         tmap = mt.CreateTriangular(dim,dim,3,opts) # Simple third order map
 
         x = torch.randn(numSamps, dim, dtype=torch.double)
-        tmap2 = tmap.torch()
+        tmap2 = tmap.torch(store_coeffs=True)
         y = tmap2.forward(x)
         assert np.all(y.detach().numpy() == tmap.Evaluate(x.T.detach().numpy()).T)
 
-        tmap2 = tmap.torch(return_logdet=True)
+        tmap2 = tmap.torch(return_logdet=True, store_coeffs=True)
         y, logdet = tmap2.forward(x)
         
         assert np.all(y.detach().numpy() == tmap.Evaluate(x.T.detach().numpy()).T)
         assert np.all(logdet.detach().numpy() == tmap.LogDeterminant(x.T.detach().numpy()))
+
+    def test_AutogradCoeffAsInput():
+
+        opts = mt.MapOptions()
+        tmap = mt.CreateTriangular(dim,dim,3,opts) # Simple third order map
+
+        tmap2 = tmap.torch(store_coeffs=False)
+
+        x = torch.randn(numSamps, dim, dtype=torch.double)
+        coeffs = torch.randn(tmap.numCoeffs, dtype=torch.double)
+
+        y = tmap2(x,coeffs)
+        assert y.shape[0] == numSamps
+        assert y.shape[1] == dim 
+        assert not y.isnan().any()
 
 
 if __name__=='__main__':
@@ -103,3 +118,4 @@ if __name__=='__main__':
     test_Autograd()
     test_AutogradCoeffs()
     test_TorchMethod()
+    test_AutogradCoeffAsInput()

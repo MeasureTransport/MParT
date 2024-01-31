@@ -110,6 +110,10 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
     REQUIRE( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
 
+    MultiIndexSet mset_sep = MultiIndexSet::CreateTotalOrder(dim+1, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder));
+    REQUIRE( mset_sep.Size()== ((maxOrder+1)*(maxOrder+2)/2) + maxOrder);
+    REQUIRE( mset_sep.NonzeroDiagonalEntries().size() == maxOrder);
+
 
     /*
     AdmissableNeighbor.ValidNeighbor
@@ -429,6 +433,22 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         REQUIRE( set.at(inds.at(2)) == MultiIndex{3,0} );
 
     }
+
+    SECTION("NonzeroDiagonalEntries") {
+        unsigned int dim = 2, maxOrder = 3;
+        MultiIndexSet set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder));
+        std::vector<unsigned int> inds = set.NonzeroDiagonalEntries();
+        for(unsigned int ind: inds) {
+            MultiIndex multi = set.at(ind);
+            REQUIRE( multi.HasNonzeroEnd() );
+        }
+        unsigned int expected_size = 0;
+        for(unsigned int i = 0; i < set.Size(); ++i) {
+            MultiIndex multi = set.at(i);
+            expected_size += multi.HasNonzeroEnd();
+        }
+        REQUIRE( expected_size == inds.size() );
+    }
 }
 
 TEST_CASE("MultiIndexSet Operator Tests", "[MultiIndexSet_Operators]")
@@ -462,6 +482,44 @@ TEST_CASE("MultiIndexSet Operator Tests", "[MultiIndexSet_Operators]")
     REQUIRE(mset4.at(1) == MultiIndex{1,0});
     REQUIRE(mset4.at(2) == MultiIndex{0,1});
 
+}
+
+TEST_CASE("MultiIndexSet ReducedMargin Test", "[MultiIndexSet_RM]") {
+    unsigned int dim = 5;
+    SECTION("OrderZero_RM") {
+        // Simple tests for the reduced margin function
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, 0);
+        std::vector<MultiIndex> rmset = mset.ReducedMargin();
+        REQUIRE(rmset.size() == 5);
+        for(auto& multi : rmset)
+            REQUIRE(multi.Sum() == 1);
+        unsigned int dim_idx = 2;
+        rmset = mset.ReducedMarginDim(dim_idx);
+        REQUIRE(rmset.size() == 1);
+        MultiIndex multi = rmset.at(0);
+        REQUIRE(multi.Sum() == 1);
+        REQUIRE(multi.Get(dim_idx) == 1);
+    }
+    unsigned int P = 2;
+    SECTION("OrderP_RM") {
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(dim, P);
+        // The RM of a TO set should be the same as the new midxs in the next TO set
+        MultiIndexSet mset2 = MultiIndexSet::CreateTotalOrder(dim, P+1);
+        std::vector<MultiIndex> rmset = mset.ReducedMargin();
+        REQUIRE(rmset.size() == mset2.Size() - mset.Size());
+        for(auto& multi : rmset) {
+            REQUIRE(multi.Sum() == P+1);
+        }
+        unsigned int dim_idx = 0;
+        rmset = mset.ReducedMarginDim(dim_idx);
+        // I'm unsure how big the RM should be for a particular dimension
+        // e.g. [0,2,1] has bw neighbors [0,1,1], [0,2,0], which means it gets included
+        // this multiple bw neighbors business makes it hard to count exactly
+        REQUIRE(rmset.size() < mset2.Size() - mset.Size());
+        for(auto& multi : rmset) {
+            REQUIRE(multi.Sum() == P+1);
+        }
+    }
 }
 
 TEST_CASE("MultiIndexSet Visualization Test", "[MultiIndexSet_Viz]")
