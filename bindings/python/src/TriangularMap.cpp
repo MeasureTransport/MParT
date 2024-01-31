@@ -20,6 +20,7 @@ void mpart::binding::TriangularMapWrapper(py::module &m)
     py::class_<TriangularMap<MemorySpace>, ConditionalMapBase<MemorySpace>, ParameterizedFunctionBase<MemorySpace>, std::shared_ptr<TriangularMap<MemorySpace>>>(m, tName.c_str())
         .def(py::init<std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>>, bool>(), py::arg("comps"), py::arg("moveCoeffs") = false)
         .def("GetComponent", &TriangularMap<MemorySpace>::GetComponent)
+        #if defined(MPART_HAS_CEREAL)
         .def(py::pickle(
             [](std::shared_ptr<TriangularMap<Kokkos::HostSpace>> const& ptr) { // __getstate__
                 std::stringstream ss;
@@ -35,6 +36,7 @@ void mpart::binding::TriangularMapWrapper(py::module &m)
                 return ptr;
             }
         ))
+        #endif
         ;
 
 }

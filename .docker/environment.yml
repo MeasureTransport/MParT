@@ -5,7 +5,7 @@ channels:
 dependencies:
   - eigen
   - pybind11
-  - catch2
+  - catch2=3.4.0
   - nlopt
   - cereal
   - cmake
