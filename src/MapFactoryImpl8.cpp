@@ -13,7 +13,7 @@ using namespace mpart;
 template<typename MemorySpace, typename PosFuncType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_HF_CC(FixedMultiIndexSet<MemorySpace> const& mset, MapOptions opts)
 {
-    HermiteFunction basis1d;
+    BasisEvaluator<BasisHomogeneity::Homogeneous,HermiteFunction> basis1d;
     ClenshawCurtisQuadrature<MemorySpace> quad(opts.quadPts, 1);
 
     MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
@@ -33,11 +33,11 @@ static auto reg_host_hf_cc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::Ho
 #endif
 
 #if defined(MPART_HAS_CEREAL)
-REGISTER_MONO_COMP(HermiteFunction, Exp, ClenshawCurtisQuadrature, Kokkos::HostSpace)
-REGISTER_MONO_COMP(HermiteFunction, SoftPlus, ClenshawCurtisQuadrature, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, Exp, ClenshawCurtisQuadrature, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, SoftPlus, ClenshawCurtisQuadrature, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
-REGISTER_MONO_COMP(HermiteFunction, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
-REGISTER_MONO_COMP(HermiteFunction, Softplus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, Softplus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory8)
 #endif

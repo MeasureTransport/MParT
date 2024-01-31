@@ -1,5 +1,6 @@
 #include <catch2/catch_all.hpp>
 
+#include "MParT/Sigmoid.h"
 #include "MParT/MultivariateExpansionWorker.h"
 #include "MParT/OrthogonalPolynomial.h"
 
@@ -10,14 +11,47 @@
 using namespace mpart;
 using namespace Catch;
 
-TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]") {
+using HomogeneousEval_T = BasisEvaluator<BasisHomogeneity::Homogeneous, ProbabilistHermite>;
+using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic>>>;
+using HeterogeneousEval_T = BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_ptr<ProbabilistHermite>>>;
+
+template<typename T>
+T CreateEvaluator(int) {assert(false);}
+
+template<>
+HomogeneousEval_T CreateEvaluator<HomogeneousEval_T>(int) {
+    return HomogeneousEval_T{};
+}
+
+template<>
+OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
+    ProbabilistHermite offdiag;
+    const int order = 3;
+    const int params_size = order*(order+1)/2;
+    Kokkos::View<double*,Kokkos::HostSpace> centers("Sigmoid centers", params_size);
+    Kokkos::View<double*,Kokkos::HostSpace> widths("Sigmoid widths", params_size);
+    Kokkos::View<double*,Kokkos::HostSpace> weights("Sigmoid weights", params_size);
+    int basis_idx = 0;
+    for(int curr_order = 1; curr_order <= order; curr_order++) {
+        for(int j = 0; j<curr_order; j++) {
+            centers(basis_idx) = 4*(-(curr_order-1)/2 + j);
+            widths(basis_idx) = 1/((double)j+1);
+            weights(basis_idx) = 1.;
+            basis_idx++;
+        }
+    }
+
+    Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic> diag(centers, widths, weights);
+    return OffdiagHomogeneousEval_T {dim, Kokkos::make_pair(offdiag, diag)};
+}
+
+TEMPLATE_TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorker]", HomogeneousEval_T, OffdiagHomogeneousEval_T) {
 
     unsigned int dim = 3;
     unsigned int maxDegree = 3;
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
-
-    ProbabilistHermite poly1d;
-    MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> expansion(mset);
+    TestType poly1d = CreateEvaluator<TestType>(dim);
+    MultivariateExpansionWorker<TestType,Kokkos::HostSpace> expansion(mset, poly1d);
 
     unsigned int cacheSize = expansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(2*dim+1));
@@ -31,16 +65,21 @@ TEST_CASE( "Testing multivariate expansion worker", "[MultivariateExpansionWorke
 
     // Fill in the cache the first d-1 components of the cache
     expansion.FillCache1(&cache[0], pt, DerivativeFlags::None);
+    double out[maxDegree+1];
     for(unsigned int d=0; d<dim-1;++d){
+        for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
+        poly1d.EvaluateAll(d, out, maxDegree, pt(d));
         for(unsigned int i=0; i<maxDegree+1; ++i){
-            CHECK(cache[i + d*(maxDegree+1)] == Approx( poly1d.Evaluate(i,pt(d))).epsilon(1e-15) );
+            CHECK(cache[i + d*(maxDegree+1)] == Approx(out[i]).epsilon(1e-15) );
         }
     }
 
     // Fill in the last part of the cache for an evaluation
     expansion.FillCache2(&cache[0], pt, pt(dim-1), DerivativeFlags::None);
+    for(int i = 0; i <= maxDegree; i++) out[i] = 0.;
+    poly1d.EvaluateAll(dim-1, out, maxDegree, pt(dim-1));
     for(unsigned int i=0; i<maxDegree+1; ++i){
-        CHECK(cache[i + (dim-1)*(maxDegree+1)] == Approx( poly1d.Evaluate(i,pt(dim-1))).epsilon(1e-15) );
+        CHECK(cache[i + (dim-1)*(maxDegree+1)] == Approx(out[i]).epsilon(1e-15) );
     }
 
     // Evaluate the expansion using the cache
@@ -172,8 +211,8 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWo
     FixedMultiIndexSet<Kokkos::HostSpace> hset(dim,maxDegree);
     FixedMultiIndexSet<DeviceSpace> dset = hset.ToDevice<DeviceSpace>(); // Create a total order limited fixed multindex set
 
-    MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> hexpansion(hset);
-    MultivariateExpansionWorker<ProbabilistHermite,DeviceSpace> dexpansion(dset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,Kokkos::HostSpace> hexpansion(hset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,DeviceSpace> dexpansion(dset);
 
     unsigned int cacheSize = hexpansion.CacheSize();
     CHECK(cacheSize == (maxDegree+1)*(2*dim+1));

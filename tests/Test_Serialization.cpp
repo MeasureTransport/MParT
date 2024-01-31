@@ -18,7 +18,7 @@
 
 using namespace mpart;
 using namespace Catch;
-using DefaultMonotoneComponent = MonotoneComponent<MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace>, SoftPlus, AdaptiveSimpson<Kokkos::HostSpace>, Kokkos::HostSpace>;
+using DefaultMonotoneComponent = MonotoneComponent<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,Kokkos::HostSpace>, SoftPlus, AdaptiveSimpson<Kokkos::HostSpace>, Kokkos::HostSpace>;
 
 TEST_CASE( "Test serializing Kokkos Views", "[Serialization]" ) {
     std::stringstream ss;
@@ -253,7 +253,7 @@ TEST_CASE("Test serialization of multivariate expansion worker.", "[Serializatio
     unsigned int cacheSize1, cacheSize2;
     {
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, maxDegree); // Create a total order limited fixed multindex set
-    MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> expansion(mset);
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,Kokkos::HostSpace> expansion(mset);
 
     cacheSize1 = expansion.CacheSize();
     CHECK(cacheSize1 == (maxDegree+1)*(2*dim+1));
@@ -264,7 +264,7 @@ TEST_CASE("Test serialization of multivariate expansion worker.", "[Serializatio
     }
 
     {
-    MultivariateExpansionWorker<ProbabilistHermite,Kokkos::HostSpace> expansion;
+    MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,Kokkos::HostSpace> expansion;
 
     cereal::BinaryInputArchive archive(ss);
     archive(expansion);
@@ -315,7 +315,7 @@ TEST_CASE("Test serialization of monotone component.", "[Serialization]"){
         coeffs(2) = 0.5; // Quadratic term = x^2 - 1.0
         coeffs(0) = 1.0 + coeffs(2); // Constant term = x^0
 
-        MultivariateExpansionWorker<LinearizedBasis<HermiteFunction>,Kokkos::HostSpace> expansion(mset);
+        MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,LinearizedBasis<HermiteFunction>>,Kokkos::HostSpace> expansion(mset);
 
         unsigned int maxSub = 30;
         double relTol = 1e-7;

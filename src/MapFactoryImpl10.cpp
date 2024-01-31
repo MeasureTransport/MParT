@@ -16,7 +16,7 @@ using namespace mpart;
 template<typename MemorySpace, typename PosFuncType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_LinPhys_ACC(FixedMultiIndexSet<MemorySpace> const& mset, MapOptions opts)
 {
-    LinearizedBasis<PhysicistHermite> basis1d(PhysicistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
+    BasisEvaluator<BasisHomogeneity::Homogeneous,LinearizedBasis<PhysicistHermite>> basis1d(PhysicistHermite(opts.basisNorm), opts.basisLB, opts.basisUB);
 
     unsigned int level = std::log2(opts.quadPts-2);
     AdaptiveClenshawCurtis<MemorySpace> quad(level, opts.quadMaxSub, 1, nullptr, opts.quadAbsTol, opts.quadRelTol, QuadError::First, opts.quadMinSub);
@@ -38,11 +38,11 @@ static auto reg_host_linphys_acc_splus = mpart::MapFactory::CompFactoryImpl<Kokk
 #endif
 
 #if defined(MPART_HAS_CEREAL)
-REGISTER_MONO_COMP(LinearizedBasis<mpart::PhysicistHermite>, Exp, AdaptiveClenshawCurtis, Kokkos::HostSpace)
-REGISTER_MONO_COMP(LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Exp, AdaptiveClenshawCurtis, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
-REGISTER_MONO_COMP(LinearizedBasis<mpart::PhysicistHermite>, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
-REGISTER_MONO_COMP(LinearizedBasis<mpart::PhysicistHermite>, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory10)
 #endif 

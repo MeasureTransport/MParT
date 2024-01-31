@@ -13,7 +13,7 @@ using namespace mpart;
 template<typename MemorySpace, typename PosFuncType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_Phys_AS(FixedMultiIndexSet<MemorySpace> const& mset, MapOptions opts)
 {
-    PhysicistHermite basis1d(opts.basisNorm);
+    BasisEvaluator<BasisHomogeneity::Homogeneous,PhysicistHermite> basis1d(opts.basisNorm);
     AdaptiveSimpson<MemorySpace> quad(opts.quadMaxSub, 1, nullptr, opts.quadAbsTol, opts.quadRelTol, QuadError::First, opts.quadMinSub);
 
     MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
@@ -33,11 +33,11 @@ static auto reg_host_phys_as_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::
 #endif
 
 #if defined(MPART_HAS_CEREAL)
-REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveSimpson, Kokkos::HostSpace)
-REGISTER_MONO_COMP(PhysicistHermite, SoftPlus, AdaptiveSimpson, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, PhysicistHermite, Exp, AdaptiveSimpson, Kokkos::HostSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, PhysicistHermite, SoftPlus, AdaptiveSimpson, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
-REGISTER_MONO_COMP(PhysicistHermite, Exp, AdaptiveSimpson, mpart::DeviceSpace)
-REGISTER_MONO_COMP(PhysicistHermite, Softplus, AdaptiveSimpson, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, PhysicistHermite, Exp, AdaptiveSimpson, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, PhysicistHermite, Softplus, AdaptiveSimpson, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory3)
 #endif 

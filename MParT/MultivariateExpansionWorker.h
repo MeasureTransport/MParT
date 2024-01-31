@@ -10,6 +10,7 @@
 #include "MParT/Utilities/KokkosSpaceMappings.h"
 
 #include "MParT/Utilities/ArrayConversions.h"
+#include "MParT/BasisEvaluator.h"
 
 namespace mpart{
 
@@ -56,7 +57,7 @@ struct CacheSizeFunctor{
      \text{cache} = \left[\begin{array}{c}
      \phi_1^0(x_1)\\
      \phi_1^1(x_1)\\
-     \vdots
+     \vdots\\
      \phi_1^{p_1}\\
      \phi_2^0(x_2)\\
      \vdots\\
@@ -66,7 +67,7 @@ struct CacheSizeFunctor{
      \frac{\partial}{\partial x_d}\phi_d^0(x_d)\\
      \vdots\\
      \frac{\partial}{\partial x_d}\phi_d^{p_d}(x_d)\\
-     \frac{\partial^2}{\partial x_d}\phi_d^0(x_d^2)\\
+     \frac{\partial^2}{\partial x_d^2}\phi_d^0(x_d^2)\\
      \vdots\\
      \frac{\partial^2}{\partial x_d^2}\phi_d^{p_d}(x_d)
      \end{array}
@@ -141,12 +142,12 @@ public:
         // Fill in first derivative information if needed
         if((derivType == DerivativeFlags::Input)||(derivType==DerivativeFlags::MixedInput)){
             for(unsigned int d=0; d<dim_-1; ++d)
-                basis1d_.EvaluateDerivatives(&polyCache[startPos_(d)],&polyCache[startPos_(d+dim_)], maxDegrees_(d), pt(d));
+                basis1d_.EvaluateDerivatives(d, &polyCache[startPos_(d)],&polyCache[startPos_(d+dim_)], maxDegrees_(d), pt(d));
 
         // Evaluate all degrees of all 1d polynomials except the last dimension, which will be evaluated inside the integrand
         }else{
             for(unsigned int d=0; d<dim_-1; ++d)
-                basis1d_.EvaluateAll(&polyCache[startPos_(d)], maxDegrees_(d), pt(d));
+                basis1d_.EvaluateAll(d, &polyCache[startPos_(d)], maxDegrees_(d), pt(d));
         }
     }
 
@@ -170,18 +171,22 @@ public:
     {
 
         if((derivType==DerivativeFlags::None)||(derivType==DerivativeFlags::Parameters)){
-            basis1d_.EvaluateAll(&polyCache[startPos_(dim_-1)],
-                                  maxDegrees_(dim_-1),
-                                  xd);
+
+            basis1d_.EvaluateAll(dim_-1,
+                                 &polyCache[startPos_(dim_-1)],
+                                 maxDegrees_(dim_-1),
+                                 xd);
 
         }else if((derivType==DerivativeFlags::Diagonal) || (derivType==DerivativeFlags::Input)){
-            basis1d_.EvaluateDerivatives(&polyCache[startPos_(dim_-1)],     // basis vals
+            basis1d_.EvaluateDerivatives(dim_ - 1,                          // input dimension
+                                         &polyCache[startPos_(dim_-1)],     // basis vals
                                          &polyCache[startPos_(2*dim_-1)],   // basis derivatives
                                          maxDegrees_(dim_-1),               // largest basis degree
                                          xd);                               // point to evaluate at
 
         }else if((derivType==DerivativeFlags::Diagonal2) || (derivType==DerivativeFlags::MixedInput)){
-            basis1d_.EvaluateSecondDerivatives(&polyCache[startPos_(dim_-1)],     // basis vals
+            basis1d_.EvaluateSecondDerivatives(dim_ - 1,                          // input dimension
+                                               &polyCache[startPos_(dim_-1)],     // basis vals
                                                &polyCache[startPos_(2*dim_-1)],   // basis derivatives
                                                &polyCache[startPos_(2*dim_)],     // basis second derivatives
                                                maxDegrees_(dim_-1),               // largest basis degree
