@@ -1,4 +1,4 @@
-#include "MParT/MarginalAffineMap.h"
+#include "MParT/InnerMarginalAffineMap.h"
 #include "MParT/Utilities/KokkosSpaceMappings.h"
 
 #include "MParT/Utilities/ArrayConversions.h"
@@ -8,7 +8,7 @@
 using namespace mpart;
 
 template<typename MemorySpace>
-MarginalAffineMap<MemorySpace>::MarginalAffineMap(StridedVector<double,MemorySpace> scale,
+InnerMarginalAffineMap<MemorySpace>::InnerMarginalAffineMap(StridedVector<double,MemorySpace> scale,
                                   StridedVector<double,MemorySpace> shift,
                                   std::shared_ptr<ConditionalMapBase<MemorySpace>> map,
                                   bool moveCoeffs) :
@@ -20,12 +20,12 @@ MarginalAffineMap<MemorySpace>::MarginalAffineMap(StridedVector<double,MemorySpa
     Kokkos::deep_copy(scale_, scale);
     Kokkos::deep_copy(shift_, shift);
     if (scale_.size() != shift_.size())
-        ProcAgnosticError<MemorySpace, std::runtime_error>::error("MarginalAffineMap: scale and shift must have the same size");
+        ProcAgnosticError<MemorySpace, std::runtime_error>::error("InnerMarginalAffineMap: scale and shift must have the same size");
     if (scale_.size() != map->inputDim)
-        ProcAgnosticError<MemorySpace, std::runtime_error>::error("MarginalAffineMap: scale and shift must have the same size as the input dimension of the map");
+        ProcAgnosticError<MemorySpace, std::runtime_error>::error("InnerMarginalAffineMap: scale and shift must have the same size as the input dimension of the map");
 
     logDet_ = 0.;
-    Kokkos::parallel_reduce("MarginalAffineMap logdet", scale.extent(0), KOKKOS_LAMBDA(const int&i, double& ldet){
+    Kokkos::parallel_reduce("InnerMarginalAffineMap logdet", scale.extent(0), KOKKOS_LAMBDA(const int&i, double& ldet){
         ldet += Kokkos::log(scale_(i));
     }, logDet_);
     this->SetCoeffs(map->Coeffs());
@@ -35,7 +35,7 @@ MarginalAffineMap<MemorySpace>::MarginalAffineMap(StridedVector<double,MemorySpa
 }
 
 template<typename MemorySpace>
-void MarginalAffineMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
+void InnerMarginalAffineMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                 StridedVector<double, MemorySpace>              output)
 {
     int n1 = pts.extent(0), n2 = pts.extent(1);
@@ -45,13 +45,13 @@ void MarginalAffineMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const doub
         tmp(i,j) = pts(i,j)*scale_(i) + shift_(i);
     });
     map_->LogDeterminantImpl(tmp, output);
-    Kokkos::parallel_for("MarginalAffineMap LogDeterminant", output.size(), KOKKOS_CLASS_LAMBDA(const int& i) {
+    Kokkos::parallel_for("InnerMarginalAffineMap LogDeterminant", output.size(), KOKKOS_CLASS_LAMBDA(const int& i) {
         output(i) += logDet_;
     });
 }
 
 template<typename MemorySpace>
-void MarginalAffineMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
+void InnerMarginalAffineMap<MemorySpace>::InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
                                          StridedMatrix<const double, MemorySpace> const& r,
                                          StridedMatrix<double, MemorySpace>              output)
 {
@@ -79,7 +79,7 @@ void MarginalAffineMap<MemorySpace>::InverseImpl(StridedMatrix<const double, Mem
 
 
 template<typename MemorySpace>
-void MarginalAffineMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+void InnerMarginalAffineMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                          StridedMatrix<double, MemorySpace>              output)
 {
     int n1 = pts.extent(0), n2 = pts.extent(1);
@@ -92,7 +92,7 @@ void MarginalAffineMap<MemorySpace>::LogDeterminantCoeffGradImpl(StridedMatrix<c
 }
 
 template<typename MemorySpace>
-void MarginalAffineMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+void InnerMarginalAffineMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                           StridedMatrix<double, MemorySpace>              output)
 {
     int n1 = pts.extent(0), n2 = pts.extent(1);
@@ -105,7 +105,7 @@ void MarginalAffineMap<MemorySpace>::EvaluateImpl(StridedMatrix<const double, Me
 }
 
 template<typename MemorySpace>
-void MarginalAffineMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+void InnerMarginalAffineMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                            StridedMatrix<const double, MemorySpace> const& sens,
                                            StridedMatrix<double, MemorySpace>              output)
 {
@@ -119,7 +119,7 @@ void MarginalAffineMap<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, M
 }
 
 template<typename MemorySpace>
-void MarginalAffineMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
+void InnerMarginalAffineMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                          StridedMatrix<double, MemorySpace>              output)
 {
     int n1 = pts.extent(0), n2 = pts.extent(1);
@@ -132,14 +132,14 @@ void MarginalAffineMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<c
     int out_n1 = output.extent(0), out_n2 = output.extent(1);
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy2({0, 0}, {out_n1, out_n2});
     int scale_idx_start = map_->inputDim-map_->outputDim;
-    Kokkos::parallel_for("MarginalAffineMap LogDeterminantInputGrad", policy2, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+    Kokkos::parallel_for("InnerMarginalAffineMap LogDeterminantInputGrad", policy2, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
         int scale_idx = i+scale_idx_start;
         output(i,j) *= scale_(scale_idx);
     });
 }
 
 template<typename MemorySpace>
-void MarginalAffineMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
+void InnerMarginalAffineMap<MemorySpace>::GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                           StridedMatrix<const double, MemorySpace> const& sens,
                                           StridedMatrix<double, MemorySpace>              output)
 {
@@ -152,13 +152,13 @@ void MarginalAffineMap<MemorySpace>::GradientImpl(StridedMatrix<const double, Me
     map_->GradientImpl(tmp, sens, output);
     int out_n1 = output.extent(0), out_n2 = output.extent(1);
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy2({0, 0}, {out_n1, out_n2});
-    Kokkos::parallel_for("MarginalAffineMap Gradient", policy2, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
+    Kokkos::parallel_for("InnerMarginalAffineMap Gradient", policy2, KOKKOS_CLASS_LAMBDA(const int& i, const int& j) {
         output(i,j) *= scale_(i);
     });
 }
 
 
-template class mpart::MarginalAffineMap<Kokkos::HostSpace>;
+template class mpart::InnerMarginalAffineMap<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)
-    template class mpart::MarginalAffineMap<mpart::DeviceSpace>;
+    template class mpart::InnerMarginalAffineMap<mpart::DeviceSpace>;
 #endif

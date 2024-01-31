@@ -1,5 +1,5 @@
-#ifndef MPART_MARGINALMarginalAffineMap_H
-#define MPART_MARGINALMarginalAffineMap_H
+#ifndef MPART_INNERMARGINALAFFINEMAP_H
+#define MPART_INNERMARGINALAFFINEMAP_H
 
 #include <Kokkos_Core.hpp>
 
@@ -12,16 +12,16 @@ namespace mpart{
  * Makes a deep copy of any views passed to the constructor.
 */
 template<typename MemorySpace>
-class MarginalAffineMap : public ConditionalMapBase<MemorySpace>
+class InnerMarginalAffineMap : public ConditionalMapBase<MemorySpace>
 {
 public:
 
-    MarginalAffineMap(StridedVector<double,MemorySpace> scale,
+    InnerMarginalAffineMap(StridedVector<double,MemorySpace> scale,
     StridedVector<double,MemorySpace> shift,
     std::shared_ptr<ConditionalMapBase<MemorySpace>> map,
     bool moveCoeffs = true);
 
-    virtual ~MarginalAffineMap() = default;
+    virtual ~InnerMarginalAffineMap() = default;
 
     void LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                             StridedVector<double, MemorySpace>              output) override;
