@@ -25,6 +25,9 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     MultiIndexSet multiSet_reconstructed = multiSet_fixed.Unfix();
     REQUIRE(multiSet_original.Size() == multiSet_reconstructed.Size());
     REQUIRE(multiSet_original.MaxOrders() == multiSet_reconstructed.MaxOrders());
+    std::vector<unsigned int> diagonal_idxs_ref = multiSet_reconstructed.NonzeroDiagonalEntries();
+    std::vector<unsigned int> diagonal_idxs = multiSet_fixed.NonzeroDiagonalEntries();
+    REQUIRE(diagonal_idxs_ref == diagonal_idxs);
 }
 
 TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedMultiIndexSetSorting]" ) {

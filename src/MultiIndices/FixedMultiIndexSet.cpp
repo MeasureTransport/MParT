@@ -246,6 +246,25 @@ std::vector<unsigned int> FixedMultiIndexSet<Kokkos::HostSpace>::IndexToMulti(un
 
 
 template<typename MemorySpace>
+std::vector<unsigned int> FixedMultiIndexSet<MemorySpace>::NonzeroDiagonalEntries() const
+{
+    assert(false);
+    return std::vector<unsigned int>();
+}
+
+template<>
+std::vector<unsigned int> FixedMultiIndexSet<Kokkos::HostSpace>::NonzeroDiagonalEntries() const
+{
+    std::vector<unsigned int> output;
+    if(!isCompressed) throw std::runtime_error("NonzeroDiagonalEntries only works for compressed multiindex sets");
+    for(unsigned int midx = 0; midx < nzStarts.extent(0)-1; midx++){
+        if(nzStarts(midx) == nzStarts(midx+1)) continue;
+        if(nzDims(nzStarts(midx+1)-1) == this->dim-1) output.push_back(midx);
+    }
+    return output;
+}
+
+template<typename MemorySpace>
 int FixedMultiIndexSet<MemorySpace>::MultiToIndex(std::vector<unsigned int> const& multi) const
 {
     if(isCompressed){
