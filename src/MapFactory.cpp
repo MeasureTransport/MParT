@@ -49,7 +49,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateSingle
     if(activeInd == 1){  // special case if activeInd = 1, map is of form [T_1; Id]
 
         // Bottom identity map
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> botIdMap = std::make_shared<IdentityMap<Kokkos::HostSpace>>(dim, dim-activeInd);
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> botIdMap = std::make_shared<IdentityMap<MemorySpace>>(dim, dim-activeInd);
 
         // fill a vector of components with identity, active component, identity
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks(2);
@@ -63,7 +63,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateSingle
     }
     else if (activeInd == dim){  // special case if activeInd = dim, map is of form [Id; T_d]
         // Top identity map
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> topIdMap = std::make_shared<IdentityMap<Kokkos::HostSpace>>(activeInd-1, activeInd-1);
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> topIdMap = std::make_shared<IdentityMap<MemorySpace>>(activeInd-1, activeInd-1);
 
         // fill a vector of components with identity, active component, identity
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks(2);
@@ -76,10 +76,10 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateSingle
     else{ // general case, map is of form [Id; T_i; Id]
 
         // Top identity map
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> topIdMap = std::make_shared<IdentityMap<Kokkos::HostSpace>>(activeInd-1, activeInd-1);
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> topIdMap = std::make_shared<IdentityMap<MemorySpace>>(activeInd-1, activeInd-1);
 
         // Bottom identity map
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> botIdMap = std::make_shared<IdentityMap<Kokkos::HostSpace>>(dim, dim-activeInd);
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> botIdMap = std::make_shared<IdentityMap<MemorySpace>>(dim, dim-activeInd);
 
         // fill a vector of components with identity, active component, identity
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> blocks(3);
