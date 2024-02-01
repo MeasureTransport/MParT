@@ -1023,6 +1023,15 @@ public:
         return expansion_.GetMultiIndexSet();
     }
 
+    /**
+     * @brief Indices of coeffs that correspond to terms non-constant in \f$x_d\f$
+     * 
+     * @return std::vector<unsigned int> 
+     */
+    std::vector<unsigned int> DiagonalCoeffIndices() const override {
+        return expansion_.NonzeroDiagonalEntries();
+    }
+
 #if defined(MPART_HAS_CEREAL)
     // Define a serialize or save/load pair as you normally would
     template <class Archive>

@@ -868,6 +868,12 @@ TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[M
         }
 
     }
+
+    SECTION("DiagonalCoeffIndices") {
+        std::vector<unsigned int> indices = comp.DiagonalCoeffIndices();
+        std::vector<unsigned int> indices_ref = expansion.NonzeroDiagonalEntries();
+        REQUIRE(indices == indices_ref);
+    }
 }
 
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
