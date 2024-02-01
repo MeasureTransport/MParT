@@ -69,7 +69,7 @@ double KLObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const 
         Kokkos::TeamPolicy<MemoryToExecution<MemorySpace>> policy(grad_dim, Kokkos::AUTO());
 
         Kokkos::parallel_for(policy,
-            KOKKOS_LAMBDA(auto& tag, auto& teamMember){
+            KOKKOS_LAMBDA(auto& tag, auto&& teamMember){
                 int row = teamMember.league_rank();
                 double thisRowSum = 0.0;
                 Kokkos::parallel_reduce(Kokkos::TeamThreadRange(teamMember, N_samps), 
