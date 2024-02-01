@@ -28,6 +28,12 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     std::vector<unsigned int> diagonal_idxs_ref = multiSet_reconstructed.NonzeroDiagonalEntries();
     std::vector<unsigned int> diagonal_idxs = multiSet_fixed.NonzeroDiagonalEntries();
     REQUIRE(diagonal_idxs_ref == diagonal_idxs);
+    FixedMultiIndexSet<Kokkos::HostSpace> multiSet_allDiag = multiSet_fixed.RemoveZeroDiagonalEntries();
+    std::vector<unsigned int> diagonal_idxs_allDiag = multiSet_allDiag.NonzeroDiagonalEntries();
+    REQUIRE(diagonal_idxs_allDiag.size() == multiSet_allDiag.Size());
+    for(int i = 0; i < diagonal_idxs_allDiag.size(); i++) {
+        REQUIRE(diagonal_idxs_allDiag[i] == i);
+    }
 }
 
 TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedMultiIndexSetSorting]" ) {
