@@ -28,12 +28,6 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     std::vector<unsigned int> diagonal_idxs_ref = multiSet_reconstructed.NonzeroDiagonalEntries();
     std::vector<unsigned int> diagonal_idxs = multiSet_fixed.NonzeroDiagonalEntries();
     REQUIRE(diagonal_idxs_ref == diagonal_idxs);
-    FixedMultiIndexSet<Kokkos::HostSpace> multiSet_allDiag = multiSet_fixed.RemoveZeroDiagonalEntries();
-    std::vector<unsigned int> diagonal_idxs_allDiag = multiSet_allDiag.NonzeroDiagonalEntries();
-    REQUIRE(diagonal_idxs_allDiag.size() == multiSet_allDiag.Size());
-    for(int i = 0; i < diagonal_idxs_allDiag.size(); i++) {
-        REQUIRE(diagonal_idxs_allDiag[i] == i);
-    }
 }
 
 TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedMultiIndexSetSorting]" ) {
@@ -505,6 +499,13 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
             expected_size += multi.HasNonzeroEnd();
         }
         REQUIRE( expected_size == inds.size() );
+        MultiIndexSet full_set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(maxOrder));
+        inds = full_set.NonzeroDiagonalEntries();
+        REQUIRE( inds.size() == full_set.Size() );
+        for(int i = 0; i < full_set.Size(); ++i) {
+            REQUIRE(inds[i] == i);
+            REQUIRE( full_set.at(i).HasNonzeroEnd() );
+        }
     }
 }
 

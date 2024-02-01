@@ -59,9 +59,6 @@ public:
     // Returns the indices of multiindices with nonzero elements in dimension length
     std::vector<unsigned int> NonzeroDiagonalEntries() const;
 
-    // Creates a new FixedMultiIndexSet with all entries from this except those with zero in last element
-    FixedMultiIndexSet<MemorySpace> RemoveZeroDiagonalEntries() const;
-
     // Returns the linear index of a given multiindex.  Returns -1 if not found.
     int MultiToIndex(std::vector<unsigned int> const& multi) const;
 
