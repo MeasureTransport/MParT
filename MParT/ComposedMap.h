@@ -50,12 +50,12 @@ public:
                   start at index \f$\sum_{j=1}^{k-1} C_j\f$.
     */
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
-    void SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs) override;
-    void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+    using ConditionalMapBase<MemorySpace>::WrapCoeffs;
+    void SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs) override;
+    void WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
 
     #if defined(MPART_ENABLE_GPU)
-    void SetCoeffs(Kokkos::View<const double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs) override;
-    void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs) override;
+    void SetCoeffs(Kokkos::View<const double*, std::conditional_t<std::is_same_v<MemorySpace, Kokkos::HostSpace>, mpart::DeviceSpace, Kokkos::HostSpace>> coeffs) override;
     #endif
 
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return maps_.at(i);}
