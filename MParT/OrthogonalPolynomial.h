@@ -9,10 +9,10 @@
 namespace mpart{
 
 /**
- *   @brief Generic class to represent orthogonal polynomials.
- *   @details An orthogonal polynomial has form
+ * @brief Generic class to represent orthogonal polynomials.
+ * @details An orthogonal polynomial has form
  \f[ p_{k}(x) = (a_k x + b_k) p_{k-1}(x) - c_k p_{k-2}(x) \f]
- *   where \f(a_k,b_k,c_k\f) are all given explicitly (three-term recurrence).
+ *   where \f$a_k,b_k,c_k\f$ are all given explicitly (three-term recurrence).
  */
 template<class Mixer>
 class OrthogonalPolynomial : public Mixer

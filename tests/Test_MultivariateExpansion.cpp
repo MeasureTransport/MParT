@@ -20,7 +20,7 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     FixedMultiIndexSet<Kokkos::HostSpace> mset(inDim, maxDegree);
 
     ProbabilistHermite basis;
-    MultivariateExpansion<ProbabilistHermite,Kokkos::HostSpace> func(outDim, mset, basis);
+    MultivariateExpansion<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>,Kokkos::HostSpace> func(outDim, mset, basis);
     CHECK(func.numCoeffs == (mset.Size()*outDim));
 
     Kokkos::View<double*,Kokkos::HostSpace> coeffs("coefficients", func.numCoeffs);

@@ -26,6 +26,15 @@ namespace mpart{
 
         return policy;
     };
+    
+    #if (KOKKOS_VERSION / 10000 < 4) || ((KOKKOS_VERSION / 10000 == 4) && (KOKKOS_VERSION / 100 % 100 < 1))
+    template<typename ViewType>
+    struct GetViewRank{ static constexpr size_t Rank = ViewType::Rank; };
+
+    #else
+    template<typename ViewType>
+    struct GetViewRank{ static constexpr size_t Rank = ViewType::rank(); };
+    #endif
 
 } // namespace mpart
 
