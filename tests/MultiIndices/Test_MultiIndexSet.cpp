@@ -19,6 +19,12 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     REQUIRE(maxDegrees.extent(0)==2);
     CHECK(maxDegrees(0)==maxOrder);
     CHECK(maxDegrees(1)==maxOrder);
+
+    MultiIndexSet multiSet_original = MultiIndexSet::CreateTotalOrder(dim, maxOrder);
+    FixedMultiIndexSet<Kokkos::HostSpace> multiSet_fixed = multiSet_original.Fix(true);
+    MultiIndexSet multiSet_reconstructed = multiSet_fixed.Unfix();
+    REQUIRE(multiSet_original.Size() == multiSet_reconstructed.Size());
+    REQUIRE(multiSet_original.MaxOrders() == multiSet_reconstructed.MaxOrders());
 }
 
 TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedMultiIndexSetSorting]" ) {

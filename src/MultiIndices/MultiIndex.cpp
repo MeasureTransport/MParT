@@ -1,4 +1,5 @@
 #include "MParT/MultiIndices/MultiIndex.h"
+#include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -54,6 +55,22 @@ MultiIndex::MultiIndex(std::initializer_list<unsigned int> const& indIn) : Multi
   }
 }
 
+MultiIndex::MultiIndex(unsigned int* nzIndsIn,
+                       unsigned int* nzValsIn,
+                       unsigned int numNz,
+                       unsigned int lengthIn) : length(lengthIn),
+                                                maxValue(0),
+                                                totalOrder(0)
+{
+  for(unsigned int i=0; i<numNz; ++i){
+    if(nzValsIn[i]>0){
+      nzInds.push_back(nzIndsIn[i]);
+      nzVals.push_back(nzValsIn[i]);
+      maxValue = std::max<unsigned int>(maxValue, nzValsIn[i]);
+      totalOrder += nzValsIn[i];
+    }
+  }
+}
 
 std::vector<unsigned int>MultiIndex::Vector() const
 {
