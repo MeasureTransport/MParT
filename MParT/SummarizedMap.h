@@ -44,11 +44,10 @@ where the function \f$s:\mathbb{R}^{N-1}\rightarrow \mathbb{R}^{r}\f$ is a funct
     virtual ~SummarizedMap() = default;
 
     using ConditionalMapBase<MemorySpace>::SetCoeffs;
-    void SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs) override;
-    void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs) override;
+    void SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs) override;
+    void WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
     #if defined(MPART_ENABLE_GPU)
-    void SetCoeffs(Kokkos::View<const double*, DeviceSpace> coeffs) override;
-    void WrapCoeffs(Kokkos::View<double*, DeviceSpace> coeffs) override;
+    void SetCoeffs(Kokkos::View<const double*, std::conditional_t<std::is_same_v<Kokkos::HostSpace, MemorySpace>, mpart::DeviceSpace, Kokkos::HostSpace>> coeffs) override;
     #endif
 
     void SummarizePts(StridedMatrix<const double, MemorySpace> const&  pts,

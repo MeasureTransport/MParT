@@ -91,8 +91,8 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateSingle
         output = std::make_shared<TriangularMap<MemorySpace>>(blocks);
 
     }
-
-    output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
+    Kokkos::View<const double*, MemorySpace> coeffs = Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs);
+    output->SetCoeffs(coeffs);
     return output;
 
 }
@@ -114,7 +114,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> mpart::MapFactory::CreateTriang
         comps.at(i) = CreateComponent<MemorySpace>(mset.ToDevice<MemorySpace>(), options);
     }
     auto output = std::make_shared<TriangularMap<MemorySpace>>(comps);
-    output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
+    
+    Kokkos::View<const double*, MemorySpace> coeffs = Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs);
+    output->SetCoeffs(coeffs);
     return output;
 }
 
@@ -156,7 +158,8 @@ std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::Creat
     }
 
     if(output){
-        output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
+        Kokkos::View<const double*, MemorySpace> coeffs = Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs);
+    	output->SetCoeffs(coeffs);
         return output;
     }
 
