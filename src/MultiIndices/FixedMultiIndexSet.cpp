@@ -347,13 +347,6 @@ FixedMultiIndexSet<MemorySpace> FixedMultiIndexSet<MemorySpace>::RemoveZeroDiago
     Kokkos::View<unsigned int*, MemorySpace> diagEntryView = VecToKokkos<unsigned int, MemorySpace>(diagEntries);
     Kokkos::View<unsigned int*, MemorySpace> newStarts("newStarts", diagEntries.size()+1);
     unsigned int numNz = 0;
-    // Kokkos::parallel_reduce(diagEntries.size(), KOKKOS_CLASS_LAMBDA(const int i, unsigned int& lnumNz){
-    //     unsigned int localNz = nzStarts(diagEntryView(i)+1) - nzStarts(diagEntryView(i));
-    //     newStarts(i) = lnumNz;
-    //     if(i == diagEntries.size()-1)
-    //         newStarts(i+1) = lnumNz + localNz;
-    //     lnumNz += localNz;
-    // }, numNz);
     Kokkos::parallel_scan(diagEntries.size(), KOKKOS_LAMBDA(const int i, unsigned int& lnumNz, const bool final){
         unsigned int localNz = nzStarts(diagEntryView(i)+1) - nzStarts(diagEntryView(i));
         if(final){
