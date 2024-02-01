@@ -55,12 +55,12 @@ void SummarizedMap<Kokkos::HostSpace>::SetCoeffs(Kokkos::View<const double*, Kok
 
 }
 template<>
-void SummarizedMap<Kokkos::DefaultExecutionSpace::memory_space>::SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs)
+void SummarizedMap<mpart::DeviceSpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs)
 
 {
 
         // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
-    ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>::SetCoeffs(coeffs);
+    ConditionalMapBase<mpart::DeviceSpace>::SetCoeffs(coeffs);
     comp_->WrapCoeffs(this->savedCoeffs);
 
 }

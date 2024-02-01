@@ -213,7 +213,7 @@ void ComposedMap<MemorySpace>::WrapCoeffs(Kokkos::View<double*, MemorySpace> coe
 
 #if defined(MPART_ENABLE_GPU)
 template<>
-void ComposedMap<Kokkos::HostSpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::DefaultExecutionSpace::memory_space> coeffs)
+void ComposedMap<Kokkos::HostSpace>::SetCoeffs(Kokkos::View<const double*, mpart::DeviceSpace> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
      ConditionalMapBase<Kokkos::HostSpace>::SetCoeffs(coeffs);
@@ -230,10 +230,10 @@ void ComposedMap<Kokkos::HostSpace>::SetCoeffs(Kokkos::View<const double*, Kokko
 }
 
 template<>
-void ComposedMap<Kokkos::DefaultExecutionSpace::memory_space>::SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs)
+void ComposedMap<mpart::DeviceSpace>::SetCoeffs(Kokkos::View<const double*, Kokkos::HostSpace> coeffs)
 {
     // First, call the ConditionalMapBase version of this function to copy the view into the savedCoeffs member variable
-     ConditionalMapBase<Kokkos::DefaultExecutionSpace::memory_space>::SetCoeffs(coeffs);
+     ConditionalMapBase<mpart::DeviceSpace>::SetCoeffs(coeffs);
 
     // Now create subviews for each of the maps
     unsigned int cumNumCoeffs = 0;
