@@ -105,20 +105,41 @@ namespace mpart{
 
 
         /**
-        @brief Constructs a (generally) non-monotone multivariate expansion.
-        @param outputDim The output dimension of the expansion.  Each output will be defined by the same multiindex set but will have different coefficients.
-        @param mset The multiindex set specifying which terms should be used in the multivariate expansion.
-        @param options Options specifying the 1d basis functions used in the parameterization.
+        @brief Constructs a "Single entry" map, which is an identity for all but one output dimension.  The active output dimension is defined by a given component.
+        @param dim The dimension of the mapping
+        @param activeInd Which output dimension is "active", i.e., not identity
+        @param comp The component that will be used for the active output dimension.
         */
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSingleEntryMap(unsigned int dim,
-                                                                                     unsigned int activeInd,
-                                                                                     std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
+                                                                              unsigned int activeInd,
+                                                                              std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
+        /**
+         * @brief Create a MultivariateExpansion using a sigmoid object; INTERNAL USE ONLY
+         * 
+         * @details Using the parameters described in \c`opts`, this function creates
+         * a "multivariate expansion" object that uses a collection of sigmoid functions
+         * to map the input space to the output space. The pertinent options are
+         * - \c`opts.basisType` : The type of basis function to use in the expansion for the first \f$d-1\f$ inputs
+         * - \c`opts.posFuncType` : The type of positive function to use in the rectified basis @ref MultivariateExpansionWorker
+         * - \c`opts.edgeWidth` : The width of the "edge terms" on the last input @ref Sigmoid1d
+         * - \c`opts.sigmoidType` : The type of sigmoid function to use in the expansion @ref Sigmoid1d
+         * 
+         * By default, this constructs a total-order multi-index set. Note that, since the basis
+         * evaluator is rectified, this *will always* be a positive-valued function in the first \f$d-1\f$ inputs.
+         * As such, this factory function is largely for internal testing.
+         * 
+         * @tparam MemorySpace 
+         * @param inputDim 
+         * @param centers 
+         * @param opts 
+         * @return std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> 
+         */
         template<typename MemorySpace>
         std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> CreateSigmoidExpansion(
-            unsigned int inputDim, unsigned int maxOrder, StridedVector<double, MemorySpace> centers,
-            MapOptions opts, std::pair<double,double> edgeWidth={1.5,1.5});
+            unsigned int inputDim, StridedVector<double, MemorySpace> centers,
+            MapOptions opts);
 
         /** This struct is used to map the options to functions that can create a map component with types corresponding
             to the options.

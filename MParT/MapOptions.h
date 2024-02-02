@@ -65,6 +65,9 @@ namespace mpart{
         /** The type of edge terms to use with sigmoids */
         EdgeTypes edgeType = EdgeTypes::SoftPlus;
 
+        /** The shape of the edge terms in a sigmoid expansion */
+        std::pair<double,double> edgeWidth = std::make_pair(1.5, 1.5);
+
         /** Linearization bounds for the 1d basis function. The basis function is linearized outside [lb,ub] */
         double basisLB = -std::numeric_limits<double>::infinity();
         double basisUB =  std::numeric_limits<double>::infinity();
