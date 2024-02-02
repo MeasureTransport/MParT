@@ -174,7 +174,7 @@ using SigmoidBasisEval = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Ko
 
 template <typename MemorySpace, typename OffdiagEval, typename Rectifier, typename SigmoidType, typename EdgeType>
 SigmoidBasisEval<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType> CreateSigmoidEvaluator(
-    unsigned int inputDim, StridedVector<double, MemorySpace> centers, std::pair<double,double> edgeWidth) {
+    unsigned int inputDim, StridedVector<double, MemorySpace> centers, double edgeShape) {
     using BasisEval_T = SigmoidBasisEval<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType>;
     Kokkos::View<double*, MemorySpace> widths("Sigmoid Widths", centers.size());
     Kokkos::View<double*, MemorySpace> weights("Sigmoid Weights", centers.size());
@@ -188,16 +188,14 @@ SigmoidBasisEval<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType> Cre
         ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
             ss.str().c_str());
     }
-    double left_edge = edgeWidth.first;
-    double right_edge = edgeWidth.second;
     Kokkos::parallel_for(max_order+2, KOKKOS_LAMBDA(unsigned int i) {
         if (i == max_order) {
-            widths(0) = left_edge;
-            weights(0) = 1./left_edge;
+            widths(0) = edgeShape;
+            weights(0) = 1./edgeShape;
             return;
         } else if (i == max_order+1) {
-            widths(1) = right_edge;
-            weights(1) = 1./right_edge;
+            widths(1) = edgeShape;
+            weights(1) = 1./edgeShape;
             return;
         }
         int start_idx = 2+(i*(i+1))/2;
@@ -225,7 +223,7 @@ SigmoidBasisEval<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType> Cre
 
 template <typename MemorySpace, typename OffdiagEval, typename Rectifier, typename SigmoidType, typename EdgeType>
 std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> CreateSigmoidExpansionTemplate(
-    unsigned int inputDim, StridedVector<double, MemorySpace> centers, std::pair<double,double> edgeWidth)
+    unsigned int inputDim, StridedVector<double, MemorySpace> centers, double edgeWidth)
 {
     using BasisEval_T = SigmoidBasisEval<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType>;
     auto basisEval = CreateSigmoidEvaluator<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType>(inputDim, centers, edgeWidth);
@@ -266,9 +264,9 @@ std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> MapFactory::CreateSigmoi
     }
     // Dispatch to the correct sigmoid expansion template
     if(opts.posFuncType == PosFuncTypes::Exp) {
-        return CreateSigmoidExpansionTemplate<MemorySpace, HermiteFunction, Exp, SigmoidTypeSpace::Logistic, SoftPlus>(inputDim, centers, opts.edgeWidth);
+        return CreateSigmoidExpansionTemplate<MemorySpace, HermiteFunction, Exp, SigmoidTypeSpace::Logistic, SoftPlus>(inputDim, centers, opts.edgeShape);
     } else if(opts.posFuncType == PosFuncTypes::SoftPlus) {
-        return CreateSigmoidExpansionTemplate<MemorySpace, HermiteFunction, SoftPlus, SigmoidTypeSpace::Logistic, SoftPlus>(inputDim, centers, opts.edgeWidth);
+        return CreateSigmoidExpansionTemplate<MemorySpace, HermiteFunction, SoftPlus, SigmoidTypeSpace::Logistic, SoftPlus>(inputDim, centers, opts.edgeShape);
     }
     else {
         return nullptr;
@@ -285,5 +283,5 @@ template std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> mpart::Ma
     template std::shared_ptr<ParameterizedFunctionBase<DeviceSpace>> mpart::MapFactory::CreateExpansion<DeviceSpace>(unsigned int, FixedMultiIndexSet<DeviceSpace> const&, MapOptions);
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateTriangular<DeviceSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateSingleEntryMap(unsigned int, unsigned int, std::shared_ptr<ConditionalMapBase<DeviceSpace>> const&);
-    template std::shared_ptr<ParameterizedFunctionBase<DeviceSpace>> mpart::MapFactory::CreateSigmoidExpansion<DeviceSpace>(unsigned int, unsigned int, StridedVector<double, DeviceSpace>, MapOptions, std::pair<double, double>);
+    template std::shared_ptr<ParameterizedFunctionBase<DeviceSpace>> mpart::MapFactory::CreateSigmoidExpansion<DeviceSpace>(unsigned int, StridedVector<double, DeviceSpace>, MapOptions);
 #endif
