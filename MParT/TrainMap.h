@@ -53,6 +53,7 @@ struct TrainOptions {
         ss << "verbose = " << verbose;
         return ss.str();
     }
+
 };
 
 /**
