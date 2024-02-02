@@ -82,11 +82,11 @@ class Sigmoid1d {
 	/**
 	 * @brief Construct a new Sigmoid 1d object
 	 *
-	 * Each input should be of length \f$n(n+1)/2\f$, where \f$n\f$ is the
-	 * maximum order.
+	 * Each input should be of length \f$2 + n(n+1)/2\f$, where \f$n\f$ is the
+	 * number of sigmoids.
 	 *
 	 * @param centers Where to center the sigmoids
-	 * @param widths How "wide" the sigmoids should be
+	 * @param widths How "wide" the basis functions should be
 	 * @param weights How much to weight the sigmoids linearly
 	 */
 	Sigmoid1d(Kokkos::View<double*, MemorySpace> centers,
@@ -99,8 +99,8 @@ class Sigmoid1d {
 	/**
 	 * @brief Construct a new Sigmoid 1d object from centers and widths
 	 *
-	 * Each input should be of length \f$n(n+1)/2\f$, where \f$n\f$ is the
-	 * maximum order.
+	 * Each input should be of length \f$2 + n(n+1)/2\f$, where \f$n\f$ is the
+	 * number of sigmoids.
 	 *
 	 * @param centers
 	 * @param widths
