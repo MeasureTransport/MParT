@@ -21,6 +21,13 @@ void ParameterizedFunctionBase<MemorySpace>::CheckDeviceMismatch(std::string fun
     throw std::runtime_error(msg.str());
 }
 
+template<typename MemorySpace>
+std::vector<unsigned int> ParameterizedFunctionBase<MemorySpace>::DiagonalCoeffIndices() const
+{
+    throw std::logic_error("DiagonalCoeffIndices not implemented for the given Parameterized Function class.");
+    return {};
+}
+
 
 template<>
 template<>

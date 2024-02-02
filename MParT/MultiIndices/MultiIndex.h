@@ -50,6 +50,19 @@ public:
         }
     }
 
+    /**
+     * @brief Construct a new Multi Index object from a set of nonzero indices and values
+     * 
+     * @param nzIndsIn indices of the nonzero values
+     * @param nzValsIn values that are nonzero
+     * @param numNz number of nonzero values (i.e., length of nzIndsIn and nzValsIn)
+     * @param lengthIn dimension of the index (numNz==lengthIn iff all values are nonzero)
+     */
+    MultiIndex(unsigned int* nzIndsIn,
+        unsigned int* nzValsIn,
+        unsigned int numNz,
+        unsigned int lengthIn);
+    
     /** Uses a dense vector description of the multiindex, defined through a pointer,
         and extracts the nonzero components.
         @param[in] fullVec A pointer the memory containing the dense multiindex.

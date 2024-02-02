@@ -399,6 +399,8 @@ public:
      */
     FixedMultiIndexSet<MemorySpace> GetMultiIndexSet() const { return multiSet_; }
 
+    std::vector<unsigned int> NonzeroDiagonalEntries() const { return multiSet_.NonzeroDiagonalEntries(); }
+
 #if defined(MPART_HAS_CEREAL)
     template<typename Archive>
     void save(Archive& ar) const{
