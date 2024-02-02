@@ -32,9 +32,9 @@ void mpart::binding::MapOptionsWrapper(jlcxx::Module &mod) {
     mod.add_bits<SigmoidTypes>("__SigmoidTypes", jlcxx::julia_type("CppEnum"));
     mod.set_const("__Logistic", SigmoidTypes::Logistic);
 
-    // EdgeTypes
-    mod.add_bits<EdgeTypes>("__EdgeTypes", jlcxx::julia_type("CppEnum"));
-    mod.set_const("__SoftPlus", EdgeTypes::SoftPlus);
+    // EdgeTypes: TODO: SoftPlus overlaps with PosFuncTypes, needs to be fixed
+    // mod.add_bits<EdgeTypes>("__EdgeTypes", jlcxx::julia_type("CppEnum"));
+    // mod.set_const("__SoftPlus", EdgeTypes::SoftPlus);
 
     // MapOptions
     mod.add_type<MapOptions>("__MapOptions")
