@@ -11,6 +11,7 @@
 #include "MParT/MultivariateExpansionWorker.h"
 #include "MParT/PositiveBijectors.h"
 #include "MParT/LinearizedBasis.h"
+#include "MParT/Sigmoid.h"
 
 using namespace mpart;
 
@@ -168,14 +169,112 @@ std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::Creat
 }
 
 
+template <typename MemorySpace, typename OffdiagEval, typename Rectifier, typename SigmoidType, typename EdgeType>
+using SigmoidBasisEval = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<OffdiagEval, Sigmoid1d<MemorySpace, SigmoidType, EdgeType>>, Rectifier>;
+
+template <typename MemorySpace, typename OffdiagEval, typename Rectifier, typename SigmoidType, typename EdgeType>
+std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> CreateSigmoidExpansionTemplate(unsigned int inputDim, unsigned int maxOrder, StridedVector<double, MemorySpace> centers, std::pair<double,double> edgeWidth) {
+    using BasisEval_T = SigmoidBasisEval<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType>;
+    Kokkos::View<double*, MemorySpace> widths("Sigmoid Widths", centers.size());
+    Kokkos::View<double*, MemorySpace> weights("Sigmoid Weights", centers.size());
+    int sigmoid_count = centers.size() - 2;
+    double max_order_double = Sigmoid1d<MemorySpace, SigmoidType, EdgeType>::LengthToOrder(sigmoid_count);
+    int max_order = int(max_order_double);
+    if(max_order_double  != double(max_order)) {
+        std::stringstream ss;
+        ss << "Incorrect length of centers, " << centers.size() << ".\n";
+        ss << "Length should be of form 2+(1+2+3+...+n) for some order n";
+        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+            ss.str().c_str());
+    }
+    double left_edge = edgeWidth.first;
+    double right_edge = edgeWidth.second;
+    Kokkos::parallel_for(max_order+2, KOKKOS_LAMBDA(unsigned int i) {
+        if (i == max_order) {
+            widths(0) = left_edge;
+            weights(0) = 1./left_edge;
+            return;
+        } else if (i == max_order+1) {
+            widths(1) = right_edge;
+            weights(1) = 1./right_edge;
+            return;
+        }
+        int start_idx = 2+(i*(i+1))/2;
+
+        for(unsigned int j = 0; j < i; j++) {
+            double prev_center, next_center;
+            if(j == 0 || i == 0) {// Use center for left edge term
+                prev_center = centers(0);
+            } else {
+                prev_center = centers(start_idx+j-1);
+            }
+            if(j == i-1 || i == 0) { // Use center for right edge term
+                next_center = centers(1);
+            } else {
+                next_center = centers(start_idx+j);
+            }
+            widths(start_idx + j) = 2/(next_center - prev_center);
+            weights(start_idx + j) = 1.;
+        }
+    });
+    Sigmoid1d<MemorySpace, SigmoidType, EdgeType> sig(centers, widths, weights);
+    OffdiagEval basis1d;
+    BasisEval_T basisEval {inputDim, basis1d, sig};
+    FixedMultiIndexSet<MemorySpace> mset(inputDim, maxOrder);
+    auto output = std::make_shared<MultivariateExpansion<BasisEval_T, MemorySpace>>(1, mset, basisEval);
+    output->WrapCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
+    return output;
+}
+
+template<typename MemorySpace>
+std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> MapFactory::CreateSigmoidExpansion(
+    unsigned int inputDim, unsigned int maxOrder, StridedVector<double, MemorySpace> centers,
+    MapOptions opts, std::pair<double,double> edgeWidth) {
+    // Check that the opts are valid
+    if (opts.basisType != BasisTypes::HermiteFunctions) {
+        std::string basisString = MapOptions::btypes[static_cast<unsigned int>(opts.basisType)];
+        std::stringstream ss;
+        ss << "Unsupported basis type for sigmoid expansion: " << basisString;
+        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(ss.str().c_str());
+    }
+    if(opts.posFuncType != PosFuncTypes::Exp && opts.posFuncType != PosFuncTypes::SoftPlus) {
+        std::string posString = MapOptions::pftypes[static_cast<unsigned int>(opts.posFuncType)];
+        std::stringstream ss;
+        ss << "Unsupported positive function type for sigmoid expansion: " << posString;
+        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(ss.str().c_str());
+    }
+    if(opts.edgeType != EdgeTypes::SoftPlus) {
+        std::string edgeString = MapOptions::etypes[static_cast<unsigned int>(opts.edgeType)];
+        std::stringstream ss;
+        ss << "Unsupported edge type for sigmoid expansion: " << edgeString;
+        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(ss.str().c_str());
+    }
+    if(opts.sigmoidType != SigmoidTypes::Logistic) {
+        std::string sigmoidString = MapOptions::stypes[static_cast<unsigned int>(opts.sigmoidType)];
+        std::stringstream ss;
+        ss << "Unsupported sigmoid type for sigmoid expansion: " << sigmoidString;
+        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(ss.str().c_str());
+    }
+    // Dispatch to the correct sigmoid expansion template
+    if(opts.posFuncType == PosFuncTypes::Exp) {
+        return CreateSigmoidExpansionTemplate<MemorySpace, HermiteFunction, Exp, SigmoidTypeSpace::Logistic, SoftPlus>(inputDim, maxOrder, centers, edgeWidth);
+    } else if(opts.posFuncType == PosFuncTypes::SoftPlus) {
+        return CreateSigmoidExpansionTemplate<MemorySpace, HermiteFunction, SoftPlus, SigmoidTypeSpace::Logistic, SoftPlus>(inputDim, maxOrder, centers, edgeWidth);
+    }
+    else {
+        return nullptr;
+    }
+}
+
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateComponent<Kokkos::HostSpace>(FixedMultiIndexSet<Kokkos::HostSpace> const&, MapOptions);
 template std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> mpart::MapFactory::CreateExpansion<Kokkos::HostSpace>(unsigned int, FixedMultiIndexSet<Kokkos::HostSpace> const&, MapOptions);
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateTriangular<Kokkos::HostSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateSingleEntryMap(unsigned int, unsigned int, std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> const&);
-
+template std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> mpart::MapFactory::CreateSigmoidExpansion<Kokkos::HostSpace>(unsigned int, unsigned int, StridedVector<double, Kokkos::HostSpace>, MapOptions, std::pair<double, double>);
 #if defined(MPART_ENABLE_GPU)
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateComponent<DeviceSpace>(FixedMultiIndexSet<DeviceSpace> const&, MapOptions);
     template std::shared_ptr<ParameterizedFunctionBase<DeviceSpace>> mpart::MapFactory::CreateExpansion<DeviceSpace>(unsigned int, FixedMultiIndexSet<DeviceSpace> const&, MapOptions);
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateTriangular<DeviceSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateSingleEntryMap(unsigned int, unsigned int, std::shared_ptr<ConditionalMapBase<DeviceSpace>> const&);
+    template std::shared_ptr<ParameterizedFunctionBase<DeviceSpace>> mpart::MapFactory::CreateSigmoidExpansion<DeviceSpace>(unsigned int, unsigned int, StridedVector<double, DeviceSpace>, MapOptions, std::pair<double, double>);
 #endif

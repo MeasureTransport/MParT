@@ -115,6 +115,11 @@ namespace mpart{
                                                                                      unsigned int activeInd,
                                                                                      std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
+        template<typename MemorySpace>
+        std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> CreateSigmoidExpansion(
+            unsigned int inputDim, unsigned int maxOrder, StridedVector<double, MemorySpace> centers,
+            MapOptions opts, std::pair<double,double> edgeWidth={1.5,1.5});
+
         /** This struct is used to map the options to functions that can create a map component with types corresponding
             to the options.
         */
