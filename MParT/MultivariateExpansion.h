@@ -11,6 +11,9 @@
 
 namespace mpart{
 
+    template<typename MemorySpace, class BasisEvaluatorType, class RectifiedBasisEvaluatorType>
+    class RectifiedMultivariateExpansion;
+
     /**
      @brief Defines a multivariate expansion based on the tensor product of 1d basis functions.
      
@@ -22,6 +25,9 @@ namespace mpart{
     template<class BasisEvaluatorType, typename MemorySpace>
     class MultivariateExpansion : public ParameterizedFunctionBase<MemorySpace>
     {
+        template<typename Mspace, typename B1, typename B2>
+        friend class RectifiedMultivariateExpansion;
+
     public:
 
         template<typename SetType>
@@ -42,8 +48,8 @@ namespace mpart{
         virtual ~MultivariateExpansion() = default;
 
 
-        virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                                  StridedMatrix<double, MemorySpace>              output) override
+        void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                          StridedMatrix<double, MemorySpace>              output) override
         {
             using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
             
@@ -93,9 +99,9 @@ namespace mpart{
             Kokkos::fence();
         }
 
-        virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                                  StridedMatrix<const double, MemorySpace> const& sens,
-                                  StridedMatrix<double, MemorySpace>              output) override
+        void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                          StridedMatrix<const double, MemorySpace> const& sens,
+                          StridedMatrix<double, MemorySpace>              output) override
         {
             using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
             
@@ -153,7 +159,7 @@ namespace mpart{
         }
 
 
-        virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+        void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                            StridedMatrix<const double, MemorySpace> const& sens,
                            StridedMatrix<double, MemorySpace>              output) override
         {

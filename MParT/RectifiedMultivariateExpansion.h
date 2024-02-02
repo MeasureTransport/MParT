@@ -19,7 +19,7 @@ namespace mpart{
      @tparam BasisEvaluatorType The type of the 1d basis functions
      @tparam MemorySpace The Kokkos memory space where the coefficients and evaluations are stored.
      */
-    template<class BasisEvaluatorType, class RectifiedBasisEvaluatorType, typename MemorySpace>
+    template<typename MemorySpace, class BasisEvaluatorType, class RectifiedBasisEvaluatorType>
     class RectifiedMultivariateExpansion : public ConditionalMapBase<MemorySpace>
     {
     public:
@@ -88,7 +88,39 @@ namespace mpart{
                                 StridedVector<double, MemorySpace>              output) override
         {
             // Take logdet of diagonal expansion
-            expansion_diag.LogDeterminant(pts, output);
+            unsigned int numPts = pts.extent(1);
+            StridedVector<double, MemorySpace> coeff_diag = Kokkos::subview(this->savedCoeffs, std::make_pair(expansion_off.numCoeffs,expansion_off.numCoeffs+expansion_diag.numCoeffs));
+            MultivariateExpansionWorker<RectifiedBasisEvaluatorType, MemorySpace> worker_diag = expansion_diag.worker;
+            unsigned int cacheSize = worker_diag.CacheSize();
+
+            // Take logdet of diagonal expansion
+            auto functor = KOKKOS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
+
+                unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
+
+                if(ptInd<numPts){
+
+                    // Create a subview containing only the current point
+                    auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
+                    
+                    // Get a pointer to the shared memory that Kokkos set up for this team
+                    Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
+
+                    // Fill in entries in the cache that are independent of x_d.  By passing DerivativeFlags::None, we are telling the expansion that no derivatives with wrt x_1,...x_{d-1} will be needed.
+                    worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::None);
+                    worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::Diagonal);
+                    // Evaluate the expansion
+                    output(ptInd) = Kokkos::log(worker_diag.DiagonalDerivative(cache.data(), coeff_diag, 1));
+                }
+            };
+
+            auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
+            
+            // Paralel loop over each point computing T(x_1,...,x_D) for that point
+            auto policy = GetCachedRangePolicy<ExecutionSpace>(numPts, cacheBytes, functor);
+            Kokkos::parallel_for(policy, functor);
+    
+            Kokkos::fence();
         }
 
         void InverseImpl(StridedMatrix<const double, MemorySpace> const& x1,
@@ -98,29 +130,75 @@ namespace mpart{
             // We know x1 should be the same as the input to expansion_off
             // Since we are working with r = g(x) + f(x,y) --> y = f(x,.)^{-1}(r - g(x))
             expansion_off.EvaluateImpl(x1, output);
+            StridedVector<double, MemorySpace> out_slice = Kokkos::subview(output, 0, Kokkos::ALL());
+            StridedVector<const double, MemorySpace> r_slice = Kokkos::subview(r, 0, Kokkos::ALL());
             Kokkos::parallel_for(output.extent(1), KOKKOS_LAMBDA(int i){
-                output(0, i) = r(0, i) - output(0, i);
+                out_slice(i) = r_slice(i) - out_slice(0, i);
             });
             // Need inverse implementation for expansion_diag
-            expansion_diag.InverseImpl(x1, output, output);
+            // TODO
         }
 
         void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                                          StridedMatrix<double, MemorySpace>              output) override
         {
-            // Take logdetinputgrad of diagonal expansion
-            expansion_diag.LogDeterminantInputGrad(pts, output);
+            
+            unsigned int numPts = pts.extent(1);
+            StridedVector<double, MemorySpace> coeff_diag = Kokkos::subview(this->savedCoeffs,
+                std::make_pair(expansion_off.numCoeffs,expansion_off.numCoeffs+expansion_diag.numCoeffs)
+            );
+            MultivariateExpansionWorker<RectifiedBasisEvaluatorType, MemorySpace> worker_diag = expansion_diag.worker;
+            unsigned int cacheSize = worker_diag.CacheSize();
+
+            // Take logdet of diagonal expansion
+            auto functor = KOKKOS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
+
+                unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
+
+                if(ptInd<numPts){
+
+                    // Create a subview containing only the current point
+                    auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
+                    
+                    // Get a pointer to the shared memory that Kokkos set up for this team
+                    Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
+
+                    // Fill in entries in the cache that are independent of x_d.  By passing DerivativeFlags::None, we are telling the expansion that no derivatives with wrt x_1,...x_{d-1} will be needed.
+                    worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::MixedInput);
+                    worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::MixedInput);
+                    
+                    // Evaluate the expansion
+                    output(ptInd) = worker_diag.MixedInputDerivative(cache.data(), coeff_diag, 1);
+                    
+                    worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::Diagonal);
+                    worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::Diagonal);
+                    output(ptInd) /= worker_diag.DiagonalDerivative(cache.data(), coeff_diag, 1);
+                }
+            };
+
+            auto cacheBytes = Kokkos::View<double*,MemorySpace>::shmem_size(cacheSize);
+            
+            // Paralel loop over each point computing T(x_1,...,x_D) for that point
+            auto policy = GetCachedRangePolicy<ExecutionSpace>(numPts, cacheBytes, functor);
+            Kokkos::parallel_for(policy, functor);
         }
 
         void LogDeterminantCoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
                                          StridedMatrix<double, MemorySpace>              output) override
         {
             // Take logdetcoeffgrad of diagonal expansion, output to bottom block
-            StridedMatrix<double, MemorySpace> output_diag = Kokkos::subview(output, std::make_pair(expansion_off.numCoeffs,expansion_off.numCoeffs+expansion_diag.numCoeffs), Kokkos::ALL());
-            expansion_diag.LogDeterminantCoeffGrad(pts, output_diag);
+            StridedMatrix<double, MemorySpace> output_diag = Kokkos::subview(output,
+                std::make_pair(expansion_off.numCoeffs,expansion_off.numCoeffs+expansion_diag.numCoeffs),
+                Kokkos::ALL());
+            // TODO
         }
 
     private:
+
+        void MixedInputDerivative(StridedMatrix<const double, MemorySpace> const& pts,  
+                                  StridedMatrix<double, MemorySpace>              output) override
+        {
+        }
         MultivariateExpansion<BasisEvaluatorType, MemorySpace> expansion_off;
         MultivariateExpansion<RectifiedBasisEvaluatorType, MemorySpace> expansion_diag;
 
