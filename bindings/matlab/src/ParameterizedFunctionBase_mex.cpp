@@ -205,11 +205,7 @@ MEX_DEFINE(MapOptions_Serialize) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 1);
 
   std::string filename = input.get<std::string>(0);
-  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
-                                         input.get<std::string>(3),input.get<double>(4),
-                                         input.get<double>(5),input.get<unsigned int>(6),
-                                         input.get<unsigned int>(7),input.get<unsigned int>(8),
-                                         input.get<bool>(9),input.get<double>(10),input.get<double>(11),input.get<bool>(12),input.get<double>(13));
+  MapOptions opts = MapOptionsFromMatlab(input, 1);
   std::ofstream os (filename);
   cereal::BinaryOutputArchive oarchive(os);
   oarchive(opts);
