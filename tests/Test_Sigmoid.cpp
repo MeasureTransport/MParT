@@ -50,15 +50,15 @@ void TestSigmoidGradients(Function Sigmoid, unsigned int N_grad_points, double f
     }
 }
 
-TEMPLATE_TEST_CASE("Sigmoid1d","[sigmoid1d]", SigmoidTypes::Logistic) {
+TEMPLATE_TEST_CASE("Sigmoid1d","[sigmoid1d]", SigmoidTypeSpace::Logistic) {
     SECTION("Initialization") {
         Kokkos::View<double*, MemorySpace> centers("Sigmoid Centers", 2);
-        Kokkos::View<double*, MemorySpace> widths("Sigmoid Widths", 1);
-        Kokkos::View<double*, MemorySpace> weights("Sigmoid weights", 1);
+        Kokkos::View<double*, MemorySpace> widths("Sigmoid Widths", 3);
+        Kokkos::View<double*, MemorySpace> weights("Sigmoid weights", 2);
 
         CHECK_THROWS_AS((Sigmoid1d<MemorySpace,TestType>(centers, widths, weights)), std::invalid_argument);
         CHECK_THROWS_AS((Sigmoid1d<MemorySpace,TestType>(centers, widths)), std::invalid_argument);
-        int N_wrong = 1+2+3+5;
+        int N_wrong = 2+1+2+3+5;
         centers = Kokkos::View<double*, MemorySpace>("Sigmoid Centers", N_wrong);
         widths = Kokkos::View<double*, MemorySpace>("Sigmoid widths", N_wrong);
         weights = Kokkos::View<double*, MemorySpace>("Sigmoid weights", N_wrong);

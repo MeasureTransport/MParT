@@ -34,6 +34,14 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     .value("AdaptiveSimpson",QuadTypes::AdaptiveSimpson)
     .value("AdaptiveClenshawCurtis",QuadTypes::AdaptiveClenshawCurtis);
 
+    // SigmoidTypes
+    py::enum_<SigmoidTypes>(m, "SigmoidTypes")
+    .value("Logistic",SigmoidTypes::Logistic);
+
+    // EdgeTypes
+    py::enum_<EdgeTypes>(m, "EdgeTypes")
+    .value("SoftPlus",EdgeTypes::SoftPlus);
+
     // MapOptions
     py::class_<MapOptions, std::shared_ptr<MapOptions>>(m, "MapOptions")
     .def(py::init<>())
@@ -45,6 +53,9 @@ void mpart::binding::MapOptionsWrapper(py::module &m)
     .def_readwrite("basisUB", &MapOptions::basisUB)
     .def_readwrite("basisNorm", &MapOptions::basisNorm)
     .def_readwrite("posFuncType", &MapOptions::posFuncType)
+    .def_readwrite("edgeType", &MapOptions::edgeType)
+    .def_readwrite("edgeShape", &MapOptions::edgeShape)
+    .def_readwrite("sigmoidType", &MapOptions::sigmoidType)
     .def_readwrite("quadType", &MapOptions::quadType)
     .def_readwrite("quadAbsTol", &MapOptions::quadAbsTol)
     .def_readwrite("quadRelTol", &MapOptions::quadRelTol)

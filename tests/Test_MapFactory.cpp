@@ -202,4 +202,56 @@ TEST_CASE( "Testing factory method for single entry map, 1 < activeInd < dim", "
     REQUIRE(map != nullptr);
 }
 
+TEST_CASE( "Testing factory method for Sigmoid MVE", "[MapFactorySigmoidMVE]" ) {
 
+    MapOptions options;
+    unsigned int inputDim = 7;
+    unsigned int maxDegree = 5;
+    unsigned int numCenters = 2 + maxDegree*(maxDegree+1)/2;
+    Kokkos::View<double*, MemorySpace> centers("Centers", numCenters);
+    double bound = 3.;
+    centers(0) = -bound; centers(1) = bound;
+    unsigned int center_idx = 2;
+    for(int j = 0; j < maxDegree; j++){
+        for(int i = 0; i <= j; i++){
+            centers(center_idx) = -bound + (2*bound)*(i+1)/(j+2);
+            center_idx++;
+        }
+    }
+    options.basisType = BasisTypes::HermiteFunctions;
+    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func = MapFactory::CreateSigmoidExpansion<MemorySpace>(inputDim, centers, options);
+    REQUIRE(func != nullptr);
+
+    unsigned int numPts = 100;
+    Kokkos::View<double**,MemorySpace> pts("Points", inputDim, numPts);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>> policy({0,0}, {inputDim, numPts});
+    Kokkos::parallel_for("Fill points", policy, KOKKOS_LAMBDA(const int i, const int j){
+        pts(i,j) = double(j*i)/double((inputDim)*(numPts-1));
+    });
+    Kokkos::fence();
+    // Checking example of Gradient
+    StridedVector<double, MemorySpace> coeffs = func->Coeffs();
+    Kokkos::deep_copy(coeffs, 1.0);
+    Kokkos::View<double**, MemorySpace> eval = func->Evaluate(pts);
+    CHECK(eval.extent(0)==1);
+    Kokkos::View<double**, MemorySpace> sens ( "Sensitivities", 1, numPts);
+    Kokkos::parallel_for("fill sensitivities", numPts, KOKKOS_LAMBDA(const int i){
+        sens(0,i) = 1.0;
+    });
+    Kokkos::View<double**, MemorySpace> grad = func->Gradient(pts, sens);
+    CHECK(grad.extent(0)==inputDim);
+    CHECK(grad.extent(1)==numPts);
+    double fd_step = 1e-6;
+    for(int i = 0; i < inputDim; i++){
+        Kokkos::parallel_for(numPts, KOKKOS_LAMBDA(const int j){
+            if(i > 0) pts(i-1,j) -= fd_step;
+            pts(i,j) += fd_step;
+        });
+        Kokkos::fence();
+        Kokkos::View<double**, MemorySpace> eval2 = func->Evaluate(pts);
+        for(int j = 0; j < numPts; j++){
+            double fd = (eval2(0,j) - eval(0,j))/(fd_step);
+            CHECK(grad(i,j) == Approx(fd).epsilon(20*fd_step));
+        }
+    }
+}

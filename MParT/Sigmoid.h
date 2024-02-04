@@ -19,7 +19,7 @@ namespace mpart {
  * - \c Derivative
  * - \c SecondDerivative
  */
-namespace SigmoidTypes {
+namespace SigmoidTypeSpace {
 struct Logistic {
 	KOKKOS_INLINE_FUNCTION double static Evaluate(double x) {
 		return 0.5 + 0.5 * MathSpace::tanh(x / 2);
@@ -37,7 +37,7 @@ struct Logistic {
 					(1 - 2 * fx);  // Known expression for the second derivative of this
 	}
 };
-}  // namespace SigmoidTypes
+}  // namespace SigmoidTypeSpace
 
 /**
  * @brief Class to represent univariate function space spanned by sigmoids.
@@ -74,9 +74,9 @@ struct Logistic {
  * Currently the minimum order one can construct is 1, i.e., an affine map.
  *
  * @tparam MemorySpace Where the (nonlinear) parameters are stored
- * @tparam SigmoidType Class defining eval, @ref SigmoidTypes
+ * @tparam SigmoidType Class defining eval, @ref SigmoidTypeSpace
  */
-template <typename MemorySpace, typename SigmoidType = SigmoidTypes::Logistic, typename EdgeType = SoftPlus>
+template <typename MemorySpace, typename SigmoidType = SigmoidTypeSpace::Logistic, typename EdgeType = SoftPlus>
 class Sigmoid1d {
  public:
 	/**
@@ -121,7 +121,7 @@ class Sigmoid1d {
 	 * @param max_order Maximum order of basis function to evaluate
 	 * @param input Point to evaluate function
 	 */
-	void EvaluateAll(double* output, int max_order, double input) const {
+	KOKKOS_FUNCTION void EvaluateAll(double* output, int max_order, double input) const {
 		if (order_ < max_order) {
 			std::stringstream ss;
 			ss << "Sigmoid basis evaluation order too large.\n";
@@ -164,7 +164,7 @@ class Sigmoid1d {
 	 * @param max_order Number of sigmoids to evaluate
 	 * @param input Where to evaluate sigmoids
 	 */
-	void EvaluateDerivatives(double* output, double* output_diff, int max_order,
+	KOKKOS_FUNCTION void EvaluateDerivatives(double* output, double* output_diff, int max_order,
 							 double input) const {
 		if (order_ < max_order) {
 			std::stringstream ss;
@@ -218,7 +218,7 @@ class Sigmoid1d {
 	 * @param max_order Maximum order of sigmoid to evaluate
 	 * @param input Where to evaluate the sigmoids
 	 */
-	void EvaluateSecondDerivatives(double* output, double* output_diff,
+	KOKKOS_FUNCTION void EvaluateSecondDerivatives(double* output, double* output_diff,
 								   double* output_diff2, int max_order,
 								   double input) const {
 		if (order_ < max_order) {
@@ -278,7 +278,13 @@ class Sigmoid1d {
 	 *
 	 * @return int
 	 */
-	int GetOrder() const { return order_; }
+	KOKKOS_INLINE_FUNCTION int GetOrder() const { return order_; }
+
+	/// @brief Given the length of centers, return the number of sigmoid levels
+	static double LengthToOrder(int length) {
+		double n_sig_double = (MathSpace::sqrt(1 + 8 * length) - 1) / 2;
+		return n_sig_double;
+	}
 
  private:
 	void Validate() {
@@ -303,7 +309,7 @@ class Sigmoid1d {
 		// Arithmetic sum length calculation
 		// Number of centers should be n_sigmoid_centers = num_sigmoids*(num_sigmoids+1)/2
 		// Solve for num_sigmoids
-		double n_sig_double = (MathSpace::sqrt(1 + 8 * n_sigmoid_centers) - 1) / 2;
+		double n_sig_double = LengthToOrder(n_sigmoid_centers);
 		int n_sig = n_sig_double;
 		if (n_sig < 0 || MathSpace::abs((double)n_sig - n_sig_double) > 1e-15) {
 			std::stringstream ss;
@@ -320,6 +326,7 @@ class Sigmoid1d {
 	static int constexpr START_SIGMOIDS_IDX = 2;
 	Kokkos::View<const double*, MemorySpace> centers_, widths_, weights_;
 };
+
 }  // namespace mpart
 
 #endif  // MPART_SIGMOID_H
