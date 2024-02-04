@@ -160,7 +160,7 @@ struct GetRectifier<BasisEvaluator<HowHomogeneous, BasisEvaluatorType, Rectifier
 template <typename BasisEvaluatorType>
 class BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
   public:
-  BasisEvaluator(unsigned int, BasisEvaluatorType const &basis1d) : basis1d_(basis1d) {}
+  BasisEvaluator(unsigned int, BasisEvaluatorType const &basis1d = BasisEvaluatorType()) : basis1d_(basis1d) {}
 
   /**
    * @brief Helper function to construct a new Basis Evaluator object
@@ -222,7 +222,8 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
   public:
   BasisEvaluator(
       unsigned int dim,
-      Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType> const &basis1d)
+      Kokkos::pair<OffdiagEvaluatorType,
+      DiagEvaluatorType> const &basis1d = Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType>())
       : offdiag_(basis1d.first), diag_(basis1d.second), dim_(dim) {}
 
   /**

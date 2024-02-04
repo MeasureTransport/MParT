@@ -106,6 +106,8 @@ public:
         cacheSize_ = ToHost(dCacheSize)(0);
     };
 
+    MultivariateExpansionWorker(MultivariateExpansionWorker const& other) = default;
+
     /**
      @brief Returns the size of the cache needed to evaluate the expansion (in terms of number of doubles).
      @return unsigned int  The length of the required cache vector.

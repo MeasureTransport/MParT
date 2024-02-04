@@ -11,9 +11,6 @@
 
 namespace mpart{
 
-    template<typename MemorySpace, class BasisEvaluatorType, class RectifiedBasisEvaluatorType>
-    class RectifiedMultivariateExpansion;
-
     /**
      @brief Defines a multivariate expansion based on the tensor product of 1d basis functions.
      
@@ -25,9 +22,6 @@ namespace mpart{
     template<class BasisEvaluatorType, typename MemorySpace>
     class MultivariateExpansion : public ParameterizedFunctionBase<MemorySpace>
     {
-        template<typename Mspace, typename B1, typename B2>
-        friend class RectifiedMultivariateExpansion;
-
     public:
 
         template<typename SetType>

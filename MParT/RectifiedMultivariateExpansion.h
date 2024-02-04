@@ -31,15 +31,17 @@ namespace mpart{
             Rectifier>, MemorySpace
         >;
         using OffdiagWorker_T = MultivariateExpansionWorker<
-            BasisEvaluator<BasisHomogeneity::Homogeneous, OffdiagEval, MemorySpace>
+            BasisEvaluator<BasisHomogeneity::Homogeneous, OffdiagEval>
         >;
 
 
         RectifiedMultivariateExpansion(OffdiagWorker_T const& worker_off_,
                                        DiagWorker_T const& worker_diag_):
-                                    ConditionalMapBase<MemorySpace>(worker_off.InputSize(), 1, worker_off.NumCoeffs() + worker_diag.NumCoeffs()),
+                                    ConditionalMapBase<MemorySpace>(worker_diag_.InputSize(), 1, worker_off_.NumCoeffs() + worker_diag_.NumCoeffs()),
                                     setSize_off(worker_off_.NumCoeffs()),
-                                    setSize_diag(worker_diag_.NumCoeffs())
+                                    setSize_diag(worker_diag_.NumCoeffs()),
+                                    worker_off(worker_off_),
+                                    worker_diag(worker_diag_)
         {
             // TODO: Check that the inputs are compatible
             // MVE_diag has no terms constant in last input
@@ -55,7 +57,6 @@ namespace mpart{
             // Take first dim-1 dimensions of pts and evaluate expansion_off
             // Add that to the evaluation of expansion_diag on pts
             StridedVector<double, MemorySpace> output_slice = Kokkos::subview(output, 0, Kokkos::ALL());
-
             StridedVector<const double, MemorySpace> coeff_off = CoeffOff();
             StridedVector<const double, MemorySpace> coeff_diag = CoeffDiag();
 
@@ -73,7 +74,7 @@ namespace mpart{
 
                     // Create a subview containing only the current point
                     auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
-                    auto pt_off = Kokkos::subview(pt, {0u,pt.size()-1});
+                    auto pt_off = Kokkos::subview(pt, std::pair<int,int>(0,pt.size()-1));
 
                     // Get a pointer to the shared memory that Kokkos set up for this team
                     Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
@@ -107,7 +108,7 @@ namespace mpart{
         {
             // Take first dim-1 dimensions of pts and take gradient of expansion_off
             // Add that to the gradient of expansion_diag on pts
-            StridedVector<double, MemorySpace> sens_slice = Kokkos::subview(sens, 0, Kokkos::ALL());
+            StridedVector<const double, MemorySpace> sens_slice = Kokkos::subview(sens, 0, Kokkos::ALL());
             unsigned int inDim = pts.extent(0);
 
             StridedVector<const double, MemorySpace> coeff_off = CoeffOff();
@@ -127,7 +128,7 @@ namespace mpart{
 
                     // Create a subview containing only the current point
                     auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
-                    auto pt_off = Kokkos::subview(pt, {0u,pt.size()-1});
+                    auto pt_off = Kokkos::subview(pts, std::pair<int,int>(0,pt.size()-1), ptInd);
 
                     // Get a pointer to the shared memory that Kokkos set up for this team
                     Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
@@ -171,7 +172,7 @@ namespace mpart{
         {
             StridedVector<const double, MemorySpace> coeff_off = CoeffOff();
             StridedVector<const double, MemorySpace> coeff_diag = CoeffDiag();
-            StridedVector<double, MemorySpace> sens_slice = Kokkos::subview(sens, 0, Kokkos::ALL());
+            StridedVector<const double, MemorySpace> sens_slice = Kokkos::subview(sens, 0, Kokkos::ALL());
 
             const unsigned int numPts = pts.extent(1);
 
@@ -189,16 +190,16 @@ namespace mpart{
 
                     // Create a subview containing only the current point
                     auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
-                    auto pt_off = Kokkos::subview(pt, {0u,pt.extent(0)-1});
+                    auto pt_off = Kokkos::subview(pt, std::pair<int,int>(0,pt.extent(0)-1));
 
                     // Get a pointer to the shared memory that Kokkos set up for this team
                     Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
-                    Kokkos::View<double*,MemorySpace> grad_off = Kokkos::subview(output, coeff_off_idx, ptInd);
-                    Kokkos::View<double*,MemorySpace> grad_diag = Kokkos::subview(output, coeff_diag_idx, ptInd);
+                    auto grad_off = Kokkos::subview(output, coeff_off_idx, ptInd);
+                    auto grad_diag = Kokkos::subview(output, coeff_diag_idx, ptInd);
 
                     // Fill in entries in the cache that are independent of x_d.
                     worker_off.FillCache1(cache.data(), pt_off, DerivativeFlags::Parameters);
-                    worker_off.FillCache2(cache.data(), pt_off, pt_off(pt_off.size()-2), DerivativeFlags::Parameters);
+                    worker_off.FillCache2(cache.data(), pt_off, pt_off(pt_off.size()-1), DerivativeFlags::Parameters);
 
                     // Evaluate the expansion
                     worker_off.CoeffDerivative(cache.data(), coeff_off, grad_off);
@@ -229,7 +230,7 @@ namespace mpart{
         {
             // Take logdet of diagonal expansion
             unsigned int numPts = pts.extent(1);
-            StridedVector<double, MemorySpace> coeff_diag = CoeffDiag();
+            StridedVector<const double, MemorySpace> coeff_diag = CoeffDiag();
             unsigned int cacheSize = worker_diag.CacheSize();
 
             // Take logdet of diagonal expansion
@@ -330,7 +331,7 @@ namespace mpart{
         {
 
             unsigned int numPts = pts.extent(1);
-            StridedVector<double, MemorySpace> coeff_diag = CoeffDiag();
+            StridedVector<const double, MemorySpace> coeff_diag = CoeffDiag();
             unsigned int cacheSize = worker_diag.CacheSize();
 
             // Take logdet of diagonal expansion
@@ -350,12 +351,13 @@ namespace mpart{
                     worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::MixedInput);
                     worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::MixedInput);
 
-                    // Evaluate the expansion
-                    output(ptInd) = worker_diag.MixedInputDerivative(cache.data(), coeff_diag, 1);
+                    // Evaluate the expansion TODO: Fix
+                    // output(ptInd) = worker_diag.MixedInputDerivative(cache.data(), coeff_diag, 1);
 
                     worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::Diagonal);
                     worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::Diagonal);
-                    output(ptInd) /= worker_diag.DiagonalDerivative(cache.data(), coeff_diag, 1);
+                    // Evaluate the diag expansion TODO: Fix
+                    // output(ptInd) /= worker_diag.DiagonalDerivative(cache.data(), coeff_diag, 1);
                 }
             };
 
@@ -372,12 +374,12 @@ namespace mpart{
         {
             // Take logdetcoeffgrad of diagonal expansion, output to bottom block
             StridedMatrix<double, MemorySpace> output_off = Kokkos::subview(output,
-                {0u,worker_off.NumCoeffs()}, Kokkos::ALL());
+                std::make_pair(0u,worker_off.NumCoeffs()), Kokkos::ALL());
             Kokkos::deep_copy(output_off, 0.0);
             StridedMatrix<double, MemorySpace> output_diag = Kokkos::subview(output,
-                {worker_off.NumCoeffs(),worker_off.NumCoeffs()+worker_diag.NumCoeffs()},
+                std::make_pair(worker_off.NumCoeffs(),worker_off.NumCoeffs()+worker_diag.NumCoeffs()),
                 Kokkos::ALL());
-            StridedVector<double, MemorySpace> coeff_diag = CoeffDiag();
+            StridedVector<const double, MemorySpace> coeff_diag = CoeffDiag();
             unsigned int numPts = pts.extent(1);
             unsigned int cacheSize = worker_diag.CacheSize();
 
@@ -398,12 +400,13 @@ namespace mpart{
                     worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::MixedCoeff);
                     worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::MixedCoeff);
 
-                    // Evaluate the expansion
-                    output(ptInd) = worker_diag.MixedCoeffDerivative(cache.data(), coeff_diag, 1);
+                    // Evaluate the expansion TODO: Fix
+                    // output(ptInd) = worker_diag.MixedCoeffDerivative(cache.data(), coeff_diag, 1);
 
                     worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::Diagonal);
                     worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::Diagonal);
-                    output(ptInd) /= worker_diag.DiagonalDerivative(cache.data(), coeff_diag, 1);
+                    // Evaluate the expansion TODO: Fix
+                    // output(ptInd) /= worker_diag.DiagonalDerivative(cache.data(), coeff_diag, 1);
                 }
             };
 
@@ -435,8 +438,8 @@ namespace mpart{
         DiagWorker_T worker_diag;
         const unsigned int setSize_off;
         const unsigned int setSize_diag;
-        StridedVector<const double, MemorySpace> CoeffOff() const { return Kokkos::subview(this->savedCoeffs, {0u, setSize_off}); }
-        StridedVector<const double, MemorySpace> CoeffDiag() const { return Kokkos::subview(this->savedCoeffs, {setSize_off, setSize_off+setSize_diag}); }
+        StridedVector<const double, MemorySpace> CoeffOff() const { return Kokkos::subview(this->savedCoeffs, std::make_pair(0u, setSize_off)); }
+        StridedVector<const double, MemorySpace> CoeffDiag() const { return Kokkos::subview(this->savedCoeffs, std::make_pair(setSize_off, setSize_off+setSize_diag)); }
     }; // class RectifiedMultivariateExpansion
 }
 
