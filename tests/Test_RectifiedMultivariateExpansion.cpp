@@ -1,6 +1,9 @@
 #include <catch2/catch_all.hpp>
-#include "MParT/MultiIndex/MultiIndexSet.h"
-#include "MParT/MultiIndex/FixedMultiIndexSet.h"
+#include "MParT/MultiIndices/MultiIndexSet.h"
+#include "MParT/MultiIndices/FixedMultiIndexSet.h"
+#include "MParT/Sigmoid.h"
+#include "MParT/HermiteFunction.h"
+#include "MParT/RectifiedMultivariateExpansion.h"
 
 using namespace mpart;
 using namespace Catch;
@@ -11,10 +14,10 @@ TEMPLATE_TEST_CASE("RectifiedMultivariateExpansion","[rmve]", SigmoidTypes::Logi
     unsigned int maxOrder = 4;
     unsigned int dim = 3;
     FixedMultiIndexSet<MemorySpace> fmset_offdiag(dim-1, maxOrder);
-    auto limiter = NonzeroDiagTotalOrderLimiter(maxOrder);
+    auto limiter = MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(maxOrder);
     MultiIndexSet mset_diag = MultiIndexSet::CreateTotalOrder(dim, maxOrder, limiter);
-    FixedMultiIndexSet<MemorySpace> fmset_diag(mset_diag);
-    
+    FixedMultiIndexSet<MemorySpace> fmset_diag = mset_diag.Fix(true);
+
     const int num_sigmoids = 3;
     const int order = num_sigmoids+1+2;
     const int param_length = 2 + num_sigmoids*(num_sigmoids+1)/2;
@@ -33,9 +36,11 @@ TEMPLATE_TEST_CASE("RectifiedMultivariateExpansion","[rmve]", SigmoidTypes::Logi
             param_idx++;
         }
     }
-    Sigmoid1d<MemorySpace,TestType> Sigmoids (center, width, weight);
-
-    auto MVE_offdiag = MultivariateExpansion()
+    using Sigmoid_T = Sigmoid1d<MemorySpace,TestType>;
+    Sigmoid_T basis_diag (center, width, weight);
+    HermiteFunction basis_offdiag;
+    BasisEvaluator<BasisHomogeneity::Homogeneous, HermiteFunction> basis_eval_offdiag {basis_offdiag};
+    BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<HermiteFunction, Sigmoid_T>> basis_eval_diag {dim, basis_offdiag, basis_diag};
     SECTION("Initialization") {
 
     }
