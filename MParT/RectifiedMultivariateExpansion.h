@@ -31,7 +31,8 @@ namespace mpart{
             Rectifier>, MemorySpace
         >;
         using OffdiagWorker_T = MultivariateExpansionWorker<
-            BasisEvaluator<BasisHomogeneity::Homogeneous, OffdiagEval>
+            BasisEvaluator<BasisHomogeneity::Homogeneous, OffdiagEval>,
+            MemorySpace
         >;
 
 
@@ -42,11 +43,7 @@ namespace mpart{
                                     setSize_diag(worker_diag_.NumCoeffs()),
                                     worker_off(worker_off_),
                                     worker_diag(worker_diag_)
-        {
-            // TODO: Check that the inputs are compatible
-            // MVE_diag has no terms constant in last input
-            // Then, ensure all of these have the appropriate coefficient views
-        };
+        {};
 
         ~RectifiedMultivariateExpansion() = default;
 

@@ -219,7 +219,7 @@ TEST_CASE( "Testing factory method for Sigmoid MVE", "[MapFactorySigmoidMVE]" ) 
         }
     }
     options.basisType = BasisTypes::HermiteFunctions;
-    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func = MapFactory::CreateSigmoidExpansion<MemorySpace>(inputDim, centers, options);
+    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func = MapFactory::CreateSigmoidComponent<MemorySpace>(inputDim, centers, options);
     REQUIRE(func != nullptr);
 
     unsigned int numPts = 100;

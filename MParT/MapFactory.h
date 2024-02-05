@@ -116,28 +116,27 @@ namespace mpart{
                                                                               std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
         /**
-         * @brief Create a MultivariateExpansion using a sigmoid object; INTERNAL USE ONLY
+         * @brief Create a RectifiedMultivariateExpansion using sigmoids
          * 
          * @details Using the parameters described in \c`opts`, this function creates
-         * a "multivariate expansion" object that uses a collection of sigmoid functions
+         * a "rectified multivariate expansion" object that uses a collection of sigmoid functions
          * to map the input space to the output space. The pertinent options are
          * - \c`opts.basisType` : The type of basis function to use in the expansion for the first \f$d-1\f$ inputs
          * - \c`opts.posFuncType` : The type of positive function to use in the rectified basis @ref MultivariateExpansionWorker
          * - \c`opts.edgeWidth` : The width of the "edge terms" on the last input @ref Sigmoid1d
          * - \c`opts.sigmoidType` : The type of sigmoid function to use in the expansion @ref Sigmoid1d
          * 
-         * By default, this constructs a total-order multi-index set. Note that, since the basis
-         * evaluator is rectified, this *will always* be a positive-valued function in the first \f$d-1\f$ inputs.
-         * As such, this factory function is largely for internal testing.
+         * By default, this constructs total-order multi-index sets. This is only creating a real-valued function.
+         * To create a map, use `TriangularMap` function.
          * 
          * @tparam MemorySpace 
          * @param inputDim 
          * @param centers 
          * @param opts 
-         * @return std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> 
+         * @return std::shared_ptr<ConditionalMapBase<MemorySpace>> 
          */
         template<typename MemorySpace>
-        std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> CreateSigmoidExpansion(
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidComponent(
             unsigned int inputDim, StridedVector<double, MemorySpace> centers,
             MapOptions opts);
 
