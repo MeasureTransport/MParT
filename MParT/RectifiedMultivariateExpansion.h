@@ -343,21 +343,25 @@ namespace mpart{
 
                     // Create a subview containing only the current point
                     auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
+                    auto out = Kokkos::subview(output, Kokkos::ALL(), ptInd);
 
                     // Get a pointer to the shared memory that Kokkos set up for this team
                     Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
 
-                    // Fill in entries in the cache that are independent of x_d.  By passing DerivativeFlags::None, we are telling the expansion that no derivatives with wrt x_1,...x_{d-1} will be needed.
+                    // Fill in the mixed entries grad_{x,y}d_y
                     worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::MixedInput);
                     worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::MixedInput);
 
-                    // Evaluate the expansion TODO: Fix
-                    // output(ptInd) = worker_diag.MixedInputDerivative(cache.data(), coeff_diag, 1);
+                    // Evaluate the expansion for mixed derivative
+                    worker_diag.MixedInputDerivative(cache.data(), coeff_diag, out);
 
+                    // Find diagonal derivative d_y
                     worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::Diagonal);
                     worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::Diagonal);
-                    // Evaluate the diag expansion TODO: Fix
-                    // output(ptInd) /= worker_diag.DiagonalDerivative(cache.data(), coeff_diag, 1);
+                    double diag_deriv = worker_diag.DiagonalDerivative(cache.data(), coeff_diag, 1);
+
+                    // grad_{x,y} log(d_y T(x,y)) = [grad_x d_y T(x,y), d_y^2 T(x,y)] / d_y T(x,y)
+                    for(unsigned int ii=0; ii<out.size(); ++ii) out(ii) /= diag_deriv;
                 }
             };
 
@@ -392,21 +396,23 @@ namespace mpart{
 
                     // Create a subview containing only the current point
                     auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
+                    auto out = Kokkos::subview(output_diag, Kokkos::ALL(), ptInd);
 
                     // Get a pointer to the shared memory that Kokkos set up for this team
                     Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
 
-                    // Fill in entries in the cache that are independent of x_d.
+                    // Fill in cache with mixed entries grad_c d_y T(x,y; c)
                     worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::MixedCoeff);
                     worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::MixedCoeff);
 
-                    // Evaluate the expansion TODO: Fix
-                    // output(ptInd) = worker_diag.MixedCoeffDerivative(cache.data(), coeff_diag, 1);
+                    // Evaluate the Mixed coeff derivatives
+                    worker_diag.MixedCoeffDerivative(cache.data(), coeff_diag, 1, out);
 
+                    // Find diagonal derivative d_y
                     worker_diag.FillCache1(cache.data(), pt, DerivativeFlags::Diagonal);
                     worker_diag.FillCache2(cache.data(), pt, pt(pt.size()-1), DerivativeFlags::Diagonal);
-                    // Evaluate the expansion TODO: Fix
-                    // output(ptInd) /= worker_diag.DiagonalDerivative(cache.data(), coeff_diag, 1);
+                    double diag_deriv = worker_diag.DiagonalDerivative(cache.data(), coeff_diag, 1);
+                    for(unsigned int ii=0; ii<out.size(); ++ii) out(ii) /= diag_deriv;
                 }
             };
 

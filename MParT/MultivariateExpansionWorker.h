@@ -151,8 +151,9 @@ public:
 
         // Evaluate all degrees of all 1d polynomials except the last dimension, which will be evaluated inside the integrand
         }else{
-            for(unsigned int d=0; d<dim_-1; ++d)
+            for(unsigned int d=0; d<dim_-1; ++d) {
                 basis1d_.EvaluateAll(d, &polyCache[startPos_(d)], maxDegrees_(d), pt(d));
+            }
         }
     }
 
@@ -424,9 +425,8 @@ private:
         // Compute the value of this term in the expansion
         double termVal = 1.0;
         unsigned int end_idx = multiSet_.nzStarts(termInd+1)-1;
-        for(unsigned int i=multiSet_.nzStarts(termInd); i<end_idx; ++i)
+        for(unsigned int i=multiSet_.nzStarts(termInd); i<end_idx; ++i) 
             termVal *= polyCache[startPos_(multiSet_.nzDims(i)) + multiSet_.nzOrders(i)];
-        
         double lastVal = polyCache[startPos_(multiSet_.nzDims(end_idx)) + multiSet_.nzOrders(end_idx)];
         if constexpr(!std::is_same_v<Rectifier,Identity>){
             if(multiSet_.nzDims(end_idx)==dim_-1){
