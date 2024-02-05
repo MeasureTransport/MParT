@@ -23,7 +23,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_HF_ACC(Fixe
 
     output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv, opts.nugget);
 
-    output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
+    Kokkos::View<const double*,MemorySpace> coeffs = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
+    output->SetCoeffs(coeffs);
+
     return output;
 }
 
@@ -39,8 +41,8 @@ static auto reg_host_hf_acc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::H
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, Exp, AdaptiveClenshawCurtis, Kokkos::HostSpace)
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
-REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
-REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, SoftPlus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 #endif
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory7) 
 #endif
