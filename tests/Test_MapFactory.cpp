@@ -255,12 +255,21 @@ TEST_CASE( "Testing factory method for Sigmoid Component", "[MapFactorySigmoidCo
             CHECK(grad(i,j) == Approx(fd).epsilon(20*fd_step));
         }
     }
-    SECTION("Create Triangular Sigmoid Map") {
+    SECTION("Create Triangular Sigmoid Map From Components") {
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> maps;
         for(int i = 1; i <= inputDim; i++){
             maps.push_back(MapFactory::CreateSigmoidComponent<MemorySpace>(i, centers, options));
         }
         auto map = std::make_shared<TriangularMap<MemorySpace>>(maps);
+        REQUIRE(map != nullptr);
+    }
+    SECTION("CreateSigmoidTriangular") {
+        std::vector<StridedVector<const double, MemorySpace>> centers_vec;
+        unsigned int outputDim = 3;
+        for(int i = 0; i < outputDim; i++){
+            centers_vec.push_back(centers);
+        }
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateSigmoidTriangular<MemorySpace>(inputDim, outputDim, centers_vec, options);
         REQUIRE(map != nullptr);
     }
 }

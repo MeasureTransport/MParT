@@ -136,8 +136,13 @@ namespace mpart{
          */
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidComponent(
-            unsigned int inputDim, StridedVector<double, MemorySpace> centers,
+            unsigned int inputDim, StridedVector<const double, MemorySpace> centers,
             MapOptions opts);
+
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidTriangular(
+            unsigned int inputDim, unsigned int outputDim,
+            std::vector<StridedVector<const double, MemorySpace>> const& centers, MapOptions opts);
 
         /** This struct is used to map the options to functions that can create a map component with types corresponding
             to the options.
