@@ -57,6 +57,14 @@ void mpart::binding::ParameterizedFunctionBaseWrapper(jlcxx::Module &mod) {
             std::cerr << "ParameterizedFunctionBase::Serialize: MParT was not compiled with Cereal support. Operation incomplete." << std::endl;
 #endif // MPART_HAS_CEREAL
         })
+        .method("DiagonalCoeffIndices", [](ParameterizedFunctionBase<Kokkos::HostSpace> &pfb){
+            std::vector<unsigned int> diagIndices = pfb.DiagonalCoeffIndices();
+            jlcxx::ArrayRef<int64_t> diagIndices_jl = jlMalloc<int64_t>(diagIndices.size());
+            for(unsigned int i = 0; i < diagIndices.size(); i++){
+                diagIndices_jl[i] = diagIndices[i];
+            }
+            return diagIndices_jl;
+        })
     ;
 
     mod.method("__DeserializeMap", [](std::string &filename, jlcxx::ArrayRef<int> dims){
