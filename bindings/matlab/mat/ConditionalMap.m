@@ -59,8 +59,23 @@ methods
           end
         end
     elseif(nargin==3)
-      if(varargin{3}=="Ab")
-          this.id_=MParT_('ConditionalMap_newAffineMapAb', varargin{1},varargin{2});
+      if(isstring(varargin{3}) && varargin{3}=="Ab")
+        this.id_=MParT_('ConditionalMap_newAffineMapAb', varargin{1},varargin{2});
+      elseif(isnumeric(varargin{1}))
+        inputDim = varargin{1};
+        if(round(inputDim) - inputDim ~= 0)
+          error("inputDim must be an integer")
+        end
+        centers = varargin{2};
+        opts = varargin{3};
+        mexOptions = opts.getMexOptions;
+        input_str=['MParT_(',char(39),'ConditionalMap_newSigmoidComp',char(39),',inputDim,centers'];
+        for o=1:length(mexOptions)
+          input_o=[',mexOptions{',num2str(o),'}'];
+          input_str=[input_str,input_o];
+        end
+        input_str=[input_str,')'];
+        this.id_ = eval(input_str);
       else
         error("Wrong input arguments");
       end
@@ -71,8 +86,13 @@ methods
       opts = varargin{4};
 
       mexOptions = opts.getMexOptions;
+      if isinteger(totalOrder)
+        fcn_name = 'TotalTriMap';
+      else
+        fcn_name = 'SigmoidTriMap';
+      end
 
-      input_str=['MParT_(',char(39),'ConditionalMap_newTotalTriMap',char(39),',inputDim,outputDim,totalOrder'];
+      input_str=['MParT_(',char(39),'ConditionalMap_new',fcn_name,char(39),',inputDim,outputDim,totalOrder'];
       for o=1:length(mexOptions)
         input_o=[',mexOptions{',num2str(o),'}'];
         input_str=[input_str,input_o];
