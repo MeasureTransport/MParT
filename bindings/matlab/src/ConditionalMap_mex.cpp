@@ -13,6 +13,7 @@
 
 using namespace mpart;
 using namespace mexplus;
+using namespace mpart::binding;
 using MemorySpace = Kokkos::HostSpace;
 
 namespace {
@@ -116,7 +117,7 @@ MEX_DEFINE(ConditionalMap_newAffineMapb) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
                                            int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 16);
+  InputArguments input(nrhs, prhs, 3 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
   OutputArguments output(nlhs, plhs, 1);
   unsigned int inputDim = input.get<unsigned int>(0);
   unsigned int outputDim = input.get<unsigned int>(1);
@@ -130,7 +131,7 @@ MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 14);
+  InputArguments input(nrhs, prhs, 1 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
   OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   MapOptions opts = binding::MapOptionsFromMatlab(input, 1);
@@ -141,7 +142,7 @@ MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(ConditionalMap_newMapFixed) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 14);
+  InputArguments input(nrhs, prhs, 1 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
   OutputArguments output(nlhs, plhs, 1);
   const FixedMultiIndexSet<MemorySpace>& mset = Session<FixedMultiIndexSet<MemorySpace>>::getConst(input.get(0));
   MapOptions opts = binding::MapOptionsFromMatlab(input, 1);
