@@ -14,6 +14,7 @@
 #include "MParT/PositiveBijectors.h"
 #include "MParT/LinearizedBasis.h"
 #include "MParT/Sigmoid.h"
+#include "MParT/UnivariateExpansion.h"
 
 using namespace mpart;
 
@@ -171,13 +172,9 @@ std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> mpart::MapFactory::Creat
 }
 
 
-template <typename MemorySpace, typename OffdiagEval, typename Rectifier, typename SigmoidType, typename EdgeType>
-using SigmoidBasisEval = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<OffdiagEval, Sigmoid1d<MemorySpace, SigmoidType, EdgeType>>, Rectifier>;
-
-template <typename MemorySpace, typename OffdiagEval, typename Rectifier, typename SigmoidType, typename EdgeType>
-SigmoidBasisEval<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType> CreateSigmoidEvaluator(
+template <typename MemorySpace, typename SigmoidType, typename EdgeType>
+Sigmoid1d<MemorySpace, SigmoidType, EdgeType> CreateSigmoid(
     unsigned int inputDim, StridedVector<double, MemorySpace> centers, double edgeShape) {
-    using BasisEval_T = SigmoidBasisEval<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType>;
     Kokkos::View<double*, MemorySpace> widths("Sigmoid Widths", centers.size());
     Kokkos::View<double*, MemorySpace> weights("Sigmoid Weights", centers.size());
     int sigmoid_count = centers.size() - 2;
@@ -218,30 +215,39 @@ SigmoidBasisEval<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType> Cre
             weights(start_idx + j) = 1.;
         }
     });
-    Sigmoid1d<MemorySpace, SigmoidType, EdgeType> sig(centers, widths, weights);
-    OffdiagEval basis1d;
-    return BasisEval_T {inputDim, basis1d, sig};
+    Sigmoid1d<MemorySpace, SigmoidType, EdgeType> sig {centers, widths, weights};
+    return sig;
 }
+
+template<typename MemorySpace, typename OffdiagEval, typename Rectifier, typename SigmoidType, typename EdgeType>
+using SigmoidBasisEval = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<OffdiagEval, Sigmoid1d<MemorySpace, SigmoidType, EdgeType>>>;
 
 template <typename MemorySpace, typename OffdiagEval, typename Rectifier, typename SigmoidType, typename EdgeType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidExpansionTemplate(
     unsigned int inputDim, StridedVector<double, MemorySpace> centers, double edgeWidth)
 {
     using Sigmoid_T = Sigmoid1d<MemorySpace, SigmoidType, EdgeType>;
-    using DiagBasisEval_T = SigmoidBasisEval<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType>;
+    using DiagBasisEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<OffdiagEval, Sigmoid_T>, Rectifier>;
     using OffdiagBasisEval_T = BasisEvaluator<BasisHomogeneity::Homogeneous, OffdiagEval>;
-    using RMVE = RectifiedMultivariateExpansion<MemorySpace, OffdiagEval, Sigmoid_T, Rectifier>;
-    auto diagBasisEval = CreateSigmoidEvaluator<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType>(inputDim, centers, edgeWidth);
-    unsigned int maxOrder = diagBasisEval.diag_.GetOrder();
-    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(inputDim, maxOrder, MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(maxOrder));
-    FixedMultiIndexSet<MemorySpace> fmset_diag = mset.Fix(true).ToDevice<MemorySpace>();
-    FixedMultiIndexSet<MemorySpace> fmset_offdiag {inputDim-1, maxOrder};
-    OffdiagBasisEval_T offdiagBasisEval;
-    MultivariateExpansionWorker<DiagBasisEval_T,MemorySpace> worker_diag(fmset_diag, diagBasisEval);
-    MultivariateExpansionWorker<OffdiagBasisEval_T,MemorySpace> worker_offdiag(fmset_offdiag, offdiagBasisEval);
-    auto output = std::make_shared<RMVE>(worker_offdiag, worker_diag);
-    output->WrapCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
-    return output;
+    auto sigmoid = CreateSigmoid<MemorySpace, SigmoidType, EdgeType>(inputDim, centers, edgeWidth);
+    if(inputDim > 1) {
+        DiagBasisEval_T diagBasisEval(inputDim, OffdiagEval(), sigmoid);
+        using RMVE = RectifiedMultivariateExpansion<MemorySpace, OffdiagEval, Sigmoid_T, Rectifier>;
+        unsigned int maxOrder = diagBasisEval.diag_.GetOrder();
+        MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(inputDim, maxOrder, MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(maxOrder));
+        FixedMultiIndexSet<MemorySpace> fmset_diag = mset.Fix(true).ToDevice<MemorySpace>();
+        FixedMultiIndexSet<MemorySpace> fmset_offdiag {inputDim-1, maxOrder};
+        OffdiagBasisEval_T offdiagBasisEval;
+        MultivariateExpansionWorker<DiagBasisEval_T,MemorySpace> worker_diag(fmset_diag, diagBasisEval);
+        MultivariateExpansionWorker<OffdiagBasisEval_T,MemorySpace> worker_offdiag(fmset_offdiag, offdiagBasisEval);
+        auto output = std::make_shared<RMVE>(worker_offdiag, worker_diag);
+        output->WrapCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
+        return output;
+    } else {
+        auto output = std::make_shared<UnivariateExpansion<MemorySpace, Sigmoid_T>>(sigmoid.GetOrder(), sigmoid);
+        output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", output->numCoeffs));
+        return output;
+    }
 }
 
 template<typename MemorySpace>

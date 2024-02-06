@@ -1,3 +1,6 @@
+#ifndef MPART_BASISEVALUATOR_H
+#define MPART_BASISEVALUATOR_H
+
 #include <Kokkos_Core.hpp>
 #include "MParT/PositiveBijectors.h"
 
@@ -330,3 +333,4 @@ class BasisEvaluator<BasisHomogeneity::Heterogeneous,
   std::vector<std::shared_ptr<CommonBasisEvaluatorType>> basis1d_;
 };
 }  // namespace mpart
+#endif // MPART_BASISEVALUATOR_H

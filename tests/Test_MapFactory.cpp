@@ -257,7 +257,7 @@ TEST_CASE( "Testing factory method for Sigmoid Component", "[MapFactorySigmoidCo
     }
     SECTION("Create Triangular Sigmoid Map") {
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> maps;
-        for(int i = 2; i <= inputDim; i++){
+        for(int i = 1; i <= inputDim; i++){
             maps.push_back(MapFactory::CreateSigmoidComponent<MemorySpace>(i, centers, options));
         }
         auto map = std::make_shared<TriangularMap<MemorySpace>>(maps);
