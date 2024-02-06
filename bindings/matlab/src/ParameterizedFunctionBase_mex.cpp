@@ -151,6 +151,17 @@ MEX_DEFINE(ParameterizedFunction_Gradient) (int nlhs, mxArray* plhs[],
   parFunc.fun_ptr->GradientImpl(pts,sens,out);
 }
 
+MEX_DEFINE(ParameterizedFunction_DiagonalCoeffIndices) (int nlhs, mxArray* plhs[],
+                                      int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 1);
+  OutputArguments output(nlhs, plhs, 1);
+
+  const ParameterizedFunctionMex& parFunc = Session<ParameterizedFunctionMex>::getConst(input.get(0));
+  std::vector<unsigned int> indices = parFunc.fun_ptr->DiagonalCoeffIndices();
+  output.set(0,indices);
+}
+
 MEX_DEFINE(ParameterizedFunction_Serialize) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
 
