@@ -139,10 +139,41 @@ namespace mpart{
             unsigned int inputDim, StridedVector<const double, MemorySpace> centers,
             MapOptions opts);
 
+        template<typename MemorySpace, std::enable_if_t<std::is_same_v<MemorySpace, Kokkos::HostSpace>, bool> = true>
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> CreateSigmoidComponent(
+            unsigned int inputDim, Eigen::Ref<const Eigen::RowVectorXd> centers,
+            MapOptions opts) {
+            StridedVector<const double, Kokkos::HostSpace> centersVec = ConstVecToKokkos<double, Kokkos::HostSpace>(centers);
+            return CreateSigmoidComponent<Kokkos::HostSpace>(inputDim, centersVec, opts);
+        }
+
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidTriangular(
             unsigned int inputDim, unsigned int outputDim,
-            std::vector<StridedVector<const double, MemorySpace>> const& centers, MapOptions opts);
+            std::vector<StridedVector<const double, MemorySpace>> const& centers, MapOptions opts
+        );
+
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidTriangular(
+            unsigned int inputDim, unsigned int outputDim,
+            StridedMatrix<const double, MemorySpace> const& centers, MapOptions opts
+        ) {
+            std::vector<StridedVector<const double, MemorySpace>> centersVecs;
+            for(unsigned int i = 0; i < centers.extent(1); i++){
+                StridedVector<const double, MemorySpace> center_i = Kokkos::subview(centers, Kokkos::ALL(), i);
+                centersVecs.push_back(center_i);
+            }
+            return CreateSigmoidTriangular<MemorySpace>(inputDim, outputDim, centersVecs, opts);
+        }
+
+        template<typename MemorySpace, std::enable_if_t<std::is_same_v<MemorySpace, Kokkos::HostSpace>, bool> = true>
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> CreateSigmoidTriangular(
+            unsigned int inputDim, unsigned int outputDim,
+            Eigen::Ref<const Eigen::RowMatrixXd> const& centers, MapOptions opts
+        ) {
+            StridedMatrix<const double, Kokkos::HostSpace> centersMat = ConstRowMatToKokkos<double,Kokkos::HostSpace>(centers);
+            return CreateSigmoidTriangular<Kokkos::HostSpace>(inputDim, outputDim, centersMat, opts);
+        }
 
         /** This struct is used to map the options to functions that can create a map component with types corresponding
             to the options.
