@@ -67,8 +67,7 @@ namespace mpart{
                                                                               std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
 
-                                                                                  /**
-            @brief Constructs a triangular map with MonotoneComponents for each block.  A total order multiindex
+        /** @brief Constructs a triangular map with MonotoneComponents for each block.  A total order multiindex
                    set is used to define the MonotoneComponent.
 
             @details For more control over the individual components, consider constructing components with

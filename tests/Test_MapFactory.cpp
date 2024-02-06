@@ -2,6 +2,7 @@
 
 #include "MParT/MapFactory.h"
 #include "MParT/ConditionalMapBase.h"
+#include "MParT/TriangularMap.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
 #include <unordered_map>
@@ -202,7 +203,7 @@ TEST_CASE( "Testing factory method for single entry map, 1 < activeInd < dim", "
     REQUIRE(map != nullptr);
 }
 
-TEST_CASE( "Testing factory method for Sigmoid MVE", "[MapFactorySigmoidMVE]" ) {
+TEST_CASE( "Testing factory method for Sigmoid Component", "[MapFactorySigmoidComponent]" ) {
 
     MapOptions options;
     unsigned int inputDim = 7;
@@ -253,5 +254,13 @@ TEST_CASE( "Testing factory method for Sigmoid MVE", "[MapFactorySigmoidMVE]" ) 
             double fd = (eval2(0,j) - eval(0,j))/(fd_step);
             CHECK(grad(i,j) == Approx(fd).epsilon(20*fd_step));
         }
+    }
+    SECTION("Create Triangular Sigmoid Map") {
+        std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> maps;
+        for(int i = 2; i <= inputDim; i++){
+            maps.push_back(MapFactory::CreateSigmoidComponent<MemorySpace>(i, centers, options));
+        }
+        auto map = std::make_shared<TriangularMap<MemorySpace>>(maps);
+        REQUIRE(map != nullptr);
     }
 }
