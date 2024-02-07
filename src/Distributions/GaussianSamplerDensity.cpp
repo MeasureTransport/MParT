@@ -44,10 +44,11 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
         covChol_.solveInPlaceL(diff);
     }
 
-    ReduceDim<ReduceDimMap::norm,MemorySpace,0> rr(diff, -0.5);
-    Kokkos::parallel_reduce(M, rr, &output(0));
-    Kokkos::parallel_for( "log terms", N, KOKKOS_LAMBDA (const int& j) {
-        output(j) -= 0.5*( M*logtau_ + logDetCov_ );
+    Kokkos::parallel_for(N, KOKKOS_LAMBDA(const int& j){
+        output(j) = -0.5*( M*logtau_ + logDetCov_ );
+        for(int d=0; d<M; ++d){
+            output(j) += -0.5*diff(d,j)*diff(d,j);
+        }
     });
 }
 
