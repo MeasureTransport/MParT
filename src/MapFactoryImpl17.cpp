@@ -32,8 +32,8 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_LinHF_CC(Fi
 static auto reg_host_linhf_cc_exp = mpart::MapFactory::CompFactoryImpl<Kokkos::HostSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, true, PosFuncTypes::Exp, QuadTypes::ClenshawCurtis), CreateComponentImpl_LinHF_CC<Kokkos::HostSpace, Exp>));
 static auto reg_host_linhf_cc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::HostSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, true, PosFuncTypes::SoftPlus, QuadTypes::ClenshawCurtis), CreateComponentImpl_LinHF_CC<Kokkos::HostSpace, SoftPlus>));
 #if defined(MPART_ENABLE_GPU)
-    static auto reg_device_linhf_cc_exp = mpart::MapFactory::CompFactoryImpl<DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, true, PosFuncTypes::Exp, QuadTypes::ClenshawCurtis), CreateComponentImpl_LinHF_CC<Kokkos::HostSpace, Exp>));
-    static auto reg_device_linhf_cc_splus = mpart::MapFactory::CompFactoryImpl<DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, true, PosFuncTypes::SoftPlus, QuadTypes::ClenshawCurtis), CreateComponentImpl_LinHF_CC<Kokkos::HostSpace, SoftPlus>));
+    static auto reg_device_linhf_cc_exp = mpart::MapFactory::CompFactoryImpl<DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, true, PosFuncTypes::Exp, QuadTypes::ClenshawCurtis), CreateComponentImpl_LinHF_CC<mpart::DeviceSpace, Exp>));
+    static auto reg_device_linhf_cc_splus = mpart::MapFactory::CompFactoryImpl<DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::HermiteFunctions, true, PosFuncTypes::SoftPlus, QuadTypes::ClenshawCurtis), CreateComponentImpl_LinHF_CC<mpart::DeviceSpace, SoftPlus>));
 #endif
 
 #if defined(MPART_HAS_CEREAL)
