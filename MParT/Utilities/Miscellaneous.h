@@ -24,8 +24,8 @@ namespace mpart{
      */
     template<typename MemorySpace, typename ErrorType>
     struct ProcAgnosticError {
-        static void error(const char*) {
-            assert(false);
+        KOKKOS_INLINE_FUNCTION static void error(const char*) {
+            KOKKOS_ASSERT(false);
         }
     };
 
