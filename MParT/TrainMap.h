@@ -3,8 +3,9 @@
 
 #include <functional>
 #include <nlopt.hpp>
-#include "ConditionalMapBase.h"
-#include "MapObjective.h"
+#include <iostream>
+#include "MParT/ConditionalMapBase.h"
+#include "MParT/MapObjective.h"
 
 namespace mpart {
 

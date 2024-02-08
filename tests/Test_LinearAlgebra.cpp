@@ -139,47 +139,6 @@ TEST_CASE( "Testing Linear Mat-Mat product", "[LinearAlgebra_MatMat]" ) {
     }
 }
 
-TEST_CASE( "Testing ReduceDim", "ReduceDim" ) {
-    int N = 23;
-    StridedMatrix<double, Kokkos::HostSpace> A = Kokkos::View<double**, Kokkos::HostSpace>("A", 3, N);
-    StridedMatrix<double, Kokkos::HostSpace> AT = Kokkos::View<double**, Kokkos::HostSpace>("AT", N, 3);
-    double ref_avg = ((double) (N+1)) / 2.0;
-    for(int i = 0; i < N; i++) {
-        A(0,i) = i+1;
-        A(1,i) = N-i;
-        A(2,i) = ref_avg;
-
-        AT(i,0) = i+1;
-        AT(i,1) = N-i;
-        AT(i,2) = ref_avg;
-    }
-    ReduceDim<ReduceDimMap::sum,Kokkos::HostSpace,1> rc (A, 1.0);
-    Kokkos::View<double*, Kokkos::HostSpace> avg_col("avg_col", 3);
-    Kokkos::parallel_reduce(N, rc, avg_col.data());
-    CHECK(avg_col(0) == Approx(N*ref_avg).epsilon(1e-14).margin(1e-14));
-    CHECK(avg_col(1) == Approx(N*ref_avg).epsilon(1e-14).margin(1e-14));
-    CHECK(avg_col(2) == Approx(N*ref_avg).epsilon(1e-14).margin(1e-14));
-    
-    ReduceDim<ReduceDimMap::sum,Kokkos::HostSpace,0> rr (AT,1.0);
-    Kokkos::View<double*, Kokkos::HostSpace> avg_row("avg_row", 3);
-    Kokkos::parallel_reduce(N, rr, avg_row.data());
-    CHECK(avg_row(0) == Approx(N*ref_avg).epsilon(1e-14).margin(1e-14));
-    CHECK(avg_row(1) == Approx(N*ref_avg).epsilon(1e-14).margin(1e-14));
-    CHECK(avg_row(2) == Approx(N*ref_avg).epsilon(1e-14).margin(1e-14));
-
-    rc = ReduceDim<ReduceDimMap::sum,Kokkos::HostSpace>(A, -1.0/((double) N));
-    Kokkos::parallel_reduce(N, rc, avg_col.data());
-    CHECK(avg_col(0) == Approx(-ref_avg).epsilon(1e-14).margin(1e-14));
-    CHECK(avg_col(1) == Approx(-ref_avg).epsilon(1e-14).margin(1e-14));
-    CHECK(avg_col(2) == Approx(-ref_avg).epsilon(1e-14).margin(1e-14));
-    
-    rr = ReduceDim<ReduceDimMap::sum,Kokkos::HostSpace,0>(AT, -1.0/((double) N));
-    Kokkos::parallel_reduce(N, rr, avg_row.data());
-    CHECK(avg_row(0) == Approx(-ref_avg).epsilon(1e-14).margin(1e-14));
-    CHECK(avg_row(1) == Approx(-ref_avg).epsilon(1e-14).margin(1e-14));
-    CHECK(avg_row(2) == Approx(-ref_avg).epsilon(1e-14).margin(1e-14));
-}
-
 TEST_CASE( "Testing LU Factorization", "LinearAlgebra_LU" ) {
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> A("A", 3, 3);
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> B("B", 3, 2);
