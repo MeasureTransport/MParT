@@ -24,10 +24,10 @@ void mpart::binding::MapFactoryWrapper(py::module &m)
     m.def(isDevice? "dCreateSingleEntryMap" : "CreateSingleEntryMap", &MapFactory::CreateSingleEntryMap<MemorySpace>);
 
     // CreateSigmoidComponent
-    m.def(isDevice? "dCreateSigmoidComponent" : "CreateSigmoidComponent", py::overload_cast<unsigned int, Eigen::Ref<const Eigen::RowVectorXd>, MapOptions>(&MapFactory::CreateSigmoidComponent<MemorySpace>));
+    m.def(isDevice? "dCreateSigmoidComponent" : "CreateSigmoidComponent", py::overload_cast<unsigned int, Eigen::Ref<const Eigen::RowVectorXd>, MapOptions,unsigned int>(&MapFactory::CreateSigmoidComponent<MemorySpace>));
 
     // CreateSigmoidTriangular
-    m.def(isDevice? "dCreateSigmoidTriangular" : "CreateSigmoidTriangular", py::overload_cast<unsigned int, unsigned int,Eigen::Ref<const Eigen::RowMatrixXd> const&, MapOptions>(&MapFactory::CreateSigmoidTriangular<MemorySpace>));
+    m.def(isDevice? "dCreateSigmoidTriangular" : "CreateSigmoidTriangular", py::overload_cast<unsigned int, unsigned int, unsigned int, Eigen::Ref<const Eigen::RowMatrixXd> const&, MapOptions>(&MapFactory::CreateSigmoidTriangular<MemorySpace>));
 }
 template void mpart::binding::MapFactoryWrapper<Kokkos::HostSpace>(py::module&);
 #if defined(MPART_ENABLE_GPU)

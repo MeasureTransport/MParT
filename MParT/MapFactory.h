@@ -137,15 +137,16 @@ namespace mpart{
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidComponent(
             unsigned int inputDim, StridedVector<const double, MemorySpace> centers,
-            MapOptions opts);
+            MapOptions opts, unsigned int maxOrder = 0);
 
         template<typename MemorySpace, std::enable_if_t<std::is_same_v<MemorySpace, Kokkos::HostSpace>, bool> = true>
         std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> CreateSigmoidComponent(
             unsigned int inputDim, Eigen::Ref<const Eigen::RowVectorXd> centers,
-            MapOptions opts) {
+            MapOptions opts, unsigned int maxOrder = 0) {
             StridedVector<const double, Kokkos::HostSpace> centersVec = ConstVecToKokkos<double, Kokkos::HostSpace>(centers);
             return CreateSigmoidComponent<Kokkos::HostSpace>(inputDim, centersVec, opts);
         }
+
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidComponent(
             FixedMultiIndexSet<MemorySpace> mset_offdiag, FixedMultiIndexSet<MemorySpace> mset_diag,
@@ -153,13 +154,13 @@ namespace mpart{
 
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidTriangular(
-            unsigned int inputDim, unsigned int outputDim,
+            unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder,
             std::vector<StridedVector<const double, MemorySpace>> const& centers, MapOptions opts
         );
 
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidTriangular(
-            unsigned int inputDim, unsigned int outputDim,
+            unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder,
             StridedMatrix<const double, MemorySpace> const& centers, MapOptions opts
         ) {
             std::vector<StridedVector<const double, MemorySpace>> centersVecs;
@@ -167,16 +168,16 @@ namespace mpart{
                 StridedVector<const double, MemorySpace> center_i = Kokkos::subview(centers, Kokkos::ALL(), i);
                 centersVecs.push_back(center_i);
             }
-            return CreateSigmoidTriangular<MemorySpace>(inputDim, outputDim, centersVecs, opts);
+            return CreateSigmoidTriangular<MemorySpace>(inputDim, outputDim, totalOrder, centersVecs, opts);
         }
 
         template<typename MemorySpace, std::enable_if_t<std::is_same_v<MemorySpace, Kokkos::HostSpace>, bool> = true>
         std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> CreateSigmoidTriangular(
-            unsigned int inputDim, unsigned int outputDim,
+            unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder,
             Eigen::Ref<const Eigen::RowMatrixXd> const& centers, MapOptions opts
         ) {
             StridedMatrix<const double, Kokkos::HostSpace> centersMat = ConstRowMatToKokkos<double,Kokkos::HostSpace>(centers);
-            return CreateSigmoidTriangular<Kokkos::HostSpace>(inputDim, outputDim, centersMat, opts);
+            return CreateSigmoidTriangular<Kokkos::HostSpace>(inputDim, outputDim, totalOrder, centersMat, opts);
         }
 
         /** This struct is used to map the options to functions that can create a map component with types corresponding

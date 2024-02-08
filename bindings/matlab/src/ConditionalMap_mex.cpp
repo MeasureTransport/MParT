@@ -131,15 +131,16 @@ MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
 MEX_DEFINE(ConditionalMap_newSigmoidTriMap) (int nlhs, mxArray* plhs[],
                                            int nrhs, const mxArray* prhs[]) {
 
-  InputArguments input(nrhs, prhs, 3 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
+  InputArguments input(nrhs, prhs, 4 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
   OutputArguments output(nlhs, plhs, 1);
   unsigned int inputDim = input.get<unsigned int>(0);
   unsigned int outputDim = input.get<unsigned int>(1);
-  StridedMatrix<const double, Kokkos::HostSpace> centers = MexToKokkos2d(prhs[2]);
+  unsigned int totalOrder = input.get<unsigned int>(2);
+  StridedMatrix<const double, Kokkos::HostSpace> centers = MexToKokkos2d(prhs[3]);
 
-  MapOptions opts = binding::MapOptionsFromMatlab(input, 3);
+  MapOptions opts = binding::MapOptionsFromMatlab(input, 4);
 
-  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(inputDim,outputDim,centers,opts)));
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(inputDim,outputDim,totalOrder,centers,opts)));
 }
 
 MEX_DEFINE(ConditionalMap_newSigmoidComp) (int nlhs, mxArray* plhs[],

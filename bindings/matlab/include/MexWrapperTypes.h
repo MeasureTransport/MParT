@@ -39,8 +39,8 @@ public:
     map_ptr = MapFactory::CreateSigmoidComponent<MemorySpace>(inputDim,centers,opts);
   }
 
-  ConditionalMapMex(unsigned int inputDim, unsigned int outputDim, StridedMatrix<const double, MemorySpace> centers, MapOptions opts){
-    map_ptr = MapFactory::CreateSigmoidTriangular<MemorySpace>(inputDim,outputDim,centers,opts);
+  ConditionalMapMex(unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder, StridedMatrix<const double, MemorySpace> centers, MapOptions opts){
+    map_ptr = MapFactory::CreateSigmoidTriangular<MemorySpace>(inputDim,outputDim,totalOrder,centers,opts);
   }
 
   ConditionalMapMex(std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> triMaps,std::string typeMap){

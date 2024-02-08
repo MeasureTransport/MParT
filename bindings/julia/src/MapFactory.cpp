@@ -16,8 +16,14 @@ void mpart::binding::MapFactoryWrapper(jlcxx::Module &mod) {
         return MapFactory::CreateSigmoidComponent<Kokkos::HostSpace>(inDim, centersVec, opts);
     });
 
+    // CreateSigmoidComponent
+    mod.method("CreateSigmoidComponent", [](unsigned int inDim, jlcxx::ArrayRef<double,1> centers, MapOptions opts){
+        StridedVector<const double, Kokkos::HostSpace> centersVec = JuliaToKokkos(centers);
+        return MapFactory::CreateSigmoidComponent<Kokkos::HostSpace>(inDim, centersVec, opts);
+    });
+
     // CreateSigmoidTriangular
-    mod.method("CreateSigmoidTriangular", [](unsigned int inDim, unsigned int outDim, jlcxx::ArrayRef<double,2> centers, MapOptions opts){
+    mod.method("CreateSigmoidTriangular", [](unsigned int inDim, unsigned int outDim, unsigned int totalOrder, jlcxx::ArrayRef<double,2> centers, MapOptions opts){
         std::vector<StridedVector<const double, Kokkos::HostSpace>> centersVecs;
         StridedMatrix<double, Kokkos::HostSpace> centersMat = JuliaToKokkos(centers);
         for(unsigned int i = 0; i < size(centers, 1); i++){
@@ -26,6 +32,6 @@ void mpart::binding::MapFactoryWrapper(jlcxx::Module &mod) {
             Kokkos::deep_copy(centersVec, center_i);
             centersVecs.push_back(centersVec);
         }
-        return MapFactory::CreateSigmoidTriangular<Kokkos::HostSpace>(inDim, outDim, centersVecs, opts);
+        return MapFactory::CreateSigmoidTriangular<Kokkos::HostSpace>(inDim, outDim, totalOrder, centersVecs, opts);
     });
 }
