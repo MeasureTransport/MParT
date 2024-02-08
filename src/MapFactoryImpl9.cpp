@@ -38,8 +38,8 @@ static auto reg_host_hf_as_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::Ho
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, Exp, AdaptiveSimpson, Kokkos::HostSpace)
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, SoftPlus, AdaptiveSimpson, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
-//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, Exp, AdaptiveSimpson, mpart::DeviceSpace)
-//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, SoftPlus, AdaptiveSimpson, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, Exp, AdaptiveSimpson, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, HermiteFunction, SoftPlus, AdaptiveSimpson, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory9)
 #endif

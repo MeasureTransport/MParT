@@ -38,8 +38,8 @@ static auto reg_host_prob_cc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, ProbabilistHermite, Exp, ClenshawCurtisQuadrature, Kokkos::HostSpace)
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, ProbabilistHermite, SoftPlus, ClenshawCurtisQuadrature, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
-//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, ProbabilistHermite, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
-//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, ProbabilistHermite, SoftPlus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, ProbabilistHermite, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, ProbabilistHermite, SoftPlus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory5)
 #endif

@@ -40,8 +40,8 @@ static auto reg_host_linprob_as_splus = mpart::MapFactory::CompFactoryImpl<Kokko
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::ProbabilistHermite>, Exp, AdaptiveSimpson, Kokkos::HostSpace)
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::ProbabilistHermite>, SoftPlus, AdaptiveSimpson, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
-//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::ProbabilistHermite>, Exp, AdaptiveSimpson, mpart::DeviceSpace)
-//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::ProbabilistHermite>, SoftPlus, AdaptiveSimpson, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::ProbabilistHermite>, Exp, AdaptiveSimpson, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::ProbabilistHermite>, SoftPlus, AdaptiveSimpson, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory15)
 #endif 

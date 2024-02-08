@@ -41,8 +41,8 @@ static auto reg_host_linhf_acc_splus = mpart::MapFactory::CompFactoryImpl<Kokkos
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::HermiteFunction>, Exp, AdaptiveClenshawCurtis, Kokkos::HostSpace)
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::HermiteFunction>, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
-//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::HermiteFunction>, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
-//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::HermiteFunction>, SoftPlus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::HermiteFunction>, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::HermiteFunction>, SoftPlus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory18)
 #endif 

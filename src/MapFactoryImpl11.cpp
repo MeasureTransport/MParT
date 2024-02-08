@@ -41,8 +41,8 @@ static auto reg_host_linphys_cc_splus = mpart::MapFactory::CompFactoryImpl<Kokko
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Exp, ClenshawCurtisQuadrature, Kokkos::HostSpace)
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, ClenshawCurtisQuadrature, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
-//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
-//REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory11)
 #endif 
