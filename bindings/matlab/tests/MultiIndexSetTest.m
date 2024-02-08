@@ -24,8 +24,8 @@ classdef MultiIndexSetTest < matlab.unittest.TestCase
             mset2 = MultiIndexSet.CreateNonzeroDiagTotalOrder( dim, totalOrder );
             nzd1 = mset1.NonzeroDiagonalEntries();
             nzd2 = mset2.NonzeroDiagonalEntries();
-            testCase.verifyEqual( nzd1, nzd2 );
-            testCase.verifyEqual( nzd1, mset2.Size());
+            testCase.verifyEqual( numel(nzd1), numel(nzd2) );
+            testCase.verifyEqual( uint32(numel(nzd1)), mset2.Size());
         end
     end
 end

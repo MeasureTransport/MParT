@@ -71,7 +71,7 @@ methods
       opts = varargin{4};
 
       mexOptions = opts.getMexOptions;
-      if isa(inputDim, 'MultiIndexSet') % If the first arguments are multi-index sets, we call CreateSigmoidComponent from msets
+      if isa(inputDim, 'FixedMultiIndexSet') % If the first arguments are multi-index sets, we call CreateSigmoidComponent from msets
         fcn_name = 'SigmoidCompFromMsets'; % arguments (mset_offdiag, mset_diag, centers, opts)
         inputDim = inputDim.get_id(); % Need to get the IDs, these are multi-index sets
         outputDim = outputDim.get_id();
