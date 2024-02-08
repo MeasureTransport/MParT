@@ -146,6 +146,10 @@ namespace mpart{
             StridedVector<const double, Kokkos::HostSpace> centersVec = ConstVecToKokkos<double, Kokkos::HostSpace>(centers);
             return CreateSigmoidComponent<Kokkos::HostSpace>(inputDim, centersVec, opts);
         }
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidComponent(
+            FixedMultiIndexSet<MemorySpace> mset_offdiag, FixedMultiIndexSet<MemorySpace> mset_diag,
+            StridedVector<const double, MemorySpace> centers, MapOptions opts);
 
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidTriangular(
