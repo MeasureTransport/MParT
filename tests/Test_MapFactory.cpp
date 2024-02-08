@@ -207,20 +207,21 @@ TEST_CASE( "Testing factory method for Sigmoid Component", "[MapFactorySigmoidCo
 
     MapOptions options;
     unsigned int inputDim = 7;
-    unsigned int maxDegree = 5;
-    unsigned int numCenters = 2 + maxDegree*(maxDegree+1)/2;
+    unsigned int maxDegree = 3;
+    unsigned int num_sigmoids = 5;
+    unsigned int numCenters = 2 + num_sigmoids*(num_sigmoids+1)/2;
     options.basisType = BasisTypes::HermiteFunctions;
     Kokkos::View<double*, MemorySpace> centers("Centers", numCenters);
     double bound = 3.;
     centers(0) = -bound; centers(1) = bound;
     unsigned int center_idx = 2;
-    for(int j = 0; j < maxDegree; j++){
+    for(int j = 0; j < num_sigmoids; j++){
         for(int i = 0; i <= j; i++){
             centers(center_idx) = -bound + (2*bound)*(i+1)/(j+2);
             center_idx++;
         }
     }
-    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func = MapFactory::CreateSigmoidComponent<MemorySpace>(inputDim, centers, options);
+    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func = MapFactory::CreateSigmoidComponent<MemorySpace>(inputDim, maxDegree, centers, options);
     REQUIRE(func != nullptr);
     unsigned int numPts = 100;
     Kokkos::View<double**,MemorySpace> pts("Points", inputDim, numPts);
@@ -270,7 +271,7 @@ TEST_CASE( "Testing factory method for Sigmoid Component", "[MapFactorySigmoidCo
     SECTION("Create Triangular Sigmoid Map From Components") {
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> maps;
         for(int i = 1; i <= inputDim; i++){
-            maps.push_back(MapFactory::CreateSigmoidComponent<MemorySpace>(i, centers, options));
+            maps.push_back(MapFactory::CreateSigmoidComponent<MemorySpace>(i, 0, centers, options));
         }
         auto map = std::make_shared<TriangularMap<MemorySpace>>(maps);
         REQUIRE(map != nullptr);

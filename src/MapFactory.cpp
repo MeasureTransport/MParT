@@ -258,20 +258,20 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidExpansionTemplate(
 
 template <typename MemorySpace, typename OffdiagEval, typename Rectifier, typename SigmoidType, typename EdgeType>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidExpansionTemplate(
-    unsigned int inputDim, StridedVector<double, MemorySpace> centers, double edgeWidth, unsigned int maxOrder)
+    unsigned int inputDim, unsigned int totalOrder, StridedVector<double, MemorySpace> centers, double edgeWidth)
 {
     using Sigmoid_T = Sigmoid1d<MemorySpace, SigmoidType, EdgeType>;
-    if(maxOrder == 0)
-        maxOrder = Sigmoid_T::LengthToOrder(centers.size()-2)+3;
+    if(totalOrder == 0)
+        totalOrder = Sigmoid_T::LengthToOrder(centers.size()-2)+3;
     if(inputDim == 1) {
-        FixedMultiIndexSet<MemorySpace> mset {1, maxOrder};
+        FixedMultiIndexSet<MemorySpace> mset {1, totalOrder};
         FixedMultiIndexSet<MemorySpace> mset_offdiag {1,0};
         return CreateSigmoidExpansionTemplate<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType>(
             mset_offdiag, mset, centers, edgeWidth);
     }
-    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(inputDim, maxOrder, MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(maxOrder));
+    MultiIndexSet mset = MultiIndexSet::CreateTotalOrder(inputDim, totalOrder, MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(totalOrder));
     FixedMultiIndexSet<MemorySpace> fmset_diag = mset.Fix(true).ToDevice<MemorySpace>();
-    FixedMultiIndexSet<MemorySpace> fmset_offdiag {inputDim-1, maxOrder};
+    FixedMultiIndexSet<MemorySpace> fmset_offdiag {inputDim-1, totalOrder};
     return CreateSigmoidExpansionTemplate<MemorySpace, OffdiagEval, Rectifier, SigmoidType, EdgeType>(
         fmset_offdiag, fmset_diag, centers, edgeWidth);
 }
@@ -307,15 +307,15 @@ void HandleSigmoidComponentErrors(MapOptions const& opts) {
 
 template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> MapFactory::CreateSigmoidComponent(
-    unsigned int inputDim, StridedVector<const double, MemorySpace> centers, MapOptions opts, unsigned int maxOrder) {
+    unsigned int inputDim, unsigned int totalOrder, StridedVector<const double, MemorySpace> centers, MapOptions opts) {
     HandleSigmoidComponentErrors<MemorySpace>(opts);
     Kokkos::View<double*, MemorySpace> centers_copy("Centers Copy", centers.size());
     Kokkos::deep_copy(centers_copy, centers);
     // Dispatch to the correct sigmoid expansion template
     if(opts.posFuncType == PosFuncTypes::Exp) {
-        return CreateSigmoidExpansionTemplate<MemorySpace, HermiteFunction, Exp, SigmoidTypeSpace::Logistic, SoftPlus>(inputDim, centers_copy, opts.edgeShape, maxOrder);
+        return CreateSigmoidExpansionTemplate<MemorySpace, HermiteFunction, Exp, SigmoidTypeSpace::Logistic, SoftPlus>(inputDim, totalOrder, centers_copy, opts.edgeShape);
     } else if(opts.posFuncType == PosFuncTypes::SoftPlus) {
-        return CreateSigmoidExpansionTemplate<MemorySpace, HermiteFunction, SoftPlus, SigmoidTypeSpace::Logistic, SoftPlus>(inputDim, centers_copy, opts.edgeShape, maxOrder);
+        return CreateSigmoidExpansionTemplate<MemorySpace, HermiteFunction, SoftPlus, SigmoidTypeSpace::Logistic, SoftPlus>(inputDim, totalOrder, centers_copy, opts.edgeShape);
     }
     else {
         return nullptr;
@@ -342,7 +342,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> MapFactory::CreateSigmoidCompon
 
 template<typename MemorySpace>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> MapFactory::CreateSigmoidTriangular(unsigned int inputDim,
-    unsigned int outputDim, unsigned int maxOrder, std::vector<StridedVector<const double, MemorySpace>> const& centers, MapOptions opts) {
+    unsigned int outputDim, unsigned int totalOrder, std::vector<StridedVector<const double, MemorySpace>> const& centers, MapOptions opts) {
     if(outputDim > inputDim) {
         std::stringstream ss;
         ss << "CreateSigmoidTriangular: Output dimension " << outputDim << " cannot be greater than input dimension " << inputDim;
@@ -352,7 +352,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> MapFactory::CreateSigmoidTriang
     for(int i = 0; i < outputDim; i++) {
         StridedVector<const double, MemorySpace> center_view = centers[i];
         unsigned int inputDim_i = (inputDim - outputDim) + i+1;
-        auto comp = CreateSigmoidComponent<MemorySpace>(inputDim_i, center_view, opts, maxOrder);
+        auto comp = CreateSigmoidComponent<MemorySpace>(inputDim_i, totalOrder, center_view, opts);
         comps[i] = comp;
     }
     auto output = std::make_shared<TriangularMap<MemorySpace>>(comps);
@@ -364,7 +364,7 @@ template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactor
 template std::shared_ptr<ParameterizedFunctionBase<Kokkos::HostSpace>> mpart::MapFactory::CreateExpansion<Kokkos::HostSpace>(unsigned int, FixedMultiIndexSet<Kokkos::HostSpace> const&, MapOptions);
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateTriangular<Kokkos::HostSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateSingleEntryMap(unsigned int, unsigned int, std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> const&);
-template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateSigmoidComponent<Kokkos::HostSpace>(unsigned int, StridedVector<const double, Kokkos::HostSpace>, MapOptions, unsigned int);
+template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateSigmoidComponent<Kokkos::HostSpace>(unsigned int, unsigned int, StridedVector<const double, Kokkos::HostSpace>, MapOptions);
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateSigmoidComponent<Kokkos::HostSpace>(FixedMultiIndexSet<Kokkos::HostSpace>, FixedMultiIndexSet<Kokkos::HostSpace>, StridedVector<const double, Kokkos::HostSpace>, MapOptions);
 template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactory::CreateSigmoidTriangular<Kokkos::HostSpace>(unsigned int, unsigned int, unsigned int, std::vector<StridedVector<const double, Kokkos::HostSpace>> const&, MapOptions);
 #if defined(MPART_ENABLE_GPU)
@@ -372,7 +372,7 @@ template std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> mpart::MapFactor
     template std::shared_ptr<ParameterizedFunctionBase<DeviceSpace>> mpart::MapFactory::CreateExpansion<DeviceSpace>(unsigned int, FixedMultiIndexSet<DeviceSpace> const&, MapOptions);
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateTriangular<DeviceSpace>(unsigned int, unsigned int, unsigned int, MapOptions);
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateSingleEntryMap(unsigned int, unsigned int, std::shared_ptr<ConditionalMapBase<DeviceSpace>> const&);
-    template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateSigmoidComponent<DeviceSpace>(unsigned int, StridedVector<const double, DeviceSpace>, MapOptions, unsigned int);
+    template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateSigmoidComponent<DeviceSpace>(unsigned int, unsigned int, StridedVector<const double, DeviceSpace>, MapOptions);
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateSigmoidComponent<DeviceSpace>(FixedMultiIndexSet<DeviceSpace>, FixedMultiIndexSet<DeviceSpace>, StridedVector<const double, DeviceSpace>, MapOptions);
     template std::shared_ptr<ConditionalMapBase<DeviceSpace>> mpart::MapFactory::CreateSigmoidTriangular<DeviceSpace>(unsigned int, unsigned int, unsigned int, std::vector<StridedVector<const double, DeviceSpace>> const&, MapOptions);
 #endif

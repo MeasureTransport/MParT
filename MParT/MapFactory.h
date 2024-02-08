@@ -129,22 +129,23 @@ namespace mpart{
          * To create a map, use `TriangularMap` function.
          * 
          * @tparam MemorySpace 
-         * @param inputDim 
-         * @param centers 
+         * @param inputDim Dimension of the input space to component
+         * @param totalOrder Total order of your multi-index set. If 0, deduce from length of centers.
+         * @param centers Set of centers of the sigmoids. Should be length 2 + (1 + 2 + ... + p) where p is the default total order.
          * @param opts 
          * @return std::shared_ptr<ConditionalMapBase<MemorySpace>> 
          */
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidComponent(
-            unsigned int inputDim, StridedVector<const double, MemorySpace> centers,
-            MapOptions opts, unsigned int maxOrder = 0);
+            unsigned int inputDim, unsigned int totalOrder, StridedVector<const double, MemorySpace> centers,
+            MapOptions opts);
 
         template<typename MemorySpace, std::enable_if_t<std::is_same_v<MemorySpace, Kokkos::HostSpace>, bool> = true>
         std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> CreateSigmoidComponent(
-            unsigned int inputDim, Eigen::Ref<const Eigen::RowVectorXd> centers,
-            MapOptions opts, unsigned int maxOrder = 0) {
+            unsigned int inputDim, unsigned int totalOrder, Eigen::Ref<const Eigen::RowVectorXd> centers,
+            MapOptions opts) {
             StridedVector<const double, Kokkos::HostSpace> centersVec = ConstVecToKokkos<double, Kokkos::HostSpace>(centers);
-            return CreateSigmoidComponent<Kokkos::HostSpace>(inputDim, centersVec, opts);
+            return CreateSigmoidComponent<Kokkos::HostSpace>(inputDim, totalOrder, centersVec, opts);
         }
 
         template<typename MemorySpace>
