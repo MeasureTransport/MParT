@@ -1,3 +1,3 @@
-function map = CreateSigmoidComponent(inputDim, centers, options)
-    map = ConditionalMap(inputDim, centers, options);
+function map = CreateSigmoidComponent(inputDim, totalOrder, centers, options)
+    map = ConditionalMap(inputDim, totalOrder, centers, options);
 end

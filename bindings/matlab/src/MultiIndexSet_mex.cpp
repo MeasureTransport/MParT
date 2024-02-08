@@ -38,7 +38,7 @@ MEX_DEFINE(MultiIndexSet_newTotalOrder) (int nlhs, mxArray* plhs[],
   MultiIndexSet::LimiterType limiter;
   if(limiter_type == "separable")
     limiter = MultiIndexLimiter::SeparableTotalOrder(order);
-  else if(limiter_type == "nonzerodiag")
+  else if(limiter_type == "nonzeroDiag")
     limiter = MultiIndexLimiter::NonzeroDiagTotalOrder(order);
   else
     limiter = MultiIndexLimiter::None();

@@ -1,3 +1,3 @@
-function map = CreateSigmoidTriangular(inDim, outDim, centers, opts)
-    map = ConditionalMap(inDim, outDim, centers, opts);
+function map = CreateSigmoidTriangular(inDim, outDim, totalOrder, centers, opts)
+    map = ConditionalMap(inDim, outDim, totalOrder, centers, opts);
 end

@@ -21,10 +21,13 @@ end
 
 methods(Static)
     function mset = CreateTotalOrder(dim, totalOrder)
-        mset = MultiIndexSet(dim,totalOrder,false);
+        mset = MultiIndexSet(dim,totalOrder,'');
     end
     function mset = CreateSeparableTotalOrder(dim, totalOrder)
-        mset = MultiIndexSet(dim,totalOrder,true);
+        mset = MultiIndexSet(dim,totalOrder,'separable');
+    end
+    function mset = CreateNonzeroDiagTotalOrder(dim, totalOrder)
+        mset = MultiIndexSet(dim,totalOrder,'nonzeroDiag');
     end
 end
 

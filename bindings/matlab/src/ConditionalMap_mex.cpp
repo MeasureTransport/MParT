@@ -157,18 +157,15 @@ MEX_DEFINE(ConditionalMap_newSigmoidComp) (int nlhs, mxArray* plhs[],
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(inputDim,totalOrder,centers,opts)));
 }
 
-MEX_DEFINE(ConditionalMap_newSigmoidCompFromMidx) (int nlhs, mxArray* plhs[],
+MEX_DEFINE(ConditionalMap_newSigmoidCompFromMsets) (int nlhs, mxArray* plhs[],
                                            int nrhs, const mxArray* prhs[]) {
-
   InputArguments input(nrhs, prhs, 3 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
   OutputArguments output(nlhs, plhs, 1);
   const MultiIndexSet& mset_offdiag = Session<MultiIndexSet>::getConst(input.get(0));
   const MultiIndexSet& mset_diag = Session<MultiIndexSet>::getConst(input.get(1));
   StridedVector<const double, Kokkos::HostSpace> centers = MexToKokkos1d(prhs[2]);
-
   MapOptions opts = binding::MapOptionsFromMatlab(input, 3);
-
-  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(mset_offdiag.Fix(), mset_diag.Fix(),centers,opts)));
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(mset_offdiag.Fix(true), mset_diag.Fix(true), centers, opts)));
 }
 
 MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
@@ -176,6 +173,7 @@ MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
 
   InputArguments input(nrhs, prhs, 1 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
   OutputArguments output(nlhs, plhs, 1);
+  std::cout << "ConditionalMap_newMap mset_ptr, " << (void*)(input.get(0)) << std::endl;
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   MapOptions opts = binding::MapOptionsFromMatlab(input, 1);
 

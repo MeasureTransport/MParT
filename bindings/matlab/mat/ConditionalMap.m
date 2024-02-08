@@ -61,21 +61,6 @@ methods
     elseif(nargin==3)
       if(isstring(varargin{3}) && varargin{3}=="Ab")
         this.id_=MParT_('ConditionalMap_newAffineMapAb', varargin{1},varargin{2});
-      elseif(isnumeric(varargin{1}))
-        inputDim = varargin{1};
-        if(round(inputDim) - inputDim ~= 0)
-          error("inputDim must be an integer")
-        end
-        centers = varargin{2};
-        opts = varargin{3};
-        mexOptions = opts.getMexOptions;
-        input_str=['MParT_(',char(39),'ConditionalMap_newSigmoidComp',char(39),',inputDim,centers'];
-        for o=1:length(mexOptions)
-          input_o=[',mexOptions{',num2str(o),'}'];
-          input_str=[input_str,input_o];
-        end
-        input_str=[input_str,')'];
-        this.id_ = eval(input_str);
       else
         error("Wrong input arguments");
       end
@@ -86,12 +71,15 @@ methods
       opts = varargin{4};
 
       mexOptions = opts.getMexOptions;
-      if isinteger(totalOrder)
+      if isa(inputDim, 'MultiIndexSet') % If the first arguments are multi-index sets, we call CreateSigmoidComponent from msets
+        fcn_name = 'SigmoidCompFromMsets'; % arguments (mset_offdiag, mset_diag, centers, opts)
+        inputDim = inputDim.get_id(); % Need to get the IDs, these are multi-index sets
+        outputDim = outputDim.get_id();
+      elseif numel(totalOrder)==1 % if totalOrder is a scalar, this is calling CreateTriangular
         fcn_name = 'TotalTriMap';
-      else
-        fcn_name = 'SigmoidTriMap';
+      else % otherwise, we call CreateSigmoidComponent, args (inputDim, totalOrder, centers, opts)
+        fcn_name = 'SigmoidComp';
       end
-
       input_str=['MParT_(',char(39),'ConditionalMap_new',fcn_name,char(39),',inputDim,outputDim,totalOrder'];
       for o=1:length(mexOptions)
         input_o=[',mexOptions{',num2str(o),'}'];
@@ -99,7 +87,21 @@ methods
       end
       input_str=[input_str,')'];
       this.id_ = eval(input_str);
+    elseif(nargin==5) % CreateSigmoidTriangular
+      inputDim = varargin{1};
+      outputDim = varargin{2};
+      totalOrder = varargin{3};
+      centers = varargin{4};
+      opts = varargin{5};
 
+      mexOptions = opts.getMexOptions;
+      input_str=['MParT_(',char(39),'ConditionalMap_newSigmoidTriMap',char(39),',inputDim,outputDim,totalOrder,centers'];
+      for o=1:length(mexOptions)
+        input_o=[',mexOptions{',num2str(o),'}'];
+        input_str=[input_str,input_o];
+      end
+      input_str=[input_str,')'];
+      this.id_ = eval(input_str);
     elseif(nargin==1)
          this.id_=MParT_('ConditionalMap_newTriMap', varargin{1});
     else
