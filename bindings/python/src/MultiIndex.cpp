@@ -121,6 +121,8 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
 
         .def_static("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder, py::arg("length"), py::arg("maxOrder"), py::arg("limiter")=MultiIndexLimiter::None())
         .def_static("CreateSeparableTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder));}, py::arg("length"), py::arg("maxOrder"))
+        .def_static("CreateNonzeroDiagTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::NonzeroDiagTotalOrder(maxOrder));}, py::arg("length"), py::arg("maxOrder"))
+
         .def_static("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct, py::arg("length"), py::arg("maxOrder"), py::arg("limiter")=MultiIndexLimiter::None())
 
         .def("union", &MultiIndexSet::Union)

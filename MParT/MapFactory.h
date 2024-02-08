@@ -153,6 +153,14 @@ namespace mpart{
             FixedMultiIndexSet<MemorySpace> mset_offdiag, FixedMultiIndexSet<MemorySpace> mset_diag,
             StridedVector<const double, MemorySpace> centers, MapOptions opts);
 
+        template<typename MemorySpace, std::enable_if_t<std::is_same_v<MemorySpace, Kokkos::HostSpace>, bool> = true>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidComponent(
+            FixedMultiIndexSet<MemorySpace> mset_offdiag, FixedMultiIndexSet<MemorySpace> mset_diag,
+            Eigen::Ref<const Eigen::RowVectorXd> centers, MapOptions opts) {
+            StridedVector<const double, Kokkos::HostSpace> centersVec = ConstVecToKokkos<double, Kokkos::HostSpace>(centers);
+            return CreateSigmoidComponent<Kokkos::HostSpace>(mset_offdiag, mset_diag, centersVec, opts);
+        }
+
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidTriangular(
             unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder,

@@ -499,7 +499,7 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
             expected_size += multi.HasNonzeroEnd();
         }
         REQUIRE( expected_size == inds.size() );
-        MultiIndexSet full_set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(maxOrder));
+        MultiIndexSet full_set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::NonzeroDiagTotalOrder(maxOrder));
         inds = full_set.NonzeroDiagonalEntries();
         REQUIRE( inds.size() == full_set.Size() );
         for(int i = 0; i < full_set.Size(); ++i) {

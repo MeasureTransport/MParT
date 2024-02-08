@@ -50,18 +50,18 @@ namespace MultiIndexLimiter{
 
     };
 
-    /** @class NonzeroDiagTotalOrderLimiter
+    /** @class NonzeroDiagTotalOrder
         @brief Same as TotalOrder, except without any term that has nonzero diagonal entries
         @details This limter only allows terms that satisfy
         \f$\|\mathbf{j}\|_1\leq p_U\f$, where \f$\mathbf{j}\f$
         is the multiindex, and \f$p_U\f$ is a nonnegative integer passed to the
         constructor of this class.
     */
-    class NonzeroDiagTotalOrderLimiter{
+    class NonzeroDiagTotalOrder{
 
     public:
 
-        NonzeroDiagTotalOrderLimiter(unsigned int totalOrderIn) : totalOrder(totalOrderIn){};
+        NonzeroDiagTotalOrder(unsigned int totalOrderIn) : totalOrder(totalOrderIn){};
 
         bool operator()(MultiIndex const& multi){
           unsigned int sum = multi.Sum();

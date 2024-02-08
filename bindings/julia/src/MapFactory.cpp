@@ -3,17 +3,25 @@
 #include "JlArrayConversions.h"
 #include "jlcxx/stl.hpp"
 
+using MemorySpace = Kokkos::HostSpace;
+
 void mpart::binding::MapFactoryWrapper(jlcxx::Module &mod) {
     // CreateComponent
-    mod.method("CreateComponent", &MapFactory::CreateComponent<Kokkos::HostSpace>);
+    mod.method("CreateComponent", &MapFactory::CreateComponent<MemorySpace>);
 
     // CreateTriangular
-    mod.method("CreateTriangular", &MapFactory::CreateTriangular<Kokkos::HostSpace>);
+    mod.method("CreateTriangular", &MapFactory::CreateTriangular<MemorySpace>);
 
     // CreateSigmoidComponent
     mod.method("CreateSigmoidComponent", [](unsigned int inDim, unsigned int totalOrder, jlcxx::ArrayRef<double,1> centers, MapOptions opts){
-        StridedVector<const double, Kokkos::HostSpace> centersVec = JuliaToKokkos(centers);
+        StridedVector<const double, MemorySpace> centersVec = JuliaToKokkos(centers);
         return MapFactory::CreateSigmoidComponent<Kokkos::HostSpace>(inDim, totalOrder, centersVec, opts);
+    });
+
+    // CreateSigmoidComponent
+    mod.method("CreateSigmoidComponent", [](FixedMultiIndexSet<MemorySpace> mset_offdiag, FixedMultiIndexSet<MemorySpace> mset_diag, jlcxx::ArrayRef<double,1> centers, MapOptions opts){
+        StridedVector<const double, MemorySpace> centersVec = JuliaToKokkos(centers);
+        return MapFactory::CreateSigmoidComponent<Kokkos::HostSpace>(mset_offdiag, mset_diag, centersVec, opts);
     });
 
     // CreateSigmoidTriangular

@@ -78,6 +78,7 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
 
     mod.method("CreateTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::None()); });
     mod.method("CreateSeparableTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder)); });
+    mod.method("CreateNonzeroDiagTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::NonzeroDiagTotalOrder(maxOrder)); });
 
     mod.set_override_module(jl_base_module);
     mod.method("sum", [](MultiIndex const& idx){ return idx.Sum(); });
