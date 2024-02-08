@@ -2,6 +2,7 @@
 
 import mpart
 import numpy as np
+import math
 import unittest
 
 noneLim = mpart.NoneLim()
@@ -100,8 +101,34 @@ def test_CreateSingleEntryMap_3():
     single_entry_map = mpart.CreateSingleEntryMap(dim, activeInd, component)
     assert single_entry_map.numCoeffs == component.numCoeffs
 
-
-
-
-
-    
+def test_CreateSigmoidMaps():
+    input_dim = 6
+    num_sigmoid = 5
+    centers_len = 2+num_sigmoid*(num_sigmoid+1)//2
+    max_degree = 3
+    centers = np.zeros(centers_len)
+    center_idx = 0
+    bound = 3.
+    # Edge terms
+    centers[0] = -bound
+    centers[1] =  bound
+    centers[2] = 0.
+    # Sigmoid terms
+    for order in range(2,num_sigmoid+1):
+        for j in range(order):
+            centers[center_idx] = 1.9*bound*(j-(order-1)/2)/(order-1)
+            center_idx += 1
+    opts = mpart.MapOptions()
+    opts.basisType = mpart.BasisTypes.HermiteFunctions
+    sig = mpart.CreateSigmoidComponent(input_dim, max_degree, centers, opts)
+    expected_num_coeffs = math.comb(input_dim+max_degree, input_dim)
+    assert sig.numCoeffs == expected_num_coeffs
+    mset_diag = mpart.MultiIndexSet.CreateNonzeroDiagTotalOrder(input_dim, max_degree).fix(True)
+    mset_off = mpart.FixedMultiIndexSet(input_dim-1, max_degree)
+    sig_mset = mpart.CreateSigmoidComponent(mset_off, mset_diag, centers, opts)
+    assert sig_mset.numCoeffs == mset_diag.Size() + mset_off.Size()
+    output_dim = input_dim
+    centers_total = np.column_stack([centers for _ in range(output_dim)])
+    sig_trimap = mpart.CreateSigmoidTriangular(input_dim, output_dim, max_degree, centers_total, opts)
+    expected_num_coeffs = np.sum([math.comb(d+max_degree, d) for d in range(1, input_dim+1)])
+    assert sig_trimap.numCoeffs == expected_num_coeffs
