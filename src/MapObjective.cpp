@@ -9,7 +9,8 @@ class InnerPlusDensityGrad{
 	int row;
     public:
 	InnerPlusDensityGrad(double scale_, StridedMatrix<double, MemorySpace> densityGradX_, int row_) :row(row_), scale(scale_), densityGradX(densityGradX_){}
-	void operator()(int col, double innerUpdate){
+
+	void operator()(int col, double innerUpdate) const{
        	    innerUpdate += scale*densityGradX(row,col);
         }
 };
