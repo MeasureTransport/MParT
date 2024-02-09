@@ -4,7 +4,7 @@ using namespace mpart;
 template<typename MemorySpace>
 double MapObjective<MemorySpace>::operator()(unsigned int n, const double* coeffs, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) {
 
-    StridedVector<const double, MemorySpace> coeffView = ToConstKokkos<double,MemorySpace>(coeffs, n);
+    Kokkos::View<const double*, MemorySpace> coeffView = ToConstKokkos<double,MemorySpace>(coeffs, n);
     StridedVector<double, MemorySpace> gradView = ToKokkos<double,MemorySpace>(grad, n);
     map->SetCoeffs(coeffView);
     return ObjectivePlusCoeffGradImpl(train_, gradView, map);
