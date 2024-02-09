@@ -6,6 +6,7 @@
 #include "MParT/Utilities/KokkosHelpers.h"
 #include "MParT/Utilities/RootFinding.h"
 #include <iostream>
+#include <numeric>
 
 
 namespace mpart {

@@ -9,6 +9,7 @@
 #include "MParT/Utilities/KokkosHelpers.h"
 
 #include <algorithm>
+#include <numeric>
 
 namespace mpart{
 
@@ -176,8 +177,8 @@ namespace mpart{
             // Figure out how much memory we'll need in the cache
             unsigned int cacheSize = std::max(worker_diag.CacheSize(), worker_off.CacheSize());
             unsigned int maxParams = coeff_off.size() + coeff_diag.size();
-            Kokkos::pair<unsigned int, unsigned int> coeff_off_idx {0u,coeff_off.size()};
-            Kokkos::pair<unsigned int, unsigned int> coeff_diag_idx {coeff_off.size(), maxParams};
+            Kokkos::pair<unsigned int, unsigned int> coeff_off_idx {0u,(unsigned int)coeff_off.size()};
+            Kokkos::pair<unsigned int, unsigned int> coeff_diag_idx {(unsigned int) coeff_off.size(), maxParams};
 
             auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
