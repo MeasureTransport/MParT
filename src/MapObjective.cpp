@@ -2,6 +2,19 @@
 using namespace mpart;
 
 template<typename MemorySpace>
+class InnerPlusDensityGrad{
+    private:
+	double scale;
+	StridedMatrix<double, MemorySpace> densityGradX;
+	int row;
+    public:
+	InnerPlusDensityGrad(double scale_, StridedMatrix<double, MemorySpace> densityGradX_, int row_) :row(row_), scale(scale_), densityGradX(densityGradX_){}
+	void operator()(int col, double innerUpdate){
+       	    innerUpdate += scale*densityGradX(row,col);
+        }
+};
+
+template<typename MemorySpace>
 double MapObjective<MemorySpace>::operator()(unsigned int n, const double* coeffs, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) {
 
     Kokkos::View<const double*, MemorySpace> coeffView = ToConstKokkos<double,MemorySpace>(coeffs, n);
@@ -73,9 +86,7 @@ double KLObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const 
                 int row = teamMember.league_rank();
                 double thisRowSum = 0.0;
                 Kokkos::parallel_reduce(Kokkos::TeamThreadRange(teamMember, N_samps), 
-                    KOKKOS_LAMBDA(int col, double& innerUpdate){
-                        innerUpdate += scale*densityGradX(row,col);
-                    }, 
+                    InnerPlusDensityGrad(scale, densityGradX, row), 
                 thisRowSum);
 
                 grad(row) = thisRowSum;
@@ -109,9 +120,8 @@ void KLObjective<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
         KOKKOS_LAMBDA(auto t, typename Kokkos::TeamPolicy<MemoryToExecution<MemorySpace>>::member_type teamMember){
             int row = teamMember.league_rank();
             double thisRowSum = 0.0;
-            Kokkos::parallel_reduce(Kokkos::TeamThreadRange(teamMember, N_samps), KOKKOS_LAMBDA(int col, double& innerUpdate){
-              innerUpdate += scale*densityGradX(row,col);
-            }, thisRowSum);
+            Kokkos::parallel_reduce(Kokkos::TeamThreadRange(teamMember, N_samps), InnerPlusDensityGrad(scale, densityGradX, row),
+            thisRowSum);
             grad(row) = thisRowSum;
         }
     );
