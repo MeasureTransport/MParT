@@ -5,13 +5,13 @@ using namespace mpart;
 using namespace Catch;
 
 struct TestEvaluators {
-    virtual void EvaluateAll(double* output, int max_order, double input) const {
+    KOKKOS_INLINE_FUNCTION virtual void EvaluateAll(double* output, int max_order, double input) const {
         assert(false);
     };
-    virtual void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) const {
+    KOKKOS_INLINE_FUNCTION virtual void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) const {
         assert(false);
     };
-    virtual void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
+    KOKKOS_INLINE_FUNCTION virtual void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
         assert(false);
     };
     virtual ~TestEvaluators() = default;
