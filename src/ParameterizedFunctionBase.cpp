@@ -208,6 +208,13 @@ void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<const double
     SetCoeffsInternal(this->numCoeffs, this->savedCoeffs, coeffs);
 }
 
+template<typename MemorySpace>
+void ParameterizedFunctionBase<MemorySpace>::SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs){
+    Kokkos::View<const double*, MemorySpace> tmpCoeffs = coeffs;
+    SetCoeffsInternal(this->numCoeffs, this->savedCoeffs, tmpCoeffs);
+}
+
+
 
 template<typename MemorySpace>
 void ParameterizedFunctionBase<MemorySpace>::WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs){
@@ -231,6 +238,19 @@ template<>
 void ParameterizedFunctionBase<Kokkos::HostSpace>::SetCoeffs(Kokkos::View<const double*, mpart::DeviceSpace> coeffs)
 {
     SetCoeffsInternal(this->numCoeffs, this->savedCoeffs, coeffs);
+}
+
+template<>
+void ParameterizedFunctionBase<mpart::DeviceSpace>::SetCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs)
+{
+    Kokkos::View<const double*, Kokkos::HostSpace> tmpCoeffs = coeffs;
+    SetCoeffsInternal(this->numCoeffs, this->savedCoeffs, tmpCoeffs);
+}
+template<>
+void ParameterizedFunctionBase<Kokkos::HostSpace>::SetCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs)
+{   
+    Kokkos::View<const double*, mpart::DeviceSpace> tmpCoeffs = coeffs;
+    SetCoeffsInternal(this->numCoeffs, this->savedCoeffs, tmpCoeffs);
 }
 
 
