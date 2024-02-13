@@ -336,7 +336,6 @@ public:
     {
         const unsigned int numTerms = multiSet_.Size();
         double df = 0.0;
-        unsigned int posInd;
 
         for(int wrt=-1; wrt<int(dim_); ++wrt){
             if(wrt>=0){
@@ -529,7 +528,6 @@ private:
     KOKKOS_FUNCTION double GetTermValMixedCoeffDeriv(unsigned int termInd, int wrt, const double* cache, unsigned int posIndex) const {
         // Compute the value of this term in the expansion
         double termVal = 1.0;
-        bool hasDeriv = false;
         if(multiSet_.nzStarts(termInd)==multiSet_.nzStarts(termInd+1)) return 0.; // Value is zero if constant in last dimension
         unsigned int end_idx = multiSet_.nzStarts(termInd+1)-1; // last index in loop
         if(multiSet_.nzDims(end_idx)!=dim_-1) return 0.; // Value is zero if constant in last dimension
