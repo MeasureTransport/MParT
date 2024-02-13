@@ -1073,9 +1073,9 @@ private:
         ExpansionType expansion;
         double nugget;
 
-        SingleEvaluator(double* workspace_, double* cache_, PointType pt_, CoeffType coeffs_, QuadratureType quad_, ExpansionType expansion_, double nugget_):
+        KOKKOS_FUNCTION SingleEvaluator(double* workspace_, double* cache_, PointType pt_, CoeffType coeffs_, QuadratureType quad_, ExpansionType expansion_, double nugget_):
             workspace(workspace_), cache(cache_), pt(pt_), coeffs(coeffs_), quad(quad_), expansion(expansion_), nugget(nugget_) {};
-        double operator()(double x) {
+        KOKKOS_INLINE_FUNCTION double operator()(double x) {
             return EvaluateSingle(cache, workspace, pt, x, coeffs, quad, expansion, nugget);
         }
     };
