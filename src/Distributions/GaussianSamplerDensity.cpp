@@ -30,12 +30,12 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> diff ("diff", M, N);
 
     if(mean_.extent(0) == 0){
-        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
             diff(i,j) = pts(i,j);
         });
     }
     else {
-        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
             diff(i,j) = pts(i,j) - mean_(i);
         });
     }
@@ -44,10 +44,11 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
         covChol_.solveInPlaceL(diff);
     }
 
-    ReduceDim<ReduceDimMap::norm,MemorySpace,0> rr(diff, -0.5);
-    Kokkos::parallel_reduce(M, rr, &output(0));
-    Kokkos::parallel_for( "log terms", N, KOKKOS_LAMBDA (const int& j) {
-        output(j) -= 0.5*( M*logtau_ + logDetCov_ );
+    Kokkos::parallel_for(N, KOKKOS_CLASS_LAMBDA(const int& j){
+        output(j) = -0.5*( M*logtau_ + logDetCov_ );
+        for(int d=0; d<M; ++d){
+            output(j) += -0.5*diff(d,j)*diff(d,j);
+        }
     });
 }
 
@@ -62,12 +63,12 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityInputGradImpl(StridedMatrix<
     Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
 
     if(mean_.extent(0) == 0){
-        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
             output(i,j) = -pts(i,j);
         });
     }
     else {
-        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int& j, const int& i) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
             output(i,j) = -pts(i,j) + mean_(i);
         });
     }
@@ -93,7 +94,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
     if(idCov_) {
         // If dim_ is 0, the distribution is the standard normal
         if(mean_.extent(0) == 0) {
-            Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
+            Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int j, const int i) {
                 GeneratorType rgen = rand_pool.get_state();
                 output_(i,j) = rgen.normal();
                 rand_pool.free_state(rgen);
@@ -101,7 +102,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
         }
         // Otherwise, we sample from the mean-shifted normal
         else {
-            Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
+            Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int j, const int i) {
                 GeneratorType rgen = rand_pool.get_state();
                 output_(i,j) = rgen.normal() + mean_(i);
                 rand_pool.free_state(rgen);
@@ -113,7 +114,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
         // Enforce that the output is the correct layout!
         Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> output = output_;
         // Sample from the standard normal
-        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
+        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int j, const int i) {
             GeneratorType rgen = rand_pool.get_state();
             output(i,j) = rgen.normal();
             rand_pool.free_state(rgen);
@@ -125,7 +126,7 @@ void GaussianSamplerDensity<MemorySpace>::SampleImpl(StridedMatrix<double, Memor
             Kokkos::deep_copy(output, mul);
         }
         else {
-            Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int j, const int i) {
+            Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int j, const int i) {
                 output(i,j) = mul(i,j) + mean_(i);
             });
         }

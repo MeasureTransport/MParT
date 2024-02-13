@@ -16,18 +16,30 @@ void NormalizeSamples(StridedMatrix<double, Kokkos::HostSpace> mat) {
     unsigned int dim = mat.extent(0);
     unsigned int N_samples = mat.extent(1);
     // Take sum of each row, divide by 1/N_samples
-    ReduceDim<ReduceDimMap::sum,MemorySpace,1> rd_mean(mat, 1./(static_cast<double>(N_samples)));
     Kokkos::View<double*, MemorySpace> meanVar("MeanStd", dim);
-    Kokkos::parallel_reduce(N_samples, rd_mean, &meanVar(0));
+    for(int i=0; i<dim; ++i){
+        for(int j=0; j<N_samples; ++j){
+            meanVar(i) += mat(i,j);
+        }
+        meanVar(i) /= static_cast<double>(N_samples);
+    }
+
     // Subtract mean from each point
     using ExecSpace = typename MemoryToExecution<MemorySpace>::Space;
     auto policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>,ExecSpace>({0,0},{dim,N_samples});
     Kokkos::parallel_for("Center data", policy, KOKKOS_LAMBDA(const unsigned int i, const unsigned int j){
         mat(i,j) -= meanVar(i);
     });
+
     // Take || . ||_2^2 of each row, divide by 1/(N_samples-1)
-    ReduceDim<ReduceDimMap::norm,MemorySpace,1> rd_var(mat, 1./(static_cast<double>(N_samples-1)));
-    Kokkos::parallel_reduce(N_samples, rd_var, &meanVar(0));
+    for(int i=0; i<dim; ++i){
+        meanVar(i) = 0.0;
+        for(int j=0; j<N_samples; ++j){
+            meanVar(i) += mat(i,j)*mat(i,j);
+        }
+        meanVar(i) /= static_cast<double>(N_samples-1);
+    }
+
     // Divide each point by appropriate standard deviation
     Kokkos::parallel_for("Scale data", policy, KOKKOS_LAMBDA(const unsigned int i, const unsigned int j){
         mat(i,j) /= std::sqrt(meanVar(i));
