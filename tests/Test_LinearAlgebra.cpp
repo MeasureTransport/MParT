@@ -150,7 +150,7 @@ TEST_CASE( "Testing LU Factorization", "LinearAlgebra_LU" ) {
     B(1,0) = 2.; B(1,1) = 5.;
     B(2,0) = 3.; B(2,1) = 6.;
 
-    auto constA = ToConstKokkos(A.data(), 3, 3);
+    Kokkos::View<const double**, Kokkos::LayoutLeft, Kokkos::HostSpace> constA = A;
     auto eigA = ConstKokkosToMat(constA);
     auto eigB = KokkosToMat(B);
     unsigned int nrows = eigA.rows();
@@ -197,7 +197,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
     B(1,0) = 2.; B(1,1) = 5.;
     B(2,0) = 3.; B(2,1) = 6.;
 
-    auto constA = ToConstKokkos(A.data(), 3, 3);
+    Kokkos::View<const double**, Kokkos::LayoutLeft, Kokkos::HostSpace> constA = A;
     auto eigA = ConstKokkosToMat(constA);
     auto eigB = KokkosToMat(B);
     unsigned int nrows = eigA.rows();
@@ -364,7 +364,7 @@ TEST_CASE( "Testing LU Factorization on Device", "LinearAlgebra_LUDevice" ) {
     B(1,0) = 2.; B(1,1) = 5.;
     B(2,0) = 3.; B(2,1) = 6.;
 
-    auto constA = ToConstKokkos(A.data(), 3, 3);
+    Kokkos::View<const double**, Kokkos::LayoutLeft, Kokkos::HostSpace> constA = A;
     auto constA_d = ToDevice<mpart::DeviceSpace>(constA);
     auto B_d = ToDevice<mpart::DeviceSpace>(B);
     auto eigA = ConstKokkosToMat(constA);
@@ -415,7 +415,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
     B_h(1,0) = 2.; B_h(1,1) = 5.;
     B_h(2,0) = 3.; B_h(2,1) = 6.;
 
-    auto constA_h = ToConstKokkos(A.data(), 3, 3);
+    Kokkos::View<const double**, Kokkos::LayoutLeft, Kokkos::HostSpace> constA_h = A;
     auto constA_d = ToDevice<mpart::DeviceSpace>(constA_h);
     auto B_d = ToDevice<mpart::DeviceSpace>(B);
     auto eigA = ConstKokkosToMat(constA_h);

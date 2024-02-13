@@ -109,7 +109,7 @@ class Sigmoid1d {
 						Kokkos::View<double*, MemorySpace> widths)
 			: centers_(centers), widths_(widths) {
 		Kokkos::View<double*, MemorySpace> weights ("Sigmoid weights", centers.extent(0));
-		Kokkos::parallel_for(centers.extent(0), KOKKOS_LAMBDA(unsigned int i) { weights(i) = 1.; });
+		Kokkos::deep_copy(weights, 1.0);
 		weights_ = weights;
 		Validate();
 	}
@@ -121,7 +121,7 @@ class Sigmoid1d {
 	 * @param max_order Maximum order of basis function to evaluate
 	 * @param input Point to evaluate function
 	 */
-	void EvaluateAll(double* output, int max_order, double input) const {
+	KOKKOS_FUNCTION void EvaluateAll(double* output, int max_order, double input) const {
 		if (order_ < max_order) {
 			std::stringstream ss;
 			ss << "Sigmoid basis evaluation order too large.\n";
@@ -164,7 +164,7 @@ class Sigmoid1d {
 	 * @param max_order Number of sigmoids to evaluate
 	 * @param input Where to evaluate sigmoids
 	 */
-	void EvaluateDerivatives(double* output, double* output_diff, int max_order,
+	KOKKOS_FUNCTION void EvaluateDerivatives(double* output, double* output_diff, int max_order,
 							 double input) const {
 		if (order_ < max_order) {
 			std::stringstream ss;
@@ -218,7 +218,7 @@ class Sigmoid1d {
 	 * @param max_order Maximum order of sigmoid to evaluate
 	 * @param input Where to evaluate the sigmoids
 	 */
-	void EvaluateSecondDerivatives(double* output, double* output_diff,
+	KOKKOS_FUNCTION void EvaluateSecondDerivatives(double* output, double* output_diff,
 								   double* output_diff2, int max_order,
 								   double input) const {
 		if (order_ < max_order) {
