@@ -257,6 +257,7 @@ namespace mpart{
     Kokkos::View<double**,Kokkos::CudaSpace> deviceView("Some stuff on the device", N1, N2);
     Kokkos::View<double*,Kokkos::HostSpace> hostView = ToHost(deviceView, 2, Kokkos::All() ); // Similar to python notation: deviceView[2,:]
     @endcode
+    */
 #if defined(MPART_ENABLE_GPU)
 
     /**
