@@ -227,13 +227,6 @@ namespace mpart{
     @param[in] inview A kokkos view ind device space.
     @return A kokkos array in host memory, that is a copy of the inview.
     */
-    template<class ViewType>
-    typename ViewType::HostMirror ToHost(ViewType const& inview){
-        typename ViewType::HostMirror outview = Kokkos::create_mirror_view(inview);
-        Kokkos::deep_copy (outview, inview);
-        return outview;
-    }
-
     /**
     @brief Copies a range of elements from a Kokkos array in device to host memory
     @details
@@ -258,6 +251,13 @@ namespace mpart{
     Kokkos::View<double*,Kokkos::HostSpace> hostView = ToHost(deviceView, 2, Kokkos::All() ); // Similar to python notation: deviceView[2,:]
     @endcode
     */
+    template<class ViewType>
+    typename ViewType::HostMirror ToHost(ViewType const& inview){
+        typename ViewType::HostMirror outview = Kokkos::create_mirror_view(inview);
+        Kokkos::deep_copy (outview, inview);
+        return outview;
+    }
+
 #if defined(MPART_ENABLE_GPU)
 
     /**
