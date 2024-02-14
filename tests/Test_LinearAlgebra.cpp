@@ -390,7 +390,7 @@ TEST_CASE( "Testing LU Factorization on Device", "LinearAlgebra_LUDevice" ) {
     }
     SECTION("Solve LU out of place") {
         PartialPivLU<mpart::DeviceSpace> Alu_d(constA_d);
-        auto C_d = Alu.solve(B_d);
+        auto C_d = Alu_d.solve(B_d);
         auto C_h = ToHost(C_d);
         for(unsigned int j=0; j<C_h.extent(1); ++j){
             for(unsigned int i=0; i<C_h.extent(0); ++i){
@@ -417,9 +417,9 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
 
     Kokkos::View<const double**, Kokkos::LayoutLeft, Kokkos::HostSpace> constA_h = A;
     auto constA_d = ToDevice<mpart::DeviceSpace>(constA_h);
-    auto B_d = ToDevice<mpart::DeviceSpace>(B);
+    auto B_d = ToDevice<mpart::DeviceSpace>(B_h);
     auto eigA = ConstKokkosToMat(constA_h);
-    auto eigB = KokkosToMat(B);
+    auto eigB = KokkosToMat(B_h);
     Eigen::MatrixXd eigX = eigA.llt().solve(eigB);
     Eigen::MatrixXd eigY = eigA.llt().matrixL().solve(eigB);
 
@@ -452,7 +452,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
     }
     SECTION("Solve Cholesky out of place") {
         Cholesky<Kokkos::HostSpace> Achol_d(constA_d);
-        auto C_d = Achol.solve(B_d);
+        auto C_d = Achol_d.solve(B_d);
         auto C_h = ToHost(C_d);
         for(unsigned int j=0; j<C_h.extent(1); ++j){
             for(unsigned int i=0; i<C_h.extent(0); ++i){

@@ -226,14 +226,14 @@ namespace mpart{
     @param[in] inview A kokkos array in device memory.
     @return A kokkos array in host memory.  Note that the layout (row-major or col-major) might be different than the default on the Host.  The layout will match the device's default layout.
     */
-    template<typename DeviceMemoryType, typename ScalarType>
-    typename Kokkos::View<ScalarType,Kokkos::HostSpace>::HostMirror ToHost(Kokkos::View<ScalarType,DeviceMemoryType> const& inview){
-        typename Kokkos::View<ScalarType,DeviceMemoryType>::HostMirror outview = Kokkos::create_mirror_view(inview);
+    template<typename ScalarType, typename DeviceMemorySpace>
+    typename Kokkos::View<ScalarType, Kokkos::HostSpace>::HostMirror ToHost(Kokkos::View<ScalarType, DeviceMemorySpace> const& inview){
+        typename Kokkos::View<ScalarType, Kokkos::HostSpace>::HostMirror outview = Kokkos::create_mirror_view(inview);
         Kokkos::deep_copy (outview, inview);
         return outview;
     }
 
-    template<typename DeviceMemoryType, typename ScalarType>
+    template<typename DeviceMemoryType,typename ScalarType>
     StridedMatrix<ScalarType, Kokkos::HostSpace> ToHost(StridedMatrix<ScalarType,DeviceMemoryType> const& inview){
         typename StridedMatrix<ScalarType,DeviceMemoryType>::HostMirror outview = Kokkos::create_mirror_view(inview);
         Kokkos::deep_copy (outview, inview);
