@@ -223,30 +223,16 @@ namespace mpart{
     /**
     @brief Copies a Kokkos array from device memory to host memory
     @details
-    @param[in] inview A kokkos array in device memory.
-    @return A kokkos array in host memory.  Note that the layout (row-major or col-major) might be different than the default on the Host.  The layout will match the device's default layout.
+    @tparam ViewType A Kokkos View type in device space.
+    @param[in] inview A kokkos view ind device space.
+    @return A kokkos array in host memory, that is a copy of the inview.
     */
-    // template<typename ScalarType, typename DeviceMemorySpace>
-    // typename Kokkos::View<ScalarType, Kokkos::HostSpace>::HostMirror ToHost(Kokkos::View<ScalarType, DeviceMemorySpace> const& inview){
-    //     typename Kokkos::View<ScalarType, Kokkos::HostSpace>::HostMirror outview = Kokkos::create_mirror_view(inview);
-    //     Kokkos::deep_copy (outview, inview);
-    //     return outview;
-    // }
-
     template<class ViewType>
     typename ViewType::HostMirror ToHost(ViewType const& inview){
         typename ViewType::HostMirror outview = Kokkos::create_mirror_view(inview);
         Kokkos::deep_copy (outview, inview);
         return outview;
     }
-
-
-    // template<typename DeviceMemoryType,typename ScalarType>
-    // StridedMatrix<ScalarType, Kokkos::HostSpace> ToHost(StridedMatrix<ScalarType,DeviceMemoryType> const& inview){
-    //     typename StridedMatrix<ScalarType,DeviceMemoryType>::HostMirror outview = Kokkos::create_mirror_view(inview);
-    //     Kokkos::deep_copy (outview, inview);
-    //     return outview;
-    // }
 
     /**
     @brief Copies a range of elements from a Kokkos array in device to host memory
