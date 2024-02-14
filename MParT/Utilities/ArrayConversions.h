@@ -221,13 +221,6 @@ namespace mpart{
 
 
     /**
-    @brief Copies a Kokkos array from device memory to host memory
-    @details
-    @tparam ViewType A Kokkos View type in device space.
-    @param[in] inview A kokkos view ind device space.
-    @return A kokkos array in host memory, that is a copy of the inview.
-    */
-    /**
     @brief Copies a range of elements from a Kokkos array in device to host memory
     @details
     Typical usage for a 1d array is something like:
