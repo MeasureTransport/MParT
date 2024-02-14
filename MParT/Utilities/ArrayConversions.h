@@ -257,24 +257,6 @@ namespace mpart{
     Kokkos::View<double**,Kokkos::CudaSpace> deviceView("Some stuff on the device", N1, N2);
     Kokkos::View<double*,Kokkos::HostSpace> hostView = ToHost(deviceView, 2, Kokkos::All() ); // Similar to python notation: deviceView[2,:]
     @endcode
-
-    @param[in] inview A kokkos array in device memory.
-    @param[in] sliceParams One or more parameters defining a Kokkos::subview.  See the [Kokkos Subview documentation](https://github.com/kokkos/kokkos/wiki/Subviews#112-how-to-take-a-subview) for more details.
-    @return A kokkos array in host memory.  Note that the layout (row-major or col-major) might be different than the default on the Host.  The layout will match the device's default layout.
-
-    @tparam DeviceMemoryType The memory space (e.g., Kokkos::CudaSpace) or the device
-    @tparam ScalarType The type and dimension of the Kokkos::View (e.g., double*, double**, or int*)
-    @tparam SliceTypes A variadic parameter pack containing options for constructing a Kokkos::subview of the device view.
-    */
-    // template<typename DeviceMemoryType, typename ScalarType, class... SliceTypes>
-    // Kokkos::View<ScalarType, Kokkos::HostSpace> ToHost(Kokkos::View<ScalarType,DeviceMemoryType> const& inview, SliceTypes... sliceParams){
-    //     auto subview = Kokkos::subview(inview, sliceParams...); // Construct the subview
-    //     typename Kokkos::View<ScalarType>::HostMirror outview = Kokkos::create_mirror_view(subview);
-    //     Kokkos::deep_copy (outview, subview);
-    //     return outview;
-    // }
-
-
 #if defined(MPART_ENABLE_GPU)
 
     /**
