@@ -120,8 +120,8 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
         .def("Size", &MultiIndexSet::Size, "Retrieves the number of elements in this MultiIndexSet")
 
         .def_static("CreateTotalOrder", &MultiIndexSet::CreateTotalOrder, py::arg("length"), py::arg("maxOrder"), py::arg("limiter")=MultiIndexLimiter::None())
-        .def_static("CreateSeparableTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder));}, py::arg("length"), py::arg("maxOrder"))
-        .def_static("CreateNonzeroDiagTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::NonzeroDiagTotalOrder(maxOrder));}, py::arg("length"), py::arg("maxOrder"))
+        .def_static("CreateSeparableTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::Separable());}, py::arg("length"), py::arg("maxOrder"))
+        .def_static("CreateNonzeroDiagTotalOrder", [](unsigned int length, unsigned int maxOrder){return MultiIndexSet::CreateTotalOrder(length, maxOrder, MultiIndexLimiter::NonzeroDiag());}, py::arg("length"), py::arg("maxOrder"))
 
         .def_static("CreateTensorProduct", &MultiIndexSet::CreateTensorProduct, py::arg("length"), py::arg("maxOrder"), py::arg("limiter")=MultiIndexLimiter::None())
 

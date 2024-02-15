@@ -37,9 +37,9 @@ MEX_DEFINE(MultiIndexSet_newTotalOrder) (int nlhs, mxArray* plhs[],
   const std::string limiter_type = input.get<std::string>(2);
   MultiIndexSet::LimiterType limiter;
   if(limiter_type == "separable")
-    limiter = MultiIndexLimiter::SeparableTotalOrder(order);
+    limiter = MultiIndexLimiter::Separable();
   else if(limiter_type == "nonzeroDiag")
-    limiter = MultiIndexLimiter::NonzeroDiagTotalOrder(order);
+    limiter = MultiIndexLimiter::NonzeroDiag();
   else
     limiter = MultiIndexLimiter::None();
   MultiIndexSet toCreate = MultiIndexSet::CreateTotalOrder(dim, order, limiter);
