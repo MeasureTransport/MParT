@@ -221,26 +221,6 @@ namespace mpart{
 
 
     /**
-    @brief Copies a Kokkos array from device memory to host memory
-    @details
-    @param[in] inview A kokkos array in device memory.
-    @return A kokkos array in host memory.  Note that the layout (row-major or col-major) might be different than the default on the Host.  The layout will match the device's default layout.
-    */
-    template<typename DeviceMemoryType, typename ScalarType>
-    typename Kokkos::View<ScalarType,Kokkos::HostSpace>::HostMirror ToHost(Kokkos::View<ScalarType,DeviceMemoryType> const& inview){
-        typename Kokkos::View<ScalarType,DeviceMemoryType>::HostMirror outview = Kokkos::create_mirror_view(inview);
-        Kokkos::deep_copy (outview, inview);
-        return outview;
-    }
-
-    template<typename DeviceMemoryType, typename ScalarType>
-    StridedMatrix<ScalarType, Kokkos::HostSpace> ToHost(StridedMatrix<ScalarType,DeviceMemoryType> const& inview){
-        typename StridedMatrix<ScalarType,DeviceMemoryType>::HostMirror outview = Kokkos::create_mirror_view(inview);
-        Kokkos::deep_copy (outview, inview);
-        return outview;
-    }
-
-    /**
     @brief Copies a range of elements from a Kokkos array in device to host memory
     @details
     Typical usage for a 1d array is something like:
@@ -263,23 +243,13 @@ namespace mpart{
     Kokkos::View<double**,Kokkos::CudaSpace> deviceView("Some stuff on the device", N1, N2);
     Kokkos::View<double*,Kokkos::HostSpace> hostView = ToHost(deviceView, 2, Kokkos::All() ); // Similar to python notation: deviceView[2,:]
     @endcode
-
-    @param[in] inview A kokkos array in device memory.
-    @param[in] sliceParams One or more parameters defining a Kokkos::subview.  See the [Kokkos Subview documentation](https://github.com/kokkos/kokkos/wiki/Subviews#112-how-to-take-a-subview) for more details.
-    @return A kokkos array in host memory.  Note that the layout (row-major or col-major) might be different than the default on the Host.  The layout will match the device's default layout.
-
-    @tparam DeviceMemoryType The memory space (e.g., Kokkos::CudaSpace) or the device
-    @tparam ScalarType The type and dimension of the Kokkos::View (e.g., double*, double**, or int*)
-    @tparam SliceTypes A variadic parameter pack containing options for constructing a Kokkos::subview of the device view.
     */
-    template<typename DeviceMemoryType, typename ScalarType, class... SliceTypes>
-    Kokkos::View<ScalarType, Kokkos::HostSpace> ToHost(Kokkos::View<ScalarType,DeviceMemoryType> const& inview, SliceTypes... sliceParams){
-        auto subview = Kokkos::subview(inview, sliceParams...); // Construct the subview
-        typename Kokkos::View<ScalarType>::HostMirror outview = Kokkos::create_mirror_view(subview);
-        Kokkos::deep_copy (outview, subview);
+    template<class ViewType>
+    typename ViewType::HostMirror ToHost(ViewType const& inview){
+        typename ViewType::HostMirror outview = Kokkos::create_mirror_view(inview);
+        Kokkos::deep_copy (outview, inview);
         return outview;
     }
-
 
 #if defined(MPART_ENABLE_GPU)
 

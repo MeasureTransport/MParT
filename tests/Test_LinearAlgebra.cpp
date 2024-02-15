@@ -150,7 +150,7 @@ TEST_CASE( "Testing LU Factorization", "LinearAlgebra_LU" ) {
     B(1,0) = 2.; B(1,1) = 5.;
     B(2,0) = 3.; B(2,1) = 6.;
 
-    auto constA = ToConstKokkos(A.data(), 3, 3);
+    Kokkos::View<const double**, Kokkos::LayoutLeft, Kokkos::HostSpace> constA = A;
     auto eigA = ConstKokkosToMat(constA);
     auto eigB = KokkosToMat(B);
     unsigned int nrows = eigA.rows();
@@ -197,7 +197,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
     B(1,0) = 2.; B(1,1) = 5.;
     B(2,0) = 3.; B(2,1) = 6.;
 
-    auto constA = ToConstKokkos(A.data(), 3, 3);
+    Kokkos::View<const double**, Kokkos::LayoutLeft, Kokkos::HostSpace> constA = A;
     auto eigA = ConstKokkosToMat(constA);
     auto eigB = KokkosToMat(B);
     unsigned int nrows = eigA.rows();
@@ -364,7 +364,7 @@ TEST_CASE( "Testing LU Factorization on Device", "LinearAlgebra_LUDevice" ) {
     B(1,0) = 2.; B(1,1) = 5.;
     B(2,0) = 3.; B(2,1) = 6.;
 
-    auto constA = ToConstKokkos(A.data(), 3, 3);
+    Kokkos::View<const double**, Kokkos::LayoutLeft, Kokkos::HostSpace> constA = A;
     auto constA_d = ToDevice<mpart::DeviceSpace>(constA);
     auto B_d = ToDevice<mpart::DeviceSpace>(B);
     auto eigA = ConstKokkosToMat(constA);
@@ -390,7 +390,7 @@ TEST_CASE( "Testing LU Factorization on Device", "LinearAlgebra_LUDevice" ) {
     }
     SECTION("Solve LU out of place") {
         PartialPivLU<mpart::DeviceSpace> Alu_d(constA_d);
-        auto C_d = Alu.solve(B_d);
+        auto C_d = Alu_d.solve(B_d);
         auto C_h = ToHost(C_d);
         for(unsigned int j=0; j<C_h.extent(1); ++j){
             for(unsigned int i=0; i<C_h.extent(0); ++i){
@@ -399,7 +399,7 @@ TEST_CASE( "Testing LU Factorization on Device", "LinearAlgebra_LUDevice" ) {
         }
     }
     SECTION("Compute Determinant") {
-        PartialPivLU<Kokkos::HostSpace> Alu_d(constA_d);
+        PartialPivLU<mpart::DeviceSpace> Alu_d(constA_d);
         CHECK(Alu_d.determinant() == Approx(eigA.determinant()).epsilon(1e-14).margin(1e-14));
     }
 }
@@ -415,21 +415,21 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
     B_h(1,0) = 2.; B_h(1,1) = 5.;
     B_h(2,0) = 3.; B_h(2,1) = 6.;
 
-    auto constA_h = ToConstKokkos(A.data(), 3, 3);
+    Kokkos::View<const double**, Kokkos::LayoutLeft, Kokkos::HostSpace> constA_h = A;
     auto constA_d = ToDevice<mpart::DeviceSpace>(constA_h);
-    auto B_d = ToDevice<mpart::DeviceSpace>(B);
+    auto B_d = ToDevice<mpart::DeviceSpace>(B_h);
     auto eigA = ConstKokkosToMat(constA_h);
-    auto eigB = KokkosToMat(B);
+    auto eigB = KokkosToMat(B_h);
     Eigen::MatrixXd eigX = eigA.llt().solve(eigB);
     Eigen::MatrixXd eigY = eigA.llt().matrixL().solve(eigB);
 
     SECTION("Compute Cholesky") {
-        Cholesky<Kokkos::HostSpace> Achol_d(constA_d);
+        Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
     }
     SECTION("Solve Cholesky inplace") {
         Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace> C_d("C", 3, 2);
         Kokkos::deep_copy(C_d, B_d);
-        Cholesky<Kokkos::HostSpace> Achol_d(constA_d);
+        Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
         Achol_d.solveInPlace(C_d);
         auto C_h = ToHost(C_d);
         for(unsigned int j=0; j<C_h.extent(1); ++j){
@@ -441,7 +441,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
     SECTION("Solve Cholesky L inplace") {
         Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace> C_d("C", 3, 2);
         Kokkos::deep_copy(C_d, B_d);
-        Cholesky<Kokkos::HostSpace> Achol_d(constA_d);
+        Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
         Achol_d.solveInPlaceL(C_d);
         auto C_h = ToHost(C_d);
         for(unsigned int j=0; j<C_h.extent(1); ++j){
@@ -451,8 +451,8 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
         }
     }
     SECTION("Solve Cholesky out of place") {
-        Cholesky<Kokkos::HostSpace> Achol_d(constA_d);
-        auto C_d = Achol.solve(B_d);
+        Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
+        auto C_d = Achol_d.solve(B_d);
         auto C_h = ToHost(C_d);
         for(unsigned int j=0; j<C_h.extent(1); ++j){
             for(unsigned int i=0; i<C_h.extent(0); ++i){
@@ -461,7 +461,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
         }
     }
     SECTION("Compute Determinant") {
-        Cholesky<Kokkos::HostSpace> Achol_d(constA_d);
+        Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
         CHECK(Achol_d.determinant() == Approx(eigA.determinant()).epsilon(1e-14).margin(1e-14));
     }
 }

@@ -1,4 +1,5 @@
 #include "MParT/MapObjective.h"
+
 using namespace mpart;
 
 template<typename MemorySpace>
@@ -51,6 +52,7 @@ std::shared_ptr<MapObjective<MemorySpace>> ObjectiveFactory::CreateGaussianKLObj
 
 template<typename MemorySpace>
 double KLObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {
+    using ExecSpace = typename MemoryToExecution<MemorySpace>::Space;
     unsigned int N_samps = data.extent(1);
     unsigned int grad_dim = grad.extent(0);
     PullbackDensity<MemorySpace> pullback {map, density_};
@@ -66,21 +68,22 @@ double KLObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const 
     if (grad.data()!=nullptr){
         double scale = -1.0/((double) N_samps);
 
-        Kokkos::TeamPolicy<MemoryToExecution<MemorySpace>> policy(grad_dim, Kokkos::AUTO());
-
+        Kokkos::TeamPolicy<ExecSpace> policy(grad_dim, Kokkos::AUTO());
+        using team_handle = typename Kokkos::TeamPolicy<ExecSpace>::member_type;
         Kokkos::parallel_for(policy,
-            KOKKOS_LAMBDA(auto& tag, auto&& teamMember){
+            KOKKOS_LAMBDA(const team_handle& teamMember){
                 int row = teamMember.league_rank();
                 double thisRowSum = 0.0;
                 Kokkos::parallel_reduce(Kokkos::TeamThreadRange(teamMember, N_samps), 
-                    KOKKOS_LAMBDA(int col, double& innerUpdate){
-                        innerUpdate += scale*densityGradX(row,col);
-                    }, 
+                [&] (const int& col, double& innerUpdate) {
+                    innerUpdate += scale*densityGradX(row,col);
+                },
                 thisRowSum);
 
                 grad(row) = thisRowSum;
             }
         );
+        Kokkos::fence();
     }
     return sumDensity/N_samps;
 }
@@ -99,22 +102,28 @@ double KLObjective<MemorySpace>::ObjectiveImpl(StridedMatrix<const double, Memor
 
 template<typename MemorySpace>
 void KLObjective<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {
+    using ExecSpace = typename MemoryToExecution<MemorySpace>::Space;
     unsigned int N_samps = data.extent(1);
     unsigned int grad_dim = grad.extent(0);
     PullbackDensity<MemorySpace> pullback {map, density_};
     StridedMatrix<double, MemorySpace> densityGradX = pullback.LogDensityCoeffGrad(data);
 
     double scale = -1.0/((double) N_samps);
-    Kokkos::parallel_for("grad", Kokkos::TeamPolicy<MemoryToExecution<MemorySpace>>(grad_dim, Kokkos::AUTO()),
-        KOKKOS_LAMBDA(auto t, typename Kokkos::TeamPolicy<MemoryToExecution<MemorySpace>>::member_type teamMember){
+    Kokkos::TeamPolicy<ExecSpace> policy(grad_dim, Kokkos::AUTO());
+    using team_handle = typename Kokkos::TeamPolicy<ExecSpace>::member_type;
+    Kokkos::parallel_for(policy,
+        KOKKOS_LAMBDA(const team_handle& teamMember){
             int row = teamMember.league_rank();
             double thisRowSum = 0.0;
-            Kokkos::parallel_reduce(Kokkos::TeamThreadRange(teamMember, N_samps), KOKKOS_LAMBDA(int col, double& innerUpdate){
-              innerUpdate += scale*densityGradX(row,col);
-            }, thisRowSum);
+            Kokkos::parallel_reduce(Kokkos::TeamThreadRange(teamMember, N_samps), 
+            [&] (const int& col, double& innerUpdate) {
+                innerUpdate += scale*densityGradX(row,col);
+            },
+            thisRowSum);
             grad(row) = thisRowSum;
         }
     );
+    Kokkos::fence();
 }
 
 // Explicit template instantiation
