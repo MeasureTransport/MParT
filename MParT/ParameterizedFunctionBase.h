@@ -51,7 +51,7 @@ namespace mpart {
             @param coeffs A view containing the coefficients to copy.
         */
        virtual void SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs);
-       virtual void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs);
+       void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs);
 
 
         /** @brief Wrap the internal coefficient view around another view.
