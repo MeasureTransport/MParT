@@ -9,7 +9,7 @@ void mpart::binding::ParameterizedFunctionBaseWrapper(jlcxx::Module &mod) {
     mod.add_type<ParameterizedFunctionBase<Kokkos::HostSpace>>("ParameterizedFunctionBase")
         .method("CoeffMap" , [](ParameterizedFunctionBase<Kokkos::HostSpace> &pfb){ return KokkosToJulia(pfb.Coeffs()); })
         .method("SetCoeffs", [](ParameterizedFunctionBase<Kokkos::HostSpace> &pfb, jlcxx::ArrayRef<double> v){ 
-	    Kokkos::View<const double*, Kokkos::HostSpace> ConstCoeffs = JuliaToKokkos(v));
+	    Kokkos::View<const double*, Kokkos::HostSpace> ConstCoeffs = JuliaToKokkos(v);
 	    pfb.SetCoeffs(ConstCoeffs); 
 	})
         .method("numCoeffs", [](ParameterizedFunctionBase<Kokkos::HostSpace> &pfb) { return pfb.numCoeffs; })
