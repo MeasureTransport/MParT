@@ -347,10 +347,9 @@ MultiIndexSet FixedMultiIndexSet<MemorySpace>::Unfix() const
     for(int term = 0; term < h_nzStarts.extent(0)-1; term++){
         unsigned int start = h_nzStarts(term);
         unsigned int end = h_nzStarts(term+1);
-        unsigned int numNz = end - start;
-        unsigned int* nzIndTerm = h_nzDims.data() + start;
-        unsigned int* nzValTerm = h_nzOrders.data() + start;
-        MultiIndex midx_term {nzIndTerm, nzValTerm, numNz, this->dim};
+        auto nzIndTerm = Kokkos::subview(h_nzDims, Kokkos::pair<unsigned int, unsigned int>(start, end));
+        auto nzValTerm = Kokkos::subview(h_nzOrders, Kokkos::pair<unsigned int, unsigned int>(start, end));
+        MultiIndex midx_term {nzIndTerm, nzValTerm, this->dim};
         output.AddActive(midx_term);
     }
     return output;
