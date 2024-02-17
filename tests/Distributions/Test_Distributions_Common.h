@@ -23,7 +23,7 @@ UniformSampler(int dim, double scale = std::exp(1.)): SampleGenerator<MemorySpac
 
 void SampleImpl(StridedMatrix<double, MemorySpace> output) {
     Kokkos::MDRangePolicy<Kokkos::Rank<2>,typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {output.extent(0), output.extent(1)});
-    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(int i, int j) {
+    Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(int i, int j) {
         auto rgen = this->rand_pool.get_state();
         output(i,j) = scale_*rgen.drand();
         this->rand_pool.free_state(rgen);
@@ -42,7 +42,8 @@ UniformDensity(int dim): DensityBase<MemorySpace>(dim) {}
 void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) override {
     double euler = std::exp(1.0);
     unsigned int N = pts.extent(1);
-    Kokkos::parallel_for( "uniform log density", N, KOKKOS_LAMBDA (const int& j) {
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0, N);
+    Kokkos::parallel_for( "uniform log density", policy, KOKKOS_CLASS_LAMBDA (const int& j) {
         bool in_bounds1 = (pts(0, j) >= 0.0) && (pts(0, j) <= euler);
         bool in_bounds2 = (pts(1, j) >= 0.0) && (pts(1, j) <= euler);
         output(j) = in_bounds1 && in_bounds2 ? -2 : -std::numeric_limits<double>::infinity();
@@ -51,7 +52,8 @@ void LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, Strided
 
 void LogDensityInputGradImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedMatrix<double, MemorySpace> output) override {
     unsigned int N = pts.extent(1);
-    Kokkos::parallel_for( "uniform grad log density", N, KOKKOS_LAMBDA (const int& j) {
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0, N);
+    Kokkos::parallel_for( "uniform grad log density", policy, KOKKOS_CLASS_LAMBDA (const int& j) {
         output(0,j) = 0.;
         output(1,j) = 0.;
     });
