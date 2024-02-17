@@ -423,7 +423,11 @@ TEST_CASE( "Testing Cholesky Factorization on Device", "LinearAlgebra_Cholesky_D
     Eigen::MatrixXd eigX = eigA.llt().solve(eigB);
     Eigen::MatrixXd eigY = eigA.llt().matrixL().solve(eigB);
 
+<<<<<<< HEAD
     SECTION("Compute Cholesky on Device") {
+=======
+    SECTION("Compute Cholesky") {
+>>>>>>> gpu_compile_24
         Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
     }
     SECTION("Solve Cholesky inplace on Device") {
