@@ -404,7 +404,7 @@ TEST_CASE( "Testing LU Factorization on Device", "LinearAlgebra_LUDevice" ) {
     }
 }
 
-TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
+TEST_CASE( "Testing Cholesky Factorization on Device", "LinearAlgebra_Cholesky_Deivice" ) {
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> A("A", 3, 3);
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> B_h("B", 3, 2);
     A(0,0) = 36.; A(0,1) = 18.; A(0,2) = 6.;
@@ -423,10 +423,10 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
     Eigen::MatrixXd eigX = eigA.llt().solve(eigB);
     Eigen::MatrixXd eigY = eigA.llt().matrixL().solve(eigB);
 
-    SECTION("Compute Cholesky") {
+    SECTION("Compute Cholesky on Device") {
         Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
     }
-    SECTION("Solve Cholesky inplace") {
+    SECTION("Solve Cholesky inplace on Device") {
         Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace> C_d("C", 3, 2);
         Kokkos::deep_copy(C_d, B_d);
         Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
@@ -438,7 +438,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
             }
         }
     }
-    SECTION("Solve Cholesky L inplace") {
+    SECTION("Solve Cholesky L inplace on Device") {
         Kokkos::View<double**, Kokkos::LayoutLeft, mpart::DeviceSpace> C_d("C", 3, 2);
         Kokkos::deep_copy(C_d, B_d);
         Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
@@ -450,7 +450,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
             }
         }
     }
-    SECTION("Solve Cholesky out of place") {
+    SECTION("Solve Cholesky out of place on Device") {
         Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
         auto C_d = Achol_d.solve(B_d);
         auto C_h = ToHost(C_d);
@@ -460,7 +460,7 @@ TEST_CASE( "Testing Cholesky Factorization", "LinearAlgebra_Cholesky" ) {
             }
         }
     }
-    SECTION("Compute Determinant") {
+    SECTION("Compute Determinant on Device") {
         Cholesky<mpart::DeviceSpace> Achol_d(constA_d);
         CHECK(Achol_d.determinant() == Approx(eigA.determinant()).epsilon(1e-14).margin(1e-14));
     }
