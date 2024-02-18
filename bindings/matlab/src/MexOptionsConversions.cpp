@@ -3,9 +3,6 @@
 
 using namespace mpart;
 
-#define MPART_MEX_MAPOPTIONS_ARGCOUNT 16
-#define MPART_MEX_TRAINOPTIONS_ARGCOUNT 9
-
 MapOptions MapOptionsFromMatlabArgs(
     std::string basisType, std::string sigmoidType,
     std::string edgeType, std::string posFuncType,
