@@ -128,8 +128,10 @@ void FixedMultiIndexSet<MemorySpace>::SetupTerms()
     unsigned int numTerms = nzOrders.extent(0) / dim;
 
     nzStarts = Kokkos::View<unsigned int*, MemorySpace>("Start of a Multiindex", numTerms+1);
-    Kokkos::parallel_for(numTerms, StartSetter<MemorySpace>(nzStarts,dim));
-    Kokkos::parallel_for(dim*numTerms, DimSetter<MemorySpace>(nzDims,dim));
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0, numTerms);
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policyDims(0, dim*numTerms);
+    Kokkos::parallel_for(policy, StartSetter<MemorySpace>(nzStarts,dim));
+    Kokkos::parallel_for(policyDims, DimSetter<MemorySpace>(nzDims,dim));
 }
 template<>
 void FixedMultiIndexSet<Kokkos::HostSpace>::SetupTerms()
@@ -155,9 +157,11 @@ template<typename MemorySpace>
 void FixedMultiIndexSet<MemorySpace>::CalculateMaxDegrees()
 {
     maxDegrees = Kokkos::View<unsigned int*, MemorySpace>("Maximum degrees", dim);
-
-    Kokkos::parallel_for(dim, MaxDegreeInitializer<MemorySpace>(maxDegrees));
-    Kokkos::parallel_for(nzOrders.extent(0), MaxDegreeSetter<MemorySpace>(maxDegrees, nzDims, nzOrders, dim));
+    
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> DimPolicy(0, dim); 
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> NZPolicy(0, nzOrders.extent(0));
+    Kokkos::parallel_for(DimPolicy, MaxDegreeInitializer<MemorySpace>(maxDegrees));
+    Kokkos::parallel_for(NZPolicy, MaxDegreeSetter<MemorySpace>(maxDegrees, nzDims, nzOrders, dim));
 }
 
 template<>
