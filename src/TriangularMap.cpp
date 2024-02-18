@@ -309,24 +309,6 @@ void TriangularMap<MemorySpace>::LogDeterminantInputGradImpl(StridedMatrix<const
     }
 }
 
-template<typename MemorySpace>
-std::vector<unsigned int> TriangularMap<MemorySpace>::DiagonalCoeffIndices() const
-{
-    std::vector<unsigned int> indices;
-    unsigned int cumNumCoeffs = 0;
-    for(unsigned int i=0; i<comps_.size(); ++i){
-        if(comps_.at(i)->numCoeffs != 0){
-            std::vector<unsigned int> compIndices = comps_.at(i)->DiagonalCoeffIndices();
-            for(unsigned int j=0; j<compIndices.size(); ++j){
-                indices.push_back(cumNumCoeffs + compIndices.at(j));
-            }
-        }
-        cumNumCoeffs += comps_.at(i)->numCoeffs;
-    }
-
-    return indices;
-}
-
 // Explicit template instantiation
 template class mpart::TriangularMap<Kokkos::HostSpace>;
 #if defined(MPART_ENABLE_GPU)

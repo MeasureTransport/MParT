@@ -186,13 +186,6 @@ namespace mpart {
         /** Checks to see if the coefficients have been initialized yet, returns true if so, false if not */
         bool CheckCoefficients() const;
 
-        /**
-         * @brief Returns the indices of coeffs for functions non-constant in the last input for their respective output.
-         * 
-         * @return std::vector<unsigned int> 
-         */
-        virtual std::vector<unsigned int> DiagonalCoeffIndices() const;
-
         const unsigned int inputDim; /// The total dimension of the input N+M
         const unsigned int outputDim; /// The output dimension M
         const unsigned int numCoeffs; /// The number of coefficients used to parameterize this map.

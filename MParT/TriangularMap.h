@@ -122,7 +122,7 @@ public:
     void LogDeterminantInputGradImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                              StridedMatrix<double, MemorySpace>              output) override;
 
-    std::vector<unsigned int> DiagonalCoeffIndices() const override;
+    std::vector<unsigned int> DiagonalCoeffIndices() const;
 #if defined(MPART_HAS_CEREAL)
     template<class Archive>
     void save(Archive & ar) const
