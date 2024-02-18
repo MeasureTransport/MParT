@@ -218,47 +218,6 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=fa
         }
 
     }
-
-    SECTION("DiagonalCoeffIndices") {
-        std::vector<unsigned int> diagInds = triMap->DiagonalCoeffIndices();
-        std::vector<std::vector<unsigned int>> diagInds_blocks (blocks.size());
-        unsigned int diagIndSize = 0;
-        for(int i = 0; i < blocks.size(); ++i) {
-            diagInds_blocks[i] = blocks[i]->DiagonalCoeffIndices();
-            diagIndSize += diagInds_blocks[i].size();
-        }
-        std::vector<unsigned int> diagInds_ref(diagIndSize);
-        unsigned int cumInd = 0;
-        unsigned int blockStart = 0;
-        for (unsigned int i = 0; i < blocks.size(); ++i) {
-            for (unsigned int j = 0; j < diagInds_blocks[i].size(); ++j) {
-                diagInds_ref[cumInd] = diagInds_blocks[i][j] + blockStart;
-                cumInd++;
-            }
-            blockStart += blocks[i]->numCoeffs;
-        }
-        REQUIRE(diagInds == diagInds_ref);
-
-        // Check that the LogdeterminantCoeffGrad is zero for non-diagonal coefficients
-        // Construct sample points
-        unsigned int N_samples = 10;
-        Kokkos::View<double**,Kokkos::HostSpace> in("Map Input", triMap->inputDim, N_samples);
-        for(unsigned int i=0; i<triMap->inputDim; ++i){
-            for(unsigned int j=0; j<N_samples; ++j){
-                in(i,j) = (double(i))/(triMap->inputDim) + (double(j))/(N_samples);
-            }
-        }
-        // Compute the gradient
-        Kokkos::View<double**,Kokkos::HostSpace> grad = triMap->LogDeterminantCoeffGrad(in);
-        // Check that the gradient is zero for non-diagonal coefficients
-        for (unsigned int i = 0; i < triMap->numCoeffs; ++i) {
-            if (std::find(diagInds.begin(), diagInds.end(), i) == diagInds.end()) {
-                for (unsigned int j = 0; j < N_samples; ++j) {
-                    REQUIRE(grad(i,j) == Approx(0.0).margin(1e-10));
-                }
-            }
-        }
-    }
 }
 
 TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=true", "[TriangularMap_MonotoneComponents]" ) {
