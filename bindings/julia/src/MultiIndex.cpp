@@ -22,6 +22,7 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
         .method("NumNz", &MultiIndex::NumNz)
         .method("count_nonzero", &MultiIndex::NumNz)
         .method("HasNonzeroEnd", &MultiIndex::HasNonzeroEnd)
+        .method("ToVector", [](MultiIndex const& idx) { return idx.Vector(); })
     ;
 
     jlcxx::stl::apply_stl<MultiIndex>(mod);
@@ -92,7 +93,6 @@ void mpart::binding::MultiIndexWrapper(jlcxx::Module &mod) {
     mod.method("length", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset){return mset.Length();});
     mod.method("size", [](FixedMultiIndexSet<Kokkos::HostSpace> &mset){return mset.Size();});
     mod.method("size", [](MultiIndexSet &mset){return mset.Size();});
-    mod.method("vec", [](MultiIndex const& idx){ return idx.Vector(); });
     mod.method("==", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 == idx2; });
     mod.method("!=", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 != idx2; });
     mod.method("<", [](MultiIndex const& idx1, MultiIndex const& idx2){ return idx1 < idx2; });
