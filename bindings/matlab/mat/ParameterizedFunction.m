@@ -80,10 +80,6 @@ methods
     result = zeros(size(pts,1), size(pts,2));
     MParT_('ParameterizedFunction_Gradient',this.id_,pts,sens,result);
   end
-  
-  function result = DiagonalCoeffIndices(this)
-    result = MParT_('ParameterizedFunction_DiagonalCoeffIndices',this.id_);
-  end
 
   function result = get_id(this)
     result = this.id_;

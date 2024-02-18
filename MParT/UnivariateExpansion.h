@@ -268,7 +268,7 @@ class UnivariateExpansion: public ConditionalMapBase<MemorySpace>{
         Kokkos::fence();
     }
 
-    std::vector<unsigned int> DiagonalCoeffIndices() const override {
+    std::vector<unsigned int> DiagonalCoeffIndices() const {
         std::vector<unsigned int> diagIndices(maxOrder_+1);
         std::iota(diagIndices.begin(), diagIndices.end(), 0);
         return diagIndices;

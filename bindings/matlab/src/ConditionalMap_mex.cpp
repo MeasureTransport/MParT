@@ -422,17 +422,6 @@ MEX_DEFINE(ConditionalMap_LogDeterminantInputGrad) (int nlhs, mxArray* plhs[],
   condMap.map_ptr->LogDeterminantInputGradImpl(pts,out);
 }
 
-MEX_DEFINE(ConditionalMap_DiagonalCoeffIndices) (int nlhs, mxArray* plhs[],
-                                      int nrhs, const mxArray* prhs[]) {
-
-  InputArguments input(nrhs, prhs, 1);
-  OutputArguments output(nlhs, plhs, 1);
-
-  const ConditionalMapMex& condMap = Session<ConditionalMapMex>::getConst(input.get(0));
-  std::vector<unsigned int> indices = condMap.map_ptr->DiagonalCoeffIndices();
-  output.set(0,indices);
-}
-
 MEX_DEFINE(ConditionalMap_Serialize) (int nlhs, mxArray* plhs[],
                                       int nrhs, const mxArray* prhs[]) {
 

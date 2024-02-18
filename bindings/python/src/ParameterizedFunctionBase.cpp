@@ -44,7 +44,6 @@ void mpart::binding::ParameterizedFunctionBaseWrapper<Kokkos::HostSpace>(py::mod
             }
             return mpart.attr("TorchParameterizedFunctionBase")(obj, store_coeffs);
         }, py::arg("store_coeffs")=true)
-        .def("DiagonalCoeffIndices", &ParameterizedFunctionBase<Kokkos::HostSpace>::DiagonalCoeffIndices)
         .def_readonly("numCoeffs", &ParameterizedFunctionBase<Kokkos::HostSpace>::numCoeffs)
         .def_readonly("inputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::inputDim)
         .def_readonly("outputDim", &ParameterizedFunctionBase<Kokkos::HostSpace>::outputDim)

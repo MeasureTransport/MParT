@@ -191,10 +191,6 @@ methods
     MParT_('ConditionalMap_Serialize',this.id_,filename);
   end
 
-  function result = DiagonalCoeffIndices(this)
-    result = MParT_('ConditionalMap_DiagonalCoeffIndices',this.id_);
-  end
-
 end
 
 end

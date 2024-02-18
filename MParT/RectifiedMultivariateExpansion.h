@@ -422,7 +422,7 @@ namespace mpart{
             Kokkos::fence();
         }
 
-        std::vector<unsigned int> DiagonalCoeffIndices() const override
+        std::vector<unsigned int> DiagonalCoeffIndices() const
         {
             std::vector<unsigned int> diagIndices(setSize_diag);
             std::iota(diagIndices.begin(), diagIndices.end(), setSize_off);
