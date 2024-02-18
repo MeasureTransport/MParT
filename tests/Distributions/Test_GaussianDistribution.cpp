@@ -3,6 +3,7 @@
 #include "MParT/Utilities/ArrayConversions.h"
 #include "MParT/Distributions/GaussianSamplerDensity.h"
 #include "Test_Distributions_Common.h"
+#include <iostream>
 
 using namespace mpart;
 using namespace Catch;
@@ -15,8 +16,10 @@ void TestGaussianLogPDF(StridedMatrix<double, Kokkos::HostSpace> samples, Stride
 
     double offset = -0.9189385332046728*dim; // -log(2*pi)*dim/2
     offset -= 0.5*logdet_cov;
+
+    Kokkos::RangePolicy<typename MemoryToExecution<Kokkos::HostSpace>::Space> policy {0, N_samp};
     // Calculate difference of samples_pdf and the true pdf in place
-    Kokkos::parallel_for(N_samp, KOKKOS_LAMBDA(const int i) {
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i) {
         double norm = 0.;
         for(int j = 0; j < dim; j++) {
             norm += samples(j, i)*samples(j, i);
@@ -66,7 +69,8 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
         dist->SampleImpl(samples);
         dist->LogDensityImpl(samples, samples_pdf);
         dist->LogDensityInputGradImpl(samples, samples_gradpdf);
-        Kokkos::parallel_for(dim, KOKKOS_LAMBDA(const int i) {
+        Kokkos::RangePolicy<typename MemoryToExecution<Kokkos::HostSpace>::Space> policy {0, dim};
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i) {
             for(int j = 0; j < N_samp; j++) {
                 samples(i, j) -= 1.0;
             }
@@ -76,7 +80,7 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
     }
 
     Kokkos::View<double**, Kokkos::LayoutLeft, Kokkos::HostSpace> covar("covar", dim, dim);
-    auto policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {dim, dim});
+    Kokkos::MDRangePolicy<typename MemoryToExecution<Kokkos::HostSpace>::Space, Kokkos::Rank<2>> policy ({0, 0}, {dim, dim});
     Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i, const int j) {
         covar(i, j) = ((double) (i == j))*covar_diag_val;
     });
@@ -90,7 +94,7 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
         dist->SampleImpl(samples);
         dist->LogDensityImpl(samples, samples_pdf);
         dist->LogDensityInputGradImpl(samples, samples_gradpdf);
-        policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {dim, N_samp});
+        policy = Kokkos::MDRangePolicy<typename MemoryToExecution<Kokkos::HostSpace>::Space, Kokkos::Rank<2>>({0, 0}, {dim, N_samp});
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i, const int j) {
             samples(i, j) /= std::sqrt(covar_diag_val);
         });
@@ -107,7 +111,7 @@ TEST_CASE( "Testing Gaussian Distribution", "[GaussianDist]") {
         dist->SampleImpl(samples);
         dist->LogDensityImpl(samples, samples_pdf);
         dist->LogDensityInputGradImpl(samples, samples_gradpdf);
-        policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {dim, N_samp});
+        policy = Kokkos::MDRangePolicy<typename MemoryToExecution<Kokkos::HostSpace>::Space, Kokkos::Rank<2>>({0, 0}, {dim, N_samp});
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i, const int j) {
             samples(i, j) -= 1.0;
             samples(i, j) /= std::sqrt(covar_diag_val);
