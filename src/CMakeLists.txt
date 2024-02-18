@@ -33,6 +33,7 @@ target_sources(mpart
     # DebugMap.cpp
     AffineMap.cpp
     AffineFunction.cpp
+    InnerMarginalAffineMap.cpp
     MapFactory.cpp
 
     MapFactoryImpl1.cpp

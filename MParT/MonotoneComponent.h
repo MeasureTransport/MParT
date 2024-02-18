@@ -1028,7 +1028,7 @@ public:
      * 
      * @return std::vector<unsigned int> 
      */
-    std::vector<unsigned int> DiagonalCoeffIndices() const override {
+    std::vector<unsigned int> DiagonalCoeffIndices() const {
         return expansion_.NonzeroDiagonalEntries();
     }
 
