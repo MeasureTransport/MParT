@@ -46,7 +46,8 @@ TEST_CASE( "Test KLMapObjective", "[KLMapObjective]") {
     const double coeff_def = 1.;
 
     auto map = MapFactory::CreateTriangular<Kokkos::HostSpace>(dim, dim, 2);
-    Kokkos::parallel_for("Fill coeffs", map->numCoeffs, KOKKOS_LAMBDA(const unsigned int i){
+    Kokkos::RangePolicy<typename MemoryToExecution<Kokkos::HostSpace>::Space> policy(0, map->numCoeffs);
+    Kokkos::parallel_for("Fill coeffs", policy, KOKKOS_LAMBDA(const unsigned int i){
         map->Coeffs()(i) = coeff_def;
     });
 

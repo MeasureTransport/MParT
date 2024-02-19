@@ -251,9 +251,9 @@ TEST_CASE( "Device Hermite polynomial evaluation", "[PhysicistHermiteDevice]" ) 
     auto xs_device = ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(xs_host);
 
     Kokkos::View<double*,Kokkos::DefaultExecutionSpace::memory_space> ys_device("evals", xs.size());
-
+    Kokkos::RangePolicy<typename Kokkos::DefaultExecutionSpace::execution_space> policy(0,xs.size());
     for(unsigned int p=0; p<10; ++p){
-        Kokkos::parallel_for(xs.size(), KOKKOS_LAMBDA(const size_t ind){
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const size_t ind){
             ys_device(ind) = poly.Evaluate(p, xs_device(ind));
         });
         

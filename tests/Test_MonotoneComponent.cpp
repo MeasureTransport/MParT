@@ -905,7 +905,8 @@ TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
     SECTION("Integrand Only") {
         Kokkos::View<double*, DeviceSpace> dres("result", 1);
 
-        Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
+    	Kokkos::RangePolicy<typename MemoryToExecution<DeviceSpace>::Space> policy(0,1);
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i){
             MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::None, 0.0);
             integrand(0.5, &dres(0));
         });
@@ -918,7 +919,8 @@ TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
     SECTION("Integrand Derivative") {
         Kokkos::View<double*, DeviceSpace> dres("result", 2);
 
-        Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
+    	Kokkos::RangePolicy<typename MemoryToExecution<DeviceSpace>::Space> policy(0,1);
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i){
             MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Diagonal, 0.0);
             integrand(0.5, dres.data());
         });
@@ -934,7 +936,8 @@ TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
         Kokkos::View<double*, DeviceSpace> dres_fd("result_fd", hset.Size());
         Kokkos::View<double*, DeviceSpace> testVal("integrand", 1+hset.Size());
 
-        Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
+    	Kokkos::RangePolicy<typename MemoryToExecution<DeviceSpace>::Space> policy(0,1);
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i){
 
             MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Parameters, 0.0);
             MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand2(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::None, 0.0);
@@ -968,8 +971,9 @@ TEST_CASE( "MonotoneIntegrand1d on device", "[MonotoneIntegrandDevice]") {
         Kokkos::View<double*, DeviceSpace> dres_fd("result_fd", hset.Size());
         Kokkos::View<double*, DeviceSpace> testVal("integrand", 1+hset.Size());
         Kokkos::View<double*, DeviceSpace> workspace("workspace", hset.Size());
-
-        Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
+	
+	Kokkos::RangePolicy<typename MemoryToExecution<DeviceSpace>::Space> policy(0,1);
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i){
 
             MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Mixed, 0.0, workspace);
             MonotoneIntegrand<decltype(expansion), Exp, decltype(dpt), decltype(dcoeffs), DeviceSpace> integrand2(dcache.data(), expansion, dpt, dcoeffs, DerivativeFlags::Diagonal, 0.0);
@@ -1036,7 +1040,8 @@ TEST_CASE( "Testing MonotoneComponent::EvaluateSingle on Device", "[MonotoneComp
 
     Kokkos::View<double*, DeviceSpace> dres("Device Evaluation", 1);
     // Run the fill cache funciton, using a parallel_for loop to ensure it's run on the device
-    Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
+    Kokkos::RangePolicy<typename MemoryToExecution<DeviceSpace>::Space> policy(0,1);
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i){
         dexpansion.FillCache1(dcache.data(), dpt, DerivativeFlags::None);
         dres(0) = MonotoneComponent<decltype(dexpansion),Exp, decltype(quad), DeviceSpace>::EvaluateSingle(dcache.data(), workspace.data(), dpt, dpt(dim-1), dcoeffs, quad, dexpansion);
     });
