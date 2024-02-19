@@ -44,7 +44,7 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
         covChol_.solveInPlaceL(diff);
     }
 
-    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy1d(0, N);
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy1d{0, N};
     Kokkos::parallel_for(policy1d, KOKKOS_CLASS_LAMBDA(const int& j){
         output(j) = -0.5*( M*logtau_ + logDetCov_ );
         for(int d=0; d<M; ++d){
