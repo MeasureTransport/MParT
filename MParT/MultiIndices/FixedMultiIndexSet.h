@@ -13,6 +13,8 @@
 
 namespace mpart{
 
+class MultiIndexSet;
+
 template<typename MemorySpace=Kokkos::HostSpace>
 class FixedMultiIndexSet
 {
@@ -54,8 +56,13 @@ public:
     // Returns the multiindex with a given linear index
     std::vector<unsigned int> IndexToMulti(unsigned int index) const;
 
+    // Returns the indices of multiindices with nonzero elements in dimension length
+    std::vector<unsigned int> NonzeroDiagonalEntries() const;
+
     // Returns the linear index of a given multiindex.  Returns -1 if not found.
     int MultiToIndex(std::vector<unsigned int> const& multi) const;
+
+    MultiIndexSet Unfix() const;
 
     void Print() const;
 

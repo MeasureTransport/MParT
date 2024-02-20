@@ -9,18 +9,17 @@
 #include <functional>
 
 #include <Eigen/Core>
+#include <Kokkos_Core.hpp>
 
 
-#include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexNeighborhood.h"
+#include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndex.h"
 #include "MParT/MultiIndices/MultiIndexLimiter.h"
 
 
 
 namespace mpart{
-
-class MultiIndexSet;
 
 /** @class MultiIndexSet
   @brief A class for holding, sorting, and adapting sets of multiindices.
