@@ -21,12 +21,12 @@ GaussianSamplerDensity<MemorySpace>::GaussianSamplerDensity(unsigned int dim): S
 template<typename MemorySpace>
 void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const double, MemorySpace> const &pts, StridedVector<double, MemorySpace> output) {
     // Compute the log density
-    int M = pts.extent(0);
-    int N = pts.extent(1);
+    unsigned int M = pts.extent(0);
+    unsigned int N = pts.extent(1);
     if(M != dim_) {
         throw std::runtime_error("GaussianSamplerDensity::LogDensityImpl: The number of rows in pts must match the dimension of the distribution.");
     }
-    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({{0, 0}}, {{N, M}});
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy {{0u, 0u}, {N, M}};
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> diff ("diff", M, N);
 
     if(mean_.extent(0) == 0){
@@ -44,7 +44,7 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
         covChol_.solveInPlaceL(diff);
     }
 
-    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy1d{0, N};
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy1d{0u, N};
     Kokkos::parallel_for(policy1d, KOKKOS_CLASS_LAMBDA(const int& j){
         output(j) = -0.5*( M*logtau_ + logDetCov_ );
         for(int d=0; d<M; ++d){
