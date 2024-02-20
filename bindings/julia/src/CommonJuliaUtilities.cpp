@@ -24,6 +24,6 @@ void mpart::binding::CommonUtilitiesWrapper(jlcxx::Module &mod)
 {
     mod.method("Initialize", [](){mpart::binding::Initialize(std::vector<std::string> {});});
     mod.method("Initialize", [](std::vector<std::string> v){mpart::binding::Initialize(makeInitArguments(v));});
-    mod.method("Concurrency", &Kokkos::DefaultExecutionSpace::concurrency);
+    mod.method("Concurrency", [](){return Kokkos::DefaultExecutionSpace::concurrency();});
     mod.add_type<Kokkos::LayoutStride>("LayoutStride");
 }

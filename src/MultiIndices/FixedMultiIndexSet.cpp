@@ -1,5 +1,6 @@
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
-
+#include "MParT/MultiIndices/MultiIndex.h"
+#include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/Utilities/ArrayConversions.h"
 #include <stdio.h>
 
@@ -243,6 +244,41 @@ std::vector<unsigned int> FixedMultiIndexSet<Kokkos::HostSpace>::IndexToMulti(un
     return output;
 }
 
+std::vector<unsigned int> CompressedNonzeroDiagonalEntries(
+    const Kokkos::View<unsigned int*, Kokkos::HostSpace> &nzStarts,
+    const Kokkos::View<unsigned int*, Kokkos::HostSpace> &nzDims,
+    unsigned int dim) {
+    std::vector<unsigned int> output;
+    for(unsigned int midx = 0; midx < nzStarts.extent(0)-1; midx++){
+        if(nzStarts(midx) == nzStarts(midx+1)) continue;
+        if(nzDims(nzStarts(midx+1)-1) == dim-1) output.push_back(midx);
+    }
+    return output;
+}
+
+std::vector<unsigned int> UncompressedNonzeroDiagonalEntries(
+    const Kokkos::View<unsigned int*, Kokkos::HostSpace> &orders,
+    unsigned int dim) {
+    std::vector<unsigned int> output;
+    for(unsigned int midx = 0; midx < orders.extent(0)/dim; midx++){
+        bool isDiagonal = orders((midx+1)*dim-1) > 0;
+        if(isDiagonal) output.push_back(midx);
+    }
+    return output;
+}
+
+template<typename MemorySpace>
+std::vector<unsigned int> FixedMultiIndexSet<MemorySpace>::NonzeroDiagonalEntries() const
+{
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> h_nzStarts = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), nzStarts);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> h_nzDims = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), nzDims);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> h_nzOrders = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), nzOrders);
+    if(isCompressed) {
+        return CompressedNonzeroDiagonalEntries(h_nzStarts, h_nzDims, this->dim);
+    } else {
+        return UncompressedNonzeroDiagonalEntries(h_nzOrders, this->dim);
+    }
+}
 
 template<typename MemorySpace>
 int FixedMultiIndexSet<MemorySpace>::MultiToIndex(std::vector<unsigned int> const& multi) const
@@ -297,6 +333,26 @@ int FixedMultiIndexSet<MemorySpace>::MultiToIndex(std::vector<unsigned int> cons
         return -1;
 
     }
+}
+
+template<typename MemorySpace>
+MultiIndexSet FixedMultiIndexSet<MemorySpace>::Unfix() const
+{
+    if(!isCompressed)
+        throw std::runtime_error("MultiIndexSet must be compressed to unfix");
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> h_nzStarts = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), nzStarts);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> h_nzDims = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), nzDims);
+    Kokkos::View<unsigned int*, Kokkos::HostSpace> h_nzOrders = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), nzOrders);
+    MultiIndexSet output (this->dim);
+    for(int term = 0; term < h_nzStarts.extent(0)-1; term++){
+        unsigned int start = h_nzStarts(term);
+        unsigned int end = h_nzStarts(term+1);
+        auto nzIndTerm = Kokkos::subview(h_nzDims, Kokkos::pair<unsigned int, unsigned int>(start, end));
+        auto nzValTerm = Kokkos::subview(h_nzOrders, Kokkos::pair<unsigned int, unsigned int>(start, end));
+        MultiIndex midx_term {nzIndTerm, nzValTerm, this->dim};
+        output.AddActive(midx_term);
+    }
+    return output;
 }
 
 template<typename MemorySpace>

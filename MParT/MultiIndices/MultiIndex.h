@@ -6,6 +6,8 @@
 #include <vector>
 
 #include <Eigen/Core>
+#include <Kokkos_Core.hpp>
+#include <iostream>
 
 namespace mpart {
 
@@ -49,6 +51,17 @@ public:
             }
         }
     }
+
+    /**
+     * @brief Construct a new Multi Index object from a set of nonzero indices and values
+     * 
+     * @param nzIndsIn indices of the nonzero values
+     * @param nzValsIn values that are nonzero
+     * @param lengthIn dimension of the index (numNz==lengthIn iff all values are nonzero)
+     */
+    MultiIndex(Kokkos::View<unsigned int*, Kokkos::HostSpace> const& nzIndsIn,
+        Kokkos::View<unsigned int*, Kokkos::HostSpace> const& nzValsIn,
+        unsigned int lengthIn);
 
     /** Uses a dense vector description of the multiindex, defined through a pointer,
         and extracts the nonzero components.

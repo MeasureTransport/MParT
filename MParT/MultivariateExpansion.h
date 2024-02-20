@@ -211,6 +211,8 @@ namespace mpart{
             Kokkos::fence();
         }
 
+        std::vector<unsigned int> DiagonalCoeffIndices() const { return worker.NonzeroDiagonalEntries(); }
+
     private:
 
         MultivariateExpansionWorker<BasisEvaluatorType, MemorySpace> worker;
