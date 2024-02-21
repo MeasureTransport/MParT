@@ -15,7 +15,8 @@ template<typename Function>
 void TestSigmoidGradients(Function Sigmoid, unsigned int N_grad_points, double fd_delta) {
     Kokkos::View<double*, MemorySpace> gradPts("Gradient points", N_grad_points);
     Kokkos::View<double*, MemorySpace> gradPts_plus_delta("Gradient points plus delta", N_grad_points);
-    Kokkos::parallel_for(N_grad_points, KOKKOS_LAMBDA(unsigned int point_index) {
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy {0u, N_grad_points};
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(unsigned int point_index) {
         double gradPt = 3.0*(-1.0 + 2*((double) point_index)/((double) N_grad_points-1));
         gradPts(point_index) = gradPt;
         gradPts_plus_delta(point_index) = gradPt + fd_delta;

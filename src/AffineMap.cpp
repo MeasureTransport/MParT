@@ -56,7 +56,8 @@ template<typename MemorySpace>
 void AffineMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const double, MemorySpace> const& pts,
                                                 StridedVector<double, MemorySpace>              output)
 {
-    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy{0,output.size()};
+    unsigned int N = output.size();
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy{0u, N};
 
     Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& i) {
         output(i) = logDet_;

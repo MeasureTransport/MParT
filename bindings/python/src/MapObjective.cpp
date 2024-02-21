@@ -30,7 +30,7 @@ void mpart::binding::MapObjectiveWrapper(py::module &m) {
 
     py::class_<KLObjective<MemorySpace>, MapObjective<MemorySpace>, std::shared_ptr<KLObjective<MemorySpace>>>(m, t2Name.c_str());
     m.def(mName.c_str(), [](Eigen::Ref<Eigen::MatrixXd> &train, unsigned int dim){
-            StridedMatrix<const double, MemorySpace> trainView = MatToKokkos<double, MemorySpace>(train);
+            StridedMatrix<const double, MemorySpace> trainView = RowMatToKokkos<double, MemorySpace>(train);
             Kokkos::View<double**,MemorySpace> storeTrain ("Training data store", trainView.extent(0), trainView.extent(1));
             Kokkos::deep_copy(storeTrain, trainView);
             trainView = storeTrain;

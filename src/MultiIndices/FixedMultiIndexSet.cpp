@@ -194,7 +194,8 @@ FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int                
 {
     DimensionSorter<MemorySpace> dimSort {nzStarts, nzDims, nzOrders};
     // Sort so that nzDims increases for each multiindex
-    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy{0, nzStarts.extent(0)-1};
+    unsigned int N_midxs = nzStarts.extent(0) - 1;
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy{0lu, N_midxs};
     Kokkos::parallel_for(policy, dimSort);
 
     CalculateMaxDegrees();

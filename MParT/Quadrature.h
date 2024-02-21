@@ -9,6 +9,8 @@
 
 #include <Eigen/Core>
 
+#include "MParT/Utilities/KokkosSpaceMappings.h"
+
 #if defined(MPART_HAS_CEREAL)
 #include <cereal/access.hpp>
 #include <cereal/types/base_class.hpp>
@@ -353,8 +355,8 @@ struct GetRuleFunctor{
 template<typename MemorySpace>
 inline ClenshawCurtisQuadrature<MemorySpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim) : QuadratureBase<MemorySpace>(maxDim,maxDim),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
 {
-    // TODO: Add parallel for loop here with one thread to make sure rule is filled in the correct space
-    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(numPts, pts_.data(), wts_.data()));
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy {0,1};
+    Kokkos::parallel_for(policy, GetRuleFunctor<MemorySpace>(numPts, pts_.data(), wts_.data()));
 };
 
 template<>
@@ -367,8 +369,8 @@ inline ClenshawCurtisQuadrature<Kokkos::HostSpace>::ClenshawCurtisQuadrature(uns
 template<typename MemorySpace>
 inline ClenshawCurtisQuadrature<MemorySpace>::ClenshawCurtisQuadrature(unsigned int numPts, unsigned int maxDim, double* workspace) : QuadratureBase<MemorySpace>(maxDim,maxDim,workspace),  pts_("Points", numPts), wts_("Weights", numPts), numPts_(numPts)
 {
-    // TODO: Add parallel for loop here with one thread to make sure rule is filled in the correct space
-    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(numPts, pts_.data(), wts_.data()));
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy {0,1};
+    Kokkos::parallel_for(policy, GetRuleFunctor<MemorySpace>(numPts, pts_.data(), wts_.data()));
 };
 
 template<>
@@ -1020,9 +1022,9 @@ inline AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int 
                                                             fineWts_("Coarse Pts", std::pow(2,level+1)+1)
 {
     assert(std::pow(2,level)+1 >=3);
-
-    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(std::pow(2,level)+1, coarsePts_.data(), coarseWts_.data()));
-    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(std::pow(2,level+1)+1, finePts_.data(), fineWts_.data()));
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy {0,1};
+    Kokkos::parallel_for(policy, GetRuleFunctor<MemorySpace>(std::pow(2,level)+1, coarsePts_.data(), coarseWts_.data()));
+    Kokkos::parallel_for(policy, GetRuleFunctor<MemorySpace>(std::pow(2,level+1)+1, finePts_.data(), fineWts_.data()));
 };
 
 template<>
@@ -1060,9 +1062,9 @@ inline AdaptiveClenshawCurtis<MemorySpace>::AdaptiveClenshawCurtis(unsigned int 
                                                             fineWts_("Coarse Pts", std::pow(2,level+1)+1)
 {
     assert(std::pow(2,level)+1 >=3);
-
-    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(std::pow(2,level)+1, coarsePts_.data(), coarseWts_.data()));
-    Kokkos::parallel_for(1, GetRuleFunctor<MemorySpace>(std::pow(2,level+1)+1, finePts_.data(), fineWts_.data()));
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy {0, 1};
+    Kokkos::parallel_for(policy, GetRuleFunctor<MemorySpace>(std::pow(2,level)+1, coarsePts_.data(), coarseWts_.data()));
+    Kokkos::parallel_for(policy, GetRuleFunctor<MemorySpace>(std::pow(2,level+1)+1, finePts_.data(), fineWts_.data()));
 };
 
 template<>
