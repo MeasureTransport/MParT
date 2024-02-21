@@ -44,7 +44,7 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
         .def("GetBaseFunction", &ConditionalMapBase<MemorySpace>::GetBaseFunction)
 #if defined(MPART_HAS_CEREAL)
         .def(py::pickle(
-            [](std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> const& ptr) { // __getstate__
+            [](std::shared_ptr<ConditionalMapBase<MemorySpace>> const& ptr) { // __getstate__
                 std::stringstream ss;
                 ptr->Save(ss);
                 return py::bytes(ss.str());
@@ -54,12 +54,12 @@ void mpart::binding::ConditionalMapBaseWrapper(py::module &m)
                 std::stringstream ss;
                 ss.str(input);
 
-                auto ptr = std::dynamic_pointer_cast<ConditionalMapBase<Kokkos::HostSpace>>(ParameterizedFunctionBase<Kokkos::HostSpace>::Load(ss));
+                auto ptr = std::dynamic_pointer_cast<ConditionalMapBase<MemorySpace>>(ParameterizedFunctionBase<MemorySpace>::Load(ss));
                 return ptr;
             }
         ))
 #endif
-        ;
+    ;
 
 }
 

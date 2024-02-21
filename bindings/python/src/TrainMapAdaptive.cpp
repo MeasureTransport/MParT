@@ -58,5 +58,6 @@ void mpart::binding::TrainMapAdaptiveWrapper(py::module &m) {
 
 template void mpart::binding::TrainMapAdaptiveWrapper<Kokkos::HostSpace>(py::module&);
 #if defined(MPART_ENABLE_GPU)
-template void mpart::binding::TrainMapAdaptiveWrapper<mpart::DeviceSpace>(py::module&);
+// TODO: Implement TrainMap for GPU
+// template void mpart::binding::TrainMapAdaptiveWrapper<mpart::DeviceSpace>(py::module&);
 #endif // MPART_ENABLE_GPU
