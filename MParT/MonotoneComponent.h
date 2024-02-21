@@ -141,7 +141,7 @@ public:
             "sens: (" << sensRows << "," << sensCols << "), expected: " << this->outputDim << ", " << ptsCols << "), "
             << "pts: (" << ptsRows << "," << ptsCols << "), expected: (" << this->inputDim << "," << ptsCols << "), "
             << "output: (" << outputRows << "," << outputCols << "), expected: (" << expectedOutputRows << "," << ptsCols << ")";
-            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+            ProcAgnosticError<std::invalid_argument>(ss.str().c_str());
         }
     }
 
@@ -262,7 +262,7 @@ public:
             std::stringstream ss;
             ss << "EvaluateImpl: output has incorrect number of columns. "
             << "Expected: " << pts.extent(1) << ", got " << output.extent(0);
-            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+            ProcAgnosticError<std::invalid_argument>(ss.str().c_str());
         }
 
         // Ask the expansion how much memory it would like for its one-point cache
@@ -663,7 +663,7 @@ public:
                << "jacobian: (" << jacRows << "," << jacCols << "), expected: (" << expectJacRows << "," << expectJacCols << "), ";
             if(expectEvalRows > 0)
                 ss << "evaluations: (" << evalRows << "), expected: (" << expectEvalRows << ")";
-            ProcAgnosticError<MemorySpace,std::invalid_argument>::error(ss.str().c_str());
+            ProcAgnosticError<std::invalid_argument>(ss.str().c_str());
         }
     }
 
