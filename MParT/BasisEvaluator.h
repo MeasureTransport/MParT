@@ -161,7 +161,6 @@ template <typename BasisEvaluatorType>
 class BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
   public:
   BasisEvaluator(unsigned int, BasisEvaluatorType const &basis1d = BasisEvaluatorType()) : basis1d_(basis1d) {}
-
   /**
    * @brief Helper function to construct a new Basis Evaluator object
    *
@@ -222,8 +221,7 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
   public:
   BasisEvaluator(
       unsigned int dim,
-      Kokkos::pair<OffdiagEvaluatorType,
-      DiagEvaluatorType> const &basis1d = Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType>())
+      Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType> const &basis1d)
       : offdiag_(basis1d.first), diag_(basis1d.second), dim_(dim) {}
 
   /**
