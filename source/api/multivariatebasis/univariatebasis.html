@@ -569,7 +569,7 @@ document.write(`
 
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4I000EN5mpart9Sigmoid1dE">
-<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SigmoidType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">SigmoidTypes</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Logistic</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EdgeType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">SoftPlus</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_sigmoid1d"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sigmoid1d</span></span></span><a class="headerlink" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="Permalink to this definition">#</a><br /></dt>
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SigmoidType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">SigmoidTypeSpace</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Logistic</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EdgeType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">SoftPlus</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_sigmoid1d"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sigmoid1d</span></span></span><a class="headerlink" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Class to represent univariate function space spanned by sigmoids. Order should generally be &gt;= 4. </p>
 <p>This class stores functions of the form <div class="math notranslate nohighlight">
 \[f_{k}(x;\mathbf{c},\mathbf{b},\mathbf{w})=b_0+b_1(x-c_1)+w_2g(-b_2(x-c_2))+w_3g(b_3(x-c_3))+\sum_{j=4}^kw_js(b_j(x-c_j))\]</div>
@@ -581,7 +581,7 @@ document.write(`
 <dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>MemorySpace</strong> – Where the (nonlinear) parameters are stored </p></li>
-<li><p><strong>SigmoidType</strong> – Class defining eval, SigmoidTypes</p></li>
+<li><p><strong>SigmoidType</strong> – Class defining eval, SigmoidTypeSpace</p></li>
 </ul>
 </dd>
 </dl>
@@ -675,6 +675,15 @@ document.write(`
 <dd class="field-odd"><p>int </p>
 </dd>
 </dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9Sigmoid1d13LengthToOrderEi">
+<span class="target" id="classmpart_1_1_sigmoid1d_1a01a13f4827a9529602a841107f975b92"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LengthToOrder</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart9Sigmoid1d13LengthToOrderEi" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Given the length of centers, return the number of sigmoid levels. </p>
 </dd></dl>
 
 </div>
