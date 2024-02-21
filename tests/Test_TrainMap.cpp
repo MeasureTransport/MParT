@@ -3,6 +3,7 @@
 #include "MParT/MapFactory.h"
 #include "MParT/MapObjective.h"
 #include "MParT/TrainMap.h"
+#include "MParT/Utilities/KokkosSpaceMappings.h"
 #include "MParT/Distributions/GaussianSamplerDensity.h"
 
 // For testing the normality of the pushforward
@@ -11,17 +12,19 @@
 using namespace mpart;
 using namespace Catch;
 
+using MemorySpace = Kokkos::HostSpace;
+
 TEST_CASE("Test_TrainMap", "[TrainMap]") {
     unsigned int seed = 42;
     unsigned int dim = 2;
     unsigned int numPts = 5000;
     unsigned int testPts = numPts / 5;
-    auto sampler = std::make_shared<GaussianSamplerDensity<Kokkos::HostSpace>>(3);
+    auto sampler = std::make_shared<GaussianSamplerDensity<MemorySpace>>(3);
     sampler->SetSeed(seed);
     auto samples = sampler->Sample(numPts);
     Kokkos::View<double**, Kokkos::HostSpace> targetSamples("targetSamples", 3, numPts);
-    double max = 0;
-    Kokkos::parallel_for("Banana", numPts, KOKKOS_LAMBDA(const unsigned int i) {
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy {0u, numPts};
+    Kokkos::parallel_for("Banana", policy, KOKKOS_LAMBDA(const unsigned int i) {
         targetSamples(0,i) = samples(0,i);
         targetSamples(1,i) = samples(1,i);
         targetSamples(2,i) = samples(2,i) + samples(1,i)*samples(1,i);

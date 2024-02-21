@@ -40,8 +40,9 @@ PYBIND11_MODULE(pympart, m) {
     MapFactoryWrapper<mpart::DeviceSpace>(m);
     AffineMapWrapperDevice(m);
     AffineFunctionWrapperDevice(m);
-    IdentityMapWrapper<Kokkos::DeviceSpace>(m);
-    SerializeWrapper<mpart::DeviceSpace>(m);
+    IdentityMapWrapper<mpart::DeviceSpace>(m);
+#if defined(MPART_HAS_CEREAL)
     DeserializeWrapper<mpart::DeviceSpace>(m);
+#endif
 #endif
 }

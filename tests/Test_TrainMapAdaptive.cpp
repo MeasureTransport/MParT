@@ -10,6 +10,7 @@ using namespace Catch;
 
 #include "MParT/Utilities/LinearAlgebra.h"
 #include "Distributions/Test_Distributions_Common.h"
+using MemorySpace = Kokkos::HostSpace;
 
 void NormalizeSamples(StridedMatrix<double, Kokkos::HostSpace> mat) {
     using MemorySpace = Kokkos::HostSpace;
@@ -154,7 +155,8 @@ TEST_CASE("Adaptive Transport Map","[ATM]") {
     // }
     SECTION("TraditionalBananaOneComp") {
         Kokkos::View<double**, Kokkos::HostSpace> targetSamples("targetSamples", 2, numPts);
-        Kokkos::parallel_for("Intializing targetSamples", numPts, KOKKOS_LAMBDA(const unsigned int i){
+        Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy {0u, numPts};
+        Kokkos::parallel_for("Intializing targetSamples", policy, KOKKOS_LAMBDA(const unsigned int i){
             targetSamples(0,i) = samples(0,i);
             targetSamples(1,i) = samples(1,i) + samples(0,i)*samples(0,i);
         });
