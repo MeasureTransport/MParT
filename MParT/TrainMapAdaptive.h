@@ -39,6 +39,11 @@ struct ATMOptions: public MapOptions, public TrainOptions {
 
         return ss.str();
     }
+
+    ATMOptions() = default;
+
+    ATMOptions(MapOptions mapOpts, TrainOptions trainOpts, MultiIndex maxDegrees_, unsigned int maxPatience_, unsigned int maxSize_) :
+        MapOptions(mapOpts), TrainOptions(trainOpts), maxDegrees(maxDegrees_), maxPatience(maxPatience_), maxSize(maxSize_) {}
 };
 
 /**

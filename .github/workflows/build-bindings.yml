@@ -114,7 +114,9 @@ jobs:
 
       - name: Setup Matlab Tests
         continue-on-error: true
+        shell: bash -l {0}
         run: |
+          export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH
           sed -i "1s|^|addpath(genpath(\'$GITHUB_WORKSPACE/MPART_INSTALL\'))\n|" $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
           cat $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
 

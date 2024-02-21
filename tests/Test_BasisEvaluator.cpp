@@ -60,7 +60,7 @@ struct NegativeEvaluator: public TestEvaluators {
 };
 
 TEST_CASE( "Testing basis evaluators", "[BasisEvaluators]") {
-    int dim = 3;
+    unsigned int dim = 3;
     const int max_order = 3;
     const double point = 2.3049201;
     double out[max_order+1];

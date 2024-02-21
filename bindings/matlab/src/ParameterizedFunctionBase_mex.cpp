@@ -43,11 +43,7 @@ MEX_DEFINE(ParameterizedFunction_newMap) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 1);
   unsigned int outputDim = input.get<unsigned int>(0);
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(1));
-  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(2),input.get<std::string>(3),
-                                         input.get<std::string>(4),input.get<double>(5),
-                                         input.get<double>(6),input.get<unsigned int>(7),
-                                         input.get<unsigned int>(8),input.get<unsigned int>(9),
-                                         input.get<bool>(10),input.get<double>(11),input.get<double>(12),input.get<bool>(13),input.get<double>(14));
+  MapOptions opts = MapOptionsFromMatlab(input, 2);
 
   output.set(0, Session<ParameterizedFunctionMex>::create(new ParameterizedFunctionMex(outputDim,mset.Fix(),opts)));
 }
@@ -209,11 +205,7 @@ MEX_DEFINE(MapOptions_Serialize) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 1);
 
   std::string filename = input.get<std::string>(0);
-  MapOptions opts = MapOptionsFromMatlab(input.get<std::string>(1),input.get<std::string>(2),
-                                         input.get<std::string>(3),input.get<double>(4),
-                                         input.get<double>(5),input.get<unsigned int>(6),
-                                         input.get<unsigned int>(7),input.get<unsigned int>(8),
-                                         input.get<bool>(9),input.get<double>(10),input.get<double>(11),input.get<bool>(12),input.get<double>(13));
+  MapOptions opts = MapOptionsFromMatlab(input, 1);
   std::ofstream os (filename);
   cereal::BinaryOutputArchive oarchive(os);
   oarchive(opts);

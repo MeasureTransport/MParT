@@ -28,6 +28,14 @@ void mpart::binding::MapOptionsWrapper(jlcxx::Module &mod) {
     mod.set_const("__AdaptiveSimpson", QuadTypes::AdaptiveSimpson);
     mod.set_const("__AdaptiveClenshawCurtis", QuadTypes::AdaptiveClenshawCurtis);
 
+    // SigmoidTypes
+    mod.add_bits<SigmoidTypes>("__SigmoidTypes", jlcxx::julia_type("CppEnum"));
+    mod.set_const("__Logistic", SigmoidTypes::Logistic);
+
+    // EdgeTypes: TODO: SoftPlus overlaps with PosFuncTypes, needs to be fixed
+    // mod.add_bits<EdgeTypes>("__EdgeTypes", jlcxx::julia_type("CppEnum"));
+    // mod.set_const("__SoftPlus", EdgeTypes::SoftPlus);
+
     // MapOptions
     mod.add_type<MapOptions>("__MapOptions")
         .method("__basisType!", [](MapOptions &opts, unsigned int basis){ opts.basisType = static_cast<BasisTypes>(basis); })
@@ -36,6 +44,9 @@ void mpart::binding::MapOptionsWrapper(jlcxx::Module &mod) {
         .method("__basisNorm!", [](MapOptions &opts, bool shouldNorm){ opts.basisNorm = shouldNorm; })
         .method("__posFuncType!", [](MapOptions &opts, unsigned int f){ opts.posFuncType = static_cast<PosFuncTypes>(f); })
         .method("__quadType!", [](MapOptions &opts, unsigned int quad){ opts.quadType = static_cast<QuadTypes>(quad); })
+        .method("__sigmoidType!", [](MapOptions &opts, unsigned int sig){ opts.sigmoidType = static_cast<SigmoidTypes>(sig); })
+        .method("__edgeType!", [](MapOptions &opts, unsigned int edge){ opts.edgeType = static_cast<EdgeTypes>(edge); })
+        .method("__edgeShape!", [](MapOptions &opts, double width){ opts.edgeShape = width; })
         .method("__quadAbsTol!", [](MapOptions &opts, double tol){ opts.quadAbsTol = tol; })
         .method("__quadRelTol!", [](MapOptions &opts, double tol){ opts.quadRelTol = tol; })
         .method("__quadMaxSub!", [](MapOptions &opts, unsigned int sub){ opts.quadMaxSub = sub; })
