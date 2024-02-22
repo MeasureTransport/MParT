@@ -17,16 +17,17 @@
 
 namespace cereal {
     template <typename ScalarType, typename Archive, typename... Traits>
-    std::enable_if_t<traits::is_output_serializable<BinaryData<ScalarType>, Archive>::value && (std::is_same_v<Traits, Kokkos::HostSpace> || ...), void> save(
+    std::enable_if_t<traits::is_output_serializable<BinaryData<ScalarType>, Archive>::value, void> save(
         Archive &ar, Kokkos::View<ScalarType*, Traits...> const &vec) {
-        Kokkos::View<ScalarType*,Traits...> vec_h = vec;
+        Kokkos::View<ScalarType*,Traits...> vec_d = vec;
         static_assert(!(std::is_same_v<Traits, Kokkos::LayoutStride> || ...), "LayoutStride not supported");
 
         std::string name = vec.label();
         ar(name);
 
-        unsigned int sz = vec_h.extent(0);
+        unsigned int sz = vec_d.extent(0);
         ar(sz);
+        auto vec_h = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), vec_d);
 
         if(sz>0){
             ar(binary_data(vec_h.data(), sz * sizeof(std::remove_cv_t<ScalarType>)));
@@ -34,7 +35,7 @@ namespace cereal {
     }
 
     template<typename ScalarType, typename Archive, typename... Traits>
-    std::enable_if_t<traits::is_input_serializable<BinaryData<ScalarType>, Archive>::value && (std::is_same_v<Traits, Kokkos::HostSpace> || ...), void> load(
+    std::enable_if_t<traits::is_input_serializable<BinaryData<ScalarType>, Archive>::value, void> load(
         Archive &ar, Kokkos::View<ScalarType*, Traits...> &vec) {
         static_assert(!(std::is_same_v<Traits, Kokkos::LayoutStride> || ...), "LayoutStride not supported");
         
@@ -42,12 +43,16 @@ namespace cereal {
         ar(name);
         unsigned int sz;
         ar(sz);
-        Kokkos::View<ScalarType*,Traits...> vec_h (name, sz);
+        
+        Kokkos::View<ScalarType*,Traits...> vec_d (name, sz);
+        auto vec_h = Kokkos::create_mirror_view(Kokkos::HostSpace(), vec_d);
 
         if(sz>0){
             ar(binary_data(vec_h.data(), sz * sizeof(ScalarType)));
         }
-        vec = std::move(vec_h);
+        Kokkos::deep_copy(vec_d, vec_h);
+        vec = std::move(vec_d);
+
     }
 
     template<typename ScalarType, typename Archive, typename... Traits>

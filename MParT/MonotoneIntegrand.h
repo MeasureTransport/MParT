@@ -183,7 +183,7 @@ public:
         // Check for infs or nans
         if(std::isinf(gf)){
             if(failOnNaN) {
-                ProcAgnosticError<MemorySpace,std::runtime_error>::error("MonotoneIntegrand: nan was encountered in value of g(df(...)). Use MonotoneIntegrand::setFailOnNaN for enabling NaN propagation.");
+                ProcAgnosticError<std::runtime_error>("MonotoneIntegrand: nan was encountered in value of g(df(...)). Use MonotoneIntegrand::setFailOnNaN for enabling NaN propagation.");
             } else {
                 printf("\nERROR: In MonotoneIntegrand, value of g(df(...)) is inf.  The value of df(...) is %0.4f, and the value of f(df(...)) is %0.4f.\n\n", df, gf);
             }

@@ -16,8 +16,8 @@ namespace py = pybind11;
 using namespace mpart;
 using namespace mpart::binding;
 
-template<>
-void mpart::binding::DeserializeWrapper<Kokkos::HostSpace>(py::module &m)
+template<typename MemorySpace>
+void mpart::binding::DeserializeWrapper<MemorySpace>(py::module &m)
 {
     m.def("DeserializeMap",
     [](std::string const &filename) {
@@ -25,8 +25,13 @@ void mpart::binding::DeserializeWrapper<Kokkos::HostSpace>(py::module &m)
         cereal::BinaryInputArchive archive(is);
         unsigned int inputDim, outputDim, numCoeffs;
         archive(inputDim, outputDim, numCoeffs);
-        Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Map coeffs", numCoeffs);
+        Kokkos::View<double*, MemorySpace> coeffs ("Map coeffs", numCoeffs);
         load(archive, coeffs);
         return std::make_tuple(inputDim, outputDim, CopyKokkosToVec(coeffs));
     });
 }
+
+template void mpart::binding::DeserializeWrapper<Kokkos::HostSpace>(py::module&);
+#if defined(MPART_ENABLE_GPU)
+template void mpart::binding::DeserializeWrapper<mpart::DeviceSpace>(py::module&);
+#endif

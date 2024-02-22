@@ -30,15 +30,15 @@ void mpart::binding::MapObjectiveWrapper(py::module &m) {
 
     py::class_<KLObjective<MemorySpace>, MapObjective<MemorySpace>, std::shared_ptr<KLObjective<MemorySpace>>>(m, t2Name.c_str());
     m.def(mName.c_str(), [](Eigen::Ref<Eigen::MatrixXd> &train, unsigned int dim){
-            StridedMatrix<const double, MemorySpace> trainView = RowMatToKokkos<double, MemorySpace>(train);
+            StridedMatrix<const double, MemorySpace> trainView = ConstRowMatToKokkos<double, MemorySpace>(train);
             Kokkos::View<double**,MemorySpace> storeTrain ("Training data store", trainView.extent(0), trainView.extent(1));
             Kokkos::deep_copy(storeTrain, trainView);
             trainView = storeTrain;
             return ObjectiveFactory::CreateGaussianKLObjective(trainView, dim);
         }, "train"_a, "dim"_a = 0)
         .def(mName.c_str(), [](Eigen::Ref<Eigen::MatrixXd> &trainEig, Eigen::Ref<Eigen::MatrixXd> &testEig, unsigned int dim){
-            StridedMatrix<const double, MemorySpace> trainView = MatToKokkos<double, MemorySpace>(trainEig);
-            StridedMatrix<const double, MemorySpace> testView = MatToKokkos<double, MemorySpace>(testEig);
+            StridedMatrix<const double, MemorySpace> trainView = ConstColMatToKokkos<double, MemorySpace>(trainEig);
+            StridedMatrix<const double, MemorySpace> testView = ConstColMatToKokkos<double, MemorySpace>(testEig);
             Kokkos::View<double**,MemorySpace> storeTrain ("Training data store", trainView.extent(0), trainView.extent(1));
             Kokkos::View<double**,MemorySpace> storeTest ("Testing data store", testView.extent(0), testView.extent(1));
             Kokkos::deep_copy(storeTrain, trainView);
