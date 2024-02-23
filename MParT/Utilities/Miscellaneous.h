@@ -30,23 +30,6 @@ namespace mpart{
         );
         }
 
-
-    /** Provides a mechanism for raising exceptions in CPU code where recovery is possible 
-        and assertions in GPU code where exceptions aren't alllowed.
-     */
-    // template<typename MemorySpace, typename ErrorType>
-    // struct ProcAgnosticError {
-    //     KOKKOS_INLINE_FUNCTION static void error(const char*) {
-    //         KOKKOS_ASSERT(false);
-    //     }
-    // };
-
-    // template<typename ErrorType>
-    // struct ProcAgnosticError<Kokkos::HostSpace, ErrorType> {
-    //     static void error(const char* message) {
-    //         throw ErrorType(message);
-    //     }
-    // };
 }
 
 #endif
