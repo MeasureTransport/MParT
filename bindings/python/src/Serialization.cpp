@@ -17,7 +17,7 @@ using namespace mpart;
 using namespace mpart::binding;
 
 template<typename MemorySpace>
-void mpart::binding::DeserializeWrapper<MemorySpace>(py::module &m)
+void mpart::binding::DeserializeWrapper(py::module &m)
 {
     m.def("DeserializeMap",
     [](std::string const &filename) {
