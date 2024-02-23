@@ -26,7 +26,8 @@ template<typename ViewType1, typename ViewType2>
 void AddInPlace(ViewType1 x, ViewType2 y) {
     constexpr size_t rank = GetViewRank<ViewType1>::Rank;
     if constexpr(rank == 1) {
-        Kokkos::parallel_for(x.extent(0), KOKKOS_LAMBDA(const int i){x(i) += y(i);});
+        Kokkos::RangePolicy<typename ViewType1::execution_space> policy(0,x.extent(0));
+        Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i){x(i) += y(i);});
     } else if (rank == 2) {
         Kokkos::MDRangePolicy<Kokkos::Rank<2>,typename ViewType1::execution_space> policy({0, 0}, {x.extent(0), x.extent(1)});
         Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i, const int j){x(i, j) += y(i, j);});

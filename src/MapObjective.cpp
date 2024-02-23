@@ -59,8 +59,9 @@ double KLObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const 
     StridedVector<double, MemorySpace> densityX = pullback.LogDensity(data);
     StridedMatrix<double, MemorySpace> densityGradX = pullback.LogDensityCoeffGrad(data);
     double sumDensity = 0.;
-    
-    Kokkos::parallel_reduce ("Sum Negative Log Likelihood", N_samps, KOKKOS_LAMBDA (const int i, double &sum) {
+   
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0,N_samps); 
+    Kokkos::parallel_reduce ("Sum Negative Log Likelihood", policy, KOKKOS_LAMBDA (const int i, double &sum) {
         sum -= densityX(i);
     }, sumDensity);
 
@@ -94,7 +95,8 @@ double KLObjective<MemorySpace>::ObjectiveImpl(StridedMatrix<const double, Memor
     PullbackDensity<MemorySpace> pullback {map, density_};
     StridedVector<double, MemorySpace> densityX = pullback.LogDensity(data);
     double sumDensity = 0.;
-    Kokkos::parallel_reduce ("Sum Negative Log Likelihood", N_samps, KOKKOS_LAMBDA (const int i, double &sum) {
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0,N_samps); 
+    Kokkos::parallel_reduce ("Sum Negative Log Likelihood", policy, KOKKOS_LAMBDA (const int i, double &sum) {
         sum -= densityX(i);
     }, sumDensity);
     return sumDensity/N_samps;

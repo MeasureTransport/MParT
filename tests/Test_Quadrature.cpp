@@ -333,7 +333,6 @@ TEST_CASE( "Testing CC Quadrature on device", "[ClenshawCurtisDevice]" ) {
     unsigned int numRepeats = 320;
 
     // Set tolerance for tests
-    double testTol = 1e-8;
     double lb = 0;
     double ub = 1.0;
 
@@ -383,7 +382,6 @@ TEST_CASE( "Testing Adaptive Simpson Quadrature on device", "[AdaptiveSimpsonDev
     double absTol = 1e-6;
     
     // Set tolerance for tests
-    double testTol = 1e-4;
     double lb = 0;
     double ub = 1.0;
 
@@ -432,7 +430,6 @@ TEST_CASE( "Testing Adaptive Clenshaw Curtis on device", "[AdaptiveCCDevice]" ) 
     unsigned int order = 8;
 
     // Set tolerance for tests
-    double testTol = 1e-4;
     double lb = 0;
     double ub = 1.0;
 

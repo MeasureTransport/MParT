@@ -4,6 +4,7 @@
 
 #include "MParT/PositiveBijectors.h"
 #include "MParT/Utilities/ArrayConversions.h"
+#include "MParT/Utilities/KokkosSpaceMappings.h"
 
 using namespace mpart;
 using namespace Catch;
@@ -50,10 +51,11 @@ TEST_CASE( "Testing soft plus function on device.", "[SofPlusDevice]" ) {
 
     auto xs_device = ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(xs_host);
 
-    Kokkos::View<double*,Kokkos::DefaultExecutionSpace::memory_space> ys_device("ys_device", xs_host.extent(0));
-    Kokkos::View<double*,Kokkos::DefaultExecutionSpace::memory_space> deriv_device("deriv_device", xs_host.extent(0));
-    
-    Kokkos::parallel_for(xs_host.size(), KOKKOS_LAMBDA(const size_t ind){
+    unsigned int N_p = xs_host.extent(0);
+    Kokkos::View<double*,DeviceSpace> ys_device("ys_device", N_p);
+    Kokkos::View<double*,DeviceSpace> deriv_device("deriv_device", N_p);
+    Kokkos::RangePolicy<typename MemoryToExecution<DeviceSpace>::Space> policy {0u, N_p};
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const size_t ind){
         ys_device(ind) = SoftPlus::Evaluate(xs_device(ind));
         deriv_device(ind) = SoftPlus::Derivative(xs_device(ind));
     });

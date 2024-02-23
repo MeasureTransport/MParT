@@ -70,7 +70,7 @@ TEST_CASE( "RootFindingUtils", "[RootFindingUtils]") {
         CHECK(info==0);
     }
     SECTION("Test Inverse Flat") {
-        double xd = 0.5, yd = 0.0;
+        double yd = 0.0;
         double x0 = 0.0, xtol = 1e-5, ftol = 1e-5;
         auto f = [](double x){return -1.0;};
         int info = 0;

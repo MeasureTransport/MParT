@@ -47,8 +47,10 @@ public:
      * @param X The points where we want to evaluate the log density.
      * @return Matrix \f$A\in\mathbb{R}^{m\times n}\f$ containing the log density at each point.
      */
-    template<typename AnyMemorySpace>
-    StridedVector<double, AnyMemorySpace> LogDensity(StridedMatrix<const double, AnyMemorySpace> const &X);
+    StridedVector<double, MemorySpace> LogDensity(StridedMatrix<const double, MemorySpace> const &X);
+    #if defined(MPART_ENABLE_GPU)
+    StridedVector<double, std::conditional_t< std::is_same_v<MemorySpace, Kokkos::HostSpace> , DeviceSpace, Kokkos::HostSpace> > LogDensity(StridedMatrix<const double, std::conditional_t< std::is_same_v<MemorySpace, Kokkos::HostSpace> , DeviceSpace, Kokkos::HostSpace > > const &X);
+    #endif
 
     /**
      * @brief Computes the log density at the given points.
@@ -66,8 +68,10 @@ public:
      * @param X The points where we want to evaluate the gradient log density.
      * @return A matrix \f$A\in\mathbb{R}^{m\times n}\f$ containing the gradient of the log density at each point.
      */
-    template<typename AnyMemorySpace>
-    StridedMatrix<double, AnyMemorySpace> LogDensityInputGrad(StridedMatrix<const double, AnyMemorySpace> const &X);
+    StridedMatrix<double, MemorySpace> LogDensityInputGrad(StridedMatrix<const double, MemorySpace> const &X);
+    #if defined(MPART_ENABLE_GPU)
+    StridedMatrix<double, std::conditional_t< std::is_same_v<MemorySpace, Kokkos::HostSpace> , DeviceSpace, Kokkos::HostSpace> > LogDensityInputGrad(StridedMatrix<const double, std::conditional_t< std::is_same_v<MemorySpace, Kokkos::HostSpace> , DeviceSpace, Kokkos::HostSpace > > const &X);
+    #endif
 
     /**
      * @brief Returns the input dimension of the density

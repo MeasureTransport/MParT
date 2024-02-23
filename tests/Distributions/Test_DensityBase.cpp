@@ -27,10 +27,7 @@ TEST_CASE( "Testing Custom Uniform Density", "[UniformDensity]" ) {
 
     SECTION("LogDensityInputGradImpl") {
         Kokkos::View<double**, Kokkos::HostSpace> output ("output", 2, N_pts);
-        Kokkos::parallel_for( "initialize output", N_pts, KOKKOS_LAMBDA (const int& j) {
-            output(0,j) = -3.;
-            output(1,j) = -3.;
-        });
+        Kokkos::deep_copy(output, -3.);
         density->LogDensityInputGradImpl(pts, output);
         for(unsigned int j = 0; j < N_pts; ++j) {
             REQUIRE(output(0,j) == Approx(0.));

@@ -295,7 +295,8 @@ double PartialPivLU<mpart::DeviceSpace>::determinant() const
 {
     assert(isComputed);
     double det = 1.0;
-    Kokkos::parallel_reduce(LU_.extent(0), KOKKOS_CLASS_LAMBDA (const int& i, double& lprod) {
+    Kokkos::RangePolicy<typename MemoryToExecution<mpart::DeviceSpace>::Space> policy(0, LU_.extent(0));
+    Kokkos::parallel_reduce(policy, KOKKOS_CLASS_LAMBDA (const int& i, double& lprod) {
         lprod *= LU_(i,i);
     },Kokkos::Prod<double>(det));
 
@@ -473,7 +474,8 @@ double Cholesky<mpart::DeviceSpace>::determinant() const
 {
     assert(isComputed);
     double det = 1.0;
-    Kokkos::parallel_reduce(LLT_.extent(0), KOKKOS_CLASS_LAMBDA (const int& i, double& lprod) {
+    Kokkos::RangePolicy<typename MemoryToExecution<mpart::DeviceSpace>::Space> policy(0, LLT_.extent(0));
+    Kokkos::parallel_reduce(policy, KOKKOS_CLASS_LAMBDA (const int& i, double& lprod) {
         lprod *= LLT_(i,i);
     },Kokkos::Prod<double>(det));
     return det*det;

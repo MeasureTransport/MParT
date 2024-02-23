@@ -11,6 +11,8 @@
 using namespace mpart;
 using namespace Catch;
 
+using MemorySpace = Kokkos::HostSpace;
+
 TEST_CASE( "Testing Pullback/Pushforward sampling", "[PullbackPushforwardSampler]") {
     unsigned int dim = 2;
     unsigned int N_samp = 10000;
@@ -41,7 +43,7 @@ TEST_CASE( "Testing Pullback/Pushforward sampling", "[PullbackPushforwardSampler
         auto pullbackSamples = pullback.Sample(N_samp);
 
         // Calculate the pullback and pushforward density error
-        auto policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {N_samp, dim});
+        auto policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space>({0, 0}, {N_samp, dim});
         Kokkos::parallel_for("Normalize Pullback Samples", policy, KOKKOS_LAMBDA(const int j, const int i) {
             pullbackSamples(i,j) *= diag_el;
             pullbackSamples(i,j) += mean;
@@ -58,7 +60,7 @@ TEST_CASE( "Testing Pullback/Pushforward sampling", "[PullbackPushforwardSampler
         auto pushforwardSamples = pushforward.Sample(N_samp);
 
         // Calculate the pullback and pushforward density error
-        auto policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>>({0, 0}, {N_samp, dim});
+        auto policy = Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space>({0, 0}, {N_samp, dim});
         Kokkos::parallel_for("Normalize Samples", policy, KOKKOS_LAMBDA(const int j, const int i) {
             pushforwardSamples(i,j) -= mean;
             pushforwardSamples(i,j) /= diag_el;

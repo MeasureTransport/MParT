@@ -51,7 +51,7 @@ namespace mpart {
             @param coeffs A view containing the coefficients to copy.
         */
        virtual void SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs);
-       void SetCoeffs(Kokkos::View<double*, MemorySpace> coeffs);
+               void SetCoeffs(Kokkos::View<      double*, MemorySpace> coeffs);
 
 
         /** @brief Wrap the internal coefficient view around another view.
@@ -64,8 +64,8 @@ namespace mpart {
 
         #if defined(MPART_ENABLE_GPU)
         virtual void SetCoeffs(Kokkos::View<const double*, std::conditional_t<std::is_same_v<Kokkos::HostSpace,MemorySpace>, mpart::DeviceSpace, Kokkos::HostSpace>> coeffs);
-	virtual void SetCoeffs(Kokkos::View<double*, std::conditional_t<std::is_same_v<Kokkos::HostSpace,MemorySpace>, mpart::DeviceSpace, Kokkos::HostSpace>> coeffs);
-	#endif
+	            void SetCoeffs(Kokkos::View<      double*, std::conditional_t<std::is_same_v<Kokkos::HostSpace,MemorySpace>, mpart::DeviceSpace, Kokkos::HostSpace>> coeffs);
+	    #endif
 
         /** SetCoeffs function with conversion from Eigen to Kokkos vector types.*/
         virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs);

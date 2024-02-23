@@ -3,6 +3,7 @@
 
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
+#include "MParT/Utilities/GPUtils.h"
 
 using namespace mpart;
 
@@ -41,7 +42,7 @@ TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedM
     nzDims(3) = 1; nzOrders(3)=2; // The 2 in [1,2]
 
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, nzStarts, nzDims, nzOrders);
-
+    
     CHECK(mset.nzDims(3)>mset.nzDims(2));
     CHECK(mset.nzOrders(3)==2);
     CHECK(mset.nzOrders(2)==1);
@@ -52,12 +53,12 @@ TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedM
     nzDims(1) = 1; nzOrders(1)=1; // [0,1]
     nzDims(2) = 1; nzOrders(2)=2; // The 2 in [1,2]
     nzDims(3) = 0; nzOrders(3)=1; // The 1 in [1,2].  Internal to the FixedMultiIndexSet, this should come before 2.
-    
+
     FixedMultiIndexSet<Kokkos::HostSpace> mset2(dim, nzStarts, nzDims, nzOrders);
 
-    CHECK(mset.nzDims(3)>mset.nzDims(2));
-    CHECK(mset.nzOrders(3)==2);
-    CHECK(mset.nzOrders(2)==1);
+    CHECK(mset2.nzDims(3)>mset2.nzDims(2));
+    CHECK(mset2.nzOrders(3)==2);
+    CHECK(mset2.nzOrders(2)==1);
     
 }
 
@@ -102,7 +103,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class with anisotropic degrees", "[An
 }
 
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined( MPART_ENABLE_GPU)
 
 TEST_CASE( "Testing the FixedMultiIndexSet class copy to device", "[FixedMultiIndexSet]" ) {
 
@@ -111,7 +112,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class copy to device", "[FixedMultiIn
 
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim,maxOrder);
 
-    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> deviceSet = mset.ToDevice<Kokkos::DefaultExecutionSpace::memory_space>();
+    FixedMultiIndexSet<DeviceSpace> deviceSet = mset.ToDevice<DeviceSpace>();
 
 }
 #endif

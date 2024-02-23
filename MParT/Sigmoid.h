@@ -127,7 +127,7 @@ class Sigmoid1d {
 			ss << "Sigmoid basis evaluation order too large.\n";
 			ss << "Given order " << max_order << ", ";
 			ss << "can only evaluate up to order " << order_;
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+			ProcAgnosticError< std::invalid_argument>(
 				ss.str().c_str());
 		}
 
@@ -171,7 +171,7 @@ class Sigmoid1d {
 			ss << "Sigmoid basis evaluation order too large.\n";
 			ss << "Given order " << max_order << ", ";
 			ss << "can only evaluate up to order " << order_;
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+			ProcAgnosticError< std::invalid_argument>(
 				ss.str().c_str());
 		}
 
@@ -226,7 +226,7 @@ class Sigmoid1d {
 			ss << "Sigmoid basis evaluation order too large.\n";
 			ss << "Given order " << max_order << ", ";
 			ss << "can only evaluate up to order " << order_;
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+			ProcAgnosticError< std::invalid_argument>(
 				ss.str().c_str());
 		}
 
@@ -289,14 +289,14 @@ class Sigmoid1d {
 			ss << "centers: " << centers_.extent(0) << ", \n";
 			ss << "widths: " << widths_.extent(0) << ",\n";
 			ss << "weights: " << weights_.extent(0) << "\n";
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+			ProcAgnosticError< std::invalid_argument>(
 				ss.str().c_str());
 		}
 		if (centers_.extent(0) < 2) {
 			std::stringstream ss;
 			ss << "Sigmoid: centers/widths/weights too short.\n";
 			ss << "Length should be of form 2+(1+2+3+...+n) for some order n>=0";
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+			ProcAgnosticError< std::invalid_argument>(
 				ss.str().c_str());
 		}
 		int n_sigmoid_centers = centers_.extent(0) - 2;
@@ -309,7 +309,7 @@ class Sigmoid1d {
 			std::stringstream ss;
 			ss << "Incorrect length of centers/widths/weights.";
 			ss << "Length should be of form 2+(1+2+3+...+n) for some order n";
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+			ProcAgnosticError< std::invalid_argument>(
 				ss.str().c_str());
 		}
 		// one added for affine part of this, two added for edge terms
