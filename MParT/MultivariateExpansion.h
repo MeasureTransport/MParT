@@ -42,8 +42,8 @@ namespace mpart{
         virtual ~MultivariateExpansion() = default;
 
 
-        void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
-                          StridedMatrix<double, MemorySpace>              output) override
+        virtual void EvaluateImpl(StridedMatrix<const double, MemorySpace> const& pts,
+                                  StridedMatrix<double, MemorySpace>              output) override
         {
             using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
             
@@ -93,9 +93,9 @@ namespace mpart{
             Kokkos::fence();
         }
 
-        void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                          StridedMatrix<const double, MemorySpace> const& sens,
-                          StridedMatrix<double, MemorySpace>              output) override
+        virtual void GradientImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                                  StridedMatrix<const double, MemorySpace> const& sens,
+                                  StridedMatrix<double, MemorySpace>              output) override
         {
             using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
             
@@ -153,9 +153,9 @@ namespace mpart{
         }
 
 
-        void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                           StridedMatrix<const double, MemorySpace> const& sens,
-                           StridedMatrix<double, MemorySpace>              output) override
+        virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
+                                   StridedMatrix<const double, MemorySpace> const& sens,
+                                   StridedMatrix<double, MemorySpace>              output) override
         {
             using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
             
