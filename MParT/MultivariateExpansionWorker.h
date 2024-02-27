@@ -106,6 +106,8 @@ public:
         cacheSize_ = ToHost(dCacheSize)(0);
     };
 
+    MultivariateExpansionWorker(MultivariateExpansionWorker const& other) = default;
+
     /**
      @brief Returns the size of the cache needed to evaluate the expansion (in terms of number of doubles).
      @return unsigned int  The length of the required cache vector.
@@ -149,8 +151,9 @@ public:
 
         // Evaluate all degrees of all 1d polynomials except the last dimension, which will be evaluated inside the integrand
         }else{
-            for(unsigned int d=0; d<dim_-1; ++d)
+            for(unsigned int d=0; d<dim_-1; ++d) {
                 basis1d_.EvaluateAll(d, &polyCache[startPos_(d)], maxDegrees_(d), pt(d));
+            }
         }
     }
 
@@ -172,21 +175,21 @@ public:
                                     double           xd,
                                     DerivativeFlags::DerivativeType derivType) const
     {
-
+        // No derivative in x_d
         if((derivType==DerivativeFlags::None)||(derivType==DerivativeFlags::Parameters)){
 
             basis1d_.EvaluateAll(dim_-1,
                                  &polyCache[startPos_(dim_-1)],
                                  maxDegrees_(dim_-1),
                                  xd);
-
-        }else if((derivType==DerivativeFlags::Diagonal) || (derivType==DerivativeFlags::Input)){
+        // First derivative in x_d
+        }else if((derivType==DerivativeFlags::Diagonal) || (derivType==DerivativeFlags::Input) || (derivType==DerivativeFlags::MixedCoeff)){
             basis1d_.EvaluateDerivatives(dim_ - 1,                          // input dimension
                                          &polyCache[startPos_(dim_-1)],     // basis vals
                                          &polyCache[startPos_(2*dim_-1)],   // basis derivatives
                                          maxDegrees_(dim_-1),               // largest basis degree
                                          xd);                               // point to evaluate at
-
+        // Second derivative in x_d
         }else if((derivType==DerivativeFlags::Diagonal2) || (derivType==DerivativeFlags::MixedInput)){
             basis1d_.EvaluateSecondDerivatives(dim_ - 1,                          // input dimension
                                                &polyCache[startPos_(dim_-1)],     // basis vals
@@ -364,7 +367,7 @@ public:
     }
 
     /** Computes the gradient of the diagonal derivative \f$\nabla_w \partial_d f(x_1:d; w)\f$ with respect to the parameters.
-        @param polyCache[in] Cache vector that has been set up by calling both FillCache1 and FillCache2 with `DerivativeFlags::Mixed`
+        @param polyCache[in] Cache vector that has been set up by calling both FillCache1 and FillCache2 with `DerivativeFlags::MixedCoeff`
         @param coeffs[in] Vector of coefficients.  Must have parentheses access operator.
         @param grad[out] Preallocated vector to hold the gradient.
         @return The value of $\partial_d f(x_{1:d})$.
@@ -422,9 +425,8 @@ private:
         // Compute the value of this term in the expansion
         double termVal = 1.0;
         unsigned int end_idx = multiSet_.nzStarts(termInd+1)-1;
-        for(unsigned int i=multiSet_.nzStarts(termInd); i<end_idx; ++i)
+        for(unsigned int i=multiSet_.nzStarts(termInd); i<end_idx; ++i) 
             termVal *= polyCache[startPos_(multiSet_.nzDims(i)) + multiSet_.nzOrders(i)];
-        
         double lastVal = polyCache[startPos_(multiSet_.nzDims(end_idx)) + multiSet_.nzOrders(end_idx)];
         if constexpr(!std::is_same_v<Rectifier,Identity>){
             if(multiSet_.nzDims(end_idx)==dim_-1){

@@ -962,7 +962,7 @@ public:
 
                 // Create the integrand g( \partial_D f(x_1,...,x_{D-1},t))
                 Kokkos::View<double*,MemorySpace> integrandWork(team_member.thread_scratch(1), numTerms);
-                MonotoneIntegrand<ExpansionType, PosFuncType,  decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::Mixed, nugget_, integrandWork);
+                MonotoneIntegrand<ExpansionType, PosFuncType,  decltype(pt), decltype(coeffs), MemorySpace> integrand(cache.data(), expansion_, pt, coeffs, DerivativeFlags::MixedCoeff, nugget_, integrandWork);
 
                 // Compute \int_0^x g( \partial_D f(x_1,...,x_{D-1},t)) dt as well as the gradient of this term wrt the coefficients of f
                 quad_.Integrate(workspace.data(), integrand, 0, 1, integral.data());

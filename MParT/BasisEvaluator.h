@@ -160,8 +160,7 @@ struct GetRectifier<BasisEvaluator<HowHomogeneous, BasisEvaluatorType, Rectifier
 template <typename BasisEvaluatorType>
 class BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
   public:
-  BasisEvaluator(unsigned int, BasisEvaluatorType const &basis1d) : basis1d_(basis1d) {}
-
+  BasisEvaluator(unsigned int, BasisEvaluatorType const &basis1d = BasisEvaluatorType()) : basis1d_(basis1d) {}
   /**
    * @brief Helper function to construct a new Basis Evaluator object
    *
@@ -232,8 +231,8 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
    * @param offdiag Evaluator for offdiagonal input elements
    * @param diag Evaluator for diagonal input element
    */
-  BasisEvaluator(unsigned int dim, OffdiagEvaluatorType const &offdiag,
-                 DiagEvaluatorType const &diag)
+  BasisEvaluator(unsigned int dim, OffdiagEvaluatorType const &offdiag = OffdiagEvaluatorType(),
+                 DiagEvaluatorType const &diag = DiagEvaluatorType())
       : offdiag_(offdiag), diag_(diag), dim_(dim) {}
 
   // EvaluateAll(dim, output, max_order, input)
