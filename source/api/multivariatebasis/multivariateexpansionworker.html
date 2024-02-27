@@ -588,6 +588,11 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerERK27MultivariateExpansionWorker">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a58cddb092dbaeae7d36fa3c70712a4f3"></span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansionWorker</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerERK27MultivariateExpansionWorker" title="mpart::MultivariateExpansionWorker::MultivariateExpansionWorker"><span class="n"><span class="pre">MultivariateExpansionWorker</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerERK27MultivariateExpansionWorker" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK5mpart27MultivariateExpansionWorker9CacheSizeEv">
 <span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a0982eac6e1b8a05821178bab64daafb5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CacheSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart27MultivariateExpansionWorker9CacheSizeEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns the size of the cache needed to evaluate the expansion (in terms of number of doubles). </p>
@@ -758,7 +763,7 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>polyCache[in]</strong> – Cache vector that has been set up by calling both FillCache1 and FillCache2 with <code class="docutils literal notranslate"><span class="pre">DerivativeFlags::Mixed</span></code></p></li>
+<li><p><strong>polyCache[in]</strong> – Cache vector that has been set up by calling both FillCache1 and FillCache2 with <code class="docutils literal notranslate"><span class="pre">DerivativeFlags::MixedCoeff</span></code></p></li>
 <li><p><strong>coeffs[in]</strong> – Vector of coefficients. Must have parentheses access operator. </p></li>
 <li><p><strong>grad[out]</strong> – Preallocated vector to hold the gradient. </p></li>
 </ul>
