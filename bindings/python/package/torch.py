@@ -1,9 +1,6 @@
 import torch
-import dill 
-
 from .torch_helpers import ExtractTorchTensorData, MpartTorchAutograd
         
-
 
 class TorchParameterizedFunctionBase(torch.nn.Module):
     """ Defines a wrapper around the MParT ParameterizedFunctionBase class that
