@@ -427,9 +427,11 @@ document.write(`
 </li>
 <li class="toctree-l1"><a class="reference internal" href="utilities/linearalgebra.html">Linear Algebra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="utilities/kokkoswrappers.html">Kokkos Array Conversions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="templateconcepts.html">Template Concepts</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="concepts/cachedparameterization.html">Cached Parameterization Concept</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="multivariatebasis/multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tensorproductfunction.html">Tensor Product Function</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="concepts/parameterizedfunction.html">Parameterized Function Concept</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -443,12 +445,6 @@ document.write(`
 <li class="toctree-l1 has-children"><a class="reference internal" href="maptraining.html">Map Training</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="maptraining/trainmap.html">Train Map</a></li>
 <li class="toctree-l2"><a class="reference internal" href="maptraining/trainmapadaptive.html">Adaptive Map Training</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="multivariatebasis.html">Multivariate Basis Evaluation</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="multivariatebasis/univariatebasis.html">Univariate Bases</a></li>
-<li class="toctree-l2"><a class="reference internal" href="multivariatebasis/basisevaluator.html">Basis Evaluators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="multivariatebasis/multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 </ul>
 </li>
 </ul>
@@ -549,7 +545,7 @@ document.write(`
 <dt class="sig sig-object cpp" id="_CPPv4I0EN5mpart10MapFactory20CreateSingleEntryMapENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjRKNSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEE">
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacempart_1_1_map_factory_1af6c59fe268827e12f5d40a8a7697e7b3"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="conditionalmapbase.html#_CPPv4I0EN5mpart18ConditionalMapBaseE" title="mpart::ConditionalMapBase"><span class="n"><span class="pre">ConditionalMapBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN5mpart10MapFactory20CreateSingleEntryMapENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjRKNSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEE" title="mpart::MapFactory::CreateSingleEntryMap::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CreateSingleEntryMap</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dim</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">activeInd</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="conditionalmapbase.html#_CPPv4I0EN5mpart18ConditionalMapBaseE" title="mpart::ConditionalMapBase"><span class="n"><span class="pre">ConditionalMapBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN5mpart10MapFactory20CreateSingleEntryMapENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjRKNSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEE" title="mpart::MapFactory::CreateSingleEntryMap::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">comp</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN5mpart10MapFactory20CreateSingleEntryMapENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjRKNSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Creates a square triangular map that is an identity in all but one output dimension. </p>
-<p>Constructs a “Single entry” map, which is an identity for all but one output dimension. The active output dimension is defined by a given component.</p>
+<p>Constructs a (generally) non-monotone multivariate expansion.</p>
 <p>Given a dimension <span class="math notranslate nohighlight">\(d\)</span>, an active index <span class="math notranslate nohighlight">\(i\)</span>, and a real-valued map <span class="math notranslate nohighlight">\(f:\mathbb{R}^d\rightarrow\mathbb{R}\)</span>, this function creates a map <span class="math notranslate nohighlight">\(T:\mathbb{R}^d\rightarrow\mathbb{R}^d\)</span> such that <span class="math notranslate nohighlight">\(T_j(x) = x_j\)</span> for all <span class="math notranslate nohighlight">\(j\neq i\)</span> and <span class="math notranslate nohighlight">\(T_i(x) = f(x)\)</span>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -557,9 +553,9 @@ document.write(`
 <li><p><strong>dim</strong> – The dimension of the map. </p></li>
 <li><p><strong>activeInd</strong> – The index of the component to be non-identity. </p></li>
 <li><p><strong>comp</strong> – The component placed the activeInd.</p></li>
-<li><p><strong>dim</strong> – The dimension of the mapping </p></li>
-<li><p><strong>activeInd</strong> – Which output dimension is “active”, i.e., not identity </p></li>
-<li><p><strong>comp</strong> – The component that will be used for the active output dimension. </p></li>
+<li><p><strong>outputDim</strong> – The output dimension of the expansion. Each output will be defined by the same multiindex set but will have different coefficients. </p></li>
+<li><p><strong>mset</strong> – The multiindex set specifying which terms should be used in the multivariate expansion. </p></li>
+<li><p><strong>options</strong> – Options specifying the 1d basis functions used in the parameterization. </p></li>
 </ul>
 </dd>
 </dl>
@@ -593,35 +589,6 @@ document.write(`
 <li><p><strong>mset</strong> – The multiindex set specifying which terms should be used in the multivariate expansion. </p></li>
 <li><p><strong>options</strong> – Options specifying the 1d basis functions used in the parameterization. </p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4I0EN5mpart10MapFactory22CreateSigmoidExpansionENSt10shared_ptrI25ParameterizedFunctionBaseI11MemorySpaceEEEj13StridedVectorId11MemorySpaceE10MapOptions">
-<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacempart_1_1_map_factory_1a903870a0644178ae228b503434506564"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="parameterizedfunctionbase.html#_CPPv4I0EN5mpart25ParameterizedFunctionBaseE" title="mpart::ParameterizedFunctionBase"><span class="n"><span class="pre">ParameterizedFunctionBase</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidExpansionENSt10shared_ptrI25ParameterizedFunctionBaseI11MemorySpaceEEEj13StridedVectorId11MemorySpaceE10MapOptions" title="mpart::MapFactory::CreateSigmoidExpansion::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CreateSigmoidExpansion</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">inputDim</span></span>, <span class="n"><span class="pre">StridedVector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidExpansionENSt10shared_ptrI25ParameterizedFunctionBaseI11MemorySpaceEEEj13StridedVectorId11MemorySpaceE10MapOptions" title="mpart::MapFactory::CreateSigmoidExpansion::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centers</span></span>, <a class="reference internal" href="#_CPPv4N5mpart10MapOptionsE" title="mpart::MapOptions"><span class="n"><span class="pre">MapOptions</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">opts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidExpansionENSt10shared_ptrI25ParameterizedFunctionBaseI11MemorySpaceEEEj13StridedVectorId11MemorySpaceE10MapOptions" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>Create a <a class="reference internal" href="multivariateexpansion.html#classmpart_1_1_multivariate_expansion"><span class="std std-ref">MultivariateExpansion</span></a> using a sigmoid object; INTERNAL USE ONLY. </p>
-<p>Using the parameters described in <code class="docutils literal notranslate"></code> <code class="docutils literal notranslate"><span class="pre">opts</span></code>, this function creates a “multivariate expansion” object that uses a collection of sigmoid functions to map the input space to the output space. The pertinent options are<ul class="simple">
-<li><p><code class="docutils literal notranslate"></code> <code class="docutils literal notranslate"><span class="pre">opts.basisType</span></code> : The type of basis function to use in the expansion for the first <span class="math notranslate nohighlight">\(d-1\)</span> inputs</p></li>
-<li><p><code class="docutils literal notranslate"></code> <code class="docutils literal notranslate"><span class="pre">opts.posFuncType</span></code> : The type of positive function to use in the rectified basis <a class="reference internal" href="multivariatebasis/multivariateexpansionworker.html#classmpart_1_1_multivariate_expansion_worker"><span class="std std-ref">MultivariateExpansionWorker</span></a></p></li>
-<li><p><code class="docutils literal notranslate"></code> <code class="docutils literal notranslate"><span class="pre">opts.edgeWidth</span></code> : The width of the “edge terms” on the last input <a class="reference internal" href="multivariatebasis/univariatebasis.html#classmpart_1_1_sigmoid1d"><span class="std std-ref">Sigmoid1d</span></a></p></li>
-<li><p><code class="docutils literal notranslate"></code> <code class="docutils literal notranslate"><span class="pre">opts.sigmoidType</span></code> : The type of sigmoid function to use in the expansion <a class="reference internal" href="multivariatebasis/univariatebasis.html#classmpart_1_1_sigmoid1d"><span class="std std-ref">Sigmoid1d</span></a></p></li>
-</ul>
-</p>
-<p>By default, this constructs a total-order multi-index set. Note that, since the basis evaluator is rectified, this <em>will always</em> be a positive-valued function in the first <span class="math notranslate nohighlight">\(d-1\)</span> inputs. As such, this factory function is largely for internal testing.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>MemorySpace</strong> – </p>
-</dd>
-<dt class="field-even">Parameters<span class="colon">:</span></dt>
-<dd class="field-even"><ul class="simple">
-<li><p><strong>inputDim</strong> – </p></li>
-<li><p><strong>centers</strong> – </p></li>
-<li><p><strong>opts</strong> – </p></li>
-</ul>
-</dd>
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>std::shared_ptr&lt;ParameterizedFunctionBase&lt;MemorySpace&gt;&gt; </p>
 </dd>
 </dl>
 </dd></dl>
@@ -688,24 +655,6 @@ document.write(`
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions9basisTypeE">
 <span class="target" id="structmpart_1_1_map_options_1a731d5a7dacbb6cfcf9fb5eebd8e82a5a"></span><a class="reference internal" href="#_CPPv4N5mpart10BasisTypesE" title="mpart::BasisTypes"><span class="n"><span class="pre">BasisTypes</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">basisType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N5mpart10BasisTypesE" title="mpart::BasisTypes"><span class="n"><span class="pre">BasisTypes</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N5mpart10BasisTypes18ProbabilistHermiteE" title="mpart::BasisTypes::ProbabilistHermite"><span class="n"><span class="pre">ProbabilistHermite</span></span></a><a class="headerlink" href="#_CPPv4N5mpart10MapOptions9basisTypeE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>The type of 1d basis function used to define the multivariate expansion. </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions11sigmoidTypeE">
-<span class="target" id="structmpart_1_1_map_options_1ad09a35e1702123e2d589935be855138e"></span><span class="n"><span class="pre">SigmoidTypes</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sigmoidType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">SigmoidTypes</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Logistic</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions11sigmoidTypeE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>The type of sigmoid we want to use to define the diagonal of a rectified multivariate expansion </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions8edgeTypeE">
-<span class="target" id="structmpart_1_1_map_options_1a28147d0ca72eb5b1b38156632b7ab611"></span><span class="n"><span class="pre">EdgeTypes</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">edgeType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">EdgeTypes</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">SoftPlus</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions8edgeTypeE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>The type of edge terms to use with sigmoids </p>
-</dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions9edgeShapeE">
-<span class="target" id="structmpart_1_1_map_options_1afef053f7fe7b85e4d178a21891ed926c"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">edgeShape</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1.5</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions9edgeShapeE" title="Permalink to this definition">#</a><br /></dt>
-<dd><p>The “shape” of the edge terms in a sigmoid expansion (larger is “sharper” edge terms) </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -778,34 +727,6 @@ document.write(`
 <span class="target" id="structmpart_1_1_map_options_1a45504704a5d136c9c7aabbe1b9507f64"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nugget</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0.0</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions6nuggetE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>The minimum slope of the monotone component. This nugget is added to the g(df) integrand. Must be non-negative. </p>
 </dd></dl>
-
-</div>
-<div class="breathe-sectiondef docutils container">
-<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions6btypesE">
-<span class="target" id="structmpart_1_1_map_options_1acdcbf5b1471190ab0cd57bc12bdeb8d3"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">btypes</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="s"><span class="pre">&quot;ProbabilistHermite&quot;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;PhysicistHermite&quot;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;HermiteFunctions&quot;</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions6btypesE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions7pftypesE">
-<span class="target" id="structmpart_1_1_map_options_1adae13c904f9ca45439029d3f9f7a7ee5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">pftypes</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">2</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="s"><span class="pre">&quot;Exp&quot;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;SoftPlus&quot;</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions7pftypesE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions6qtypesE">
-<span class="target" id="structmpart_1_1_map_options_1a1cf3c93a32c5be81ce7e01f49af4931b"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qtypes</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="s"><span class="pre">&quot;ClenshawCurtis&quot;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;AdaptiveSimpson&quot;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">&quot;AdaptiveClenshawCurtis&quot;</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions6qtypesE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions6etypesE">
-<span class="target" id="structmpart_1_1_map_options_1acabd04bb177587eef27955160006de4f"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">etypes</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="s"><span class="pre">&quot;SoftPlus&quot;</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions6etypesE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart10MapOptions6stypesE">
-<span class="target" id="structmpart_1_1_map_options_1a7860aa2970e34fbdf2af73ff7e8c5a90"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stypes</span></span></span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="p"><span class="pre">{</span></span><span class="s"><span class="pre">&quot;Logistic&quot;</span></span><span class="p"><span class="pre">}</span></span><a class="headerlink" href="#_CPPv4N5mpart10MapOptions6stypesE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
 
 </div>
 </dd></dl>

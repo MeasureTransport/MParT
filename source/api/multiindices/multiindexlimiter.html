@@ -427,9 +427,11 @@ document.write(`
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/linearalgebra.html">Linear Algebra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/kokkoswrappers.html">Kokkos Array Conversions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../templateconcepts.html">Template Concepts</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/cachedparameterization.html">Cached Parameterization Concept</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../multivariatebasis/multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../tensorproductfunction.html">Tensor Product Function</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/parameterizedfunction.html">Parameterized Function Concept</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -443,12 +445,6 @@ document.write(`
 <li class="toctree-l1 has-children"><a class="reference internal" href="../maptraining.html">Map Training</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../maptraining/trainmap.html">Train Map</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../maptraining/trainmapadaptive.html">Adaptive Map Training</a></li>
-</ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../multivariatebasis.html">Multivariate Basis Evaluation</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/univariatebasis.html">Univariate Bases</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/basisevaluator.html">Basis Evaluators</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 </ul>
 </li>
 </ul>
@@ -565,15 +561,6 @@ document.write(`
 </dd></dl>
 
 <dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter28NonzeroDiagTotalOrderLimiterE">
-<span class="target" id="classmpart_1_1_multi_index_limiter_1_1_nonzero_diag_total_order_limiter"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NonzeroDiagTotalOrderLimiter</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter28NonzeroDiagTotalOrderLimiterE" title="Permalink to this definition">#</a><br /></dt>
-<dd><div class="docutils container">
-<em>#include &lt;MultiIndexLimiter.h&gt;</em></div>
-<p>Same as <a class="reference internal" href="#classmpart_1_1_multi_index_limiter_1_1_total_order"><span class="std std-ref">TotalOrder</span></a>, except without any term that has nonzero diagonal entries. </p>
-<p>This limter only allows terms that satisfy <span class="math notranslate nohighlight">\(\|\mathbf{j}\|_1\leq p_U\)</span>, where <span class="math notranslate nohighlight">\(\mathbf{j}\)</span> is the multiindex, and <span class="math notranslate nohighlight">\(p_U\)</span> is a nonnegative integer passed to the constructor of this class. </p>
-</dd></dl>
-
-<dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter2OrE">
 <span class="target" id="classmpart_1_1_multi_index_limiter_1_1_or"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Or</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter2OrE" title="Permalink to this definition">#</a><br /></dt>
 <dd><div class="docutils container">
@@ -581,11 +568,6 @@ document.write(`
 <p>Combines two limiters through an OR operation. </p>
 <p>This class will return true if either of the limiters given to the constructor return true. </p>
 </dd></dl>
-
-<dl class="cpp class">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter19SeparableTotalOrderE">
-<span class="target" id="classmpart_1_1_multi_index_limiter_1_1_separable_total_order"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SeparableTotalOrder</span></span></span><a class="headerlink" href="#_CPPv4N5mpart17MultiIndexLimiter19SeparableTotalOrderE" title="Permalink to this definition">#</a><br /></dt>
-<dd></dd></dl>
 
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart17MultiIndexLimiter10TotalOrderE">
