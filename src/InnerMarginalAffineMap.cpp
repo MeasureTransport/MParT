@@ -20,9 +20,9 @@ InnerMarginalAffineMap<MemorySpace>::InnerMarginalAffineMap(StridedVector<double
     Kokkos::deep_copy(scale_, scale);
     Kokkos::deep_copy(shift_, shift);
     if (scale_.size() != shift_.size())
-        ProcAgnosticError<MemorySpace, std::runtime_error>::error("InnerMarginalAffineMap: scale and shift must have the same size");
+        ProcAgnosticError<MemorySpace, std::runtime_error>("InnerMarginalAffineMap: scale and shift must have the same size");
     if (scale_.size() != map->inputDim)
-        ProcAgnosticError<MemorySpace, std::runtime_error>::error("InnerMarginalAffineMap: scale and shift must have the same size as the input dimension of the map");
+        ProcAgnosticError<MemorySpace, std::runtime_error>("InnerMarginalAffineMap: scale and shift must have the same size as the input dimension of the map");
 
     logDet_ = 0.;
     Kokkos::parallel_reduce("InnerMarginalAffineMap logdet", scale.extent(0), KOKKOS_LAMBDA(const int&i, double& ldet){
@@ -45,7 +45,8 @@ void InnerMarginalAffineMap<MemorySpace>::LogDeterminantImpl(StridedMatrix<const
         tmp(i,j) = pts(i,j)*scale_(i) + shift_(i);
     });
     map_->LogDeterminantImpl(tmp, output);
-    Kokkos::parallel_for("InnerMarginalAffineMap LogDeterminant", output.size(), KOKKOS_CLASS_LAMBDA(const int& i) {
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy1d {0, output.size()};
+    Kokkos::parallel_for("InnerMarginalAffineMap LogDeterminant", policy1d, KOKKOS_CLASS_LAMBDA(const int& i) {
         output(i) += logDet_;
     });
 }
