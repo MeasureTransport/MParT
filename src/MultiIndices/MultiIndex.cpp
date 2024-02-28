@@ -1,4 +1,5 @@
 #include "MParT/MultiIndices/MultiIndex.h"
+#include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -54,6 +55,25 @@ MultiIndex::MultiIndex(std::initializer_list<unsigned int> const& indIn) : Multi
   }
 }
 
+MultiIndex::MultiIndex(Kokkos::View<unsigned int*, Kokkos::HostSpace> const& nzIndsIn,
+        Kokkos::View<unsigned int*, Kokkos::HostSpace> const& nzValsIn,
+        unsigned int lengthIn): length(lengthIn), maxValue(0), totalOrder(0) {
+    unsigned int numNz = nzIndsIn.size();
+    if(numNz != nzValsIn.size()){
+        std::stringstream ss;
+        ss << "MultiIndex::MultiIndex: nzIndsIn and nzValsIn must have the same number"
+            << "of elements.  Found " << numNz << " and " << nzValsIn.size() << " elements.";
+        throw std::runtime_error(ss.str().c_str());
+    }
+    for(unsigned int i=0; i<numNz; ++i){
+        if(nzValsIn(i)>0){
+            nzInds.push_back(nzIndsIn(i));
+            nzVals.push_back(nzValsIn(i));
+            maxValue = std::max<unsigned int>(maxValue, nzValsIn(i));
+            totalOrder += nzValsIn(i);
+        }
+    }
+}
 
 std::vector<unsigned int>MultiIndex::Vector() const
 {

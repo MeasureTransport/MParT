@@ -27,6 +27,16 @@ namespace mpart{
         AdaptiveClenshawCurtis
     };
 
+    enum class SigmoidTypes
+    {
+        Logistic
+    };
+
+    enum class EdgeTypes
+    {
+        SoftPlus
+    };
+
     /** @brief struct to hold options used by the MapFactory methods to construct monotone components and triangular maps.
         @details
 
@@ -48,6 +58,15 @@ namespace mpart{
     {
         /** The type of 1d basis function used to define the multivariate expansion. */
         BasisTypes basisType = BasisTypes::ProbabilistHermite;
+
+        /** The type of sigmoid we want to use to define the diagonal of a rectified multivariate expansion */
+        SigmoidTypes sigmoidType = SigmoidTypes::Logistic;
+
+        /** The type of edge terms to use with sigmoids */
+        EdgeTypes edgeType = EdgeTypes::SoftPlus;
+
+        /** The "shape" of the edge terms in a sigmoid expansion (larger is "sharper" edge terms)*/
+        double edgeShape = 1.5;
 
         /** Linearization bounds for the 1d basis function. The basis function is linearized outside [lb,ub] */
         double basisLB = -std::numeric_limits<double>::infinity();
@@ -112,6 +131,8 @@ namespace mpart{
             ret &= (basisType   == opts2.basisType);
             ret &= (basisLB     == opts2.basisLB);
             ret &= (basisUB     == opts2.basisUB);
+            ret &= (edgeType    == opts2.edgeType);
+            ret &= (sigmoidType == opts2.sigmoidType);
             ret &= (posFuncType == opts2.posFuncType);
             ret &= (quadType    == opts2.quadType);
             ret &= (quadAbsTol  == opts2.quadAbsTol);
@@ -126,13 +147,12 @@ namespace mpart{
         }
 
         virtual std::string String() {
-            std::string btypes[3] = {"ProbabilistHermite", "PhysicistHermite", "HermiteFunctions"};
-            std::string pftypes[2] = {"Exp", "SoftPlus"};
-            std::string qtypes[3] = {"ClenshawCurtis", "AdaptiveSimpson", "AdaptiveClenshawCurtis"};
             std::stringstream ss;
             ss << "basisType = " << btypes[static_cast<unsigned int>(basisType)] << "\n";
             ss << "basisLB = " << basisLB << "\n";
             ss << "basisUB = " << basisUB << "\n";
+            ss << "edgeType = " << etypes[static_cast<unsigned int>(edgeType)] << "\n";
+            ss << "sigmoidType = " << stypes[static_cast<unsigned int>(sigmoidType)] << "\n";
             ss << "basisNorm = " << (basisNorm ? "true" : "false") << "\n";
             ss << "posFuncType = " << pftypes[static_cast<unsigned int>(posFuncType)] << "\n";
             ss << "quadType = " << qtypes[static_cast<unsigned int>(quadType)] << "\n";
@@ -145,6 +165,12 @@ namespace mpart{
             ss << "nugget = " << nugget << "\n";
             return ss.str();
         }
+
+        inline static const std::string btypes[3] = {"ProbabilistHermite", "PhysicistHermite", "HermiteFunctions"};
+        inline static const std::string pftypes[2] = {"Exp", "SoftPlus"};
+        inline static const std::string qtypes[3] = {"ClenshawCurtis", "AdaptiveSimpson", "AdaptiveClenshawCurtis"};
+        inline static const std::string etypes[1] = {"SoftPlus"};
+        inline static const std::string stypes[1] = {"Logistic"};
     };
 };
 

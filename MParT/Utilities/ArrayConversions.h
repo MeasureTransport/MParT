@@ -443,6 +443,13 @@ namespace mpart{
         return Kokkos::View<ScalarType*, Kokkos::LayoutStride, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
     }
 
+    template<typename ScalarType, typename MemorySpace = Kokkos::HostSpace>
+    inline Kokkos::View<const ScalarType*, Kokkos::LayoutStride, MemorySpace> ConstVecToKokkos(Eigen::Ref<const Eigen::Matrix<ScalarType,Eigen::Dynamic,1>, 0, Eigen::InnerStride<Eigen::Dynamic>> ref)
+    {
+        Kokkos::LayoutStride strides(ref.rows(), ref.innerStride());
+        return Kokkos::View<const ScalarType*, Kokkos::LayoutStride, MemorySpace, Kokkos::MemoryTraits<Kokkos::Unmanaged>> (ref.data(), strides);
+    }
+
     #if defined(MPART_ENABLE_GPU)
         template<typename ScalarType>
         StridedMatrix<ScalarType, DeviceSpace> MatToKokkos<ScalarType, DeviceSpace>(Eigen::Ref<Eigen::Matrix<ScalarType,Eigen::Dynamic,Eigen::Dynamic,Eigen::RowMajor>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> ref)

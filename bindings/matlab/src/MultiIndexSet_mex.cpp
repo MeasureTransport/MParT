@@ -34,10 +34,15 @@ MEX_DEFINE(MultiIndexSet_newTotalOrder) (int nlhs, mxArray* plhs[],
   OutputArguments output(nlhs, plhs, 1);
   const unsigned int dim = input.get<unsigned int>(0);
   const unsigned int order = input.get<unsigned int>(1);
-  const bool isSeparable = input.get<bool>(2);
-  MultiIndexSet toCreate = isSeparable ?
-    MultiIndexSet::CreateTotalOrder(dim, order, MultiIndexLimiter::SeparableTotalOrder(order)) :
-    MultiIndexSet::CreateTotalOrder(dim, order);
+  const std::string limiter_type = input.get<std::string>(2);
+  MultiIndexSet::LimiterType limiter;
+  if(limiter_type == "separable")
+    limiter = MultiIndexLimiter::Separable();
+  else if(limiter_type == "nonzeroDiag")
+    limiter = MultiIndexLimiter::NonzeroDiag();
+  else
+    limiter = MultiIndexLimiter::None();
+  MultiIndexSet toCreate = MultiIndexSet::CreateTotalOrder(dim, order, limiter);
   output.set(0, Session<MultiIndexSet>::create(new MultiIndexSet(toCreate)));
 }
 

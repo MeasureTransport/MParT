@@ -154,8 +154,8 @@ namespace mpart{
 
 
         virtual void CoeffGradImpl(StridedMatrix<const double, MemorySpace> const& pts,  
-                           StridedMatrix<const double, MemorySpace> const& sens,
-                           StridedMatrix<double, MemorySpace>              output) override
+                                   StridedMatrix<const double, MemorySpace> const& sens,
+                                   StridedMatrix<double, MemorySpace>              output) override
         {
             using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
             
@@ -210,6 +210,8 @@ namespace mpart{
 
             Kokkos::fence();
         }
+
+        std::vector<unsigned int> DiagonalCoeffIndices() const { return worker.NonzeroDiagonalEntries(); }
 
     private:
 

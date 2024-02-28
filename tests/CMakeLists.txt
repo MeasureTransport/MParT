@@ -49,6 +49,9 @@ set (TEST_SOURCES
      tests/Test_AffineFunction.cpp
      tests/Test_IdentityMap.cpp
      tests/Test_SummarizedMap.cpp
+     tests/Test_RectifiedMultivariateExpansion.cpp
+     tests/Test_UnivariateExpansion.cpp
+     tests/Test_InnerMarginalAffineMap.cpp
 
      ${MPART_SERIALIZE_TESTS}
      ${MPART_OPT_TESTS}

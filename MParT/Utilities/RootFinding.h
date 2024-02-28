@@ -105,11 +105,23 @@ KOKKOS_INLINE_FUNCTION double Find_x_ITP(double xlb, double xub, double yd, doub
         return xc;
 }
 
-/** Computes the inverse of a function using the ITP method.  
- *  The info argument will be 0 upon successful completion and negative for failed inversions.  
- *  A value of info=-2 indicates a failure to find a bracket that contains the root. In this case, a nan will be returned.
- *  A value of info=-1 indicates that the maximum number of iterations was exceeded. 
-*/
+/**
+ * @brief 
+ * @details Finds \f$x\f$ such that \f$f(x)=y_d\f$ using the ITP method.  The function \f$f\f$ must be continuous and
+ * monotone.
+ * The info argument will be 0 upon successful completion and negative for failed inversions.
+ * A value of info=-2 indicates a failure to find a bracket that contains the root. In this case, a nan will be returned.
+ * A value of info=-1 indicates that the maximum number of iterations was exceeded.
+ * @tparam MemorySpace
+ * @tparam FunctorType
+ * @param yd Given output value
+ * @param f Functor
+ * @param x0 Initial guess
+ * @param xtol Tolerance for the root
+ * @param ftol Tolerance for the function value
+ * @param info Output flag
+ * @return root of the function \f$f(\cdot)-y_d\f$
+ */
 template<typename MemorySpace, typename FunctorType>
 KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, double x0, const double xtol, const double ftol, int& info)
 {   

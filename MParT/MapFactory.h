@@ -67,8 +67,7 @@ namespace mpart{
                                                                               std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
 
 
-                                                                                  /**
-            @brief Constructs a triangular map with MonotoneComponents for each block.  A total order multiindex
+        /** @brief Constructs a triangular map with MonotoneComponents for each block.  A total order multiindex
                    set is used to define the MonotoneComponent.
 
             @details For more control over the individual components, consider constructing components with
@@ -105,15 +104,90 @@ namespace mpart{
 
 
         /**
-        @brief Constructs a (generally) non-monotone multivariate expansion.
-        @param outputDim The output dimension of the expansion.  Each output will be defined by the same multiindex set but will have different coefficients.
-        @param mset The multiindex set specifying which terms should be used in the multivariate expansion.
-        @param options Options specifying the 1d basis functions used in the parameterization.
+        @brief Constructs a "Single entry" map, which is an identity for all but one output dimension.  The active output dimension is defined by a given component.
+        @param dim The dimension of the mapping
+        @param activeInd Which output dimension is "active", i.e., not identity
+        @param comp The component that will be used for the active output dimension.
         */
         template<typename MemorySpace>
         std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSingleEntryMap(unsigned int dim,
-                                                                                     unsigned int activeInd,
-                                                                                     std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
+                                                                              unsigned int activeInd,
+                                                                              std::shared_ptr<ConditionalMapBase<MemorySpace>> const &comp);
+
+        /**
+         * @brief Create a RectifiedMultivariateExpansion using sigmoids
+         * 
+         * @details Using the parameters described in \c`opts`, this function creates
+         * a "rectified multivariate expansion" object that uses a collection of sigmoid functions
+         * to map the input space to the output space. The pertinent options are
+         * - \c`opts.basisType` : The type of basis function to use in the expansion for the first \f$d-1\f$ inputs
+         * - \c`opts.posFuncType` : The type of positive function to use in the rectified basis @ref MultivariateExpansionWorker
+         * - \c`opts.edgeWidth` : The width of the "edge terms" on the last input @ref Sigmoid1d
+         * - \c`opts.sigmoidType` : The type of sigmoid function to use in the expansion @ref Sigmoid1d
+         * 
+         * By default, this constructs total-order multi-index sets. This is only creating a real-valued function.
+         * To create a map, use `TriangularMap` function.
+         * 
+         * @tparam MemorySpace 
+         * @param inputDim Dimension of the input space to component
+         * @param totalOrder Total order of your multi-index set. If 0, deduce from length of centers.
+         * @param centers Set of centers of the sigmoids. Should be length 2 + (1 + 2 + ... + p) where p is the default total order.
+         * @param opts 
+         * @return std::shared_ptr<ConditionalMapBase<MemorySpace>> 
+         */
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidComponent(
+            unsigned int inputDim, unsigned int totalOrder, StridedVector<const double, MemorySpace> centers,
+            MapOptions opts);
+
+        template<typename MemorySpace, std::enable_if_t<std::is_same_v<MemorySpace, Kokkos::HostSpace>, bool> = true>
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> CreateSigmoidComponent(
+            unsigned int inputDim, unsigned int totalOrder, Eigen::Ref<const Eigen::RowVectorXd> centers,
+            MapOptions opts) {
+            StridedVector<const double, Kokkos::HostSpace> centersVec = ConstVecToKokkos<double, Kokkos::HostSpace>(centers);
+            return CreateSigmoidComponent<Kokkos::HostSpace>(inputDim, totalOrder, centersVec, opts);
+        }
+
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidComponent(
+            FixedMultiIndexSet<MemorySpace> mset_offdiag, FixedMultiIndexSet<MemorySpace> mset_diag,
+            StridedVector<const double, MemorySpace> centers, MapOptions opts);
+
+        template<typename MemorySpace, std::enable_if_t<std::is_same_v<MemorySpace, Kokkos::HostSpace>, bool> = true>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidComponent(
+            FixedMultiIndexSet<MemorySpace> mset_offdiag, FixedMultiIndexSet<MemorySpace> mset_diag,
+            Eigen::Ref<const Eigen::RowVectorXd> centers, MapOptions opts) {
+            StridedVector<const double, Kokkos::HostSpace> centersVec = ConstVecToKokkos<double, Kokkos::HostSpace>(centers);
+            return CreateSigmoidComponent<Kokkos::HostSpace>(mset_offdiag, mset_diag, centersVec, opts);
+        }
+
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidTriangular(
+            unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder,
+            std::vector<StridedVector<const double, MemorySpace>> const& centers, MapOptions opts
+        );
+
+        template<typename MemorySpace>
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidTriangular(
+            unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder,
+            StridedMatrix<const double, MemorySpace> const& centers, MapOptions opts
+        ) {
+            std::vector<StridedVector<const double, MemorySpace>> centersVecs;
+            for(unsigned int i = 0; i < centers.extent(1); i++){
+                StridedVector<const double, MemorySpace> center_i = Kokkos::subview(centers, Kokkos::ALL(), i);
+                centersVecs.push_back(center_i);
+            }
+            return CreateSigmoidTriangular<MemorySpace>(inputDim, outputDim, totalOrder, centersVecs, opts);
+        }
+
+        template<typename MemorySpace, std::enable_if_t<std::is_same_v<MemorySpace, Kokkos::HostSpace>, bool> = true>
+        std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> CreateSigmoidTriangular(
+            unsigned int inputDim, unsigned int outputDim, unsigned int totalOrder,
+            Eigen::Ref<const Eigen::RowMatrixXd> const& centers, MapOptions opts
+        ) {
+            StridedMatrix<const double, Kokkos::HostSpace> centersMat = ConstRowMatToKokkos<double,Kokkos::HostSpace>(centers);
+            return CreateSigmoidTriangular<Kokkos::HostSpace>(inputDim, outputDim, totalOrder, centersMat, opts);
+        }
 
         /** This struct is used to map the options to functions that can create a map component with types corresponding
             to the options.

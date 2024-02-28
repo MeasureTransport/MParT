@@ -61,7 +61,7 @@ jobs:
         id: cache-kokkos
         with:
           path: "${{ github.workspace }}/KOKKOS_INSTALL"
-          key: kokkos3.7.00
+          key: kokkos4.2.00
 
       - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
         name: Checkout Kokkos
@@ -69,7 +69,7 @@ jobs:
         with:
           repository: kokkos/kokkos
           path: kokkos
-          ref: '3.7.00'
+          ref: '4.2.00'
 
       - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
         name: Install Kokkos
@@ -114,7 +114,9 @@ jobs:
 
       - name: Setup Matlab Tests
         continue-on-error: true
+        shell: bash -l {0}
         run: |
+          export LD_LIBRARY_PATH=/usr/local/lib64:$LD_LIBRARY_PATH
           sed -i "1s|^|addpath(genpath(\'$GITHUB_WORKSPACE/MPART_INSTALL\'))\n|" $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
           cat $GITHUB_WORKSPACE/mpart/bindings/matlab/tests/runtests.m
 

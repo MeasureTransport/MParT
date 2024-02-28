@@ -2,6 +2,8 @@
 
 #include "MParT/MapFactory.h"
 #include "MParT/ConditionalMapBase.h"
+#include "MParT/TriangularMap.h"
+#include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 
 #include <unordered_map>
@@ -201,5 +203,86 @@ TEST_CASE( "Testing factory method for single entry map, 1 < activeInd < dim", "
 
     REQUIRE(map != nullptr);
 }
+TEST_CASE( "Testing factory method for Sigmoid Component", "[MapFactorySigmoidComponent]" ) {
 
-
+    MapOptions options;
+    unsigned int inputDim = 7;
+    unsigned int maxDegree = 3;
+    unsigned int num_sigmoids = 5;
+    unsigned int numCenters = 2 + num_sigmoids*(num_sigmoids+1)/2;
+    options.basisType = BasisTypes::HermiteFunctions;
+    Kokkos::View<double*, MemorySpace> centers("Centers", numCenters);
+    double bound = 3.;
+    centers(0) = -bound; centers(1) = bound;
+    unsigned int center_idx = 2;
+    for(int j = 0; j < num_sigmoids; j++){
+        for(int i = 0; i <= j; i++){
+            centers(center_idx) = -bound + (2*bound)*(i+1)/(j+2);
+            center_idx++;
+        }
+    }
+    std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func = MapFactory::CreateSigmoidComponent<MemorySpace>(inputDim, maxDegree, centers, options);
+    REQUIRE(func != nullptr);
+    unsigned int numPts = 100;
+    Kokkos::View<double**,MemorySpace> pts("Points", inputDim, numPts);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>> policy({0,0}, {inputDim, numPts});
+    Kokkos::parallel_for("Fill points", policy, KOKKOS_LAMBDA(const int i, const int j){
+        pts(i,j) = double(j*i)/double((inputDim)*(numPts-1));
+    });
+    Kokkos::fence();
+    // Checking example of Gradient
+    StridedVector<double, MemorySpace> coeffs = func->Coeffs();
+    Kokkos::deep_copy(coeffs, 1.0);
+    Kokkos::View<double**, MemorySpace> eval = func->Evaluate(pts);
+    CHECK(eval.extent(0)==1);
+    SECTION("Check Gradient") {
+        Kokkos::View<double**, MemorySpace> sens ( "Sensitivities", 1, numPts);
+        Kokkos::parallel_for("fill sensitivities", numPts, KOKKOS_LAMBDA(const int i){
+            sens(0,i) = 1.0;
+        });
+        Kokkos::View<double**, MemorySpace> grad = func->Gradient(pts, sens);
+        CHECK(grad.extent(0)==inputDim);
+        CHECK(grad.extent(1)==numPts);
+        double fd_step = 1e-6;
+        for(int i = 0; i < inputDim; i++){
+            Kokkos::parallel_for(numPts, KOKKOS_LAMBDA(const int j){
+                if(i > 0) pts(i-1,j) -= fd_step;
+                pts(i,j) += fd_step;
+            });
+            Kokkos::fence();
+            Kokkos::View<double**, MemorySpace> eval2 = func->Evaluate(pts);
+            for(int j = 0; j < numPts; j++){
+                double fd = (eval2(0,j) - eval(0,j))/(fd_step);
+                CHECK(grad(i,j) == Approx(fd).epsilon(20*fd_step));
+            }
+        }
+    }
+    SECTION("Create Sigmoid Component from fixed msets") {
+        FixedMultiIndexSet<MemorySpace> mset_offdiag(inputDim-1, maxDegree);
+        // Make some arbitrary limiter
+        auto limiter = [maxDegree](MultiIndex const& index){
+            return index.Get(index.Length()-1) != 0 && index.Sum() == maxDegree;
+        };
+        FixedMultiIndexSet<MemorySpace> mset_diag = MultiIndexSet::CreateTotalOrder(inputDim, maxDegree, limiter).Fix(true);
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateSigmoidComponent<MemorySpace>(mset_offdiag, mset_diag, centers, options);
+        REQUIRE(map != nullptr);
+        REQUIRE(map->numCoeffs == mset_diag.Size()+mset_offdiag.Size());
+    }
+    SECTION("Create Triangular Sigmoid Map From Components") {
+        std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> maps;
+        for(int i = 1; i <= inputDim; i++){
+            maps.push_back(MapFactory::CreateSigmoidComponent<MemorySpace>(i, 0, centers, options));
+        }
+        auto map = std::make_shared<TriangularMap<MemorySpace>>(maps);
+        REQUIRE(map != nullptr);
+    }
+    SECTION("CreateSigmoidTriangular") {
+        std::vector<StridedVector<const double, MemorySpace>> centers_vec;
+        unsigned int outputDim = 3;
+        for(int i = 0; i < outputDim; i++){
+            centers_vec.push_back(centers);
+        }
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateSigmoidTriangular<MemorySpace>(inputDim, outputDim, 0, centers_vec, options);
+        REQUIRE(map != nullptr);
+    }
+}

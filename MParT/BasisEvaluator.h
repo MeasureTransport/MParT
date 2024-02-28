@@ -1,3 +1,6 @@
+#ifndef MPART_BASISEVALUATOR_H
+#define MPART_BASISEVALUATOR_H
+
 #include <Kokkos_Core.hpp>
 #include "MParT/PositiveBijectors.h"
 
@@ -79,7 +82,7 @@ class BasisEvaluator {
    * @param dim input dimension of the multivariate basis
    * @param basis1d object(s) used to evaluate the basis
    */
-  BasisEvaluator(int dim, BasisEvaluatorType basis1d) {
+  BasisEvaluator(unsigned int dim, BasisEvaluatorType basis1d) {
     // This class should not be constructed
     assert(false);
   }
@@ -91,7 +94,7 @@ class BasisEvaluator {
    * @param maxOrder Maximum basis order to evaluate
    * @param point Input point to evaluate the \c dim th basis functions at
    */
-  KOKKOS_INLINE_FUNCTION void EvaluateAll(int dim, double *output_eval,
+  KOKKOS_INLINE_FUNCTION void EvaluateAll(unsigned int dim, double *output_eval,
                                           int maxOrder, double point) const {
     assert(false);
   }
@@ -105,7 +108,7 @@ class BasisEvaluator {
    * @param maxOrder Maximum basis order to evaluate
    * @param point Input point to evaluate the \c dim th basis functions at
    */
-  KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int dim, double *output_eval,
+  KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(unsigned int dim, double *output_eval,
                                                   double *output_diff,
                                                   int maxOrder,
                                                   double point) const {
@@ -124,7 +127,7 @@ class BasisEvaluator {
    * @param point Input point to evaluate the \c dim th basis functions at
    */
   KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(
-      int dim, double *output_eval, double *output_diff, double *output_diff_2,
+      unsigned int dim, double *output_eval, double *output_diff, double *output_diff_2,
       int maxOrder, double point) const {
     assert(false);
   }
@@ -160,8 +163,7 @@ struct GetRectifier<BasisEvaluator<HowHomogeneous, BasisEvaluatorType, Rectifier
 template <typename BasisEvaluatorType>
 class BasisEvaluator<BasisHomogeneity::Homogeneous, BasisEvaluatorType> {
   public:
-  BasisEvaluator(int, BasisEvaluatorType const &basis1d) : basis1d_(basis1d) {}
-
+  BasisEvaluator(unsigned int, BasisEvaluatorType const &basis1d = BasisEvaluatorType()) : basis1d_(basis1d) {}
   /**
    * @brief Helper function to construct a new Basis Evaluator object
    *
@@ -221,7 +223,7 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
                      Rectifier> {
   public:
   BasisEvaluator(
-      int dim,
+      unsigned int dim,
       Kokkos::pair<OffdiagEvaluatorType, DiagEvaluatorType> const &basis1d)
       : offdiag_(basis1d.first), diag_(basis1d.second), dim_(dim) {}
 
@@ -232,12 +234,12 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
    * @param offdiag Evaluator for offdiagonal input elements
    * @param diag Evaluator for diagonal input element
    */
-  BasisEvaluator(int dim, OffdiagEvaluatorType const &offdiag,
-                 DiagEvaluatorType const &diag)
+  BasisEvaluator(unsigned int dim, OffdiagEvaluatorType const &offdiag = OffdiagEvaluatorType(),
+                 DiagEvaluatorType const &diag = DiagEvaluatorType())
       : offdiag_(offdiag), diag_(diag), dim_(dim) {}
 
   // EvaluateAll(dim, output, max_order, input)
-  KOKKOS_INLINE_FUNCTION void EvaluateAll(int dim, double *output,
+  KOKKOS_INLINE_FUNCTION void EvaluateAll(unsigned int dim, double *output,
                                           int max_order, double input) const {
     if (dim < dim_ - 1)
       offdiag_.EvaluateAll(output, max_order, input);
@@ -246,7 +248,7 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
   }
 
   // EvaluateDerivatives(dim, output_eval, output_deriv, max_order, input)
-  KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int dim, double *output,
+  KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(unsigned int dim, double *output,
                                                   double *output_diff,
                                                   int max_order,
                                                   double input) const {
@@ -257,7 +259,7 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
   }
 
   // EvaluateSecondDerivatives(dim, output_eval, output_deriv, max_order, input)
-  KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int dim, double *output,
+  KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(unsigned int dim, double *output,
                                                         double *output_diff,
                                                         double *output_diff2,
                                                         int max_order,
@@ -277,7 +279,7 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
   }
 #endif
   /// @brief Number of input dimensions for multivariate basis
-  int dim_;
+  unsigned int dim_;
   OffdiagEvaluatorType offdiag_;
   DiagEvaluatorType diag_;
 };
@@ -292,26 +294,26 @@ class BasisEvaluator<BasisHomogeneity::Heterogeneous,
                      std::vector<std::shared_ptr<CommonBasisEvaluatorType>>, Rectifier> {
   public:
   BasisEvaluator(
-      int dim,
+      unsigned int dim,
       std::vector<std::shared_ptr<CommonBasisEvaluatorType>> const &basis1d)
       : basis1d_(basis1d) {
     assert(dim == basis1d.size());  // TODO: Fix
   }
   // EvaluateAll(dim, output, max_order, input)
   // dim is zero-based indexing
-  KOKKOS_INLINE_FUNCTION void EvaluateAll(int dim, double *output,
+  KOKKOS_INLINE_FUNCTION void EvaluateAll(unsigned int dim, double *output,
                                           int max_order, double input) const {
     basis1d_[dim]->EvaluateAll(output, max_order, input);
   }
   // EvaluateDerivatives(dim, output_eval, output_deriv, max_order, input)
-  KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(int dim, double *output,
+  KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(unsigned int dim, double *output,
                                                   double *output_diff,
                                                   int max_order,
                                                   double input) const {
     basis1d_[dim]->EvaluateDerivatives(output, output_diff, max_order, input);
   }
   // EvaluateSecondDerivatives(dim, output_eval, output_deriv, max_order, input)
-  KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(int dim, double *output,
+  KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(unsigned int dim, double *output,
                                                         double *output_diff,
                                                         double *output_diff2,
                                                         int max_order,
@@ -329,3 +331,4 @@ class BasisEvaluator<BasisHomogeneity::Heterogeneous,
   std::vector<std::shared_ptr<CommonBasisEvaluatorType>> basis1d_;
 };
 }  // namespace mpart
+#endif // MPART_BASISEVALUATOR_H

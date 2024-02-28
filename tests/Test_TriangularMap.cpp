@@ -218,7 +218,6 @@ TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=fa
         }
 
     }
-
 }
 
 TEST_CASE( "Testing 3d triangular map from MonotoneComponents with moveCoeffs=true", "[TriangularMap_MonotoneComponents]" ) {

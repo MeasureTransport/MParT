@@ -20,6 +20,15 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     REQUIRE(maxDegrees.extent(0)==2);
     CHECK(maxDegrees(0)==maxOrder);
     CHECK(maxDegrees(1)==maxOrder);
+
+    MultiIndexSet multiSet_original = MultiIndexSet::CreateTotalOrder(dim, maxOrder);
+    FixedMultiIndexSet<Kokkos::HostSpace> multiSet_fixed = multiSet_original.Fix(true);
+    MultiIndexSet multiSet_reconstructed = multiSet_fixed.Unfix();
+    REQUIRE(multiSet_original.Size() == multiSet_reconstructed.Size());
+    REQUIRE(multiSet_original.MaxOrders() == multiSet_reconstructed.MaxOrders());
+    std::vector<unsigned int> diagonal_idxs_ref = multiSet_reconstructed.NonzeroDiagonalEntries();
+    std::vector<unsigned int> diagonal_idxs = multiSet_fixed.NonzeroDiagonalEntries();
+    REQUIRE(diagonal_idxs_ref == diagonal_idxs);
 }
 
 TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedMultiIndexSetSorting]" ) {
@@ -153,7 +162,7 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
     REQUIRE( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
 
-    MultiIndexSet mset_sep = MultiIndexSet::CreateTotalOrder(dim+1, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder));
+    MultiIndexSet mset_sep = MultiIndexSet::CreateTotalOrder(dim+1, maxOrder, MultiIndexLimiter::Separable());
     REQUIRE( mset_sep.Size()== ((maxOrder+1)*(maxOrder+2)/2) + maxOrder);
     REQUIRE( mset_sep.NonzeroDiagonalEntries().size() == maxOrder);
 
@@ -479,7 +488,7 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
     SECTION("NonzeroDiagonalEntries") {
         unsigned int dim = 2, maxOrder = 3;
-        MultiIndexSet set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder));
+        MultiIndexSet set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::Separable());
         std::vector<unsigned int> inds = set.NonzeroDiagonalEntries();
         for(unsigned int ind: inds) {
             MultiIndex multi = set.at(ind);
@@ -491,6 +500,22 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
             expected_size += multi.HasNonzeroEnd();
         }
         REQUIRE( expected_size == inds.size() );
+        FixedMultiIndexSet<Kokkos::HostSpace> fixedSet = set.Fix(true);
+        FixedMultiIndexSet<Kokkos::HostSpace> fixedSet2 = set.Fix(false);
+        std::vector<unsigned int> inds_fixed = fixedSet.NonzeroDiagonalEntries();
+        std::vector<unsigned int> inds_fixed2 = fixedSet2.NonzeroDiagonalEntries();
+        std::sort(inds.begin(), inds.end());
+        std::sort(inds_fixed.begin(), inds_fixed.end());
+        std::sort(inds_fixed2.begin(), inds_fixed2.end());
+        REQUIRE( inds == inds_fixed );
+        REQUIRE( inds == inds_fixed2 );
+        MultiIndexSet full_set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::NonzeroDiag());
+        inds = full_set.NonzeroDiagonalEntries();
+        REQUIRE( inds.size() == full_set.Size() );
+        for(int i = 0; i < full_set.Size(); ++i) {
+            REQUIRE(inds[i] == i);
+            REQUIRE( full_set.at(i).HasNonzeroEnd() );
+        }
     }
 }
 

@@ -12,7 +12,7 @@ using namespace mpart;
 using namespace Catch;
 
 using HomogeneousEval_T = BasisEvaluator<BasisHomogeneity::Homogeneous, ProbabilistHermite>;
-using Sigmoid_T = Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic>;
+using Sigmoid_T = Sigmoid1d<Kokkos::HostSpace,SigmoidTypeSpace::Logistic>;
 using OffdiagHomogeneousEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<ProbabilistHermite,Sigmoid_T>, Identity>;
 using RectifiedOffdiagHomogeneousEval_T = BasisEvaluator<
     BasisHomogeneity::OffdiagHomogeneous,
@@ -22,10 +22,10 @@ using RectifiedOffdiagHomogeneousEval_T = BasisEvaluator<
 using HeterogeneousEval_T = BasisEvaluator<BasisHomogeneity::Heterogeneous, std::vector<std::shared_ptr<ProbabilistHermite>>>;
 
 template<typename T>
-T CreateEvaluator(int) {assert(false);}
+T CreateEvaluator(unsigned int) {assert(false);}
 
 template<>
-HomogeneousEval_T CreateEvaluator<HomogeneousEval_T>(int) {
+HomogeneousEval_T CreateEvaluator<HomogeneousEval_T>(unsigned int) {
     return HomogeneousEval_T{};
 }
 
@@ -47,18 +47,18 @@ Sigmoid_T CreateDefaultSigmoids() {
         }
     }
 
-    return Sigmoid1d<Kokkos::HostSpace,SigmoidTypes::Logistic> {centers, widths, weights};
+    return Sigmoid1d<Kokkos::HostSpace,SigmoidTypeSpace::Logistic> {centers, widths, weights};
 }
 
 template<>
-OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(int dim) {
+OffdiagHomogeneousEval_T CreateEvaluator<OffdiagHomogeneousEval_T>(unsigned int dim) {
     ProbabilistHermite offdiag;
     Sigmoid_T diag = CreateDefaultSigmoids();
     return OffdiagHomogeneousEval_T {dim, Kokkos::make_pair(offdiag, diag)};
 }
 
 template<>
-RectifiedOffdiagHomogeneousEval_T CreateEvaluator<RectifiedOffdiagHomogeneousEval_T>(int dim) {
+RectifiedOffdiagHomogeneousEval_T CreateEvaluator<RectifiedOffdiagHomogeneousEval_T>(unsigned int dim) {
     ProbabilistHermite offdiag;
     Sigmoid_T diag = CreateDefaultSigmoids();
     return RectifiedOffdiagHomogeneousEval_T {dim, Kokkos::make_pair(offdiag, diag)};

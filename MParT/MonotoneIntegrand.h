@@ -73,7 +73,7 @@ public:
                                                                                             derivType_(derivType),
                                                                                             nugget_(nugget)
     {
-        assert(derivType!=DerivativeFlags::Mixed);
+        assert(derivType!=DerivativeFlags::MixedCoeff);
         assert(derivType!=DerivativeFlags::MixedInput);
     }
 
@@ -104,7 +104,7 @@ public:
                                                                                             nugget_(nugget),
                                                                                             workspace_(workspace)
     {
-        if(derivType==DerivativeFlags::Mixed)
+        if(derivType==DerivativeFlags::MixedCoeff)
             assert(workspace.extent(0)>=coeffs.extent(0));
     }
 
@@ -123,13 +123,13 @@ public:
         unsigned int numOutputs = 1;
         if(derivType_==DerivativeFlags::Diagonal)
             numOutputs++;
-        if((derivType_==DerivativeFlags::Parameters) || (derivType_==DerivativeFlags::Mixed))
+        if((derivType_==DerivativeFlags::Parameters) || (derivType_==DerivativeFlags::MixedCoeff))
             numOutputs += numTerms;
         if((derivType_==DerivativeFlags::Input) || (derivType_==DerivativeFlags::MixedInput))
             numOutputs += dim;
 
         // Finish filling in the cache at the quadrature point (FillCache1 is called outside this class)
-        if((derivType_==DerivativeFlags::Diagonal)||(derivType_==DerivativeFlags::Mixed)||(derivType_==DerivativeFlags::Input)){
+        if((derivType_==DerivativeFlags::Diagonal)||(derivType_==DerivativeFlags::MixedCoeff)||(derivType_==DerivativeFlags::Input)){
             expansion_.FillCache2(cache_, pt_, t*xd_, DerivativeFlags::Diagonal2);
         }else{
             expansion_.FillCache2(cache_, pt_, t*xd_, DerivativeFlags::Diagonal);
@@ -145,7 +145,7 @@ public:
             for(unsigned int i=0; i<numTerms;++i)
                 gradSeg(i) *= scale;
 
-        }else if(derivType_==DerivativeFlags::Mixed){
+        }else if(derivType_==DerivativeFlags::MixedCoeff){
 
             df = expansion_.DiagonalDerivative(cache_, coeffs_, 1);
 

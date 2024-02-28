@@ -21,7 +21,6 @@ void ParameterizedFunctionBase<MemorySpace>::CheckDeviceMismatch(std::string fun
     throw std::runtime_error(msg.str());
 }
 
-
 template<>
 template<>
 StridedMatrix<double, Kokkos::HostSpace> ParameterizedFunctionBase<Kokkos::HostSpace>::Evaluate(StridedMatrix<const double, Kokkos::HostSpace> const& pts)
