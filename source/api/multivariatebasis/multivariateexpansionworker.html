@@ -1,0 +1,900 @@
+
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Multivariate Expansion Worker &#8212; MParT  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
+  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/sphinx_highlight.js"></script>
+    <script src="../../../_static/design-tabs.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'source/api/multivariatebasis/multivariateexpansionworker';</script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Parameterized Function Concept" href="../concepts/parameterizedfunction.html" />
+    <link rel="prev" title="Cached Parameterization Concept" href="../concepts/cachedparameterization.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">MParT  documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../getting_started.html">
+                        Getting Started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../mathematics.html">
+                        Mathematical Background
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
+                    More
+                </button>
+                <ul id="pst-nav-more-links" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
+                        Community
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MeasureTransport/MParT" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </nav>
+  
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <p class="sidebar-header-items__title"
+     role="heading"
+     aria-level="1"
+     aria-label="Site Navigation">
+    Site Navigation
+  </p>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../installation.html">
+                        Installation
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../getting_started.html">
+                        Getting Started
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
+                        Tutorials
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../mathematics.html">
+                        Mathematical Background
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="../index.html">
+                        API Reference
+                      </a>
+                    </li>
+                
+            <li class="nav-item dropdown">
+                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
+                    More
+                </button>
+                <ul id="pst-nav-more-links-2" class="dropdown-menu">
+                    
+                    <li class="nav-item">
+                      <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
+                        Community
+                      </a>
+                    </li>
+                
+                </ul>
+            </li>
+            
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MeasureTransport/MParT" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fab fa-github-square fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../mapfactory.html">Map Factory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conditionalmapbase.html">Conditional Map Base</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../triangularmap.html">Triangular Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../composedmap.html">Composed Map</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../monotonecomponent.html">Monotone Component</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../multiindex.html">MultiIndices</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../multiindices/multiindex.html">MultiIndex</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multiindices/multiindexset.html">MultiIndexSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multiindices/fixedmultiindexset.html">FixedMultiIndexSet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multiindices/multiindexlimiter.html">MultiIndexLimiter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multiindices/multiindexneighborhood.html">MultiIndexNeighborhood</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../quadrature.html">Quadrature</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../quadrature/clenshawcurtis.html">Clenshaw Curtis Quadrature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quadrature/adaptivesimpson.html">Adaptive Simpson Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quadrature/recursivequadrature.html">Adaptive Clenshaw Curtis Quadrature</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/linearalgebra.html">Linear Algebra</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/kokkoswrappers.html">Kokkos Array Conversions</a></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../templateconcepts.html">Template Concepts</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../concepts/cachedparameterization.html">Cached Parameterization Concept</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">Multivariate Expansion Worker</a></li>
+</ul>
+</li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/parameterizedfunction.html">Parameterized Function Concept</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../monotonecomponent.html">Monotone Component</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/initialization.html">Initialization Helpers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../utilities/serialization.html">Serialization</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../maptraining.html">Map Training</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../maptraining/trainmap.html">Train Map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../maptraining/trainmapadaptive.html">Adaptive Map Training</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../multivariatebasis.html">Multivariate Basis Evaluation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="univariatebasis.html">Univariate Bases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basisevaluator.html">Basis Evaluators</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">Multivariate Expansion Worker</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">API Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><i class="fa-solid fa-ellipsis"></i></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../concepts/cachedparameterization.html" class="nav-link">Cached Parameterization Concept</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Multivariate...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article" role="main">
+                  
+  <section id="multivariate-expansion-worker">
+<h1>Multivariate Expansion Worker<a class="headerlink" href="#multivariate-expansion-worker" title="Permalink to this heading">#</a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN5mpart27MultivariateExpansionWorkerE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BasisEvaluatorType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">HostSpace</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_worker"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansionWorker</span></span></span><a class="headerlink" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Defines a function in terms of the tensor product of unary basis functions. </p>
+<p><ul class="simple">
+<li><p>Cache memory managed elsewhere  <div class="math notranslate nohighlight">
+\[\begin{split}
+    \text{cache} = \left[\begin{array}{c}
+    \phi_1^0(x_1)\\
+    \phi_1^1(x_1)\\
+    \vdots\\
+    \phi_1^{p_1}\\
+    \phi_2^0(x_2)\\
+    \vdots\\
+    \phi_2^{p_2}(x_2)\\
+    \vdots \\
+    \phi_d^{p_d}(x_d)\\
+    \frac{\partial}{\partial x_d}\phi_d^0(x_d)\\
+    \vdots\\
+    \frac{\partial}{\partial x_d}\phi_d^{p_d}(x_d)\\
+    \frac{\partial^2}{\partial x_d^2}\phi_d^0(x_d^2)\\
+    \vdots\\
+    \frac{\partial^2}{\partial x_d^2}\phi_d^{p_d}(x_d)
+    \end{array}
+    \right]
+ \end{split}\]</div>
+</p></li>
+</ul>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>BasisEvaluatorType</strong> – The family of 1d basis functions to employ. </p>
+</dd>
+</dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart27MultivariateExpansionWorker9BasisTypeE">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a7b5d6ffd365d29eaadd3b6f3f8ed3107"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BasisType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="mpart::MultivariateExpansionWorker::BasisEvaluatorType"><span class="n"><span class="pre">BasisEvaluatorType</span></span></a><a class="headerlink" href="#_CPPv4N5mpart27MultivariateExpansionWorker9BasisTypeE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart27MultivariateExpansionWorker11KokkosSpaceE">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1ae53da940d8613b45a163eb6644cfe94b"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">KokkosSpace</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="mpart::MultivariateExpansionWorker::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><a class="headerlink" href="#_CPPv4N5mpart27MultivariateExpansionWorker11KokkosSpaceE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart27MultivariateExpansionWorker9RectifierE">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a61dbd6120d6d26bd836e1cfe840552aa"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Rectifier</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="n"><span class="pre">GetRectifier</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="mpart::MultivariateExpansionWorker::BasisEvaluatorType"><span class="n"><span class="pre">BasisEvaluatorType</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><a class="headerlink" href="#_CPPv4N5mpart27MultivariateExpansionWorker9RectifierE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerEv">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1adc89497a8db67a1443d8d4be1686b016"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansionWorker</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerEv" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerERK13MultiIndexSetRK18BasisEvaluatorType">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a0e5bb6717db561cde7a83cade4b599dd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansionWorker</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../multiindices/multiindexset.html#_CPPv4N5mpart13MultiIndexSetE" title="mpart::MultiIndexSet"><span class="n"><span class="pre">MultiIndexSet</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multiSet</span></span>, <a class="reference internal" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="mpart::MultivariateExpansionWorker::BasisEvaluatorType"><span class="n"><span class="pre">BasisEvaluatorType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">basis1d</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="mpart::MultivariateExpansionWorker::BasisEvaluatorType"><span class="n"><span class="pre">BasisEvaluatorType</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerERK13MultiIndexSetRK18BasisEvaluatorType" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerERK18FixedMultiIndexSetI11MemorySpaceERK18BasisEvaluatorType">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a37a4c700f6000e711485068eaca03b1c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansionWorker</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../multiindices/fixedmultiindexset.html#_CPPv4I0EN5mpart18FixedMultiIndexSetE" title="mpart::FixedMultiIndexSet"><span class="n"><span class="pre">FixedMultiIndexSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="mpart::MultivariateExpansionWorker::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multiSet</span></span>, <a class="reference internal" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="mpart::MultivariateExpansionWorker::BasisEvaluatorType"><span class="n"><span class="pre">BasisEvaluatorType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">basis1d</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="mpart::MultivariateExpansionWorker::BasisEvaluatorType"><span class="n"><span class="pre">BasisEvaluatorType</span></span></a><span class="p"><span class="pre">(</span></span><span class="p"><span class="pre">)</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerERK18FixedMultiIndexSetI11MemorySpaceERK18BasisEvaluatorType" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerERK27MultivariateExpansionWorker">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a58cddb092dbaeae7d36fa3c70712a4f3"></span><span class="sig-name descname"><span class="n"><span class="pre">MultivariateExpansionWorker</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerERK27MultivariateExpansionWorker" title="mpart::MultivariateExpansionWorker::MultivariateExpansionWorker"><span class="n"><span class="pre">MultivariateExpansionWorker</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5mpart27MultivariateExpansionWorker27MultivariateExpansionWorkerERK27MultivariateExpansionWorker" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart27MultivariateExpansionWorker9CacheSizeEv">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a0982eac6e1b8a05821178bab64daafb5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CacheSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart27MultivariateExpansionWorker9CacheSizeEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Returns the size of the cache needed to evaluate the expansion (in terms of number of doubles). </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>unsigned int The length of the required cache vector. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart27MultivariateExpansionWorker9NumCoeffsEv">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1ac7a9ef37cacce0c1a39b6fcf1ecfaa55"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumCoeffs</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart27MultivariateExpansionWorker9NumCoeffsEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Returns the number of coefficients in this expansion. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>unsigned int The number of terms in the multiindexset, which corresponds to the number of coefficients needed to define the expansion. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart27MultivariateExpansionWorker9InputSizeEv">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a0815aba0e62237a69f4183912bba2ac3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InputSize</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart27MultivariateExpansionWorker9InputSizeEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Returns the dimension of inputs to this multivariate expansion. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>unsigned int The dimension of an input point. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK5mpart27MultivariateExpansionWorker10FillCache1EvPdRK9PointTypeN15DerivativeFlags14DerivativeTypeE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PointType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a822fd76ffa3e88fcf40866f6fbc46e8f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FillCache1</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I0ENK5mpart27MultivariateExpansionWorker10FillCache1EvPdRK9PointTypeN15DerivativeFlags14DerivativeTypeE" title="mpart::MultivariateExpansionWorker::FillCache1::PointType"><span class="n"><span class="pre">PointType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">pt</span></span>, <span class="n"><span class="pre">DerivativeFlags</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">DerivativeType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derivType</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart27MultivariateExpansionWorker10FillCache1EvPdRK9PointTypeN15DerivativeFlags14DerivativeTypeE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Precomputes parts of the cache using all but the last component of the point, i.e., using only <span class="math notranslate nohighlight">\(x_1,x_2,\ldots,x_{d-1}\)</span>, not <span class="math notranslate nohighlight">\(x_d\)</span>. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#classmpart_1_1_multivariate_expansion_worker_1ad833bd64c8d1d085aa918482e6ad9070"><span class="std std-ref">FillCache2</span></a></p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>PointType</strong> – The vector type used to define the point. Can be anything allowing access to components with operator(). Examples are Kokkos::View&lt;double*&gt; or Eigen::VectorXd. Only the first d-1 components of the vector will be accessed in this function. </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>polyCache</strong> – A pointer to the start of the cache. This memory must be allocated before calling this function. </p></li>
+<li><p><strong>pt</strong> – The point (at least the first <span class="math notranslate nohighlight">\(d-1\)</span> components) to use when filling in the cache. </p></li>
+<li><p><strong>derivType</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK5mpart27MultivariateExpansionWorker10FillCache2EvPdRK9PointTypedN15DerivativeFlags14DerivativeTypeE">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">PointType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_worker_1ad833bd64c8d1d085aa918482e6ad9070"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">FillCache2</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I0ENK5mpart27MultivariateExpansionWorker10FillCache2EvPdRK9PointTypedN15DerivativeFlags14DerivativeTypeE" title="mpart::MultivariateExpansionWorker::FillCache2::PointType"><span class="n"><span class="pre">PointType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="p"><span class="pre">&amp;</span></span>, <span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xd</span></span>, <span class="n"><span class="pre">DerivativeFlags</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">DerivativeType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derivType</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart27MultivariateExpansionWorker10FillCache2EvPdRK9PointTypedN15DerivativeFlags14DerivativeTypeE" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Precomputes parts of the cache that depend on the <span class="math notranslate nohighlight">\(d^{th}\)</span> component of the point <span class="math notranslate nohighlight">\(x\)</span>. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#classmpart_1_1_multivariate_expansion_worker_1a822fd76ffa3e88fcf40866f6fbc46e8f"><span class="std std-ref">FillCache1</span></a></p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>PointType</strong> – The vector type used to define the point. Can be anything allowing access to components with operator(). Examples are Kokkos::View&lt;double*&gt; or Eigen::VectorXd. Only the first d-1 components of the vector will be accessed in this function. </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>polyCache</strong> – A pointer to the start of the cache. This memory must be allocated before calling this function. </p></li>
+<li><p><strong>pt</strong> – The point to use when filling in the cache. Should contain <span class="math notranslate nohighlight">\([x_1,\ldots,x_{d-1}]\)</span>. The vector itself can have more than <span class="math notranslate nohighlight">\(d-1\)</span> components, but only the first <span class="math notranslate nohighlight">\(d-1\)</span> will be accessed. The value of <span class="math notranslate nohighlight">\(x_d\)</span> is passed through the <code class="docutils literal notranslate"><span class="pre">xd</span></code> argument. </p></li>
+<li><p><strong>xd</strong> – The value of <span class="math notranslate nohighlight">\(x_d\)</span>. This is passed separate from <span class="math notranslate nohighlight">\([x_1,\ldots,x_{d-1}]\)</span> to make integrating over the last component more efficient. A copy of the point does not need to be created. </p></li>
+<li><p><strong>derivType</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK5mpart27MultivariateExpansionWorker8EvaluateEdPKdRK12CoeffVecType">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a19e8ef417e187adbd9c59abb48f60902"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Evaluate</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I0ENK5mpart27MultivariateExpansionWorker8EvaluateEdPKdRK12CoeffVecType" title="mpart::MultivariateExpansionWorker::Evaluate::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart27MultivariateExpansionWorker8EvaluateEdPKdRK12CoeffVecType" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK5mpart27MultivariateExpansionWorker18DiagonalDerivativeEdPKdRK12CoeffVecTypej">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a450857a9765fd784b8dc07d8ed0884ba"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DiagonalDerivative</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I0ENK5mpart27MultivariateExpansionWorker18DiagonalDerivativeEdPKdRK12CoeffVecTypej" title="mpart::MultivariateExpansionWorker::DiagonalDerivative::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derivOrder</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK5mpart27MultivariateExpansionWorker18DiagonalDerivativeEdPKdRK12CoeffVecTypej" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Evaluates the derivative of the expansion wrt x_{D-1}. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>CoeffVecType</strong> – </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>polyCache</strong> – </p></li>
+<li><p><strong>coeffs</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>double </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00ENK5mpart27MultivariateExpansionWorker15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GradVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a85b1fbc9d37088461c6b41b387c2b1e7"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffDerivative</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="mpart::MultivariateExpansionWorker::CoeffDerivative::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="mpart::MultivariateExpansionWorker::CoeffDerivative::GradVecType"><span class="n"><span class="pre">GradVecType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grad</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker15CoeffDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Evaluates the expansion and also computes the gradient of the expansion output wrt the coefficients. </p>
+<p>Using cached values in the “polyCache” argument and coefficients <span class="math notranslate nohighlight">\(\theta\)</span> from the coeffs argument, this function returns the value of the expansion <span class="math notranslate nohighlight">\(f(x;\theta)\)</span> and computes the gradient <span class="math notranslate nohighlight">\(\nabla_\theta f\)</span> of the expansion output with respect to the coefficients <span class="math notranslate nohighlight">\(\theta\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>CoeffVecType</strong> – </p></li>
+<li><p><strong>GradVecType</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>polyCache</strong> – </p></li>
+<li><p><strong>coeffs</strong> – </p></li>
+<li><p><strong>grad</strong> – A vector that will be updated with the scaled gradient. This is the vector <span class="math notranslate nohighlight">\(g\)</span> in the expression above. </p></li>
+<li><p><strong>gradScale</strong> – The scaling <span class="math notranslate nohighlight">\(\alpha\)</span> used in the expression above. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00ENK5mpart27MultivariateExpansionWorker15InputDerivativeEdPKdRK12CoeffVecTypeR11GradVecType">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GradVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a3ecb3cec6416b8047a155683e85c5a97"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">InputDerivative</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker15InputDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="mpart::MultivariateExpansionWorker::InputDerivative::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker15InputDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="mpart::MultivariateExpansionWorker::InputDerivative::GradVecType"><span class="n"><span class="pre">GradVecType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grad</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker15InputDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Computes the gradient <span class="math notranslate nohighlight">\(\nabla_x f(x_{1:d})\)</span> with respect to the input <span class="math notranslate nohighlight">\(x\)</span>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polyCache[in]</strong> – Cache vector that has been set up by calling both FillCache1 and FillCache2 with <code class="docutils literal notranslate"><span class="pre">DerivativeFlags::Input</span></code></p></li>
+<li><p><strong>coeffs[in]</strong> – Vector of coefficients. Must have parentheses access operator. </p></li>
+<li><p><strong>grad[out]</strong> – Preallocated vector to hold the gradient. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of $f(x_{1:d})$. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00ENK5mpart27MultivariateExpansionWorker20MixedInputDerivativeEdPKdRK12CoeffVecTypeR11GradVecType">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GradVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a5a5ed66473ffd32c8cbfc331054fa39f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MixedInputDerivative</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">polyCache</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker20MixedInputDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="mpart::MultivariateExpansionWorker::MixedInputDerivative::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker20MixedInputDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="mpart::MultivariateExpansionWorker::MixedInputDerivative::GradVecType"><span class="n"><span class="pre">GradVecType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grad</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker20MixedInputDerivativeEdPKdRK12CoeffVecTypeR11GradVecType" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Computes the gradient of the diagonal derivative <span class="math notranslate nohighlight">\(\nabla_x \partial_d f(x_{1:d})\)</span> with respect to the input <span class="math notranslate nohighlight">\(x\)</span>. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polyCache[in]</strong> – Cache vector that has been set up by calling both FillCache1 and FillCache2 with <code class="docutils literal notranslate"><span class="pre">DerivativeFlags::MixedInput</span></code></p></li>
+<li><p><strong>coeffs[in]</strong> – Vector of coefficients. Must have parentheses access operator. </p></li>
+<li><p><strong>grad[out]</strong> – Preallocated vector to hold the gradient. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of $\partial_d f(x_{1:d})$. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00ENK5mpart27MultivariateExpansionWorker20MixedCoeffDerivativeEdPKdRK12CoeffVecTypejR11GradVecType">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CoeffVecType</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GradVecType</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a4c2cf42eb5794e6c80c69967d2b69379"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MixedCoeffDerivative</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">cache</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker20MixedCoeffDerivativeEdPKdRK12CoeffVecTypejR11GradVecType" title="mpart::MultivariateExpansionWorker::MixedCoeffDerivative::CoeffVecType"><span class="n"><span class="pre">CoeffVecType</span></span></a><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">coeffs</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">derivOrder</span></span>, <a class="reference internal" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker20MixedCoeffDerivativeEdPKdRK12CoeffVecTypejR11GradVecType" title="mpart::MultivariateExpansionWorker::MixedCoeffDerivative::GradVecType"><span class="n"><span class="pre">GradVecType</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">grad</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I00ENK5mpart27MultivariateExpansionWorker20MixedCoeffDerivativeEdPKdRK12CoeffVecTypejR11GradVecType" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Computes the gradient of the diagonal derivative <span class="math notranslate nohighlight">\(\nabla_w \partial_d f(x_1:d; w)\)</span> with respect to the parameters. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polyCache[in]</strong> – Cache vector that has been set up by calling both FillCache1 and FillCache2 with <code class="docutils literal notranslate"><span class="pre">DerivativeFlags::MixedCoeff</span></code></p></li>
+<li><p><strong>coeffs[in]</strong> – Vector of coefficients. Must have parentheses access operator. </p></li>
+<li><p><strong>grad[out]</strong> – Preallocated vector to hold the gradient. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The value of $\partial_d f(x_{1:d})$. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart27MultivariateExpansionWorker16GetMultiIndexSetEv">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1a6c8ee09a86754e5143dc94c578dce90b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../multiindices/fixedmultiindexset.html#_CPPv4I0EN5mpart18FixedMultiIndexSetE" title="mpart::FixedMultiIndexSet"><span class="n"><span class="pre">FixedMultiIndexSet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN5mpart27MultivariateExpansionWorkerE" title="mpart::MultivariateExpansionWorker::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">GetMultiIndexSet</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart27MultivariateExpansionWorker16GetMultiIndexSetEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Allows access to the Fixed <a class="reference internal" href="../multiindices/multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> Set </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The Fixed <a class="reference internal" href="../multiindices/multiindex.html#classmpart_1_1_multi_index"><span class="std std-ref">MultiIndex</span></a> Set </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart27MultivariateExpansionWorker22NonzeroDiagonalEntriesEv">
+<span class="target" id="classmpart_1_1_multivariate_expansion_worker_1aa5f1293ec56282e4037d5db8571c7734"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NonzeroDiagonalEntries</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart27MultivariateExpansionWorker22NonzeroDiagonalEntriesEv" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../concepts/cachedparameterization.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Cached Parameterization Concept</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../concepts/parameterizedfunction.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Parameterized Function Concept</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../../../_sources/source/api/multivariatebasis/multivariateexpansionworker.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2022, The MParT development team..
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 6.2.1.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

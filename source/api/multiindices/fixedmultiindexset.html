@@ -425,11 +425,9 @@ document.write(`
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/linearalgebra.html">Linear Algebra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/kokkoswrappers.html">Kokkos Array Conversions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../templateconcepts.html">Template Concepts</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/cachedparameterization.html">Cached Parameterization Concept</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tensorproductfunction.html">Tensor Product Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multivariatebasis/multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/parameterizedfunction.html">Parameterized Function Concept</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -443,6 +441,12 @@ document.write(`
 <li class="toctree-l1 has-children"><a class="reference internal" href="../maptraining.html">Map Training</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../maptraining/trainmap.html">Train Map</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../maptraining/trainmapadaptive.html">Adaptive Map Training</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../multivariatebasis.html">Multivariate Basis Evaluation</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/univariatebasis.html">Univariate Bases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/basisevaluator.html">Basis Evaluators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 </ul>
 </li>
 </ul>
@@ -523,7 +527,7 @@ document.write(`
 <dt class="sig sig-object cpp" id="_CPPv4N5mpart18FixedMultiIndexSet18FixedMultiIndexSetEjN6Kokkos4ViewIPj11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEE">
 <span class="target" id="classmpart_1_1_fixed_multi_index_set_1a3a010de73d9b518b645590e7f9b0fc45"></span><span class="sig-name descname"><span class="n"><span class="pre">FixedMultiIndexSet</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_dim</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart18FixedMultiIndexSetE" title="mpart::FixedMultiIndexSet::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_nzStarts</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart18FixedMultiIndexSetE" title="mpart::FixedMultiIndexSet::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_nzDims</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0EN5mpart18FixedMultiIndexSetE" title="mpart::FixedMultiIndexSet::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">_nzOrders</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart18FixedMultiIndexSet18FixedMultiIndexSetEjN6Kokkos4ViewIPj11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Construct a fixed multiindex set in compressed form. </p>
-<p>Only nonzero orders are stored in this representation. For multivariate polynomials, the compressed representation can yield faster polynomial evaluations. </p>
+<p>Only nonzero orders are stored in this representation. For multivariate polynomials, the compressed representation can yield faster polynomial evaluations. Note that the internal order of <code class="docutils literal notranslate"><span class="pre">nzDims</span></code> is guaranteed to to be increasing for each multiindex. The internal values of <code class="docutils literal notranslate"><span class="pre">nzDims</span></code> might therefore differ from <code class="docutils literal notranslate"><span class="pre">_nzDims</span></code> because they will be sorted. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -542,8 +546,18 @@ document.write(`
 <dd></dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart18FixedMultiIndexSet22NonzeroDiagonalEntriesEv">
+<span class="target" id="classmpart_1_1_fixed_multi_index_set_1acf2b1ad7c8669e337a0bb77db1a69724"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NonzeroDiagonalEntries</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart18FixedMultiIndexSet22NonzeroDiagonalEntriesEv" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK5mpart18FixedMultiIndexSet12MultiToIndexERKNSt6vectorIjEE">
 <span class="target" id="classmpart_1_1_fixed_multi_index_set_1a89a719d53743bce2a4253c107cdc1701"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MultiToIndex</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">multi</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart18FixedMultiIndexSet12MultiToIndexERKNSt6vectorIjEE" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart18FixedMultiIndexSet5UnfixEv">
+<span class="target" id="classmpart_1_1_fixed_multi_index_set_1a51ccce40d23d66772f1a9532f308e8a7"></span><a class="reference internal" href="multiindexset.html#_CPPv4N5mpart13MultiIndexSetE" title="mpart::MultiIndexSet"><span class="n"><span class="pre">MultiIndexSet</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Unfix</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart18FixedMultiIndexSet5UnfixEv" title="Permalink to this definition">#</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">

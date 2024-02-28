@@ -427,11 +427,9 @@ document.write(`
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/linearalgebra.html">Linear Algebra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/kokkoswrappers.html">Kokkos Array Conversions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../templateconcepts.html">Template Concepts</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/cachedparameterization.html">Cached Parameterization Concept</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tensorproductfunction.html">Tensor Product Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multivariatebasis/multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/parameterizedfunction.html">Parameterized Function Concept</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -445,6 +443,12 @@ document.write(`
 <li class="toctree-l1 has-children"><a class="reference internal" href="../maptraining.html">Map Training</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2"><a class="reference internal" href="../maptraining/trainmap.html">Train Map</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../maptraining/trainmapadaptive.html">Adaptive Map Training</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../multivariatebasis.html">Multivariate Basis Evaluation</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/univariatebasis.html">Univariate Bases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/basisevaluator.html">Basis Evaluators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 </ul>
 </li>
 </ul>
@@ -852,6 +856,25 @@ j_d\)</span>. </p>
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart13MultiIndexSet16ReducedMarginDimEj">
+<span class="target" id="classmpart_1_1_multi_index_set_1a518f0545b7b6e158ce7bc92d05c70e52"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ReducedMarginDim</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dim</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet16ReducedMarginDimEj" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Returns multiindices in reduced margin incrementing dim. Will admit multiindices that have <em>any</em> backward neighbor where the given entry in the given dimension is lower. </p>
+<p><div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<p><a class="reference internal" href="#classmpart_1_1_multi_index_set_1a4310f91b0c29c0a6fe07be41e121ccc6"><span class="std std-ref">ReducedMargin()</span></a>.</p>
+</div>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dim</strong> – <strong>[in]</strong> The dimension of the reduced margin to return. </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A std::vector containing the multiindices in the reduced margin </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK5mpart13MultiIndexSet14StrictFrontierEv">
 <span class="target" id="classmpart_1_1_multi_index_set_1ae0242f73bd0f690ccd98ad24c0b1eb08"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">StrictFrontier</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet14StrictFrontierEv" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>We define the strict frontier to be the collection of multiindices, where all admissible forward neighbors are inactive. </p>
@@ -934,6 +957,17 @@ j_d\)</span>. </p>
 <dt class="sig sig-object cpp" id="_CPPv4NK5mpart13MultiIndexSet10NumForwardEj">
 <span class="target" id="classmpart_1_1_multi_index_set_1ab7a4ab9bed06ba123c645fd09313ef7e"></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NumForward</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">activeInd</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet10NumForwardEj" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Returns the number of forward neighbors (active or inactive) </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK5mpart13MultiIndexSet22NonzeroDiagonalEntriesEv">
+<span class="target" id="classmpart_1_1_multi_index_set_1afb583e44d9dabaf7c3feb16048399d73"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NonzeroDiagonalEntries</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK5mpart13MultiIndexSet22NonzeroDiagonalEntriesEv" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Finds all active indices in the multiindex set that have a nonzero value in the last dimension. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>std::vector&lt;unsigned int&gt; A vector of linear indices of active multiindices with nonzero last component </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="cpp function">

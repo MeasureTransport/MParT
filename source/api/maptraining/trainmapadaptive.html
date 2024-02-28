@@ -45,7 +45,7 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'source/api/maptraining/trainmapadaptive';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
-    <link rel="next" title="Community" href="../../development/index.html" />
+    <link rel="next" title="Multivariate Basis Evaluation" href="../multivariatebasis.html" />
     <link rel="prev" title="Train Map" href="trainmap.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -425,11 +425,9 @@ document.write(`
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/linearalgebra.html">Linear Algebra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/kokkoswrappers.html">Kokkos Array Conversions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../templateconcepts.html">Template Concepts</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/cachedparameterization.html">Cached Parameterization Concept</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l3"><a class="reference internal" href="../multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../tensorproductfunction.html">Tensor Product Function</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../multivariatebasis/multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 </ul>
 </li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/parameterizedfunction.html">Parameterized Function Concept</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
@@ -443,6 +441,12 @@ document.write(`
 <li class="toctree-l1 current active has-children"><a class="reference internal" href="../maptraining.html">Map Training</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="trainmap.html">Train Map</a></li>
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Adaptive Map Training</a></li>
+</ul>
+</li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../multivariatebasis.html">Multivariate Basis Evaluation</a><input class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/univariatebasis.html">Univariate Bases</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/basisevaluator.html">Basis Evaluators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../multivariatebasis/multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 </ul>
 </li>
 </ul>
@@ -544,6 +548,16 @@ document.write(`
 </dl>
 </dd></dl>
 
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10ATMOptions10ATMOptionsEv">
+<span class="target" id="structmpart_1_1_a_t_m_options_1a060bbf3b99e59a711f13fbbb2bd6a240"></span><span class="sig-name descname"><span class="n"><span class="pre">ATMOptions</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N5mpart10ATMOptions10ATMOptionsEv" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart10ATMOptions10ATMOptionsE10MapOptions12TrainOptions10MultiIndexjj">
+<span class="target" id="structmpart_1_1_a_t_m_options_1ab7434d2fa915e2373d5b316b7fc4f89d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ATMOptions</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../mapfactory.html#_CPPv4N5mpart10MapOptionsE" title="mpart::MapOptions"><span class="n"><span class="pre">MapOptions</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">mapOpts</span></span>, <a class="reference internal" href="trainmap.html#_CPPv4N5mpart12TrainOptionsE" title="mpart::TrainOptions"><span class="n"><span class="pre">TrainOptions</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">trainOpts</span></span>, <a class="reference internal" href="../multiindices/multiindex.html#_CPPv4N5mpart10MultiIndexE" title="mpart::MultiIndex"><span class="n"><span class="pre">MultiIndex</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">maxDegrees_</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxPatience_</span></span>, <span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">maxSize_</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart10ATMOptions10ATMOptionsE10MapOptions12TrainOptions10MultiIndexjj" title="Permalink to this definition">#</a><br /></dt>
+<dd></dd></dl>
+
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
@@ -590,11 +604,11 @@ document.write(`
       </div>
     </a>
     <a class="right-next"
-       href="../../development/index.html"
+       href="../multivariatebasis.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Community</p>
+        <p class="prev-next-title">Multivariate Basis Evaluation</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
