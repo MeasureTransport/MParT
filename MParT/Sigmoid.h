@@ -106,7 +106,7 @@ class Sigmoid1d {
 	 * @param widths
 	 */
 	Sigmoid1d(Kokkos::View<double*, MemorySpace> centers,
-						Kokkos::View<double*, MemorySpace> widths)
+			  Kokkos::View<double*, MemorySpace> widths)
 			: centers_(centers), widths_(widths) {
 		Kokkos::View<double*, MemorySpace> weights ("Sigmoid weights", centers.extent(0));
 		Kokkos::parallel_for(centers.extent(0), KOKKOS_LAMBDA(unsigned int i) { weights(i) = 1.; });

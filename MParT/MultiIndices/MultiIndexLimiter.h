@@ -27,49 +27,39 @@ namespace MultiIndexLimiter{
 
     };
 
-    /** @class SeparableTotalOrderLimiter
-        @brief Same as TotalOrder without cross-terms
-        @details This limter only allows terms that satisfy
-        \f$\|\mathbf{j}\|_1\leq p_U\f$, where \f$\mathbf{j}\f$
-        is the multiindex, and \f$p_U\f$ is a nonnegative integer passed to the
-        constructor of this class.
+    /** @class Separable
+        @brief Restricts multi-indices to refuse cross-terms
+        @details This limiter only allows terms that satisfy
+        \f$\mathbf{j}_d = 0\f$ *or* \f$\mathbf{j}_d=\|\mathbf{j}\|_1\f$,
+        where \f$\mathbf{j}\in\mathbb{N}_0^d\f$ is the multiindex.
     */
-    class SeparableTotalOrder{
+    class Separable{
 
     public:
 
-        SeparableTotalOrder(unsigned int totalOrderIn) : totalOrder(totalOrderIn){};
+        Separable(){};
 
         bool operator()(MultiIndex const& multi){
           unsigned int sum = multi.Sum();
-          return (sum <= totalOrder) && (!multi.HasNonzeroEnd() || sum == multi.Get(multi.Length()-1));
+          return !multi.HasNonzeroEnd() || sum == multi.Get(multi.Length()-1);
         };
-
-    private:
-        const unsigned int totalOrder;
 
     };
 
-    /** @class NonzeroDiagTotalOrderLimiter
-        @brief Same as TotalOrder, except without any term that has nonzero diagonal entries
-        @details This limter only allows terms that satisfy
-        \f$\|\mathbf{j}\|_1\leq p_U\f$, where \f$\mathbf{j}\f$
-        is the multiindex, and \f$p_U\f$ is a nonnegative integer passed to the
-        constructor of this class.
+    /** @class NonzeroDiag
+        @brief Restricts acceptable to any term that has nonzero diagonal entries
+        @details This limiter only allows terms that satisfy
+        \f$\mathbf{j}_d \neq 0\f$ when the multi-index \f$\mathbf{j}\in\mathbb{N}_0^d\f$.
     */
-    class NonzeroDiagTotalOrderLimiter{
+    class NonzeroDiag{
 
     public:
 
-        NonzeroDiagTotalOrderLimiter(unsigned int totalOrderIn) : totalOrder(totalOrderIn){};
+        NonzeroDiag() {};
 
         bool operator()(MultiIndex const& multi){
-          unsigned int sum = multi.Sum();
-          return (sum <= totalOrder) && (multi.HasNonzeroEnd());
+          return (multi.HasNonzeroEnd());
         };
-
-    private:
-        const unsigned int totalOrder;
 
     };
 

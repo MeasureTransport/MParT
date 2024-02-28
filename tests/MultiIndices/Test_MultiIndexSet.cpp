@@ -161,7 +161,7 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
     REQUIRE( mset.Size()==((maxOrder+1)*(maxOrder+2)/2));
 
-    MultiIndexSet mset_sep = MultiIndexSet::CreateTotalOrder(dim+1, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder));
+    MultiIndexSet mset_sep = MultiIndexSet::CreateTotalOrder(dim+1, maxOrder, MultiIndexLimiter::Separable());
     REQUIRE( mset_sep.Size()== ((maxOrder+1)*(maxOrder+2)/2) + maxOrder);
     REQUIRE( mset_sep.NonzeroDiagonalEntries().size() == maxOrder);
 
@@ -487,7 +487,7 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
 
     SECTION("NonzeroDiagonalEntries") {
         unsigned int dim = 2, maxOrder = 3;
-        MultiIndexSet set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::SeparableTotalOrder(maxOrder));
+        MultiIndexSet set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::Separable());
         std::vector<unsigned int> inds = set.NonzeroDiagonalEntries();
         for(unsigned int ind: inds) {
             MultiIndex multi = set.at(ind);
@@ -508,7 +508,7 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         std::sort(inds_fixed2.begin(), inds_fixed2.end());
         REQUIRE( inds == inds_fixed );
         REQUIRE( inds == inds_fixed2 );
-        MultiIndexSet full_set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(maxOrder));
+        MultiIndexSet full_set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::NonzeroDiag());
         inds = full_set.NonzeroDiagonalEntries();
         REQUIRE( inds.size() == full_set.Size() );
         for(int i = 0; i < full_set.Size(); ++i) {

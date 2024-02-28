@@ -22,7 +22,7 @@ TEST_CASE("RectifiedMultivariateExpansion, Unrectified", "[RMVE_NoRect]") {
     BasisEvaluator<BasisHomogeneity::Homogeneous, T> basis_eval_offdiag;
     BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<T, T>, Identity> basis_eval_diag{dim};
     FixedMultiIndexSet<MemorySpace> fmset_offdiag(dim-1, maxOrder);
-    auto limiter = MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(maxOrder);
+    auto limiter = MultiIndexLimiter::NonzeroDiag();
     FixedMultiIndexSet<MemorySpace> fmset_diag = MultiIndexSet::CreateTotalOrder(dim, maxOrder, limiter).Fix(true);
     MultivariateExpansionWorker<OffdiagEval_T, MemorySpace> worker_off(fmset_offdiag, basis_eval_offdiag);
     MultivariateExpansionWorker<DiagEval_T, MemorySpace> worker_diag(fmset_diag, basis_eval_diag);
@@ -179,7 +179,7 @@ TEMPLATE_TEST_CASE("Single Sigmoid RectifiedMultivariateExpansion","[single_sigm
     unsigned int maxOrder = 4;
     FixedMultiIndexSet<MemorySpace> fmset_offdiag (dim-1, maxOrder);
     unsigned int sigmoid_order = 4; // const, linear, left ET, right ET, sigmoid
-    auto limiter = MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(sigmoid_order);
+    auto limiter = MultiIndexLimiter::NonzeroDiag();
     MultiIndexSet mset_diag = MultiIndexSet::CreateTotalOrder(dim, sigmoid_order, limiter);
     FixedMultiIndexSet<MemorySpace> fmset_diag = mset_diag.Fix(true);
     // Setup expansion
@@ -282,7 +282,7 @@ TEMPLATE_TEST_CASE("Multiple Sigmoid RectifiedMultivariateExpansion","[multi_sig
     unsigned int maxOrder = 4;
     unsigned int dim = 3;
     FixedMultiIndexSet<MemorySpace> fmset_offdiag(dim-1, maxOrder);
-    auto limiter = MultiIndexLimiter::NonzeroDiagTotalOrderLimiter(maxOrder);
+    auto limiter = MultiIndexLimiter::NonzeroDiag();
     MultiIndexSet mset_diag = MultiIndexSet::CreateTotalOrder(dim, maxOrder, limiter);
     FixedMultiIndexSet<MemorySpace> fmset_diag = mset_diag.Fix(true);
 

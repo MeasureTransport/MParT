@@ -128,11 +128,52 @@ MEX_DEFINE(ConditionalMap_newTotalTriMap) (int nlhs, mxArray* plhs[],
   output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(inputDim,outputDim,totalOrder,opts)));
 }
 
+MEX_DEFINE(ConditionalMap_newSigmoidTriMap) (int nlhs, mxArray* plhs[],
+                                           int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 4 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
+  OutputArguments output(nlhs, plhs, 1);
+  unsigned int inputDim = input.get<unsigned int>(0);
+  unsigned int outputDim = input.get<unsigned int>(1);
+  unsigned int totalOrder = input.get<unsigned int>(2);
+  StridedMatrix<const double, Kokkos::HostSpace> centers = MexToKokkos2d(prhs[3]);
+
+  MapOptions opts = binding::MapOptionsFromMatlab(input, 4);
+
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(inputDim,outputDim,totalOrder,centers,opts)));
+}
+
+MEX_DEFINE(ConditionalMap_newSigmoidComp) (int nlhs, mxArray* plhs[],
+                                           int nrhs, const mxArray* prhs[]) {
+
+  InputArguments input(nrhs, prhs, 3 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
+  OutputArguments output(nlhs, plhs, 1);
+  unsigned int inputDim = input.get<unsigned int>(0);
+  unsigned int totalOrder = input.get<unsigned int>(1);
+  StridedVector<const double, Kokkos::HostSpace> centers = MexToKokkos1d(prhs[2]);
+
+  MapOptions opts = binding::MapOptionsFromMatlab(input, 3);
+
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(inputDim,totalOrder,centers,opts)));
+}
+
+MEX_DEFINE(ConditionalMap_newSigmoidCompFromMsets) (int nlhs, mxArray* plhs[],
+                                           int nrhs, const mxArray* prhs[]) {
+  InputArguments input(nrhs, prhs, 3 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
+  OutputArguments output(nlhs, plhs, 1);
+  const FixedMultiIndexSet<MemorySpace>& mset_offdiag = Session<FixedMultiIndexSet<MemorySpace>>::getConst(input.get(0));
+  const FixedMultiIndexSet<MemorySpace>& mset_diag = Session<FixedMultiIndexSet<MemorySpace>>::getConst(input.get(1));
+  StridedVector<const double, Kokkos::HostSpace> centers = MexToKokkos1d(prhs[2]);
+  MapOptions opts = binding::MapOptionsFromMatlab(input, 3);
+  output.set(0, Session<ConditionalMapMex>::create(new ConditionalMapMex(mset_offdiag, mset_diag, centers, opts)));
+}
+
 MEX_DEFINE(ConditionalMap_newMap) (int nlhs, mxArray* plhs[],
                     int nrhs, const mxArray* prhs[]) {
 
   InputArguments input(nrhs, prhs, 1 + MPART_MEX_MAPOPTIONS_ARGCOUNT);
   OutputArguments output(nlhs, plhs, 1);
+  std::cout << "ConditionalMap_newMap mset_ptr, " << (void*)(input.get(0)) << std::endl;
   const MultiIndexSet& mset = Session<MultiIndexSet>::getConst(input.get(0));
   MapOptions opts = binding::MapOptionsFromMatlab(input, 1);
 

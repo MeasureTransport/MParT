@@ -42,3 +42,9 @@ def test_at():
     last_idx = msetTotalOrder.Size()-1
     assert np.all(msetTotalOrder[last_idx].tolist() == [4,0,0])
 
+def test_total_order_limited():
+    msetTotalOrderSeparable = mpart.MultiIndexSet.CreateSeparableTotalOrder(dim+1,power)
+    assert msetTotalOrderSeparable.Size() == msetTotalOrder.Size()+power
+    msetTotalOrderNonzeroDiag = mpart.MultiIndexSet.CreateNonzeroDiagTotalOrder(dim,power)
+    assert np.all([midx[len(midx)-1] > 0 for midx in msetTotalOrderNonzeroDiag])
+    assert msetTotalOrderNonzeroDiag.NonzeroDiagonalEntries() == list(range(msetTotalOrderNonzeroDiag.Size()))

@@ -1,4 +1,4 @@
-classdef TrainMapTest < matlab.unittest.TestCase
+classdef TrainMapAdaptiveTest < matlab.unittest.TestCase
     % Copyright 2014 - 2016 The MathWorks, Inc.
 
     methods ( Test )
@@ -16,9 +16,9 @@ classdef TrainMapTest < matlab.unittest.TestCase
             obj1 = GaussianKLObjective(train, test, 1);
             obj2 = GaussianKLObjective(train, test);
             map_options = ATMOptions();
-            map_options.maxDegrees = MultiIndex([3,5])
-            msets2 = [CreateTotalOrder(1,1), CreateTotalOrder(2,1)]
-            msets1 = [CreateTotalOrder(2,1)]
+            map_options.maxDegrees = MultiIndex([3,5]);
+            msets2 = [MultiIndexSet.CreateTotalOrder(1,1), MultiIndexSet.CreateTotalOrder(2,1)];
+            msets1 = [MultiIndexSet.CreateTotalOrder(2,1)];
 
             % Print test error before
             map1 = TrainMapAdaptive(msets1, obj1, map_options);

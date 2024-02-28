@@ -59,8 +59,8 @@ methods
           end
         end
     elseif(nargin==3)
-      if(varargin{3}=="Ab")
-          this.id_=MParT_('ConditionalMap_newAffineMapAb', varargin{1},varargin{2});
+      if(isstring(varargin{3}) && varargin{3}=="Ab")
+        this.id_=MParT_('ConditionalMap_newAffineMapAb', varargin{1},varargin{2});
       else
         error("Wrong input arguments");
       end
@@ -71,15 +71,37 @@ methods
       opts = varargin{4};
 
       mexOptions = opts.getMexOptions;
-
-      input_str=['MParT_(',char(39),'ConditionalMap_newTotalTriMap',char(39),',inputDim,outputDim,totalOrder'];
+      if isa(inputDim, 'FixedMultiIndexSet') % If the first arguments are multi-index sets, we call CreateSigmoidComponent from msets
+        fcn_name = 'SigmoidCompFromMsets'; % arguments (mset_offdiag, mset_diag, centers, opts)
+        inputDim = inputDim.get_id(); % Need to get the IDs, these are multi-index sets
+        outputDim = outputDim.get_id();
+      elseif numel(totalOrder)==1 % if totalOrder is a scalar, this is calling CreateTriangular
+        fcn_name = 'TotalTriMap';
+      else % otherwise, we call CreateSigmoidComponent, args (inputDim, totalOrder, centers, opts)
+        fcn_name = 'SigmoidComp';
+      end
+      input_str=['MParT_(',char(39),'ConditionalMap_new',fcn_name,char(39),',inputDim,outputDim,totalOrder'];
       for o=1:length(mexOptions)
         input_o=[',mexOptions{',num2str(o),'}'];
         input_str=[input_str,input_o];
       end
       input_str=[input_str,')'];
       this.id_ = eval(input_str);
+    elseif(nargin==5) % CreateSigmoidTriangular
+      inputDim = varargin{1};
+      outputDim = varargin{2};
+      totalOrder = varargin{3};
+      centers = varargin{4};
+      opts = varargin{5};
 
+      mexOptions = opts.getMexOptions;
+      input_str=['MParT_(',char(39),'ConditionalMap_newSigmoidTriMap',char(39),',inputDim,outputDim,totalOrder,centers'];
+      for o=1:length(mexOptions)
+        input_o=[',mexOptions{',num2str(o),'}'];
+        input_str=[input_str,input_o];
+      end
+      input_str=[input_str,')'];
+      this.id_ = eval(input_str);
     elseif(nargin==1)
          this.id_=MParT_('ConditionalMap_newTriMap', varargin{1});
     else
@@ -168,7 +190,6 @@ methods
   function Serialize(this,filename)
     MParT_('ConditionalMap_Serialize',this.id_,filename);
   end
-
 
 end
 

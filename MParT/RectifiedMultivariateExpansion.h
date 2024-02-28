@@ -9,6 +9,7 @@
 #include "MParT/Utilities/KokkosHelpers.h"
 
 #include <algorithm>
+#include <numeric>
 
 namespace mpart{
 
@@ -31,7 +32,8 @@ namespace mpart{
             Rectifier>, MemorySpace
         >;
         using OffdiagWorker_T = MultivariateExpansionWorker<
-            BasisEvaluator<BasisHomogeneity::Homogeneous, OffdiagEval>
+            BasisEvaluator<BasisHomogeneity::Homogeneous, OffdiagEval>,
+            MemorySpace
         >;
 
 
@@ -42,11 +44,7 @@ namespace mpart{
                                     setSize_diag(worker_diag_.NumCoeffs()),
                                     worker_off(worker_off_),
                                     worker_diag(worker_diag_)
-        {
-            // TODO: Check that the inputs are compatible
-            // MVE_diag has no terms constant in last input
-            // Then, ensure all of these have the appropriate coefficient views
-        };
+        {};
 
         ~RectifiedMultivariateExpansion() = default;
 
@@ -179,8 +177,8 @@ namespace mpart{
             // Figure out how much memory we'll need in the cache
             unsigned int cacheSize = std::max(worker_diag.CacheSize(), worker_off.CacheSize());
             unsigned int maxParams = coeff_off.size() + coeff_diag.size();
-            Kokkos::pair<unsigned int, unsigned int> coeff_off_idx {0u,coeff_off.size()};
-            Kokkos::pair<unsigned int, unsigned int> coeff_diag_idx {coeff_off.size(), maxParams};
+            Kokkos::pair<unsigned int, unsigned int> coeff_off_idx {0u,(unsigned int)coeff_off.size()};
+            Kokkos::pair<unsigned int, unsigned int> coeff_diag_idx {(unsigned int) coeff_off.size(), maxParams};
 
             auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
@@ -422,6 +420,13 @@ namespace mpart{
             auto policy = GetCachedRangePolicy<ExecutionSpace>(numPts, cacheBytes, functor);
             Kokkos::parallel_for(policy, functor);
             Kokkos::fence();
+        }
+
+        std::vector<unsigned int> DiagonalCoeffIndices() const
+        {
+            std::vector<unsigned int> diagIndices(setSize_diag);
+            std::iota(diagIndices.begin(), diagIndices.end(), setSize_off);
+            return diagIndices;
         }
 
     private:
