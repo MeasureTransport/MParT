@@ -289,7 +289,6 @@ TEST_CASE("Test serialization of multivariate expansion worker.", "[Serializatio
 
 TEST_CASE("Test serialization of monotone component.", "[Serialization]"){
     
-    double testTol = 1e-7;
     unsigned int maxDegree = 2;
     unsigned int dim = 1;
 

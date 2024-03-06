@@ -288,7 +288,6 @@ TEMPLATE_TEST_CASE("Multiple Sigmoid RectifiedMultivariateExpansion","[multi_sig
 
     // Set up sigmoids
     const int num_sigmoids = 3;
-    const int order = num_sigmoids+1+2;
     const int param_length = 2 + num_sigmoids*(num_sigmoids+1)/2;
     Kokkos::View<double*, MemorySpace> center("Sigmoid Center", param_length);
     Kokkos::View<double*, MemorySpace> width("Sigmoid Width", param_length);

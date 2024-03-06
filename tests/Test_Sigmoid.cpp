@@ -83,8 +83,6 @@ TEMPLATE_TEST_CASE("Sigmoid1d","[sigmoid1d]", SigmoidTypeSpace::Logistic) {
         CHECK(Sigmoid.GetOrder() == 1 + 2 + 1); // Affine + 2 edge terms + 1 sigmoid
     }
 
-    unsigned int N_grad_points = 100;
-    double fd_delta = 1e-6;
     const double support_bound = 100.;
 
     SECTION("Single Sigmoid") {
