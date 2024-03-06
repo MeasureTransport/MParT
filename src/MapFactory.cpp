@@ -187,10 +187,12 @@ Sigmoid1d<MemorySpace, SigmoidType, EdgeType> CreateSigmoid(
         std::stringstream ss;
         ss << "Incorrect length of centers, " << centers.size() << ".\n";
         ss << "Length should be of form 2+(1+2+3+...+n) for some order n";
-        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+        ProcAgnosticError<std::invalid_argument>(
             ss.str().c_str());
     }
-    Kokkos::parallel_for(max_order+2, KOKKOS_LAMBDA(unsigned int i) {
+    unsigned int N = max_order+2; 
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy{0, N};
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(unsigned int i) {
         if (i == max_order) {
             widths(0) = edgeShape;
             weights(0) = 1./edgeShape;
@@ -236,7 +238,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateSigmoidExpansionTemplate(
         ss << "Mismatched input dimensions for offdiag and diag multiindex sets\n"
         << "offdiag: " << mset_offdiag.Length() << "\n"
         << "diag: " << mset_diag.Length();
-        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(ss.str().c_str());
+        ProcAgnosticError<std::invalid_argument>(ss.str().c_str());
     }
     using Sigmoid_T = Sigmoid1d<MemorySpace, SigmoidType, EdgeType>;
     using DiagBasisEval_T = BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<OffdiagEval, Sigmoid_T>, Rectifier>;
@@ -286,25 +288,25 @@ void HandleSigmoidComponentErrors(MapOptions const& opts) {
         std::string basisString = MapOptions::btypes[static_cast<unsigned int>(opts.basisType)];
         std::stringstream ss;
         ss << "Unsupported basis type for sigmoid expansion: " << basisString;
-        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(ss.str().c_str());
+        ProcAgnosticError<std::invalid_argument>(ss.str().c_str());
     }
     if(opts.posFuncType != PosFuncTypes::Exp && opts.posFuncType != PosFuncTypes::SoftPlus) {
         std::string posString = MapOptions::pftypes[static_cast<unsigned int>(opts.posFuncType)];
         std::stringstream ss;
         ss << "Unsupported positive function type for sigmoid expansion: " << posString;
-        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(ss.str().c_str());
+        ProcAgnosticError<std::invalid_argument>(ss.str().c_str());
     }
     if(opts.edgeType != EdgeTypes::SoftPlus) {
         std::string edgeString = MapOptions::etypes[static_cast<unsigned int>(opts.edgeType)];
         std::stringstream ss;
         ss << "Unsupported edge type for sigmoid expansion: " << edgeString;
-        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(ss.str().c_str());
+        ProcAgnosticError<std::invalid_argument>(ss.str().c_str());
     }
     if(opts.sigmoidType != SigmoidTypes::Logistic) {
         std::string sigmoidString = MapOptions::stypes[static_cast<unsigned int>(opts.sigmoidType)];
         std::stringstream ss;
         ss << "Unsupported sigmoid type for sigmoid expansion: " << sigmoidString;
-        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(ss.str().c_str());
+        ProcAgnosticError<std::invalid_argument>(ss.str().c_str());
     }
 }
 
@@ -349,7 +351,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> MapFactory::CreateSigmoidTriang
     if(outputDim > inputDim) {
         std::stringstream ss;
         ss << "CreateSigmoidTriangular: Output dimension " << outputDim << " cannot be greater than input dimension " << inputDim;
-        ProcAgnosticError<MemorySpace, std::invalid_argument>::error(ss.str().c_str());
+        ProcAgnosticError<std::invalid_argument>(ss.str().c_str());
     }
     std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>> > comps(outputDim);
     for(int i = 0; i < outputDim; i++) {

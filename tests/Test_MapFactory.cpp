@@ -5,6 +5,7 @@
 #include "MParT/TriangularMap.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
+#include "MParT/Utilities/KokkosSpaceMappings.h"
 
 #include <unordered_map>
 #include <string>
@@ -225,7 +226,7 @@ TEST_CASE( "Testing factory method for Sigmoid Component", "[MapFactorySigmoidCo
     REQUIRE(func != nullptr);
     unsigned int numPts = 100;
     Kokkos::View<double**,MemorySpace> pts("Points", inputDim, numPts);
-    Kokkos::MDRangePolicy<Kokkos::Rank<2>> policy({0,0}, {inputDim, numPts});
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0,0}, {inputDim, numPts});
     Kokkos::parallel_for("Fill points", policy, KOKKOS_LAMBDA(const int i, const int j){
         pts(i,j) = double(j*i)/double((inputDim)*(numPts-1));
     });
@@ -237,7 +238,8 @@ TEST_CASE( "Testing factory method for Sigmoid Component", "[MapFactorySigmoidCo
     CHECK(eval.extent(0)==1);
     SECTION("Check Gradient") {
         Kokkos::View<double**, MemorySpace> sens ( "Sensitivities", 1, numPts);
-        Kokkos::parallel_for("fill sensitivities", numPts, KOKKOS_LAMBDA(const int i){
+        Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy_pts {0, numPts};
+        Kokkos::parallel_for("fill sensitivities", policy_pts, KOKKOS_LAMBDA(const int i){
             sens(0,i) = 1.0;
         });
         Kokkos::View<double**, MemorySpace> grad = func->Gradient(pts, sens);
@@ -245,7 +247,7 @@ TEST_CASE( "Testing factory method for Sigmoid Component", "[MapFactorySigmoidCo
         CHECK(grad.extent(1)==numPts);
         double fd_step = 1e-6;
         for(int i = 0; i < inputDim; i++){
-            Kokkos::parallel_for(numPts, KOKKOS_LAMBDA(const int j){
+            Kokkos::parallel_for(policy_pts, KOKKOS_LAMBDA(const int j){
                 if(i > 0) pts(i-1,j) -= fd_step;
                 pts(i,j) += fd_step;
             });

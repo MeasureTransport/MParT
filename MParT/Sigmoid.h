@@ -123,12 +123,7 @@ class Sigmoid1d {
 	 */
 	KOKKOS_FUNCTION void EvaluateAll(double* output, int max_order, double input) const {
 		if (order_ < max_order) {
-			std::stringstream ss;
-			ss << "Sigmoid basis evaluation order too large.\n";
-			ss << "Given order " << max_order << ", ";
-			ss << "can only evaluate up to order " << order_;
-			ProcAgnosticError< std::invalid_argument>(
-				ss.str().c_str());
+			ProcAgnosticError<std::invalid_argument>("Sigmoid basis evaluation order too large.");
 		}
 
 		output[0] = 1.;
@@ -167,12 +162,7 @@ class Sigmoid1d {
 	KOKKOS_FUNCTION void EvaluateDerivatives(double* output, double* output_diff, int max_order,
 							 double input) const {
 		if (order_ < max_order) {
-			std::stringstream ss;
-			ss << "Sigmoid basis evaluation order too large.\n";
-			ss << "Given order " << max_order << ", ";
-			ss << "can only evaluate up to order " << order_;
-			ProcAgnosticError< std::invalid_argument>(
-				ss.str().c_str());
+			ProcAgnosticError<std::invalid_argument>("Sigmoid derivative evaluation order too large.");
 		}
 
 		output[0] = 1.;
@@ -222,12 +212,7 @@ class Sigmoid1d {
 								   double* output_diff2, int max_order,
 								   double input) const {
 		if (order_ < max_order) {
-			std::stringstream ss;
-			ss << "Sigmoid basis evaluation order too large.\n";
-			ss << "Given order " << max_order << ", ";
-			ss << "can only evaluate up to order " << order_;
-			ProcAgnosticError< std::invalid_argument>(
-				ss.str().c_str());
+			ProcAgnosticError<std::invalid_argument>("Sigmoid second derivative evaluation order too large");
 		}
 
 		output[0] = 1.;

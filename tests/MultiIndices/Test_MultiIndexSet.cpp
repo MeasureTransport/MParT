@@ -25,10 +25,12 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     FixedMultiIndexSet<Kokkos::HostSpace> multiSet_fixed = multiSet_original.Fix(true);
     MultiIndexSet multiSet_reconstructed = multiSet_fixed.Unfix();
     REQUIRE(multiSet_original.Size() == multiSet_reconstructed.Size());
-    REQUIRE(multiSet_original.MaxOrders() == multiSet_reconstructed.MaxOrders());
+    bool same_max_orders = multiSet_original.MaxOrders() == multiSet_reconstructed.MaxOrders();
+    REQUIRE(same_max_orders);
     std::vector<unsigned int> diagonal_idxs_ref = multiSet_reconstructed.NonzeroDiagonalEntries();
     std::vector<unsigned int> diagonal_idxs = multiSet_fixed.NonzeroDiagonalEntries();
-    REQUIRE(diagonal_idxs_ref == diagonal_idxs);
+    bool diag_idxs_pass = diagonal_idxs_ref == diagonal_idxs;
+    REQUIRE(diag_idxs_pass);
 }
 
 TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedMultiIndexSetSorting]" ) {
@@ -507,8 +509,10 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         std::sort(inds.begin(), inds.end());
         std::sort(inds_fixed.begin(), inds_fixed.end());
         std::sort(inds_fixed2.begin(), inds_fixed2.end());
-        REQUIRE( inds == inds_fixed );
-        REQUIRE( inds == inds_fixed2 );
+        bool inds_same_fixed = inds == inds_fixed;
+        REQUIRE( inds_same_fixed );
+        bool inds_same_fixed2 = inds == inds_fixed2;
+        REQUIRE( inds_same_fixed2 );
         MultiIndexSet full_set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::NonzeroDiag());
         inds = full_set.NonzeroDiagonalEntries();
         REQUIRE( inds.size() == full_set.Size() );
