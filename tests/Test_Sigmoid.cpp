@@ -65,20 +65,19 @@ void TestSigmoidGradients(Function Sigmoid, unsigned int N_grad_points, double f
     }
 }
 
-using TestType1 = std::pair< SigmoidTypeSpace::Logistic, std::integral_constant<int, 0> >;
+using TestType1 = std::pair< SigmoidTypeSpace::Logistic, Kokkos::HostSpace>;
 
 #if defined(MPART_ENABLE_GPU)
-using TestType2 = std::pair< SigmoidTypeSpace::Logistic, std::integral_constant<int, 1> >;
+using TestType2 = std::pair< SigmoidTypeSpace::Logistic, DeviceSpace>;
 #else
-using TestType2 = std::pair< SigmoidTypeSpace::Logistic, std::integral_constant<int, -1> >;
+using TestType2 = std::pair< SigmoidTypeSpace::Logistic, std::false_type>;
 #endif
 
 TEMPLATE_TEST_CASE("Sigmoid1d","[sigmoid1d]", TestType1, TestType2) {
-if (TestType::second_type::value >= 0) { // Don't worry about testing the host twice
+if (!std::is_same_v<typename TestType::second_type, std::false_type>) { // Don't worry about testing the host twice
 
     using SigmoidType = typename TestType::first_type;
-    constexpr bool is_device = (TestType::second_type::value == 1);
-    using MemorySpace = std::conditional_t< is_device, DeviceSpace, Kokkos::HostSpace>;
+    using MemorySpace = std::conditional_t<std::is_same_v<typename TestType::second_type, std::false_type>, Kokkos::HostSpace, typename TestType::second_type>;
     using ExecutionSpace = typename MemoryToExecution<MemorySpace>::Space;
     SECTION("Initialization") {
         Kokkos::View<double*, MemorySpace> centers("Sigmoid Centers", 2);
