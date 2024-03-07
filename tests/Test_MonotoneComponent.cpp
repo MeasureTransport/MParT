@@ -871,7 +871,8 @@ TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[M
     SECTION("DiagonalCoeffIndices") {
         std::vector<unsigned int> indices = comp.DiagonalCoeffIndices();
         std::vector<unsigned int> indices_ref = expansion.NonzeroDiagonalEntries();
-        REQUIRE(indices == indices_ref);
+        bool same_indices = indices == indices_ref;
+        REQUIRE(same_indices);
     }
 }
 
