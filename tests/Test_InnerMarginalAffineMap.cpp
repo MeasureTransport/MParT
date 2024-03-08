@@ -225,7 +225,6 @@ TEST_CASE( "Test InnerMarginalAffineMap", "[InnerMarginalAffineMap]") {
     SECTION("MoveCoeffs") {
         unsigned int maxOrder = 3;
         unsigned int outputDim = 2;
-        unsigned int numPts = 20;
         auto trimap = MapFactory::CreateTriangular<MemorySpace>(inputDim, outputDim, maxOrder, MapOptions());
 
         // Penalize high order k

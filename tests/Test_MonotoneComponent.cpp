@@ -263,12 +263,11 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     }
 
     SECTION("Integrand Input Gradient") {
-        double fdStep = 1e-5;
 
         MonotoneIntegrand<MultivariateExpansionWorker<BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite>>, Exp, Kokkos::View<double*,HostSpace>,Kokkos::View<double*,HostSpace>> integrand(&cache[0], expansion, pt, coeffs, DerivativeFlags::Input, 0.0);
 
         // Evaluate the expansion
-        double df, d2f;
+        double df;
         Kokkos::View<double*,HostSpace> fval("Integrand", dim+1);
         Kokkos::View<double*,HostSpace> coeffGrad("Coefficient Gradient", dim);
 
@@ -872,7 +871,8 @@ TEST_CASE("Testing MonotoneComponent CoeffGrad and LogDeterminantCoeffGrad", "[M
     SECTION("DiagonalCoeffIndices") {
         std::vector<unsigned int> indices = comp.DiagonalCoeffIndices();
         std::vector<unsigned int> indices_ref = expansion.NonzeroDiagonalEntries();
-        REQUIRE(indices == indices_ref);
+        bool same_indices = indices == indices_ref;
+        REQUIRE(same_indices);
     }
 }
 

@@ -72,7 +72,7 @@ namespace mpart{
 
                     // Create a subview containing only the current point
                     auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
-                    auto pt_off = Kokkos::subview(pt, std::pair<int,int>(0,pt.size()-1));
+                    auto pt_off = Kokkos::subview(pt, Kokkos::pair<int,int>(0,pt.size()-1));
 
                     // Get a pointer to the shared memory that Kokkos set up for this team
                     Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
@@ -126,11 +126,11 @@ namespace mpart{
 
                     // Create a subview containing only the current point
                     auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
-                    auto pt_off = Kokkos::subview(pts, std::pair<int,int>(0,pt.size()-1), ptInd);
+                    auto pt_off = Kokkos::subview(pts, Kokkos::pair<int,int>(0,pt.size()-1), ptInd);
 
                     // Get a pointer to the shared memory that Kokkos set up for this team
-                    Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
-                    Kokkos::View<double*,MemorySpace> grad_off(team_member.thread_scratch(1), inDim-1);
+                    Kokkos::View<double*, MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
+                    Kokkos::View<double*, MemorySpace> grad_off(team_member.thread_scratch(1), inDim-1);
                     StridedVector<double, MemorySpace> grad_out = Kokkos::subview(output, Kokkos::ALL(), ptInd);
 
                     // Fill in entries in the cache that are independent of x_d
@@ -188,7 +188,7 @@ namespace mpart{
 
                     // Create a subview containing only the current point
                     auto pt = Kokkos::subview(pts, Kokkos::ALL(), ptInd);
-                    auto pt_off = Kokkos::subview(pt, std::pair<int,int>(0,pt.extent(0)-1));
+                    auto pt_off = Kokkos::subview(pt, Kokkos::pair<int,int>(0,pt.extent(0)-1));
 
                     // Get a pointer to the shared memory that Kokkos set up for this team
                     Kokkos::View<double*,MemorySpace> cache(team_member.thread_scratch(1), cacheSize);
@@ -232,7 +232,7 @@ namespace mpart{
             unsigned int cacheSize = worker_diag.CacheSize();
 
             // Take logdet of diagonal expansion
-            auto functor = KOKKOS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
+            auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
                 unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
 
@@ -333,7 +333,7 @@ namespace mpart{
             unsigned int cacheSize = worker_diag.CacheSize();
 
             // Take logdet of diagonal expansion
-            auto functor = KOKKOS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
+            auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
                 unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
 
@@ -386,7 +386,7 @@ namespace mpart{
             unsigned int cacheSize = worker_diag.CacheSize();
 
             // Take logdet of diagonal expansion
-            auto functor = KOKKOS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
+            auto functor = KOKKOS_CLASS_LAMBDA (typename Kokkos::TeamPolicy<ExecutionSpace>::member_type team_member) {
 
                 unsigned int ptInd = team_member.league_rank () * team_member.team_size () + team_member.team_rank ();
 
@@ -437,9 +437,9 @@ namespace mpart{
             CoeffType coeffs;
             DiagWorker_T worker;
 
-            SingleWorkerEvaluator(double* cache_, PointType pt_, CoeffType coeffs_, DiagWorker_T worker_):
+            KOKKOS_INLINE_FUNCTION SingleWorkerEvaluator(double* cache_, PointType pt_, CoeffType coeffs_, DiagWorker_T worker_):
                 cache(cache_), pt(pt_), coeffs(coeffs_), worker(worker_) {}
-            double operator()(double x) {
+            KOKKOS_INLINE_FUNCTION double operator()(double x) {
                 worker.FillCache2(cache, pt, x, DerivativeFlags::None);
                 return worker.Evaluate(cache, coeffs);
             }
