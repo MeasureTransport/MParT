@@ -24,7 +24,8 @@ TEST_CASE( "Testing multivariate expansion", "[MultivariateExpansion]") {
     CHECK(func.numCoeffs == (mset.Size()*outDim));
     std::vector<unsigned int> nonzeroDiagTerms_ref = mset.NonzeroDiagonalEntries();
     std::vector<unsigned int> diagCoeffs = func.DiagonalCoeffIndices();
-    REQUIRE(nonzeroDiagTerms_ref == diagCoeffs);
+    
+    REQUIRE((nonzeroDiagTerms_ref == diagCoeffs));
 
     Kokkos::View<double*,Kokkos::HostSpace> coeffs("coefficients", func.numCoeffs);
     for(unsigned int i=0; i<func.numCoeffs; ++i)
