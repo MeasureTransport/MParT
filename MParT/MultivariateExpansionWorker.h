@@ -432,7 +432,7 @@ private:
             if(multiSet_.nzDims(end_idx)==dim_-1){
                 termVal = Rectifier::Evaluate(termVal)*lastVal;
             } else {
-                termVal = Rectifier::Evaluate(termVal*lastVal);
+                termVal = termVal*lastVal;
             }
         } else {
             termVal *= lastVal;
@@ -484,13 +484,18 @@ private:
             lastVal = polyCache[startPos_(d) + multiSet_.nzOrders(end_idx)];
         }
         if constexpr (!std::is_same_v<Rectifier, Identity>) {
+            bool isRectified = d == dim_ - 1;
             if(wrt == dim_ - 1) { // Diagonal deriv
                 termVal = Rectifier::Evaluate(termVal)*wrtDeriv; // if wrt != d, wrtDeriv = 0
             } else if (wrt == -1) { // No deriv
-                termVal = (d == dim_ - 1) ? Rectifier::Evaluate(termVal)*lastVal : Rectifier::Evaluate(termVal*lastVal);
+                termVal = (isRectified) ? Rectifier::Evaluate(termVal)*lastVal : termVal*lastVal;
             } else { // Offdiag deriv
-                if(d != dim_ - 1) wrtVal *= lastVal; // lastVal belongs on inside and outside
-                termVal = Rectifier::Derivative(termVal*wrtVal)*termVal*wrtDeriv*lastVal;
+                if(!isRectified) {
+                    termVal *= lastVal*wrtDeriv;
+                }
+                else{
+                    termVal = Rectifier::Derivative(termVal*wrtVal)*termVal*wrtDeriv*lastVal;
+                }
             }
         } else { // Reduce to loop body
             termVal *= lastVal*wrtDeriv;
