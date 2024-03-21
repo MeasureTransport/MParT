@@ -490,20 +490,27 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Kokkos is usingKokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
-  process threads available :   2,  requested thread :   8
- 8 threads
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+  process threads available :   4,  requested thread :   8
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
 Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
-                                    Detected: 2 cores per node.
+                                    Detected: 4 cores per node.
                                     Detected: 1 MPI_ranks per node.
                                     Requested: 8 threads per process.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Kokkos is using 8 threads
 </pre></div></div>
 </div>
 </section>
@@ -705,21 +712,28 @@ Initial objective value: 3.39E+00
 </pre></div>
 </div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 ==================
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
 Optimization terminated successfully.
-         Current function value: 2.844511
-         Iterations: 17
-         Function evaluations: 19
-         Gradient evaluations: 19
+         Current function value: 2.840443
+         Iterations: 20
+         Function evaluations: 22
+         Gradient evaluations: 22
 Final coeffs:
-[-0.01108237  0.84833716  0.00631056  0.98331819  0.84867706  0.00667816
- -0.00985025  0.02820473  2.22978852]
-Final objective value: 2.83E+00
+[-0.01425586  0.84478473 -0.00722493  0.99251992  0.86379603  0.02144773
+ -0.06676881 -0.01965374  2.23008538]
+Final objective value: 2.84E+00
 ==================
 </pre></div></div>
 </div>
@@ -798,7 +812,7 @@ Final objective value: 2.83E+00
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 ==================
-Variance diagnostic: 3.13E-04
+Variance diagnostic: 3.84E-04
 ==================
 </pre></div></div>
 </div>

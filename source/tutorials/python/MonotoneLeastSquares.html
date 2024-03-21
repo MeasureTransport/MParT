@@ -490,20 +490,27 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Kokkos is usingKokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
-  process threads available :   2,  requested thread :   8
- 8 threads
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+  process threads available :   4,  requested thread :   8
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
 Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
-                                    Detected: 2 cores per node.
+                                    Detected: 4 cores per node.
                                     Detected: 1 MPI_ranks per node.
                                     Requested: 8 threads per process.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Kokkos is using 8 threads
 </pre></div></div>
 </div>
 </section>
@@ -671,10 +678,10 @@ Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU core
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Optimization terminated successfully.
-         Current function value: 0.168862
-         Iterations: 53
-         Function evaluations: 56
-         Gradient evaluations: 56
+         Current function value: 0.172947
+         Iterations: 55
+         Function evaluations: 60
+         Gradient evaluations: 60
 </pre></div></div>
 </div>
 </section>

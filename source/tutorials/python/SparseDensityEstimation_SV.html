@@ -483,20 +483,27 @@ document.write(`
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Kokkos is usingKokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
-  process threads available :   2,  requested thread :   8
- 8 threads
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+  process threads available :   4,  requested thread :   8
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
 Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
-                                    Detected: 2 cores per node.
+                                    Detected: 4 cores per node.
                                     Detected: 1 MPI_ranks per node.
                                     Requested: 8 threads per process.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Kokkos is using 8 threads
 </pre></div></div>
 </div>
 </section>
@@ -600,11 +607,26 @@ Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU core
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+&lt;&gt;:3: SyntaxWarning: invalid escape sequence &#39;\m&#39;
+&lt;&gt;:4: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+&lt;&gt;:3: SyntaxWarning: invalid escape sequence &#39;\m&#39;
+&lt;&gt;:4: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+/tmp/ipykernel_268/2191412704.py:3: SyntaxWarning: invalid escape sequence &#39;\m&#39;
+  plt.plot(range(1,Nvisu+1),Xvisu[1,:],label=&#39;$\mu$&#39;)
+/tmp/ipykernel_268/2191412704.py:4: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+  plt.plot(range(1,Nvisu+1),Xvisu[2,:],label=&#39;$\phi$&#39;)
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/source_tutorials_python_SparseDensityEstimation_SV_15_0.png" src="../../../_images/source_tutorials_python_SparseDensityEstimation_SV_15_0.png" />
+<img alt="../../../_images/source_tutorials_python_SparseDensityEstimation_SV_15_1.png" src="../../../_images/source_tutorials_python_SparseDensityEstimation_SV_15_1.png" />
 </div>
 </div>
 </section>
@@ -786,12 +808,284 @@ Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU core
 <br/></pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:   0%|          | 0/32 [00:00&amp;lt;?, ?it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:   0%|          | 0/32 [00:00&lt;?, ?it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:   0%|          | 0/32 [00:00&lt;?, ?it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  16%|█▌        | 5/32 [00:00&amp;lt;00:00, 38.08it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  16%|█▌        | 5/32 [00:00&lt;00:00, 38.08it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  16%|█▌        | 5/32 [00:00&lt;00:00, 38.08it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  28%|██▊       | 9/32 [00:00&amp;lt;00:00, 23.74it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  28%|██▊       | 9/32 [00:00&lt;00:00, 23.74it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  28%|██▊       | 9/32 [00:00&lt;00:00, 23.74it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  38%|███▊      | 12/32 [00:00&amp;lt;00:00, 20.10it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  38%|███▊      | 12/32 [00:00&lt;00:00, 20.10it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  38%|███▊      | 12/32 [00:00&lt;00:00, 20.10it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  47%|████▋     | 15/32 [00:00&amp;lt;00:01, 15.94it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  47%|████▋     | 15/32 [00:00&lt;00:01, 15.94it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  47%|████▋     | 15/32 [00:00&lt;00:01, 15.94it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  53%|█████▎    | 17/32 [00:00&amp;lt;00:01, 14.62it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  53%|█████▎    | 17/32 [00:00&lt;00:01, 14.62it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  53%|█████▎    | 17/32 [00:00&lt;00:01, 14.62it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  59%|█████▉    | 19/32 [00:01&amp;lt;00:00, 13.25it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  59%|█████▉    | 19/32 [00:01&lt;00:00, 13.25it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  59%|█████▉    | 19/32 [00:01&lt;00:00, 13.25it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  66%|██████▌   | 21/32 [00:01&amp;lt;00:00, 11.92it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  66%|██████▌   | 21/32 [00:01&lt;00:00, 11.92it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  66%|██████▌   | 21/32 [00:01&lt;00:00, 11.92it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  72%|███████▏  | 23/32 [00:01&amp;lt;00:00, 11.10it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  72%|███████▏  | 23/32 [00:01&lt;00:00, 11.10it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  72%|███████▏  | 23/32 [00:01&lt;00:00, 11.10it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  78%|███████▊  | 25/32 [00:01&amp;lt;00:00, 10.51it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  78%|███████▊  | 25/32 [00:01&lt;00:00, 10.51it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  78%|███████▊  | 25/32 [00:01&lt;00:00, 10.51it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  84%|████████▍ | 27/32 [00:02&amp;lt;00:00,  9.92it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  84%|████████▍ | 27/32 [00:02&lt;00:00,  9.92it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  84%|████████▍ | 27/32 [00:02&lt;00:00,  9.92it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  91%|█████████ | 29/32 [00:02&amp;lt;00:00,  9.47it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  91%|█████████ | 29/32 [00:02&lt;00:00,  9.47it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  91%|█████████ | 29/32 [00:02&lt;00:00,  9.47it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  94%|█████████▍| 30/32 [00:02&amp;lt;00:00,  9.26it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  94%|█████████▍| 30/32 [00:02&lt;00:00,  9.26it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  94%|█████████▍| 30/32 [00:02&lt;00:00,  9.26it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  97%|█████████▋| 31/32 [00:02&amp;lt;00:00,  8.83it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  97%|█████████▋| 31/32 [00:02&lt;00:00,  8.83it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  97%|█████████▋| 31/32 [00:02&lt;00:00,  8.83it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component: 100%|██████████| 32/32 [00:02&amp;lt;00:00,  8.25it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component: 100%|██████████| 32/32 [00:02&lt;00:00,  8.25it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component: 100%|██████████| 32/32 [00:02&lt;00:00,  8.25it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component: 100%|██████████| 32/32 [00:02&amp;lt;00:00, 11.94it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component: 100%|██████████| 32/32 [00:02&lt;00:00, 11.94it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component: 100%|██████████| 32/32 [00:02&lt;00:00, 11.94it/s]</p>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Map component: 100%|██████████| 32/32 [00:03&lt;00:00,  9.11it/s]
+
 </pre></div></div>
 </div>
 </section>
@@ -850,12 +1144,573 @@ Map component: 100%|██████████| 32/32 [00:03&lt;00:00,  9.11
 <br/></pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:   0%|          | 0/32 [00:00&amp;lt;?, ?it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:   0%|          | 0/32 [00:00&lt;?, ?it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:   0%|          | 0/32 [00:00&lt;?, ?it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:   6%|▋         | 2/32 [00:00&amp;lt;00:06,  4.78it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:   6%|▋         | 2/32 [00:00&lt;00:06,  4.78it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:   6%|▋         | 2/32 [00:00&lt;00:06,  4.78it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:   9%|▉         | 3/32 [00:00&amp;lt;00:05,  4.92it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:   9%|▉         | 3/32 [00:00&lt;00:05,  4.92it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:   9%|▉         | 3/32 [00:00&lt;00:05,  4.92it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  12%|█▎        | 4/32 [00:01&amp;lt;00:08,  3.34it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  12%|█▎        | 4/32 [00:01&lt;00:08,  3.34it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  12%|█▎        | 4/32 [00:01&lt;00:08,  3.34it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  16%|█▌        | 5/32 [00:01&amp;lt;00:11,  2.34it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  16%|█▌        | 5/32 [00:01&lt;00:11,  2.34it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  16%|█▌        | 5/32 [00:01&lt;00:11,  2.34it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  19%|█▉        | 6/32 [00:02&amp;lt;00:15,  1.68it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  19%|█▉        | 6/32 [00:02&lt;00:15,  1.68it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  19%|█▉        | 6/32 [00:02&lt;00:15,  1.68it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  22%|██▏       | 7/32 [00:03&amp;lt;00:20,  1.22it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  22%|██▏       | 7/32 [00:03&lt;00:20,  1.22it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  22%|██▏       | 7/32 [00:03&lt;00:20,  1.22it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  25%|██▌       | 8/32 [00:04&amp;lt;00:20,  1.18it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  25%|██▌       | 8/32 [00:04&lt;00:20,  1.18it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  25%|██▌       | 8/32 [00:04&lt;00:20,  1.18it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  28%|██▊       | 9/32 [00:06&amp;lt;00:26,  1.17s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  28%|██▊       | 9/32 [00:06&lt;00:26,  1.17s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  28%|██▊       | 9/32 [00:06&lt;00:26,  1.17s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  31%|███▏      | 10/32 [00:09&amp;lt;00:37,  1.69s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  31%|███▏      | 10/32 [00:09&lt;00:37,  1.69s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  31%|███▏      | 10/32 [00:09&lt;00:37,  1.69s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  34%|███▍      | 11/32 [00:13&amp;lt;00:50,  2.42s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  34%|███▍      | 11/32 [00:13&lt;00:50,  2.42s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  34%|███▍      | 11/32 [00:13&lt;00:50,  2.42s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  38%|███▊      | 12/32 [00:17&amp;lt;00:59,  2.95s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  38%|███▊      | 12/32 [00:17&lt;00:59,  2.95s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  38%|███▊      | 12/32 [00:17&lt;00:59,  2.95s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  41%|████      | 13/32 [00:22&amp;lt;01:04,  3.39s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  41%|████      | 13/32 [00:22&lt;01:04,  3.39s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  41%|████      | 13/32 [00:22&lt;01:04,  3.39s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  44%|████▍     | 14/32 [00:27&amp;lt;01:11,  3.97s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  44%|████▍     | 14/32 [00:27&lt;01:11,  3.97s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  44%|████▍     | 14/32 [00:27&lt;01:11,  3.97s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  47%|████▋     | 15/32 [00:35&amp;lt;01:25,  5.02s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  47%|████▋     | 15/32 [00:35&lt;01:25,  5.02s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  47%|████▋     | 15/32 [00:35&lt;01:25,  5.02s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  50%|█████     | 16/32 [00:41&amp;lt;01:26,  5.39s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  50%|█████     | 16/32 [00:41&lt;01:26,  5.39s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  50%|█████     | 16/32 [00:41&lt;01:26,  5.39s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  53%|█████▎    | 17/32 [00:48&amp;lt;01:29,  6.00s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  53%|█████▎    | 17/32 [00:48&lt;01:29,  6.00s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  53%|█████▎    | 17/32 [00:48&lt;01:29,  6.00s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  56%|█████▋    | 18/32 [00:57&amp;lt;01:34,  6.74s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  56%|█████▋    | 18/32 [00:57&lt;01:34,  6.74s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  56%|█████▋    | 18/32 [00:57&lt;01:34,  6.74s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  59%|█████▉    | 19/32 [01:08&amp;lt;01:46,  8.22s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  59%|█████▉    | 19/32 [01:08&lt;01:46,  8.22s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  59%|█████▉    | 19/32 [01:08&lt;01:46,  8.22s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  62%|██████▎   | 20/32 [01:20&amp;lt;01:50,  9.22s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  62%|██████▎   | 20/32 [01:20&lt;01:50,  9.22s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  62%|██████▎   | 20/32 [01:20&lt;01:50,  9.22s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  66%|██████▌   | 21/32 [01:30&amp;lt;01:44,  9.53s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  66%|██████▌   | 21/32 [01:30&lt;01:44,  9.53s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  66%|██████▌   | 21/32 [01:30&lt;01:44,  9.53s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  69%|██████▉   | 22/32 [01:42&amp;lt;01:43, 10.33s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  69%|██████▉   | 22/32 [01:42&lt;01:43, 10.33s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  69%|██████▉   | 22/32 [01:42&lt;01:43, 10.33s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  72%|███████▏  | 23/32 [01:56&amp;lt;01:42, 11.37s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  72%|███████▏  | 23/32 [01:56&lt;01:42, 11.37s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  72%|███████▏  | 23/32 [01:56&lt;01:42, 11.37s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  75%|███████▌  | 24/32 [02:09&amp;lt;01:34, 11.84s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  75%|███████▌  | 24/32 [02:09&lt;01:34, 11.84s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  75%|███████▌  | 24/32 [02:09&lt;01:34, 11.84s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  78%|███████▊  | 25/32 [02:28&amp;lt;01:38, 14.07s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  78%|███████▊  | 25/32 [02:28&lt;01:38, 14.07s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  78%|███████▊  | 25/32 [02:28&lt;01:38, 14.07s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  81%|████████▏ | 26/32 [02:45&amp;lt;01:29, 14.91s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  81%|████████▏ | 26/32 [02:45&lt;01:29, 14.91s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  81%|████████▏ | 26/32 [02:45&lt;01:29, 14.91s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  84%|████████▍ | 27/32 [03:06&amp;lt;01:23, 16.74s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  84%|████████▍ | 27/32 [03:06&lt;01:23, 16.74s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  84%|████████▍ | 27/32 [03:06&lt;01:23, 16.74s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  88%|████████▊ | 28/32 [03:29&amp;lt;01:13, 18.41s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  88%|████████▊ | 28/32 [03:29&lt;01:13, 18.41s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  88%|████████▊ | 28/32 [03:29&lt;01:13, 18.41s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  91%|█████████ | 29/32 [03:52&amp;lt;01:00, 20.07s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  91%|█████████ | 29/32 [03:52&lt;01:00, 20.07s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  91%|█████████ | 29/32 [03:52&lt;01:00, 20.07s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  94%|█████████▍| 30/32 [04:16&amp;lt;00:41, 20.99s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  94%|█████████▍| 30/32 [04:16&lt;00:41, 20.99s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  94%|█████████▍| 30/32 [04:16&lt;00:41, 20.99s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  97%|█████████▋| 31/32 [04:43&amp;lt;00:22, 22.89s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  97%|█████████▋| 31/32 [04:43&lt;00:22, 22.89s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  97%|█████████▋| 31/32 [04:43&lt;00:22, 22.89s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component: 100%|██████████| 32/32 [05:15&amp;lt;00:00, 25.65s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component: 100%|██████████| 32/32 [05:15&lt;00:00, 25.65s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component: 100%|██████████| 32/32 [05:15&lt;00:00, 25.65s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component: 100%|██████████| 32/32 [05:15&amp;lt;00:00,  9.86s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component: 100%|██████████| 32/32 [05:15&lt;00:00,  9.86s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component: 100%|██████████| 32/32 [05:15&lt;00:00,  9.86s/it]</p>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Map component: 100%|██████████| 32/32 [08:23&lt;00:00, 15.73s/it]
+
 </pre></div></div>
 </div>
 </section>
@@ -948,12 +1803,573 @@ Map component: 100%|██████████| 32/32 [08:23&lt;00:00, 15.73
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:   0%|          | 0/32 [00:00&amp;lt;?, ?it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:   0%|          | 0/32 [00:00&lt;?, ?it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:   0%|          | 0/32 [00:00&lt;?, ?it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:   6%|▋         | 2/32 [00:03&amp;lt;00:56,  1.88s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:   6%|▋         | 2/32 [00:03&lt;00:56,  1.88s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:   6%|▋         | 2/32 [00:03&lt;00:56,  1.88s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:   9%|▉         | 3/32 [00:03&amp;lt;00:34,  1.18s/it]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:   9%|▉         | 3/32 [00:03&lt;00:34,  1.18s/it]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:   9%|▉         | 3/32 [00:03&lt;00:34,  1.18s/it]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  12%|█▎        | 4/32 [00:04&amp;lt;00:25,  1.10it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  12%|█▎        | 4/32 [00:04&lt;00:25,  1.10it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  12%|█▎        | 4/32 [00:04&lt;00:25,  1.10it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  16%|█▌        | 5/32 [00:04&amp;lt;00:19,  1.38it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  16%|█▌        | 5/32 [00:04&lt;00:19,  1.38it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  16%|█▌        | 5/32 [00:04&lt;00:19,  1.38it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  19%|█▉        | 6/32 [00:05&amp;lt;00:15,  1.71it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  19%|█▉        | 6/32 [00:05&lt;00:15,  1.71it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  19%|█▉        | 6/32 [00:05&lt;00:15,  1.71it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  22%|██▏       | 7/32 [00:05&amp;lt;00:12,  1.97it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  22%|██▏       | 7/32 [00:05&lt;00:12,  1.97it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  22%|██▏       | 7/32 [00:05&lt;00:12,  1.97it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  25%|██▌       | 8/32 [00:05&amp;lt;00:10,  2.29it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  25%|██▌       | 8/32 [00:05&lt;00:10,  2.29it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  25%|██▌       | 8/32 [00:05&lt;00:10,  2.29it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  28%|██▊       | 9/32 [00:06&amp;lt;00:10,  2.24it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  28%|██▊       | 9/32 [00:06&lt;00:10,  2.24it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  28%|██▊       | 9/32 [00:06&lt;00:10,  2.24it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  31%|███▏      | 10/32 [00:06&amp;lt;00:08,  2.58it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  31%|███▏      | 10/32 [00:06&lt;00:08,  2.58it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  31%|███▏      | 10/32 [00:06&lt;00:08,  2.58it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  34%|███▍      | 11/32 [00:06&amp;lt;00:08,  2.48it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  34%|███▍      | 11/32 [00:06&lt;00:08,  2.48it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  34%|███▍      | 11/32 [00:06&lt;00:08,  2.48it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  38%|███▊      | 12/32 [00:07&amp;lt;00:07,  2.73it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  38%|███▊      | 12/32 [00:07&lt;00:07,  2.73it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  38%|███▊      | 12/32 [00:07&lt;00:07,  2.73it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  41%|████      | 13/32 [00:07&amp;lt;00:06,  2.95it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  41%|████      | 13/32 [00:07&lt;00:06,  2.95it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  41%|████      | 13/32 [00:07&lt;00:06,  2.95it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  44%|████▍     | 14/32 [00:07&amp;lt;00:05,  3.03it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  44%|████▍     | 14/32 [00:07&lt;00:05,  3.03it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  44%|████▍     | 14/32 [00:07&lt;00:05,  3.03it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  47%|████▋     | 15/32 [00:08&amp;lt;00:05,  3.06it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  47%|████▋     | 15/32 [00:08&lt;00:05,  3.06it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  47%|████▋     | 15/32 [00:08&lt;00:05,  3.06it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  50%|█████     | 16/32 [00:08&amp;lt;00:05,  2.93it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  50%|█████     | 16/32 [00:08&lt;00:05,  2.93it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  50%|█████     | 16/32 [00:08&lt;00:05,  2.93it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  53%|█████▎    | 17/32 [00:08&amp;lt;00:05,  2.90it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  53%|█████▎    | 17/32 [00:08&lt;00:05,  2.90it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  53%|█████▎    | 17/32 [00:08&lt;00:05,  2.90it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  56%|█████▋    | 18/32 [00:09&amp;lt;00:04,  3.02it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  56%|█████▋    | 18/32 [00:09&lt;00:04,  3.02it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  56%|█████▋    | 18/32 [00:09&lt;00:04,  3.02it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  59%|█████▉    | 19/32 [00:09&amp;lt;00:04,  2.95it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  59%|█████▉    | 19/32 [00:09&lt;00:04,  2.95it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  59%|█████▉    | 19/32 [00:09&lt;00:04,  2.95it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  62%|██████▎   | 20/32 [00:09&amp;lt;00:03,  3.00it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  62%|██████▎   | 20/32 [00:09&lt;00:03,  3.00it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  62%|██████▎   | 20/32 [00:09&lt;00:03,  3.00it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  66%|██████▌   | 21/32 [00:10&amp;lt;00:03,  2.85it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  66%|██████▌   | 21/32 [00:10&lt;00:03,  2.85it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  66%|██████▌   | 21/32 [00:10&lt;00:03,  2.85it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  69%|██████▉   | 22/32 [00:10&amp;lt;00:03,  2.82it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  69%|██████▉   | 22/32 [00:10&lt;00:03,  2.82it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  69%|██████▉   | 22/32 [00:10&lt;00:03,  2.82it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  72%|███████▏  | 23/32 [00:10&amp;lt;00:03,  2.89it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  72%|███████▏  | 23/32 [00:10&lt;00:03,  2.89it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  72%|███████▏  | 23/32 [00:10&lt;00:03,  2.89it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  75%|███████▌  | 24/32 [00:11&amp;lt;00:02,  3.09it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  75%|███████▌  | 24/32 [00:11&lt;00:02,  3.09it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  75%|███████▌  | 24/32 [00:11&lt;00:02,  3.09it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  78%|███████▊  | 25/32 [00:11&amp;lt;00:02,  3.19it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  78%|███████▊  | 25/32 [00:11&lt;00:02,  3.19it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  78%|███████▊  | 25/32 [00:11&lt;00:02,  3.19it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  81%|████████▏ | 26/32 [00:11&amp;lt;00:02,  2.94it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  81%|████████▏ | 26/32 [00:11&lt;00:02,  2.94it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  81%|████████▏ | 26/32 [00:11&lt;00:02,  2.94it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  84%|████████▍ | 27/32 [00:12&amp;lt;00:01,  2.95it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  84%|████████▍ | 27/32 [00:12&lt;00:01,  2.95it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  84%|████████▍ | 27/32 [00:12&lt;00:01,  2.95it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  88%|████████▊ | 28/32 [00:12&amp;lt;00:01,  2.83it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  88%|████████▊ | 28/32 [00:12&lt;00:01,  2.83it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  88%|████████▊ | 28/32 [00:12&lt;00:01,  2.83it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  91%|█████████ | 29/32 [00:12&amp;lt;00:01,  2.71it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  91%|█████████ | 29/32 [00:12&lt;00:01,  2.71it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  91%|█████████ | 29/32 [00:12&lt;00:01,  2.71it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  94%|█████████▍| 30/32 [00:13&amp;lt;00:00,  2.50it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  94%|█████████▍| 30/32 [00:13&lt;00:00,  2.50it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  94%|█████████▍| 30/32 [00:13&lt;00:00,  2.50it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component:  97%|█████████▋| 31/32 [00:13&amp;lt;00:00,  2.49it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component:  97%|█████████▋| 31/32 [00:13&lt;00:00,  2.49it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component:  97%|█████████▋| 31/32 [00:13&lt;00:00,  2.49it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component: 100%|██████████| 32/32 [00:14&amp;lt;00:00,  2.48it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component: 100%|██████████| 32/32 [00:14&lt;00:00,  2.48it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component: 100%|██████████| 32/32 [00:14&lt;00:00,  2.48it/s]</p>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre></div></div>
+</div>
+<dl>
+<dt>Map component: 100%|██████████| 32/32 [00:14&amp;lt;00:00,  2.25it/s]</dt><dd><blockquote>
+<div><p>&lt;/pre&gt;</p>
+</div></blockquote>
+</dd>
+<dt>Map component: 100%|██████████| 32/32 [00:14&lt;00:00,  2.25it/s]</dt><dd><blockquote>
+<div><p>end{sphinxVerbatim}</p>
+</div></blockquote>
+</dd>
+</dl>
+<p>Map component: 100%|██████████| 32/32 [00:14&lt;00:00,  2.25it/s]</p>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Map component: 100%|██████████| 32/32 [00:26&lt;00:00,  1.21it/s]
+
 </pre></div></div>
 </div>
 </section>
@@ -992,11 +2408,22 @@ Map component: 100%|██████████| 32/32 [00:26&lt;00:00,  1.21
 </pre></div>
 </div>
 </div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+&lt;&gt;:8: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+&lt;&gt;:8: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+/tmp/ipykernel_268/1071692651.py:8: SyntaxWarning: invalid escape sequence &#39;\p&#39;
+  ax.set_ylabel(&#39;$D_{KL}(\pi(\mathbf{x}_t)||S^\sharp \eta)$&#39;)
+</pre></div></div>
+</div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
-<img alt="../../../_images/source_tutorials_python_SparseDensityEstimation_SV_57_0.png" src="../../../_images/source_tutorials_python_SparseDensityEstimation_SV_57_0.png" />
+<img alt="../../../_images/source_tutorials_python_SparseDensityEstimation_SV_57_1.png" src="../../../_images/source_tutorials_python_SparseDensityEstimation_SV_57_1.png" />
 </div>
 </div>
 <p>Usually increasing map complexity will improve map approximation. However when the number of parameters increases too much compared to the number of samples, computed map overfits the data which lead to worst approximation. This overfitting can be seen in this examples when looking at the total order 2 approximation that rapidly loses accuracy when the dimension increases.</p>

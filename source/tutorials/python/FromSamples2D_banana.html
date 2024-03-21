@@ -491,20 +491,27 @@ reads:</p>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-Kokkos is usingKokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
-  process threads available :   2,  requested thread :   8
- 8 threads
+Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
+  process threads available :   4,  requested thread :   8
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
 Kokkos::OpenMP::initialize WARNING: You are likely oversubscribing your CPU cores.
-                                    Detected: 2 cores per node.
+                                    Detected: 4 cores per node.
                                     Detected: 1 MPI_ranks per node.
                                     Requested: 8 threads per process.
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Kokkos is using 8 threads
 </pre></div></div>
 </div>
 </section>
@@ -777,7 +784,7 @@ Objective value for component 1: 1.53E+00
 ==================
 Starting coeffs component 2:
 [0. 0. 0. 0. 0. 0.]
-Objective value for component 2: 2.26E+00
+Objective value for component 2: 2.33E+00
 ==================
 </pre></div></div>
 </div>
@@ -804,7 +811,7 @@ Objective value for component 2: 2.26E+00
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Optimization terminated successfully.
-         Current function value: 1.424850
+         Current function value: 1.409863
          Iterations: 5
          Function evaluations: 6
          Gradient evaluations: 6
@@ -829,7 +836,7 @@ Optimization terminated successfully.
 <div class="output_area docutils container">
 <div class="highlight"><pre>
 Optimization terminated successfully.
-         Current function value: 1.426039
+         Current function value: 1.416648
          Iterations: 16
          Function evaluations: 18
          Gradient evaluations: 18
@@ -892,12 +899,13 @@ Optimization terminated successfully.
 <div class="highlight"><pre>
 ==================
 Final coeffs component 1:
-[0.00174073 0.84225657]
+[0.00802657 0.87981868]
 Objective value for component 1: 1.43E+00
 ==================
 Final coeffs component 2:
-[-0.99504069  0.82750629  0.00824115  0.01208213 -0.01193632 -2.2576335 ]
-Objective value for component 2: 1.42E+00
+[-9.99591197e-01  8.60401350e-01  1.84772872e-03  9.63642525e-04
+  2.93190421e-02 -2.22058868e+00]
+Objective value for component 2: 1.43E+00
 ==================
 </pre></div></div>
 </div>
@@ -926,11 +934,11 @@ Objective value for component 2: 1.42E+00
 <div class="highlight"><pre>
 ==================
 Mean of normalized test samples
-[-0.01391257 -0.01288152]
+[0.00914977 0.010794  ]
 ==================
 Cov of normalized test samples
-[[ 1.00033428 -0.01059318]
- [-0.01059318  0.99498315]]
+[[ 1.03171901 -0.00378754]
+ [-0.00378754  1.03298134]]
 ==================
 </pre></div></div>
 </div>
