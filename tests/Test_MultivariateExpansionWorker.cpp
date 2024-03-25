@@ -251,7 +251,8 @@ TEST_CASE( "Testing multivariate expansion on device", "[MultivariateExpansionWo
     hexpansion.FillCache1(hcache.data(), hpt, DerivativeFlags::None);
 
     // Run the fill cache funciton, using a parallel_for loop to ensure it's run on the device
-    Kokkos::parallel_for(1, KOKKOS_LAMBDA(const int i){
+    Kokkos::RangePolicy<typename MemoryToExecution<DeviceSpace>::Space> policy(0,1);
+    Kokkos::parallel_for(policy, KOKKOS_LAMBDA(const int i){
         dexpansion.FillCache1(dcache.data(), dpt, DerivativeFlags::None);
         dexpansion.FillCache2(dcache.data(), dpt, 0.5 * dpt(dim-1), DerivativeFlags::None);
     });

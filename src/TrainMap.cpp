@@ -63,10 +63,12 @@ double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> ma
             std::cout << "TrainMap: Initializing map coeffs to 1." << std::endl;
         }
         Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Default coeffs", map->numCoeffs);
-        Kokkos::parallel_for("Setting default coeff val", map->numCoeffs, KOKKOS_LAMBDA(const unsigned int i){
+	Kokkos::RangePolicy<typename MemoryToExecution<Kokkos::HostSpace>::Space> policy(0,map->numCoeffs);
+        Kokkos::parallel_for("Setting default coeff val", policy, KOKKOS_LAMBDA(const unsigned int i){
             coeffs(i) = 1.;
         });
-        map->SetCoeffs(coeffs);
+	Kokkos::View<const double*, Kokkos::HostSpace> constCoeffs = coeffs;
+        map->SetCoeffs(constCoeffs);
     }
     nlopt::opt opt = SetupOptimization(map->numCoeffs, options);
 
@@ -83,7 +85,7 @@ double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> ma
     nlopt::result res = opt.optimize(mapCoeffsStd, error);
 
     // Set the coefficients using SetCoeffs
-    Kokkos::View<double*, Kokkos::HostSpace> mapCoeffsView = VecToKokkos<double,Kokkos::HostSpace>(mapCoeffsStd);
+    Kokkos::View<const double*, Kokkos::HostSpace> mapCoeffsView = VecToKokkos<double,Kokkos::HostSpace>(mapCoeffsStd);
     map->SetCoeffs(mapCoeffsView);
 
     // Print a warning if something goes wrong with NLOpt

@@ -279,11 +279,11 @@ class UnivariateExpansion: public ConditionalMapBase<MemorySpace>{
     template<typename CoeffType>
     class SingleUnivariateEvaluator {
         public:
-        SingleUnivariateEvaluator(double* cache, CoeffType coeff, BasisType basis):
+        KOKKOS_FUNCTION SingleUnivariateEvaluator(double* cache, CoeffType coeff, BasisType basis):
             cache_(cache), coeff_(coeff), basisEval_(basis), maxOrderEval_(coeff.extent(0)-1)
         {};
 
-        double operator()(double x) const {
+        KOKKOS_INLINE_FUNCTION double operator()(double x) const {
             basisEval_.EvaluateAll(cache_, maxOrderEval_, x);
             double result = 0.0;
             for(int i = 0; i <= maxOrderEval_; i++) {

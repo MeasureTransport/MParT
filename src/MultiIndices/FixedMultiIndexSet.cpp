@@ -2,6 +2,9 @@
 #include "MParT/MultiIndices/MultiIndex.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
 #include "MParT/Utilities/ArrayConversions.h"
+#include "MParT/Utilities/KokkosSpaceMappings.h"
+#include "MParT/Utilities/GPUtils.h"
+
 #include <stdio.h>
 
 using namespace mpart;
@@ -126,8 +129,10 @@ void FixedMultiIndexSet<MemorySpace>::SetupTerms()
     unsigned int numTerms = nzOrders.extent(0) / dim;
 
     nzStarts = Kokkos::View<unsigned int*, MemorySpace>("Start of a Multiindex", numTerms+1);
-    Kokkos::parallel_for(numTerms, StartSetter<MemorySpace>(nzStarts,dim));
-    Kokkos::parallel_for(dim*numTerms, DimSetter<MemorySpace>(nzDims,dim));
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy(0, numTerms);
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policyDims(0, dim*numTerms);
+    Kokkos::parallel_for(policy, StartSetter<MemorySpace>(nzStarts,dim));
+    Kokkos::parallel_for(policyDims, DimSetter<MemorySpace>(nzDims,dim));
 }
 template<>
 void FixedMultiIndexSet<Kokkos::HostSpace>::SetupTerms()
@@ -153,9 +158,11 @@ template<typename MemorySpace>
 void FixedMultiIndexSet<MemorySpace>::CalculateMaxDegrees()
 {
     maxDegrees = Kokkos::View<unsigned int*, MemorySpace>("Maximum degrees", dim);
-
-    Kokkos::parallel_for(dim, MaxDegreeInitializer<MemorySpace>(maxDegrees));
-    Kokkos::parallel_for(nzOrders.extent(0), MaxDegreeSetter<MemorySpace>(maxDegrees, nzDims, nzOrders, dim));
+    
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> DimPolicy(0, dim); 
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> NZPolicy(0, nzOrders.extent(0));
+    Kokkos::parallel_for(DimPolicy, MaxDegreeInitializer<MemorySpace>(maxDegrees));
+    Kokkos::parallel_for(NZPolicy, MaxDegreeSetter<MemorySpace>(maxDegrees, nzDims, nzOrders, dim));
 }
 
 template<>
@@ -186,8 +193,11 @@ FixedMultiIndexSet<MemorySpace>::FixedMultiIndexSet(unsigned int                
                                                                                 nzDims(nzDims),
                                                                                 nzOrders(nzOrders)
 {
+    DimensionSorter<MemorySpace> dimSort {nzStarts, nzDims, nzOrders};
     // Sort so that nzDims increases for each multiindex
-    Kokkos::parallel_for(nzStarts.extent(0)-1, DimensionSorter<MemorySpace>(nzStarts, nzDims, nzOrders));
+    unsigned int N_midxs = nzStarts.extent(0) - 1;
+    Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy{0lu, N_midxs};
+    Kokkos::parallel_for(policy, dimSort);
 
     CalculateMaxDegrees();
 }
@@ -456,18 +466,18 @@ FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<Kokkos::HostSpace>::ToD
 #if defined(MPART_ENABLE_GPU)
     template<>
     template<>
-    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>()
+    FixedMultiIndexSet<DeviceSpace> FixedMultiIndexSet<Kokkos::HostSpace>::ToDevice<DeviceSpace>()
     {
-        auto deviceStarts = mpart::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(nzStarts);
-        auto deviceDims = mpart::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(nzDims);
-        auto deviceOrders =  mpart::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>(nzOrders);
-        FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> output(dim, deviceStarts, deviceDims, deviceOrders);
+        auto deviceStarts = mpart::ToDevice<DeviceSpace>(nzStarts);
+        auto deviceDims = mpart::ToDevice<DeviceSpace>(nzDims);
+        auto deviceOrders =  mpart::ToDevice<DeviceSpace>(nzOrders);
+        FixedMultiIndexSet<DeviceSpace> output(dim, deviceStarts, deviceDims, deviceOrders);
         return output;
     }
 
     template<>
     template<>
-    FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>::ToDevice<Kokkos::HostSpace>()
+    FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<DeviceSpace>::ToDevice<Kokkos::HostSpace>()
     {
         assert(false);
         return FixedMultiIndexSet<Kokkos::HostSpace>(0,0);
@@ -475,10 +485,9 @@ FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<Kokkos::HostSpace>::ToD
 
     template<>
     template<>
-    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>::ToDevice<Kokkos::DefaultExecutionSpace::memory_space>()
+    FixedMultiIndexSet<DeviceSpace> FixedMultiIndexSet<DeviceSpace>::ToDevice<DeviceSpace>()
     {
-        assert(false);
-        return FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>(0,0);
+        return *this;
     }
 
 #endif
@@ -487,7 +496,7 @@ FixedMultiIndexSet<Kokkos::HostSpace> FixedMultiIndexSet<Kokkos::HostSpace>::ToD
 // Explicit template instantiation
 #if defined(MPART_ENABLE_GPU)
     template class mpart::FixedMultiIndexSet<Kokkos::HostSpace>;
-    template class mpart::FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space>;
+    template class mpart::FixedMultiIndexSet<DeviceSpace>;
 #else
     template class mpart::FixedMultiIndexSet<Kokkos::HostSpace>;
 #endif

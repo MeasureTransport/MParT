@@ -26,7 +26,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_LinPhys_ACC
 
     output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv, opts.nugget);
 
-    output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
+    Kokkos::View<const double*,MemorySpace> coeffs = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
+    output->SetCoeffs(coeffs);
+
     return output;
 }
 
@@ -42,7 +44,7 @@ REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::Physici
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, AdaptiveClenshawCurtis, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Exp, AdaptiveClenshawCurtis, mpart::DeviceSpace)
-REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, Softplus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::PhysicistHermite>, SoftPlus, AdaptiveClenshawCurtis, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory10)
 #endif 

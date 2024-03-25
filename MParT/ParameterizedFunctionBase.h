@@ -51,10 +51,8 @@ namespace mpart {
             @param coeffs A view containing the coefficients to copy.
         */
        virtual void SetCoeffs(Kokkos::View<const double*, MemorySpace> coeffs);
+               void SetCoeffs(Kokkos::View<      double*, MemorySpace> coeffs);
 
-       #if defined(MPART_ENABLE_GPU)
-       void SetCoeffs(Kokkos::View<const double*, std::conditional_t<std::is_same_v<MemorySpace,Kokkos::HostSpace>,mpart::DeviceSpace,Kokkos::HostSpace>> coeffs);
-       #endif
 
         /** @brief Wrap the internal coefficient view around another view.
             @details Performs a shallow copy of the input coefficients to the internally stored coefficients.
@@ -62,12 +60,12 @@ namespace mpart {
             internally stored view.
             @param coeffs A view containing the coefficients we want to wrap.
         */
-        virtual void WrapCoeffs(Kokkos::View<double*, Kokkos::HostSpace> coeffs);
+        virtual void WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs);
 
         #if defined(MPART_ENABLE_GPU)
-        virtual void SetCoeffs(Kokkos::View<const double*, mpart::DeviceSpace> coeffs);
-        virtual void WrapCoeffs(Kokkos::View<double*, mpart::DeviceSpace> coeffs);
-        #endif
+        virtual void SetCoeffs(Kokkos::View<const double*, std::conditional_t<std::is_same_v<Kokkos::HostSpace,MemorySpace>, mpart::DeviceSpace, Kokkos::HostSpace>> coeffs);
+	            void SetCoeffs(Kokkos::View<      double*, std::conditional_t<std::is_same_v<Kokkos::HostSpace,MemorySpace>, mpart::DeviceSpace, Kokkos::HostSpace>> coeffs);
+	    #endif
 
         /** SetCoeffs function with conversion from Eigen to Kokkos vector types.*/
         virtual void SetCoeffs(Eigen::Ref<Eigen::VectorXd> coeffs);

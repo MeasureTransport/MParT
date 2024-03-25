@@ -583,7 +583,6 @@ TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[Triangular
         triMap->SetCoeffs(coeffs);
 
         // Now make sure that the coefficients of each block were set
-        unsigned int cumCoeffInd = 0;
         for(unsigned int i=0; i<triMap->numCoeffs; ++i){
                 CHECK(comp->Coeffs()(i) == triMap->Coeffs()(i)); // Values of coefficients should be equal
                 CHECK(&comp->Coeffs()(i) == &triMap->Coeffs()(i)); // Memory location should also be the same (no copy)
@@ -603,9 +602,6 @@ TEST_CASE( "Testing TriangularMap made using CreateSingleEntryMap", "[Triangular
     auto out = triMap->Evaluate(in);
 
     SECTION("Evaluation"){
-
-        unsigned int start = 0;
-
 
         auto inTop = Kokkos::subview(in, std::make_pair(0, int(activeInd-1)), Kokkos::ALL());
         auto inTopAndMid = Kokkos::subview(in, std::make_pair(0, int(activeInd)), Kokkos::ALL());

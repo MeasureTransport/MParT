@@ -125,7 +125,6 @@ KOKKOS_INLINE_FUNCTION double Find_x_ITP(double xlb, double xub, double yd, doub
 template<typename MemorySpace, typename FunctorType>
 KOKKOS_INLINE_FUNCTION double InverseSingleBracket(double yd, FunctorType f, double x0, const double xtol, const double ftol, int& info)
 {   
-    double stepSize=1.0;
     const unsigned int maxIts = 10000;
 
     // First, we need to find two points that bound the solution.

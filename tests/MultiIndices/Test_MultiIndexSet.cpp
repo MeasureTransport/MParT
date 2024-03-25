@@ -3,6 +3,7 @@
 
 #include "MParT/MultiIndices/FixedMultiIndexSet.h"
 #include "MParT/MultiIndices/MultiIndexSet.h"
+#include "MParT/Utilities/GPUtils.h"
 
 using namespace mpart;
 
@@ -24,10 +25,12 @@ TEST_CASE( "Testing the FixedMultiIndexSet class", "[FixedMultiIndexSet]" ) {
     FixedMultiIndexSet<Kokkos::HostSpace> multiSet_fixed = multiSet_original.Fix(true);
     MultiIndexSet multiSet_reconstructed = multiSet_fixed.Unfix();
     REQUIRE(multiSet_original.Size() == multiSet_reconstructed.Size());
-    REQUIRE(multiSet_original.MaxOrders() == multiSet_reconstructed.MaxOrders());
+    bool same_max_orders = multiSet_original.MaxOrders() == multiSet_reconstructed.MaxOrders();
+    REQUIRE(same_max_orders);
     std::vector<unsigned int> diagonal_idxs_ref = multiSet_reconstructed.NonzeroDiagonalEntries();
     std::vector<unsigned int> diagonal_idxs = multiSet_fixed.NonzeroDiagonalEntries();
-    REQUIRE(diagonal_idxs_ref == diagonal_idxs);
+    bool diag_idxs_pass = diagonal_idxs_ref == diagonal_idxs;
+    REQUIRE(diag_idxs_pass);
 }
 
 TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedMultiIndexSetSorting]" ) {
@@ -50,7 +53,7 @@ TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedM
     nzDims(3) = 1; nzOrders(3)=2; // The 2 in [1,2]
 
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim, nzStarts, nzDims, nzOrders);
-
+    
     CHECK(mset.nzDims(3)>mset.nzDims(2));
     CHECK(mset.nzOrders(3)==2);
     CHECK(mset.nzOrders(2)==1);
@@ -61,12 +64,12 @@ TEST_CASE( "Testing dimension sorting in the FixedMultiIndexSet class", "[FixedM
     nzDims(1) = 1; nzOrders(1)=1; // [0,1]
     nzDims(2) = 1; nzOrders(2)=2; // The 2 in [1,2]
     nzDims(3) = 0; nzOrders(3)=1; // The 1 in [1,2].  Internal to the FixedMultiIndexSet, this should come before 2.
-    
+
     FixedMultiIndexSet<Kokkos::HostSpace> mset2(dim, nzStarts, nzDims, nzOrders);
 
-    CHECK(mset.nzDims(3)>mset.nzDims(2));
-    CHECK(mset.nzOrders(3)==2);
-    CHECK(mset.nzOrders(2)==1);
+    CHECK(mset2.nzDims(3)>mset2.nzDims(2));
+    CHECK(mset2.nzOrders(3)==2);
+    CHECK(mset2.nzOrders(2)==1);
     
 }
 
@@ -111,7 +114,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class with anisotropic degrees", "[An
 }
 
 
-#if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
+#if defined( MPART_ENABLE_GPU)
 
 TEST_CASE( "Testing the FixedMultiIndexSet class copy to device", "[FixedMultiIndexSet]" ) {
 
@@ -120,7 +123,7 @@ TEST_CASE( "Testing the FixedMultiIndexSet class copy to device", "[FixedMultiIn
 
     FixedMultiIndexSet<Kokkos::HostSpace> mset(dim,maxOrder);
 
-    FixedMultiIndexSet<Kokkos::DefaultExecutionSpace::memory_space> deviceSet = mset.ToDevice<Kokkos::DefaultExecutionSpace::memory_space>();
+    FixedMultiIndexSet<DeviceSpace> deviceSet = mset.ToDevice<DeviceSpace>();
 
 }
 #endif
@@ -506,8 +509,10 @@ TEST_CASE("Testing the MultiIndexSet class", "[MultiIndexSet]" ) {
         std::sort(inds.begin(), inds.end());
         std::sort(inds_fixed.begin(), inds_fixed.end());
         std::sort(inds_fixed2.begin(), inds_fixed2.end());
-        REQUIRE( inds == inds_fixed );
-        REQUIRE( inds == inds_fixed2 );
+        bool inds_same_fixed = inds == inds_fixed;
+        REQUIRE( inds_same_fixed );
+        bool inds_same_fixed2 = inds == inds_fixed2;
+        REQUIRE( inds_same_fixed2 );
         MultiIndexSet full_set = MultiIndexSet::CreateTotalOrder(dim, maxOrder, MultiIndexLimiter::NonzeroDiag());
         inds = full_set.NonzeroDiagonalEntries();
         REQUIRE( inds.size() == full_set.Size() );

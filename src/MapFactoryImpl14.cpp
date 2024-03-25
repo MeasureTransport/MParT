@@ -23,7 +23,9 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_LinProb_CC(
 
     output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv, opts.nugget);
 
-    output->SetCoeffs(Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size()));
+    Kokkos::View<const double*,MemorySpace> coeffs = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
+    output->SetCoeffs(coeffs);
+
     return output;
 }
 
@@ -39,7 +41,7 @@ REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::Probabi
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::ProbabilistHermite>, SoftPlus, ClenshawCurtisQuadrature, Kokkos::HostSpace)
 #if defined(MPART_ENABLE_GPU)
 REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::ProbabilistHermite>, Exp, ClenshawCurtisQuadrature, mpart::DeviceSpace)
-REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::ProbabilistHermite>, Softplus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
+REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, LinearizedBasis<mpart::ProbabilistHermite>, SoftPlus, ClenshawCurtisQuadrature, mpart::DeviceSpace)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory14)
 #endif 

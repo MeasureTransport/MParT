@@ -93,7 +93,7 @@ void mpart::binding::ParameterizedFunctionBaseWrapper<mpart::DeviceSpace>(py::mo
     // ParameterizedFunctionBase
     py::class_<ParameterizedFunctionBase<mpart::DeviceSpace>, std::shared_ptr<ParameterizedFunctionBase<mpart::DeviceSpace>>>(m, "dParameterizedFunctionBase")
         .def("CoeffMap", [](const ParameterizedFunctionBase<mpart::DeviceSpace> &f) {
-            Kokkos::View<const double*, Kokkos::HostSpace> host_coeffs = ToHost<mpart::DeviceSpace, const double*>( f.Coeffs() );
+            Kokkos::View<const double*, Kokkos::HostSpace> host_coeffs = ToHost( f.Coeffs() );
             return Eigen::VectorXd(Eigen::Map<const Eigen::VectorXd>(host_coeffs.data(), host_coeffs.size()));
         })
         .def("SetCoeffs", py::overload_cast<Eigen::Ref<Eigen::VectorXd>>(&ParameterizedFunctionBase<mpart::DeviceSpace>::SetCoeffs))

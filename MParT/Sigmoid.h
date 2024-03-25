@@ -109,7 +109,7 @@ class Sigmoid1d {
 			  Kokkos::View<double*, MemorySpace> widths)
 			: centers_(centers), widths_(widths) {
 		Kokkos::View<double*, MemorySpace> weights ("Sigmoid weights", centers.extent(0));
-		Kokkos::parallel_for(centers.extent(0), KOKKOS_LAMBDA(unsigned int i) { weights(i) = 1.; });
+		Kokkos::deep_copy(weights, 1.0);
 		weights_ = weights;
 		Validate();
 	}
@@ -123,12 +123,7 @@ class Sigmoid1d {
 	 */
 	KOKKOS_FUNCTION void EvaluateAll(double* output, int max_order, double input) const {
 		if (order_ < max_order) {
-			std::stringstream ss;
-			ss << "Sigmoid basis evaluation order too large.\n";
-			ss << "Given order " << max_order << ", ";
-			ss << "can only evaluate up to order " << order_;
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
-				ss.str().c_str());
+			ProcAgnosticError<std::invalid_argument>("Sigmoid basis evaluation order too large.");
 		}
 
 		output[0] = 1.;
@@ -167,12 +162,7 @@ class Sigmoid1d {
 	KOKKOS_FUNCTION void EvaluateDerivatives(double* output, double* output_diff, int max_order,
 							 double input) const {
 		if (order_ < max_order) {
-			std::stringstream ss;
-			ss << "Sigmoid basis evaluation order too large.\n";
-			ss << "Given order " << max_order << ", ";
-			ss << "can only evaluate up to order " << order_;
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
-				ss.str().c_str());
+			ProcAgnosticError<std::invalid_argument>("Sigmoid derivative evaluation order too large.");
 		}
 
 		output[0] = 1.;
@@ -222,12 +212,7 @@ class Sigmoid1d {
 								   double* output_diff2, int max_order,
 								   double input) const {
 		if (order_ < max_order) {
-			std::stringstream ss;
-			ss << "Sigmoid basis evaluation order too large.\n";
-			ss << "Given order " << max_order << ", ";
-			ss << "can only evaluate up to order " << order_;
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
-				ss.str().c_str());
+			ProcAgnosticError<std::invalid_argument>("Sigmoid second derivative evaluation order too large");
 		}
 
 		output[0] = 1.;
@@ -295,14 +280,14 @@ class Sigmoid1d {
 			ss << "centers: " << centers_.extent(0) << ", \n";
 			ss << "widths: " << widths_.extent(0) << ",\n";
 			ss << "weights: " << weights_.extent(0) << "\n";
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+			ProcAgnosticError< std::invalid_argument>(
 				ss.str().c_str());
 		}
 		if (centers_.extent(0) < 2) {
 			std::stringstream ss;
 			ss << "Sigmoid: centers/widths/weights too short.\n";
 			ss << "Length should be of form 2+(1+2+3+...+n) for some order n>=0";
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+			ProcAgnosticError< std::invalid_argument>(
 				ss.str().c_str());
 		}
 		int n_sigmoid_centers = centers_.extent(0) - 2;
@@ -315,7 +300,7 @@ class Sigmoid1d {
 			std::stringstream ss;
 			ss << "Incorrect length of centers/widths/weights.";
 			ss << "Length should be of form 2+(1+2+3+...+n) for some order n";
-			ProcAgnosticError<MemorySpace, std::invalid_argument>::error(
+			ProcAgnosticError< std::invalid_argument>(
 				ss.str().c_str());
 		}
 		// one added for affine part of this, two added for edge terms

@@ -119,7 +119,9 @@ TEST_CASE( "Testing Pullback/Pushforward density", "[PullbackPushforwardDensity]
         for(int i = 0; i < map->numCoeffs; i++) {
             map->Coeffs()(i) += fdstep;
             auto logDensityPerturb = pullback.LogDensity(pullbackSamples);
-            Kokkos::parallel_for("Test LogDensityCoeffGrad", N_samp, KOKKOS_LAMBDA(const int j) {
+	    Kokkos::RangePolicy<typename MemoryToExecution<Kokkos::HostSpace>::Space> policy(0,N_samp);
+
+            Kokkos::parallel_for("Test LogDensityCoeffGrad", policy, KOKKOS_LAMBDA(const int j) {
                 logDensityPerturb(j) -= samplesDensity(j);
                 logDensityPerturb(j) /= fdstep;
                 logDensityPerturb(j) -= coeffGrad(i, j);

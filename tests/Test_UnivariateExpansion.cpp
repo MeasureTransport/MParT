@@ -88,7 +88,6 @@ TEST_CASE("UnivariateExpansion") {
         StridedMatrix<double, MemorySpace> logDetGrad = expansion.LogDeterminantInputGrad(points);
         REQUIRE(logDetGrad.extent(0) == 1);
         REQUIRE(logDetGrad.extent(1) == numPts);
-        unsigned int counter = 0;
         for(int i = 0; i < numPts; i++) {
             double df = 0.;
             double d2f = 0.;

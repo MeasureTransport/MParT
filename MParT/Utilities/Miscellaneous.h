@@ -19,22 +19,17 @@ namespace mpart{
                           std::string                                 const& key,
                           std::string                                 const& defaultValue);
 
-    /** Provides a mechanism for raising exceptions in CPU code where recovery is possible 
-        and assertions in GPU code where exceptions aren't alllowed.
-     */
-    template<typename MemorySpace, typename ErrorType>
-    struct ProcAgnosticError {
-        static void error(const char*) {
-            assert(false);
-        }
-    };
 
-    template<typename ErrorType>
-    struct ProcAgnosticError<Kokkos::HostSpace, ErrorType> {
-        static void error(const char* message) {
-            throw ErrorType(message);
+        template<typename ErrorType>
+        KOKKOS_INLINE_FUNCTION void ProcAgnosticError(const char* msg) {
+        KOKKOS_IF_ON_DEVICE(
+            Kokkos::abort(msg);
+        );
+        KOKKOS_IF_ON_HOST(
+            throw ErrorType(msg);
+        );
         }
-    };
+
 }
 
 #endif
