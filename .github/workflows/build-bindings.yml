@@ -47,7 +47,7 @@ jobs:
 
       - name: Setup Julia
         run: |
-          julia -e "using Pkg; Pkg.add([\"CxxWrap\",\"TestReports\"])"
+          julia -e "using Pkg; Pkg.add([Pkg.PackageSpec(;name=\"CxxWrap\",version=v\"0.14.2\"),Pkg.PackageSpec(;name=\"TestReports\")])"
           export GITHUB_JULIA_PATH=$(julia -e "println(DEPOT_PATH[1])")
           echo -n $'[bee5971c-294f-5168-9fcd-9fb3c811d495]\nMParT = \"' >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
           echo -n $GITHUB_WORKSPACE                                     >> $GITHUB_JULIA_PATH/artifacts/Overrides.toml
