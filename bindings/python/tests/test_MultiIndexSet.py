@@ -3,6 +3,8 @@
 import mpart
 import numpy as np
 
+
+
 multis = np.array([[0, 1], [2, 0]])
 msetFromArray = mpart.MultiIndexSet(multis)
 
@@ -11,6 +13,14 @@ dim = 3
 power = 4
 msetTensorProduct = mpart.MultiIndexSet.CreateTensorProduct(dim,power,noneLim)
 msetTotalOrder = mpart.MultiIndexSet.CreateTotalOrder(dim,power,noneLim)
+
+def test_create():
+    mset_one = mpart.MultiIndexSet([[2]])
+    assert mset_one.Size() == 1
+    assert len(mset_one) == 1
+    mset_one = mpart.MultiIndexSet(np.array([[2]]))
+    assert mset_one.Size() == 1
+    assert len(mset_one) == 1
 
 def test_max_degrees():
 
