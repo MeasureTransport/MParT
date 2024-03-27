@@ -25,6 +25,44 @@
 namespace py = pybind11;
 using namespace mpart::binding;
 
+template<typename Scalar_T>
+using Matrix_Map_T = Eigen::Map<Eigen::Matrix<Scalar_T,Eigen::Dynamic,Eigen::Dynamic>, 0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>>;
+
+mpart::MultiIndexSet MultiIndexSet_PyBuffer(py::buffer x){
+    constexpr bool rowMajor = Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>::Flags & Eigen::RowMajorBit;
+
+    py::buffer_info info = x.request();
+
+    // Check for int32, int64
+    bool is_int32 = info.format == py::format_descriptor<int32_t>::format();
+    bool is_int64 = info.format == "l"; // This is based on a pybind bug; numpy int64 buffer is l, not q
+    if (!(is_int32 || is_int64))
+        throw std::runtime_error("Incompatible format: expected an array of either int32 or int64!");
+
+    if (info.ndim != 2)
+        throw std::runtime_error("Expected array with ndims = 2");
+
+    int stride_size = is_int32 ? sizeof(int32_t) : sizeof(int64_t);
+    Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic> strides(
+        info.strides[rowMajor ? 0 : 1] / (py::ssize_t)stride_size,
+        info.strides[rowMajor ? 1 : 0] / (py::ssize_t)stride_size
+        );
+
+    if(is_int64) { // Is int64
+        Matrix_Map_T<int64_t> map (static_cast<int64_t*>(info.ptr), info.shape[0], info.shape[1], strides);
+        Eigen::Matrix<int32_t,Eigen::Dynamic,Eigen::Dynamic> mat_32t {info.shape[0], info.shape[1]};
+        for(int i = 0; i < info.shape[0]; i++) {
+            for(int j = 0; j < info.shape[1]; j++) {
+                mat_32t(i,j) = int32_t(map(i,j));
+            }
+        }
+        return mpart::MultiIndexSet {mat_32t};
+    } else { // Is int32
+        Matrix_Map_T<int32_t> map (static_cast<int32_t*>(info.ptr), info.shape[0], info.shape[1], strides);
+        return mpart::MultiIndexSet {map};
+    }
+}
+
 void mpart::binding::MultiIndexWrapper(py::module &m)
 {
     // MultiIndexSetLimiters
@@ -112,6 +150,7 @@ void mpart::binding::MultiIndexWrapper(py::module &m)
     // MultiIndexSet
     py::class_<MultiIndexSet, std::shared_ptr<MultiIndexSet>>(m, "MultiIndexSet")
         .def(py::init<const unsigned int>())
+        .def(py::init<std::function<MultiIndexSet(py::buffer)>>(&MultiIndexSet_PyBuffer))
         .def(py::init<Eigen::Ref<const Eigen::MatrixXi> const&>())
         .def("fix", &MultiIndexSet::Fix)
         .def("__len__", &MultiIndexSet::Length, "Retrieves the length of _each_ multiindex within this set (i.e. the dimension of the input)")
