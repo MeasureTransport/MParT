@@ -49,14 +49,8 @@ mpart::MultiIndexSet MultiIndexSet_PyBuffer(py::buffer x){
         );
 
     if(is_int64) { // Is int64
-        Matrix_Map_T<int64_t> map (static_cast<int64_t*>(info.ptr), info.shape[0], info.shape[1], strides);
-        Eigen::Matrix<int32_t,Eigen::Dynamic,Eigen::Dynamic> mat_32t {info.shape[0], info.shape[1]};
-        for(int i = 0; i < info.shape[0]; i++) {
-            for(int j = 0; j < info.shape[1]; j++) {
-                mat_32t(i,j) = int32_t(map(i,j));
-            }
-        }
-        return mpart::MultiIndexSet {mat_32t};
+        Matrix_Map_T<int64_t> map_64 (static_cast<int64_t*>(info.ptr), info.shape[0], info.shape[1], strides);
+        return mpart::MultiIndexSet {map_64.cast<int32_t>()};
     } else { // Is int32
         Matrix_Map_T<int32_t> map (static_cast<int32_t*>(info.ptr), info.shape[0], info.shape[1], strides);
         return mpart::MultiIndexSet {map};
