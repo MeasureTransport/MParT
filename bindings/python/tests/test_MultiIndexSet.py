@@ -10,6 +10,14 @@ noneLim = mpart.NoneLim()
 msetTensorProduct = mpart.MultiIndexSet.CreateTensorProduct(3,4,noneLim)
 msetTotalOrder = mpart.MultiIndexSet.CreateTotalOrder(3,4,noneLim)
 
+def test_create():
+    mset_one = mpart.MultiIndexSet([[2]])
+    assert mset_one.Size() == 1
+    assert len(mset_one) == 1
+    mset_one = mpart.MultiIndexSet(np.array([[2]]))
+    assert mset_one.Size() == 1
+    assert len(mset_one) == 1
+
 def test_max_degrees():
 
     assert np.all(msetFromArray.MaxOrders() == [2,1])
