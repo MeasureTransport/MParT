@@ -371,21 +371,21 @@ class BasisEvaluator<BasisHomogeneity::Heterogeneous,
 
 
 template<typename It, typename... Args>
-constexpr std::tuple<Args...> CreateArrHelper(It ret, Args... args) {
+constexpr std::tuple<Args...> CreateHeterogeneousBasisEvaluatorHelper(It ret, Args... args) {
     return std::make_tuple(args...);
 }
 
 template<typename It, typename I, std::enable_if_t<std::is_integral_v<I>, bool> = true, typename... Args>
-constexpr auto CreateArrHelper(It ret, I next, Args... args) {
+constexpr auto CreateHeterogeneousBasisEvaluatorHelper(It ret, I next, Args... args) {
     *ret = next;
-    return CreateArrHelper(ret + 1, args...);
+    return CreateHeterogeneousBasisEvaluatorHelper(ret + 1, args...);
 }
 
 template<typename Rectifier, typename I, std::enable_if_t<std::is_integral_v<I>,bool> = true, typename... Args, typename std::enable_if_t<sizeof...(Args) % 2 == 1, bool> = true>
 constexpr auto CreateHeterogeneousBasisEvaluator(I idx1, Args... args) {
     std::array<I, (sizeof...(Args) + 1)/2> arr;
     arr[0] = idx1;
-    auto basis1d = CreateArrHelper(arr.begin() + 1, args...);
+    auto basis1d = CreateHeterogeneousBasisEvaluatorHelper(arr.begin() + 1, args...);
     return BasisEvaluator<BasisHomogeneity::Heterogeneous, decltype(basis1d), Rectifier>(arr, basis1d);
 }
 
