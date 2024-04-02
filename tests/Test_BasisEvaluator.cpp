@@ -1,5 +1,4 @@
 #include "MParT/BasisEvaluator.h"
-#include <iostream>
 #include <catch2/catch_all.hpp>
 
 using namespace mpart;

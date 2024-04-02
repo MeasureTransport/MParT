@@ -2,7 +2,6 @@
 #define MPART_BASISEVALUATOR_H
 
 #include <Kokkos_Core.hpp>
-#include <iostream>
 #include "MParT/PositiveBijectors.h"
 
 namespace mpart {
