@@ -192,18 +192,11 @@ class FastGaussianReverseKLObjective: public MapObjective<MemorySpace> {
     FastGaussianReverseKLObjective(StridedMatrix<const double, MemorySpace> train, unsigned int numCoeffs);
     FastGaussianReverseKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test, unsigned int numCoeffs);
 
-    double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override {
-        return CommonEval<ObjectiveType::EvalGrad>(data, grad, map);
-    }
+    double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
 
-    double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override {
-        Kokkos::View<double*, MemorySpace> grad_holder;
-        return CommonEval<ObjectiveType::Eval>(data, grad_holder, map);
-    }
+    double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
 
-    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override {
-        CommonEval<ObjectiveType::Grad>(data, grad, map);
-    }
+    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
 
     private:
     using ExecSpace = typename MemoryToExecution<MemorySpace>::Space;
@@ -219,7 +212,7 @@ class FastGaussianReverseKLObjective: public MapObjective<MemorySpace> {
     void ClearSpaces() const;
 
     mutable Kokkos::View<double**, MemorySpace> eval_space_;
-    mutable Kokkos::View<double**, MemorySpace> logdet_space_;
+    mutable Kokkos::View<double*, MemorySpace> logdet_space_;
 
     mutable Kokkos::View<double**, MemorySpace> grad_space_;
     mutable Kokkos::View<double**, MemorySpace> logdet_grad_space_;
