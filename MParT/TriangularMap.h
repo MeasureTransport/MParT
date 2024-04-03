@@ -64,6 +64,7 @@ public:
     void WrapCoeffs(Kokkos::View<double*, MemorySpace> coeffs) override;
 
     virtual std::shared_ptr<ConditionalMapBase<MemorySpace>> GetComponent(unsigned int i){ return comps_.at(i);}
+    unsigned int NumComponents() const { return comps_.size();}
 
     /** @brief Computes the log determinant of the Jacobian matrix of this map.
 

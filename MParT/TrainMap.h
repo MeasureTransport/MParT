@@ -5,6 +5,7 @@
 #include <nlopt.hpp>
 #include <iostream>
 #include "MParT/ConditionalMapBase.h"
+#include "MParT/TriangularMap.h"
 #include "MParT/MapObjective.h"
 
 namespace mpart {

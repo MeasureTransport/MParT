@@ -56,25 +56,96 @@ nlopt::opt SetupOptimization(unsigned int dim, TrainOptions options) {
     return opt;
 }
 
-template<>
-double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective, TrainOptions options) {
+template<typename MemorySpace>
+bool isMapObjectiveStandardGaussianKL(std::shared_ptr<MapObjective<MemorySpace>> objective) {
+    std::shared_ptr<KLObjective<MemorySpace>> klObjective = std::dynamic_pointer_cast<KLObjective<MemorySpace>>(objective);
+    if(klObjective == nullptr) return false;
+    std::shared_ptr<DensityBase<MemorySpace>> density = klObjective->density_;
+    std::shared_ptr<GaussianSamplerDensity<MemorySpace>> gaussianDensity = std::dynamic_pointer_cast<GaussianSamplerDensity<MemorySpace>>(density);
+    return gaussianDensity != nullptr && gaussianDensity->IsStandardNormal();
+}
+
+template<typename MemorySpace>
+class NLOptFunctor {
+    NLOptFunctor(std::shared_ptr<MapObjective<MemorySpace>> objective, std::shared_ptr<ConditionalMapBase<MemorySpace>> map): objective_(objective), map_(map) {
+        unsigned int numCoeffs = map->numCoeffs;
+        coeff_d_ = Kokkos::View<double*, MemorySpace>("coeff", numCoeffs);
+        grad_d_ = Kokkos::View<double*, MemorySpace>("grad", numCoeffs);
+    }
+
+    double operator()(unsigned n, const double* coeff_ptr, double* grad_ptr) {
+        assert(n == coeff_d_.extent(0));
+        Kokkos::View<const double*, Kokkos::HostSpace> coeff = ToKokkos<const double, Kokkos::HostSpace>(coeff_ptr, n);
+        Kokkos::View<double*, Kokkos::HostSpace> grad = ToKokkos<double, Kokkos::HostSpace>(grad_ptr, n);
+        Kokkos::deep_copy(coeff_d_, coeff);
+        double error = objective(n, coeff_d_.data(), grad_d_.data(), map_);
+        Kokkos::deep_copy(grad, grad_d_);
+        Kokkos::deep_copy(grad_d_, 0);
+        return error;
+    }
+
+    private:
+    Kokkos::View<double*, MemorySpace> coeff_d_;
+    Kokkos::View<double*, MemorySpace> grad_d_;
+    std::shared_ptr<MapObjective<MemorySpace>> objective_;
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> map_;
+};
+
+template<typename MemorySpace>
+std::function<double(unsigned, const double*, double*)> CreateNLOptObjective(std::shared_ptr<MapObjective<MemorySpace>> objective, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) {
+    if constexpr(std::is_same_v<MemorySpace, Kokkos::HostSpace>) {
+        return std::bind(&MapObjective<MemorySpace>::operator(), objective, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, map);
+    } else {
+        NLOptFunctor<MemorySpace> functor(objective, map);
+        return functor;
+    }
+}
+
+template<typename MemorySpace>
+std::pair<double, nlopt::result> TrainComponent_StandardNormalDensity(std::shared_ptr<ConditionalMapBase<MemorySpace>> component, std::shared_ptr<FastGaussianReverseKLObjective<MemorySpace>> objective, TrainOptions options) {
+    std::function<double(unsigned, const double*, double*)> functor = CreateNLOptObjective(objective, component);
+
+    // Get the initial guess at the coefficients
+    std::vector<double> compCoeffsStd = KokkosToStd(component->Coeffs());
+
+    // Optimize the map coefficients using NLopt
+    nlopt::opt opt = SetupOptimization(component->numCoeffs, options);
+
+    double error;
+    nlopt::result res = opt.optimize(compCoeffsStd, error);
+    return {error, res};
+}
+
+template<typename MemorySpace>
+double TrainMap_Triangular_StandardNormalDensity(std::shared_ptr<TriangularMap<MemorySpace>> map, std::shared_ptr<FastGaussianReverseKLObjective<MemorySpace>> objective, TrainOptions options) {
+    if(options.verbose) {
+        std::cout << "Detected standard normal reference density" << std::endl;
+    }
+    // Assume each component is a scalar-valued function
+    for(int i = 0; i < map->NumComponents(); i++) {
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> component = map->GetComponent(i);
+        if(options.verbose) std::cout << "Training component " << i << "..." << std::endl;
+        TrainComponent_StandardNormalDensity(component, objective, options);
+        if(options.verbose) std::cout << "Component " << i << " trained." << std::endl;
+    }
+}
+
+template<typename MemorySpace>
+double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, std::shared_ptr<MapObjective<MemorySpace>> objective, TrainOptions options) {
     if(map->Coeffs().extent(0) == 0) {
         if(options.verbose) {
             std::cout << "TrainMap: Initializing map coeffs to 1." << std::endl;
         }
         Kokkos::View<double*, Kokkos::HostSpace> coeffs ("Default coeffs", map->numCoeffs);
-	Kokkos::RangePolicy<typename MemoryToExecution<Kokkos::HostSpace>::Space> policy(0,map->numCoeffs);
-        Kokkos::parallel_for("Setting default coeff val", policy, KOKKOS_LAMBDA(const unsigned int i){
-            coeffs(i) = 1.;
-        });
-	Kokkos::View<const double*, Kokkos::HostSpace> constCoeffs = coeffs;
+        Kokkos::deep_copy(coeffs, 1.);
+	    Kokkos::View<const double*, Kokkos::HostSpace> constCoeffs = coeffs;
         map->SetCoeffs(constCoeffs);
     }
     nlopt::opt opt = SetupOptimization(map->numCoeffs, options);
 
     // Since objective is (rightfully) separate from the map, we use std::bind to create a functor
     // from objective::operator() that keeps the map argument held.
-    std::function<double(unsigned, const double*, double*)> functor = std::bind(&MapObjective<Kokkos::HostSpace>::operator(), objective, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, map);
+    std::function<double(unsigned, const double*, double*)> functor = CreateNLOptObjective(objective, map);
     opt.set_min_objective(functor_wrapper, reinterpret_cast<void*>(&functor));
 
     // Get the initial guess at the coefficients
@@ -103,3 +174,8 @@ double mpart::TrainMap(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> ma
     }
     return error;
 }
+
+template double mpart::TrainMap<Kokkos::HostSpace>(std::shared_ptr<ConditionalMapBase<Kokkos::HostSpace>> map, std::shared_ptr<MapObjective<Kokkos::HostSpace>> objective, TrainOptions options);
+#if defined(MPART_ENABLE_GPU)
+template double mpart::TrainMap<DeviceSpace>(std::shared_ptr<ConditionalMapBase<DeviceSpace>> map, std::shared_ptr<MapObjective<DeviceSpace>> objective, TrainOptions options);
+#endif

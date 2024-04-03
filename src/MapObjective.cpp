@@ -90,6 +90,87 @@ double KLObjective<MemorySpace>::ObjectivePlusCoeffGradImpl(StridedMatrix<const 
 }
 
 template<typename MemorySpace>
+FastGaussianReverseKLObjective<MemorySpace>::FastGaussianReverseKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test, unsigned int numCoeffs) : MapObjective<MemorySpace>(train, test) {
+    unsigned int N = std::max(train.extent(1), test.extent(1));
+    eval_space_ = Kokkos::View<double**, MemorySpace>("eval_space", 1, N);
+    logdet_space_ = Kokkos::View<double*, MemorySpace>("logdet_space", N);
+    grad_space_ = Kokkos::View<double*, MemorySpace>("grad_space", numCoeffs, N);
+    logdet_grad_space_ = Kokkos::View<double*, MemorySpace>("logdet_grad_space", numCoeffs, N);
+}
+
+template<typename MemorySpace>
+FastGaussianReverseKLObjective<MemorySpace>::FastGaussianReverseKLObjective(StridedMatrix<const double, MemorySpace> train, unsigned int numCoeffs) : FastGaussianReverseKLObjective<MemorySpace>(train, Kokkos::View<const double, MemorySpace>(), numCoeffs) {}
+
+template<typename MemorySpace>
+template<unsigned int Type_idx>
+void FastGaussianReverseKLObjective<MemorySpace>::FillSpaces(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, StridedMatrix<const double, MemorySpace> data) const {
+    constexpr ObjectiveType Type = static_cast<ObjectiveType>(Type_idx);
+    unsigned int N_points = data.extent(1);
+    if(N_points <= eval_space_.extent(1)){
+        throw std::invalid_argument("FastGaussianReverseKLObjective: Not enough space allocated for evaluation!");
+    }
+    StridedMatrix<double, MemorySpace> eval_space_view = Kokkos::subview(eval_space_, Kokkos::ALL(), Kokkos::make_pair(0, N_points));
+    StridedVector<double, MemorySpace> logdet_space_view = Kokkos::subview(logdet_space_, Kokkos::make_pair(0, N_points));
+    map->EvaluateImpl(data, eval_space_view);
+    if constexpr((Type == ObjectiveType::Eval) || (Type == ObjectiveType::EvalGrad))
+        map->LogDeterminantImpl(data, logdet_space_view);
+    if constexpr((Type == ObjectiveType::Grad) || (Type == ObjectiveType::EvalGrad)) {
+        StridedMatrix<double, MemorySpace> grad_space_view = Kokkos::subview(grad_space_, Kokkos::ALL(), Kokkos::make_pair(0, N_points));
+        StridedMatrix<double, MemorySpace> logdet_grad_space_view = Kokkos::subview(logdet_grad_space_, Kokkos::ALL(), Kokkos::make_pair(0, N_points));
+        map->CoeffGradImpl(data, eval_space_view, grad_space_view);
+        map->LogDeterminantCoeffGradImpl(data, logdet_grad_space_view);
+    }
+}
+
+template<typename MemorySpace>
+template<unsigned int Type_idx>
+void FastGaussianReverseKLObjective<MemorySpace>::ClearSpaces() const {
+    constexpr ObjectiveType Type = static_cast<ObjectiveType>(Type_idx);
+    if constexpr((Type == ObjectiveType::Eval) || (Type == ObjectiveType::EvalGrad)) {
+        Kokkos::deep_copy(eval_space_, 0.);
+        Kokkos::deep_copy(logdet_space_, 0.);
+    }
+    if constexpr((Type == ObjectiveType::Grad) || (Type == ObjectiveType::EvalGrad)) {
+        Kokkos::deep_copy(grad_space_, 0.);
+        Kokkos::deep_copy(logdet_grad_space_, 0.);
+    }
+}
+
+template<typename MemorySpace>
+template<unsigned int Type_idx>
+double FastGaussianReverseKLObjective<MemorySpace>::CommonEval(StridedMatrix<const double, MemorySpace> points, StridedVector<double, MemorySpace> kl_grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {
+    constexpr ObjectiveType Type = static_cast<ObjectiveType>(Type_idx);
+    unsigned int N_points = points.extent(1);
+    unsigned int numCoeffs = map->numCoeffs;
+    if(numCoeffs != kl_grad.extent(0)){
+        throw std::invalid_argument("FastGaussianReverseKLObjective: Gradient vector has incorrect size!");
+    }
+
+    FillGradSpaces<Type_idx>(map, points);
+
+    double kl_loss = 0.;
+    if constexpr((Type == ObjectiveType::Eval) || (Type == ObjectiveType::EvalGrad)) {
+        Kokkos::RangePolicy<ExecSpace> eval_policy(0, N_points);
+        Kokkos::parallel_reduce("FastGaussianReverseKL Evaluate", eval_policy, KOKKOS_LAMBDA(const unsigned int j, double& loss) {
+            loss += 0.5*eval_space_(0, j)*eval_space_(0, j) - logdet_space_(j);
+        }, kl_loss);
+    }
+    if constexpr((Type == ObjectiveType::Grad) || (Type == ObjectiveType::EvalGrad)) {
+        using team_handle=Kokkos::TeamPolicy<>::member_type;
+        Kokkos::TeamPolicy<ExecSpace> grad_policy(numCoeffs, Kokkos::AUTO());
+        Kokkos::parallel_for("FastGaussianReverseKL Gradient", grad_policy, KOKKOS_LAMBDA(const team_handle& team) {
+            int d = team.league_rank();
+            Kokkos::parallel_reduce(Kokkos::TeamThreadRange(team, N_points), [=] (const unsigned int j, double& grad_d) {
+                grad_d += grad_space_(d, j) - logdet_grad_space_(d, j);
+            }, kl_grad(d));
+        });
+        Kokkos::fence();
+    }
+    ClearSpaces<Type>();
+    return kl_loss;
+}
+
+template<typename MemorySpace>
 double KLObjective<MemorySpace>::ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {
     unsigned int N_samps = data.extent(1);
     PullbackDensity<MemorySpace> pullback {map, density_};
