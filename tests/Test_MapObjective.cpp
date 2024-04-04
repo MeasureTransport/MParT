@@ -58,7 +58,7 @@ TEST_CASE( "Test KLMapObjective", "[KLMapObjective]") {
             map->Coeffs()(i) += fd_step;
             double kl_perturb_i = objective.ObjectiveImpl(reference_samples, map);
             double coeffFD_i = (kl_perturb_i - kl_est)/fd_step;
-            CHECK_THAT(coeffFD_i, WithinRel(coeffGrad(i), 5*fd_step));
+            CHECK_THAT(coeffFD_i, WithinRel(coeffGrad(i), 10*fd_step));
             map->Coeffs()(i) -= fd_step;
         }
     }

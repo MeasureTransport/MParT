@@ -142,6 +142,37 @@ void FastGaussianReverseKLObjective<MemorySpace>::ClearSpaces() const {
     }
 }
 
+template<typename EvalSpaceType, typename LogDetSpaceType>
+class EvaluationFunctor {
+    public:
+    EvaluationFunctor(const EvalSpaceType& eval_space_view, const LogDetSpaceType& logdet_space_view): eval_space_view_(eval_space_view), logdet_space_view_(logdet_space_view){}
+    KOKKOS_FUNCTION void operator()(const unsigned int j, double& loss) const {
+        loss += 0.5*eval_space_view_(0, j)*eval_space_view_(0, j) - logdet_space_view_(j);
+    }
+    private:
+    const EvalSpaceType eval_space_view_;
+    const LogDetSpaceType logdet_space_view_;
+};
+
+template<typename KLGradSpaceType, typename GradSpaceType, typename GradLogDetSpaceType>
+class GradientFunctor {
+    using team_handle=typename Kokkos::TeamPolicy<typename GradSpaceType::execution_space>::member_type;
+    public:
+    GradientFunctor(KLGradSpaceType kl_grad, unsigned int N_points, const GradSpaceType& grad_space_view, const GradLogDetSpaceType& logdet_grad_space_view): kl_grad_(kl_grad), N_points_(N_points), grad_space_view_(grad_space_view), logdet_grad_space_view_(logdet_grad_space_view) {}
+    KOKKOS_FUNCTION void operator()(team_handle team) const {
+        int d = team.league_rank();
+        Kokkos::parallel_reduce(Kokkos::TeamThreadRange(team, N_points_), [=] (const unsigned int j, double& grad_d) {
+            grad_d += grad_space_view_(d, j) - logdet_grad_space_view_(d, j);
+        }, kl_grad_(d));
+    }
+    
+    private:
+    mutable KLGradSpaceType kl_grad_;
+    const unsigned int N_points_;
+    const GradSpaceType grad_space_view_;
+    const GradLogDetSpaceType logdet_grad_space_view_;
+};
+
 template<typename MemorySpace>
 template<unsigned int Type_idx>
 double FastGaussianReverseKLObjective<MemorySpace>::CommonEval(StridedMatrix<const double, MemorySpace> points, StridedVector<double, MemorySpace> kl_grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const {
@@ -152,26 +183,26 @@ double FastGaussianReverseKLObjective<MemorySpace>::CommonEval(StridedMatrix<con
     unsigned int N_points = points.extent(1);
     unsigned int numCoeffs = map->numCoeffs;
     if(Type != ObjectiveType::Eval && numCoeffs != kl_grad.extent(0)){
-        throw std::invalid_argument("FastGaussianReverseKLObjective: Gradient vector has incorrect size!");
+        std::stringstream ss;
+        ss << "FastGaussianReverseKLObjective: Gradient vector has incorrect size!"
+           << "Given size " << kl_grad.extent(0) << ", expected size " << numCoeffs
+           << ".";
+        throw std::invalid_argument(ss.str().c_str());
     }
     FillSpaces<Type_idx>(map, points);
 
     double kl_loss = 0.;
     if constexpr((Type == ObjectiveType::Eval) || (Type == ObjectiveType::EvalGrad)) {
         Kokkos::RangePolicy<ExecSpace> eval_policy(0, N_points);
-        Kokkos::parallel_reduce("FastGaussianReverseKL Evaluate", eval_policy, KOKKOS_LAMBDA(const unsigned int j, double& loss) {
-            loss += 0.5*eval_space_(0, j)*eval_space_(0, j) - logdet_space_(j);
-        }, kl_loss);
+        EvaluationFunctor eval_kernel(eval_space_, logdet_space_);
+        Kokkos::parallel_reduce("FastGaussianReverseKL Evaluate", eval_policy, eval_kernel, kl_loss);
     }
     if constexpr((Type == ObjectiveType::Grad) || (Type == ObjectiveType::EvalGrad)) {
         using team_handle=Kokkos::TeamPolicy<>::member_type;
         Kokkos::TeamPolicy<ExecSpace> grad_policy(numCoeffs, Kokkos::AUTO());
-        Kokkos::parallel_for("FastGaussianReverseKL Gradient", grad_policy, KOKKOS_LAMBDA(const team_handle& team) {
-            int d = team.league_rank();
-            Kokkos::parallel_reduce(Kokkos::TeamThreadRange(team, N_points), [=] (const unsigned int j, double& grad_d) {
-                grad_d += grad_space_(d, j) - logdet_grad_space_(d, j);
-            }, kl_grad(d));
-        });
+        GradientFunctor gradient_functor(kl_grad, N_points, grad_space_, logdet_grad_space_);
+
+        Kokkos::parallel_for("FastGaussianReverseKL Gradient", grad_policy, gradient_functor);
         Kokkos::fence();
     }
     ClearSpaces<Type_idx>();

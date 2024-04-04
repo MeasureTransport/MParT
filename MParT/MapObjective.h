@@ -201,7 +201,7 @@ class FastGaussianReverseKLObjective: public MapObjective<MemorySpace> {
     private:
     using ExecSpace = typename MemoryToExecution<MemorySpace>::Space;
     enum class ObjectiveType {Eval = 0, Grad = 1, EvalGrad = 2};
-
+    
     template<unsigned int Type_idx>
     void FillSpaces(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, StridedMatrix<const double, MemorySpace> data) const;
 

@@ -67,6 +67,7 @@ bool isMapObjectiveStandardGaussianKL(std::shared_ptr<MapObjective<MemorySpace>>
 
 template<typename MemorySpace>
 class NLOptFunctor {
+    public:
     NLOptFunctor(std::shared_ptr<MapObjective<MemorySpace>> objective, std::shared_ptr<ConditionalMapBase<MemorySpace>> map): objective_(objective), map_(map) {
         unsigned int numCoeffs = map->numCoeffs;
         coeff_d_ = Kokkos::View<double*, MemorySpace>("coeff", numCoeffs);
@@ -78,7 +79,7 @@ class NLOptFunctor {
         Kokkos::View<const double*, Kokkos::HostSpace> coeff = ToKokkos<const double, Kokkos::HostSpace>(coeff_ptr, n);
         Kokkos::View<double*, Kokkos::HostSpace> grad = ToKokkos<double, Kokkos::HostSpace>(grad_ptr, n);
         Kokkos::deep_copy(coeff_d_, coeff);
-        double error = objective(n, coeff_d_.data(), grad_d_.data(), map_);
+        double error = (*objective_)(n, coeff_d_.data(), grad_d_.data(), map_);
         Kokkos::deep_copy(grad, grad_d_);
         Kokkos::deep_copy(grad_d_, 0);
         return error;
@@ -121,13 +122,15 @@ double TrainMap_Triangular_StandardNormalDensity(std::shared_ptr<TriangularMap<M
     if(options.verbose) {
         std::cout << "Detected standard normal reference density" << std::endl;
     }
+    double total_error = 0.;
     // Assume each component is a scalar-valued function
     for(int i = 0; i < map->NumComponents(); i++) {
         std::shared_ptr<ConditionalMapBase<MemorySpace>> component = map->GetComponent(i);
         if(options.verbose) std::cout << "Training component " << i << "..." << std::endl;
-        TrainComponent_StandardNormalDensity(component, objective, options);
+        total_error += TrainComponent_StandardNormalDensity(component, objective, options);
         if(options.verbose) std::cout << "Component " << i << " trained." << std::endl;
     }
+    return total_error;
 }
 
 template<typename MemorySpace>
