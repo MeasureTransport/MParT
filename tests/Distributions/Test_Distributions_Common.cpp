@@ -22,14 +22,14 @@ void TestStandardNormalSamples(StridedMatrix<double, Kokkos::HostSpace> samples)
 
     // Check that the mean is zero and the covariance is the identity matrix
     for(int i = 0; i < dim; i++) {
-        REQUIRE_THAT(mean(i), WithinAbs(0.0, mc_margin));
+        CHECK_THAT(mean(i), WithinAbs(0.0, mc_margin));
         for(int j = 0; j < dim; j++) {
             double diag = (double) (i == j);
             double cov_ij = covar(i, j) - mean(i)*mean(j);
             if(i == j)
-                REQUIRE_THAT(cov_ij, WithinRel(1., mc_margin));
+                CHECK_THAT(cov_ij, WithinRel(1., mc_margin));
             else
-                REQUIRE_THAT(cov_ij, WithinAbs(0., mc_margin));
+                CHECK_THAT(cov_ij, WithinAbs(0., mc_margin));
         }
     }
 
@@ -54,8 +54,8 @@ void TestStandardNormalSamples(StridedMatrix<double, Kokkos::HostSpace> samples)
     double emp_two_std = 0.954499736104;
     double emp_three_std = 0.997300203937;
     for(int i = 0; i < dim; i++) {
-        REQUIRE_THAT(in_one_std[i]/(double)N_samp, WithinRel(emp_one_std, mc_margin));
-        REQUIRE_THAT(in_two_std[i]/(double)N_samp, WithinRel(emp_two_std, mc_margin));
-        REQUIRE_THAT(in_three_std[i]/(double)N_samp, WithinRel(emp_three_std, mc_margin));
+        CHECK_THAT(in_one_std[i]/(double)N_samp, WithinRel(emp_one_std, mc_margin));
+        CHECK_THAT(in_two_std[i]/(double)N_samp, WithinRel(emp_two_std, mc_margin));
+        CHECK_THAT(in_three_std[i]/(double)N_samp, WithinRel(emp_three_std, mc_margin));
     }
 }

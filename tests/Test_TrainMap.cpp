@@ -70,9 +70,9 @@ if constexpr (!std::is_same_v<TestType, std::false_type>) {
         StridedMatrix<double, Kokkos::HostSpace> pullback_samples_h = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), pullback_samples);
         TestStandardNormalSamples(pullback_samples_h);
     }
+    StridedMatrix<const double, MemorySpace> testSamps = Kokkos::subview(targetSamples, Kokkos::ALL(), Kokkos::pair<unsigned int, unsigned int>(0, testPts));
+    StridedMatrix<const double, MemorySpace> trainSamps = Kokkos::subview(targetSamples, Kokkos::ALL(), Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
     SECTION("RectangleMap") {
-        StridedMatrix<const double, MemorySpace> testSamps = Kokkos::subview(targetSamples, Kokkos::ALL(), Kokkos::pair<unsigned int, unsigned int>(0, testPts));
-        StridedMatrix<const double, MemorySpace> trainSamps = Kokkos::subview(targetSamples, Kokkos::ALL(), Kokkos::pair<unsigned int, unsigned int>(testPts, numPts));
         auto obj = ObjectiveFactory::CreateGaussianKLObjective(trainSamps, testSamps, 2);
 
         MapOptions map_options;
@@ -80,6 +80,23 @@ if constexpr (!std::is_same_v<TestType, std::false_type>) {
 
         TrainOptions train_options;
         train_options.verbose = 0;
+        TrainMap(map, obj, train_options);
+        StridedMatrix<double, MemorySpace> pullback_samples = map->Evaluate(testSamps);
+        StridedMatrix<double, Kokkos::HostSpace> pullback_samples_h = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), pullback_samples);
+        TestStandardNormalSamples(pullback_samples_h);
+    }
+    SECTION("RectangleMap_reference") {
+        Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> covar("reference", dim, dim);
+        Kokkos::MDRangePolicy<typename MemoryToExecution<MemorySpace>::Space, Kokkos::Rank<2>> policy({0,0}, {dim,dim});
+        Kokkos::parallel_for("Covar", policy, KOKKOS_LAMBDA(const unsigned int i, const unsigned int j) {
+            covar(i,j) = double(i == j);
+        });
+        std::shared_ptr<DensityBase<MemorySpace>> dens = std::make_shared<GaussianSamplerDensity<MemorySpace>>(covar); // Ensures that the KLObjective isn't shortcut-ed
+        std::shared_ptr<MapObjective<MemorySpace>> obj = std::make_shared<KLObjective<MemorySpace>>(trainSamps, testSamps, dens);
+        MapOptions map_options;
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateTriangular<MemorySpace>(dim+1, dim, map_order, map_options);
+        TrainOptions train_options;
+        train_options.verbose = 1;
         TrainMap(map, obj, train_options);
         StridedMatrix<double, MemorySpace> pullback_samples = map->Evaluate(testSamps);
         StridedMatrix<double, Kokkos::HostSpace> pullback_samples_h = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), pullback_samples);

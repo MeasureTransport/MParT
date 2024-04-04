@@ -86,8 +86,7 @@ template<>
 void Cholesky<Kokkos::HostSpace>::solveInPlace(Kokkos::View<double**,Kokkos::LayoutLeft,Kokkos::HostSpace> x)
 {
     auto eigX = KokkosToMat(x);
-    cholSolver_->matrixL().solveInPlace(eigX);
-    cholSolver_->matrixU().solveInPlace(eigX);
+    cholSolver_->solveInPlace(eigX);
 }
 
 template<>
