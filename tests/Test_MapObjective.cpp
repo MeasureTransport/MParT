@@ -119,18 +119,17 @@ TEST_CASE( "Test FastGaussianReverseKLObjective", "[FastGaussianReverseKLObjecti
     SECTION("ObjectivePlusCoeffGradImpl"){
         double kl_err_ref = klObjective.ObjectivePlusCoeffGradImpl(train_samples, coeffGradRef, map);
         double kl_err = objective.ObjectivePlusCoeffGradImpl(train_samples, coeffGrad, map);
-        double ref_scale = double(N_samples - N_testpts);
         for(int i = 0; i < map->numCoeffs; i++) {
-            CHECK_THAT(coeffGradRef(i), WithinRel(coeffGrad(i)/ref_scale, 1e-12));
+            CHECK_THAT(coeffGradRef(i), WithinRel(coeffGrad(i), 1e-12));
         }
         Kokkos::deep_copy(map->Coeffs(), 0.5);
         double kl_err_ref2 = klObjective.ObjectivePlusCoeffGradImpl(train_samples, coeffGradRef, map);
         double kl_err2 = objective.ObjectivePlusCoeffGradImpl(train_samples, coeffGrad, map);
         double slope = (kl_err_ref2 - kl_err_ref) / (kl_err2 - kl_err);
-        CHECK_THAT(1. / slope, WithinRel(ref_scale, 1e-12));
+        CHECK_THAT(slope, WithinRel(1., 1e-12));
         double shift = kl_err_ref;
         for(int i = 0; i < map->numCoeffs; i++) {
-            CHECK_THAT(coeffGradRef(i), WithinRel(coeffGrad(i)/ref_scale, 1e-12));
+            CHECK_THAT(coeffGradRef(i), WithinRel(coeffGrad(i), 1e-12));
         }
         Kokkos::deep_copy(map->Coeffs(), -0.1);
         double kl_err_ref3 = klObjective.ObjectivePlusCoeffGradImpl(train_samples, coeffGradRef, map);
@@ -138,7 +137,7 @@ TEST_CASE( "Test FastGaussianReverseKLObjective", "[FastGaussianReverseKLObjecti
         double pred_ref = (kl_err3-kl_err)*slope + shift;
         CHECK_THAT(kl_err_ref3, WithinRel(pred_ref, 1e-12));
         for(int i = 0; i < map->numCoeffs; i++) {
-            CHECK_THAT(coeffGradRef(i), WithinRel(coeffGrad(i)/ref_scale, 1e-12));
+            CHECK_THAT(coeffGradRef(i), WithinRel(coeffGrad(i), 1e-12));
         }
     }
     SECTION("ObjectiveImpl") {

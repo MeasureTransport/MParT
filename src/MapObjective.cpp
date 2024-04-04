@@ -6,6 +6,7 @@ template<typename MemorySpace>
 double MapObjective<MemorySpace>::operator()(unsigned int n, const double* coeffs, double* grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) {
 
     Kokkos::View<const double*, MemorySpace> coeffView = ToConstKokkos<double,MemorySpace>(coeffs, n);
+    if (grad == nullptr) return ObjectiveImpl(train_, map);
     StridedVector<double, MemorySpace> gradView = ToKokkos<double,MemorySpace>(grad, n);
     map->SetCoeffs(coeffView);
     return ObjectivePlusCoeffGradImpl(train_, gradView, map);
@@ -158,12 +159,16 @@ template<typename KLGradSpaceType, typename GradSpaceType, typename GradLogDetSp
 class GradientFunctor {
     using team_handle=typename Kokkos::TeamPolicy<typename GradSpaceType::execution_space>::member_type;
     public:
-    GradientFunctor(KLGradSpaceType kl_grad, unsigned int N_points, const GradSpaceType& grad_space_view, const GradLogDetSpaceType& logdet_grad_space_view): kl_grad_(kl_grad), N_points_(N_points), grad_space_view_(grad_space_view), logdet_grad_space_view_(logdet_grad_space_view) {}
-    KOKKOS_FUNCTION void operator()(team_handle team) const {
+    GradientFunctor(KLGradSpaceType& kl_grad, unsigned int N_points, const GradSpaceType& grad_space_view, const GradLogDetSpaceType& logdet_grad_space_view):
+        kl_grad_(kl_grad), N_points_(N_points), grad_space_view_(grad_space_view), logdet_grad_space_view_(logdet_grad_space_view) {
+    }
+    KOKKOS_FUNCTION void operator()(const team_handle& team) const {
         int d = team.league_rank();
-        Kokkos::parallel_reduce(Kokkos::TeamThreadRange(team, N_points_), [=] (const unsigned int j, double& grad_d) {
-            grad_d += grad_space_view_(d, j) - logdet_grad_space_view_(d, j);
-        }, kl_grad_(d));
+        double grad_d_ = 0.;
+        Kokkos::parallel_reduce(Kokkos::TeamThreadRange(team, N_points_), [&](const unsigned int j, double& grad_d_tmp) {
+            grad_d_tmp += grad_space_view_(d, j) - logdet_grad_space_view_(d, j);
+        }, grad_d_);
+        kl_grad_(d) = grad_d_/N_points_;
     }
     
     private:
@@ -196,9 +201,9 @@ double FastGaussianReverseKLObjective<MemorySpace>::CommonEval(StridedMatrix<con
         Kokkos::RangePolicy<ExecSpace> eval_policy(0, N_points);
         EvaluationFunctor eval_kernel(eval_space_, logdet_space_);
         Kokkos::parallel_reduce("FastGaussianReverseKL Evaluate", eval_policy, eval_kernel, kl_loss);
+        kl_loss /= N_points;
     }
     if constexpr((Type == ObjectiveType::Grad) || (Type == ObjectiveType::EvalGrad)) {
-        using team_handle=Kokkos::TeamPolicy<>::member_type;
         Kokkos::TeamPolicy<ExecSpace> grad_policy(numCoeffs, Kokkos::AUTO());
         GradientFunctor gradient_functor(kl_grad, N_points, grad_space_, logdet_grad_space_);
 
@@ -246,7 +251,7 @@ void KLObjective<MemorySpace>::CoeffGradImpl(StridedMatrix<const double, MemoryS
     using ExecSpace = typename MemoryToExecution<MemorySpace>::Space;
     unsigned int N_samps = data.extent(1);
     unsigned int grad_dim = grad.extent(0);
-    PullbackDensity<MemorySpace> pullback {map, density_};
+    PullbackDensity<MemorySpace> pullback {map, density_}; 
     StridedMatrix<double, MemorySpace> densityGradX = pullback.LogDensityCoeffGrad(data);
 
     double scale = -1.0/((double) N_samps);
