@@ -141,4 +141,18 @@ TEST_CASE( "Test FastGaussianReverseKLObjective", "[FastGaussianReverseKLObjecti
             CHECK_THAT(coeffGradRef(i), WithinRel(coeffGrad(i)/ref_scale, 1e-12));
         }
     }
+    SECTION("ObjectiveImpl") {
+        double kl_err_cgrad = objective.ObjectivePlusCoeffGradImpl(train_samples, coeffGrad, map);
+        double kl_err = objective.ObjectiveImpl(train_samples, map);
+        CHECK_THAT(kl_err_cgrad, WithinRel(kl_err, 1e-14));
+    }
+    SECTION("CoeffGradImpl") {
+        Kokkos::deep_copy(coeffGrad, 0.);
+        Kokkos::deep_copy(coeffGradRef, 0.);
+        objective.ObjectivePlusCoeffGradImpl(train_samples, coeffGradRef, map);
+        objective.CoeffGradImpl(train_samples, coeffGrad, map);
+        for(int i = 0; i < map->numCoeffs; i++) {
+            CHECK_THAT(coeffGradRef(i), WithinRel(coeffGrad(i), 1e-14));
+        }
+    }
 }
