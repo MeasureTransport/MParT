@@ -79,11 +79,14 @@ class NLOptFunctor {
         Kokkos::View<const double*, Kokkos::HostSpace> coeff = ToKokkos<const double, Kokkos::HostSpace>(coeff_ptr, n);
         Kokkos::View<double*, Kokkos::HostSpace> grad = ToKokkos<double, Kokkos::HostSpace>(grad_ptr, n);
         Kokkos::deep_copy(coeff_d_, coeff);
-        Kokkos::fence();
-        double error = (*objective_)(n, coeff_d_.data(), grad_d_.data(), map_);
-        Kokkos::fence();
-        Kokkos::deep_copy(grad, grad_d_);
-        Kokkos::deep_copy(grad_d_, 0);
+        double error;
+        if(grad_ptr != nullptr) {
+            error = (*objective_)(n, coeff_d_.data(), grad_d_.data(), map_);
+            Kokkos::deep_copy(grad, grad_d_);
+            Kokkos::deep_copy(grad_d_, 0);
+        } else {
+            error = (*objective_)(n, coeff_d_.data(), nullptr, map_);
+        }
         return error;
     }
 
