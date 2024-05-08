@@ -73,14 +73,17 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityInputGradImpl(StridedMatrix<
     }
 
     if(!idCov_) {
-        StridedMatrix<double,MemorySpace> outLeft;
+        
         if(output.stride_0()==1){
-            outLeft = output;
+            covChol_.solveInPlace(output);
         }else{
+            StridedMatrix<double,MemorySpace> outLeft;
             outLeft = Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>("OutLeft", output.extent(0), output.extent(1));
+            Kokkos::deep_copy(outLeft, output);
+            covChol_.solveInPlace(outLeft);
+            Kokkos::deep_copy(output, outLeft);
         }
-        covChol_.solveInPlace(outLeft);
-        Kokkos::deep_copy(output, outLeft);
+        
     }
 }
 

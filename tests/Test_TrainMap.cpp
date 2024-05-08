@@ -96,7 +96,7 @@ if constexpr (!std::is_same_v<TestType, std::false_type>) {
         MapOptions map_options;
         std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateTriangular<MemorySpace>(dim+1, dim, map_order, map_options);
         TrainOptions train_options;
-        train_options.verbose = 1;
+        train_options.verbose = 0;
         TrainMap(map, obj, train_options);
         StridedMatrix<double, MemorySpace> pullback_samples = map->Evaluate(testSamps);
         StridedMatrix<double, Kokkos::HostSpace> pullback_samples_h = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), pullback_samples);
