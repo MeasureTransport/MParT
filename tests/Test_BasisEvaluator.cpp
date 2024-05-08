@@ -4,32 +4,19 @@
 using namespace mpart;
 using namespace Catch;
 
-struct TestEvaluators {
-    KOKKOS_INLINE_FUNCTION virtual void EvaluateAll(double* output, int max_order, double input) const {
-        assert(false);
-    };
-    KOKKOS_INLINE_FUNCTION virtual void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) const {
-        assert(false);
-    };
-    KOKKOS_INLINE_FUNCTION virtual void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
-        assert(false);
-    };
-    virtual ~TestEvaluators() = default;
-};
-
-struct IdentityEvaluator: public TestEvaluators {
-    KOKKOS_INLINE_FUNCTION void EvaluateAll(double* output, int max_order, double input) const override {
+struct IdentityEvaluator{
+    KOKKOS_INLINE_FUNCTION void EvaluateAll(double* output, int max_order, double input) const {
         for(int i = 0; i <= max_order; i++) {
             output[i] = input;
         }
     }
-    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) const override {
+    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) const {
         for(int i = 0; i <= max_order; i++) {
             output[i] = input;
             output_diff[i] = 1;
         }
     }
-    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) const override {
+    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
         for(int i = 0; i <= max_order; i++) {
             output[i] = input;
             output_diff[i] = 1;
@@ -38,19 +25,19 @@ struct IdentityEvaluator: public TestEvaluators {
     }
 };
 
-struct NegativeEvaluator: public TestEvaluators {
-    KOKKOS_INLINE_FUNCTION void EvaluateAll(double* output, int max_order, double input) const override {
+struct NegativeEvaluator {
+    KOKKOS_INLINE_FUNCTION void EvaluateAll(double* output, int max_order, double input) const {
         for(int i = 0; i <= max_order; i++) {
             output[i] = -input;
         }
     }
-    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) const override {
+    KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(double* output, double* output_diff, int max_order, double input) const {
         for(int i = 0; i <= max_order; i++) {
             output[i] = -input;
             output_diff[i] = -1;
         }
     }
-    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) const override {
+    KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(double* output, double* output_diff, double* output_diff2, int max_order, double input) const {
         for(int i = 0; i <= max_order; i++) {
             output[i] = -input;
             output_diff[i] = -1;
@@ -118,28 +105,28 @@ TEST_CASE( "Testing basis evaluators", "[BasisEvaluators]") {
         }
     }
     SECTION("Heterogeneous") {
-        using Vec_T = std::vector<std::shared_ptr<TestEvaluators>>;
-        using Eval_T = BasisEvaluator<BasisHomogeneity::Heterogeneous, Vec_T>;
-        Vec_T evals1d {std::make_shared<IdentityEvaluator>(), std::make_shared<NegativeEvaluator>(), std::make_shared<IdentityEvaluator>()};
-        Eval_T eval {dim, evals1d};
+        dim = 8;
+        auto eval = CreateHeterogeneousBasisEvaluator<Identity>(3, 4, 1, IdentityEvaluator(), NegativeEvaluator(), IdentityEvaluator());
         for(int d = 0; d < dim; d++) {
             reset_out();
             eval.EvaluateAll(d, out, max_order, point);
-            for(int i = 0; i <= max_order; i++) CHECK(out[i] == (d % 2 ? -point : point));
+            bool isNegative = d >= 3 && d < 7;
+            double expectedEval = isNegative ? -point : point;
+            for(int i = 0; i <= max_order; i++) REQUIRE(out[i] == expectedEval);
             
             reset_out();
             eval.EvaluateDerivatives(d, out, out_diff, max_order, point);
             for(int i = 0; i <= max_order; i++) {
-                bool is_id_valid = out[i] == (d % 2 ? -point : point);
-                is_id_valid &= out_diff[i] == (d % 2 ? -1: 1);
+                bool is_id_valid = out[i] == (expectedEval);
+                is_id_valid &= out_diff[i] == (isNegative ? -1: 1);
                 CHECK(is_id_valid);
             }
 
             reset_out();
             eval.EvaluateSecondDerivatives(d, out, out_diff, out_diff2, max_order, point);
             for(int i = 0; i <= max_order; i++) {
-                bool is_id_valid = out[i] == (d % 2 ? -point : point);
-                is_id_valid &= out_diff[i] == (d % 2 ? -1 : 1);
+                bool is_id_valid = out[i] == (expectedEval);
+                is_id_valid &= out_diff[i] == (isNegative ? -1 : 1);
                 is_id_valid &= out_diff2[i] == 0.;
                 CHECK(is_id_valid);
             }
