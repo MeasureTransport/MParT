@@ -14,4 +14,4 @@ dependencies:
   - nlopt >= 2.7
   - pytorch
   - cxx-compiler
-
+  - dill

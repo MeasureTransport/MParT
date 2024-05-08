@@ -1,5 +1,8 @@
 #include "Test_Distributions_Common.h"
 
+#include <numeric>
+#include <algorithm>
+
 TEST_CASE( "Testing SampleGenerator", "[SampleGenerator]") {
 // Sample 1000 points
 // Check empirical CDF against uniform CDF

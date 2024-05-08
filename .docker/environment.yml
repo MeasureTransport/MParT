@@ -12,3 +12,4 @@ dependencies:
   - gcc
   - gxx
   - make
+  - dill
