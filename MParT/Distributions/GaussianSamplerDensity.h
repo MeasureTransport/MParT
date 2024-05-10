@@ -54,6 +54,8 @@ class GaussianSamplerDensity: public SampleGenerator<MemorySpace>, public Densit
 
     unsigned int Dim() const override { return dim_; };
 
+    bool IsStandardNormal() const { return idCov_ && mean_.size() == 0; }
+
     protected:
     using GeneratorType = typename SampleGenerator<MemorySpace>::PoolType::generator_type;
     using SampleGenerator<MemorySpace>::rand_pool;

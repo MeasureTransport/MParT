@@ -178,12 +178,44 @@ class KLObjective: public MapObjective<MemorySpace> {
     double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
     void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
     unsigned int MapOutputDim() const override {return density_->Dim();}
-    private:
+
     /**
      * @brief Density \f$\mu\f$ to calculate the KL with respect to (i.e. \f$D(\cdot||\mu)\f$ )
      *
      */
-    std::shared_ptr<DensityBase<MemorySpace>> density_;
+    const std::shared_ptr<DensityBase<MemorySpace>> density_;
+};
+
+template<typename MemorySpace>
+class FastGaussianReverseKLObjective: public MapObjective<MemorySpace> {
+    public:
+    FastGaussianReverseKLObjective(StridedMatrix<const double, MemorySpace> train, unsigned int numCoeffs);
+    FastGaussianReverseKLObjective(StridedMatrix<const double, MemorySpace> train, StridedMatrix<const double, MemorySpace> test, unsigned int numCoeffs);
+
+    double ObjectivePlusCoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
+
+    double ObjectiveImpl(StridedMatrix<const double, MemorySpace> data, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
+
+    void CoeffGradImpl(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const override;
+
+    private:
+    using ExecSpace = typename MemoryToExecution<MemorySpace>::Space;
+    enum class ObjectiveType {Eval = 0, Grad = 1, EvalGrad = 2};
+    
+    template<unsigned int Type_idx>
+    void FillSpaces(std::shared_ptr<ConditionalMapBase<MemorySpace>> map, StridedMatrix<const double, MemorySpace> data) const;
+
+    template<unsigned int Type_idx>
+    double CommonEval(StridedMatrix<const double, MemorySpace> data, StridedVector<double, MemorySpace> grad, std::shared_ptr<ConditionalMapBase<MemorySpace>> map) const;
+
+    template<unsigned int Type_idx>
+    void ClearSpaces() const;
+
+    mutable Kokkos::View<double**, MemorySpace> eval_space_;
+    mutable Kokkos::View<double*, MemorySpace> logdet_space_;
+
+    mutable Kokkos::View<double**, MemorySpace> grad_space_;
+    mutable Kokkos::View<double**, MemorySpace> logdet_grad_space_;
 };
 
 namespace ObjectiveFactory {

@@ -284,33 +284,40 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
   DiagEvaluatorType diag_;
 };
 
+
+
 /**
  * @brief Basis Evaluator to eval different basis fcns for arbitrary inputs
  *
  * @tparam CommonBasisEvaluatorType Supertype to univariate basis eval types
  */
-template <typename CommonBasisEvaluatorType, typename Rectifier>
+template <typename Rectifier, typename ...Bases>
 class BasisEvaluator<BasisHomogeneity::Heterogeneous,
-                     std::vector<std::shared_ptr<CommonBasisEvaluatorType>>, Rectifier> {
+                     std::tuple<Bases...>, Rectifier> {
   public:
+
+  template<typename I, std::enable_if_t<std::is_integral_v<I>, bool> = true>
   BasisEvaluator(
-      unsigned int dim,
-      std::vector<std::shared_ptr<CommonBasisEvaluatorType>> const &basis1d)
+      std::array<I, sizeof...(Bases)> const &dims,
+      std::tuple<Bases...> basis1d)
       : basis1d_(basis1d) {
-    assert(dim == basis1d.size());  // TODO: Fix
-  }
+        for(unsigned int i = 0; i < sizeof...(Bases); i++){
+            dims_[i] = dims[i];
+        }
+      }
+
   // EvaluateAll(dim, output, max_order, input)
   // dim is zero-based indexing
   KOKKOS_INLINE_FUNCTION void EvaluateAll(unsigned int dim, double *output,
                                           int max_order, double input) const {
-    basis1d_[dim]->EvaluateAll(output, max_order, input);
+    basis1d_Evaluator<FunctionEvalType::EvaluateAll, 0>(dim, output, max_order, input);
   }
   // EvaluateDerivatives(dim, output_eval, output_deriv, max_order, input)
   KOKKOS_INLINE_FUNCTION void EvaluateDerivatives(unsigned int dim, double *output,
                                                   double *output_diff,
                                                   int max_order,
                                                   double input) const {
-    basis1d_[dim]->EvaluateDerivatives(output, output_diff, max_order, input);
+    basis1d_Evaluator<FunctionEvalType::EvaluateDerivatives, 0>(dim, output, output_diff, max_order, input);
   }
   // EvaluateSecondDerivatives(dim, output_eval, output_deriv, max_order, input)
   KOKKOS_INLINE_FUNCTION void EvaluateSecondDerivatives(unsigned int dim, double *output,
@@ -318,17 +325,72 @@ class BasisEvaluator<BasisHomogeneity::Heterogeneous,
                                                         double *output_diff2,
                                                         int max_order,
                                                         double input) const {
-    basis1d_[dim]->EvaluateSecondDerivatives(output, output_diff, output_diff2,
-                                             max_order, input);
+    basis1d_Evaluator<FunctionEvalType::EvaluateSecondDerivatives, 0>(dim, output, output_diff, output_diff2, max_order, input);
   }
+
+  private:
+  constexpr static unsigned int MaxIndex = std::integral_constant<unsigned int, sizeof...(Bases)>::value;
+
+  enum class FunctionEvalType { EvaluateAll, EvaluateDerivatives, EvaluateSecondDerivatives };
+
+  template<FunctionEvalType evalType, unsigned int idx, typename ...Args>
+  KOKKOS_INLINE_FUNCTION void basis1d_Evaluator(unsigned int dim_eval, Args... args) const {
+    // Ensure that idx is within bounds (prevent overflow)
+    if constexpr(idx >= MaxIndex) {
+      assert(false); // TODO: use ProcAgnosticError
+      return;
+    } else {
+      // Check if idx gives the right basis function to evaluate
+      if(dim_eval >= std::get<idx>(dims_)){
+        basis1d_Evaluator<evalType, idx + 1, Args...>(dim_eval - std::get<idx>(dims_), args...);
+        return;
+      }
+      // Evaluate the basis function
+      if constexpr (evalType == FunctionEvalType::EvaluateAll) {
+        std::get<idx>(basis1d_).EvaluateAll(args...);
+      } else if constexpr (evalType == FunctionEvalType::EvaluateDerivatives) {
+        std::get<idx>(basis1d_).EvaluateDerivatives(args...);
+      } else if constexpr (evalType == FunctionEvalType::EvaluateSecondDerivatives) {
+        std::get<idx>(basis1d_).EvaluateSecondDerivatives(args...);
+      }
+    }
+  }
+
 #if defined(MPART_HAS_CEREAL)
   template <typename Archive>
   void serialize(Archive &ar) {
+    ar(dims_);
     ar(basis1d_);
   }
 #endif
-  // NOTE: shared_ptr is necessary to avoid type slicing
-  std::vector<std::shared_ptr<CommonBasisEvaluatorType>> basis1d_;
+
+  /// @brief Number of input dimensions for multivariate basis
+  std::tuple<Bases...> basis1d_;
+  std::array<unsigned int, sizeof...(Bases)> dims_;
 };
+
+
+template<typename It, typename... Args>
+constexpr std::tuple<Args...> CreateHeterogeneousBasisEvaluatorHelper(It ret, Args... args) {
+    return std::make_tuple(args...);
+}
+
+template<typename It, typename I, std::enable_if_t<std::is_integral_v<I>, bool> = true, typename... Args>
+constexpr auto CreateHeterogeneousBasisEvaluatorHelper(It ret, I next, Args... args) {
+    *ret = next;
+    return CreateHeterogeneousBasisEvaluatorHelper(ret + 1, args...);
+}
+
+template<typename Rectifier, typename I, std::enable_if_t<std::is_integral_v<I>,bool> = true, typename... Args, typename std::enable_if_t<sizeof...(Args) % 2 == 1, bool> = true>
+constexpr auto CreateHeterogeneousBasisEvaluator(I idx1, Args... args) {
+    std::array<I, (sizeof...(Args) + 1)/2> arr;
+    arr[0] = idx1;
+    auto basis1d = CreateHeterogeneousBasisEvaluatorHelper(arr.begin() + 1, args...);
+    return BasisEvaluator<BasisHomogeneity::Heterogeneous, decltype(basis1d), Rectifier>(arr, basis1d);
+}
+
+template<typename Rectifier, typename ...Bases>
+using HeterogeneousBasisEvaluator = BasisEvaluator<BasisHomogeneity::Heterogeneous, std::tuple<Bases...>, Rectifier>;
+
 }  // namespace mpart
 #endif // MPART_BASISEVALUATOR_H

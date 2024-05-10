@@ -30,9 +30,7 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityImpl(StridedMatrix<const dou
     Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace> diff ("diff", M, N);
 
     if(mean_.extent(0) == 0){
-        Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
-            diff(i,j) = pts(i,j);
-        });
+        Kokkos::deep_copy(diff, pts);
     }
     else {
         Kokkos::parallel_for(policy, KOKKOS_CLASS_LAMBDA(const int& j, const int& i) {
@@ -75,7 +73,17 @@ void GaussianSamplerDensity<MemorySpace>::LogDensityInputGradImpl(StridedMatrix<
     }
 
     if(!idCov_) {
-        covChol_.solveInPlace(output);
+        
+        if(output.stride_0()==1){
+            covChol_.solveInPlace(output);
+        }else{
+            StridedMatrix<double,MemorySpace> outLeft;
+            outLeft = Kokkos::View<double**, Kokkos::LayoutLeft, MemorySpace>("OutLeft", output.extent(0), output.extent(1));
+            Kokkos::deep_copy(outLeft, output);
+            covChol_.solveInPlace(outLeft);
+            Kokkos::deep_copy(output, outLeft);
+        }
+        
     }
 }
 

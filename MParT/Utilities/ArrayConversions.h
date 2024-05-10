@@ -148,9 +148,10 @@ namespace mpart{
     template<typename ScalarType, class... ViewTraits>
     std::vector<typename std::remove_const<ScalarType>::type> KokkosToStd(Kokkos::View<ScalarType*,ViewTraits...> const& view)
     {
+        auto view_copy = Kokkos::create_mirror_view_and_copy(Kokkos::HostSpace(), view);
         std::vector<typename std::remove_const<ScalarType>::type> output(view.extent(0));
         for(unsigned int i=0; i<view.extent(0); ++i)
-            output[i] = view(i);
+            output[i] = view_copy(i);
         return output;
     }
 

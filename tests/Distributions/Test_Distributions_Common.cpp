@@ -1,4 +1,5 @@
 #include "Test_Distributions_Common.h"
+using namespace Catch::Matchers;
 
 void TestStandardNormalSamples(StridedMatrix<double, Kokkos::HostSpace> samples) {
     unsigned int dim = samples.extent(0);
@@ -21,10 +22,14 @@ void TestStandardNormalSamples(StridedMatrix<double, Kokkos::HostSpace> samples)
 
     // Check that the mean is zero and the covariance is the identity matrix
     for(int i = 0; i < dim; i++) {
-        REQUIRE(mean(i) == Approx(0.0).margin(mc_margin));
+        CHECK_THAT(mean(i), WithinAbs(0.0, mc_margin));
         for(int j = 0; j < dim; j++) {
             double diag = (double) (i == j);
-            REQUIRE(covar(i, j) - mean(i)*mean(j) == Approx(diag).margin(mc_margin));
+            double cov_ij = covar(i, j) - mean(i)*mean(j);
+            if(i == j)
+                CHECK_THAT(cov_ij, WithinRel(1., mc_margin));
+            else
+                CHECK_THAT(cov_ij, WithinAbs(0., mc_margin));
         }
     }
 
@@ -49,8 +54,8 @@ void TestStandardNormalSamples(StridedMatrix<double, Kokkos::HostSpace> samples)
     double emp_two_std = 0.954499736104;
     double emp_three_std = 0.997300203937;
     for(int i = 0; i < dim; i++) {
-        REQUIRE(in_one_std[i]/(double)N_samp == Approx(emp_one_std).margin(mc_margin));
-        REQUIRE(in_two_std[i]/(double)N_samp == Approx(emp_two_std).margin(mc_margin));
-        REQUIRE(in_three_std[i]/(double)N_samp == Approx(emp_three_std).margin(mc_margin));
+        CHECK_THAT(in_one_std[i]/(double)N_samp, WithinRel(emp_one_std, mc_margin));
+        CHECK_THAT(in_two_std[i]/(double)N_samp, WithinRel(emp_two_std, mc_margin));
+        CHECK_THAT(in_three_std[i]/(double)N_samp, WithinRel(emp_three_std, mc_margin));
     }
 }
