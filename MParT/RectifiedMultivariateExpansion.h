@@ -394,7 +394,7 @@ namespace mpart{
             CoeffType coeffs;
             Worker_T worker;
 
-            SingleWorkerEvaluator(double* cache_, PointType pt_, CoeffType coeffs_, Worker_T worker_):
+            KOKKOS_FUNCTION SingleWorkerEvaluator(double* cache_, PointType pt_, CoeffType coeffs_, Worker_T worker_):
                 cache(cache_), pt(pt_), coeffs(coeffs_), worker(worker_) {}
             KOKKOS_INLINE_FUNCTION double operator()(double x) {
                 worker.FillCache2(cache, pt, x, DerivativeFlags::None);
