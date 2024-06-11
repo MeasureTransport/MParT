@@ -34,7 +34,7 @@ jobs:
 
       - name: Install sphinx extensions
         shell: bash -l {0}
-        run: conda install -c conda-forge doxygen pygments sphinx==4.35.0 sphinx-design breathe==6.2.1 pydata-sphinx-theme nbsphinx jupytext pandoc ipykernel nbconvert
+        run: conda install -c conda-forge doxygen pygments breathe==4.35.0 sphinx-design sphinx==6.2.1 pydata-sphinx-theme nbsphinx jupytext pandoc ipykernel nbconvert
 
       - name: Run CMake
         shell: bash -l {0}
