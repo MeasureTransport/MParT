@@ -15,27 +15,27 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../../_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../../_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="../../../_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="../../../_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="../../../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="../../../_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="../../../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/doctools.js"></script>
@@ -58,28 +58,23 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -101,12 +96,17 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
@@ -134,60 +134,54 @@
       
         <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../getting_started.html">
-                        Getting Started
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
-                        Tutorials
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../getting_started.html">
+    Getting Started
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../mathematics.html">
-                        Mathematical Background
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
-            <li class="nav-item dropdown">
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../mathematics.html">
+    Mathematical Background
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown pst-header-nav-item">
                 <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
-                        Community
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
+    Community
+  </a>
+</li>
+
                 </ul>
             </li>
             
@@ -262,16 +256,19 @@ document.write(`
   
 
   
-    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+    <button class="sidebar-toggle secondary-toggle" aria-label="On this page">
       <span class="fa-solid fa-outdent"></span>
-    </label>
+    </button>
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -282,67 +279,56 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
+          
+          
+            <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../getting_started.html">
-                        Getting Started
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../tutorials/index.html">
-                        Tutorials
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../getting_started.html">
+    Getting Started
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="../../mathematics.html">
-                        Mathematical Background
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item current active">
-                      <a class="nav-link nav-internal" href="../index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="../../development/index.html">
-                        Community
-                      </a>
-                    </li>
-                
-                </ul>
-            </li>
-            
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../mathematics.html">
+    Mathematical Background
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item current active">
+  <a class="nav-link nav-internal" href="../index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="../../development/index.html">
+    Community
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -411,46 +397,46 @@ document.write(`
 <li class="toctree-l1"><a class="reference internal" href="../triangularmap.html">Triangular Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../composedmap.html">Composed Map</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../monotonecomponent.html">Monotone Component</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../multiindex.html">MultiIndices</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-1"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../multiindex.html">MultiIndices</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../multiindices/multiindex.html">MultiIndex</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiindices/multiindexset.html">MultiIndexSet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiindices/fixedmultiindexset.html">FixedMultiIndexSet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiindices/multiindexlimiter.html">MultiIndexLimiter</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../multiindices/multiindexneighborhood.html">MultiIndexNeighborhood</a></li>
 </ul>
-</li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../quadrature.html">Quadrature</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-2"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../quadrature.html">Quadrature</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../quadrature/clenshawcurtis.html">Clenshaw Curtis Quadrature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../quadrature/adaptivesimpson.html">Adaptive Simpson Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../quadrature/recursivequadrature.html">Adaptive Clenshaw Curtis Quadrature</a></li>
 </ul>
-</li>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/linearalgebra.html">Linear Algebra</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/kokkoswrappers.html">Kokkos Array Conversions</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../templateconcepts.html">Template Concepts</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-3"><i class="fa-solid fa-chevron-down"></i></label><ul>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/cachedparameterization.html">Cached Parameterization Concept</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-4"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../templateconcepts.html">Template Concepts</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/cachedparameterization.html">Cached Parameterization Concept</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 </ul>
-</li>
-<li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/parameterizedfunction.html">Parameterized Function Concept</a><input class="toctree-checkbox" id="toctree-checkbox-5" name="toctree-checkbox-5" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-5"><i class="fa-solid fa-chevron-down"></i></label><ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../concepts/parameterizedfunction.html">Parameterized Function Concept</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../monotonecomponent.html">Monotone Component</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
-</li>
+</details></li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/initialization.html">Initialization Helpers</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../utilities/serialization.html">Serialization</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../maptraining.html">Map Training</a><input class="toctree-checkbox" id="toctree-checkbox-6" name="toctree-checkbox-6" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-6"><i class="fa-solid fa-chevron-down"></i></label><ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../maptraining.html">Map Training</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l2"><a class="reference internal" href="../maptraining/trainmap.html">Train Map</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../maptraining/trainmapadaptive.html">Adaptive Map Training</a></li>
 </ul>
-</li>
-<li class="toctree-l1 current active has-children"><a class="reference internal" href="../multivariatebasis.html">Multivariate Basis Evaluation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-7" name="toctree-checkbox-7" type="checkbox"/><label class="toctree-toggle" for="toctree-checkbox-7"><i class="fa-solid fa-chevron-down"></i></label><ul class="current">
+</details></li>
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../multivariatebasis.html">Multivariate Basis Evaluation</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
 <li class="toctree-l2 current active"><a class="current reference internal" href="#">Univariate Bases</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basisevaluator.html">Basis Evaluators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="multivariateexpansionworker.html">Multivariate Expansion Worker</a></li>
 </ul>
-</li>
+</details></li>
 </ul>
 </div>
 </nav></div>
@@ -465,13 +451,13 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article">
+              <div class="bd-header-article d-print-none">
 <div class="header-article-items header-article__inner">
   
     <div class="header-article-items__start">
@@ -480,7 +466,7 @@ document.write(`
 
 
 
-<nav aria-label="Breadcrumb">
+<nav aria-label="Breadcrumb" class="d-print-none">
   <ul class="bd-breadcrumbs">
     
     <li class="breadcrumb-item breadcrumb-home">
@@ -509,7 +495,7 @@ document.write(`
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
   <section id="univariate-bases">
 <h1>Univariate Bases<a class="headerlink" href="#univariate-bases" title="Permalink to this heading">#</a></h1>
@@ -571,25 +557,32 @@ document.write(`
 <dt class="sig sig-object cpp" id="_CPPv4I000EN5mpart9Sigmoid1dE">
 <span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MemorySpace</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SigmoidType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">SigmoidTypeSpace</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Logistic</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">EdgeType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">SoftPlus</span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classmpart_1_1_sigmoid1d"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sigmoid1d</span></span></span><a class="headerlink" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Class to represent univariate function space spanned by sigmoids. Order should generally be &gt;= 4. </p>
-<p>This class stores functions of the form <div class="math notranslate nohighlight">
-\[f_{k}(x;\mathbf{c},\mathbf{b},\mathbf{w})=b_0+b_1(x-c_1)+w_2g(-b_2(x-c_2))+w_3g(b_3(x-c_3))+\sum_{j=4}^kw_js(b_j(x-c_j))\]</div>
-</p>
-<p>where <span class="math notranslate nohighlight">\(w_j,b_j\geq 0\)</span> and <span class="math notranslate nohighlight">\(s\)</span> is a monotone increasing function. While it is expected that <span class="math notranslate nohighlight">\(s\)</span> is a sigmoid (e.g., Logistic or Erf function), any monotone function will allow this class to work as expected. Without loss of generality we set <span class="math notranslate nohighlight">\(b_0,b_1\equiv 1\)</span> and <span class="math notranslate nohighlight">\(c_1\equiv0\)</span>&amp;#8212; for a linear basis, this will be equivalent to the class of functions presented above. If <span class="math notranslate nohighlight">\(k\in\{0,1\}\)</span>, then we revert only to (increasing) linear functions. The function <span class="math notranslate nohighlight">\(g\)</span> should be an “edge” term where it is a monotone increasing function with <span class="math notranslate nohighlight">\(\lim_{x\to-\infty}g(x)=0\)</span> and <span class="math notranslate nohighlight">\(\lim_{x\to\infty}g(x)=\infty\)</span>. The difference here between <span class="math notranslate nohighlight">\(g\)</span> and <span class="math notranslate nohighlight">\(s\)</span> is that <span class="math notranslate nohighlight">\(s\)</span> is generally expected to approach a constant value as <span class="math notranslate nohighlight">\(x\to\infty\)</span>.</p>
-<p>In the above expression, we denote <span class="math notranslate nohighlight">\(\mathbf{c}\)</span> as the “centers”, <span class="math notranslate nohighlight">\(\mathbf{b}\)</span> as the “width” or “bandwidth”, and <span class="math notranslate nohighlight">\(\mathbf{w}\)</span> as the “weights”. If we want a function class that works with up to <span class="math notranslate nohighlight">\(n\)</span> sigmoids, then we need to store two “center+width+weight” for the edge terms, then one “center+width+weight” for the first order, then two “center+width+weight”s for the second order (representing two sigmoids), then three “center+width+weight”s for the third order and so on. Generally, the weights will be uniform, but the centers and widths of these sigmoids can affect behavior dramatically. If performing approximation in <span class="math notranslate nohighlight">\(L^2(\mu)\)</span>, a good heuristic is to place the weights at the quantiles of <span class="math notranslate nohighlight">\(\mu\)</span> and create widths that are half the distance to the nearest neighbor.</p>
-<p>Currently the minimum order one can construct is 1, i.e., an affine map.</p>
+<p>This class defines a family of basis functions $f_k(x)$ built from one-dimensional sigmoid functions. This family is index by an integer <span class="math notranslate nohighlight">\(k\)</span>, similar to the way the polynomial degree is used to index a class of orthogonal polynomials. In particular, the family of functions is defined by  <div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+ f_0(x) &amp; = 1 \\
+ f_1(x) &amp; = x \\
+ f_2(x) &amp; = -w_0 g(-b_0(x-c_0))\\
+ f_3(x) &amp; = w_1 g(b_1(x-c_1)) \\
+ f_k(x) &amp; = \sum_{j=1}^{N_k} w_{kj} s( b_{kj}(x-c_{kj}))
+ \end{aligned}
+ \end{split}\]</div>
+ where <span class="math notranslate nohighlight">\(c\)</span> represents the “center” of a single sigmoid function $s$, <span class="math notranslate nohighlight">\(w_j,b_j\geq 0\)</span> are positive constants, <span class="math notranslate nohighlight">\(s\)</span> is a monotone increasing function, and <span class="math notranslate nohighlight">\(g\)</span> is an “edge” function satisfying <span class="math notranslate nohighlight">\(\lim_{x\to-\infty}g(x)=0\)</span> and <span class="math notranslate nohighlight">\(\lim_{x\to\infty}g(x)=\infty\)</span>. Generally, the weights will be uniform, but the centers and widths of these sigmoids can affect behavior dramatically. If performing approximation in <span class="math notranslate nohighlight">\(L^2(\mu)\)</span>, a good heuristic is to place the weights at the quantiles of <span class="math notranslate nohighlight">\(\mu\)</span> and create widths that are half the distance to the nearest neighbor.</p>
+<p>The quantities <span class="math notranslate nohighlight">\(w_{kj}\)</span>, <span class="math notranslate nohighlight">\(b_{kj}\)</span>, and <span class="math notranslate nohighlight">\(c_{kj}\)</span> are stored in unrolled vectors and indexed by an array with values <span class="math notranslate nohighlight">\(\sigma_k\)</span> that store the index of <span class="math notranslate nohighlight">\(c_{k0}\)</span> in the unrolled vector, much like the vector used to define sparse matrices stored in CSR format. For example if <code class="docutils literal notranslate"><span class="pre">c</span></code> is the unrolled vector of centers and <code class="docutils literal notranslate"><span class="pre">startInds</span></code> contains <span class="math notranslate nohighlight">\(\sigma_k\)</span>, then <span class="math notranslate nohighlight">\(c_{kj}\)</span> is stored at <code class="docutils literal notranslate"><span class="pre">c[startInds[k]+j-1]</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>MemorySpace</strong> – Where the (nonlinear) parameters are stored </p></li>
 <li><p><strong>SigmoidType</strong> – Class defining eval, SigmoidTypeSpace</p></li>
+<li><p><strong>EdgeType</strong> – Class defining the edge function type, e.g., SoftPlus</p></li>
 </ul>
 </dd>
 </dl>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE">
-<span class="target" id="classmpart_1_1_sigmoid1d_1a6e81806f6be373d8e645469d6d5f1e03"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sigmoid1d</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centers</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">widths</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weights</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEE">
+<span class="target" id="classmpart_1_1_sigmoid1d_1a50ba6219e757d5233f61fd839ff43974"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sigmoid1d</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centers</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">widths</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weights</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">startInds</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Construct a new Sigmoid 1d object. </p>
 <p>Each input should be of length <span class="math notranslate nohighlight">\(2 + n(n+1)/2\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is the number of sigmoids.</p>
 <dl class="field-list simple">
@@ -598,14 +591,15 @@ document.write(`
 <li><p><strong>centers</strong> – Where to center the sigmoids </p></li>
 <li><p><strong>widths</strong> – How “wide” the basis functions should be </p></li>
 <li><p><strong>weights</strong> – How much to weight the sigmoids linearly </p></li>
+<li><p><strong>startInds</strong> – Contains indices into “centers”, “widths”, and “weights” indicating where each term starts. This contains the <span class="math notranslate nohighlight">\(\sigma_k\)</span> values mentioned above. </p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE">
-<span class="target" id="classmpart_1_1_sigmoid1d_1ac6d0a8f832e57bebaafd082c250bd066"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sigmoid1d</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centers</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">widths</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEE">
+<span class="target" id="classmpart_1_1_sigmoid1d_1a64da87b6c0c949e6e6a76767fa5bcdf0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sigmoid1d</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centers</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">widths</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">startInds</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEE" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Construct a new Sigmoid 1d object from centers and widths. </p>
 <p>Each input should be of length <span class="math notranslate nohighlight">\(2 + n(n+1)/2\)</span>, where <span class="math notranslate nohighlight">\(n\)</span> is the number of sigmoids.</p>
 <dl class="field-list simple">
@@ -613,6 +607,39 @@ document.write(`
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>centers</strong> – </p></li>
 <li><p><strong>widths</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE18SigmoidSumSizeType">
+<span class="target" id="classmpart_1_1_sigmoid1d_1ac9cbe9ec6a628de8aeb50f453d414f0d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sigmoid1d</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centers</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">widths</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">weights</span></span>, <span class="n"><span class="pre">SigmoidSumSizeType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sumType</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">SigmoidSumSizeType</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Linear</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE18SigmoidSumSizeType" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new Sigmoid 1d object. </p>
+<p>Each input should either be of length <span class="math notranslate nohighlight">\(2 + n(n+1)/2\)</span> if sumType==Linear or of length <span class="math notranslate nohighlight">\(2+n\)</span> if sumType==Constant, where <span class="math notranslate nohighlight">\(n\)</span> is the number of sigmoids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>centers</strong> – Where to center the sigmoids </p></li>
+<li><p><strong>widths</strong> – How “wide” the basis functions should be </p></li>
+<li><p><strong>weights</strong> – How much to weight the sigmoids linearly </p></li>
+<li><p><strong>sumType</strong> – Indication of how the centers and widths should be interpreted: Either as separate basis functions if sumType==Constant or if sumType==Linear, it will assume that basis function <code class="docutils literal notranslate"><span class="pre">k</span></code> includes the sum of <code class="docutils literal notranslate"><span class="pre">k-3</span></code> Sigmoid terms. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE18SigmoidSumSizeType">
+<span class="target" id="classmpart_1_1_sigmoid1d_1a2477b6748d274835d357a4bedf13c045"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Sigmoid1d</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centers</span></span>, <span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">widths</span></span>, <span class="n"><span class="pre">SigmoidSumSizeType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sumType</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="n"><span class="pre">SigmoidSumSizeType</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Linear</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE18SigmoidSumSizeType" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Construct a new Sigmoid 1d object from centers and widths. </p>
+<p>Each input should either be of length <span class="math notranslate nohighlight">\(2 + n(n+1)/2\)</span> if sumType==Linear or of length <span class="math notranslate nohighlight">\(2+n\)</span> if sumType==Constant, where <span class="math notranslate nohighlight">\(n\)</span> is the number of sigmoids.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>centers</strong> – Where to center the sigmoids </p></li>
+<li><p><strong>widths</strong> – How “wide” the basis functions should be </p></li>
+<li><p><strong>sumType</strong> – Indication of how the centers and widths should be interpreted: Either as separate basis functions if sumType==Constant or if sumType==Linear, it will assume that basis function <code class="docutils literal notranslate"><span class="pre">k</span></code> includes the sum of <code class="docutils literal notranslate"><span class="pre">k-3</span></code> Sigmoid terms. </p></li>
 </ul>
 </dd>
 </dl>
@@ -681,8 +708,22 @@ document.write(`
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4N5mpart9Sigmoid1d13LengthToOrderEi">
-<span class="target" id="classmpart_1_1_sigmoid1d_1a01a13f4827a9529602a841107f975b92"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LengthToOrder</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart9Sigmoid1d13LengthToOrderEi" title="Permalink to this definition">#</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9Sigmoid1d18ConstructStartIndsEj18SigmoidSumSizeType">
+<span class="target" id="classmpart_1_1_sigmoid1d_1a39fbf4ed348c8a40a69b70ca4de74dc5"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">View</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I000EN5mpart9Sigmoid1dE" title="mpart::Sigmoid1d::MemorySpace"><span class="n"><span class="pre">MemorySpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ConstructStartInds</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">unsigned</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">centerSize</span></span>, <span class="n"><span class="pre">SigmoidSumSizeType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sumType</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart9Sigmoid1d18ConstructStartIndsEj18SigmoidSumSizeType" title="Permalink to this definition">#</a><br /></dt>
+<dd><p>Constructs starting indices from the number of provided centers. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>centerSize</strong> – The number of centers provided to the constructor, i.e., centers.extent(0) </p></li>
+<li><p><strong>sumType</strong> – The form of each term’s expansion. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N5mpart9Sigmoid1d18ComputeNumSigmoidsEi18SigmoidSumSizeType">
+<span class="target" id="classmpart_1_1_sigmoid1d_1a322c116a90da0f05677a29512c5a2b42"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ComputeNumSigmoids</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">numCenters</span></span>, <span class="n"><span class="pre">SigmoidSumSizeType</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sumType</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N5mpart9Sigmoid1d18ComputeNumSigmoidsEi18SigmoidSumSizeType" title="Permalink to this definition">#</a><br /></dt>
 <dd><p>Given the length of centers, return the number of sigmoid levels. </p>
 </dd></dl>
 
@@ -698,7 +739,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
     <a class="left-prev"
@@ -728,6 +769,7 @@ document.write(`
               
                 <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
+
   <div class="sidebar-secondary-item">
 
   <div class="tocsection sourcelink">
@@ -750,8 +792,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="../../../_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="../../../_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -784,7 +826,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.3.
 </p></div>
       
     </div>

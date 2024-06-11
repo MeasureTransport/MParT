@@ -14,27 +14,27 @@
   
   <script data-cfasync="false">
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
-    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="_static/styles/theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="_static/styles/bootstrap.css?digest=5b4479735964841361fd" rel="stylesheet" />
-<link href="_static/styles/pydata-sphinx-theme.css?digest=5b4479735964841361fd" rel="stylesheet" />
+  <link href="_static/styles/theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
 
   
-  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=5b4479735964841361fd" rel="stylesheet" />
-  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2" />
-<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2" />
+  <link href="_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=3ee479438cf8b5e0d341" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css" />
   
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=5b4479735964841361fd" />
-<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd" />
-  <script src="_static/vendor/fontawesome/6.1.2/js/all.min.js?digest=5b4479735964841361fd"></script>
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341" />
+  <script src="_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=3ee479438cf8b5e0d341"></script>
 
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/doctools.js"></script>
@@ -53,28 +53,23 @@
 
   
   
-  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
-
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>
-    Back to top
-  </button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__primary"
-          id="__primary"/>
-  <label class="overlay overlay-primary" for="__primary"></label>
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
   
   <input type="checkbox"
           class="sidebar-toggle"
-          name="__secondary"
-          id="__secondary"/>
-  <label class="overlay overlay-secondary" for="__secondary"></label>
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
   
   <div class="search-button__wrapper">
     <div class="search-button__overlay"></div>
@@ -96,12 +91,17 @@
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
 </form></div>
   </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
   
-    <nav class="bd-header navbar navbar-expand-lg bd-navbar">
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
 <div class="bd-header__inner bd-page-width">
-  <label class="sidebar-toggle primary-toggle" for="__primary">
+  <button class="sidebar-toggle primary-toggle" aria-label="Site navigation">
     <span class="fa-solid fa-bars"></span>
-  </label>
+  </button>
   
   
   <div class="col-lg-3 navbar-header-items__start">
@@ -129,60 +129,54 @@
       
         <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="source/installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="source/getting_started.html">
-                        Getting Started
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="source/tutorials/index.html">
-                        Tutorials
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/getting_started.html">
+    Getting Started
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="source/mathematics.html">
-                        Mathematical Background
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="source/api/index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
-            <li class="nav-item dropdown">
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/mathematics.html">
+    Mathematical Background
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/api/index.html">
+    API Reference
+  </a>
+</li>
+
+            <li class="nav-item dropdown pst-header-nav-item">
                 <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links">
                     More
                 </button>
                 <ul id="pst-nav-more-links" class="dropdown-menu">
                     
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="source/development/index.html">
-                        Community
-                      </a>
-                    </li>
-                
+<li class="nav-item ">
+  <a class="nav-link dropdown-item nav-internal" href="source/development/index.html">
+    Community
+  </a>
+</li>
+
                 </ul>
             </li>
             
@@ -259,10 +253,15 @@ document.write(`
   
 </div>
 
-    </nav>
+    </header>
   
+
   <div class="bd-container">
     <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
       
       <div class="bd-sidebar-primary bd-sidebar">
         
@@ -273,67 +272,56 @@ document.write(`
     
       <div class="sidebar-header-items__center">
         
-          <div class="navbar-item">
+          
+          
+            <div class="navbar-item">
 <nav class="navbar-nav">
-  <p class="sidebar-header-items__title"
-     role="heading"
-     aria-level="1"
-     aria-label="Site Navigation">
-    Site Navigation
-  </p>
   <ul class="bd-navbar-elements navbar-nav">
     
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="source/installation.html">
-                        Installation
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/installation.html">
+    Installation
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="source/getting_started.html">
-                        Getting Started
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="source/tutorials/index.html">
-                        Tutorials
-                      </a>
-                    </li>
-                
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/getting_started.html">
+    Getting Started
+  </a>
+</li>
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="source/mathematics.html">
-                        Mathematical Background
-                      </a>
-                    </li>
-                
 
-                    <li class="nav-item">
-                      <a class="nav-link nav-internal" href="source/api/index.html">
-                        API Reference
-                      </a>
-                    </li>
-                
-            <li class="nav-item dropdown">
-                <button class="btn dropdown-toggle nav-item" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-controls="pst-nav-more-links-2">
-                    More
-                </button>
-                <ul id="pst-nav-more-links-2" class="dropdown-menu">
-                    
-                    <li class="nav-item">
-                      <a class="nav-link dropdown-item nav-internal" href="source/development/index.html">
-                        Community
-                      </a>
-                    </li>
-                
-                </ul>
-            </li>
-            
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/mathematics.html">
+    Mathematical Background
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/api/index.html">
+    API Reference
+  </a>
+</li>
+
+
+<li class="nav-item pst-header-nav-item">
+  <a class="nav-link nav-internal" href="source/development/index.html">
+    Community
+  </a>
+</li>
+
   </ul>
 </nav></div>
+          
         
       </div>
     
@@ -402,19 +390,19 @@ document.write(`
 
       </div>
       
-      <main id="main-content" class="bd-main">
+      <main id="main-content" class="bd-main" role="main">
         
         
           <div class="bd-content">
             <div class="bd-article-container">
               
-              <div class="bd-header-article"></div>
+              <div class="bd-header-article d-print-none"></div>
               
               
               
                 
 <div id="searchbox"></div>
-                <article class="bd-article" role="main">
+                <article class="bd-article">
                   
 
 <h1 id="index">Index</h1>
@@ -584,7 +572,11 @@ document.write(`
 </li>
       <li><a href="source/api/conditionalmapbase.html#_CPPv4I0EN5mpart18ConditionalMapBaseE">mpart::ConditionalMapBase (C++ class)</a>
 </li>
+      <li><a href="source/api/conditionalmapbase.html#_CPPv4NK5mpart18ConditionalMapBase11CoeffBoundsEv">mpart::ConditionalMapBase::CoeffBounds (C++ function)</a>
+</li>
       <li><a href="source/api/conditionalmapbase.html#_CPPv4N5mpart18ConditionalMapBase18ConditionalMapBaseEjjj">mpart::ConditionalMapBase::ConditionalMapBase (C++ function)</a>, <a href="source/api/conditionalmapbase.html#_CPPv4N5mpart18ConditionalMapBase18ConditionalMapBaseEjjjN6Kokkos4ViewIPKd11MemorySpaceEE">[1]</a>
+</li>
+      <li><a href="source/api/conditionalmapbase.html#_CPPv4NK5mpart18ConditionalMapBase19FillCoeffBoundsImplEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE">mpart::ConditionalMapBase::FillCoeffBoundsImpl (C++ function)</a>
 </li>
       <li><a href="source/api/conditionalmapbase.html#_CPPv4N5mpart18ConditionalMapBase15GetBaseFunctionEv">mpart::ConditionalMapBase::GetBaseFunction (C++ function)</a>
 </li>
@@ -622,33 +614,7 @@ document.write(`
 </li>
       <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4I0EN5mpart18FixedMultiIndexSetE">mpart::FixedMultiIndexSet (C++ class)</a>
 </li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSet18FixedMultiIndexSetEjN6Kokkos4ViewIPj11MemorySpaceEE">mpart::FixedMultiIndexSet::FixedMultiIndexSet (C++ function)</a>, <a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSet18FixedMultiIndexSetEjN6Kokkos4ViewIPj11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEE">[1]</a>, <a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSet18FixedMultiIndexSetEjj">[2]</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4NK5mpart18FixedMultiIndexSet12IndexToMultiEj">mpart::FixedMultiIndexSet::IndexToMulti (C++ function)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4NK5mpart18FixedMultiIndexSet6LengthEv">mpart::FixedMultiIndexSet::Length (C++ function)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4NK5mpart18FixedMultiIndexSet10MaxDegreesEv">mpart::FixedMultiIndexSet::MaxDegrees (C++ function)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSet10maxDegreesE">mpart::FixedMultiIndexSet::maxDegrees (C++ member)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4NK5mpart18FixedMultiIndexSet12MultiToIndexERKNSt6vectorIjEE">mpart::FixedMultiIndexSet::MultiToIndex (C++ function)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4NK5mpart18FixedMultiIndexSet22NonzeroDiagonalEntriesEv">mpart::FixedMultiIndexSet::NonzeroDiagonalEntries (C++ function)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSet6nzDimsE">mpart::FixedMultiIndexSet::nzDims (C++ member)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSet8nzOrdersE">mpart::FixedMultiIndexSet::nzOrders (C++ member)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSet8nzStartsE">mpart::FixedMultiIndexSet::nzStarts (C++ member)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4NK5mpart18FixedMultiIndexSet5PrintEv">mpart::FixedMultiIndexSet::Print (C++ function)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4NK5mpart18FixedMultiIndexSet4SizeEv">mpart::FixedMultiIndexSet::Size (C++ function)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4I0EN5mpart18FixedMultiIndexSet8ToDeviceE18FixedMultiIndexSetI16OtherMemorySpaceEv">mpart::FixedMultiIndexSet::ToDevice (C++ function)</a>
-</li>
-      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4NK5mpart18FixedMultiIndexSet5UnfixEv">mpart::FixedMultiIndexSet::Unfix (C++ function)</a>
+      <li><a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSet18FixedMultiIndexSetEjN6Kokkos4ViewIPj11MemorySpaceEE">mpart::FixedMultiIndexSet::FixedMultiIndexSet (C++ function)</a>, <a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSet18FixedMultiIndexSetEjN6Kokkos4ViewIPj11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEE">[1]</a>, <a href="source/api/multiindices/fixedmultiindexset.html#_CPPv4N5mpart18FixedMultiIndexSet18FixedMultiIndexSetEjjj">[2]</a>
 </li>
       <li><a href="source/api/mapfactory.html#_CPPv4N5mpart10MapFactoryE">mpart::MapFactory (C++ type)</a>
 </li>
@@ -658,7 +624,7 @@ document.write(`
 </li>
       <li><a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory15CreateExpansionENSt10shared_ptrI25ParameterizedFunctionBaseI11MemorySpaceEEEjRK18FixedMultiIndexSetI11MemorySpaceE10MapOptions">mpart::MapFactory::CreateExpansion (C++ function)</a>
 </li>
-      <li><a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidComponentENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEE18FixedMultiIndexSetI11MemorySpaceE18FixedMultiIndexSetI11MemorySpaceE13StridedVectorIKd11MemorySpaceE10MapOptions">mpart::MapFactory::CreateSigmoidComponent (C++ function)</a>, <a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidComponentENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEE18FixedMultiIndexSetI11MemorySpaceE18FixedMultiIndexSetI11MemorySpaceEN5Eigen3RefIKN5Eigen11RowVectorXdEEE10MapOptions">[1]</a>, <a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidComponentENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjj13StridedVectorIKd11MemorySpaceE10MapOptions">[2]</a>, <a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidComponentENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjN5Eigen3RefIKN5Eigen11RowVectorXdEEE10MapOptions">[3]</a>
+      <li><a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidComponentENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEE18FixedMultiIndexSetI11MemorySpaceE13StridedVectorIKd11MemorySpaceE10MapOptions">mpart::MapFactory::CreateSigmoidComponent (C++ function)</a>, <a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidComponentENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEE18FixedMultiIndexSetI11MemorySpaceEN5Eigen3RefIKN5Eigen11RowVectorXdEEE10MapOptions">[1]</a>, <a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidComponentENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjj13StridedVectorIKd11MemorySpaceE10MapOptions">[2]</a>, <a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidComponentENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjN5Eigen3RefIKN5Eigen11RowVectorXdEEE10MapOptions">[3]</a>, <a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidComponentENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjj13StridedVectorIKd11MemorySpaceE10MapOptions">[4]</a>, <a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory22CreateSigmoidComponentENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjjN5Eigen3RefIKN5Eigen11RowVectorXdEEE10MapOptions">[5]</a>
 </li>
       <li><a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory23CreateSigmoidTriangularENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjjRK13StridedMatrixIKd11MemorySpaceE10MapOptions">mpart::MapFactory::CreateSigmoidTriangular (C++ function)</a>, <a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory23CreateSigmoidTriangularENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjjRKN5Eigen3RefIKN5Eigen11RowMatrixXdEEE10MapOptions">[1]</a>, <a href="source/api/mapfactory.html#_CPPv4I0EN5mpart10MapFactory23CreateSigmoidTriangularENSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEEjjjRKNSt6vectorI13StridedVectorIKd11MemorySpaceEEE10MapOptions">[2]</a>
 </li>
@@ -707,6 +673,10 @@ document.write(`
       <li><a href="source/api/mapfactory.html#_CPPv4N5mpart10MapOptions10quadRelTolE">mpart::MapOptions::quadRelTol (C++ member)</a>
 </li>
       <li><a href="source/api/mapfactory.html#_CPPv4N5mpart10MapOptions8quadTypeE">mpart::MapOptions::quadType (C++ member)</a>
+</li>
+      <li><a href="source/api/mapfactory.html#_CPPv4N5mpart10MapOptions8sbstypesE">mpart::MapOptions::sbstypes (C++ member)</a>
+</li>
+      <li><a href="source/api/mapfactory.html#_CPPv4N5mpart10MapOptions19sigmoidBasisSumTypeE">mpart::MapOptions::sigmoidBasisSumType (C++ member)</a>
 </li>
       <li><a href="source/api/mapfactory.html#_CPPv4N5mpart10MapOptions11sigmoidTypeE">mpart::MapOptions::sigmoidType (C++ member)</a>
 </li>
@@ -768,6 +738,8 @@ document.write(`
 </li>
       <li><a href="source/api/multiindices/multiindex.html#_CPPv4NK5mpart10MultiIndex10AnyBoundedERK10MultiIndex">mpart::MultiIndex::AnyBounded (C++ function)</a>
 </li>
+      <li><a href="source/api/multiindices/multiindex.html#_CPPv4NK5mpart10MultiIndex11ConcatenateERK10MultiIndex">mpart::MultiIndex::Concatenate (C++ function)</a>
+</li>
       <li><a href="source/api/multiindices/multiindex.html#_CPPv4NK5mpart10MultiIndex3GetEj">mpart::MultiIndex::Get (C++ function)</a>
 </li>
       <li><a href="source/api/multiindices/multiindex.html#_CPPv4NK5mpart10MultiIndex13HasNonzeroEndEv">mpart::MultiIndex::HasNonzeroEnd (C++ function)</a>
@@ -796,8 +768,6 @@ document.write(`
 </li>
       <li><a href="source/api/multiindices/multiindex.html#_CPPv4NK5mpart10MultiIndex6StringEv">mpart::MultiIndex::String (C++ function)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/api/multiindices/multiindex.html#_CPPv4NK5mpart10MultiIndex3SumEv">mpart::MultiIndex::Sum (C++ function)</a>
 </li>
       <li><a href="source/api/multiindices/multiindex.html#_CPPv4NK5mpart10MultiIndex6VectorEv">mpart::MultiIndex::Vector (C++ function)</a>
@@ -812,6 +782,8 @@ document.write(`
 </li>
       <li><a href="source/api/multiindices/multiindexlimiter.html#_CPPv4N5mpart17MultiIndexLimiter9MaxDegreeE">mpart::MultiIndexLimiter::MaxDegree (C++ class)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="source/api/multiindices/multiindexlimiter.html#_CPPv4N5mpart17MultiIndexLimiter4NoneE">mpart::MultiIndexLimiter::None (C++ class)</a>
 </li>
       <li><a href="source/api/multiindices/multiindexlimiter.html#_CPPv4N5mpart17MultiIndexLimiter11NonzeroDiagE">mpart::MultiIndexLimiter::NonzeroDiag (C++ class)</a>
@@ -847,6 +819,8 @@ document.write(`
       <li><a href="source/api/multiindices/multiindexset.html#_CPPv4NK5mpart13MultiIndexSet2atEi">mpart::MultiIndexSet::at (C++ function)</a>
 </li>
       <li><a href="source/api/multiindices/multiindexset.html#_CPPv4NK5mpart13MultiIndexSet17BackwardNeighborsERK10MultiIndex">mpart::MultiIndexSet::BackwardNeighbors (C++ function)</a>, <a href="source/api/multiindices/multiindexset.html#_CPPv4NK5mpart13MultiIndexSet17BackwardNeighborsEj">[1]</a>
+</li>
+      <li><a href="source/api/multiindices/multiindexset.html#_CPPv4NK5mpart13MultiIndexSet9CartesianERK13MultiIndexSetRK11LimiterType">mpart::MultiIndexSet::Cartesian (C++ function)</a>
 </li>
       <li><a href="source/api/multiindices/multiindexset.html#_CPPv4N5mpart13MultiIndexSet19CreateTensorProductEjjRK11LimiterType">mpart::MultiIndexSet::CreateTensorProduct (C++ function)</a>
 </li>
@@ -895,6 +869,8 @@ document.write(`
       <li><a href="source/api/multiindices/multiindexset.html#_CPPv4N5mpart13MultiIndexSetpLERK10MultiIndex">mpart::MultiIndexSet::operator+= (C++ function)</a>, <a href="source/api/multiindices/multiindexset.html#_CPPv4N5mpart13MultiIndexSetpLERK13MultiIndexSet">[1]</a>
 </li>
       <li><a href="source/api/multiindices/multiindexset.html#_CPPv4N5mpart13MultiIndexSetaSERK13MultiIndexSet">mpart::MultiIndexSet::operator= (C++ function)</a>
+</li>
+      <li><a href="source/api/multiindices/multiindexset.html#_CPPv4NK5mpart13MultiIndexSeteqERK13MultiIndexSet">mpart::MultiIndexSet::operator== (C++ function)</a>
 </li>
       <li><a href="source/api/multiindices/multiindexset.html#_CPPv4NK5mpart13MultiIndexSetixEi">mpart::MultiIndexSet::operator[] (C++ function)</a>
 </li>
@@ -1044,6 +1020,10 @@ document.write(`
 </li>
       <li><a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4I000EN5mpart9Sigmoid1dE">mpart::Sigmoid1d (C++ class)</a>
 </li>
+      <li><a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4N5mpart9Sigmoid1d18ComputeNumSigmoidsEi18SigmoidSumSizeType">mpart::Sigmoid1d::ComputeNumSigmoids (C++ function)</a>
+</li>
+      <li><a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4N5mpart9Sigmoid1d18ConstructStartIndsEj18SigmoidSumSizeType">mpart::Sigmoid1d::ConstructStartInds (C++ function)</a>
+</li>
       <li><a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4NK5mpart9Sigmoid1d11EvaluateAllEPdid">mpart::Sigmoid1d::EvaluateAll (C++ function)</a>
 </li>
       <li><a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4NK5mpart9Sigmoid1d19EvaluateDerivativesEPdPdid">mpart::Sigmoid1d::EvaluateDerivatives (C++ function)</a>
@@ -1052,9 +1032,7 @@ document.write(`
 </li>
       <li><a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4NK5mpart9Sigmoid1d8GetOrderEv">mpart::Sigmoid1d::GetOrder (C++ function)</a>
 </li>
-      <li><a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4N5mpart9Sigmoid1d13LengthToOrderEi">mpart::Sigmoid1d::LengthToOrder (C++ function)</a>
-</li>
-      <li><a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE">mpart::Sigmoid1d::Sigmoid1d (C++ function)</a>, <a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE">[1]</a>
+      <li><a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE18SigmoidSumSizeType">mpart::Sigmoid1d::Sigmoid1d (C++ function)</a>, <a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEE18SigmoidSumSizeType">[1]</a>, <a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEE">[2]</a>, <a href="source/api/multivariatebasis/univariatebasis.html#_CPPv4N5mpart9Sigmoid1d9Sigmoid1dEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPd11MemorySpaceEEN6Kokkos4ViewIPj11MemorySpaceEE">[3]</a>
 </li>
       <li><a href="source/api/maptraining/trainmap.html#_CPPv4I0EN5mpart8TrainMapEdNSt10shared_ptrI18ConditionalMapBaseI11MemorySpaceEEENSt10shared_ptrI12MapObjectiveI11MemorySpaceEEE12TrainOptions">mpart::TrainMap (C++ function)</a>
 </li>
@@ -1104,6 +1082,8 @@ document.write(`
 </li>
       <li><a href="source/api/triangularmap.html#_CPPv4N5mpart13TriangularMap12EvaluateImplERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE">mpart::TriangularMap::EvaluateImpl (C++ function)</a>
 </li>
+      <li><a href="source/api/triangularmap.html#_CPPv4NK5mpart13TriangularMap19FillCoeffBoundsImplEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEEN6Kokkos4ViewIPdN6Kokkos9HostSpaceEEE">mpart::TriangularMap::FillCoeffBoundsImpl (C++ function)</a>
+</li>
       <li><a href="source/api/triangularmap.html#_CPPv4N5mpart13TriangularMap12GetComponentEj">mpart::TriangularMap::GetComponent (C++ function)</a>
 </li>
       <li><a href="source/api/triangularmap.html#_CPPv4N5mpart13TriangularMap12GradientImplERK13StridedMatrixIKd11MemorySpaceERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE">mpart::TriangularMap::GradientImpl (C++ function)</a>
@@ -1117,6 +1097,8 @@ document.write(`
       <li><a href="source/api/triangularmap.html#_CPPv4N5mpart13TriangularMap18LogDeterminantImplERK13StridedMatrixIKd11MemorySpaceE13StridedVectorId11MemorySpaceE">mpart::TriangularMap::LogDeterminantImpl (C++ function)</a>
 </li>
       <li><a href="source/api/triangularmap.html#_CPPv4N5mpart13TriangularMap27LogDeterminantInputGradImplERK13StridedMatrixIKd11MemorySpaceE13StridedMatrixId11MemorySpaceE">mpart::TriangularMap::LogDeterminantInputGradImpl (C++ function)</a>
+</li>
+      <li><a href="source/api/triangularmap.html#_CPPv4NK5mpart13TriangularMap13NumComponentsEv">mpart::TriangularMap::NumComponents (C++ function)</a>
 </li>
       <li><a href="source/api/triangularmap.html#_CPPv4N5mpart13TriangularMap9SetCoeffsEN6Kokkos4ViewIPKd11MemorySpaceEE">mpart::TriangularMap::SetCoeffs (C++ function)</a>
 </li>
@@ -1153,7 +1135,7 @@ document.write(`
               
               
               
-                <footer class="prev-next-footer">
+                <footer class="prev-next-footer d-print-none">
                   
 <div class="prev-next-area">
 </div>
@@ -1174,8 +1156,8 @@ document.write(`
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script src="_static/scripts/bootstrap.js?digest=5b4479735964841361fd"></script>
-<script src="_static/scripts/pydata-sphinx-theme.js?digest=5b4479735964841361fd"></script>
+  <script src="_static/scripts/bootstrap.js?digest=3ee479438cf8b5e0d341"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=3ee479438cf8b5e0d341"></script>
 
   <footer class="bd-footer">
 <div class="bd-footer__inner bd-page-width">
@@ -1208,7 +1190,7 @@ document.write(`
       
         <div class="footer-item">
 <p class="theme-version">
-  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.14.4.
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.3.
 </p></div>
       
     </div>
