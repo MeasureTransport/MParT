@@ -152,23 +152,18 @@ TEST_CASE( "Test InnerMarginalAffineMap", "[InnerMarginalAffineMap]") {
         }
 
         // LogDeterminantCoeffGrad test
+        logdet = map->LogDeterminant(pts);
         StridedMatrix<double, MemorySpace> logdet_coeff_grad = map->LogDeterminantCoeffGrad(pts);
-        Kokkos::View<double**, MemorySpace> exp_logdet_coeff_grad_map("exp_logdet_coeff_grad_map", trimap->numCoeffs, numPts);
-        for(int k = 0; k < trimap->numCoeffs; k++) {
+        Kokkos::View<double*, MemorySpace> logdet_out_fd("memory for logdet", numPts);
+        for(int k = 0; k < map->numCoeffs; k++) {
+            map->Coeffs()(k) += fd_step;
+            Kokkos::deep_copy(logdet_out_fd, 0.);
+            map->LogDeterminantImpl(pts, logdet_out_fd);
             for(int j = 0; j < numPts; j++) {
-                trimap->Coeffs()(k) += fd_step;
-                StridedVector<double,MemorySpace> exp_logdet_map_fd = trimap->LogDeterminant(appliedPts);
-                for(int j = 0; j < numPts; j++) {
-                    exp_logdet_coeff_grad_map(k,j) = (exp_logdet_map_fd(j) - exp_logdet_map(j))/fd_step;
-                }
-                trimap->Coeffs()(k) -= fd_step;
+                double grad_fd_j = (logdet_out_fd(j) - logdet(j))/fd_step;
+                REQUIRE_THAT(logdet_coeff_grad(k,j), WithinRel(grad_fd_j, 20*fd_step));
             }
-        }
-
-        for(unsigned int k=0; k<trimap->numCoeffs; ++k){
-            for(unsigned int j=0; j<numPts; ++j){
-                REQUIRE_THAT(logdet_coeff_grad(k,j), WithinRel(exp_logdet_coeff_grad_map(k,j), 20*fd_step));
-            }
+            map->Coeffs()(k) -= fd_step;
         }
 
         Kokkos::View<double**, MemorySpace> sens("sens", outputDim, numPts);

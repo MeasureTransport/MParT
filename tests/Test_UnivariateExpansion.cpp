@@ -119,7 +119,7 @@ TEST_CASE("UnivariateExpansion") {
     }
 }
 
-TEST_CASE("UnivariateExpansion Inverse") {
+TEST_CASE("UnivariateExpansion: Sigmoid", "[SigmoidUnivariateExpansion]") {
     // Set up Sigmoid basis
     using Basis_T = Sigmoid1d<MemorySpace>;
     unsigned int num_sigmoid = 3;
@@ -142,26 +142,38 @@ TEST_CASE("UnivariateExpansion Inverse") {
     UnivariateExpansion<MemorySpace, Basis_T> expansion(maxOrder, basis);
     Kokkos::deep_copy(coeffs, 1.0);
     expansion.WrapCoeffs(coeffs);
-    unsigned int numPts = 100;
-    Kokkos::View<double**, MemorySpace> points("points", 1, numPts);
-    double grid = double(numPts)/2;
-    for(int i = 0; i < numPts; i++) {
-        points(0, i) = (bound+0.05)*double(i-grid)/double(grid);
+    SECTION("Inverse") {
+        unsigned int numPts = 100;
+        Kokkos::View<double**, MemorySpace> points("points", 1, numPts);
+        double grid = double(numPts)/2;
+        for(int i = 0; i < numPts; i++) {
+            points(0, i) = (bound+0.05)*double(i-grid)/double(grid);
+        }
+        StridedMatrix<double, MemorySpace> eval = expansion.Evaluate(points);
+        Kokkos::View<double**, MemorySpace> prefix ("inverse prefix", 0, numPts);
+        StridedMatrix<double, MemorySpace> inv = expansion.Inverse(prefix, eval);
+        REQUIRE(inv.extent(0) == 1);
+        REQUIRE(inv.extent(1) == numPts);
+        double tol = 5e-6; // Comes from rootfinding
+        for(int i = 0; i < numPts; i++) {
+            if(std::abs(points(0,i)) > tol*1e-2) CHECK_THAT(inv(0, i), WithinRel(points(0, i), tol));
+            else CHECK_THAT(inv(0, i), WithinAbs(points(0, i), 1e-10));
+        }
     }
-    StridedMatrix<double, MemorySpace> eval = expansion.Evaluate(points);
-    Kokkos::View<double**, MemorySpace> prefix ("inverse prefix", 0, numPts);
-    StridedMatrix<double, MemorySpace> inv = expansion.Inverse(prefix, eval);
-    REQUIRE(inv.extent(0) == 1);
-    REQUIRE(inv.extent(1) == numPts);
-    double tol = 5e-6; // Comes from rootfinding
-    for(int i = 0; i < numPts; i++) {
-        if(std::abs(points(0,i)) > tol*1e-2) CHECK_THAT(inv(0, i), WithinRel(points(0, i), tol));
-        else CHECK_THAT(inv(0, i), WithinAbs(points(0, i), 1e-10));
+    SECTION("CoeffBounds") {
+        Kokkos::View<double*, Kokkos::HostSpace> lb,ub;
+        std::tie(lb,ub) = expansion.CoeffBounds();
+        REQUIRE(lb.size()==expansion.numCoeffs);
+        REQUIRE(ub.size()==expansion.numCoeffs);
+
+        // Constant can be anything
+        CHECK(lb(0) == -std::numeric_limits<double>::infinity());
+        CHECK(ub(0) ==  std::numeric_limits<double>::infinity());
+
+        // All other coefficients must be positive
+        for(int i = 1; i < expansion.numCoeffs; i++) {
+            CHECK(lb(i) == 0.);
+            CHECK(ub(i) == std::numeric_limits<double>::infinity());
+        }
     }
-    Kokkos::View<double*, Kokkos::HostSpace> lb,ub;
-    std::tie(lb,ub) = expansion.CoeffBounds();
-    REQUIRE(lb.size()==expansion.numCoeffs);
-    REQUIRE(ub.size()==expansion.numCoeffs);
-    CHECK(lb(0)==0.0);
-    CHECK(ub(0)==std::numeric_limits<double>::infinity());    
 }
