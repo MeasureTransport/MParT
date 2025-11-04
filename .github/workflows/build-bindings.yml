@@ -39,7 +39,7 @@ jobs:
 
       - name: Install Conda Dependencies
         shell: bash -l {0}
-        run: mamba env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
+        run: conda env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
         if: steps.cache-conda.outputs.cache-hit != 'true'
 
       - name: Setup Julia
