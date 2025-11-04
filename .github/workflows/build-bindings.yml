@@ -131,4 +131,4 @@ jobs:
         if: always()
         with:
           check_name: "Test Results with Bindings"
-          junit_files: ${{ github.workspace }}/test-results-*.xml
+          files: ${{ github.workspace }}/test-results-*.xml
