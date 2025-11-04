@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Use Conda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
           auto-update-conda: true
           python-version: "3.11"
@@ -46,8 +46,8 @@ jobs:
       - name: Build Docs
         shell: bash -l {0}
         run: |
-           cd ${{ github.workspace }} && cd build
-           make sphinx
+          cd ${{ github.workspace }} && cd build
+          make sphinx
 
       - name: Push to gh-pages
         uses: peaceiris/actions-gh-pages@v3.6.1

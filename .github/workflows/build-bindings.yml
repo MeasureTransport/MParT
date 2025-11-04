@@ -8,13 +8,12 @@ on:
   pull_request: {}
 
 env:
-  CONDA_CACHE_NUMBER: 0  # increase to reset cache manually
+  CONDA_CACHE_NUMBER: 0 # increase to reset cache manually
 
 jobs:
   build-tests:
     runs-on: ubuntu-latest
     steps:
-
       - name: Store Date
         shell: bash -l {0}
         run: echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
@@ -25,14 +24,11 @@ jobs:
           path: mpart
 
       - name: Use Conda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-variant: Mambaforge
-          miniforge-version: latest
-          activate-environment: test
-          use-mamba: true
           auto-update-conda: true
           python-version: "3.8"
+          activate-environment: "test"
 
       - name: Cache Conda Deps
         uses: actions/cache@v3
@@ -62,7 +58,7 @@ jobs:
         id: cache-kokkos
         with:
           path: "${{ github.workspace }}/KOKKOS_INSTALL"
-          key: kokkos4.2.00
+          key: kokkos4.5.01
 
       - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
         name: Checkout Kokkos
@@ -70,7 +66,7 @@ jobs:
         with:
           repository: kokkos/kokkos
           path: kokkos
-          ref: '4.2.00'
+          ref: "4.5.01"
 
       - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
         name: Install Kokkos

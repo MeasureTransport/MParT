@@ -8,7 +8,7 @@ on:
   pull_request: {}
 
 env:
-  CONDA_CACHE_NUMBER: 0  # increase to reset cache manually
+  CONDA_CACHE_NUMBER: 0 # increase to reset cache manually
 
 jobs:
   build-tests:
@@ -24,14 +24,11 @@ jobs:
           path: mpart
 
       - name: Use Conda
-        uses: conda-incubator/setup-miniconda@v2
+        uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-variant: Mambaforge
-          miniforge-version: latest
-          activate-environment: test
-          use-mamba: true
           auto-update-conda: true
           python-version: "3.8"
+          activate-environment: "test"
 
       - name: Cache Conda Deps
         uses: actions/cache@v3
@@ -53,7 +50,7 @@ jobs:
         with:
           repository: kokkos/kokkos
           path: kokkos
-          ref: '4.2.00'
+          ref: "4.2.00"
 
       - if: ${{steps.cache-kokkos.outputs.cache-hit != 'true'}}
         name: Install Kokkos
