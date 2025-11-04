@@ -82,7 +82,8 @@ jobs:
                 -DCMAKE_CXX_STANDARD=17    \
                 -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/KOKKOS_INSTALL/ \
                 ../
-          sudo make -j2 install
+          sudo cmake --build . -- -j2
+          sudo cmake --install .
 
       - name: Configure MParT
         shell: bash -l {0}
@@ -96,7 +97,7 @@ jobs:
 
       - name: Build MParT
         shell: bash -l {0}
-        run: cd $GITHUB_WORKSPACE/mpart/build; make -j2 install
+        run: cd $GITHUB_WORKSPACE/mpart/build; cmake --build . -- -j2; cmake --install .
 
       - name: Run Python Tests
         continue-on-error: true

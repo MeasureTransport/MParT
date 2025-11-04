@@ -42,7 +42,7 @@ MParT uses CMake to handle dependencies and compiler configurations.   A basic b
    ..
    make install
 
-This will compile the main c++ :code:`mpart` library as well as any other language bindings that can be automatically configured.  If you are compiling on a multicore machine, you can use :code:`make -j N_JOBS install`, where :code:`N_JOBS` is the number of processes the computer can compile with in parallel.
+This will compile the main c++ :code:`mpart` library as well as any other language bindings that can be automatically configured.  If you are compiling on a multicore machine, you can use :code:`cmake --build . -- -j N_JOBS`, where :code:`N_JOBS` is the number of processes the computer can compile with in parallel.
 
 This installation should also automatically install and build Kokkos, Eigen, Cereal, Pybind11, and Catch2, assuming they aren't installed already. If CMake has trouble finding prior installations of these, then you can configuring CMake using:
 

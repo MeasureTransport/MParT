@@ -16,8 +16,8 @@ RUN git clone --depth=1 --branch 3.7.02 https://github.com/kokkos/kokkos.git && 
           -DBUILD_SHARED_LIBS=ON    \
           -DCMAKE_CXX_STANDARD=17   \
           ../ && \
-    make -j$(nproc) && \
-    make install && \
+    cmake --build . -- -j$(nproc) && \
+    cmake --install . && \
     cd / && \
     rm -rf kokkos
 
@@ -25,8 +25,8 @@ RUN cd MParT_ && \
     mkdir build && \
     cd build && \
     cmake -DMPART_BUILD_TESTS=OFF -DPYTHON_EXECUTABLE=`which python` -DMPART_FETCH_DEPS=OFF ../ && \
-    make -j$(nproc) && \
-    make install && \
+    cmake --build . -- -j$(nproc) && \
+    cmake --install . && \
     cd / && \
     rm -rf MParT_
 
