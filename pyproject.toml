@@ -2,7 +2,7 @@
 requires = [
     "setuptools",
     "scikit-build>=0.13",
-    "cmake",
+    "cmake<=3.31",
     "ninja",
 ]
 build-backend = "setuptools.build_meta"
@@ -16,7 +16,7 @@ license={file="LICENSE.txt"}
 readme="README.md"
 requires-python = ">=3.7"
 description="A Monotone Parameterization Toolkit"
-version="2.2.2"
+version="2.2.3"
 keywords=["Measure Transport", "Monotone", "Transport Map", "Isotonic Regression", "Triangular", "Knothe-Rosenblatt"]
 
 [project.urls]
