@@ -41,6 +41,9 @@ jobs:
         shell: bash -l {0}
         run: conda env update -n test -f $GITHUB_WORKSPACE/mpart/.github/environment.yml
         if: steps.cache-conda.outputs.cache-hit != 'true'
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: "1.10"
 
       - name: Setup Julia
         run: |
