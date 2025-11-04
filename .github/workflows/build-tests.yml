@@ -15,7 +15,10 @@ jobs:
         uses: actions/checkout@v1
 
       - name: Install CMake
-        uses: lukka/get-cmake@v3.26.0
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: 3.25.2
+          ninjaVersion: 1.13.1
 
       - name: Run CMake
         run: |
@@ -25,7 +28,7 @@ jobs:
           cmake -DKokkos_ENABLE_THREADS=ON -DKokkos_ENABLE_SERIAL=ON ../
 
       - name: Build
-        run: cd build; make -j2
+        run: cd build; ninja
 
       - name: Run Tests
         run: cd build; ./RunTests --kokkos-num-threads=2 --reporter junit -o test-results.xml
