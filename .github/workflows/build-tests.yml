@@ -25,7 +25,7 @@ jobs:
         run: cd build; make -j2
 
       - name: Run Tests
-        run: cd build; ./RunTests --kokkos-threads=2 --reporter junit -o test-results.xml
+        run: cd build; ./RunTests --kokkos-num-threads=2 --reporter junit -o test-results.xml
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
@@ -33,5 +33,3 @@ jobs:
         with:
           check_name: "Test Results"
           files: build/test-results.xml
-
-
