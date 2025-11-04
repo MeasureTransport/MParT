@@ -94,7 +94,7 @@ Or, with the additional specification of the number of Kokkos threads to use:
 
 .. code-block::
 
-   ./RunTests --kokkos-threads=4
+   ./RunTests --kokkos-num-threads=4
 
 
 Environment Paths
