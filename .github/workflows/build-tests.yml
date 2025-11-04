@@ -25,10 +25,10 @@ jobs:
           cd ${{ github.workspace }}
           mkdir build
           cd build
-          cmake -DKokkos_ENABLE_THREADS=ON -DKokkos_ENABLE_SERIAL=ON ../
+          cmake -GNinja -DKokkos_ENABLE_THREADS=ON -DKokkos_ENABLE_SERIAL=ON ../
 
       - name: Build
-        run: cd build; ninja
+        run: cd build; cmake --build . -- -j2
 
       - name: Run Tests
         run: cd build; ./RunTests --kokkos-num-threads=2 --reporter junit -o test-results.xml
