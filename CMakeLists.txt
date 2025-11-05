@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13 ... 3.31)
+cmake_minimum_required(VERSION 3.13...3.31)
 project(MParT VERSION 2.2.1)
 
 message(STATUS "Will install MParT to ${CMAKE_INSTALL_PREFIX}")
