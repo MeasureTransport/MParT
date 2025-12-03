@@ -14,153 +14,255 @@ using namespace mpart;
 using namespace Catch;
 using MemorySpace = Kokkos::HostSpace;
 
-TEST_CASE( "Testing map component factory", "[MapFactoryComponent]" ) {
+TEST_CASE("Testing map component factory", "[MapFactoryComponent]")
+{
 
-    
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
     options.basisNorm = false;
 
     unsigned int dim = 3;
     unsigned int maxDegree = 5;
-    FixedMultiIndexSet<MemorySpace> mset(dim,maxDegree);
+    FixedMultiIndexSet<MemorySpace> mset(dim, maxDegree);
 
-    SECTION("AdaptiveSimpson"){
+    SECTION("AdaptiveSimpson")
+    {
         options.quadType = QuadTypes::AdaptiveSimpson;
 
         std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
-        REQUIRE(map!=nullptr);
+        REQUIRE(map != nullptr);
 
         unsigned int numPts = 100;
-        Kokkos::View<double**,MemorySpace> pts("Points", dim, numPts);
-        for(unsigned int i=0; i<numPts; ++i)
-            pts(dim-1,i) = double(i)/double(numPts-1);
+        Kokkos::View<double **, MemorySpace> pts("Points", dim, numPts);
+        for (unsigned int i = 0; i < numPts; ++i)
+            pts(dim - 1, i) = double(i) / double(numPts - 1);
 
-        Kokkos::View<double**, MemorySpace> eval = map->Evaluate(pts);
+        Kokkos::View<double **, MemorySpace> eval = map->Evaluate(pts);
     }
 
-    SECTION("ClenshawCurtis"){
+    SECTION("ClenshawCurtis")
+    {
         options.quadType = QuadTypes::ClenshawCurtis;
-        
+
         std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
-        REQUIRE(map!=nullptr);
+        REQUIRE(map != nullptr);
 
         unsigned int numPts = 100;
-        Kokkos::View<double**,MemorySpace> pts("Points", dim, numPts);
-        for(unsigned int i=0; i<numPts; ++i)
-            pts(dim-1,i) = double(i)/double(numPts-1);
+        Kokkos::View<double **, MemorySpace> pts("Points", dim, numPts);
+        for (unsigned int i = 0; i < numPts; ++i)
+            pts(dim - 1, i) = double(i) / double(numPts - 1);
 
-        Kokkos::View<double**, MemorySpace> eval = map->Evaluate(pts);
+        Kokkos::View<double **, MemorySpace> eval = map->Evaluate(pts);
     }
 
-    SECTION("AdaptiveClenshawCurtis"){
+    SECTION("AdaptiveClenshawCurtis")
+    {
         options.quadType = QuadTypes::AdaptiveClenshawCurtis;
-        
+
         std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
-        REQUIRE(map!=nullptr);
+        REQUIRE(map != nullptr);
 
         unsigned int numPts = 100;
-        Kokkos::View<double**,MemorySpace> pts("Points", dim, numPts);
-        for(unsigned int i=0; i<numPts; ++i)
-            pts(dim-1,i) = double(i)/double(numPts-1);
+        Kokkos::View<double **, MemorySpace> pts("Points", dim, numPts);
+        for (unsigned int i = 0; i < numPts; ++i)
+            pts(dim - 1, i) = double(i) / double(numPts - 1);
 
-        Kokkos::View<double**, MemorySpace> eval = map->Evaluate(pts);
+        Kokkos::View<double **, MemorySpace> eval = map->Evaluate(pts);
     }
 }
 
+TEST_CASE("Testing map component factory with linearized basis", "[MapFactoryLinearizedComponent]")
+{
 
-TEST_CASE( "Testing map component factory with linearized basis", "[MapFactoryLinearizedComponent]" ) {
-
-    
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
     options.basisLB = -5;
     options.basisUB = 4;
     options.basisNorm = false;
-    
-    
+
     MapOptions options2;
     options2.basisType = BasisTypes::ProbabilistHermite;
     options2.basisNorm = false;
-    
+
     unsigned int dim = 1;
     unsigned int maxDegree = 7;
-    FixedMultiIndexSet<MemorySpace> mset(dim,maxDegree);
+    FixedMultiIndexSet<MemorySpace> mset(dim, maxDegree);
 
-    SECTION("AdaptiveSimpson"){
+    SECTION("AdaptiveSimpson")
+    {
         options.quadType = QuadTypes::AdaptiveSimpson;
 
         std::shared_ptr<ConditionalMapBase<MemorySpace>> linearized_map = MapFactory::CreateComponent<MemorySpace>(mset, options);
-        
-        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options2);
-        REQUIRE(linearized_map!=nullptr);
-        REQUIRE(map!=nullptr);
 
-        Kokkos::View<double*,MemorySpace> coeffs("Coefficients", map->numCoeffs);
-        for(unsigned int i=0; i<map->numCoeffs; ++i)
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options2);
+        REQUIRE(linearized_map != nullptr);
+        REQUIRE(map != nullptr);
+
+        Kokkos::View<double *, MemorySpace> coeffs("Coefficients", map->numCoeffs);
+        for (unsigned int i = 0; i < map->numCoeffs; ++i)
             coeffs(i) = 1.0;
         map->SetCoeffs(coeffs);
         linearized_map->SetCoeffs(coeffs);
 
         unsigned int numPts = 5;
-        Kokkos::View<double**,MemorySpace> pts("Points", dim, numPts);
-        pts(0,0) = -6;
-        pts(0,1) = -4.5;
-        pts(0,2) = 0;
-        pts(0,3) = 3.5;
-        pts(0,4) = 4.5;
-        
-        
-        Kokkos::View<double**, MemorySpace> linearized_evals = linearized_map->Evaluate(pts);
-        Kokkos::View<double**, MemorySpace> evals = map->Evaluate(pts);
+        Kokkos::View<double **, MemorySpace> pts("Points", dim, numPts);
+        pts(0, 0) = -6;
+        pts(0, 1) = -4.5;
+        pts(0, 2) = 0;
+        pts(0, 3) = 3.5;
+        pts(0, 4) = 4.5;
 
-        for(unsigned int i=0; i<numPts; ++i){
-            if((pts(0,i)<options.basisLB)||(pts(0,i)>options.basisUB)){
-                CHECK( std::abs(linearized_evals(0,i) - evals(0,i))>1e-13);
-            }else{
-                CHECK( linearized_evals(0,i) == Approx(evals(0,i)).epsilon(1e-15));
+        Kokkos::View<double **, MemorySpace> linearized_evals = linearized_map->Evaluate(pts);
+        Kokkos::View<double **, MemorySpace> evals = map->Evaluate(pts);
+
+        for (unsigned int i = 0; i < numPts; ++i)
+        {
+            if ((pts(0, i) < options.basisLB) || (pts(0, i) > options.basisUB))
+            {
+                CHECK(std::abs(linearized_evals(0, i) - evals(0, i)) > 1e-13);
+            }
+            else
+            {
+                CHECK(linearized_evals(0, i) == Approx(evals(0, i)).epsilon(1e-15));
             }
         }
     }
-
 }
 
-
-TEST_CASE( "Testing multivariate expansion factory", "[MapFactoryExpansion]" ) {
+TEST_CASE("Testing compact map component factory", "[MapFactoryCompactComponent]")
+{
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
-    
+    options.isCompact = true;
+    options.basisNorm = false;
+
+    unsigned int dim = 2;
+    unsigned int maxDegree = 7;
+    MultiIndexSet mset_h = MultiIndexSet::CreateTotalOrder(dim, maxDegree, [](MultiIndex m)
+                                                           { return m.HasNonzeroEnd() || m.Max() == 0; });
+    FixedMultiIndexSet<MemorySpace> mset = mset_h.Fix(true);
+
+    SECTION("AdaptiveSimpson")
+    {
+        options.quadType = QuadTypes::AdaptiveSimpson;
+
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
+        REQUIRE(map != nullptr);
+
+        Kokkos::View<double *, MemorySpace> coeffs("Coefficients", map->numCoeffs);
+        for (unsigned int i = 0; i < map->numCoeffs; ++i)
+            coeffs(i) = 1.0;
+        map->SetCoeffs(coeffs);
+
+        unsigned int numPts = 5;
+        Kokkos::View<double **, MemorySpace> pts("Points", dim, numPts);
+        pts(0, 0) = 0.0;
+        pts(0, 1) = 0.2;
+        pts(0, 2) = 0.5;
+        pts(0, 3) = 0.94;
+        pts(0, 4) = 1.0;
+        pts(1, 0) = 0.0;
+        pts(1, 1) = 0.0;
+        pts(1, 2) = 0.4;
+        pts(1, 3) = 1.0;
+        pts(1, 4) = 1.0;
+
+        Kokkos::View<double **, MemorySpace> evals = map->Evaluate(pts);
+
+        for (unsigned int i = 0; i < numPts; ++i)
+        {
+            CHECK(evals(0, i) >= 0.);
+            CHECK(evals(0, i) <= 1.);
+        }
+    }
+}
+
+TEST_CASE("Testing compact map component factory, legendre basis", "[MapFactoryCompactComponent_Legendre]")
+{
+
+    MapOptions options;
+    options.basisType = BasisTypes::Legendre;
+    options.isCompact = true;
+    options.basisNorm = false;
+
+    unsigned int dim = 2;
+    unsigned int maxDegree = 7;
+    MultiIndexSet mset_h = MultiIndexSet::CreateTotalOrder(dim, maxDegree);
+    FixedMultiIndexSet<MemorySpace> mset = mset_h.Fix(true);
+
+    SECTION("AdaptiveClenshawCurtis")
+    {
+        options.quadType = QuadTypes::AdaptiveClenshawCurtis;
+
+        std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateComponent<MemorySpace>(mset, options);
+        REQUIRE(map != nullptr);
+
+        Kokkos::View<double *, MemorySpace> coeffs("Coefficients", map->numCoeffs);
+        for (unsigned int i = 0; i < map->numCoeffs; ++i)
+            coeffs(i) = i * cos(0.5 + i * M_PI * 2 / map->numCoeffs);
+        map->SetCoeffs(coeffs);
+
+        unsigned int numPts = 5;
+        Kokkos::View<double **, MemorySpace> pts("Points", dim, numPts);
+        pts(0, 0) = 0.0;
+        pts(0, 1) = 0.2;
+        pts(0, 2) = 0.5;
+        pts(0, 3) = 0.94;
+        pts(0, 4) = 1.0;
+        pts(1, 0) = 0.0;
+        pts(1, 1) = 0.0;
+        pts(1, 2) = 0.4;
+        pts(1, 3) = 1.0;
+        pts(1, 4) = 1.0;
+
+        Kokkos::View<double **, MemorySpace> evals = map->Evaluate(pts);
+
+        for (unsigned int i = 0; i < numPts; ++i)
+        {
+            CHECK(evals(0, i) >= 0.);
+            CHECK(evals(0, i) <= 1.);
+        }
+    }
+}
+
+TEST_CASE("Testing multivariate expansion factory", "[MapFactoryExpansion]")
+{
+
+    MapOptions options;
+    options.basisType = BasisTypes::ProbabilistHermite;
+
     unsigned int outDim = 5;
     unsigned int inDim = 3;
     unsigned int maxDegree = 5;
-    FixedMultiIndexSet<MemorySpace> mset(inDim,maxDegree);
+    FixedMultiIndexSet<MemorySpace> mset(inDim, maxDegree);
 
     std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func = MapFactory::CreateExpansion<MemorySpace>(outDim, mset, options);
-    REQUIRE(func!=nullptr);
+    REQUIRE(func != nullptr);
 
     unsigned int numPts = 100;
-    Kokkos::View<double**,MemorySpace> pts("Points", inDim, numPts);
-    for(unsigned int i=0; i<numPts; ++i)
-        pts(inDim-1,i) = double(i)/double(numPts-1);
+    Kokkos::View<double **, MemorySpace> pts("Points", inDim, numPts);
+    for (unsigned int i = 0; i < numPts; ++i)
+        pts(inDim - 1, i) = double(i) / double(numPts - 1);
 
-    Kokkos::View<double**, MemorySpace> eval = func->Evaluate(pts);
-    CHECK(eval.extent(0)==outDim);
-    CHECK(eval.extent(1)==numPts);
+    Kokkos::View<double **, MemorySpace> eval = func->Evaluate(pts);
+    CHECK(eval.extent(0) == outDim);
+    CHECK(eval.extent(1) == numPts);
 }
 
-
-TEST_CASE( "Testing factory method for triangular map", "[MapFactoryTriangular]" ) {
+TEST_CASE("Testing factory method for triangular map", "[MapFactoryTriangular]")
+{
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
 
-    std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateTriangular<MemorySpace>(4,3,5, options);
+    std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateTriangular<MemorySpace>(4, 3, 5, options);
 
     REQUIRE(map != nullptr);
 }
 
-TEST_CASE( "Testing factory method for single entry map, activeInd = 1", "[MapFactorySingleEntryMap 1]" ) {
+TEST_CASE("Testing factory method for single entry map, activeInd = 1", "[MapFactorySingleEntryMap 1]")
+{
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
@@ -175,7 +277,8 @@ TEST_CASE( "Testing factory method for single entry map, activeInd = 1", "[MapFa
     REQUIRE(map != nullptr);
 }
 
-TEST_CASE( "Testing factory method for single entry map, activeInd = dim", "[MapFactorySingleEntryMap 2]" ) {
+TEST_CASE("Testing factory method for single entry map, activeInd = dim", "[MapFactorySingleEntryMap 2]")
+{
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
@@ -190,7 +293,8 @@ TEST_CASE( "Testing factory method for single entry map, activeInd = dim", "[Map
     REQUIRE(map != nullptr);
 }
 
-TEST_CASE( "Testing factory method for single entry map, 1 < activeInd < dim", "[MapFactorySingleEntryMap 3]" ) {
+TEST_CASE("Testing factory method for single entry map, 1 < activeInd < dim", "[MapFactorySingleEntryMap 3]")
+{
 
     MapOptions options;
     options.basisType = BasisTypes::ProbabilistHermite;
@@ -204,83 +308,91 @@ TEST_CASE( "Testing factory method for single entry map, 1 < activeInd < dim", "
 
     REQUIRE(map != nullptr);
 }
-TEST_CASE( "Testing factory method for Sigmoid Component", "[MapFactorySigmoidComponent]" ) {
+TEST_CASE("Testing factory method for Sigmoid Component", "[MapFactorySigmoidComponent]")
+{
 
     MapOptions options;
     unsigned int inputDim = 7;
     unsigned int maxDegree = 3;
     unsigned int num_sigmoids = 5;
-    unsigned int numCenters = 2 + num_sigmoids*(num_sigmoids+1)/2;
+    unsigned int numCenters = 2 + num_sigmoids * (num_sigmoids + 1) / 2;
     options.basisType = BasisTypes::HermiteFunctions;
-    Kokkos::View<double*, MemorySpace> centers("Centers", numCenters);
+    Kokkos::View<double *, MemorySpace> centers("Centers", numCenters);
     double bound = 3.;
-    centers(0) = -bound; centers(1) = bound;
+    centers(0) = -bound;
+    centers(1) = bound;
     unsigned int center_idx = 2;
-    for(int j = 0; j < num_sigmoids; j++){
-        for(int i = 0; i <= j; i++){
-            centers(center_idx) = -bound + (2*bound)*(i+1)/(j+2);
+    for (int j = 0; j < num_sigmoids; j++)
+    {
+        for (int i = 0; i <= j; i++)
+        {
+            centers(center_idx) = -bound + (2 * bound) * (i + 1) / (j + 2);
             center_idx++;
         }
     }
     std::shared_ptr<ParameterizedFunctionBase<MemorySpace>> func = MapFactory::CreateSigmoidComponent<MemorySpace>(inputDim, maxDegree, centers, options);
     REQUIRE(func != nullptr);
     unsigned int numPts = 100;
-    Kokkos::View<double**,MemorySpace> pts("Points", inputDim, numPts);
-    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0,0}, {inputDim, numPts});
-    Kokkos::parallel_for("Fill points", policy, KOKKOS_LAMBDA(const int i, const int j){
-        pts(i,j) = double(j*i)/double((inputDim)*(numPts-1));
-    });
+    Kokkos::View<double **, MemorySpace> pts("Points", inputDim, numPts);
+    Kokkos::MDRangePolicy<Kokkos::Rank<2>, typename MemoryToExecution<MemorySpace>::Space> policy({0, 0}, {inputDim, numPts});
+    Kokkos::parallel_for("Fill points", policy, KOKKOS_LAMBDA(const int i, const int j) { pts(i, j) = double(j * i) / double((inputDim) * (numPts - 1)); });
     Kokkos::fence();
     // Checking example of Gradient
     StridedVector<double, MemorySpace> coeffs = func->Coeffs();
     Kokkos::deep_copy(coeffs, 1.0);
-    Kokkos::View<double**, MemorySpace> eval = func->Evaluate(pts);
-    CHECK(eval.extent(0)==1);
-    SECTION("Check Gradient") {
-        Kokkos::View<double**, MemorySpace> sens ( "Sensitivities", 1, numPts);
-        Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy_pts {0, numPts};
-        Kokkos::parallel_for("fill sensitivities", policy_pts, KOKKOS_LAMBDA(const int i){
-            sens(0,i) = 1.0;
-        });
-        Kokkos::View<double**, MemorySpace> grad = func->Gradient(pts, sens);
-        CHECK(grad.extent(0)==inputDim);
-        CHECK(grad.extent(1)==numPts);
+    Kokkos::View<double **, MemorySpace> eval = func->Evaluate(pts);
+    CHECK(eval.extent(0) == 1);
+    SECTION("Check Gradient")
+    {
+        Kokkos::View<double **, MemorySpace> sens("Sensitivities", 1, numPts);
+        Kokkos::RangePolicy<typename MemoryToExecution<MemorySpace>::Space> policy_pts{0, numPts};
+        Kokkos::parallel_for("fill sensitivities", policy_pts, KOKKOS_LAMBDA(const int i) { sens(0, i) = 1.0; });
+        Kokkos::View<double **, MemorySpace> grad = func->Gradient(pts, sens);
+        CHECK(grad.extent(0) == inputDim);
+        CHECK(grad.extent(1) == numPts);
         double fd_step = 1e-6;
-        for(int i = 0; i < inputDim; i++){
-            Kokkos::parallel_for(policy_pts, KOKKOS_LAMBDA(const int j){
+        for (int i = 0; i < inputDim; i++)
+        {
+            Kokkos::parallel_for(policy_pts, KOKKOS_LAMBDA(const int j) {
                 if(i > 0) pts(i-1,j) -= fd_step;
-                pts(i,j) += fd_step;
-            });
+                pts(i,j) += fd_step; });
             Kokkos::fence();
-            Kokkos::View<double**, MemorySpace> eval2 = func->Evaluate(pts);
-            for(int j = 0; j < numPts; j++){
-                double fd = (eval2(0,j) - eval(0,j))/(fd_step);
-                CHECK(grad(i,j) == Approx(fd).epsilon(20*fd_step));
+            Kokkos::View<double **, MemorySpace> eval2 = func->Evaluate(pts);
+            for (int j = 0; j < numPts; j++)
+            {
+                double fd = (eval2(0, j) - eval(0, j)) / (fd_step);
+                CHECK(grad(i, j) == Approx(fd).epsilon(20 * fd_step));
             }
         }
     }
-    SECTION("Create Sigmoid Component from fixed msets") {
+    SECTION("Create Sigmoid Component from fixed msets")
+    {
         // Make some arbitrary limiter
-        auto limiter = [maxDegree](MultiIndex const& index){
-            return index.Get(index.Length()-1) != 0 && index.Sum() == maxDegree;
+        auto limiter = [maxDegree](MultiIndex const &index)
+        {
+            return index.Get(index.Length() - 1) != 0 && index.Sum() == maxDegree;
         };
-        FixedMultiIndexSet<MemorySpace> mset= MultiIndexSet::CreateTotalOrder(inputDim, maxDegree, limiter).Fix(true);
+        FixedMultiIndexSet<MemorySpace> mset = MultiIndexSet::CreateTotalOrder(inputDim, maxDegree, limiter).Fix(true);
         std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateSigmoidComponent<MemorySpace>(mset, centers, options);
         REQUIRE(map != nullptr);
         REQUIRE(map->numCoeffs == mset.Size());
     }
-    SECTION("Create Triangular Sigmoid Map From Components") {
+    SECTION("Create Triangular Sigmoid Map From Components")
+    {
         std::vector<std::shared_ptr<ConditionalMapBase<MemorySpace>>> maps;
-        for(int i = 1; i <= inputDim; i++){
+        for (int i = 1; i <= inputDim; i++)
+        {
             maps.push_back(MapFactory::CreateSigmoidComponent<MemorySpace>(i, 0, centers, options));
         }
         auto map = std::make_shared<TriangularMap<MemorySpace>>(maps);
         REQUIRE(map != nullptr);
     }
-    SECTION("CreateSigmoidTriangular") {
+    SECTION("CreateSigmoidTriangular")
+    {
         std::vector<StridedVector<const double, MemorySpace>> centers_vec;
         unsigned int outputDim = 3;
-        for(int i = 0; i < outputDim; i++){
+        for (int i = 0; i < outputDim; i++)
+        {
             centers_vec.push_back(centers);
         }
         std::shared_ptr<ConditionalMapBase<MemorySpace>> map = MapFactory::CreateSigmoidTriangular<MemorySpace>(inputDim, outputDim, 0, centers_vec, options);

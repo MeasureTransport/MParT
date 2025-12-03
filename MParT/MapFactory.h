@@ -217,14 +217,15 @@ namespace mpart{
         */
         template<typename MemorySpace>
         struct CompFactoryImpl{
-            typedef std::tuple<BasisTypes, bool, PosFuncTypes, QuadTypes> OptionsKeyType;
+            typedef std::tuple<BasisTypes, bool, PosFuncTypes, QuadTypes, bool> OptionsKeyType;
             typedef std::function<std::shared_ptr<ConditionalMapBase<MemorySpace>>(FixedMultiIndexSet<MemorySpace> const&, MapOptions options)> FactoryFunctionType;
             typedef std::map<OptionsKeyType, FactoryFunctionType> FactoryMapType;
 
             static FactoryFunctionType GetFactoryFunction(MapOptions opts)
             {
                 bool isLinearized = (!isinf(opts.basisLB)) ||(!isinf(opts.basisUB));
-                OptionsKeyType optionsKey(opts.basisType, isLinearized, opts.posFuncType, opts.quadType);
+                bool isCompact = opts.isCompact;
+                OptionsKeyType optionsKey(opts.basisType, isLinearized, opts.posFuncType, opts.quadType, isCompact);
 
                 auto factoryMap = GetFactoryMap();
 

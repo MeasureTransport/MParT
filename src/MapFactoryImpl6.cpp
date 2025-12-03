@@ -10,7 +10,7 @@
 
 using namespace mpart;
 
-template<typename MemorySpace, typename PosFuncType>
+template<typename MemorySpace, typename PosFuncType, bool isCompact>
 std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_Prob_AS(FixedMultiIndexSet<MemorySpace> const& mset, MapOptions opts)
 {
     BasisEvaluator<BasisHomogeneity::Homogeneous,ProbabilistHermite> basis1d(opts.basisNorm);
@@ -19,7 +19,7 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_Prob_AS(Fix
     MultivariateExpansionWorker<decltype(basis1d),MemorySpace> expansion(mset, basis1d);
     std::shared_ptr<ConditionalMapBase<MemorySpace>> output;
 
-    output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace>>(expansion, quad, opts.contDeriv, opts.nugget);
+    output = std::make_shared<MonotoneComponent<decltype(expansion), PosFuncType, decltype(quad), MemorySpace, isCompact>>(expansion, quad, opts.contDeriv, opts.nugget);
 
     Kokkos::View<const double*,MemorySpace> coeffs = Kokkos::View<double*,MemorySpace>("Component Coefficients", mset.Size());
     output->SetCoeffs(coeffs);
@@ -27,20 +27,30 @@ std::shared_ptr<ConditionalMapBase<MemorySpace>> CreateComponentImpl_Prob_AS(Fix
     return output;
 }
 
-static auto reg_host_prob_as_exp = mpart::MapFactory::CompFactoryImpl<Kokkos::HostSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::Exp, QuadTypes::AdaptiveSimpson), CreateComponentImpl_Prob_AS<Kokkos::HostSpace, Exp>));
-static auto reg_host_prob_as_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::HostSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveSimpson), CreateComponentImpl_Prob_AS<Kokkos::HostSpace, SoftPlus>));
+static auto reg_host_prob_as_exp = mpart::MapFactory::CompFactoryImpl<Kokkos::HostSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::Exp, QuadTypes::AdaptiveSimpson, false), CreateComponentImpl_Prob_AS<Kokkos::HostSpace, Exp, false>));
+static auto reg_host_prob_as_splus = mpart::MapFactory::CompFactoryImpl<Kokkos::HostSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveSimpson, false), CreateComponentImpl_Prob_AS<Kokkos::HostSpace, SoftPlus, false>));
 #if defined(MPART_ENABLE_GPU)
-    static auto reg_device_prob_as_exp = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::Exp, QuadTypes::AdaptiveSimpson), CreateComponentImpl_Prob_AS<mpart::DeviceSpace, Exp>));
-    static auto reg_device_prob_as_splus = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveSimpson), CreateComponentImpl_Prob_AS<mpart::DeviceSpace, SoftPlus>));
+    static auto reg_device_prob_as_exp = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::Exp, QuadTypes::AdaptiveSimpson, false), CreateComponentImpl_Prob_AS<mpart::DeviceSpace, Exp, false>));
+    static auto reg_device_prob_as_splus = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveSimpson, false), CreateComponentImpl_Prob_AS<mpart::DeviceSpace, SoftPlus, false>));
 #endif
 
+static auto reg_host_prob_as_exp_compact = mpart::MapFactory::CompFactoryImpl<Kokkos::HostSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::Exp, QuadTypes::AdaptiveSimpson, true), CreateComponentImpl_Prob_AS<Kokkos::HostSpace, Exp, true>));
+static auto reg_host_prob_as_splus_compact = mpart::MapFactory::CompFactoryImpl<Kokkos::HostSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveSimpson, true), CreateComponentImpl_Prob_AS<Kokkos::HostSpace, SoftPlus, true>));
+#if defined(MPART_ENABLE_GPU)
+    static auto reg_device_prob_as_exp_compact = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::Exp, QuadTypes::AdaptiveSimpson, true), CreateComponentImpl_Prob_AS<mpart::DeviceSpace, Exp, true>));
+    static auto reg_device_prob_as_splus_compact = mpart::MapFactory::CompFactoryImpl<mpart::DeviceSpace>::GetFactoryMap()->insert(std::make_pair(std::make_tuple(BasisTypes::ProbabilistHermite, false, PosFuncTypes::SoftPlus, QuadTypes::AdaptiveSimpson, true), CreateComponentImpl_Prob_AS<mpart::DeviceSpace, SoftPlus, true>));
+#endif
 
 #if defined(MPART_HAS_CEREAL)
-REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, ProbabilistHermite, Exp, AdaptiveSimpson, Kokkos::HostSpace)
-REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, ProbabilistHermite, SoftPlus, AdaptiveSimpson, Kokkos::HostSpace)
+REGISTER_HOMOGENEOUS_MONO_COMP(ProbabilistHermite, Exp, AdaptiveSimpson, Kokkos::HostSpace, false)
+REGISTER_HOMOGENEOUS_MONO_COMP(ProbabilistHermite, SoftPlus, AdaptiveSimpson, Kokkos::HostSpace, false)
+REGISTER_HOMOGENEOUS_MONO_COMP(ProbabilistHermite, Exp, AdaptiveSimpson, Kokkos::HostSpace, true)
+REGISTER_HOMOGENEOUS_MONO_COMP(ProbabilistHermite, SoftPlus, AdaptiveSimpson, Kokkos::HostSpace, true)
 #if defined(MPART_ENABLE_GPU)
-REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, ProbabilistHermite, Exp, AdaptiveSimpson, mpart::DeviceSpace)
-REGISTER_MONO_COMP(BasisHomogeneity::Homogeneous, ProbabilistHermite, SoftPlus, AdaptiveSimpson, mpart::DeviceSpace)
+REGISTER_HOMOGENEOUS_MONO_COMP(ProbabilistHermite, Exp, AdaptiveSimpson, mpart::DeviceSpace, false)
+REGISTER_HOMOGENEOUS_MONO_COMP(ProbabilistHermite, SoftPlus, AdaptiveSimpson, mpart::DeviceSpace, false)
+REGISTER_HOMOGENEOUS_MONO_COMP(ProbabilistHermite, Exp, AdaptiveSimpson, mpart::DeviceSpace, true)
+REGISTER_HOMOGENEOUS_MONO_COMP(ProbabilistHermite, SoftPlus, AdaptiveSimpson, mpart::DeviceSpace, true)
 #endif 
 CEREAL_REGISTER_DYNAMIC_INIT(mpartInitMapFactory6)
 #endif

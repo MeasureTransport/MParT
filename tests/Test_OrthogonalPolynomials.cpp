@@ -146,8 +146,6 @@ TEST_CASE( "Testing Probabilist Hermite polynomials", "[ProbabilistHermite]" ) {
 
 }
 
-
-
 TEST_CASE( "Testing Physicist Hermite normalization", "[PhysicistHermiteNorm]" ) {
 
     PhysicistHermite poly(false);
@@ -202,7 +200,6 @@ TEST_CASE( "Testing Physicist Hermite normalization", "[PhysicistHermiteNorm]" )
 
 }
 
-
 TEST_CASE( "Testing Physicist Hermite polynomials", "[PhysicistHermite]" ) {
 
     const double floatTol = 1e-15;
@@ -229,6 +226,116 @@ TEST_CASE( "Testing Physicist Hermite polynomials", "[PhysicistHermite]" ) {
     }
 }
 
+TEST_CASE( "Testing Shifted Legendre polynomials", "[ShiftedLegendre]" ) {
+
+    const double floatTol = 1e-14;
+
+    ShiftedLegendre poly;
+
+    std::vector<double> xs{0.0, 0.1, 0.5, 0.75, 1.0};
+    std::vector<double> allvals(5);
+    std::vector<double> allderivs(5);
+    std::vector<double> allderivs2(5);
+    auto shifted_legendre_eval = [](double x){return std::vector<double> {
+            1.0,
+            2.0*x-1.0,
+            6.0*x*x - 6.0*x + 1.0,
+            20.0*x*x*x - 30.0*x*x + 12.0*x - 1.0,
+            70.0*x*x*x*x - 140.0*x*x*x + 90.0*x*x - 20.0*x + 1.0
+        };
+    };
+    // Check the evaluation
+    for(auto& x : xs){
+        auto shifted_eval = shifted_legendre_eval(x);
+        CHECK( poly.Evaluate(0, x) ==        shifted_eval[0] ); 
+        CHECK( poly.Evaluate(1, x) == Approx(shifted_eval[1]).epsilon(floatTol) );
+        CHECK( poly.Evaluate(2, x) == Approx(shifted_eval[2]).epsilon(floatTol) );
+        CHECK( poly.Evaluate(3, x) == Approx(shifted_eval[3]).epsilon(floatTol) );
+        CHECK( poly.Evaluate(4, x) == Approx(shifted_eval[4]).epsilon(floatTol) );
+
+        poly.EvaluateAll(&allvals[0], 4, x);
+        CHECK( allvals[0] ==        shifted_eval[0]);
+        CHECK( allvals[1] == Approx(shifted_eval[1]).epsilon(floatTol) );
+        CHECK( allvals[2] == Approx(shifted_eval[2]).epsilon(floatTol) );
+        CHECK( allvals[3] == Approx(shifted_eval[3]).epsilon(floatTol) );
+        CHECK( allvals[4] == Approx(shifted_eval[4]).epsilon(floatTol) );
+    }
+    
+    auto shifted_legendre_deriv = [](double x){return std::vector<double> {
+            0.0,
+            2.0,
+            12.0*x - 6.0,
+            60.0*x*x - 60.0*x + 12.0,
+            280.0*x*x*x - 420.0*x*x + 180.0*x - 20.0
+        };
+    };
+    // Check the derivative
+    for(auto& x : xs){
+        auto shifted_deriv = shifted_legendre_deriv(x);
+        CHECK( poly.Derivative(0, x) ==        shifted_deriv[0] ); 
+        CHECK( poly.Derivative(1, x) ==        shifted_deriv[1] );
+        CHECK( poly.Derivative(2, x) == Approx(shifted_deriv[2]).epsilon(floatTol) );
+        CHECK( poly.Derivative(3, x) == Approx(shifted_deriv[3]).epsilon(floatTol) );
+        CHECK( poly.Derivative(4, x) == Approx(shifted_deriv[4]).epsilon(floatTol) );
+
+        auto shifted_eval = shifted_legendre_eval(x);
+        poly.EvaluateDerivatives(&allvals[0], &allderivs[0], 4, x);
+        CHECK( allvals[0] ==        shifted_eval[0] );
+        CHECK( allvals[1] == Approx(shifted_eval[1]).epsilon(floatTol) );
+        CHECK( allvals[2] == Approx(shifted_eval[2]).epsilon(floatTol) );
+        CHECK( allvals[3] == Approx(shifted_eval[3]).epsilon(floatTol) );
+        CHECK( allvals[4] == Approx(shifted_eval[4]).epsilon(floatTol) );
+        CHECK( allderivs[0] ==        shifted_deriv[0] ); 
+        CHECK( allderivs[1] ==        shifted_deriv[1] );
+        CHECK( allderivs[2] == Approx(shifted_deriv[2]).epsilon(floatTol) );
+        CHECK( allderivs[3] == Approx(shifted_deriv[3]).epsilon(floatTol) );
+        CHECK( allderivs[4] == Approx(shifted_deriv[4]).epsilon(floatTol) );
+
+        poly.EvaluateDerivatives(&allderivs[0], 4, x);
+        CHECK( allderivs[0] ==        shifted_deriv[0] ); 
+        CHECK( allderivs[1] ==        shifted_deriv[1] );
+        CHECK( allderivs[2] == Approx(shifted_deriv[2]).epsilon(floatTol) );
+        CHECK( allderivs[3] == Approx(shifted_deriv[3]).epsilon(floatTol) );
+        CHECK( allderivs[4] == Approx(shifted_deriv[4]).epsilon(floatTol) );
+    }
+    
+    auto shifted_legendre_deriv2 = [](double x){return std::vector<double> {
+            0.0,
+            0.0,
+            12.0,
+            120.0*x - 60.0,
+            840.0*x*x - 840.0*x + 180.0
+        };
+    };
+    // Check the second derivatives
+    for(auto& x : xs){
+        auto shifted_deriv2 = shifted_legendre_deriv2(x);
+        CHECK( poly.SecondDerivative(0, x) == shifted_deriv2[0] ); 
+        CHECK( poly.SecondDerivative(1, x) == shifted_deriv2[1] );
+        CHECK( poly.SecondDerivative(2, x) == Approx(shifted_deriv2[2]).epsilon(floatTol) );
+        CHECK( poly.SecondDerivative(3, x) == Approx(shifted_deriv2[3]).epsilon(floatTol) );
+        CHECK( poly.SecondDerivative(4, x) == Approx(shifted_deriv2[4]).epsilon(floatTol) );
+
+        auto shifted_eval = shifted_legendre_eval(x);
+        auto shifted_deriv = shifted_legendre_deriv(x);
+        poly.EvaluateSecondDerivatives(&allvals[0], &allderivs[0], &allderivs2[0], 4, x);
+        CHECK( allvals[0] == shifted_eval[0] );
+        CHECK( allvals[1] == Approx(shifted_eval[1]).epsilon(floatTol) );
+        CHECK( allvals[2] == Approx(shifted_eval[2]).epsilon(floatTol) );
+        CHECK( allvals[3] == Approx(shifted_eval[3]).epsilon(floatTol) );
+        CHECK( allvals[4] == Approx(shifted_eval[4]).epsilon(floatTol) );
+        CHECK( allderivs[0] == shifted_deriv[0]);
+        CHECK( allderivs[1] == shifted_deriv[1]);
+        CHECK( allderivs[2] == Approx(shifted_deriv[2]).epsilon(floatTol) );
+        CHECK( allderivs[3] == Approx(shifted_deriv[3]).epsilon(floatTol) );
+        CHECK( allderivs[4] == Approx(shifted_deriv[4]).epsilon(floatTol) );
+        CHECK( allderivs2[0] == shifted_deriv2[0]);
+        CHECK( allderivs2[1] == shifted_deriv2[1]);
+        CHECK( allderivs2[2] == Approx(shifted_deriv2[2]).epsilon(floatTol) );
+        CHECK( allderivs2[3] == Approx(shifted_deriv2[3]).epsilon(floatTol) );
+        CHECK( allderivs2[4] == Approx(shifted_deriv2[4]).epsilon(floatTol) );
+    }
+}
 
 #if defined(KOKKOS_ENABLE_CUDA ) || defined(KOKKOS_ENABLE_SYCL)
 

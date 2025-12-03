@@ -1,5 +1,5 @@
-#ifndef ORTHOGONALPOLYNOMIAL_H
-#define ORTHOGONALPOLYNOMIAL_H
+#ifndef MPART_ORTHOGONALPOLYNOMIAL_H
+#define MPART_ORTHOGONALPOLYNOMIAL_H
 
 #include <Kokkos_Core.hpp>
 #include <cmath>
@@ -326,6 +326,21 @@ protected:
 
 typedef OrthogonalPolynomial<PhysicistHermiteMixer> PhysicistHermite;
 
+
+class ShiftedLegendreMixer{ // Polynomials orthogonal on U[0,1]
+public:
+    KOKKOS_INLINE_FUNCTION double Normalization(unsigned int polyOrder) const { return 1./(2*polyOrder+1);}
+protected:
+    // \f[ p_{k}(x) = (a_k x + b_k) p_{k-1}(x) - c_k p_{k-2}(x) \f]
+    KOKKOS_INLINE_FUNCTION double ak(unsigned int k) const {return  2. * (2. * k - 1)/k;}
+    KOKKOS_INLINE_FUNCTION double bk(unsigned int k) const {return -(2. * k - 1)/k;}
+    KOKKOS_INLINE_FUNCTION double ck(unsigned int k) const {return (k-1.)/k;}
+    KOKKOS_INLINE_FUNCTION double phi0(double) const {return 1.0;}
+    KOKKOS_INLINE_FUNCTION double phi1(double x) const {return 2*x-1;}
+    KOKKOS_INLINE_FUNCTION double phi1_deriv(double) const{return 2.0;};
+};
+
+using ShiftedLegendre = OrthogonalPolynomial<ShiftedLegendreMixer>;
 
 } // namespace mpart
 

@@ -130,6 +130,27 @@ public:
     KOKKOS_INLINE_FUNCTION unsigned int InputSize() const {return multiSet_.Length();};
 
     /**
+     @brief Fills cache to evaluate f(0)
+     @details
+     @param polyCache A pointer to the start of the cache.  This memory must be allocated before calling this function.
+     @param derivType
+
+     @see FillCache1, FillCache2
+     */
+    KOKKOS_FUNCTION void FillCache0(double*          polyCache,
+                                    DerivativeFlags::DerivativeType derivType) const
+    {
+        // Only allowed to evaluate, fail if you want derivatives; while possible this is a safety precaution
+        if(derivType == DerivativeFlags::None || derivType == DerivativeFlags::Parameters){
+            for(unsigned int d=0; d<dim_; ++d) {
+                basis1d_.EvaluateAll(d, &polyCache[startPos_(d)], maxDegrees_(d), 0.);
+            }
+        } else {
+            ProcAgnosticError<std::invalid_argument>("Cannot get derivatives for FillCache0");
+        }
+    }
+
+    /**
      @brief Precomputes parts of the cache using all but the last component of the point, i.e., using only \f$x_1,x_2,\ldots,x_{d-1}\f$, not \f$x_d\f$.
      @details
      @tparam PointType The vector type used to define the point.  Can be anything allowing access to components with operator().  Examples are Kokkos::View<double*> or Eigen::VectorXd.  Only the first d-1 components of the vector will be accessed in this function.

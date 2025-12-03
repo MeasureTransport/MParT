@@ -11,10 +11,6 @@
 
 #include <Eigen/Dense>
 
-// TO REMOVE
-#include <iostream>
-#include <chrono>
-
 using namespace mpart;
 using namespace Catch;
 using HostSpace = Kokkos::HostSpace;
@@ -107,8 +103,6 @@ TEST_CASE( "MonotoneIntegrand1d", "[MonotoneIntegrand1d]") {
         }
     }
 }
-
-
 
 TEST_CASE( "MonotoneIntegrand1d With Nugget", "[MonotoneIntegrand1d]") {
 
@@ -355,8 +349,6 @@ TEST_CASE( "MonotoneIntegrand2d", "[MonotoneIntegrand2d]") {
     }
 }
 
-
-
 TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]" ) {
 
     const double testTol = 1e-7;
@@ -438,7 +430,6 @@ TEST_CASE( "Testing monotone component evaluation in 1d", "[MonotoneComponent1d]
 
     }
 }
-
 
 TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBracketInverse]" ) {
 
@@ -555,8 +546,6 @@ TEST_CASE( "Testing bracket-based inversion of monotone component", "[MonotoneBr
         }
     }
 }
-
-
 
 TEST_CASE( "Testing monotone component derivative", "[MonotoneComponentDerivative]" ) {
 

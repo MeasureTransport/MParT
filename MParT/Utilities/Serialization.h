@@ -11,8 +11,10 @@
 
 // A macro that can be used for registering the various MonotoneComponent classes with CEREAL
 // This macro is used in the MapFactoryImpl*.cpp files 
-#define REGISTER_MONO_COMP(BASIS_HOMOGENEITY, BASIS_TYPE, POS_TYPE, QUAD_TYPE, MEMORY_SPACE) \
-    CEREAL_REGISTER_TYPE(mpart::MonotoneComponent<mpart::MultivariateExpansionWorker<mpart::BasisEvaluator<BASIS_HOMOGENEITY, BASIS_TYPE>, MEMORY_SPACE>, mpart::POS_TYPE, mpart::QUAD_TYPE<MEMORY_SPACE>, MEMORY_SPACE>)
+#define REGISTER_HOMOGENEOUS_MONO_COMP(BASIS_TYPE, POS_TYPE, QUAD_TYPE, MEMORY_SPACE, IS_COMPACT) \
+    CEREAL_REGISTER_TYPE(mpart::MonotoneComponent<mpart::MultivariateExpansionWorker<mpart::BasisEvaluator<BasisHomogeneity::Homogeneous, BASIS_TYPE>, MEMORY_SPACE>, mpart::POS_TYPE, mpart::QUAD_TYPE<MEMORY_SPACE>, MEMORY_SPACE, IS_COMPACT>)
+#define REGISTER_OFFDIAGHOMOGENEOUS_MONO_COMP(BASIS_TYPE_1, BASIS_TYPE_2, RECTIFIER, POS_TYPE, QUAD_TYPE, MEMORY_SPACE, IS_COMPACT) \
+    CEREAL_REGISTER_TYPE(mpart::MonotoneComponent<mpart::MultivariateExpansionWorker<mpart::BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous, Kokkos::pair<BASIS_TYPE_1, BASIS_TYPE_2>, RECTIFIER>, MEMORY_SPACE>, mpart::POS_TYPE, mpart::QUAD_TYPE<MEMORY_SPACE>, MEMORY_SPACE, IS_COMPACT>)
 
 
 namespace cereal {

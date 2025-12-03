@@ -234,7 +234,7 @@ class BasisEvaluator<BasisHomogeneity::OffdiagHomogeneous,
    * @param offdiag Evaluator for offdiagonal input elements
    * @param diag Evaluator for diagonal input element
    */
-  BasisEvaluator(unsigned int dim, OffdiagEvaluatorType const &offdiag = OffdiagEvaluatorType(),
+  BasisEvaluator(unsigned int dim = 0, OffdiagEvaluatorType const &offdiag = OffdiagEvaluatorType(),
                  DiagEvaluatorType const &diag = DiagEvaluatorType())
       : offdiag_(offdiag), diag_(diag), dim_(dim) {}
 

@@ -12,7 +12,8 @@ namespace mpart{
     {
         ProbabilistHermite,
         PhysicistHermite,
-        HermiteFunctions
+        HermiteFunctions,
+        Legendre
     };
 
     enum class PosFuncTypes
@@ -76,6 +77,8 @@ namespace mpart{
         double basisLB = -std::numeric_limits<double>::infinity();
         double basisUB =  std::numeric_limits<double>::infinity();
 
+        /** Whether the map should be compactly supported (cannot be linearized, only works with certain other map options */
+        bool isCompact = false;
 
         /** The type of positive bijector used inside the monotonicity-guaranteeing integral
             formulation.
